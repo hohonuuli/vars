@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="1.0"
+             xmlns="http://java.sun.com/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd">
+    <persistence-unit name="vars-eclipselink-production" transaction-type="RESOURCE_LOCAL">
+        <description>VARS Data Model</description>
+        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+        <class>vars.annotation.jpa.VideoArchiveSet</class>
+        <class>vars.annotation.jpa.CameraDeployment</class>
+        <class>vars.annotation.jpa.VideoArchive</class>
+        <class>vars.annotation.jpa.VideoFrame</class>
+        <class>vars.annotation.jpa.PhysicalData</class>
+        <class>vars.annotation.jpa.CameraData</class>
+        <class>vars.annotation.jpa.Observation</class>
+        <class>vars.annotation.jpa.Association</class>
+        <class>vars.knowledgebase.jpa.Concept</class>
+        <class>vars.knowledgebase.jpa.ConceptDelegate</class>
+        <class>vars.knowledgebase.jpa.ConceptName</class>
+        <class>vars.knowledgebase.jpa.History</class>
+        <class>vars.knowledgebase.jpa.LinkRealization</class>
+        <class>vars.knowledgebase.jpa.LinkTemplate</class>
+        <class>vars.knowledgebase.jpa.Media</class>
+        <class>vars.knowledgebase.jpa.SectionInfo</class>
+        <class>vars.knowledgebase.jpa.Usage</class>
+        <properties>
+            <property name="javax.persistence.jdbc.url" value="jdbc:derby://localhost:1527/VARS-JPA;create=true"/>
+            <property name="javax.persistence.jdbc.user" value="varsuser"/>
+            <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
+            <property name="javax.persistence.jdbc.password" value="vars4mbari"/>
+            <property name="eclipselink.jdbc.url" value="jdbc:derby://localhost:1527/VARS-JPA;create=true"/>
+            <property name="eclipselink.jdbc.user" value="varsuser"/>
+            <property name="eclipselink.jdbc.driver" value="org.apache.derby.jdbc.ClientDriver"/>
+            <property name="eclipselink.jdbc.password" value="vars4mbari"/>
+            <property name="eclipselink.logging.level" value="CONFIG"/>
+            <property name="eclipselink.ddl-generation" value="create-tables"/>
+        </properties>
+    </persistence-unit>
+    <persistence-unit name="vars-eclipselink-test" transaction-type="RESOURCE_LOCAL">
+        <description>VARS Data Model</description>
+        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+        <class>vars.annotation.jpa.VideoArchiveSet</class>
+        <class>vars.annotation.jpa.CameraDeployment</class>
+        <class>vars.annotation.jpa.VideoArchive</class>
+        <class>vars.annotation.jpa.VideoFrame</class>
+        <class>vars.annotation.jpa.PhysicalData</class>
+        <class>vars.annotation.jpa.CameraData</class>
+        <class>vars.annotation.jpa.Observation</class>
+        <class>vars.annotation.jpa.Association</class>
+        <class>vars.knowledgebase.jpa.Concept</class>
+        <class>vars.knowledgebase.jpa.ConceptDelegate</class>
+        <class>vars.knowledgebase.jpa.ConceptName</class>
+        <class>vars.knowledgebase.jpa.History</class>
+        <class>vars.knowledgebase.jpa.LinkRealization</class>
+        <class>vars.knowledgebase.jpa.LinkTemplate</class>
+        <class>vars.knowledgebase.jpa.Media</class>
+        <class>vars.knowledgebase.jpa.SectionInfo</class>
+        <class>vars.knowledgebase.jpa.Usage</class>
+        <properties>
+            <property name="eclipselink.jdbc.url" value="jdbc:derby://localhost:1527/VARS-JPA;create=true"/>
+            <property name="eclipselink.jdbc.user" value="varsuser"/>
+            <property name="eclipselink.jdbc.driver" value="org.apache.derby.jdbc.ClientDriver"/>
+            <property name="eclipselink.jdbc.password" value="vars4mbari"/>
+            <property name="eclipselink.logging.level" value="FINE"/>
+            <property name="eclipselink.ddl-generation" value="create-tables"/>
+        </properties>
+    </persistence-unit>
+    <persistence-unit name="vars-hibernate-test">
+        <description>VARS Data Model</description>
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <properties>
+            <!--<property name="hibernate.ejb.cfgfile" value="/hibernate.cfg.xml"/>-->
+            <property name="hibernate.hbm2ddl.auto" value="create"/>
+            <property name="hibernate.archive.autodetection" value="class"/>
+            <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
+            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.connection.driver_class" value="org.apache.derby.jdbc.ClientDriver"/>
+            <property name="hibernate.connection.password" value="vars4mbari"/>
+            <property name="hibernate.connection.url" value="jdbc:derby://localhost:1527/VARS-JPA;create=true"/>
+            <property name="hibernate.connection.username" value="varsuser"/>
+            <property name="hibernate.dialect" value="org.hibernate.dialect.DerbyDialect"/>
+            <property name="hibernate.c3p0.min_size" value="5"/>
+            <property name="hibernate.c3p0.max_size" value="20"/>
+            <property name="hibernate.c3p0.timeout" value="300"/>
+            <property name="hibernate.c3p0.max_statements" value="50"/>
+            <property name="hibernate.c3p0.idle_test_period" value="3000"/>
+        </properties>
+    </persistence-unit>
+    <persistence-unit name="vars-hibernate-production">
+        <description>VARS Data Model</description>
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <properties>
+            <property name="hibernate.archive.autodetection" value="class"/>
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
+            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.connection.driver_class" value="org.apache.derby.jdbc.ClientDriver"/>
+            <property name="hibernate.connection.password" value="vars4mbari"/>
+            <property name="hibernate.connection.url" value="jdbc:derby://localhost:1527/VARS-JPA;create=true"/>
+            <property name="hibernate.connection.username" value="varsuser"/>
+            <property name="hibernate.dialect" value="org.hibernate.dialect.DerbyDialect"/>
+            <property name="hibernate.c3p0.min_size" value="5"/>
+            <property name="hibernate.c3p0.max_size" value="20"/>
+            <property name="hibernate.c3p0.timeout" value="300"/>
+            <property name="hibernate.c3p0.max_statements" value="50"/>
+            <property name="hibernate.c3p0.idle_test_period" value="3000"/>
+        </properties>
+    </persistence-unit>
+    <persistence-unit name="vars-openjpa-test" transaction-type="RESOURCE_LOCAL">
+        <description>VARS Data Model</description>
+        <provider>org.apache.openjpa.persistence.PersistenceProviderImpl</provider>
+        <class>vars.annotation.jpa.VideoArchiveSet</class>
+        <class>vars.annotation.jpa.CameraDeployment</class>
+        <class>vars.annotation.jpa.VideoArchive</class>
+        <class>vars.annotation.jpa.VideoFrame</class>
+        <class>vars.annotation.jpa.PhysicalData</class>
+        <class>vars.annotation.jpa.CameraData</class>
+        <class>vars.annotation.jpa.Observation</class>
+        <class>vars.annotation.jpa.Association</class>
+        <class>vars.knowledgebase.jpa.Concept</class>
+        <class>vars.knowledgebase.jpa.ConceptDelegate</class>
+        <class>vars.knowledgebase.jpa.ConceptName</class>
+        <class>vars.knowledgebase.jpa.History</class>
+        <class>vars.knowledgebase.jpa.LinkRealization</class>
+        <class>vars.knowledgebase.jpa.LinkTemplate</class>
+        <class>vars.knowledgebase.jpa.Media</class>
+        <class>vars.knowledgebase.jpa.SectionInfo</class>
+        <class>vars.knowledgebase.jpa.Usage</class>
+        <properties>
+            <property name="openjpa.ConnectionURL" value="jdbc:derby://localhost:1527/VARS-JPA;create=true"/>
+            <property name="openjpa.ConnectionDriverName" value="org.apache.derby.jdbc.ClientDriver"/>
+            <property name="openjpa.ConnectionUserName" value="varsuser"/>
+            <property name="openjpa.ConnectionPassword" value="vars4mbari"/>
+            <property name="openjpa.Log" value="DefaultLevel=INFO, Tool=INFO"/>
+            <property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema"/>
+        </properties>
+    </persistence-unit>
+</persistence>
