@@ -42,7 +42,7 @@ import vars.knowledgebase.IConceptName;
     @NamedQuery(name = "ConceptName.findById",
                 query = "SELECT v FROM ConceptName v WHERE v.id = :id"),
     @NamedQuery(name = "ConceptName.findByConceptName",
-                query = "SELECT c FROM ConceptName c WHERE c.conceptName = :conceptName"),
+                query = "SELECT c FROM ConceptName c WHERE c.name = :name"),
     @NamedQuery(name = "ConceptName.findByAuthor", query = "SELECT c FROM ConceptName c WHERE c.author = :author"),
     @NamedQuery(name = "ConceptName.findByNameType",
                 query = "SELECT c FROM ConceptName c WHERE c.nameType = :nameType")

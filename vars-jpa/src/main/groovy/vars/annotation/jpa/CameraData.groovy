@@ -27,7 +27,7 @@ import vars.annotation.IVideoFrame
                 query = "SELECT v FROM CameraData v WHERE v.name = :name"),
     @NamedQuery(name = "CameraData.findByDirection",
                 query = "SELECT c FROM CameraData c WHERE c.direction = :direction"),  
-    @NamedQuery(name = "CameraData.findByStillImage", query = "SELECT c FROM CameraData c WHERE c.stillImage = :stillImage")      
+    @NamedQuery(name = "CameraData.findByFrameGrabURL", query = "SELECT c FROM CameraData c WHERE c.frameGrabURL = :frameGrabURL")      
 ])
 class CameraData implements Serializable, ICameraData {
 

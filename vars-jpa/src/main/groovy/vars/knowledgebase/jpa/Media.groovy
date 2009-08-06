@@ -29,7 +29,7 @@ import vars.knowledgebase.IMedia;
     @NamedQuery(name = "Media.findById",
                 query = "SELECT v FROM Media v WHERE v.id = :id"),
     @NamedQuery(name = "Media.findByUrl", query = "SELECT m FROM Media m WHERE m.url = :url") ,
-    @NamedQuery(name = "Media.findByMediaType", query = "SELECT m FROM Media m WHERE m.mediaType = :mediaType") ,
+    @NamedQuery(name = "Media.findByType", query = "SELECT m FROM Media m WHERE m.type = :type") ,
     @NamedQuery(name = "Media.findByPrimaryMedia",
                 query = "SELECT m FROM Media m WHERE m.primaryMedia = :primaryMedia") ,
     @NamedQuery(name = "Media.findByCredit", query = "SELECT m FROM Media m WHERE m.credit = :credit") ,

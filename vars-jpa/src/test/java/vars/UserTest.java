@@ -29,7 +29,7 @@ import org.hibernate.ejb.HibernateEntityManager;
  */
 public class UserTest extends TestCase {
 
-    private EntityManagerFactory emf = Persistence.createEntityManagerFactory("vars-jpa-test");
+    private EntityManagerFactory emf = Persistence.createEntityManagerFactory("user-test");
 
     public void setUp() throws Exception {
         InputStream testData = User.class.getResourceAsStream("/user.db.xml");
