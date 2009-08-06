@@ -15,7 +15,8 @@ import javax.persistence.ManyToOne
 import javax.persistence.JoinColumn
 import groovy.beans.Bindable
 import vars.knowledgebase.IConcept
-import vars.knowledgebase.IConceptName;
+import vars.knowledgebase.IConceptName
+import vars.jpa.JPAEntity;
 
 /**
  * <pre>
@@ -47,7 +48,7 @@ import vars.knowledgebase.IConceptName;
     @NamedQuery(name = "ConceptName.findByNameType",
                 query = "SELECT c FROM ConceptName c WHERE c.nameType = :nameType")
 ])
-public class ConceptName implements Serializable, IConceptName {
+public class ConceptName implements Serializable, IConceptName, JPAEntity {
 
     @Id
     @Column(name = "id", nullable = false, updatable=false)

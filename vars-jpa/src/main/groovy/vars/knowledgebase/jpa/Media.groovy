@@ -14,7 +14,8 @@ import javax.persistence.GenerationType
 import javax.persistence.ManyToOne
 import javax.persistence.JoinColumn
 import vars.knowledgebase.IConceptDelegate
-import vars.knowledgebase.IMedia;
+import vars.knowledgebase.IMedia
+import vars.jpa.JPAEntity;
 
 /**
  * Created by IntelliJ IDEA.
@@ -35,7 +36,7 @@ import vars.knowledgebase.IMedia;
     @NamedQuery(name = "Media.findByCredit", query = "SELECT m FROM Media m WHERE m.credit = :credit") ,
     @NamedQuery(name = "Media.findByCaption", query = "SELECT m FROM Media m WHERE m.caption = :caption")
 ])
-public class Media implements Serializable, IMedia {
+public class Media implements Serializable, IMedia, JPAEntity {
 
     @Id
     @Column(name = "id", nullable = false, updatable=false)

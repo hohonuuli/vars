@@ -21,6 +21,7 @@ import vars.knowledgebase.IConceptName
 import vars.knowledgebase.IConcept
 import vars.knowledgebase.IConceptDelegate
 import vars.knowledgebase.ConceptNameTypes
+import vars.jpa.JPAEntity
 
 /**
  *
@@ -66,7 +67,7 @@ import vars.knowledgebase.ConceptNameTypes
     @NamedQuery(name = "Concept.findByTaxonomyType",
                 query = "SELECT c FROM Concept c WHERE c.taxonomyType = :taxonomyType")
 ])
-class Concept implements Serializable, IConcept {
+class Concept implements Serializable, IConcept, JPAEntity {
 
     @Id
     @Column(name = "id", nullable = false, updatable=false)

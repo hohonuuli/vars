@@ -9,21 +9,21 @@ package vars.services;
  * Thrown when something bad happens in the DataPersistenceService
  * @author brian
  */
-public class DataPersistenceException extends VARSException {
+public class VARSPersistenceException extends VARSException {
 
-    public DataPersistenceException(Throwable throwable) {
+    public VARSPersistenceException(Throwable throwable) {
         super(throwable);
     }
 
-    public DataPersistenceException(String s, Throwable throwable) {
+    public VARSPersistenceException(String s, Throwable throwable) {
         super(s, throwable);
     }
 
-    public DataPersistenceException(String s) {
+    public VARSPersistenceException(String s) {
         super(s);
     }
 
-    public DataPersistenceException() {
+    public VARSPersistenceException() {
     }
 
 }

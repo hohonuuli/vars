@@ -23,6 +23,7 @@ import javax.persistence.TableGenerator
 import vars.annotation.IVideoArchiveSet
 import vars.annotation.IVideoArchive
 import vars.annotation.IVideoFrame
+import vars.jpa.JPAEntity
 
 @Entity(name = "VideoArchive")
 @Table(name = "VideoArchive")
@@ -32,7 +33,7 @@ import vars.annotation.IVideoFrame
     @NamedQuery(name = "VideoArchive.findByName",
                 query = "SELECT v FROM VideoArchive v WHERE v.name = :name")
 ])
-class VideoArchive implements Serializable, IVideoArchive {
+class VideoArchive implements Serializable, IVideoArchive, JPAEntity {
 
     @Id
     @Column(name = "id", nullable = false, updatable = false)

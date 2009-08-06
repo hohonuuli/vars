@@ -22,6 +22,7 @@ import javax.persistence.TableGenerator
 import vars.annotation.IObservation
 import vars.annotation.IAssociation
 import vars.annotation.IVideoFrame
+import vars.jpa.JPAEntity
 
 @Entity(name = "Observation")
 @Table(name = "Observation")
@@ -36,7 +37,7 @@ import vars.annotation.IVideoFrame
     @NamedQuery(name = "Observation.findByObserver",
                 query = "SELECT o FROM Observation o WHERE o.observer = :observer")
 ])
-class Observation implements Serializable, IObservation {
+class Observation implements Serializable, IObservation, JPAEntity {
 
     @Id
     @Column(name = "id", nullable = false, updatable = false)

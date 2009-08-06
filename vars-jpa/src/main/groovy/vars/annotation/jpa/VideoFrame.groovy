@@ -24,6 +24,7 @@ import vars.annotation.IObservation
 import vars.annotation.ICameraData
 import vars.annotation.IPhysicalData
 import vars.annotation.IVideoArchive
+import vars.jpa.JPAEntity
 
 @Entity(name = "VideoFrame")
 @Table(name = "VideoFrame")
@@ -33,7 +34,7 @@ import vars.annotation.IVideoArchive
     @NamedQuery(name = "VideoFrame.findByName",
                 query = "SELECT v FROM VideoFrame v WHERE v.recordedDate = :recordedDate")
 ])
-class VideoFrame implements Serializable, IVideoFrame {
+class VideoFrame implements Serializable, IVideoFrame, JPAEntity {
 
     @Id
     @Column(name = "id", nullable = false, updatable = false)

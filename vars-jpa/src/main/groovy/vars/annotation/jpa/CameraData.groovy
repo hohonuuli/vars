@@ -17,6 +17,7 @@ import java.sql.Timestamp
 import javax.persistence.TableGenerator
 import vars.annotation.ICameraData
 import vars.annotation.IVideoFrame
+import vars.jpa.JPAEntity
 
 @Entity(name = "CameraData")
 @Table(name = "CameraData")
@@ -29,7 +30,7 @@ import vars.annotation.IVideoFrame
                 query = "SELECT c FROM CameraData c WHERE c.direction = :direction"),  
     @NamedQuery(name = "CameraData.findByFrameGrabURL", query = "SELECT c FROM CameraData c WHERE c.frameGrabURL = :frameGrabURL")      
 ])
-class CameraData implements Serializable, ICameraData {
+class CameraData implements Serializable, ICameraData, JPAEntity {
 
     @Id
     @Column(name = "id", nullable = false, updatable = false)

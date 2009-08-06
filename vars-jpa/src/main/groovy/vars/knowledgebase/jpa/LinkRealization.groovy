@@ -16,7 +16,8 @@ import javax.persistence.JoinColumn
 import vars.ILink
 import vars.LinkCategory
 import vars.knowledgebase.IConceptDelegate
-import vars.knowledgebase.ILinkRealization;
+import vars.knowledgebase.ILinkRealization
+import vars.jpa.JPAEntity;
 
 /**
  * <pre>
@@ -47,7 +48,7 @@ import vars.knowledgebase.ILinkRealization;
     @NamedQuery(name = "LinkRealization.findByLinkValue",
                 query = "SELECT l FROM LinkRealization l WHERE l.linkValue = :linkValue")
 ])
-class LinkRealization implements Serializable, ILinkRealization {
+class LinkRealization implements Serializable, ILinkRealization, JPAEntity {
 
     @Id
     @Column(name = "id", nullable = false, updatable=false)

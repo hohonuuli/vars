@@ -16,7 +16,8 @@ import javax.persistence.TemporalType
 import javax.persistence.ManyToOne
 import javax.persistence.JoinColumn
 import vars.knowledgebase.IConceptDelegate
-import vars.knowledgebase.IHistory;
+import vars.knowledgebase.IHistory
+import vars.jpa.JPAEntity;
 
 /**
  * CREATE TABLE HISTORY (
@@ -61,7 +62,7 @@ import vars.knowledgebase.IHistory;
     @NamedQuery(name = "History.findByComment", query = "SELECT h FROM History h WHERE h.comment = :comment") ,
     @NamedQuery(name = "History.findByRejected", query = "SELECT h FROM History h WHERE h.rejected = :rejected")
 ])
-class History implements Serializable, IHistory {
+class History implements Serializable, IHistory, JPAEntity {
 
     @Id
     @Column(name = "id", nullable = false, updatable=false)

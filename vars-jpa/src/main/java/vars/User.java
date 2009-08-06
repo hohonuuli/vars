@@ -7,21 +7,15 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Transient;
 
 @Entity
-public class User
-{
-    @Transient
-    @PersistenceContext(unitName = "vars-jpa")
-    private static EntityManager entityManager;
+public class User {
+
 
     @Id
     private long id;
 
     private String name;
 
-    public static User find(long id)
-    {
-        return entityManager.find(User.class, new Long(id));
-    }
+
 
     public long getId()
     {
@@ -43,13 +37,4 @@ public class User
         this.name = name;
     }
 
-    public static EntityManager getEntityManager()
-    {
-        return entityManager;
-    }
-
-    public static void setEntityManager(EntityManager entityManager)
-    {
-        User.entityManager = entityManager;
-    }
 }

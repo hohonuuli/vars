@@ -13,19 +13,19 @@ package vars.services;
  *
  * @author brian
  */
-public interface DataPersistenceService {
+public interface VARSPersistenceService {
 
     /**
      * TODO: Add JavaDoc
      *
      * @param object
      */
-    public void makePersistent(Object object);
+    public <T> T makePersistent(T object);
 
     /**
      * TODO: Add JavaDoc
      *
      * @param object
      */
-    public void makeTransient(Object object);
+    public <T> T makeTransient(T object);
 }

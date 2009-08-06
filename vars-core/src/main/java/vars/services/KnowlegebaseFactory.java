@@ -1,11 +1,5 @@
 package vars.services;
 
-import vars.annotation.IAssociation;
-import vars.annotation.IObservation;
-import vars.annotation.IVideoFrame;
-import vars.annotation.IVideoArchive;
-import vars.annotation.IVideoArchiveSet;
-import vars.IUserAccount;
 import vars.knowledgebase.IConcept;
 import vars.knowledgebase.IConceptDelegate;
 import vars.knowledgebase.IConceptName;
@@ -17,27 +11,17 @@ import vars.knowledgebase.ISectionInfo;
 import vars.knowledgebase.IUsage;
 
 /**
- * Interface for creating new classes
+ * Created by IntelliJ IDEA.
+ * User: brian
+ * Date: Aug 6, 2009
+ * Time: 2:50:58 PM
+ * To change this template use File | Settings | File Templates.
  */
-public interface DataCreationService {
-
-    /* --- Annotation --- */
-
-    IAssociation newAssociation();
-
-    IObservation newObservation();
-
-    IVideoFrame newVideoFrame();
-
-    IVideoArchive newVideoArchive();
-
-    IVideoArchiveSet newVideoArchiveSet();
+public interface KnowlegebaseFactory {
 
     /* --- Knowledgebase --- */
 
     IConcept newConcept();
-
-    IConceptDelegate newConceptDelegate();
 
     IConceptName newConceptName();
 
@@ -52,10 +36,4 @@ public interface DataCreationService {
     ISectionInfo newSectionInfo();
 
     IUsage newUsage();
-
-    /* --- Misc --- */
-
-    IUserAccount newUserAccount();
-
-
 }

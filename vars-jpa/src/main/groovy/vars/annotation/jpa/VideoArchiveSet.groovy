@@ -21,6 +21,7 @@ import vars.annotation.IVideoArchiveSet
 import vars.annotation.ICameraDeployment
 import vars.annotation.IVideoArchive
 import vars.annotation.IVideoFrame
+import vars.jpa.JPAEntity
 
 @Entity(name = "VideoArchiveSet")
 @Table(name = "VideoArchiveSet")
@@ -38,7 +39,7 @@ import vars.annotation.IVideoFrame
     @NamedQuery(name = "VideoArchiveSet.findByEndDate",
                 query = "SELECT v FROM VideoArchiveSet v WHERE v.endDate = :endDate")
 ])
-class VideoArchiveSet implements Serializable, IVideoArchiveSet {
+class VideoArchiveSet implements Serializable, IVideoArchiveSet, JPAEntity {
 
     @Id 
     @Column(name = "id", nullable = false, updatable = false)

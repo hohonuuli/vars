@@ -17,7 +17,8 @@ import javax.persistence.ManyToOne
 import javax.persistence.JoinColumn
 import javax.persistence.OneToOne
 import vars.knowledgebase.IConceptDelegate
-import vars.knowledgebase.IUsage;
+import vars.knowledgebase.IUsage
+import vars.jpa.JPAEntity;
 
 /**
  * CREATE TABLE USAGE (
@@ -42,7 +43,7 @@ import vars.knowledgebase.IUsage;
     @NamedQuery(name = "Usage.findBySpecification",
                 query = "SELECT u FROM Usage u WHERE u.specification = :specification")
 ])
-class Usage implements Serializable, IUsage {
+class Usage implements Serializable, IUsage, JPAEntity {
 
     @Id
     @Column(name = "id", nullable = false, updatable=false)

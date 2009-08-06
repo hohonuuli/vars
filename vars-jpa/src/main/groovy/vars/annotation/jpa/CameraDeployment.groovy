@@ -17,6 +17,7 @@ import java.sql.Timestamp
 import javax.persistence.TableGenerator
 import vars.annotation.ICameraDeployment
 import vars.annotation.IVideoArchiveSet
+import vars.jpa.JPAEntity
 
 @Entity(name = "CameraDeployment")
 @Table(name = "CameraPlatformDeployment")
@@ -32,7 +33,7 @@ import vars.annotation.IVideoArchiveSet
     @NamedQuery(name = "CameraDeployment.findByEndDate",
                 query = "SELECT v FROM CameraDeployment v WHERE v.endDate = :endDate")
 ])
-class CameraDeployment implements Serializable, ICameraDeployment {
+class CameraDeployment implements Serializable, ICameraDeployment, JPAEntity {
 
     @Id
     @Column(name = "id", nullable = false, updatable = false)

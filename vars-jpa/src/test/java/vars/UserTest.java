@@ -17,8 +17,11 @@ package vars;
 import java.io.InputStream;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.EntityManager;
+
 import junit.framework.TestCase;
 import org.hibernate.ejb.HibernateEntityManager;
+import org.mbari.jpax.EAO;
 
 /**
  * Class description
@@ -42,12 +45,31 @@ public class UserTest extends TestCase {
     }
 
     public void testFindAll() {
-        User.setEntityManager(emf.createEntityManager());
+        EntityManager em = emf.createEntityManager();
 
-        User user = User.find(1);
+        User user = em.find(User.class, new Long(1));
 
         assertNotNull(user);
         assertEquals(1, user.getId());
         assertEquals("John Doe", user.getName());
+        em.close();
+    }
+
+    public void testFindAll2() {
+        EAO eao = new EAO(emf);
+        Long key = 1L;
+        User user = eao.find(User.class, key);
+
+        assertNotNull(user);
+        assertEquals(1L, user.getId());
+        assertEquals("John Doe", user.getName());
+
+        // Repeat for grins
+        user = eao.find(User.class, key);
+
+        assertNotNull(user);
+        assertEquals(1L, user.getId());
+        assertEquals("John Doe", user.getName());
+
     }
 }

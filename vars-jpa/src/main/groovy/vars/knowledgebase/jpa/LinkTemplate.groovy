@@ -16,7 +16,8 @@ import javax.persistence.JoinColumn
 import vars.ILink
 import vars.LinkCategory
 import vars.knowledgebase.IConceptDelegate
-import vars.knowledgebase.ILinkTemplate;
+import vars.knowledgebase.ILinkTemplate
+import vars.jpa.JPAEntity;
 
 /**
  * Created by IntelliJ IDEA.
@@ -37,7 +38,7 @@ import vars.knowledgebase.ILinkTemplate;
     @NamedQuery(name = "LinkTemplate.findByLinkValue",
                 query = "SELECT l FROM LinkTemplate l WHERE l.linkValue = :linkValue")
 ])
-class LinkTemplate implements Serializable, ILinkTemplate {
+class LinkTemplate implements Serializable, ILinkTemplate, JPAEntity {
 
     @Id
     @Column(name = "id", nullable = false, updatable=false)

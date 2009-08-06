@@ -17,6 +17,7 @@ import javax.persistence.TableGenerator
 import vars.LinkCategory
 import vars.annotation.IAssociation
 import vars.annotation.IObservation
+import vars.jpa.JPAEntity
 
 
 @Entity(name = "Association")
@@ -31,7 +32,7 @@ import vars.annotation.IObservation
     @NamedQuery(name = "Association.findByLinkValue",
                 query = "SELECT a FROM Association a WHERE a.linkValue = :linkValue")
 ])
-class Association implements Serializable, IAssociation {
+class Association implements Serializable, IAssociation, JPAEntity {
 
     @Id
     @Column(name = "id", nullable = false, updatable=false)

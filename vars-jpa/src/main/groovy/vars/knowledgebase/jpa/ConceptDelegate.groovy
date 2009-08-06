@@ -23,7 +23,8 @@ import vars.knowledgebase.IMedia
 import vars.knowledgebase.ILinkTemplate
 import vars.knowledgebase.ILinkRealization
 import vars.knowledgebase.IConcept
-import vars.knowledgebase.IConceptDelegate;
+import vars.knowledgebase.IConceptDelegate
+import vars.jpa.JPAEntity;
 
 /**
  * <pre>
@@ -48,7 +49,7 @@ import vars.knowledgebase.IConceptDelegate;
     @NamedQuery(name = "ConceptDelegate.findById",
                 query = "SELECT v FROM ConceptDelegate v WHERE v.id = :id")
 ])
-class ConceptDelegate implements Serializable, IConceptDelegate {
+class ConceptDelegate implements Serializable, IConceptDelegate, JPAEntity {
 
     @Id
     @Column(name = "id", nullable = false, updatable=false)
