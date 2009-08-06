@@ -25,7 +25,7 @@ package vars.knowledgebase;
  * @author  <a href="http://www.mbari.org">MBARI</a>
  * @version  $Id: IConceptName.java 332 2006-08-01 18:38:46Z hohonuuli $
  */
-public interface IConceptName {
+public interface IConceptName extends IKnowledgebaseObject {
 
     /**
      *  Used when the author of a conceptname is unknown

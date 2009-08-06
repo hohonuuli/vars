@@ -26,7 +26,7 @@ import java.util.Date;
  *
  * @author brian
  */
-public interface IPhysicalData {
+public interface IPhysicalData extends IAnnotationObject {
 
     String PROP_DEPTH = "depth";
     String PROP_LATITUDE = "latitude";

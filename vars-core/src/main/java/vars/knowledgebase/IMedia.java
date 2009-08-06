@@ -24,7 +24,7 @@ package vars.knowledgebase;
  *
  * @author brian
  */
-public interface IMedia {
+public interface IMedia extends IKnowledgebaseObject {
 
     String TYPE_ICON = "Icon";
     String TYPE_IMAGE = "Image";

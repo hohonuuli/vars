@@ -29,7 +29,7 @@ import java.util.Set;
  *
  * @author brian
  */
-public interface IVideoArchiveSet {
+public interface IVideoArchiveSet extends IAnnotationObject {
 
     String PROP_END_DATE = "endDate";
     String PROP_FORMAT_CODE = "formatCode";

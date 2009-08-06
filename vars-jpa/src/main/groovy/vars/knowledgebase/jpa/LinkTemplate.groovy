@@ -71,7 +71,7 @@ class LinkTemplate implements Serializable, ILinkTemplate {
 
     String stringValue() {
         use (LinkCategory) {
-            return stringValue()
+            return formatLinkAsString()
         }
     }
 }

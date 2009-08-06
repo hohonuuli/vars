@@ -29,7 +29,7 @@ import java.util.Set;
  *
  * @author brian
  */
-public interface IObservation {
+public interface IObservation extends IAnnotationObject {
     
     String PROP_CONCEPT_NAME = "conceptName";
     String PROP_OBSERVATION_DATE = "observationDate";

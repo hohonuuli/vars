@@ -207,7 +207,7 @@ class Concept implements Serializable, IConcept {
         return parentConcept != null
     }
 
-
-
-
+    public void loadLazyRelations() {
+        // TODO implement this method.
+    }
 }

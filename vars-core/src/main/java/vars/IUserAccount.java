@@ -24,7 +24,7 @@ package vars;
  *
  * @author brian
  */
-public interface IUserAccount extends Comparable {
+public interface IUserAccount extends IVARSObject {
 
     /**
      * Description of the Field

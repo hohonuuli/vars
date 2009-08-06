@@ -10,7 +10,7 @@ package vars
 @Category(ILink)
 class LinkCategory {
 
-    static String stringValue(ILink link) {
+    static String formatLinkAsString(ILink link) {
         return "${link.linkName} | ${link.linkValue} | ${link.toConcept}"
     }
 

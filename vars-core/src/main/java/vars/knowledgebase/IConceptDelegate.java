@@ -27,7 +27,7 @@ import java.util.List;
  *
  * @author brian
  */
-public interface IConceptDelegate {
+public interface IConceptDelegate extends IKnowledgebaseObject {
 
     String PROP_CONCEPT = "concept";
     String PROP_USAGE = "usage";

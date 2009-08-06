@@ -24,5 +24,17 @@ public enum ConceptTypes {
 //     */
 //    String TAXONOMY = "taxonomy";
 
-    LITHOLOGY, TAXONOMY;
+    LITHOLOGY("lithology"), TAXONOMY("taxonomy"), UNSPECIFIED("unspecified");
+
+    private final String name;
+
+    ConceptTypes(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+
 }

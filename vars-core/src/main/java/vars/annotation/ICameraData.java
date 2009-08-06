@@ -26,7 +26,7 @@ import java.util.Date;
  *
  * @author brian
  */
-public interface ICameraData {
+public interface ICameraData extends IAnnotationObject {
 
     String PROP_DIRECTION = "direction";
     String PROP_FIELD_WIDTH = "fieldWidth";

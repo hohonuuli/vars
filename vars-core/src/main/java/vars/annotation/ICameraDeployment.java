@@ -26,7 +26,7 @@ import java.util.Date;
  *
  * @author brian
  */
-public interface ICameraDeployment {
+public interface ICameraDeployment extends IAnnotationObject {
 
     String PROP_CHIEF_SCIENTIST_NAME = "chiefScientistName";
     String PROP_SEQUENCE_NUMBER = "sequenceNumber";

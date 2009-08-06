@@ -21,6 +21,8 @@ import java.sql.Timestamp
 import javax.persistence.OrderBy
 import javax.persistence.TableGenerator
 import vars.annotation.IVideoArchiveSet
+import vars.annotation.IVideoArchive
+import vars.annotation.IVideoFrame
 
 @Entity(name = "VideoArchive")
 @Table(name = "VideoArchive")
@@ -30,7 +32,7 @@ import vars.annotation.IVideoArchiveSet
     @NamedQuery(name = "VideoArchive.findByName",
                 query = "SELECT v FROM VideoArchive v WHERE v.name = :name")
 ])
-class VideoArchive implements Serializable {
+class VideoArchive implements Serializable, IVideoArchive {
 
     @Id
     @Column(name = "id", nullable = false, updatable = false)
@@ -52,10 +54,6 @@ class VideoArchive implements Serializable {
     @Column(name = "VideoArchiveName", nullable = false, unique = true, length = 512)
     String name
 
-    @Column(name = "TapeNumber")
-    @Deprecated
-    Short tapeNumber
-
     @Column(name = "StartTimeCode", length = 11)
     @Deprecated
     String startTimecode
@@ -67,9 +65,9 @@ class VideoArchive implements Serializable {
     @OrderBy(value = "recordedDate")
     List<VideoFrame> videoFrames
 
-    List<VideoFrame> getVideoFrames() {
+    Set<VideoFrame> getVideoFrames() {
         if (videoFrames == null) {
-            videoFrames = new ArrayList<VideoFrame>()
+            videoFrames = new HashSet<VideoFrame>()
         }
         return videoFrames
     }
@@ -87,5 +85,33 @@ class VideoArchive implements Serializable {
             videoFrame.videoArchive = null
         }
     }
-    
+
+    public void addVideoFrame(IVideoFrame videoFrame) {
+        if (videoFrames.add(videoFrame)) {
+            videoFrame.videoArchive = this
+        }
+    }
+
+    public IVideoFrame findVideoFrameByTimeCode(String timecode) {
+        return videoFrames.find { it.timecode == timecode }
+    }
+
+    public Collection<? extends IVideoFrame> getEmptyVideoFrames() {
+        return videoFrames.findAll { IVideoFrame vf ->
+            def observations = vf.observations
+            return (observations?.size() > 0)
+        }
+    }
+
+    public void removeVideoFrame(IVideoFrame videoFrame) {
+        if (videoFrames.remove(videoFrame)) {
+            videoFrame.videoArchive = null
+        }
+    }
+
+    public void loadLazyRelations() {
+        // TODO implement this method.
+    }
+
+
 }

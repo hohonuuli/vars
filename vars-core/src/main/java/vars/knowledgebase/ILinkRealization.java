@@ -26,6 +26,6 @@ import java.util.Set;
  *
  * @author brian
  */
-public interface ILinkRealization extends ILinkTemplate {
+public interface ILinkRealization extends IKnowledgebaseObject, ILinkTemplate {
 
 }

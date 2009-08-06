@@ -27,7 +27,7 @@ import vars.IUserAccount;
  *
  * @author brian
  */
-public interface IHistory {
+public interface IHistory extends IKnowledgebaseObject {
 
     String PROP_ACTION = "action";
     String PROP_APPROVAL_DATE = "approvalDate";
@@ -145,11 +145,6 @@ public interface IHistory {
     String getOldValue();
 
     /**
-     * @return
-     */
-    boolean getRejected();
-
-    /**
      * Determines whether the action of this <code>History</code> is an add.
      *
      * @return <code>true</code> if the action of this <code>History</code>
@@ -181,7 +176,7 @@ public interface IHistory {
      *
      * @return <code>true</code> if this <code>History</code> was rejected.
      */
-    boolean isRejected();
+    Boolean isRejected();
 
     /**
      * Determines whether the action of this <code>History</code> is a
@@ -196,7 +191,6 @@ public interface IHistory {
     /**
      * Method description
      * @param  action
-     * @uml.property  name="action"
      */
     void setAction(String action);
 
@@ -204,20 +198,17 @@ public interface IHistory {
      * Sets the approval Date this <code>History</code>. DO NOT CALL THIS DIRECTLY! USE <code>approve()</code> INSTEAD.
      * @param approvalDate  The approval Data of this <code>History</code>.
      * @thows  IllegalArgumentException If the approval Date is <code>null</code>.
-     * @uml.property  name="approvalDate"
      */
     void setApprovalDate(Date approvalDate);
 
     /**
      * @param approverName  the approverName to set
-     * @uml.property  name="approverName"
      */
     void setApproverName(String approverName);
 
     /**
      * Method description
      * @param  comment
-     * @uml.property  name="comment"
      */
     void setComment(String comment);
 
@@ -244,23 +235,20 @@ public interface IHistory {
     /**
      * Method description
      * @param  newValue
-     * @uml.property  name="newValue"
      */
     void setNewValue(String newValue);
 
     /**
      * Method description
      * @param  oldValue
-     * @uml.property  name="oldValue"
      */
     void setOldValue(String oldValue);
 
     /**
      * Method description
      * @param  rejected
-     * @uml.property  name="rejected"
      */
-    void setRejected(boolean rejected);
+    void setRejected(Boolean rejected);
 
     String stringValue();
 }

@@ -9,22 +9,32 @@ package vars.annotation;
  */
 public enum FormatCodes {
 
-       /**
+    /**
      * VideoArchiveSet represents Tapes annotated in Detailed mode only.
      */
-//    char FORMAT_CODE_DETAILED = 'd';
-//
-//    /**
-//     * VideoArchiveSet represents Tapes annotated in Detailed mode and outline mode.
-//     * @deprecated: 20040907 brian: THis code is no longer used. At the request of the video lab.
-//     *
-//     */
-//    char FORMAT_CODE_MIXED = 'm';
-//
-//    /**
-//     * VideoArchiveSet represents Tapes annotated in Outline mode only.
-//     */
-//    char FORMAT_CODE_OUTLINE = 'o';
+    DETAILED('d'),
 
-    DETAILED, MIXED, OUTLINE;
+    /**
+     * VideoArchiveSet represents Tapes annotated in Detailed mode and outline mode.
+     * @deprecated: 20040907 brian: THis code is no longer used. At the request of the video lab.
+     *
+     */
+    MIXED('m'),
+
+    /**
+     * VideoArchiveSet represents Tapes annotated in Outline mode only.
+     */
+    OUTLINE('o'),
+
+    UNKNOWN('u');
+
+    private char code;
+
+    FormatCodes(char code) {
+        this.code = code;
+    }
+
+    public char getCode() {
+        return code;
+    }
 }

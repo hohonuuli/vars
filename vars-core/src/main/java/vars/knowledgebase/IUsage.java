@@ -26,7 +26,7 @@ import java.util.Date;
  *
  * @author brian
  */
-public interface IUsage {
+public interface IUsage extends IKnowledgebaseObject {
 
     String PROP_EMBARGO_EXPIRATION_DATE = "embargoExpirationDate";
     String PROP_SPECIFICATION = "specification";

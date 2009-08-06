@@ -26,7 +26,7 @@ import vars.ILink;
  *
  * @author brian
  */
-public interface ILinkTemplate extends ILink {
+public interface ILinkTemplate extends IKnowledgebaseObject, ILink {
 
     /**
      * <p><!-- Method description --></p>

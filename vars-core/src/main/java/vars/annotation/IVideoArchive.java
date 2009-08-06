@@ -20,13 +20,17 @@
 
 package vars.annotation;
 
+import vars.ILazy;
+
 import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 /**
  *
  * @author brian
  */
-public interface IVideoArchive {
+public interface IVideoArchive extends IAnnotationObject, ILazy {
 
     String PROP_START_TIME_CODE = "startTimecode";
     String PROP_VIDEO_ARCHIVE_NAME = "videoArchiveName";
@@ -70,7 +74,7 @@ public interface IVideoArchive {
      * @return  The integer tape number.
      * @uml.property  name="videoArchiveName"
      */
-    String getVideoArchiveName();
+    String getName();
 
     /**
      * @return
@@ -81,7 +85,7 @@ public interface IVideoArchive {
      * Retrieve the videoframe collection. Note: This can result in a database access if the VideoArchive has been persisted and retrieved from the database. Do not add or remove items directly from this collections.
      * @return  A synchronized collection.
      */
-    Collection<? extends IVideoFrame> getVideoFrames();
+    Set<? extends IVideoFrame> getVideoFrames();
 
 
     void removeVideoFrame(final IVideoFrame videoFrame);
@@ -101,7 +105,7 @@ public interface IVideoArchive {
      * @param videoArchiveName  An Integer tape number for this <code>VideoArchive</code>.
      * @uml.property  name="videoArchiveName"
      */
-    void setVideoArchiveName(final String videoArchiveName);
+    void setName(final String videoArchiveName);
 
 
 }

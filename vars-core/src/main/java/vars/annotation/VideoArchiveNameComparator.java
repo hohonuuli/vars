@@ -14,7 +14,7 @@ import java.util.Comparator;
 public class VideoArchiveNameComparator implements Comparator<IVideoArchive> {
 
     public int compare(IVideoArchive o1, IVideoArchive o2) {
-        return o1.getVideoArchiveName().compareTo(o2.getVideoArchiveName());
+        return o1.getName().compareTo(o2.getName());
     }
 
 }

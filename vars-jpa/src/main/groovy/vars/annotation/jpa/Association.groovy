@@ -69,7 +69,7 @@ class Association implements Serializable, IAssociation {
 
     String stringValue() {
         use (LinkCategory) {
-            return stringValue()
+            return formatLinkAsString()
         }
     }
 

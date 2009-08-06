@@ -24,7 +24,7 @@ package vars.knowledgebase;
  *
  * @author brian
  */
-public interface ISectionInfo {
+public interface ISectionInfo extends IKnowledgebaseObject {
 
     String PROP_HEADER = "header";
     String PROP_INFORMATION = "information";

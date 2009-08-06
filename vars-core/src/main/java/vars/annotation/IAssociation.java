@@ -28,7 +28,7 @@ import vars.ILink;
  *
  * @author brian
  */
-public interface IAssociation extends ILink {
+public interface IAssociation extends IAnnotationObject, ILink {
 
     String PROP_OBSERVATION = "observation";
 

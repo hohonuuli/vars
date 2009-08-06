@@ -9,9 +9,15 @@ package vars.knowledgebase;
  */
 public enum MediaTypes {
 
-//    String TYPE_ICON = "Icon";
-//    String TYPE_IMAGE = "Image";
-//    String TYPE_VIDEO = "Video";
+    ICON("Icon"), IMAGE("Image"), VIDEO("Video");
 
-    ICON, IMAGE, VIDEO
+    private String type;
+
+    MediaTypes(String type) {
+        this.type = type;
+    }
+
+    public String getType() {
+        return type;
+    }
 }

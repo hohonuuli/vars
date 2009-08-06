@@ -20,6 +20,8 @@
 
 package vars.knowledgebase;
 
+import vars.ILazy;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -28,7 +30,7 @@ import java.util.Set;
  *
  * @author brian
  */
-public interface IConcept {
+public interface IConcept extends IKnowledgebaseObject, ILazy {
 
     String ORIGINATOR_UNKNOWN = "unknown";
 

@@ -35,7 +35,7 @@ public enum ConceptNameTypes {
     PRIMARY("primary"), ALTERNATE("alternate"), COMMON("common"), FORMER("former"), SYNONYM("synonym");
 
 
-    private String name;
+    private final String name;
 
     ConceptNameTypes(String name) {
         this.name = name;

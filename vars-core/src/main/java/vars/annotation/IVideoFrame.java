@@ -20,6 +20,8 @@
 
 package vars.annotation;
 
+import vars.ILazy;
+
 import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
@@ -28,7 +30,7 @@ import java.util.Set;
  *
  * @author brian
  */
-public interface IVideoFrame {
+public interface IVideoFrame extends IAnnotationObject {
 
     String PROP_CAMERA_DATA = "cameraData";
     String PROP_ALTERNATE_TIMECODE = "alternateTimecode";

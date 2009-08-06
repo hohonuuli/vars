@@ -15,7 +15,8 @@ import javax.persistence.GenerationType
 import javax.persistence.TemporalType
 import javax.persistence.ManyToOne
 import javax.persistence.JoinColumn
-import vars.knowledgebase.IConceptDelegate;
+import vars.knowledgebase.IConceptDelegate
+import vars.knowledgebase.IHistory;
 
 /**
  * CREATE TABLE HISTORY (
@@ -60,7 +61,7 @@ import vars.knowledgebase.IConceptDelegate;
     @NamedQuery(name = "History.findByComment", query = "SELECT h FROM History h WHERE h.comment = :comment") ,
     @NamedQuery(name = "History.findByRejected", query = "SELECT h FROM History h WHERE h.rejected = :rejected")
 ])
-class History implements Serializable {
+class History implements Serializable, IHistory {
 
     @Id
     @Column(name = "id", nullable = false, updatable=false)
@@ -108,10 +109,37 @@ class History implements Serializable {
     String comment
 
     @Column(name = "Rejected")
-    Boolean rejected
+    private Short rejected
 
     @ManyToOne(optional = false, targetEntity = ConceptDelegate.class)
     @JoinColumn(name = "ConceptDelegateID_FK")
     IConceptDelegate conceptDelegate
 
+    public boolean isAdd() {
+        return false;  // TODO implement this method.
+    }
+
+    public boolean isApproved() {
+        return false;  // TODO implement this method.
+    }
+
+    public boolean isDelete() {
+        return false;  // TODO implement this method.
+    }
+
+    public boolean isReplace() {
+        return false;  // TODO implement this method.
+    }
+
+    public Boolean isRejected() {
+        return rejected == 0
+    }
+
+    public void setRejected(Boolean rejected) {
+        this.rejected = rejected ? 1 : 0
+    }
+
+    public String stringValue() {
+        return null;  // TODO implement this method.
+    }
 }

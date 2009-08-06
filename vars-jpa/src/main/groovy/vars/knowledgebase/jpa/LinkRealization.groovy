@@ -81,7 +81,7 @@ class LinkRealization implements Serializable, ILinkRealization {
 
     String stringValue() {
         use (LinkCategory) {
-            return stringValue()
+            return formatLinkAsString()
         }
     }
 }
