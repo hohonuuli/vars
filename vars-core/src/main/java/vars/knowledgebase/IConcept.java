@@ -61,7 +61,7 @@ public interface IConcept {
      * @return Description of the Return Value
      * @see IConceptName
      */
-    boolean addConceptName(IConceptName conceptName);
+    void addConceptName(IConceptName conceptName);
 
 
     /**
@@ -222,7 +222,7 @@ public interface IConcept {
      * removed.
      * @see IConcept
      */
-    boolean removeChildConcept(IConcept childConcept);
+    void removeChildConcept(IConcept childConcept);
 
     /**
      * Removes the specified <B>ConceptName</B> from this <B>Concept </B>.
@@ -233,7 +233,7 @@ public interface IConcept {
      * <code>true</code> if successfully removed.
      * @see IConceptName
      */
-    boolean removeConceptName(IConceptName conceptName);
+    void removeConceptName(IConceptName conceptName);
 
 
     /**

@@ -19,6 +19,8 @@ import javax.persistence.CascadeType
 import javax.persistence.OneToOne
 import vars.knowledgebase.IConceptName
 import vars.knowledgebase.IConcept
+import vars.knowledgebase.IConceptDelegate
+import vars.knowledgebase.ConceptNameTypes
 
 /**
  *
@@ -64,7 +66,7 @@ import vars.knowledgebase.IConcept
     @NamedQuery(name = "Concept.findByTaxonomyType",
                 query = "SELECT c FROM Concept c WHERE c.taxonomyType = :taxonomyType")
 ])
-class Concept implements Serializable {
+class Concept implements Serializable, IConcept {
 
     @Id
     @Column(name = "id", nullable = false, updatable=false)
@@ -79,9 +81,9 @@ class Concept implements Serializable {
     @Column(name = "LAST_UPDATED_TIME")
     private Timestamp updatedTime
 
-    @ManyToOne(optional = true)
+    @ManyToOne(optional = true, targetEntity = Concept.class)
     @JoinColumn(name = "ParentConceptID_FK")
-    Concept parentConcept
+    IConcept parentConcept
 
     @OneToMany(targetEntity = Concept.class,
             mappedBy = "parentConcept",
@@ -93,7 +95,7 @@ class Concept implements Serializable {
             mappedBy = "concept",
             fetch = FetchType.EAGER,
             cascade = CascadeType.ALL)
-    Set<ConceptName> conceptNames
+    Set<IConceptName> conceptNames
 
     @Column(name = "Field", length = 255)
     String field
@@ -119,10 +121,10 @@ class Concept implements Serializable {
     @Column(name = "TaxonomyType", length = 20)
     String taxonomyType
 
-    @OneToOne(mappedBy = "concept", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    ConceptDelegate conceptDelegate
+    @OneToOne(mappedBy = "concept", fetch = FetchType.LAZY, cascade = CascadeType.ALL, targetEntity = ConceptDelegate.class)
+    IConceptDelegate conceptDelegate
 
-    ConceptDelegate getConceptDelegate() {
+    IConceptDelegate getConceptDelegate() {
         if (conceptDelegate == null) {
             conceptDelegate = new ConceptDelegate()
         }
@@ -136,7 +138,7 @@ class Concept implements Serializable {
         return conceptNames
     }
 
-    void addConceptName(ConceptName conceptName) {
+    void addConceptName(IConceptName conceptName) {
         if (getConceptNames().find { IConceptName cn -> cn.name.equals(conceptName.name) }) {
             throw new IllegalArgumentException("A ConceptName with the name '${conceptName.name}' already exists in ${this}")
         }
@@ -144,10 +146,68 @@ class Concept implements Serializable {
         conceptName.concept = this
     }
 
-    void removeConceptName(ConceptName conceptName) {
+    void removeConceptName(IConceptName conceptName) {
         if (getConceptNames().remove(conceptName)) {
             conceptName.concept = null
         }
     }
+
+    Set<IConcept> getChildConcepts() {
+        if (childConcepts == null) {
+            childConcepts = new HashSet<IConcept>();
+        }
+        return childConcepts
+    }
+
+    void addChildConcept(IConcept child) {
+        if (childConcepts.add(child)) {
+            child.parentConcept = this
+        }
+    }
+
+    public void removeChildConcept(IConcept childConcept) {
+        if (childConcepts.remove(childConcept)) {
+            childConcept.parentConcept = null
+        }
+    }
+
+    IConceptName getConceptName(String name) {
+        return childConcepts?.find { it.name == name }
+    }
+
+    Set<? extends IConceptName> getDescendentPrimaryNames() {
+        return null;  // TODO implement this. Maybe move this to a DAO?
+    }
+
+    public IConceptName getPrimaryConceptName() {
+        return conceptNames.find { it.nameType == ConceptNameTypes.PRIMARY.getName() }
+    }
+
+    public IConcept getRootConcept() {
+        def concept = this
+        while(concept.parentConcept != null) {
+            concept = concept.parentConcept
+        }
+        return concept
+    }
+
+    boolean hasChildConcepts() {
+        return false;  // TODO implement this method. Maybe move this to a DAO?
+    }
+
+    boolean hasDescendent(String child) {
+        return false;  // TODO implement this method. Maybe move this to a DAO?
+    }
+
+    boolean hasDetails() {
+        return false;  // TODO implement this method. Maybe move this to a DAO?
+    }
+
+    boolean hasParent() {
+        return parentConcept != null
+    }
+
+
+
 
 }

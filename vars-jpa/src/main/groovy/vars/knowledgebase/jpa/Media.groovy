@@ -12,7 +12,9 @@ import javax.persistence.NamedQueries
 import javax.persistence.NamedQuery
 import javax.persistence.GenerationType
 import javax.persistence.ManyToOne
-import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumn
+import vars.knowledgebase.IConceptDelegate
+import vars.knowledgebase.IMedia;
 
 /**
  * Created by IntelliJ IDEA.
@@ -33,7 +35,7 @@ import javax.persistence.JoinColumn;
     @NamedQuery(name = "Media.findByCredit", query = "SELECT m FROM Media m WHERE m.credit = :credit") ,
     @NamedQuery(name = "Media.findByCaption", query = "SELECT m FROM Media m WHERE m.caption = :caption")
 ])
-public class Media implements Serializable {
+public class Media implements Serializable, IMedia {
 
     @Id
     @Column(name = "id", nullable = false, updatable=false)
@@ -52,7 +54,7 @@ public class Media implements Serializable {
     String url
 
     @Column(name = "MediaType", length = 5)
-    String mediaType
+    String type
 
     @Column(name = "PrimaryMedia")
     Boolean primaryMedia
@@ -63,9 +65,21 @@ public class Media implements Serializable {
     @Column(name = "Caption", length = 1000)
     String caption
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, targetEntity = ConceptDelegate.class)
     @JoinColumn(name = "ConceptDelegateID_FK")
-    ConceptDelegate conceptDelegate
-    
+    IConceptDelegate conceptDelegate
+
+    public boolean isPrimary() {
+        return false;  // TODO implement this method.
+    }
+
+    public void setPrimary(boolean primary) {
+        // TODO implement this method.
+    }
+
+    public String stringValue() {
+        return null;  // TODO implement this method.
+    }
+
 
 }

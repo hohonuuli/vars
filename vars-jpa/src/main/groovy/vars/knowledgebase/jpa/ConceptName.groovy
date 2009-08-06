@@ -13,7 +13,9 @@ import javax.persistence.NamedQuery
 import javax.persistence.GenerationType
 import javax.persistence.ManyToOne
 import javax.persistence.JoinColumn
-import groovy.beans.Bindable;
+import groovy.beans.Bindable
+import vars.knowledgebase.IConcept
+import vars.knowledgebase.IConceptName;
 
 /**
  * <pre>
@@ -45,7 +47,7 @@ import groovy.beans.Bindable;
     @NamedQuery(name = "ConceptName.findByNameType",
                 query = "SELECT c FROM ConceptName c WHERE c.nameType = :nameType")
 ])
-public class ConceptName implements Serializable {
+public class ConceptName implements Serializable, IConceptName {
 
     @Id
     @Column(name = "id", nullable = false, updatable=false)
@@ -72,7 +74,11 @@ public class ConceptName implements Serializable {
     @Bindable
     String author
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, targetEntity = Concept.class)
     @JoinColumn(name = "ConceptID_FK")
-    Concept concept
+    IConcept concept
+
+    public String stringValue() {
+        return null;  // TODO implement this method.
+    }
 }

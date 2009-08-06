@@ -14,6 +14,8 @@ import javax.persistence.Table
 import javax.persistence.TableGenerator
 import javax.persistence.Version
 import vars.annotation.jpa.VideoFrame
+import vars.annotation.IPhysicalData
+import vars.annotation.IVideoFrame
 
 @Entity(name = "PhysicalData")
 @Table(name = "PhysicalData")
@@ -21,7 +23,7 @@ import vars.annotation.jpa.VideoFrame
     @NamedQuery(name = "PhysicalData.findById",
                 query = "SELECT v FROM PhysicalData v WHERE v.id = :id")
 ])
-class PhysicalData implements Serializable {
+class PhysicalData implements Serializable, IPhysicalData {
 
     @Id
     @Column(name = "id", nullable = false, updatable = false)
@@ -36,9 +38,9 @@ class PhysicalData implements Serializable {
     @Column(name = "LAST_UPDATED_TIME")
     private Timestamp updatedTime
 
-    @OneToOne
+    @OneToOne(targetEntity = VideoFrame.class)
     @JoinColumn(name = "VideoFrameID_FK")
-    VideoFrame videoFrame
+    IVideoFrame videoFrame
     
     Float depth
     Float temperature
@@ -51,5 +53,7 @@ class PhysicalData implements Serializable {
     boolean containsData() {
         return (depth || temperature || salinity || oxygen || light || latitude || longitude);
     }
+
+    
     
 }

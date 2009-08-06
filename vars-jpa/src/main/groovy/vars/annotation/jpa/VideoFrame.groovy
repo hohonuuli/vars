@@ -10,7 +10,6 @@ import javax.persistence.Column
 import javax.persistence.OneToOne
 import javax.persistence.ManyToOne
 import javax.persistence.OneToMany
-import javax.persistence.PrimaryKeyJoinColumn
 import javax.persistence.GenerationType
 import javax.persistence.Temporal
 import javax.persistence.TemporalType
@@ -20,6 +19,11 @@ import javax.persistence.CascadeType
 import javax.persistence.Version
 import java.sql.Timestamp
 import javax.persistence.TableGenerator
+import vars.annotation.IVideoFrame
+import vars.annotation.IObservation
+import vars.annotation.ICameraData
+import vars.annotation.IPhysicalData
+import vars.annotation.IVideoArchive
 
 @Entity(name = "VideoFrame")
 @Table(name = "VideoFrame")
@@ -29,7 +33,7 @@ import javax.persistence.TableGenerator
     @NamedQuery(name = "VideoFrame.findByName",
                 query = "SELECT v FROM VideoFrame v WHERE v.recordedDate = :recordedDate")
 ])
-class VideoFrame implements Serializable {
+class VideoFrame implements Serializable, IVideoFrame {
 
     @Id
     @Column(name = "id", nullable = false, updatable = false)
@@ -53,7 +57,7 @@ class VideoFrame implements Serializable {
 
     @Column(name = "HDTimeCode", nullable = false, length = 11)
     @Deprecated
-    String hdTimecode
+    String alternateTimecode
 
     @Column(name = "Displacer", length = 50)
     @Deprecated
@@ -67,52 +71,66 @@ class VideoFrame implements Serializable {
     @Column(name = "inSequence")
     Short inSequence
 
-    @OneToOne(mappedBy = "videoFrame", fetch = FetchType.EAGER,cascade = CascadeType.ALL)
-    CameraData cameraData
+    @OneToOne(mappedBy = "videoFrame", fetch = FetchType.EAGER, cascade = CascadeType.ALL, targetEntity = CameraData.class)
+    ICameraData cameraData
 
-    @OneToOne(mappedBy = "videoFrame", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    PhysicalData physicalData
+    @OneToOne(mappedBy = "videoFrame", fetch = FetchType.EAGER, cascade = CascadeType.ALL, targetEntity = PhysicalData.class)
+    IPhysicalData physicalData
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, targetEntity = VideoArchive.class)
     @JoinColumn(name = "VideoArchiveID_FK")
-    VideoArchive videoArchive
+    IVideoArchive videoArchive
 
     @OneToMany(targetEntity = Observation.class,
             mappedBy = "videoFrame",
             fetch = FetchType.EAGER,
             cascade = CascadeType.ALL)
-    Set<Observation> observations
+    Set<IObservation> observations
 
-    CameraData getCameraData() {
+    ICameraData getCameraData() {
         if (cameraData == null) {
             cameraData = new CameraData()
         }
         return cameraData
     }
 
-    PhysicalData getPhysicalData() {
+    IPhysicalData getPhysicalData() {
         if (physicalData == null) {
             physicalData = new PhysicalData()
         }
         return physicalData
     }
 
-    Set<Observation> getObservations() {
+    Set<IObservation> getObservations() {
         if (observations == null) {
             observations = new HashSet()
         }
         return observations
     }
 
-    void addObservation(Observation observation) {
+    void addObservation(IObservation observation) {
         observations << observation
         observation.videoFrame = this
     }
 
-    void removeObservation(Observation observation) {
+    void removeObservation(IObservation observation) {
         if (observation.remove(observation)) {
             observation.videoFrame = null
         }
     }
+
+    boolean hasFrameGrab() {
+        return cameraData?.frameGrabURL != null
+    }
+
+    boolean isInSequence() {
+        return inSequence != 0
+    }
+
+
+    void setInSequence(boolean state) {
+        this.inSequence = state ? 1 : 0
+    }
+
 
 }

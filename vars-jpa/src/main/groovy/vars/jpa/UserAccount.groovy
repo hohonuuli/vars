@@ -2,7 +2,8 @@ package vars.jpa;
 
 import javax.persistence.Column;
 import javax.persistence.Version;
-import java.sql.Timestamp;
+import java.sql.Timestamp
+import vars.IUserAccount;
 
 /**
  * Created by IntelliJ IDEA.
@@ -11,7 +12,7 @@ import java.sql.Timestamp;
  * Time: 10:02:32 AM
  * To change this template use File | Settings | File Templates.
  */
-public class UserAccount {
+public class UserAccount implements Serializable {
 
     /** Optimistic lock to prevent concurrent overwrites */
     @Version

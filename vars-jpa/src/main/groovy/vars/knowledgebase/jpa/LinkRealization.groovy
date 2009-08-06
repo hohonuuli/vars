@@ -14,7 +14,9 @@ import java.sql.Timestamp
 import javax.persistence.ManyToOne
 import javax.persistence.JoinColumn
 import vars.ILink
-import vars.ILink;
+import vars.LinkCategory
+import vars.knowledgebase.IConceptDelegate
+import vars.knowledgebase.ILinkRealization;
 
 /**
  * <pre>
@@ -45,7 +47,7 @@ import vars.ILink;
     @NamedQuery(name = "LinkRealization.findByLinkValue",
                 query = "SELECT l FROM LinkRealization l WHERE l.linkValue = :linkValue")
 ])
-class LinkRealization implements Serializable, ILink {
+class LinkRealization implements Serializable, ILinkRealization {
 
     @Id
     @Column(name = "id", nullable = false, updatable=false)
@@ -69,11 +71,17 @@ class LinkRealization implements Serializable, ILink {
     @Column(name = "LinkValue", length = 255)
     String linkValue
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, targetEntity = ConceptDelegate.class)
     @JoinColumn(name = "ConceptDelegateID_FK")
-    ConceptDelegate conceptDelegate
+    IConceptDelegate conceptDelegate
 
     public String getFromConcept() {
         return conceptDelegate?.concept
+    }
+
+    String stringValue() {
+        use (LinkCategory) {
+            return stringValue()
+        }
     }
 }

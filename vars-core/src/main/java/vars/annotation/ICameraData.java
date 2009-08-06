@@ -81,7 +81,7 @@ public interface ICameraData {
      * Get the <code>String</code> of the Still Image captured by this <code>CameraData</code>.
      * @return  The <code>String</code> of the Still Image URL captured by  this <code>CameraData</code>.
      */
-    String getFrameGrabUR();
+    String getFrameGrabURL();
 
     /**
      * @return

@@ -12,7 +12,6 @@ import javax.persistence.GenerationType
 import javax.persistence.JoinColumn
 import javax.persistence.Temporal
 import javax.persistence.TemporalType
-import javax.persistence.PrimaryKeyJoinColumn
 import javax.persistence.Version
 import java.sql.Timestamp
 import javax.persistence.TableGenerator
@@ -33,7 +32,7 @@ import vars.annotation.IVideoArchiveSet
     @NamedQuery(name = "CameraDeployment.findByEndDate",
                 query = "SELECT v FROM CameraDeployment v WHERE v.endDate = :endDate")
 ])
-class CameraDeployment implements Serializable {
+class CameraDeployment implements Serializable, ICameraDeployment {
 
     @Id
     @Column(name = "id", nullable = false, updatable = false)
@@ -48,9 +47,9 @@ class CameraDeployment implements Serializable {
     @Column(name = "LAST_UPDATED_TIME")
     private Timestamp updatedTime
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, targetEntity = VideoArchiveSet.class)
     @JoinColumn(name = "VideoArchiveSetID_FK")
-    private VideoArchiveSet videoArchiveSet
+    IVideoArchiveSet videoArchiveSet
 
     @Column(name = "SeqNumber")
     Integer sequenceNumber
@@ -66,11 +65,5 @@ class CameraDeployment implements Serializable {
     @Temporal(value = TemporalType.TIMESTAMP)
     Date endDate
 
-    void setVideoArchiveSet(IVideoArchiveSet videoArchiveSet) {
-        this.videoArchiveSet = videoArchiveSet
-    }
 
-    public IVideoArchiveSet getVideoArchiveSet() {
-        return videoArchiveSet
-    }
 }

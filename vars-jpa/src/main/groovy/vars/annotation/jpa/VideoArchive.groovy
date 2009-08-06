@@ -20,6 +20,7 @@ import javax.persistence.TemporalType
 import java.sql.Timestamp
 import javax.persistence.OrderBy
 import javax.persistence.TableGenerator
+import vars.annotation.IVideoArchiveSet
 
 @Entity(name = "VideoArchive")
 @Table(name = "VideoArchive")
@@ -44,9 +45,9 @@ class VideoArchive implements Serializable {
     @Column(name = "LAST_UPDATED_TIME")
     private Timestamp updatedTime
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, targetEntity = VideoArchiveSet.class)
     @JoinColumn(name = "VideoArchiveSetID_FK")
-    VideoArchiveSet videoArchiveSet
+    IVideoArchiveSet videoArchiveSet
 
     @Column(name = "VideoArchiveName", nullable = false, unique = true, length = 512)
     String name

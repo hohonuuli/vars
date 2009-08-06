@@ -12,7 +12,9 @@ import javax.persistence.NamedQueries
 import javax.persistence.NamedQuery
 import javax.persistence.GenerationType
 import javax.persistence.ManyToOne
-import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumn
+import vars.knowledgebase.IConceptDelegate
+import vars.knowledgebase.ISectionInfo;
 
 /**
  * Created by IntelliJ IDEA.
@@ -31,7 +33,7 @@ import javax.persistence.JoinColumn;
     @NamedQuery(name = "SectionInfo.findByInformation",
                 query = "SELECT s FROM SectionInfo s WHERE s.information = :information")
 ])
-class SectionInfo implements Serializable {
+class SectionInfo implements Serializable, ISectionInfo {
 
     @Id
     @Column(name = "id", nullable = false, updatable=false)
@@ -55,8 +57,11 @@ class SectionInfo implements Serializable {
     @Column(name = "Information", length = 5000)
     String information
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, targetEntity = ConceptDelegate.class)
     @JoinColumn(name = "ConceptDelegateID_FK")
-    ConceptDelegate conceptDelegate
+    IConceptDelegate conceptDelegate
 
+    public String stringValue() {
+        return null;  // TODO implement this method.
+    }
 }

@@ -21,6 +21,7 @@
 package vars.knowledgebase;
 
 import java.util.Set;
+import java.util.List;
 
 /**
  *
@@ -108,28 +109,28 @@ public interface IConceptDelegate {
     /**
      * @return
      */
-    Set<? extends IHistory> getHistorySet();
+    List<? extends IHistory> getHistories();
 
 
     /**
      * @return
      */
-    Set<? extends ILinkRealization> getLinkRealizationSet();
+    Set<? extends ILinkRealization> getLinkRealizations();
 
     /**
      * @return
      */
-    Set<? extends ILinkTemplate> getLinkTemplateSet();
+    Set<? extends ILinkTemplate> getLinkTemplates();
 
     /**
      * @return
      */
-    Set<? extends IMedia> getMediaSet();
+    Set<? extends IMedia> getMedias();
 
     /**
      * @return
      */
-    Set<? extends ISectionInfo> getSectionInfoSet();
+    Set<? extends ISectionInfo> getSectionInfos();
 
     /**
      * @return
@@ -198,7 +199,7 @@ public interface IConceptDelegate {
     /**
      * Sets the <code>Usage</code> for this <code>Concept</code>.
      * @param usage               A <code>Usage</code> to be assigned to this <code>Concept</code>  node.
-     * @see  Usage
+     * @see  IUsage
      * @uml.property  name="usage"
      */
     void setUsage(IUsage usage);

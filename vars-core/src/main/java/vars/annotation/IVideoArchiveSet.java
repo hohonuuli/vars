@@ -22,6 +22,8 @@ package vars.annotation;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -46,7 +48,7 @@ public interface IVideoArchiveSet {
      * <code>CameraPlatformDeployment</code> object otherwise.
      * @see                   ICameraDeployment
      */
-    void addCameraPlatformDeployment(ICameraDeployment cameraDeployment);
+    void addCameraDeployment(ICameraDeployment cameraDeployment);
 
     /**
      * Add an <code>VideoArchive</code>.
@@ -65,7 +67,7 @@ public interface IVideoArchiveSet {
      * @return     The cameraPlatformDeploymentColl. This is a synchronized list of  <code>CameraPlatformDeployment</code> objects. Remember to synchronize  on it before using it's iterator.
      * @uml.property  name="cameraPlatformDeploymentColl"
      */
-    Collection<? extends ICameraDeployment> getCameraDeployments();
+    Set<? extends ICameraDeployment> getCameraDeployments();
 
     /**
      * Gets the endDTG attribute of the VideoArchiveSet object
@@ -128,7 +130,7 @@ public interface IVideoArchiveSet {
      * @return     The videoArchiveColl value
      * @uml.property  name="videoArchiveColl"
      */
-    Collection<? extends IVideoArchive> getVideoArchives();
+    List<? extends IVideoArchive> getVideoArchives();
 
     /**
      * This is a convience method to retrieve all <code>VideoFrames</code> that are
@@ -136,7 +138,7 @@ public interface IVideoArchiveSet {
      *
      * @return A collection of <i>ALL</i> VideoFrames that are part of this VideoArchiveSet
      */
-    Collection<? extends IVideoFrame> getVideoFrames();
+    List<? extends IVideoFrame> getVideoFrames();
 
     //void setVideoFrames(Collection<? extends IVideoFrame> videoFrames);
 
@@ -147,7 +149,7 @@ public interface IVideoArchiveSet {
      * CameraPlatfomDeployment with the given seqNumber. <b>false</b>
      * otherwise.
      */
-    boolean hasSeqNumber(final int seqNumber);
+    boolean hasSequenceNumber(final int seqNumber);
 
     /**
      * @param videoArchiveName The videoArchiveName to search for. If null is
@@ -163,7 +165,7 @@ public interface IVideoArchiveSet {
      *
      * @param cpd
      */
-    void removeCameraPlatformDeployment(ICameraDeployment cpd);
+    void removeCameraDeployment(ICameraDeployment cpd);
 
     /**
      * <p><!-- Method description --></p>

@@ -15,7 +15,9 @@ import javax.persistence.GenerationType
 import javax.persistence.TemporalType
 import javax.persistence.ManyToOne
 import javax.persistence.JoinColumn
-import javax.persistence.OneToOne;
+import javax.persistence.OneToOne
+import vars.knowledgebase.IConceptDelegate
+import vars.knowledgebase.IUsage;
 
 /**
  * CREATE TABLE USAGE (
@@ -40,7 +42,7 @@ import javax.persistence.OneToOne;
     @NamedQuery(name = "Usage.findBySpecification",
                 query = "SELECT u FROM Usage u WHERE u.specification = :specification")
 ])
-class Usage implements Serializable {
+class Usage implements Serializable, IUsage {
 
     @Id
     @Column(name = "id", nullable = false, updatable=false)
@@ -62,8 +64,8 @@ class Usage implements Serializable {
     @Column(name = "Specification", length = 1000)
     String specification
 
-    @OneToOne
+    @OneToOne(targetEntity = ConceptDelegate.class, optional = false)
     @JoinColumn(name = "ConceptDelegateID_FK")
-    ConceptDelegate conceptDelegate
+    IConceptDelegate conceptDelegate
     
 }

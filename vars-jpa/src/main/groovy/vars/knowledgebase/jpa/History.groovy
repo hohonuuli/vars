@@ -14,7 +14,8 @@ import javax.persistence.Temporal
 import javax.persistence.GenerationType
 import javax.persistence.TemporalType
 import javax.persistence.ManyToOne
-import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumn
+import vars.knowledgebase.IConceptDelegate;
 
 /**
  * CREATE TABLE HISTORY (
@@ -109,8 +110,8 @@ class History implements Serializable {
     @Column(name = "Rejected")
     Boolean rejected
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, targetEntity = ConceptDelegate.class)
     @JoinColumn(name = "ConceptDelegateID_FK")
-    ConceptDelegate conceptDelegate
+    IConceptDelegate conceptDelegate
 
 }

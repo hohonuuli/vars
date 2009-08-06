@@ -4,22 +4,15 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>vars-redux</artifactId>
-    <groupId>vars</groupId>
+    <groupId>vars-redux</groupId>
     <version>1.0-SNAPSHOT</version>
   </parent>
   <groupId>vars</groupId>
   <artifactId>vars-jpa</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <name>JPA Project</name>
+  <name>vars-jpa [Library]</name>
   <build>
     <plugins>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
-        </configuration>
-      </plugin>
           <plugin>
               <groupId>org.codehaus.groovy.maven</groupId>
               <artifactId>gmaven-plugin</artifactId>
@@ -39,7 +32,7 @@
   </build>
   <dependencies>
       <dependency>
-        <groupId>vars</groupId>
+        <groupId>vars-redux</groupId>
         <artifactId>vars-core</artifactId>
         <version>${project.version}</version>
     </dependency>

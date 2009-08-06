@@ -32,5 +32,18 @@ public enum ConceptNameTypes {
 //     */
 //    final static String NAMETYPE_SYNONYM = "Synonym";
 
-    PRIMARY, ALTERNATE, COMMON, FORMER, SYNONYM
+    PRIMARY("primary"), ALTERNATE("alternate"), COMMON("common"), FORMER("former"), SYNONYM("synonym");
+
+
+    private String name;
+
+    ConceptNameTypes(String name) {
+        this.name = name;
+    }
+
+
+    public String getName() {
+        return name;
+    }
 }
+

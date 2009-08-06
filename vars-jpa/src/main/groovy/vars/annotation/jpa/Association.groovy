@@ -14,7 +14,7 @@ import javax.persistence.NamedQueries
 import javax.persistence.NamedQuery
 import groovy.beans.Bindable
 import javax.persistence.TableGenerator
-import vars.ILink
+import vars.LinkCategory
 import vars.annotation.IAssociation
 import vars.annotation.IObservation
 
@@ -31,7 +31,7 @@ import vars.annotation.IObservation
     @NamedQuery(name = "Association.findByLinkValue",
                 query = "SELECT a FROM Association a WHERE a.linkValue = :linkValue")
 ])
-class Association implements Serializable, IAssociation, ILink {
+class Association implements Serializable, IAssociation {
 
     @Id
     @Column(name = "id", nullable = false, updatable=false)
@@ -46,10 +46,10 @@ class Association implements Serializable, IAssociation, ILink {
     @Column(name = "LAST_UPDATED_TIME")
     private Timestamp updatedTime
     
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, targetEntity = Observation.class)
     @JoinColumn(name = "ObservationID_FK")
     @Bindable
-    Observation observation
+    IObservation observation
 
     @Column(name = "LinkName", nullable = false, length = 50)
     @Bindable
@@ -67,7 +67,10 @@ class Association implements Serializable, IAssociation, ILink {
         return observation?.getConceptName()
     }
 
-    public void setObservation(IObservation observation) {
-        this.observation = observation
+    String stringValue() {
+        use (LinkCategory) {
+            return stringValue()
+        }
     }
+
 }

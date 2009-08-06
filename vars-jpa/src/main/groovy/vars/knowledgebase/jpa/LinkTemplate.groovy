@@ -13,10 +13,10 @@ import javax.persistence.NamedQuery
 import javax.persistence.GenerationType
 import javax.persistence.ManyToOne
 import javax.persistence.JoinColumn
-import javax.persistence.Inheritance
-import javax.persistence.InheritanceType
 import vars.ILink
-import vars.ILink;
+import vars.LinkCategory
+import vars.knowledgebase.IConceptDelegate
+import vars.knowledgebase.ILinkTemplate;
 
 /**
  * Created by IntelliJ IDEA.
@@ -37,7 +37,7 @@ import vars.ILink;
     @NamedQuery(name = "LinkTemplate.findByLinkValue",
                 query = "SELECT l FROM LinkTemplate l WHERE l.linkValue = :linkValue")
 ])
-class LinkTemplate implements Serializable, ILink {
+class LinkTemplate implements Serializable, ILinkTemplate {
 
     @Id
     @Column(name = "id", nullable = false, updatable=false)
@@ -61,7 +61,17 @@ class LinkTemplate implements Serializable, ILink {
     @Column(name = "LinkValue", length = 255)
     String linkValue
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, targetEntity = ConceptDelegate.class)
     @JoinColumn(name = "ConceptDelegateID_FK")
-    ConceptDelegate conceptDelegate
+    IConceptDelegate conceptDelegate
+
+    public String getFromConcept() {
+        return conceptDelegate.concept.primaryConceptName.name
+    }
+
+    String stringValue() {
+        use (LinkCategory) {
+            return stringValue()
+        }
+    }
 }

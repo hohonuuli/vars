@@ -22,6 +22,7 @@ package vars.annotation;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.Set;
 
 /**
  *
@@ -42,7 +43,7 @@ public interface IVideoFrame {
      * @see IObservation
      * @return the Observation with updated ID.
      */
-    IObservation addObservation(IObservation obs);
+    void addObservation(IObservation obs);
 
     /**
      * Get the <code>CameraData</code> associated with this <code>VideoFrame</code>.
@@ -62,7 +63,7 @@ public interface IVideoFrame {
     /**
      * @return  The observations associated with this annotated frame. This  collection is synchronized.
      */
-    Collection<? extends IObservation> getObservations();
+    Set<? extends IObservation> getObservations();
 
     /**
      * Get the <code>PhysicalData</code> associated with this <code>VideoFrame</code>.
@@ -109,7 +110,7 @@ public interface IVideoFrame {
      *
      * @return
      */
-    boolean removeObservation(IObservation obs);
+    void removeObservation(IObservation obs);
 
     /**
      * Set the <code>CameraData</code> for this <code>VideoFrame</code>. If the passed
@@ -123,7 +124,7 @@ public interface IVideoFrame {
      * @return The <code>CameraData</code> for this <code>VideoFrame</code>.
      * @see ICameraData
      */
-    ICameraData setCameraData(ICameraData camera);
+    void setCameraData(ICameraData camera);
 
 
     /**
@@ -173,7 +174,7 @@ public interface IVideoFrame {
 
     /**
      * <p><!-- Method description --></p>
-     * @param  timeCode
+     * @param  timecode
      * @uml.property  name="timeCode"
      */
     void setTimecode(String timecode);

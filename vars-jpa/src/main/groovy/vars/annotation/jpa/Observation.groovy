@@ -19,6 +19,9 @@ import javax.persistence.Version
 import java.sql.Timestamp
 import groovy.beans.Bindable
 import javax.persistence.TableGenerator
+import vars.annotation.IObservation
+import vars.annotation.IAssociation
+import vars.annotation.IVideoFrame
 
 @Entity(name = "Observation")
 @Table(name = "Observation")
@@ -33,7 +36,7 @@ import javax.persistence.TableGenerator
     @NamedQuery(name = "Observation.findByObserver",
                 query = "SELECT o FROM Observation o WHERE o.observer = :observer")
 ])
-class Observation implements Serializable {
+class Observation implements Serializable, IObservation {
 
     @Id
     @Column(name = "id", nullable = false, updatable = false)
@@ -48,10 +51,10 @@ class Observation implements Serializable {
     @Column(name = "LAST_UPDATED_TIME")
     private Timestamp updatedTime
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, targetEntity = VideoFrame.class)
     @JoinColumn(name = "VideoArchiveSetID_FK")
     @Bindable
-    VideoFrame videoFrame
+    IVideoFrame videoFrame
 
     @Column(name = "ObservationDTG")
     @Temporal(value = TemporalType.TIMESTAMP)
@@ -74,26 +77,31 @@ class Observation implements Serializable {
             mappedBy = "observation",
             fetch = FetchType.EAGER,
             cascade = CascadeType.ALL)
-    Set<Association> associations
+    Set<IAssociation> associations
 
-    Set<Association> getAssociations() {
+    Set<IAssociation> getAssociations() {
         if (associations == null) {
             associations = new HashSet<Association>();
         }
         return associations
     }
 
-    void addAssociation(Association association) {
+    void addAssociation(IAssociation association) {
         getAssociations() << association
         association.observation = this
-        firePropertyChange("associations", null, getAssociations) // This method is added by @Bindable
+        firePropertyChange(PROP_ASSOCIATIONS, null, getAssociations) // This method is added by @Bindable
     }
 
-    void removeAssociation(Association association) {
+    void removeAssociation(IAssociation association) {
         if (getAssociations().remove(association)) {
             association.observation = null
-            firePropertyChange("associations", null, getAssociations) // This method is added by @Bindable
+            firePropertyChange(PROP_ASSOCIATIONS, null, getAssociations) // This method is added by @Bindable
         }
     }
-    
+
+    public boolean hasSample() {
+        return false;  // TODO implement this.
+    }
+
+
 }

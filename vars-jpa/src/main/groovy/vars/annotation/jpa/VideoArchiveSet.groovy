@@ -17,6 +17,10 @@ import javax.persistence.Version
 import java.sql.Timestamp
 import javax.persistence.OrderBy
 import javax.persistence.TableGenerator
+import vars.annotation.IVideoArchiveSet
+import vars.annotation.ICameraDeployment
+import vars.annotation.IVideoArchive
+import vars.annotation.IVideoFrame
 
 @Entity(name = "VideoArchiveSet")
 @Table(name = "VideoArchiveSet")
@@ -34,7 +38,7 @@ import javax.persistence.TableGenerator
     @NamedQuery(name = "VideoArchiveSet.findByEndDate",
                 query = "SELECT v FROM VideoArchiveSet v WHERE v.endDate = :endDate")
 ])
-class VideoArchiveSet implements Serializable {
+class VideoArchiveSet implements Serializable, IVideoArchiveSet {
 
     @Id 
     @Column(name = "id", nullable = false, updatable = false)
@@ -60,7 +64,7 @@ class VideoArchiveSet implements Serializable {
     String platformName
     
     @Column(name = "FormatCode", length = 2)
-    String formatCode
+    char formatCode
     
     @Column(name = "StartDTG")
     @Temporal(value = TemporalType.TIMESTAMP)
@@ -75,29 +79,29 @@ class VideoArchiveSet implements Serializable {
             fetch = FetchType.EAGER,
             cascade = CascadeType.ALL)
     @OrderBy(value = "name")
-    Set<VideoArchive> videoArchives
+    Set<IVideoArchive> videoArchives
     
     @OneToMany(targetEntity = CameraDeployment.class,
             mappedBy = "videoArchiveSet",
             fetch = FetchType.EAGER,
             cascade = CascadeType.ALL)
-    Set<CameraDeployment> cameraDeployments
+    Set<ICameraDeployment> cameraDeployments
 
-    Set<CameraDeployment> getCameraDeployments() {
+    Set<ICameraDeployment> getCameraDeployments() {
         if (cameraDeployments == null) {
             cameraDeployments = new HashSet()
         }
         return cameraDeployments
     }
 
-    Set<VideoArchive> getVideoArchives() {
+    List<IVideoArchive> getVideoArchives() {
         if (videoArchives == null) {
             videoArchives = new ArrayList<VideoArchive>()
         }
         return videoArchives
     }
 
-    void addVideoArchive(VideoArchive videoArchive) {
+    void addVideoArchive(IVideoArchive videoArchive) {
         if (getVideoArchives().find { VideoArchive va -> va.name.equals(videoArchive.name) }) {
             throw new IllegalArgumentException("A VideoArchive named '${va.name} already exists in ${this}")
         }
@@ -105,19 +109,40 @@ class VideoArchiveSet implements Serializable {
         videoArchive.videoArchiveSet = this
     }
 
-    void removeVideoArchive(VideoArchive videoArchive) {
+    void removeVideoArchive(IVideoArchive videoArchive) {
         videoArchives.remove(videoArchive)
         videoArchive.videoArchiveSet = null
     }
 
-    void addCameraDeployment(CameraDeployment cameraDeployment) {
+    void addCameraDeployment(ICameraDeployment cameraDeployment) {
         cameraDeployments << cameraDeployment
         cameraDeployment.videoArchiveSet = this
     }
 
-    void removeCameraDeployment(CameraDeployment cameraDeployment) {
+    void removeCameraDeployment(ICameraDeployment cameraDeployment) {
         getCameraDeployments().remove(cameraDeployment)
         cameraDeployment.videoArchiveSet = null
     }
+
+    IVideoArchive getVideoArchiveByName(String videoArchiveName) {
+        (IVideoArchive) videoArchives.find { it.name.equals(videoArchiveName) }
+    }
+
+    List<IVideoFrame> getVideoFrames() {
+        def videoFrames = new ArrayList<? extends IVideoFrame>()
+        videoArchives.each { va ->
+            videoFrames.addAll(va.videoFrames)
+        }
+        return videoFrames.sort { it.timecode }
+    }
+
+    boolean hasSequenceNumber(int seqNumber) {
+        return (cameraDeployments.find {it.sequenceNumber == seqNumber} != null)
+    }
+
+    boolean hasVideoArchiveName(String videoArchiveName) {
+        return (videoArchives.find { it.name.equals(videoArchiveName) } != null)
+    }
+
 
 }

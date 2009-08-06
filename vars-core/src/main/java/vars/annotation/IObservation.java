@@ -23,6 +23,7 @@ package vars.annotation;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Set;
 
 /**
  *
@@ -54,7 +55,7 @@ public interface IObservation {
      * WARNING! Do not add or remove directly from this collection.
      * @return  A synchronized collection
      */
-    Collection<? extends IAssociation> getAssociations();
+    Set<? extends IAssociation> getAssociations();
 
     /**
      * @return  The fromConcept of this observation.

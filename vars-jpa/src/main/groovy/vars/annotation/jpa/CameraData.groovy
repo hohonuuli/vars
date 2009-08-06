@@ -44,9 +44,9 @@ class CameraData implements Serializable, ICameraData {
     @Column(name = "LAST_UPDATED_TIME")
     private Timestamp updatedTime
 
-    @OneToOne
+    @OneToOne(targetEntity = VideoFrame.class)
     @JoinColumn(name = "VideoFrameID_FK")
-    private VideoFrame videoFrame
+    IVideoFrame videoFrame
 
     @Column(name = "Name", length = 50)
     String name
@@ -60,7 +60,7 @@ class CameraData implements Serializable, ICameraData {
     Double fieldWidth
 
     @Column(name = "StillImageUrl", length = 1024)
-    String stillImage
+    String frameGrabURL
 
     @Column(name = "LogDTG")
     @Temporal(value = TemporalType.TIMESTAMP)
@@ -70,11 +70,4 @@ class CameraData implements Serializable, ICameraData {
         return (name || direction || zoon || focus || iris || fieldWidth || stillImage);
     }
 
-    void setVideoFrame(IVideoFrame videoFrame) {
-        this.videoFrame = videoFrame
-    }
-
-    IVideoFrame getVideoFrame() {
-        return videoFrame
-    }
 }
