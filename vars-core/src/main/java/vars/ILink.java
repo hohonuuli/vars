@@ -1,11 +1,7 @@
 package vars;
 
 /**
- * Created by IntelliJ IDEA.
- * User: brian
- * Date: Aug 4, 2009
- * Time: 10:43:53 AM
- * To change this template use File | Settings | File Templates.
+ * Inteface for VARS link style classes (Association, LinkTemplate, LinkRealization)
  */
 public interface ILink {
 

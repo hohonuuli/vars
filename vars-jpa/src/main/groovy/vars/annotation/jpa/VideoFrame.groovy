@@ -57,17 +57,7 @@ class VideoFrame implements Serializable, IVideoFrame, JPAEntity {
     String timecode
 
     @Column(name = "HDTimeCode", nullable = false, length = 11)
-    @Deprecated
     String alternateTimecode
-
-    @Column(name = "Displacer", length = 50)
-    @Deprecated
-    String displacer
-
-    @Column(name = "DisplaceDTG")
-    @Temporal(value = TemporalType.TIMESTAMP)
-    @Deprecated
-    Date displacementDate
 
     @Column(name = "inSequence")
     Short inSequence

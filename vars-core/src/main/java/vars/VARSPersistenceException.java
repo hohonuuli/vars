@@ -3,7 +3,9 @@
  * and open the template in the editor.
  */
 
-package vars.services;
+package vars;
+
+import vars.VARSException;
 
 /**
  * Thrown when something bad happens in the DataPersistenceService

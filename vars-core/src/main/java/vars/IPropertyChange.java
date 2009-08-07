@@ -6,11 +6,11 @@
 package vars;
 
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.Collection;
 
 /**
- *
- * @author brian
+ * Interface defining classes that have property change listeners
  */
 public interface IPropertyChange {
 
@@ -22,5 +22,5 @@ public interface IPropertyChange {
 
     void removePropertyChangeListener(PropertyChangeListener listener);
 
-    Collection<PropertyChangeListener> getPropertyChangeListeners();
+
 }

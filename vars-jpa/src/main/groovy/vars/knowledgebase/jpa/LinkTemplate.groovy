@@ -15,9 +15,10 @@ import javax.persistence.ManyToOne
 import javax.persistence.JoinColumn
 import vars.ILink
 import vars.LinkCategory
-import vars.knowledgebase.IConceptDelegate
+import vars.knowledgebase.IConceptMetadata
 import vars.knowledgebase.ILinkTemplate
-import vars.jpa.JPAEntity;
+import vars.jpa.JPAEntity
+import vars.knowledgebase.IConceptMetadata;
 
 /**
  * Created by IntelliJ IDEA.
@@ -62,12 +63,12 @@ class LinkTemplate implements Serializable, ILinkTemplate, JPAEntity {
     @Column(name = "LinkValue", length = 255)
     String linkValue
 
-    @ManyToOne(optional = false, targetEntity = ConceptDelegate.class)
+    @ManyToOne(optional = false, targetEntity = ConceptMetadata.class)
     @JoinColumn(name = "ConceptDelegateID_FK")
-    IConceptDelegate conceptDelegate
+    IConceptMetadata conceptMetadata
 
     public String getFromConcept() {
-        return conceptDelegate.concept.primaryConceptName.name
+        return conceptMetadata.concept.primaryConceptName.name
     }
 
     String stringValue() {

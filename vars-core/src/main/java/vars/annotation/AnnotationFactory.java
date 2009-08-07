@@ -1,4 +1,4 @@
-package vars.services;
+package vars.annotation;
 
 import vars.annotation.IAssociation;
 import vars.annotation.IObservation;
@@ -26,4 +26,5 @@ public interface AnnotationFactory {
     IVideoArchive newVideoArchive();
 
     IVideoArchiveSet newVideoArchiveSet();
+    
 }

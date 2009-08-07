@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package vars.services;
+package vars;
 
 /**
  *
@@ -13,7 +13,7 @@ package vars.services;
  *
  * @author brian
  */
-public interface VARSPersistenceService {
+public interface IDAO {
 
     /**
      * TODO: Add JavaDoc
@@ -28,4 +28,8 @@ public interface VARSPersistenceService {
      * @param object
      */
     public <T> T makeTransient(T object);
+
+
+    public <T> T findByPrimaryKey(Class<T> clazz, Object primaryKey);
+
 }

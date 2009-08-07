@@ -1,16 +1,11 @@
-package vars.services.jpa;
+package vars.annotation.jpa;
 
-import vars.services.AnnotationFactory;
+import vars.annotation.AnnotationFactory;
 import vars.annotation.IAssociation;
 import vars.annotation.IObservation;
 import vars.annotation.IVideoFrame;
 import vars.annotation.IVideoArchive;
 import vars.annotation.IVideoArchiveSet;
-import vars.annotation.jpa.Association;
-import vars.annotation.jpa.Observation;
-import vars.annotation.jpa.VideoFrame;
-import vars.annotation.jpa.VideoArchive;
-import vars.annotation.jpa.VideoArchiveSet;
 
 /**
  * Created by IntelliJ IDEA.

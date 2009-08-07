@@ -1,19 +1,21 @@
-package vars.services.jpa;
+package vars.jpa;
 
-import vars.services.VARSPersistenceService;
-import vars.services.VARSPersistenceException;
-import vars.IVARSObject;
+import vars.IDAO;
+import vars.VARSPersistenceException;
 import vars.jpa.JPAEntity;
 import org.mbari.jpax.EAO;
+import org.mbari.jpax.IEAO;
+import com.google.inject.Inject;
 
 /**
  * Persistence service implementation for use in Java SE environments
  */
-public class JSEPersistenceService implements VARSPersistenceService {
+public class DAO implements IDAO {
 
-    private final EAO eao;
+    private final IEAO eao;
 
-    public JSEPersistenceService(EAO eao) {
+    @Inject
+    public DAO(IEAO eao) {
         this.eao = eao;
     }
 
@@ -39,5 +41,13 @@ public class JSEPersistenceService implements VARSPersistenceService {
         else {
             throw new VARSPersistenceException(object + " is not an instance of IVARSObject");
         }
+    }
+
+    public <T> T findByPrimaryKey(Class<T> clazz, Object primaryKey) {
+        return eao.find(clazz, primaryKey);
+    }
+
+    protected IEAO getEAO() {
+        return eao;
     }
 }

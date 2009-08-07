@@ -33,7 +33,7 @@ public interface ILinkTemplate extends IKnowledgebaseObject, ILink {
      * @return
      * @uml.property  name="conceptDelegate"
      */
-    IConceptDelegate getConceptDelegate();
+    IConceptMetadata getConceptMetadata();
 
 
     /**

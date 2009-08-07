@@ -16,7 +16,7 @@ import javax.persistence.TemporalType
 import javax.persistence.ManyToOne
 import javax.persistence.JoinColumn
 import javax.persistence.OneToOne
-import vars.knowledgebase.IConceptDelegate
+import vars.knowledgebase.IConceptMetadata
 import vars.knowledgebase.IUsage
 import vars.jpa.JPAEntity;
 
@@ -65,8 +65,8 @@ class Usage implements Serializable, IUsage, JPAEntity {
     @Column(name = "Specification", length = 1000)
     String specification
 
-    @OneToOne(targetEntity = ConceptDelegate.class, optional = false)
+    @OneToOne(targetEntity = ConceptMetadata.class, optional = false)
     @JoinColumn(name = "ConceptDelegateID_FK")
-    IConceptDelegate conceptDelegate
+    IConceptMetadata conceptMetadata
     
 }

@@ -22,8 +22,6 @@ package vars.knowledgebase;
 
 import vars.ILazy;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -81,7 +79,7 @@ public interface IConcept extends IKnowledgebaseObject, ILazy {
      * <p> <strong>This method should not be called directly by an application developer. </strong> </p> <p> In order to speed up database transactions most of the anxillary classes are now associated with a delegate rather than directly to a <code>Concept</code>. This delegate is lazy loaded using <code>IDAO</code> objects because castor does not support lazy loading. This <em>should</em> speed up transactions greatly. </p>
      * @return  The conceptDelegate which matintains associations to anxillary  information classes.
      */
-    IConceptDelegate getConceptDelegate();
+    IConceptMetadata getConceptMetadata();
 
     /**
      * Gets the <code>ConceptName</code> object of the specified String name.

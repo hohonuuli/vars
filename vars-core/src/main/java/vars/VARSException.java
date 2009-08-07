@@ -1,4 +1,4 @@
-package vars.services;
+package vars;
 
 public class VARSException extends RuntimeException {
 

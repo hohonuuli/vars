@@ -1,13 +1,11 @@
-package vars.services;
+package vars.knowledgebase;
 
 import vars.knowledgebase.IConcept;
-import vars.knowledgebase.IConceptDelegate;
 import vars.knowledgebase.IConceptName;
 import vars.knowledgebase.IHistory;
 import vars.knowledgebase.ILinkRealization;
 import vars.knowledgebase.ILinkTemplate;
 import vars.knowledgebase.IMedia;
-import vars.knowledgebase.ISectionInfo;
 import vars.knowledgebase.IUsage;
 
 /**
@@ -33,7 +31,6 @@ public interface KnowlegebaseFactory {
 
     IMedia newMedia();
 
-    ISectionInfo newSectionInfo();
 
     IUsage newUsage();
 }

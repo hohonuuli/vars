@@ -13,9 +13,10 @@ import javax.persistence.NamedQuery
 import javax.persistence.GenerationType
 import javax.persistence.ManyToOne
 import javax.persistence.JoinColumn
-import vars.knowledgebase.IConceptDelegate
+import vars.knowledgebase.IConceptMetadata
 import vars.knowledgebase.IMedia
-import vars.jpa.JPAEntity;
+import vars.jpa.JPAEntity
+import vars.knowledgebase.IConceptMetadata;
 
 /**
  * Created by IntelliJ IDEA.
@@ -66,9 +67,9 @@ public class Media implements Serializable, IMedia, JPAEntity {
     @Column(name = "Caption", length = 1000)
     String caption
 
-    @ManyToOne(optional = false, targetEntity = ConceptDelegate.class)
+    @ManyToOne(optional = false, targetEntity = ConceptMetadata.class)
     @JoinColumn(name = "ConceptDelegateID_FK")
-    IConceptDelegate conceptDelegate
+    IConceptMetadata conceptMetadata
 
     public boolean isPrimary() {
         return false;  // TODO implement this method.

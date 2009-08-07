@@ -32,14 +32,11 @@ public interface IUsage extends IKnowledgebaseObject {
     String PROP_SPECIFICATION = "specification";
 
     /**
-     * <p><!-- Method description --></p>
      * @return
-     * @uml.property  name="conceptDelegate"
      */
-    IConceptDelegate getConceptDelegate();
+    IConceptMetadata getConceptMetadata();
 
     /**
-     * <p><!-- Method description --></p>
      * @return
      */
     Date getEmbargoExpirationDate();
@@ -61,7 +58,6 @@ public interface IUsage extends IKnowledgebaseObject {
     /**
      * Sets the <code>Usage</code> 'specification' attribute.
      * @param specification  String specification of the <code>Usage</code>
-     * @uml.property  name="specification"
      */
     void setSpecification(String specification);
 }

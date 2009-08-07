@@ -21,7 +21,6 @@
 package vars.knowledgebase;
 
 import java.util.Date;
-import vars.IUserAccount;
 
 /**
  *
@@ -112,7 +111,7 @@ public interface IHistory extends IKnowledgebaseObject {
      * Not for Developer use. This is required for Castor/DAO
      * @return  The conceptDelegate value
      */
-    IConceptDelegate getConceptDelegate();
+    IConceptMetadata getConceptMetadata();
 
     /**
      * Gets the creation date of this <code>History</code>.

@@ -1,7 +1,7 @@
 package vars.knowledgebase.rules;
 
 import vars.IPersistenceRule;
-import vars.services.VARSPersistenceException;
+import vars.VARSPersistenceException;
 import vars.knowledgebase.IConcept;
 
 /**

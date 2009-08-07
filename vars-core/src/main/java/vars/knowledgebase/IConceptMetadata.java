@@ -1,5 +1,5 @@
 /*
- * @(#)IConceptDelegate.java   2008.12.30 at 01:50:53 PST
+ * @(#)IConceptMetadata.java   2008.12.30 at 01:50:53 PST
  *
  * Copyright 2007 MBARI
  *
@@ -27,7 +27,7 @@ import java.util.List;
  *
  * @author brian
  */
-public interface IConceptDelegate extends IKnowledgebaseObject {
+public interface IConceptMetadata extends IKnowledgebaseObject {
 
     String PROP_CONCEPT = "concept";
     String PROP_USAGE = "usage";
@@ -51,7 +51,7 @@ public interface IConceptDelegate extends IKnowledgebaseObject {
      * @return          Description of the Return Value
      * @see             IHistory
      */
-    boolean addHistory(IHistory history);
+    void addHistory(IHistory history);
 
     /**
      * Adds a <code>LinkRealization</code> object to the collection
@@ -63,7 +63,7 @@ public interface IConceptDelegate extends IKnowledgebaseObject {
      * @return                  Description of the Return Value
      * @see                     ILinkRealization
      */
-    boolean addLinkRealization(ILinkRealization linkRealization);
+    void addLinkRealization(ILinkRealization linkRealization);
 
     /**
      * Adds a <code>LinkTemplate</code> to the collection maintained by this
@@ -75,7 +75,7 @@ public interface IConceptDelegate extends IKnowledgebaseObject {
      * @return               Description of the Return Value
      * @see                  ILinkTemplate
      */
-    boolean addLinkTemplate(ILinkTemplate linkTemplate);
+    void addLinkTemplate(ILinkTemplate linkTemplate);
 
     /**
      * Adds a <code>Media</code> to the collection maintained by this <code>Concept</code>.
@@ -85,19 +85,8 @@ public interface IConceptDelegate extends IKnowledgebaseObject {
      * @return        Description of the Return Value
      * @see           IMedia
      */
-    boolean addMedia(IMedia media);
+    void addMedia(IMedia media);
 
-    /**
-     * Adds a <code>SectionInfo</code> to the collection maintained by this
-     * <code>Concept</code>.
-     *
-     *
-     * @param  sectionInfo              A <code>SectionInfo</code> to be assigned to this <code>Concept</code>
-     * node.
-     * @return              Description of the Return Value
-     * @see                 ISectionInfo
-     */
-    boolean addSectionInfo(ISectionInfo sectionInfo);
 
     /**
      * Gets the concept attribute of the ConceptDelegate object
@@ -109,7 +98,7 @@ public interface IConceptDelegate extends IKnowledgebaseObject {
     /**
      * @return
      */
-    List<? extends IHistory> getHistories();
+    Set<? extends IHistory> getHistories();
 
 
     /**
@@ -127,14 +116,9 @@ public interface IConceptDelegate extends IKnowledgebaseObject {
      */
     Set<? extends IMedia> getMedias();
 
-    /**
-     * @return
-     */
-    Set<? extends ISectionInfo> getSectionInfos();
 
     /**
      * @return
-     * @uml.property  name="usage"
      */
     IUsage getUsage();
 
@@ -147,7 +131,7 @@ public interface IConceptDelegate extends IKnowledgebaseObject {
      * removed.
      * @see             IHistory
      */
-    boolean removeHistory(IHistory history);
+    void removeHistory(IHistory history);
 
     /**
      * Removes a <B>LinkRealization </B> from this <B>Concept </B>.
@@ -159,7 +143,7 @@ public interface IConceptDelegate extends IKnowledgebaseObject {
      * removed.
      * @see                     ILinkRealization
      */
-    boolean removeLinkRealization(ILinkRealization linkRealization);
+    void removeLinkRealization(ILinkRealization linkRealization);
 
     /**
      * Removes a <B>LinkTemplate </B> from this <B>Concept </B>.
@@ -170,7 +154,7 @@ public interface IConceptDelegate extends IKnowledgebaseObject {
      * removed.
      * @see                  ILinkTemplate
      */
-    boolean removeLinkTemplate(ILinkTemplate linkTemplate);
+    void removeLinkTemplate(ILinkTemplate linkTemplate);
 
     /**
      * Removes a <B>Media </B> from this <B>Concept </B>.
@@ -181,19 +165,7 @@ public interface IConceptDelegate extends IKnowledgebaseObject {
      * removed.
      * @see           IMedia
      */
-    boolean removeMedia(IMedia media);
-
-    /**
-     * Removes a <B>SectionInfo </B> from this <B>Concept </B>.
-     *
-     *
-     * @param  sectionInfo              A <B>SectionInfo </B> to remove from this <B>Concept </B>.
-     * @return              <code>true</code> if the <code>SectionInfo</code> is
-     * removed.
-     * @see                 ISectionInfo
-     */
-    boolean removeSectionInfo(ISectionInfo sectionInfo);
-
+    void removeMedia(IMedia media);
 
 
     /**

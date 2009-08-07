@@ -15,7 +15,7 @@ import javax.persistence.ManyToOne
 import javax.persistence.JoinColumn
 import vars.ILink
 import vars.LinkCategory
-import vars.knowledgebase.IConceptDelegate
+import vars.knowledgebase.IConceptMetadata
 import vars.knowledgebase.ILinkRealization
 import vars.jpa.JPAEntity;
 
@@ -72,12 +72,12 @@ class LinkRealization implements Serializable, ILinkRealization, JPAEntity {
     @Column(name = "LinkValue", length = 255)
     String linkValue
 
-    @ManyToOne(optional = false, targetEntity = ConceptDelegate.class)
+    @ManyToOne(optional = false, targetEntity = ConceptMetadata.class)
     @JoinColumn(name = "ConceptDelegateID_FK")
-    IConceptDelegate conceptDelegate
+    IConceptMetadata conceptMetadata
 
     public String getFromConcept() {
-        return conceptDelegate?.concept
+        return conceptMetadata?.concept
     }
 
     String stringValue() {

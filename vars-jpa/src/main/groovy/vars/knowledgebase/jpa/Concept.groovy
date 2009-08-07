@@ -19,9 +19,10 @@ import javax.persistence.CascadeType
 import javax.persistence.OneToOne
 import vars.knowledgebase.IConceptName
 import vars.knowledgebase.IConcept
-import vars.knowledgebase.IConceptDelegate
+import vars.knowledgebase.IConceptMetadata
 import vars.knowledgebase.ConceptNameTypes
 import vars.jpa.JPAEntity
+import vars.knowledgebase.IConceptMetadata
 
 /**
  *
@@ -122,14 +123,14 @@ class Concept implements Serializable, IConcept, JPAEntity {
     @Column(name = "TaxonomyType", length = 20)
     String taxonomyType
 
-    @OneToOne(mappedBy = "concept", fetch = FetchType.LAZY, cascade = CascadeType.ALL, targetEntity = ConceptDelegate.class)
-    IConceptDelegate conceptDelegate
+    @OneToOne(mappedBy = "concept", fetch = FetchType.LAZY, cascade = CascadeType.ALL, targetEntity = ConceptMetadata.class)
+    IConceptMetadata conceptMetadata
 
-    IConceptDelegate getConceptDelegate() {
-        if (conceptDelegate == null) {
-            conceptDelegate = new ConceptDelegate()
+    IConceptMetadata getConceptMetadata() {
+        if (conceptMetadata == null) {
+            conceptMetadata = new ConceptMetadata()
         }
-        return conceptDelegate
+        return conceptMetadata
     }
 
     Set<IConceptName> getConceptNames() {

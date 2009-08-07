@@ -14,6 +14,8 @@ import javax.persistence.NamedQueries
 import javax.persistence.NamedQuery
 import groovy.beans.Bindable
 import javax.persistence.TableGenerator
+
+import vars.IPropertyChange
 import vars.LinkCategory
 import vars.annotation.IAssociation
 import vars.annotation.IObservation

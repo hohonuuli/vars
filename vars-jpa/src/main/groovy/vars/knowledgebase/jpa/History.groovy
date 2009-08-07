@@ -15,9 +15,10 @@ import javax.persistence.GenerationType
 import javax.persistence.TemporalType
 import javax.persistence.ManyToOne
 import javax.persistence.JoinColumn
-import vars.knowledgebase.IConceptDelegate
+import vars.knowledgebase.IConceptMetadata
 import vars.knowledgebase.IHistory
-import vars.jpa.JPAEntity;
+import vars.jpa.JPAEntity
+import vars.knowledgebase.IConceptMetadata;
 
 /**
  * CREATE TABLE HISTORY (
@@ -112,9 +113,9 @@ class History implements Serializable, IHistory, JPAEntity {
     @Column(name = "Rejected")
     private Short rejected
 
-    @ManyToOne(optional = false, targetEntity = ConceptDelegate.class)
+    @ManyToOne(optional = false, targetEntity = ConceptMetadata.class)
     @JoinColumn(name = "ConceptDelegateID_FK")
-    IConceptDelegate conceptDelegate
+    IConceptMetadata conceptMetadata
 
     public boolean isAdd() {
         return false;  // TODO implement this method.

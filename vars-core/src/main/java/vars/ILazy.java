@@ -1,11 +1,8 @@
 package vars;
 
 /**
- * Created by IntelliJ IDEA.
- * User: brian
- * Date: Aug 6, 2009
- * Time: 1:28:58 PM
- * To change this template use File | Settings | File Templates.
+ * Interface used to indicate that the class has lazy-relations that will
+ * need to be loaded before they can be referenced.
  */
 public interface ILazy {
 

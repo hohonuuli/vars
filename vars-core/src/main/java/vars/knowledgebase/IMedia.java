@@ -46,7 +46,7 @@ public interface IMedia extends IKnowledgebaseObject {
      * Gets the conceptDelegate attribute of the Media object
      * @return   The conceptDelegate value
      */
-    IConceptDelegate getConceptDelegate();
+    IConceptMetadata getConceptMetadata();
 
     /**
      * Gets the <code>Media</code> 'credit' attribute.

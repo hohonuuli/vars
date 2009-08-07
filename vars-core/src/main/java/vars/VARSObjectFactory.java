@@ -1,4 +1,4 @@
-package vars.services;
+package vars;
 
 import vars.IUserAccount;
 
