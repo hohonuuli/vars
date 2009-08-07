@@ -153,13 +153,6 @@ class Concept implements Serializable, IConcept, JPAEntity {
         }
     }
 
-    Set<IConcept> getChildConcepts() {
-        if (childConcepts == null) {
-            childConcepts = new HashSet<IConcept>();
-        }
-        return childConcepts
-    }
-
     void addChildConcept(IConcept child) {
         if (childConcepts.add(child)) {
             child.parentConcept = this
@@ -209,6 +202,6 @@ class Concept implements Serializable, IConcept, JPAEntity {
     }
 
     public void loadLazyRelations() {
-        // TODO implement this method.
+        childConcepts.each { it.id } // Touch each to ensure they get loaded
     }
 }

@@ -85,7 +85,7 @@ public interface IVideoArchive extends IAnnotationObject, ILazy {
      * Retrieve the videoframe collection. Note: This can result in a database access if the VideoArchive has been persisted and retrieved from the database. Do not add or remove items directly from this collections.
      * @return  A synchronized collection.
      */
-    Set<? extends IVideoFrame> getVideoFrames();
+    List<? extends IVideoFrame> getVideoFrames();
 
 
     void removeVideoFrame(final IVideoFrame videoFrame);

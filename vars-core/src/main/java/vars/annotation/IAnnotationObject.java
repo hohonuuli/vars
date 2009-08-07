@@ -1,5 +1,7 @@
 package vars.annotation;
 
+import vars.IVARSObject;
+
 /**
  * Created by IntelliJ IDEA.
  * User: brian
@@ -7,5 +9,5 @@ package vars.annotation;
  * Time: 1:31:07 PM
  * To change this template use File | Settings | File Templates.
  */
-public interface IAnnotationObject {
+public interface IAnnotationObject extends IVARSObject {
 }

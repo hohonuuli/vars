@@ -13,10 +13,7 @@ import javax.persistence.FetchType
 import javax.persistence.GenerationType
 import javax.persistence.JoinColumn
 import javax.persistence.CascadeType
-import javax.persistence.PrimaryKeyJoinColumn
 import javax.persistence.Version
-import javax.persistence.Temporal
-import javax.persistence.TemporalType
 import java.sql.Timestamp
 import javax.persistence.OrderBy
 import javax.persistence.TableGenerator
@@ -66,12 +63,6 @@ class VideoArchive implements Serializable, IVideoArchive, JPAEntity {
     @OrderBy(value = "recordedDate")
     List<VideoFrame> videoFrames
 
-    Set<VideoFrame> getVideoFrames() {
-        if (videoFrames == null) {
-            videoFrames = new HashSet<VideoFrame>()
-        }
-        return videoFrames
-    }
 
     void addVideoFrame(VideoFrame videoFrame) {
         if (getVideoFrames().find {VideoFrame vf -> vf.timecode.equals(videoFrame.timecode)}) {
@@ -111,7 +102,7 @@ class VideoArchive implements Serializable, IVideoArchive, JPAEntity {
     }
 
     public void loadLazyRelations() {
-        // TODO implement this method.
+        videoFrames.each { it.id } // Touch each one to ensure it's read from db
     }
 
 

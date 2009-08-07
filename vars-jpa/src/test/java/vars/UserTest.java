@@ -32,7 +32,7 @@ import org.mbari.jpax.EAO;
  */
 public class UserTest extends TestCase {
 
-    private EntityManagerFactory emf = Persistence.createEntityManagerFactory("user-test");
+    private EntityManagerFactory emf = Persistence.createEntityManagerFactory("test");
 
     public void setUp() throws Exception {
         InputStream testData = User.class.getResourceAsStream("/user.db.xml");
