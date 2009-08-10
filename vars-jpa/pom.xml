@@ -84,7 +84,7 @@
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-entitymanager</artifactId>
       <version>3.4.0.ga</version>
-      <scope>test</scope>
+      <scope>compile</scope>
       <exclusions>
         <exclusion>
           <artifactId>jta</artifactId>

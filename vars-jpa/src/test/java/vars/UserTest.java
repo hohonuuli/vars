@@ -15,13 +15,17 @@
 package vars;
 
 import java.io.InputStream;
+import java.util.Date;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.EntityManager;
 
-import junit.framework.TestCase;
 import org.hibernate.ejb.HibernateEntityManager;
 import org.mbari.jpax.EAO;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import static org.junit.Assert.*;
 
 /**
  * Class description
@@ -30,11 +34,14 @@ import org.mbari.jpax.EAO;
  * @version        $date$, 2009.08.06 at 10:01:22 PDT
  * @author         Brian Schlining [brian@mbari.org]
  */
-public class UserTest extends TestCase {
+public class UserTest {
 
-    private EntityManagerFactory emf = Persistence.createEntityManagerFactory("test");
+    private final EntityManagerFactory emf = Persistence.createEntityManagerFactory("test");
 
-    public void setUp() throws Exception {
+    private final Date date = new Date();
+
+    @Before
+    public void runme() throws Exception {
         InputStream testData = User.class.getResourceAsStream("/user.db.xml");
 
         HibernateEntityManager em = (HibernateEntityManager) emf.createEntityManager();
@@ -44,6 +51,7 @@ public class UserTest extends TestCase {
         loader.populateTestData();
     }
 
+    @Test
     public void testFindAll() {
         EntityManager em = emf.createEntityManager();
 
@@ -55,6 +63,7 @@ public class UserTest extends TestCase {
         em.close();
     }
 
+    @Test
     public void testFindAll2() {
         EAO eao = new EAO(emf);
         Long key = 1L;
@@ -66,10 +75,25 @@ public class UserTest extends TestCase {
 
         // Repeat for grins
         user = eao.find(User.class, key);
-
         assertNotNull(user);
         assertEquals(1L, user.getId());
         assertEquals("John Doe", user.getName());
+
+    }
+
+    @Test
+    public void testUpdateDate01() {
+        EAO eao = new EAO(emf);
+        Long key = 1L;
+        User user = eao.find(User.class, key);
+        user.setDate(date);
+
+        user = eao.update(user);
+
+        user = eao.find(User.class, key);
+        assertNotNull(user);
+        assertEquals(1L, user.getId());
+        assertEquals(date, user.getDate());
 
     }
 }
