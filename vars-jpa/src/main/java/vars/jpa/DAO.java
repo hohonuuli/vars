@@ -2,9 +2,7 @@ package vars.jpa;
 
 import vars.IDAO;
 import vars.VARSPersistenceException;
-import vars.jpa.JPAEntity;
 import org.mbari.jpax.EAO;
-import org.mbari.jpax.IEAO;
 import com.google.inject.Inject;
 
 /**
@@ -12,10 +10,10 @@ import com.google.inject.Inject;
  */
 public class DAO implements IDAO {
 
-    private final IEAO eao;
+    private final EAO eao;
 
     @Inject
-    public DAO(IEAO eao) {
+    public DAO(EAO eao) {
         this.eao = eao;
     }
 
@@ -47,7 +45,7 @@ public class DAO implements IDAO {
         return eao.find(clazz, primaryKey);
     }
 
-    protected IEAO getEAO() {
+    protected EAO getEAO() {
         return eao;
     }
 }

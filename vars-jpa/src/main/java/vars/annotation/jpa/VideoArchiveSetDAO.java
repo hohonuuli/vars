@@ -4,7 +4,7 @@ import vars.jpa.DAO;
 import vars.annotation.IVideoArchiveSetDAO;
 import vars.annotation.IVideoArchiveSet;
 import vars.knowledgebase.IConcept;
-import org.mbari.jpax.IEAO;
+import org.mbari.jpax.EAO;
 
 import java.util.Set;
 import java.util.Date;
@@ -14,7 +14,7 @@ import com.google.inject.Inject;
 public class VideoArchiveSetDAO extends DAO implements IVideoArchiveSetDAO {
 
     @Inject
-    public VideoArchiveSetDAO(IEAO eao) {
+    public VideoArchiveSetDAO(EAO eao) {
         super(eao);
     }
 

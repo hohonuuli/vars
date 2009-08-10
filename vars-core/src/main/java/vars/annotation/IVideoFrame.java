@@ -105,28 +105,11 @@ public interface IVideoFrame extends IAnnotationObject {
     boolean isInSequence();
 
     /**
-     * <p><!-- Method description --></p>
-     *
-     *
      * @param obs
      *
      * @return
      */
     void removeObservation(IObservation obs);
-
-    /**
-     * Set the <code>CameraData</code> for this <code>VideoFrame</code>. If the passed
-     * <code>CameraData</code> object is equal to the current <code>CameraData</code> object, the
-     * current object reference not changed; otherwise, the reference is set to the
-     * passed parameter. In either case, the <code>CameraData</code> reference for this
-     * <code>VideoFrame</code> is returned.
-     *
-     *
-     * @param camera
-     * @return The <code>CameraData</code> for this <code>VideoFrame</code>.
-     * @see ICameraData
-     */
-    void setCameraData(ICameraData camera);
 
 
     /**
@@ -141,43 +124,21 @@ public interface IVideoFrame extends IAnnotationObject {
     /**
      * Set the flag indicating whether this <code>VideoFrame</code> is part of a larger sequence of <code>VideoFrame</code> objects. a.k.a This annotation is part of larger group of annotations describing a sequence of events.
      * @param state  boolean indicator of sequence state
-     * @uml.property  name="inSequence"
      */
     void setInSequence(boolean state);
 
-    /**
-     * Use by Castor, developers should not call this.
-     * @param  observationCollToSet
-     * @uml.property  name="observationColl"
-     */
-    //void setObservations(Collection observationCollToSet);
 
-    /**
-     * Set the <code>PhysicalData</code> for this <code>VideoFrame</code>. The <code>PhysicalData</code> object holds related information which pertains to all <code>Observation</code> objects of all <code>Annotator</code> objects of this <code>VideoFrame</code>.
-     * @see IPhysicalData
-     * @see IObservation
-     * @param  ancillaryData
-     * @uml.property  name="physicalData"
-     */
-    void setPhysicalData(IPhysicalData ancillaryData);
 
     /**
      * Sets the time of the frame representing the annotation
      * @param dtg  The Date that the annotated frame was recorded in UTC.
-     * @uml.property  name="recordedDTG"
      */
     void setRecordedDate(Date dtg);
 
-    /**
-     * @param  long1
-     * @uml.property  name="sampleId"
-     */
-    //void setSampleId(Long long1);
+
 
     /**
-     * <p><!-- Method description --></p>
      * @param  timecode
-     * @uml.property  name="timeCode"
      */
     void setTimecode(String timecode);
 

@@ -2,7 +2,9 @@ package vars.knowledgebase.jpa;
 
 import vars.knowledgebase.IUsageDAO;
 import vars.jpa.DAO;
-import org.mbari.jpax.IEAO;
+import org.mbari.jpax.EAO;
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 /**
  * Created by IntelliJ IDEA.
@@ -13,7 +15,8 @@ import org.mbari.jpax.IEAO;
  */
 public class UsageDAO extends DAO implements IUsageDAO {
 
-    public UsageDAO(IEAO eao) {
+    @Inject
+    public UsageDAO(EAO eao) {
         super(eao);
     }
 

@@ -3,9 +3,11 @@ package vars.annotation.jpa;
 import vars.jpa.DAO;
 import vars.annotation.IVideoFrameDAO;
 import vars.annotation.IVideoFrame;
-import org.mbari.jpax.IEAO;
+import org.mbari.jpax.EAO;
 
 import java.util.Set;
+
+import com.google.inject.Inject;
 
 /**
  * Created by IntelliJ IDEA.
@@ -16,7 +18,8 @@ import java.util.Set;
  */
 public class VideoFrameDAO extends DAO implements IVideoFrameDAO {
 
-    public VideoFrameDAO(IEAO eao) {
+    @Inject
+    public VideoFrameDAO(EAO eao) {
         super(eao);
     }
 

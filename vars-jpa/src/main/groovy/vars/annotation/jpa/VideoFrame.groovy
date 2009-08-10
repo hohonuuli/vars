@@ -63,10 +63,10 @@ class VideoFrame implements Serializable, IVideoFrame, JPAEntity {
     Short inSequence
 
     @OneToOne(mappedBy = "videoFrame", fetch = FetchType.EAGER, cascade = CascadeType.ALL, targetEntity = CameraData.class)
-    ICameraData cameraData
+    private ICameraData cameraData
 
     @OneToOne(mappedBy = "videoFrame", fetch = FetchType.EAGER, cascade = CascadeType.ALL, targetEntity = PhysicalData.class)
-    IPhysicalData physicalData
+    private IPhysicalData physicalData
 
     @ManyToOne(optional = false, targetEntity = VideoArchive.class)
     @JoinColumn(name = "VideoArchiveID_FK")

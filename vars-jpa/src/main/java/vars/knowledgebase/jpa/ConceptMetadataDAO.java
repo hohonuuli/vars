@@ -2,7 +2,8 @@ package vars.knowledgebase.jpa;
 
 import vars.knowledgebase.IConceptMetadataDAO;
 import vars.jpa.DAO;
-import org.mbari.jpax.IEAO;
+import org.mbari.jpax.EAO;
+import com.google.inject.Inject;
 
 /**
  * Created by IntelliJ IDEA.
@@ -13,7 +14,8 @@ import org.mbari.jpax.IEAO;
  */
 public class ConceptMetadataDAO extends DAO implements IConceptMetadataDAO {
 
-    public ConceptMetadataDAO(IEAO eao) {
+    @Inject
+    public ConceptMetadataDAO(EAO eao) {
         super(eao);
     }
     

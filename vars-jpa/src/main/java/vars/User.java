@@ -1,6 +1,5 @@
 package vars;
 
-import org.hibernate.annotations.Type;
 
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
@@ -20,7 +19,6 @@ public class User {
 
     private String name;
 
-    @Type(type = "vars.hibernate.HibernateUTC")
     @Temporal(value = TemporalType.TIMESTAMP)
     private Date date;
 

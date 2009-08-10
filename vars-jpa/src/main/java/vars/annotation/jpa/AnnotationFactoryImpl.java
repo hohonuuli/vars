@@ -6,6 +6,7 @@ import vars.annotation.IObservation;
 import vars.annotation.IVideoFrame;
 import vars.annotation.IVideoArchive;
 import vars.annotation.IVideoArchiveSet;
+import vars.annotation.ICameraDeployment;
 
 /**
  * Created by IntelliJ IDEA.
@@ -34,5 +35,9 @@ public class AnnotationFactoryImpl implements AnnotationFactory {
 
     public IVideoArchiveSet newVideoArchiveSet() {
         return new VideoArchiveSet();
+    }
+
+    public ICameraDeployment newCameraDeployment() {
+        return new CameraDeployment();
     }
 }

@@ -3,9 +3,11 @@ package vars.knowledgebase.jpa;
 import vars.jpa.DAO;
 import vars.knowledgebase.ILinkRealizationDAO;
 import vars.knowledgebase.ILinkRealization;
-import org.mbari.jpax.IEAO;
+import org.mbari.jpax.EAO;
 
 import java.util.Set;
+
+import com.google.inject.Inject;
 
 /**
  * Created by IntelliJ IDEA.
@@ -16,7 +18,8 @@ import java.util.Set;
  */
 public class LinkRealizationDAO extends DAO implements ILinkRealizationDAO {
 
-    public LinkRealizationDAO(IEAO eao) {
+    @Inject
+    public LinkRealizationDAO(EAO eao) {
         super(eao);
     }
 

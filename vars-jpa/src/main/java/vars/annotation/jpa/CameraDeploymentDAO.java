@@ -4,7 +4,7 @@ import vars.annotation.ICameraDeploymentDAO;
 import vars.annotation.ICameraDeployment;
 import vars.IDAO;
 import vars.jpa.DAO;
-import org.mbari.jpax.IEAO;
+import org.mbari.jpax.EAO;
 
 import java.util.Set;
 import java.util.Map;
@@ -23,7 +23,7 @@ import com.google.inject.Inject;
 public class CameraDeploymentDAO extends DAO implements ICameraDeploymentDAO {
 
     @Inject
-    public CameraDeploymentDAO(IEAO eao) {
+    public CameraDeploymentDAO(EAO eao) {
         super(eao);
     }
 

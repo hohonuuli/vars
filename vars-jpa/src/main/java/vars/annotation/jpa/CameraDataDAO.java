@@ -3,9 +3,11 @@ package vars.annotation.jpa;
 import vars.jpa.DAO;
 import vars.annotation.ICameraDataDAO;
 import vars.annotation.ICameraData;
-import org.mbari.jpax.IEAO;
+import org.mbari.jpax.EAO;
 
 import java.util.Set;
+
+import com.google.inject.Inject;
 
 /**
  * Created by IntelliJ IDEA.
@@ -16,7 +18,8 @@ import java.util.Set;
  */
 public class CameraDataDAO extends DAO implements ICameraDataDAO {
 
-    public CameraDataDAO(IEAO eao) {
+    @Inject
+    public CameraDataDAO(EAO eao) {
         super(eao);
     }
 

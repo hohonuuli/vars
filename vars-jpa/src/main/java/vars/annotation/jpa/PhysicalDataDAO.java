@@ -3,7 +3,8 @@ package vars.annotation.jpa;
 import vars.jpa.DAO;
 import vars.annotation.IPhysicalData;
 import vars.annotation.IPhysicalDataDAO;
-import org.mbari.jpax.IEAO;
+import org.mbari.jpax.EAO;
+import com.google.inject.Inject;
 
 /**
  * Created by IntelliJ IDEA.
@@ -14,7 +15,8 @@ import org.mbari.jpax.IEAO;
  */
 public class PhysicalDataDAO extends DAO implements IPhysicalDataDAO {
 
-    public PhysicalDataDAO(IEAO eao) {
+    @Inject
+    public PhysicalDataDAO(EAO eao) {
         super(eao);
     }
 

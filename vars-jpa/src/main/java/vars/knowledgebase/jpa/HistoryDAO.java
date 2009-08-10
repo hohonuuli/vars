@@ -3,9 +3,12 @@ package vars.knowledgebase.jpa;
 import vars.knowledgebase.IHistoryDAO;
 import vars.knowledgebase.IHistory;
 import vars.jpa.DAO;
-import org.mbari.jpax.IEAO;
+import org.mbari.jpax.EAO;
 
 import java.util.Set;
+
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 /**
  * Created by IntelliJ IDEA.
@@ -16,7 +19,8 @@ import java.util.Set;
  */
 public class HistoryDAO extends DAO implements IHistoryDAO {
 
-    public HistoryDAO(IEAO eao) {
+    @Inject
+    public HistoryDAO(EAO eao) {
         super(eao);
     }
 

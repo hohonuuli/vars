@@ -4,9 +4,11 @@ import vars.jpa.DAO;
 import vars.annotation.IObservationDAO;
 import vars.annotation.IObservation;
 import vars.knowledgebase.IConcept;
-import org.mbari.jpax.IEAO;
+import org.mbari.jpax.EAO;
 
 import java.util.Set;
+
+import com.google.inject.Inject;
 
 /**
  * Created by IntelliJ IDEA.
@@ -17,7 +19,8 @@ import java.util.Set;
  */
 public class ObservationDAO extends DAO implements IObservationDAO{
 
-    public ObservationDAO(IEAO eao) {
+    @Inject
+    public ObservationDAO(EAO eao) {
         super(eao);
     }
 

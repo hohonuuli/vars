@@ -5,7 +5,7 @@ import vars.annotation.IAssociation;
 import vars.jpa.DAO;
 import vars.knowledgebase.IConceptDAO;
 import vars.knowledgebase.IConcept;
-import org.mbari.jpax.IEAO;
+import org.mbari.jpax.EAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.inject.Inject;
@@ -23,7 +23,7 @@ public class AssociationDAO extends DAO implements IAssociationDAO {
     private final Logger log = LoggerFactory.getLogger(getClass());
 
     @Inject
-    public AssociationDAO(IEAO eao, IConceptDAO conceptDao) {
+    public AssociationDAO(EAO eao, IConceptDAO conceptDao) {
         super(eao);
         this.conceptDAO = conceptDao;
     }

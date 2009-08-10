@@ -3,7 +3,8 @@ package vars.knowledgebase.jpa;
 import vars.jpa.DAO;
 import vars.knowledgebase.IConceptDAO;
 import vars.knowledgebase.IConcept;
-import org.mbari.jpax.IEAO;
+import org.mbari.jpax.EAO;
+import com.google.inject.Inject;
 
 /**
  * Created by IntelliJ IDEA.
@@ -13,7 +14,9 @@ import org.mbari.jpax.IEAO;
  * To change this template use File | Settings | File Templates.
  */
 public class ConceptDAO extends DAO implements IConceptDAO {
-    public ConceptDAO(IEAO eao) {
+
+    @Inject
+    public ConceptDAO(EAO eao) {
         super(eao);
     }
 

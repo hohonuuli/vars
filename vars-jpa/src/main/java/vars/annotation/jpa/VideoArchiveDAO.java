@@ -4,9 +4,11 @@ import vars.jpa.DAO;
 import vars.annotation.IVideoArchiveDAO;
 import vars.annotation.IVideoArchive;
 import vars.knowledgebase.IConcept;
-import org.mbari.jpax.IEAO;
+import org.mbari.jpax.EAO;
 
 import java.util.Set;
+
+import com.google.inject.Inject;
 
 /**
  * Created by IntelliJ IDEA.
@@ -17,7 +19,8 @@ import java.util.Set;
  */
 public class VideoArchiveDAO extends DAO implements IVideoArchiveDAO{
 
-    public VideoArchiveDAO(IEAO eao) {
+    @Inject
+    public VideoArchiveDAO(EAO eao) {
         super(eao);
     }
 

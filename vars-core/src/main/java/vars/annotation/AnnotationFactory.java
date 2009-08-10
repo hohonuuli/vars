@@ -26,5 +26,7 @@ public interface AnnotationFactory {
     IVideoArchive newVideoArchive();
 
     IVideoArchiveSet newVideoArchiveSet();
+
+    ICameraDeployment newCameraDeployment();
     
 }

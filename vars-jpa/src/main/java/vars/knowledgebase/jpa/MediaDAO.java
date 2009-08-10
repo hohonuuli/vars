@@ -2,7 +2,8 @@ package vars.knowledgebase.jpa;
 
 import vars.knowledgebase.IMediaDAO;
 import vars.jpa.DAO;
-import org.mbari.jpax.IEAO;
+import org.mbari.jpax.EAO;
+import com.google.inject.Inject;
 
 /**
  * Created by IntelliJ IDEA.
@@ -13,7 +14,8 @@ import org.mbari.jpax.IEAO;
  */
 public class MediaDAO extends DAO implements IMediaDAO {
 
-    public MediaDAO(IEAO eao) {
+    @Inject
+    public MediaDAO(EAO eao) {
         super(eao);
     }
     

@@ -4,9 +4,11 @@ import vars.knowledgebase.ILinkTemplateDAO;
 import vars.knowledgebase.ILinkTemplate;
 import vars.knowledgebase.IConcept;
 import vars.jpa.DAO;
-import org.mbari.jpax.IEAO;
+import org.mbari.jpax.EAO;
 
 import java.util.Set;
+
+import com.google.inject.Inject;
 
 /**
  * Created by IntelliJ IDEA.
@@ -17,7 +19,8 @@ import java.util.Set;
  */
 public class LinkTemplateDAO extends DAO implements ILinkTemplateDAO {
 
-    public LinkTemplateDAO(IEAO eao) {
+    @Inject
+    public LinkTemplateDAO(EAO eao) {
         super(eao);
     }
 
