@@ -3,6 +3,7 @@ package vars.knowledgebase.jpa;
 import vars.knowledgebase.ILinkTemplateDAO;
 import vars.knowledgebase.ILinkTemplate;
 import vars.knowledgebase.IConcept;
+import vars.knowledgebase.IConceptDAO;
 import vars.jpa.DAO;
 import org.mbari.jpax.EAO;
 
@@ -19,9 +20,12 @@ import com.google.inject.Inject;
  */
 public class LinkTemplateDAO extends DAO implements ILinkTemplateDAO {
 
+    private final IConceptDAO conceptDAO;
+
     @Inject
-    public LinkTemplateDAO(EAO eao) {
+    public LinkTemplateDAO(EAO eao, IConceptDAO conceptDAO) {
         super(eao);
+        this.conceptDAO = conceptDAO; 
     }
 
     public Set<ILinkTemplate> findAllByLinkFields(String linkName, String toConcept, String linkValue) {

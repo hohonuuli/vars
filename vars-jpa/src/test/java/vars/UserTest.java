@@ -22,6 +22,7 @@ import javax.persistence.EntityManager;
 
 import org.hibernate.ejb.HibernateEntityManager;
 import org.mbari.jpax.EAO;
+import org.mbari.jpax.NonManagedEAOImpl;
 import org.junit.Test;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -65,7 +66,7 @@ public class UserTest {
 
     @Test
     public void testFindAll2() {
-        EAO eao = new EAO(emf);
+        EAO eao = new NonManagedEAOImpl(emf);
         Long key = 1L;
         User user = eao.find(User.class, key);
 
@@ -83,7 +84,7 @@ public class UserTest {
 
     @Test
     public void testUpdateDate01() {
-        EAO eao = new EAO(emf);
+        EAO eao = new NonManagedEAOImpl(emf);
         Long key = 1L;
         User user = eao.find(User.class, key);
         user.setDate(date);

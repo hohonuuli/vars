@@ -3,6 +3,7 @@ package vars.knowledgebase.jpa;
 import vars.jpa.DAO;
 import vars.knowledgebase.ILinkRealizationDAO;
 import vars.knowledgebase.ILinkRealization;
+import vars.knowledgebase.IConceptDAO;
 import org.mbari.jpax.EAO;
 
 import java.util.Set;
@@ -18,9 +19,12 @@ import com.google.inject.Inject;
  */
 public class LinkRealizationDAO extends DAO implements ILinkRealizationDAO {
 
+    private final IConceptDAO conceptDAO;
+
     @Inject
-    public LinkRealizationDAO(EAO eao) {
+    public LinkRealizationDAO(EAO eao, IConceptDAO conceptDao) {
         super(eao);
+        this.conceptDAO = conceptDao;
     }
 
     public Set<ILinkRealization> findAllByLinkName() {

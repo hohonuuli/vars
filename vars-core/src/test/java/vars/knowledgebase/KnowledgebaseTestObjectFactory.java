@@ -9,9 +9,9 @@ package vars.knowledgebase;
  */
 public class KnowledgebaseTestObjectFactory {
 
-    private final KnowlegebaseFactory factory;
+    private final KnowledgebaseFactory factory;
 
-    public KnowledgebaseTestObjectFactory(KnowlegebaseFactory factory) {
+    public KnowledgebaseTestObjectFactory(KnowledgebaseFactory factory) {
         this.factory = factory;
     }
 }

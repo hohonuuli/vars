@@ -15,7 +15,7 @@ import vars.knowledgebase.IUsage;
  * Time: 2:50:58 PM
  * To change this template use File | Settings | File Templates.
  */
-public interface KnowlegebaseFactory {
+public interface KnowledgebaseFactory {
 
     /* --- Knowledgebase --- */
 

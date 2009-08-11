@@ -2,12 +2,22 @@ package vars.jpa;
 
 import com.google.inject.Module;
 import com.google.inject.Binder;
+import com.google.inject.PrivateModule;
+import com.google.inject.Injector;
+import com.google.inject.Guice;
 import com.google.inject.name.Names;
-import vars.annotation.IAssociationDAO;
-import vars.annotation.ICameraDataDAO;
-import vars.annotation.jpa.AssociationDAO;
-import vars.annotation.jpa.CameraDataDAO;
+import vars.annotation.AnnotationDAOFactory;
+import vars.annotation.AnnotationFactory;
+import vars.annotation.jpa.AnnotationDAOFactoryImpl;
+import vars.annotation.jpa.AnnotationFactoryImpl;
 import vars.annotation.jpa.AnnotationEAO;
+import vars.annotation.jpa.VARSAnnotation;
+import vars.knowledgebase.jpa.KnowledgebaseDAOFactoryImpl;
+import vars.knowledgebase.jpa.KnowledgebaseFactoryImpl;
+import vars.knowledgebase.jpa.KnowledgebaseEAO;
+import vars.knowledgebase.jpa.VARSKnowledgebase;
+import vars.knowledgebase.KnowledgebaseDAOFactory;
+import vars.knowledgebase.KnowledgebaseFactory;
 import org.mbari.jpax.EAO;
 
 
@@ -27,10 +37,14 @@ public class VarsJpaTestModule implements Module {
         binder.bindConstant().annotatedWith(Names.named("knowledgebasePersistenceUnit")).to("test");
 
         // Bind annotation DAO
-        //binder.bind(EAO.class).to() // TODO figure out how to bind 2 different EAOs to different trees
-        binder.bind(IAssociationDAO.class).to(AssociationDAO.class);
-        binder.bind(ICameraDataDAO.class).to(CameraDataDAO.class);
+        binder.bind(AnnotationDAOFactory.class).to(AnnotationDAOFactoryImpl.class);
+        binder.bind(AnnotationFactory.class).to(AnnotationFactoryImpl.class);
+        binder.bind(KnowledgebaseDAOFactory.class).to(KnowledgebaseDAOFactoryImpl.class);
+        binder.bind(KnowledgebaseFactory.class).to(KnowledgebaseFactoryImpl.class);
+        binder.bind(EAO.class).annotatedWith(Names.named("annotationEAO")).to(AnnotationEAO.class);
+        binder.bind(EAO.class).annotatedWith(Names.named("knowledgebaseEAO")).to(KnowledgebaseEAO.class);
 
-        
     }
+
+
 }

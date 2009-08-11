@@ -3,6 +3,7 @@ package vars.knowledgebase.jpa;
 import org.mbari.jpax.NonManagedEAO;
 import org.mbari.jpax.NonManagedEAOImpl;
 import com.google.inject.name.Named;
+import com.google.inject.Inject;
 
 import javax.persistence.EntityManager;
 import java.util.List;
@@ -19,6 +20,7 @@ public class KnowledgebaseEAO implements NonManagedEAO {
 
     private final NonManagedEAO eao;
 
+    @Inject
     public KnowledgebaseEAO(@Named("knowledgebasePersistenceUnit") String persistenceUnit) {
         this.eao = new NonManagedEAOImpl(persistenceUnit);
     }

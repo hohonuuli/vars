@@ -4,6 +4,7 @@ import vars.jpa.DAO;
 import vars.annotation.IObservationDAO;
 import vars.annotation.IObservation;
 import vars.knowledgebase.IConcept;
+import vars.knowledgebase.IConceptDAO;
 import org.mbari.jpax.EAO;
 
 import java.util.Set;
@@ -19,9 +20,12 @@ import com.google.inject.Inject;
  */
 public class ObservationDAO extends DAO implements IObservationDAO{
 
+    private final IConceptDAO conceptDAO;
+
     @Inject
-    public ObservationDAO(EAO eao) {
+    public ObservationDAO(EAO eao, IConceptDAO conceptDao) {
         super(eao);
+        this.conceptDAO = conceptDao;
     }
 
     public Set<IObservation> findAllByConceptName(String conceptName) {

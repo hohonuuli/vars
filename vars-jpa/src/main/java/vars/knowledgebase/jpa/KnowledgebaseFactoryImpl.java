@@ -1,6 +1,6 @@
 package vars.knowledgebase.jpa;
 
-import vars.knowledgebase.KnowlegebaseFactory;
+import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.IConcept;
 import vars.knowledgebase.IConceptName;
 import vars.knowledgebase.IHistory;
@@ -9,7 +9,7 @@ import vars.knowledgebase.ILinkTemplate;
 import vars.knowledgebase.IMedia;
 import vars.knowledgebase.IUsage;
 
-public class KnowledgebaseFactoryImpl implements KnowlegebaseFactory {
+public class KnowledgebaseFactoryImpl implements KnowledgebaseFactory {
 
     public IConcept newConcept() {
         return new Concept();
