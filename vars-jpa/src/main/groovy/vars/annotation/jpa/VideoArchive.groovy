@@ -64,6 +64,14 @@ class VideoArchive implements Serializable, IVideoArchive, JPAEntity {
     List<VideoFrame> videoFrames
 
 
+
+    List<VideoFrame> getVideoFrames() {
+        if (videoFrames == null) {
+            videoFrames = new ArrayList<VideoFrame>();
+        }
+        return videoFrames
+    }
+
     void addVideoFrame(VideoFrame videoFrame) {
         if (getVideoFrames().find {VideoFrame vf -> vf.timecode.equals(videoFrame.timecode)}) {
             throw new IllegalArgumentException("A VideoFrame with a timecode of ${videoFrame.timecode} already exists in ${this}.")
@@ -78,30 +86,30 @@ class VideoArchive implements Serializable, IVideoArchive, JPAEntity {
         }
     }
 
-    public void addVideoFrame(IVideoFrame videoFrame) {
-        if (videoFrames.add(videoFrame)) {
+    void addVideoFrame(IVideoFrame videoFrame) {
+        if (getVideoFrames().add(videoFrame)) {
             videoFrame.videoArchive = this
         }
     }
 
-    public IVideoFrame findVideoFrameByTimeCode(String timecode) {
+    IVideoFrame findVideoFrameByTimeCode(String timecode) {
         return videoFrames.find { it.timecode == timecode }
     }
 
-    public Collection<? extends IVideoFrame> getEmptyVideoFrames() {
-        return videoFrames.findAll { IVideoFrame vf ->
+    Collection<? extends IVideoFrame> getEmptyVideoFrames() {
+        return getVideoFrames().findAll { IVideoFrame vf ->
             def observations = vf.observations
             return (observations?.size() > 0)
         }
     }
 
-    public void removeVideoFrame(IVideoFrame videoFrame) {
-        if (videoFrames.remove(videoFrame)) {
+    void removeVideoFrame(IVideoFrame videoFrame) {
+        if (getVideoFrames().remove(videoFrame)) {
             videoFrame.videoArchive = null
         }
     }
 
-    public void loadLazyRelations() {
+    void loadLazyRelations() {
         videoFrames.each { it.id } // Touch each one to ensure it's read from db
     }
 

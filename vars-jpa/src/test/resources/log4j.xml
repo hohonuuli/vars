@@ -9,11 +9,11 @@
     </appender>
 
     
-    <!-- <logger name="org.hibernate">
-        <level value="warn" />
+    <logger name="org.hibernate">
+        <level value="info" />
     </logger>
     
-    <logger name="org.mbari">
+    <!--  <logger name="org.mbari">
         <level value="debug" />
     </logger> -->
     

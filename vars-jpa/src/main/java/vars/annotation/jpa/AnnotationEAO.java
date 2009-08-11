@@ -10,11 +10,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by IntelliJ IDEA.
- * User: brian
- * Date: Aug 10, 2009
- * Time: 3:52:44 PM
- * To change this template use File | Settings | File Templates.
+ * Delegate class to the non-managed EAO. This class was created to facilitate
+ * dependency inection of different EAO's using Guice
  */
 public class AnnotationEAO implements NonManagedEAO {
 

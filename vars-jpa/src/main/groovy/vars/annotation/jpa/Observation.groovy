@@ -89,14 +89,14 @@ class Observation implements Serializable, IObservation, JPAEntity {
 
     void addAssociation(IAssociation association) {
         getAssociations() << association
-        association.observation = this
-        firePropertyChange(PROP_ASSOCIATIONS, null, getAssociations) // This method is added by @Bindable
+        ((Association) association).observation = this
+        firePropertyChange(PROP_ASSOCIATIONS, null, associations) // This method is added by @Bindable
     }
 
     void removeAssociation(IAssociation association) {
         if (getAssociations().remove(association)) {
-            association.observation = null
-            firePropertyChange(PROP_ASSOCIATIONS, null, getAssociations) // This method is added by @Bindable
+            ((Association) association).observation = null
+            firePropertyChange(PROP_ASSOCIATIONS, null, associations) // This method is added by @Bindable
         }
     }
 

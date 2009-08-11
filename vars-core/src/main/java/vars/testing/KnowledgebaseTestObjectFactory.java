@@ -1,4 +1,6 @@
-package vars.knowledgebase;
+package vars.testing;
+
+import vars.knowledgebase.KnowledgebaseFactory;
 
 /**
  * Created by IntelliJ IDEA.

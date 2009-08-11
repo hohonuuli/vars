@@ -130,7 +130,7 @@ public interface IVideoArchiveSet extends IAnnotationObject {
      * @return     The videoArchiveColl value
      * @uml.property  name="videoArchiveColl"
      */
-    List<? extends IVideoArchive> getVideoArchives();
+    Set<? extends IVideoArchive> getVideoArchives();
 
     /**
      * This is a convience method to retrieve all <code>VideoFrames</code> that are

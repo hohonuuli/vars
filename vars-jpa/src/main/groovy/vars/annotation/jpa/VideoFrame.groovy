@@ -94,18 +94,18 @@ class VideoFrame implements Serializable, IVideoFrame, JPAEntity {
 
     Set<IObservation> getObservations() {
         if (observations == null) {
-            observations = new HashSet()
+            observations = new HashSet<IObservation>()
         }
         return observations
     }
 
     void addObservation(IObservation observation) {
-        observations << observation
+        getObservations() << observation
         observation.videoFrame = this
     }
 
     void removeObservation(IObservation observation) {
-        if (observation.remove(observation)) {
+        if (observation?.remove(observation)) {
             observation.videoFrame = null
         }
     }

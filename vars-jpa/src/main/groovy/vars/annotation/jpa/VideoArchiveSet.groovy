@@ -95,9 +95,9 @@ class VideoArchiveSet implements Serializable, IVideoArchiveSet, JPAEntity {
         return cameraDeployments
     }
 
-    List<IVideoArchive> getVideoArchives() {
+    Set<IVideoArchive> getVideoArchives() {
         if (videoArchives == null) {
-            videoArchives = new ArrayList<VideoArchive>()
+            videoArchives = new HashSet<VideoArchive>()
         }
         return videoArchives
     }
@@ -116,7 +116,7 @@ class VideoArchiveSet implements Serializable, IVideoArchiveSet, JPAEntity {
     }
 
     void addCameraDeployment(ICameraDeployment cameraDeployment) {
-        cameraDeployments << cameraDeployment
+        getCameraDeployments().add(cameraDeployment)
         cameraDeployment.videoArchiveSet = this
     }
 

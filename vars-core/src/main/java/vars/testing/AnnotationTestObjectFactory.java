@@ -1,9 +1,20 @@
-package vars.annotation;
+package vars.testing;
 
 import org.mbari.movie.Timecode;
 
 import java.text.NumberFormat;
 import java.util.Date;
+
+import vars.annotation.AnnotationFactory;
+import vars.annotation.IVideoArchiveSet;
+import vars.annotation.FormatCodes;
+import vars.annotation.IVideoArchive;
+import vars.annotation.ICameraDeployment;
+import vars.annotation.IVideoFrame;
+import vars.annotation.IPhysicalData;
+import vars.annotation.ICameraData;
+import vars.annotation.IObservation;
+import vars.annotation.IAssociation;
 
 /**
  * Factory for generating prepopulated annotation objects for use in Unit tests
@@ -117,7 +128,7 @@ public class AnnotationTestObjectFactory {
         return videoFrame;
     }
 
-    public  IObservation makeObservation(String conceptName) {
+    public IObservation makeObservation(String conceptName) {
         IObservation observation = factory.newObservation();
         observation.setObserver("Testy the Tester");
         observation.setConceptName(conceptName);
