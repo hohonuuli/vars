@@ -76,4 +76,9 @@ class LinkTemplate implements Serializable, ILinkTemplate, JPAEntity {
             return formatLinkAsString()
         }
     }
+
+    @Override
+    String toString() {
+        return stringValue()
+    }
 }

@@ -23,6 +23,7 @@ import vars.annotation.IObservation
 import vars.annotation.IAssociation
 import vars.annotation.IVideoFrame
 import vars.jpa.JPAEntity
+import vars.EntityToStringCategory
 
 @Entity(name = "Observation")
 @Table(name = "Observation")
@@ -104,5 +105,8 @@ class Observation implements Serializable, IObservation, JPAEntity {
         return false;  // TODO implement this.
     }
 
+    String toString() {
+        return EntityToStringCategory.basicToString(this, [PROP_CONCEPT_NAME, PROP_OBSERVER, PROP_OBSERVATION_DATE])
+    }
 
 }

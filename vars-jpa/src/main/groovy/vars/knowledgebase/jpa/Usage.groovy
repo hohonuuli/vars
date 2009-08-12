@@ -18,7 +18,8 @@ import javax.persistence.JoinColumn
 import javax.persistence.OneToOne
 import vars.knowledgebase.IConceptMetadata
 import vars.knowledgebase.IUsage
-import vars.jpa.JPAEntity;
+import vars.jpa.JPAEntity
+import vars.EntityToStringCategory;
 
 /**
  * CREATE TABLE USAGE (
@@ -68,5 +69,10 @@ class Usage implements Serializable, IUsage, JPAEntity {
     @OneToOne(targetEntity = ConceptMetadata.class, optional = false)
     @JoinColumn(name = "ConceptDelegateID_FK")
     IConceptMetadata conceptMetadata
+
+    @Override
+    String toString() {
+        return EntityToStringCategory.basicToString(this, [PROP_EMBARGO_EXPIRATION_DATE, PROP_SPECIFICATION])
+    }
     
 }

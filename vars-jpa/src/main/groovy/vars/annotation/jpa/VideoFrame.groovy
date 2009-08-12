@@ -25,6 +25,7 @@ import vars.annotation.ICameraData
 import vars.annotation.IPhysicalData
 import vars.annotation.IVideoArchive
 import vars.jpa.JPAEntity
+import vars.EntityToStringCategory
 
 @Entity(name = "VideoFrame")
 @Table(name = "VideoFrame")
@@ -121,6 +122,11 @@ class VideoFrame implements Serializable, IVideoFrame, JPAEntity {
 
     void setInSequence(boolean state) {
         this.inSequence = state ? 1 : 0
+    }
+
+    @Override
+    String toString() {
+        return EntityToStringCategory.basicToString(this, [PROP_TIMECODE, PROP_RECORDED_DATE])
     }
 
 

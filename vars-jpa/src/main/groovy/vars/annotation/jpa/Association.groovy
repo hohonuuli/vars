@@ -76,4 +76,9 @@ class Association implements Serializable, IAssociation, JPAEntity {
         }
     }
 
+    public String toString() {
+        return stringValue()
+    }
+
+
 }

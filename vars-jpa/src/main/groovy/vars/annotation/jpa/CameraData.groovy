@@ -18,6 +18,7 @@ import javax.persistence.TableGenerator
 import vars.annotation.ICameraData
 import vars.annotation.IVideoFrame
 import vars.jpa.JPAEntity
+import vars.EntityToStringCategory
 
 @Entity(name = "CameraData")
 @Table(name = "CameraData")
@@ -28,7 +29,10 @@ import vars.jpa.JPAEntity
                 query = "SELECT v FROM CameraData v WHERE v.name = :name"),
     @NamedQuery(name = "CameraData.findByDirection",
                 query = "SELECT c FROM CameraData c WHERE c.direction = :direction"),  
-    @NamedQuery(name = "CameraData.findByFrameGrabURL", query = "SELECT c FROM CameraData c WHERE c.frameGrabURL = :frameGrabURL")      
+    @NamedQuery(name = "CameraData.findByFrameGrabURL",
+                query = "SELECT c FROM CameraData c WHERE c.frameGrabURL = :frameGrabURL"),
+    @NamedQuery(name = "CameraData.findByFrameGrabURLLike",
+                query = "SELECT c FROM CameraData c WHERE c.frameGrabURL LIKE :frameGrabURL")
 ])
 class CameraData implements Serializable, ICameraData, JPAEntity {
 
@@ -70,5 +74,11 @@ class CameraData implements Serializable, ICameraData, JPAEntity {
     boolean containsData() {
         return (name || direction || zoon || focus || iris || fieldWidth || stillImage);
     }
+
+    @Override
+    String toString() {
+        return EntityToStringCategory.basicToString(this, [PROP_DIRECTION, PROP_NAME, PROP_FRAME_GRAB_URL])
+    }
+
 
 }

@@ -16,7 +16,8 @@ import javax.persistence.JoinColumn
 import vars.knowledgebase.IConceptMetadata
 import vars.knowledgebase.IMedia
 import vars.jpa.JPAEntity
-import vars.knowledgebase.IConceptMetadata;
+import vars.knowledgebase.IConceptMetadata
+import vars.EntityToStringCategory;
 
 /**
  * Created by IntelliJ IDEA.
@@ -81,6 +82,11 @@ public class Media implements Serializable, IMedia, JPAEntity {
 
     public String stringValue() {
         return null;  // TODO implement this method.
+    }
+
+    @Override
+    String toString() {
+        return EntityToStringCategory.basicToString(this, [PROP_URL, PROP_TYPE])
     }
 
 

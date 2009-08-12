@@ -2,6 +2,7 @@ package vars.jpa
 
 import org.mbari.jpax.NonManagedEAO
 import vars.annotation.IVideoArchiveSet
+import vars.knowledgebase.IConcept
 
 /**
  * Created by IntelliJ IDEA.
@@ -51,4 +52,39 @@ class EntityUtilities {
 
         return s
     }
+
+    def buildTextTree(IConcept concept) {
+        return buildKBTree(concept, 0)
+    }
+
+    private buildKBTree(IConcept concept, int depth) {
+        def a = "    " * depth
+        def s = "${a}>-- ${concept}\n"
+        concept.conceptNames.each { cn ->
+            s += "${a}    |-- ${cn}\n"
+        }
+        def metadata = concept.getConceptMetadata()
+        s += "${a}    |-- ${metadata}\n"
+
+        metadata.medias.each { m ->
+            s += "${a}        |--${m}\n"
+        }
+
+        metadata.histories.each { m ->
+            s += "${a}        |--${m}\n"
+        }
+
+        metadata.linkRealizations.each { m ->
+            s += "${a}        |--${m}\n"
+        }
+
+        metadata.linkTemplates.each { m ->
+            s += "${a}        |--${m}\n"
+        }
+
+        depth++
+        concept.childConcepts.each { s += buildKBTree(it, depth) }
+        return s
+    }
+
 }

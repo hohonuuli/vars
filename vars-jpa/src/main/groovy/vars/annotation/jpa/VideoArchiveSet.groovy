@@ -22,6 +22,7 @@ import vars.annotation.ICameraDeployment
 import vars.annotation.IVideoArchive
 import vars.annotation.IVideoFrame
 import vars.jpa.JPAEntity
+import vars.EntityToStringCategory
 
 @Entity(name = "VideoArchiveSet")
 @Table(name = "VideoArchiveSet")
@@ -145,5 +146,9 @@ class VideoArchiveSet implements Serializable, IVideoArchiveSet, JPAEntity {
         return (videoArchives.find { it.name.equals(videoArchiveName) } != null)
     }
 
+    @Override
+    String toString() {
+        return EntityToStringCategory.basicToString(this, [PROP_PLATFORM_NAME, PROP_TRACKING_NUMBER, PROP_START_DATE])
+    }
 
 }

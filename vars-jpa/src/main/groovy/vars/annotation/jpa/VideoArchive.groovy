@@ -21,6 +21,7 @@ import vars.annotation.IVideoArchiveSet
 import vars.annotation.IVideoArchive
 import vars.annotation.IVideoFrame
 import vars.jpa.JPAEntity
+import vars.EntityToStringCategory
 
 @Entity(name = "VideoArchive")
 @Table(name = "VideoArchive")
@@ -113,5 +114,9 @@ class VideoArchive implements Serializable, IVideoArchive, JPAEntity {
         videoFrames.each { it.id } // Touch each one to ensure it's read from db
     }
 
+    @Override
+    String toString() {
+        return EntityToStringCategory.basicToString(this, [PROP_NAME, PROP_START_TIME_CODE])
+    }
 
 }

@@ -35,7 +35,7 @@ public interface ICameraData extends IAnnotationObject {
     String PROP_NAME = "name";
     String PROP_FRAME_GRAB_URL = "frameGrabURL";
     String PROP_VIDEO_FRAME = "videoFrame";
-    String PROP_ZOON = "zoom";
+    String PROP_ZOOM = "zoom";
 
 
     /**

@@ -18,6 +18,7 @@ import javax.persistence.TableGenerator
 import vars.annotation.ICameraDeployment
 import vars.annotation.IVideoArchiveSet
 import vars.jpa.JPAEntity
+import vars.EntityToStringCategory
 
 @Entity(name = "CameraDeployment")
 @Table(name = "CameraPlatformDeployment")
@@ -65,6 +66,11 @@ class CameraDeployment implements Serializable, ICameraDeployment, JPAEntity {
     @Column(name = "UsageEndDTG")
     @Temporal(value = TemporalType.TIMESTAMP)
     Date endDate
+
+    @Override
+    String toString() {
+        return EntityToStringCategory.basicToString(this, [PROP_SEQUENCE_NUMBER, PROP_CHIEF_SCIENTIST_NAME, PROP_START_DATE, PROP_END_DATE])
+    }
 
 
 }

@@ -18,7 +18,8 @@ import javax.persistence.JoinColumn
 import vars.knowledgebase.IConceptMetadata
 import vars.knowledgebase.IHistory
 import vars.jpa.JPAEntity
-import vars.knowledgebase.IConceptMetadata;
+import vars.knowledgebase.IConceptMetadata
+import vars.EntityToStringCategory;
 
 /**
  * CREATE TABLE HISTORY (
@@ -117,31 +118,36 @@ class History implements Serializable, IHistory, JPAEntity {
     @JoinColumn(name = "ConceptDelegateID_FK")
     IConceptMetadata conceptMetadata
 
-    public boolean isAdd() {
+    boolean isAdd() {
         return false;  // TODO implement this method.
     }
 
-    public boolean isApproved() {
+    boolean isApproved() {
         return false;  // TODO implement this method.
     }
 
-    public boolean isDelete() {
+    boolean isDelete() {
         return false;  // TODO implement this method.
     }
 
-    public boolean isReplace() {
+    boolean isReplace() {
         return false;  // TODO implement this method.
     }
 
-    public Boolean isRejected() {
+    Boolean isRejected() {
         return rejected == 0
     }
 
-    public void setRejected(Boolean rejected) {
+    void setRejected(Boolean rejected) {
         this.rejected = rejected ? 1 : 0
     }
 
-    public String stringValue() {
+    String stringValue() {
         return null;  // TODO implement this method.
+    }
+
+    @Override
+    String toString() {
+        return EntityToStringCategory.basicToString(this, [PROP_ACTION, PROP_FIELD, PROP_NEW_VALUE, PROP_OLD_VALUE])
     }
 }

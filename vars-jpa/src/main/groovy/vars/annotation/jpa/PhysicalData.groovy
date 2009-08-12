@@ -16,6 +16,8 @@ import javax.persistence.Version
 import vars.annotation.jpa.VideoFrame
 import vars.annotation.IPhysicalData
 import vars.annotation.IVideoFrame
+import vars.EntityToStringCategory
+import vars.jpa.JPAEntity
 
 @Entity(name = "PhysicalData")
 @Table(name = "PhysicalData")
@@ -23,7 +25,7 @@ import vars.annotation.IVideoFrame
     @NamedQuery(name = "PhysicalData.findById",
                 query = "SELECT v FROM PhysicalData v WHERE v.id = :id")
 ])
-class PhysicalData implements Serializable, IPhysicalData {
+class PhysicalData implements Serializable, IPhysicalData, JPAEntity {
 
     @Id
     @Column(name = "id", nullable = false, updatable = false)
@@ -54,6 +56,9 @@ class PhysicalData implements Serializable, IPhysicalData {
         return (depth || temperature || salinity || oxygen || light || latitude || longitude);
     }
 
-    
+    @Override
+    String toString() {
+        return EntityToStringCategory.basicToString(this, [PROP_LATITUDE, PROP_LONGITUDE, PROP_DEPTH])
+    }
     
 }

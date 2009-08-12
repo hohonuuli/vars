@@ -16,7 +16,8 @@ import javax.persistence.JoinColumn
 import groovy.beans.Bindable
 import vars.knowledgebase.IConcept
 import vars.knowledgebase.IConceptName
-import vars.jpa.JPAEntity;
+import vars.jpa.JPAEntity
+import vars.EntityToStringCategory;
 
 /**
  * <pre>
@@ -80,6 +81,13 @@ public class ConceptName implements Serializable, IConceptName, JPAEntity {
     IConcept concept
 
     public String stringValue() {
-        return null;  // TODO implement this method.
+        return name
     }
+
+    @Override
+    String toString() {
+        return EntityToStringCategory.basicToString(this, [PROP_NAME, PROP_NAME_TYPE])
+    }
+
+
 }

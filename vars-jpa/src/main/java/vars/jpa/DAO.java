@@ -19,7 +19,7 @@ public class DAO implements IDAO {
 
     public <T> T makePersistent(T object) {
         if (object instanceof JPAEntity) {
-            if (((JPAEntity) object).getId() != null) {
+            if (((JPAEntity) object).getId() == null) {
                 eao.insert(object);
             }
             else {

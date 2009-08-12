@@ -27,7 +27,8 @@ import vars.jpa.JPAEntity
 import javax.persistence.OrderBy
 import vars.knowledgebase.HistoryCreationDateComparator
 import vars.knowledgebase.MediaTypes
-import vars.knowledgebase.IConceptMetadata;
+import vars.knowledgebase.IConceptMetadata
+import vars.EntityToStringCategory;
 
 /**
  * <pre>
@@ -105,7 +106,7 @@ class ConceptMetadata implements Serializable, IConceptMetadata, JPAEntity {
     }
 
     IMedia getPrimaryImage() {
-        return medias.find { IMedia m -> m.primary && m.type == MediaTypes.IMAGE.type }
+        return medias?.find { IMedia m -> m.primary && m.type == MediaTypes.IMAGE.type }
     }
 
     Set<IHistory> getHistories() {
@@ -126,60 +127,73 @@ class ConceptMetadata implements Serializable, IConceptMetadata, JPAEntity {
         if (linkRealizations == null) {
             linkRealizations = new HashSet<ILinkRealization>()
         }
+        return linkRealizations
     }
 
     Set<ILinkTemplate> getLinkTemplates() {
         if (linkTemplates == null) {
             linkTemplates = new HashSet<ILinkTemplate>()
         }
+        return linkTemplates
     }
 
     public void addHistory(IHistory history) {
-        if (histories.add(history)) {
-            history.conceptDelegate = this
+        if (getHistories().add(history)) {
+            history.conceptMetadata = this
         }
     }
 
     public void addLinkRealization(ILinkRealization linkRealization) {
-        if (linkRealizations.add(linkRealization)) {
-            linkRealization.conceptDelegate = this
+        if (getLinkRealizations().add(linkRealization)) {
+            linkRealization.conceptMetadata = this
         }
     }
 
     public void addLinkTemplate(ILinkTemplate linkTemplate) {
-        if (linkTemplates.add(linkTemplate)) {
-            linkTemplate.conceptDelegate = this
+        if (getLinkTemplates().add(linkTemplate)) {
+            linkTemplate.conceptMetadata = this
         }
     }
 
     public void addMedia(IMedia media) {
-        if (medias.add(media)) {
-            media.conceptDelegate = this
+        if (getMedias().add(media)) {
+            media.conceptMetadata = this
         }
     }
 
     public void removeHistory(IHistory history) {
-        if (histories.remove(history)) {
-            history.conceptDelegate = null
+        if (getHistories().remove(history)) {
+            history.conceptMetadata = null
         }
     }
 
     public void removeLinkRealization(ILinkRealization linkRealization) {
-        if (linkRealizations.remove(linkRealization)) {
-            linkRealization.conceptDelegate = null
+        if (getLinkRealizations().remove(linkRealization)) {
+            linkRealization.conceptMetadata = null
         }
     }
 
     public void removeLinkTemplate(ILinkTemplate linkTemplate) {
-        if (linkTemplates.remove(linkTemplate)) {
-            linkTemplate.conceptDelegate = null
+        if (getLinkTemplates().remove(linkTemplate)) {
+            linkTemplate.conceptMetadata = null
         }
     }
 
     public void removeMedia(IMedia media) {
-        if (medias.remove(media)) {
-            media.conceptDelegate = null
+        if (getMedias().remove(media)) {
+            media.conceptMetadata = null
         }
+    }
+
+
+    void setUsage(IUsage usage) {
+        this.usage = usage;
+        usage.conceptMetadata = this
+    }
+
+    @Override
+    String toString() {
+        return EntityToStringCategory.basicToString(this, [])
     }
 
 

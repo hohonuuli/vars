@@ -10,11 +10,11 @@ import vars.jpa.EntityUtilities;
 import com.google.inject.Injector;
 import com.google.inject.Guice;
 import org.junit.Test;
+import org.junit.Assert;
 import org.mbari.jpax.NonManagedEAOImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.Entity;
 
 /**
  * Created by IntelliJ IDEA.
@@ -23,7 +23,7 @@ import javax.persistence.Entity;
  * Time: 11:06:11 AM
  * To change this template use File | Settings | File Templates.
  */
-public class CrudTest {
+public class AnnoCrudTest {
 
     public final Logger log = LoggerFactory.getLogger(getClass());
 
@@ -32,16 +32,21 @@ public class CrudTest {
         Injector injector = Guice.createInjector(new VarsJpaTestModule());
         AnnotationFactory af = injector.getInstance(AnnotationFactory.class);
         AnnotationTestObjectFactory factory = new AnnotationTestObjectFactory(af);
-        IVideoArchiveSet vas = factory.makeObjectGraph("BIG-TEST", 3);
+        IVideoArchiveSet vas = factory.makeObjectGraph("BIG-TEST", 2);
 
 
         AnnotationDAOFactory adf = injector.getInstance(AnnotationDAOFactory.class);
         IVideoArchiveSetDAO dao = adf.newVideoArchiveSetDAO();
 
         EntityUtilities eu = new EntityUtilities(new NonManagedEAOImpl("test"));
-        log.info("\n" + eu.buildTextTree(vas));
+        log.info("ANNOTATION TREE BEFORE TEST:\n" + eu.buildTextTree(vas));
 
-        dao.makePersistent(vas);
+        vas = dao.makePersistent(vas);
+        Assert.assertNotNull("Primary Key [ID] was not set!", ((VideoArchiveSet) vas).getId());        
+
+        vas = dao.findByPrimaryKey(vas.getClass(), ((VideoArchiveSet) vas).getId());
+
+        log.info("ANNOTATION TREE AFTER TEST:\n" + eu.buildTextTree(vas));
         
     }
 

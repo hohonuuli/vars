@@ -85,4 +85,9 @@ class LinkRealization implements Serializable, ILinkRealization, JPAEntity {
             return formatLinkAsString()
         }
     }
+
+    @Override
+    String toString() {
+        return stringValue()
+    }
 }

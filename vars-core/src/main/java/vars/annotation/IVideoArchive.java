@@ -33,7 +33,7 @@ import java.util.Set;
 public interface IVideoArchive extends IAnnotationObject, ILazy {
 
     String PROP_START_TIME_CODE = "startTimecode";
-    String PROP_VIDEO_ARCHIVE_NAME = "videoArchiveName";
+    String PROP_NAME = "name";
     String PROP_VIDEO_ARCHIVE_SET = "videoArchiveSet";
 
     void addVideoFrame(final IVideoFrame videoFrame);

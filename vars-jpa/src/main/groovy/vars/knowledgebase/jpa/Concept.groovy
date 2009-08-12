@@ -23,6 +23,7 @@ import vars.knowledgebase.IConceptMetadata
 import vars.knowledgebase.ConceptNameTypes
 import vars.jpa.JPAEntity
 import vars.knowledgebase.IConceptMetadata
+import vars.EntityToStringCategory
 
 /**
  *
@@ -140,6 +141,13 @@ class Concept implements Serializable, IConcept, JPAEntity {
         return conceptNames
     }
 
+    Set<IConcept> getChildConcepts() {
+        if (childConcepts == null) {
+            childConcepts = new HashSet<IConcept>()
+        }
+        return childConcepts
+    }
+
     void addConceptName(IConceptName conceptName) {
         if (getConceptNames().find { IConceptName cn -> cn.name.equals(conceptName.name) }) {
             throw new IllegalArgumentException("A ConceptName with the name '${conceptName.name}' already exists in ${this}")
@@ -155,13 +163,13 @@ class Concept implements Serializable, IConcept, JPAEntity {
     }
 
     void addChildConcept(IConcept child) {
-        if (childConcepts.add(child)) {
+        if (getChildConcepts().add(child)) {
             child.parentConcept = this
         }
     }
 
     public void removeChildConcept(IConcept childConcept) {
-        if (childConcepts.remove(childConcept)) {
+        if (getChildConcepts().remove(childConcept)) {
             childConcept.parentConcept = null
         }
     }
@@ -204,5 +212,10 @@ class Concept implements Serializable, IConcept, JPAEntity {
 
     public void loadLazyRelations() {
         childConcepts.each { it.id } // Touch each to ensure they get loaded
+    }
+
+    @Override
+    String toString() {
+        return EntityToStringCategory.basicToString(this, [PROP_ORIGINATOR, PROP_RANK_LEVEL, PROP_RANK_NAME])
     }
 }
