@@ -4,6 +4,7 @@ import vars.IDAO;
 import vars.IConceptNameValidator;
 
 import java.util.Set;
+import java.util.Collection;
 
 /**
  * Created by IntelliJ IDEA.
@@ -14,9 +15,9 @@ import java.util.Set;
  */
 public interface ILinkTemplateDAO extends IDAO, IConceptNameValidator<ILinkTemplate> {
 
-    Set<ILinkTemplate> findAllByLinkFields(String linkName, String toConcept, String linkValue);
+    Collection<ILinkTemplate> findAllByLinkFields(String linkName, String toConcept, String linkValue);
 
-    Set<ILinkTemplate> findAllByLinkName(String linkName);
+    Collection<ILinkTemplate> findAllByLinkName(String linkName);
 
     /**
      * Searches a concept for a LinkTemplate that matches a given linkName. This checks all the LinkTemplates
@@ -25,8 +26,6 @@ public interface ILinkTemplateDAO extends IDAO, IConceptNameValidator<ILinkTempl
      * @param linkName The link name whos match you are looking for.
      * @return The matching LinkTemplate. null if no match is found
      */
-    Set<ILinkTemplate> findAllByLinkName(String linkName, IConcept concept);
-
-
+    Collection<ILinkTemplate> findAllByLinkName(String linkName, IConcept concept);
 
 }

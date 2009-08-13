@@ -3,7 +3,7 @@ package vars.knowledgebase;
 import vars.IConceptNameValidator;
 import vars.IDAO;
 
-import java.util.Set;
+import java.util.Collection;
 
 /**
  * Created by IntelliJ IDEA.
@@ -14,6 +14,6 @@ import java.util.Set;
  */
 public interface ILinkRealizationDAO extends IDAO, IConceptNameValidator<ILinkRealization> {
 
-    Set<ILinkRealization> findAllByLinkName();
+    Collection<ILinkRealization> findAllByLinkName();
 
 }

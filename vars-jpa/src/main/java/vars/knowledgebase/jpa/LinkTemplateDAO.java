@@ -8,6 +8,7 @@ import vars.jpa.DAO;
 import org.mbari.jpax.EAO;
 
 import java.util.Set;
+import java.util.Collection;
 
 import com.google.inject.Inject;
 
@@ -28,15 +29,15 @@ public class LinkTemplateDAO extends DAO implements ILinkTemplateDAO {
         this.conceptDAO = conceptDAO; 
     }
 
-    public Set<ILinkTemplate> findAllByLinkFields(String linkName, String toConcept, String linkValue) {
+    public Collection<ILinkTemplate> findAllByLinkFields(String linkName, String toConcept, String linkValue) {
         return null;  // TODO implement this method.
     }
 
-    public Set<ILinkTemplate> findAllByLinkName(String linkName) {
+    public Collection<ILinkTemplate> findAllByLinkName(String linkName) {
         return null;  // TODO implement this method.
     }
 
-    public Set<ILinkTemplate> findAllByLinkName(String linkName, IConcept concept) {
+    public Collection<ILinkTemplate> findAllByLinkName(String linkName, IConcept concept) {
         return null;  // TODO implement this method.
     }
 

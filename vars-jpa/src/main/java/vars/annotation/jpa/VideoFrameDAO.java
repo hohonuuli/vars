@@ -6,6 +6,11 @@ import vars.annotation.IVideoFrame;
 import org.mbari.jpax.EAO;
 
 import java.util.Set;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Collection;
+import java.util.List;
+import java.util.HashSet;
 
 import com.google.inject.Inject;
 
@@ -24,6 +29,11 @@ public class VideoFrameDAO extends DAO implements IVideoFrameDAO {
     }
 
     public Set<IVideoFrame> findAllByVideoArchivePrimaryKey(Object primaryKey) {
-        return null;  // TODO implement this method.
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("primaryKey", primaryKey);
+        List<IVideoFrame> list= getEAO().findByNamedQuery("VideoFrame.findByVideoArchivePrimaryKey", params);
+        Set<IVideoFrame> set = new HashSet<IVideoFrame>();
+        set.addAll(list);
+        return set;
     }
 }

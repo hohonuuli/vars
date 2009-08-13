@@ -83,7 +83,7 @@ class Observation implements Serializable, IObservation, JPAEntity {
 
     Set<IAssociation> getAssociations() {
         if (associations == null) {
-            associations = new HashSet<Association>();
+            associations = new HashSet<IAssociation>();
         }
         return associations
     }

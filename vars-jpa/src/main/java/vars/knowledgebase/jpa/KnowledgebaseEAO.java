@@ -88,4 +88,12 @@ public class KnowledgebaseEAO implements NonManagedEAO {
     public List findByNamedQuery(String name, Map<String, Object> namedParameters) {
         return eao.findByNamedQuery(name, namedParameters);
     }
+
+    public EntityManager createEntityManager() {
+        return eao.createEntityManager();
+    }
+
+    public boolean isManaged() {
+        return eao.isManaged();
+    }
 }

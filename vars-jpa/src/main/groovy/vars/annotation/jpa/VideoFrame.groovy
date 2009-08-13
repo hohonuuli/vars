@@ -33,7 +33,9 @@ import vars.EntityToStringCategory
     @NamedQuery(name = "VideoFrame.findById",
                 query = "SELECT v FROM VideoFrame v WHERE v.id = :id"),
     @NamedQuery(name = "VideoFrame.findByName",
-                query = "SELECT v FROM VideoFrame v WHERE v.recordedDate = :recordedDate")
+                query = "SELECT v FROM VideoFrame v WHERE v.recordedDate = :recordedDate"),
+    @NamedQuery(name = "VideoFrame.findByVideoArchivePrimaryKey",
+                query = "SELECT v FROM VideoFrame v WHERE v.videoArchive.id = :primaryKey")
 ])
 class VideoFrame implements Serializable, IVideoFrame, JPAEntity {
 

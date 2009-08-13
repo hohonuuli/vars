@@ -2,9 +2,12 @@ package vars.knowledgebase.jpa;
 
 import vars.jpa.DAO;
 import vars.knowledgebase.IConceptNameDAO;
+import vars.knowledgebase.IConceptName;
 import org.mbari.jpax.EAO;
 
 import java.util.Set;
+import java.util.HashMap;
+import java.util.List;
 
 import com.google.inject.Inject;
 
@@ -22,7 +25,8 @@ public class ConceptNameDAO extends DAO implements IConceptNameDAO {
         super(eao);
     }
 
-    public Set<String> findAllConceptNamesUsedInAnnotations() {
-        return null;  // TODO implement this method.
+    public IConceptName findByName(final String name) {
+        List<IConceptName> names = getEAO().findByNamedQuery("ConceptName.findByName", new HashMap<String, Object>() {{ put("name", name);}} );
+        return names.size() == 0 ? null : names.get(0);
     }
 }

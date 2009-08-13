@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Collection;
 
 import com.google.inject.Inject;
 
@@ -32,4 +33,5 @@ public class CameraDeploymentDAO extends DAO implements ICameraDeploymentDAO {
         params.put("chiefScientistName", name);
         return getEAO().findByNamedQuery("CameraDeployment.findByChiefScientistName", params);
     }
+
 }

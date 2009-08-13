@@ -19,7 +19,9 @@ import vars.knowledgebase.IConceptMetadata
 import vars.knowledgebase.IHistory
 import vars.jpa.JPAEntity
 import vars.knowledgebase.IConceptMetadata
-import vars.EntityToStringCategory;
+import vars.EntityToStringCategory
+import java.text.DateFormat
+import java.text.SimpleDateFormat;
 
 /**
  * CREATE TABLE HISTORY (
@@ -62,7 +64,9 @@ import vars.EntityToStringCategory;
     @NamedQuery(name = "History.findByNewValue", query = "SELECT h FROM History h WHERE h.newValue = :newValue") ,
     @NamedQuery(name = "History.findByAction", query = "SELECT h FROM History h WHERE h.action = :action") ,
     @NamedQuery(name = "History.findByComment", query = "SELECT h FROM History h WHERE h.comment = :comment") ,
-    @NamedQuery(name = "History.findByRejected", query = "SELECT h FROM History h WHERE h.rejected = :rejected")
+    @NamedQuery(name = "History.findByRejected", query = "SELECT h FROM History h WHERE h.rejected = :rejected"),
+    @NamedQuery(name = "History.findPendingApproval", query = "SELECT h FROM History h WHERE h.approvalDate IS NULL"),
+    @NamedQuery(name = "History.findApproved", query = "SELECT h FROM History h WHERE h.approvalDate IS NOT NULL")
 ])
 class History implements Serializable, IHistory, JPAEntity {
 
@@ -118,20 +122,26 @@ class History implements Serializable, IHistory, JPAEntity {
     @JoinColumn(name = "ConceptDelegateID_FK")
     IConceptMetadata conceptMetadata
 
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+
+    static {
+        DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC")); 
+    }
+
     boolean isAdd() {
-        return false;  // TODO implement this method.
+        return ACTION_ADD.equalsIgnoreCase(action)
     }
 
     boolean isApproved() {
-        return false;  // TODO implement this method.
+        return approvalDate != null
     }
 
     boolean isDelete() {
-        return false;  // TODO implement this method.
+        return ACTION_DELETE.equalsIgnoreCase(action)
     }
 
     boolean isReplace() {
-        return false;  // TODO implement this method.
+        return ACTION_REPLACE.equalsIgnoreCase(action)
     }
 
     Boolean isRejected() {
@@ -143,7 +153,21 @@ class History implements Serializable, IHistory, JPAEntity {
     }
 
     String stringValue() {
-        return null;  // TODO implement this method.
+        
+        StringBuffer sb = new StringBuffer("[").append(DATE_FORMAT.format(creationDate));
+        sb.append(" by ").append(creatorName).append("] ").append(action).append(" ").append(field);
+        final String newVal = (newValue == null) ? "" : newValue;
+        final String oldVal = (oldValue == null) ? "" : oldValue;
+        if (ACTION_ADD.equals(action)) {
+            sb.append(" '").append(newVal).append("'");
+        }
+        else if (ACTION_DELETE.equals(action)) {
+            sb.append(" '").append(oldVal).append("'");
+        }
+        else if (ACTION_REPLACE.equals(action)) {
+            sb.append(" '").append(oldVal).append("' with '").append(newVal).append("'");
+        }
+        return sb.toString();
     }
 
     @Override

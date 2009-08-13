@@ -4,7 +4,7 @@ import vars.IDAO;
 import vars.IConceptNameValidator;
 import vars.knowledgebase.IConcept;
 
-import java.util.Set;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -15,7 +15,7 @@ import java.util.Set;
  */
 public interface IObservationDAO extends IDAO, IConceptNameValidator<IObservation> {
 
-    Set<IObservation> findAllByConceptName(String conceptName);
+    List<IObservation> findAllByConceptName(String conceptName);
 
     /**
      * Finds all Observations in the database that use this Concept OR a child of this
@@ -27,7 +27,7 @@ public interface IObservationDAO extends IDAO, IConceptNameValidator<IObservatio
      * @return A Set<IObservation> containing all matching observations. If none are found an empty collection 
      *      is returned
      */
-    Set<IObservation> findAllByConcept(IConcept concept, boolean cascade);
+    List<IObservation> findAllByConcept(IConcept concept, boolean cascade);
 
      /**
      * Retrieves all conceptnames actually used in annotations. This query
@@ -36,6 +36,6 @@ public interface IObservationDAO extends IDAO, IConceptNameValidator<IObservatio
      *
      * @return Set of Strings
      */
-    Set<String> findAllConceptNamesUsedInAnnotations();
+    List<String> findAllConceptNamesUsedInAnnotations();
 
 }

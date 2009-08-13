@@ -6,6 +6,9 @@ import vars.annotation.ICameraData;
 import org.mbari.jpax.EAO;
 
 import java.util.Set;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
 
 import com.google.inject.Inject;
 
@@ -23,15 +26,21 @@ public class CameraDataDAO extends DAO implements ICameraDataDAO {
         super(eao);
     }
 
-    public Set<ICameraData> findByFrameGrabURLContaining(String s) {
-        return null;  // TODO implement this method.
+    public List<ICameraData> findByFrameGrabURLContaining(String s) {
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("frameGrabURL", "%" + s + "%");
+        return getEAO().findByNamedQuery("CameraData.findByFrameGrabURLLike", params);
     }
 
-    public Set<ICameraData> findByFrameGrabURLPostfix(String postfix) {
-        return null;  // TODO implement this method.
+    public List<ICameraData> findByFrameGrabURLPostfix(String postfix) {
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("frameGrabURL", "%" + postfix);
+        return getEAO().findByNamedQuery("CameraData.findByFrameGrabURLLike", params);
     }
 
-    public Set<ICameraData> findByFrameGrabURLPrefix(String prefix) {
-        return null;  // TODO implement this method.
+    public List<ICameraData> findByFrameGrabURLPrefix(String prefix) {
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("frameGrabURL", prefix + "%");
+        return getEAO().findByNamedQuery("CameraData.findByFrameGrabURLLike", params);
     }
 }

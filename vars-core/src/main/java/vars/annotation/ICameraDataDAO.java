@@ -3,6 +3,7 @@ package vars.annotation;
 import vars.IDAO;
 
 import java.util.Set;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -13,10 +14,10 @@ import java.util.Set;
  */
 public interface ICameraDataDAO extends IDAO {
 
-    Set<ICameraData> findByFrameGrabURLContaining(String s);
+    List<ICameraData> findByFrameGrabURLContaining(String s);
 
-    Set<ICameraData> findByFrameGrabURLPostfix(String postfix);
+    List<ICameraData> findByFrameGrabURLPostfix(String postfix);
 
-    Set<ICameraData> findByFrameGrabURLPrefix(String prefix);
+    List<ICameraData> findByFrameGrabURLPrefix(String prefix);
 
 }

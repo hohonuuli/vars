@@ -2,6 +2,8 @@ package vars.knowledgebase;
 
 import vars.IDAO;
 
+import java.util.Collection;
+
 /**
  * Created by IntelliJ IDEA.
  * User: brian
@@ -15,6 +17,14 @@ public interface IConceptDAO extends IDAO {
 
     IConcept findRoot();
 
-    
+    /**
+     * Lookup all @{link IConceptName}s objects that are associated with
+     * this {@link IConcept} and its children
+     *
+     *
+     * @param concept The concept whos descendant names are returne
+     * @return
+     */
+    Collection<IConceptName> findDescendentNames(IConcept concept);
 
 }

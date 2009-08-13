@@ -29,6 +29,8 @@ import vars.EntityToStringCategory
 @NamedQueries( value = [
     @NamedQuery(name = "VideoArchiveSet.findById", 
                 query = "SELECT v FROM VideoArchiveSet v WHERE v.id = :id"),
+    @NamedQuery(name = "VideoArchiveSet.findAll",
+                query = "SELECT v FROM VideoArchiveSet v"),
     @NamedQuery(name = "VideoArchiveSet.findByTrackingNumber",
                 query = "SELECT v FROM VideoArchiveSet v WHERE v.trackingNumber = :trackingNumber"),
     @NamedQuery(name = "VideoArchiveSet.findByPlatformName",
@@ -38,7 +40,13 @@ import vars.EntityToStringCategory
     @NamedQuery(name = "VideoArchiveSet.findByStartDate",
                 query = "SELECT v FROM VideoArchiveSet v WHERE v.startDate = :startDate"),
     @NamedQuery(name = "VideoArchiveSet.findByEndDate",
-                query = "SELECT v FROM VideoArchiveSet v WHERE v.endDate = :endDate")
+                query = "SELECT v FROM VideoArchiveSet v WHERE v.endDate = :endDate"),
+    @NamedQuery(name = "VideoArchiveSet.findBetweenDates",
+                query = "SELECT v FROM VideoArchiveSet v WHERE v.startDate BETWEEN :date0 AND :date1"),
+    @NamedQuery(name = "VideoArchiveSet.findByPlatformAndTrackingNumber",
+                query = "SELECT v FROM VideoArchiveSet v WHERE v.platformName = :platformName AND v.trackingNumber = :trackingNumber"),
+    @NamedQuery(name = "VideoArchiveSet.findByPlatformAndSequenceNumber",
+                query = "SELECT v FROM VideoArchiveSet v WHERE v.platformName = :platformName AND v.cameraDeployment.sequenceNumber = :sequenceNumber")
 ])
 class VideoArchiveSet implements Serializable, IVideoArchiveSet, JPAEntity {
 

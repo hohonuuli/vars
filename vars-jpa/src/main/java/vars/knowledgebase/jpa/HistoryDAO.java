@@ -6,6 +6,9 @@ import vars.jpa.DAO;
 import org.mbari.jpax.EAO;
 
 import java.util.Set;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.HashSet;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -25,10 +28,16 @@ public class HistoryDAO extends DAO implements IHistoryDAO {
     }
 
     public Set<IHistory> findPendingHistories() {
-        return null;  // TODO implement this method.
+        Map<String, Object> params = new HashMap<String, Object>();
+        Set<IHistory> histories = new HashSet<IHistory>();
+        histories.addAll(getEAO().findByNamedQuery("History.findPendingApproval", params));
+        return histories;
     }
 
     public Set<IHistory> findApprovedHistories() {
-        return null;  // TODO implement this method.
+        Map<String, Object> params = new HashMap<String, Object>();
+        Set<IHistory> histories = new HashSet<IHistory>();
+        histories.addAll(getEAO().findByNamedQuery("History.findApproved", params));
+        return histories;
     }
 }

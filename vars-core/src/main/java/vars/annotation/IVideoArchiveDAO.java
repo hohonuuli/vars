@@ -23,12 +23,15 @@ public interface IVideoArchiveDAO extends IDAO {
      *
      * @param  videoArchive The videoArchive of interest. This find will
      *          search all annotation in this video archive
+     * @param  linkName The linkValue in the associations to search for
      * @return  A collection of String objects
      */
-    Set<String> findAllReferenceNumbers(IVideoArchive videoArchive);
+    Set<String> findAllLinkValues(IVideoArchive videoArchive, String linkName);
 
     /**
-     * Return all reference numbers in the current videoArchive for a given concept.
+     * Return all linkValues in the current videoArchive for a given concept and linkName.
+     * For example to find all reference numbers in a videoArchive:
+     *
      * The reference number is found in Association with the
      * 'linkName | toConcept | linkValue' of
      * 'identity-reference | self | [integer]' where integer is a value
@@ -37,10 +40,12 @@ public interface IVideoArchiveDAO extends IDAO {
      *
      * @param  videoArchive The videoArchive of interest. This find will
      *          search all annotation in this video archive
-     * @param  concept Description of the Parameter
+     * @param  linkName The name of links to match
+     * @param  concept If not null then only the linkvalues found for associations to
+     *          this concept are returned
      * @return  A collection (SortedSet) of String objects
      */
-    Set<String> findAllReferenceNumbers(IVideoArchive videoArchive, IConcept concept);
+    Set<String> findAllLinkValues(IVideoArchive videoArchive, String linkName, IConcept concept);
 
     /**
      * Looks up the @link{IVideoArchive} by name. If no match is found a new one is created and returned.

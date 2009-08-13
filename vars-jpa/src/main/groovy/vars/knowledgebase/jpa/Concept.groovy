@@ -59,15 +59,22 @@ import vars.EntityToStringCategory
 @NamedQueries( value = [
     @NamedQuery(name = "Concept.findById",
                 query = "SELECT v FROM Concept v WHERE v.id = :id"),
-    @NamedQuery(name = "Concept.findByOriginator", query = "SELECT c FROM Concept c WHERE c.originator = :originator") ,
+    @NamedQuery(name = "Concept.findByOriginator",
+                query = "SELECT c FROM Concept c WHERE c.originator = :originator"),
     @NamedQuery(name = "Concept.findByStructureType",
-                query = "SELECT c FROM Concept c WHERE c.structureType = :structureType") ,
-    @NamedQuery(name = "Concept.findByReference", query = "SELECT c FROM Concept c WHERE c.reference = :reference") ,
-    @NamedQuery(name = "Concept.findByNodcCode", query = "SELECT c FROM Concept c WHERE c.nodcCode = :nodcCode") ,
-    @NamedQuery(name = "Concept.findByRankName", query = "SELECT c FROM Concept c WHERE c.rankName = :rankName") ,
-    @NamedQuery(name = "Concept.findByRankLevel", query = "SELECT c FROM Concept c WHERE c.rankLevel = :rankLevel") ,
+                query = "SELECT c FROM Concept c WHERE c.structureType = :structureType"),
+    @NamedQuery(name = "Concept.findByReference",
+                query = "SELECT c FROM Concept c WHERE c.reference = :reference"),
+    @NamedQuery(name = "Concept.findByNodcCode",
+                query = "SELECT c FROM Concept c WHERE c.nodcCode = :nodcCode"),
+    @NamedQuery(name = "Concept.findByRankName",
+                query = "SELECT c FROM Concept c WHERE c.rankName = :rankName"),
+    @NamedQuery(name = "Concept.findByRankLevel",
+                query = "SELECT c FROM Concept c WHERE c.rankLevel = :rankLevel"),
     @NamedQuery(name = "Concept.findByTaxonomyType",
-                query = "SELECT c FROM Concept c WHERE c.taxonomyType = :taxonomyType")
+                query = "SELECT c FROM Concept c WHERE c.taxonomyType = :taxonomyType"),
+    @NamedQuery(name = "Concept.findRoot",
+                query = "SELECT c FROM Concept c WHERE c.parentConcept IS NULL")
 ])
 class Concept implements Serializable, IConcept, JPAEntity {
 

@@ -15,6 +15,8 @@ public interface IConceptNameDAO extends IDAO {
      *
      * @return Set of Strings representing the var
      */
-    Set<String> findAllConceptNamesUsedInAnnotations();
+
+
+    IConceptName findByName(String name);
 
 }

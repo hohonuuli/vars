@@ -77,7 +77,7 @@ class LinkRealization implements Serializable, ILinkRealization, JPAEntity {
     IConceptMetadata conceptMetadata
 
     public String getFromConcept() {
-        return conceptMetadata?.concept
+        return conceptMetadata?.concept.primaryConceptName.name
     }
 
     String stringValue() {
