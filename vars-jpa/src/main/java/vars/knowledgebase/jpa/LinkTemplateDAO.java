@@ -9,6 +9,9 @@ import org.mbari.jpax.EAO;
 
 import java.util.Set;
 import java.util.Collection;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.ArrayList;
 
 import com.google.inject.Inject;
 
@@ -30,15 +33,33 @@ public class LinkTemplateDAO extends DAO implements ILinkTemplateDAO {
     }
 
     public Collection<ILinkTemplate> findAllByLinkFields(String linkName, String toConcept, String linkValue) {
-        return null;  // TODO implement this method.
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("linkName", linkName);
+        params.put("toConcept", toConcept);
+        params.put("linkValue", linkValue);
+        return getEAO().findByNamedQuery("LinkTemplate.findByFields", params);
     }
 
     public Collection<ILinkTemplate> findAllByLinkName(String linkName) {
-        return null;  // TODO implement this method.
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("linkName", linkName);
+        return getEAO().findByNamedQuery("LinkTemplate.findByLinkName", params);
     }
 
     public Collection<ILinkTemplate> findAllByLinkName(String linkName, IConcept concept) {
-        return null;  // TODO implement this method.
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("linkName", linkName);
+        Collection<ILinkTemplate> linkTemplates0 = getEAO().findByNamedQuery("LinkTemplate.findByLinkName", params);
+        Collection<ILinkTemplate> linkTemplates = new ArrayList<ILinkTemplate>();
+        for (ILinkTemplate linkTemplate : linkTemplates0) {
+            // TODO FInish implementation
+        }
+
+    }
+
+    public Collection<ILinkTemplate> findAllApplicableToConcept(IConcept concept) {
+        // TODO return all linktemplates that can be applied to a particular concept
+        return null
     }
 
     public void validateName(ILinkTemplate object) {

@@ -37,7 +37,9 @@ import vars.knowledgebase.IConceptMetadata;
     @NamedQuery(name = "LinkTemplate.findByToConcept",
                 query = "SELECT l FROM LinkTemplate l WHERE l.toConcept = :toConcept") ,
     @NamedQuery(name = "LinkTemplate.findByLinkValue",
-                query = "SELECT l FROM LinkTemplate l WHERE l.linkValue = :linkValue")
+                query = "SELECT l FROM LinkTemplate l WHERE l.linkValue = :linkValue"),
+    @NamedQuery(name = "LinkTemplate.findByFields",
+                query = "SELECT l FROM LinkTemplate l WHERE l.linkName = :linkName AND l.toConcept = :toConcept AND l.linkValue = :linkValue")
 ])
 class LinkTemplate implements Serializable, ILinkTemplate, JPAEntity {
 
