@@ -46,7 +46,7 @@ import vars.EntityToStringCategory
     @NamedQuery(name = "VideoArchiveSet.findByPlatformAndTrackingNumber",
                 query = "SELECT v FROM VideoArchiveSet v WHERE v.platformName = :platformName AND v.trackingNumber = :trackingNumber"),
     @NamedQuery(name = "VideoArchiveSet.findByPlatformAndSequenceNumber",
-                query = "SELECT v FROM VideoArchiveSet v WHERE v.platformName = :platformName AND v.cameraDeployment.sequenceNumber = :sequenceNumber")
+                query = "SELECT v FROM VideoArchiveSet v, IN (v.cameraDeployments) c WHERE v.platformName = :platformName AND c.sequenceNumber = :sequenceNumber")
 ])
 class VideoArchiveSet implements Serializable, IVideoArchiveSet, JPAEntity {
 

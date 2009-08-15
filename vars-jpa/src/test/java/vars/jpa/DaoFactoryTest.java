@@ -2,10 +2,8 @@ package vars.jpa;
 
 import com.google.inject.Injector;
 import com.google.inject.Guice;
-import vars.jpa.VarsJpaTestModule;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.annotation.AnnotationDAOFactory;
-import vars.annotation.IObservationDAO;
 import org.junit.Test;
 import static org.junit.Assert.*;
 

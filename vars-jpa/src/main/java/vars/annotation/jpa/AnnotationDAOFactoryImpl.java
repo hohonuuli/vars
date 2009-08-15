@@ -1,5 +1,6 @@
 package vars.annotation.jpa;
 
+import vars.annotation.AnnotationFactory;
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.IAssociationDAO;
 import vars.annotation.ICameraDataDAO;
@@ -23,12 +24,16 @@ import com.google.inject.name.Named;
 public class AnnotationDAOFactoryImpl implements AnnotationDAOFactory {
 
     private final EAO eao;
+    private final AnnotationFactory annotationFactory;
     private final KnowledgebaseDAOFactory kbFactory;
 
     @Inject
-    public AnnotationDAOFactoryImpl(@Named("annotationEAO") EAO eao, KnowledgebaseDAOFactory kbFactory) {
+    public AnnotationDAOFactoryImpl(@Named("annotationEAO") EAO eao,
+            AnnotationFactory annotationFactory,
+            KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
         this.eao = eao;
-        this.kbFactory = kbFactory;
+        this.annotationFactory = annotationFactory;
+        this.kbFactory = knowledgebaseDAOFactory;
     }
 
     public IAssociationDAO newAssociationDAO() {
@@ -52,10 +57,10 @@ public class AnnotationDAOFactoryImpl implements AnnotationDAOFactory {
     }
 
     public IVideoArchiveDAO newVideoArchiveDAO() {
-        return new VideoArchiveDAO(eao);
+        return new VideoArchiveDAO(eao, annotationFactory);
     }
 
     public IVideoArchiveSetDAO newVideoArchiveSetDAO() {
-        return new VideoArchiveSetDAO(eao);
+        return new VideoArchiveSetDAO(eao, newVideoArchiveDAO());
     }
 }

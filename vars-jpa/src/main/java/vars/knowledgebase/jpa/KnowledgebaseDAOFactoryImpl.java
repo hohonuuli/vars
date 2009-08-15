@@ -30,7 +30,7 @@ public class KnowledgebaseDAOFactoryImpl implements KnowledgebaseDAOFactory {
     }
 
     public IConceptDAO newConceptDAO() {
-        return new ConceptDAO(eao);
+        return new ConceptDAO(eao, newConceptNameDAO());
     }
 
     public IConceptMetadataDAO newConceptMetadataDAO() {

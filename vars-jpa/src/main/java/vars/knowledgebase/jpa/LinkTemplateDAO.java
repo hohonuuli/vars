@@ -7,13 +7,15 @@ import vars.knowledgebase.IConceptDAO;
 import vars.jpa.DAO;
 import org.mbari.jpax.EAO;
 
-import java.util.Set;
 import java.util.Collection;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.ArrayList;
 
 import com.google.inject.Inject;
+import org.mbari.jpax.NonManagedEAO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by IntelliJ IDEA.
@@ -25,7 +27,8 @@ import com.google.inject.Inject;
 public class LinkTemplateDAO extends DAO implements ILinkTemplateDAO {
 
     private final IConceptDAO conceptDAO;
-
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    
     @Inject
     public LinkTemplateDAO(EAO eao, IConceptDAO conceptDAO) {
         super(eao);
@@ -54,15 +57,37 @@ public class LinkTemplateDAO extends DAO implements ILinkTemplateDAO {
         for (ILinkTemplate linkTemplate : linkTemplates0) {
             // TODO FInish implementation
         }
+        return linkTemplates;
 
     }
 
     public Collection<ILinkTemplate> findAllApplicableToConcept(IConcept concept) {
-        // TODO return all linktemplates that can be applied to a particular concept
-        return null
+
+        Collection<ILinkTemplate> linkTemplates = new ArrayList<ILinkTemplate>();
+        
+        if (!getEAO().isManaged()) {
+            ((NonManagedEAO) getEAO()).startTransaction();
+        }
+
+        while (concept != null) {
+            linkTemplates.addAll(concept.getConceptMetadata().getLinkTemplates());
+            concept = concept.getParentConcept();
+        }
+
+        if (!getEAO().isManaged()) {
+            ((NonManagedEAO) getEAO()).endTransaction();
+        }
+
+        return linkTemplates;
     }
 
     public void validateName(ILinkTemplate object) {
-        // TODO implement this method.
+        IConcept concept = conceptDAO.findByName(object.getToConcept());
+        if (concept != null) {
+            object.setToConcept(concept.getPrimaryConceptName().getName());
+        }
+        else {
+            log.warn(object + " contains a 'conceptName', " + object.getToConcept() + " that was not found in the knowlegebase");
+        }
     }
 }
