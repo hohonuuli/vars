@@ -1,4 +1,4 @@
-package vars;
+package vars.jpa;
 
 import com.google.inject.Module;
 import com.google.inject.Binder;

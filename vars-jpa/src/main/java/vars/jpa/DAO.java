@@ -28,7 +28,7 @@ public class DAO implements IDAO {
             return object;
         }
         else {
-            throw new VARSPersistenceException(object + " is not an instance of IVARSObject");
+            throw new VARSPersistenceException(object + " is not an instance of JPAEntity");
         }
     }
 
@@ -37,7 +37,16 @@ public class DAO implements IDAO {
             return eao.delete(object);
         }
         else {
-            throw new VARSPersistenceException(object + " is not an instance of IVARSObject");
+            throw new VARSPersistenceException(object + " is not an instance of JPAEntity");
+        }
+    }
+
+    public <T> T update(T object) {
+        if (object instanceof JPAEntity) {
+            return eao.update(object);
+        }
+        else {
+            throw new VARSPersistenceException(object + " is not an instance of JPAEntity");
         }
     }
 

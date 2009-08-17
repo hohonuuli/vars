@@ -26,7 +26,8 @@ import vars.knowledgebase.IConceptMetadata
 import vars.EntityToStringCategory
 import javax.persistence.EntityListeners
 import org.mbari.jpax.TransactionLogger
-import vars.KeyNullifier
+import vars.jpa.KeyNullifier
+import vars.jpa.KeyNullifier
 
 /**
  *
@@ -95,14 +96,14 @@ class Concept implements Serializable, IConcept, JPAEntity {
     @Column(name = "LAST_UPDATED_TIME")
     private Timestamp updatedTime
 
-    @ManyToOne(optional = true, targetEntity = Concept.class)
+    @ManyToOne(optional = true, targetEntity = Concept.class, cascade = [CascadeType.ALL])
     @JoinColumn(name = "ParentConceptID_FK")
     IConcept parentConcept
 
     @OneToMany(targetEntity = Concept.class,
             mappedBy = "parentConcept",
             fetch = FetchType.LAZY,
-            cascade = [CascadeType.PERSIST, CascadeType.REMOVE])
+            cascade = [CascadeType.ALL])
     Set<IConcept> childConcepts
 
     @OneToMany(targetEntity = ConceptName.class,
@@ -135,7 +136,10 @@ class Concept implements Serializable, IConcept, JPAEntity {
     @Column(name = "TaxonomyType", length = 20)
     String taxonomyType
 
-    @OneToOne(mappedBy = "concept", fetch = FetchType.LAZY, cascade = CascadeType.ALL, targetEntity = ConceptMetadata.class)
+    @OneToOne(mappedBy = "concept",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            targetEntity = ConceptMetadata.class)
     IConceptMetadata conceptMetadata
 
     IConceptMetadata getConceptMetadata() {

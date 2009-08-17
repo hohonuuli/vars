@@ -20,7 +20,7 @@ import vars.EntityToStringCategory
 import vars.jpa.JPAEntity
 import javax.persistence.EntityListeners
 import org.mbari.jpax.TransactionLogger
-import vars.KeyNullifier
+import vars.jpa.KeyNullifier
 
 @Entity(name = "PhysicalData")
 @Table(name = "PhysicalData")

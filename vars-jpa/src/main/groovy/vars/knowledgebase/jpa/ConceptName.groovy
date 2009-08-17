@@ -20,7 +20,8 @@ import vars.jpa.JPAEntity
 import vars.EntityToStringCategory
 import javax.persistence.EntityListeners;
 import org.mbari.jpax.TransactionLogger
-import vars.KeyNullifier
+import vars.jpa.KeyNullifier
+import vars.jpa.KeyNullifier
 
 /**
  * <pre>

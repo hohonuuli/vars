@@ -20,16 +20,18 @@ public interface IDAO {
      *
      * @param object
      */
-    public <T> T makePersistent(T object);
+    <T> T makePersistent(T object);
 
     /**
      * TODO: Add JavaDoc
      *
      * @param object
      */
-    public <T> T makeTransient(T object);
+    <T> T makeTransient(T object);
+
+    <T> T update(T object);
 
 
-    public <T> T findByPrimaryKey(Class<T> clazz, Object primaryKey);
+    <T> T findByPrimaryKey(Class<T> clazz, Object primaryKey);
 
 }

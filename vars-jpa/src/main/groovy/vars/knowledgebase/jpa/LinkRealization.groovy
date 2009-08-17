@@ -20,7 +20,9 @@ import vars.knowledgebase.ILinkRealization
 import vars.jpa.JPAEntity
 import javax.persistence.EntityListeners;
 import org.mbari.jpax.TransactionLogger
-import vars.KeyNullifier
+import vars.jpa.KeyNullifier
+import vars.jpa.KeyNullifier
+import javax.persistence.CascadeType
 
 /**
  * <pre>
@@ -76,7 +78,7 @@ class LinkRealization implements Serializable, ILinkRealization, JPAEntity {
     @Column(name = "LinkValue", length = 255)
     String linkValue
 
-    @ManyToOne(optional = false, targetEntity = ConceptMetadata.class)
+    @ManyToOne(optional = false, targetEntity = ConceptMetadata.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "ConceptDelegateID_FK")
     IConceptMetadata conceptMetadata
 

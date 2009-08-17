@@ -30,7 +30,7 @@ import vars.knowledgebase.MediaTypes
 import vars.EntityToStringCategory
 import javax.persistence.EntityListeners;
 import org.mbari.jpax.TransactionLogger
-import vars.KeyNullifier
+import vars.jpa.KeyNullifier
 
 /**
  * <pre>

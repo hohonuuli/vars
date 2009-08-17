@@ -20,7 +20,7 @@ import vars.knowledgebase.ILinkTemplate
 import vars.jpa.JPAEntity
 import javax.persistence.EntityListeners;
 import org.mbari.jpax.TransactionLogger
-import vars.KeyNullifier
+import vars.jpa.KeyNullifier
 
 /**
  * Created by IntelliJ IDEA.

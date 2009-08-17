@@ -21,6 +21,7 @@ import java.util.Collection;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.Ignore;
 import org.mbari.jpax.NonManagedEAO;
 import org.mbari.jpax.NonManagedEAOImpl;
 import org.slf4j.Logger;
@@ -93,8 +94,39 @@ public class KBCrudTest {
     }
 
     @Test
+    public void incrementalBuildAndDeleteByConcept() {
+
+        EntityUtilities eu = new EntityUtilities(new NonManagedEAOImpl("test"));
+
+        IConcept root = testObjectFactory.makeConcept("ROOT");
+        IConceptDAO dao = daoFactory.newConceptDAO();
+        root = dao.makePersistent(root);
+        log.info("BUILDING KNOWLEDGEBASE TREE:\n" + eu.buildTextTree(root));
+
+        IConcept concept2A = testObjectFactory.makeConcept("LEVEL 2 A");
+        root.addChildConcept(concept2A);
+        concept2A = dao.makePersistent(concept2A);
+        log.info("BUILDING KNOWLEDGEBASE TREE:\n" + eu.buildTextTree(root));
+
+        IConcept concept3AA = testObjectFactory.makeConcept("LEVEL 3 A A");
+        concept2A.addChildConcept(concept3AA);
+        IConcept concept3AB = testObjectFactory.makeConcept("LEVEL 3 A B");
+        concept2A.addChildConcept(concept3AB);
+        concept2A = dao.update(concept2A);
+        log.info("BUILDING KNOWLEDGEBASE TREE:\n" + eu.buildTextTree(root));
+
+        IConcept concept2B = testObjectFactory.makeConcept("LEVEL 2 B");
+        root.addChildConcept(concept2B);
+        dao.makePersistent(concept2B);
+        log.info("BUILDING KNOWLEDGEBASE TREE:\n" + eu.buildTextTree(root));
+
+        dao.makeTransient(root);
+
+    }
+
+    @Test
     public void bottomUpDelete() {
-        IConcept concept = testObjectFactory.makeObjectGraph("BIG-TEST", 2);
+        IConcept concept = testObjectFactory.makeObjectGraph("BIG-TEST", 1);
         IConceptDAO dao = daoFactory.newConceptDAO();
         concept = dao.makePersistent(concept);
         EntityUtilities eu = new EntityUtilities(new NonManagedEAOImpl("test"));
@@ -130,7 +162,7 @@ public class KBCrudTest {
 
         for (ILinkRealization linkRealization : linkRealizations) {
             linkRealization.getConceptMetadata().removeLinkRealization(linkRealization);
-            linkRealization = dao.makeTransient(linkRealization);
+            dao.makeTransient(linkRealization);
         }
         log.info("KNOWLEDGEBASE TREE AFTER LINKREALIZATION DELETE:\n" + eu.buildTextTree(concept));
 

@@ -23,7 +23,8 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import javax.persistence.EntityListeners;
 import org.mbari.jpax.TransactionLogger
-import vars.KeyNullifier
+import vars.jpa.KeyNullifier
+import vars.jpa.KeyNullifier
 
 /**
  * CREATE TABLE HISTORY (

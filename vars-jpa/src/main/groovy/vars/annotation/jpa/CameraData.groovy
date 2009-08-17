@@ -21,7 +21,7 @@ import vars.jpa.JPAEntity
 import vars.EntityToStringCategory
 import javax.persistence.EntityListeners
 import org.mbari.jpax.TransactionLogger
-import vars.KeyNullifier
+import vars.jpa.KeyNullifier
 
 @Entity(name = "CameraData")
 @Table(name = "CameraData")
