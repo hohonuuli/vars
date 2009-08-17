@@ -17,7 +17,10 @@ import groovy.beans.Bindable
 import vars.knowledgebase.IConcept
 import vars.knowledgebase.IConceptName
 import vars.jpa.JPAEntity
-import vars.EntityToStringCategory;
+import vars.EntityToStringCategory
+import javax.persistence.EntityListeners;
+import org.mbari.jpax.TransactionLogger
+import vars.KeyNullifier
 
 /**
  * <pre>
@@ -40,6 +43,7 @@ import vars.EntityToStringCategory;
  */
 @Entity(name = "ConceptName")
 @Table(name = "ConceptName")
+@EntityListeners( value = [TransactionLogger.class, KeyNullifier.class] )
 @NamedQueries( value = [
     @NamedQuery(name = "ConceptName.findById",
                 query = "SELECT v FROM ConceptName v WHERE v.id = :id"),

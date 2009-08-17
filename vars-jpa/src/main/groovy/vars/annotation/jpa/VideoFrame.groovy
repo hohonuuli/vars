@@ -26,9 +26,13 @@ import vars.annotation.IPhysicalData
 import vars.annotation.IVideoArchive
 import vars.jpa.JPAEntity
 import vars.EntityToStringCategory
+import javax.persistence.EntityListeners
+import org.mbari.jpax.TransactionLogger
+import vars.KeyNullifier
 
 @Entity(name = "VideoFrame")
 @Table(name = "VideoFrame")
+@EntityListeners( value = [TransactionLogger.class, KeyNullifier.class] )
 @NamedQueries( value = [
     @NamedQuery(name = "VideoFrame.findById",
                 query = "SELECT v FROM VideoFrame v WHERE v.id = :id"),
@@ -108,7 +112,7 @@ class VideoFrame implements Serializable, IVideoFrame, JPAEntity {
     }
 
     void removeObservation(IObservation observation) {
-        if (observation?.remove(observation)) {
+        if (observations?.remove(observation)) {
             observation.videoFrame = null
         }
     }

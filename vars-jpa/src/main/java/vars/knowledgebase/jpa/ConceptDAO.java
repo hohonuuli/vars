@@ -9,7 +9,6 @@ import vars.knowledgebase.IConceptNameDAO;
 import vars.VARSPersistenceException;
 import org.mbari.jpax.EAO;
 import org.mbari.jpax.NonManagedEAO;
-import org.mbari.jpax.EAOException;
 import com.google.inject.Inject;
 
 import java.util.Collection;

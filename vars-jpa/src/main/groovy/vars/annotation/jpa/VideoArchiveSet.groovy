@@ -23,9 +23,13 @@ import vars.annotation.IVideoArchive
 import vars.annotation.IVideoFrame
 import vars.jpa.JPAEntity
 import vars.EntityToStringCategory
+import javax.persistence.EntityListeners
+import org.mbari.jpax.TransactionLogger
+import vars.KeyNullifier
 
 @Entity(name = "VideoArchiveSet")
 @Table(name = "VideoArchiveSet")
+@EntityListeners( value = [TransactionLogger.class, KeyNullifier.class] )
 @NamedQueries( value = [
     @NamedQuery(name = "VideoArchiveSet.findById", 
                 query = "SELECT v FROM VideoArchiveSet v WHERE v.id = :id"),

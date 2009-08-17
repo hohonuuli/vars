@@ -17,7 +17,10 @@ import vars.ILink
 import vars.LinkCategory
 import vars.knowledgebase.IConceptMetadata
 import vars.knowledgebase.ILinkRealization
-import vars.jpa.JPAEntity;
+import vars.jpa.JPAEntity
+import javax.persistence.EntityListeners;
+import org.mbari.jpax.TransactionLogger
+import vars.KeyNullifier
 
 /**
  * <pre>
@@ -38,6 +41,7 @@ import vars.jpa.JPAEntity;
  */
 @Entity(name = "LinkRealization")
 @Table(name = "LinkRealization")
+@EntityListeners( value = [TransactionLogger.class, KeyNullifier.class] )
 @NamedQueries( value = [
     @NamedQuery(name = "LinkRealization.findById",
                 query = "SELECT v FROM LinkRealization v WHERE v.id = :id"),
@@ -52,10 +56,10 @@ class LinkRealization implements Serializable, ILinkRealization, JPAEntity {
 
     @Id
     @Column(name = "id", nullable = false, updatable=false)
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "LinkTemplate_Gen")
-    @TableGenerator(name = "LinkTemplate_Gen", table = "UniqueID",
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "LinkRealization_Gen")
+    @TableGenerator(name = "LinkRealization_Gen", table = "UniqueID",
             pkColumnName = "TableName", valueColumnName = "NextID",
-            pkColumnValue = "LinkTemplate", allocationSize = 1)
+            pkColumnValue = "LinkRealization", allocationSize = 1)
     Long id
 
     /** Optimistic lock to prevent concurrent overwrites */

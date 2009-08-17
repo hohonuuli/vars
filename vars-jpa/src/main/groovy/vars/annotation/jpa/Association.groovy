@@ -19,11 +19,15 @@ import vars.LinkCategory
 import vars.annotation.IAssociation
 import vars.annotation.IObservation
 import vars.jpa.JPAEntity
+import javax.persistence.EntityListeners
+import org.mbari.jpax.TransactionLogger
+import vars.KeyNullifier
 
 
 
 @Entity(name = "Association")
 @Table(name = "Association")
+@EntityListeners( value = [TransactionLogger.class, KeyNullifier.class] )
 @NamedQueries( value = [
     @NamedQuery(name = "Association.findById",
                 query = "SELECT v FROM Association v WHERE v.id = :id"),

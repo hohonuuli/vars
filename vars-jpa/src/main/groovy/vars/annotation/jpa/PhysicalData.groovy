@@ -18,9 +18,13 @@ import vars.annotation.IPhysicalData
 import vars.annotation.IVideoFrame
 import vars.EntityToStringCategory
 import vars.jpa.JPAEntity
+import javax.persistence.EntityListeners
+import org.mbari.jpax.TransactionLogger
+import vars.KeyNullifier
 
 @Entity(name = "PhysicalData")
 @Table(name = "PhysicalData")
+@EntityListeners( value = [TransactionLogger.class, KeyNullifier.class] )
 @NamedQueries( value = [
     @NamedQuery(name = "PhysicalData.findById",
                 query = "SELECT v FROM PhysicalData v WHERE v.id = :id")

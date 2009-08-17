@@ -24,6 +24,9 @@ import vars.knowledgebase.ConceptNameTypes
 import vars.jpa.JPAEntity
 import vars.knowledgebase.IConceptMetadata
 import vars.EntityToStringCategory
+import javax.persistence.EntityListeners
+import org.mbari.jpax.TransactionLogger
+import vars.KeyNullifier
 
 /**
  *
@@ -56,6 +59,7 @@ import vars.EntityToStringCategory
  */
 @Entity(name = "Concept")
 @Table(name = "Concept")
+@EntityListeners( value = [TransactionLogger.class, KeyNullifier.class] )
 @NamedQueries( value = [
     @NamedQuery(name = "Concept.findById",
                 query = "SELECT v FROM Concept v WHERE v.id = :id"),
@@ -98,7 +102,7 @@ class Concept implements Serializable, IConcept, JPAEntity {
     @OneToMany(targetEntity = Concept.class,
             mappedBy = "parentConcept",
             fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL)
+            cascade = [CascadeType.PERSIST, CascadeType.REMOVE])
     Set<IConcept> childConcepts
 
     @OneToMany(targetEntity = ConceptName.class,
@@ -185,9 +189,6 @@ class Concept implements Serializable, IConcept, JPAEntity {
         return childConcepts?.find { it.name == name }
     }
 
-    Set<? extends IConceptName> getDescendentPrimaryNames() {
-        return null;  // TODO implement this. Maybe move this to a DAO?
-    }
 
     public IConceptName getPrimaryConceptName() {
         return conceptNames.find { it.nameType == ConceptNameTypes.PRIMARY.getName() }

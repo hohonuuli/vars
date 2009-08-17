@@ -24,9 +24,13 @@ import vars.annotation.IAssociation
 import vars.annotation.IVideoFrame
 import vars.jpa.JPAEntity
 import vars.EntityToStringCategory
+import javax.persistence.EntityListeners
+import org.mbari.jpax.TransactionLogger
+import vars.KeyNullifier
 
 @Entity(name = "Observation")
 @Table(name = "Observation")
+@EntityListeners( value = [TransactionLogger.class, KeyNullifier.class] )
 @NamedQueries( value = [
     @NamedQuery(name = "Observation.findById",
                 query = "SELECT v FROM Observation v WHERE v.id = :id"),

@@ -16,8 +16,10 @@ import javax.persistence.JoinColumn
 import vars.knowledgebase.IConceptMetadata
 import vars.knowledgebase.IMedia
 import vars.jpa.JPAEntity
-import vars.knowledgebase.IConceptMetadata
-import vars.EntityToStringCategory;
+import vars.EntityToStringCategory
+import javax.persistence.EntityListeners;
+import org.mbari.jpax.TransactionLogger
+import vars.KeyNullifier
 
 /**
  * Created by IntelliJ IDEA.
@@ -28,6 +30,7 @@ import vars.EntityToStringCategory;
  */
 @Entity(name = "Media")
 @Table(name = "Media")
+@EntityListeners( value = [TransactionLogger.class, KeyNullifier.class] )
 @NamedQueries( value = [
     @NamedQuery(name = "Media.findById",
                 query = "SELECT v FROM Media v WHERE v.id = :id"),

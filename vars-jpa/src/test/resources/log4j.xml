@@ -10,7 +10,7 @@
 
     
     <logger name="org.hibernate">
-        <level value="info" />
+        <level value="warn" />
     </logger>
     
     <!--  <logger name="org.mbari">

@@ -27,8 +27,10 @@ import vars.jpa.JPAEntity
 import javax.persistence.OrderBy
 import vars.knowledgebase.HistoryCreationDateComparator
 import vars.knowledgebase.MediaTypes
-import vars.knowledgebase.IConceptMetadata
-import vars.EntityToStringCategory;
+import vars.EntityToStringCategory
+import javax.persistence.EntityListeners;
+import org.mbari.jpax.TransactionLogger
+import vars.KeyNullifier
 
 /**
  * <pre>
@@ -49,6 +51,7 @@ import vars.EntityToStringCategory;
  */
 @Entity(name = "ConceptMetadata")
 @Table(name = "ConceptDelegate")
+@EntityListeners( value = [TransactionLogger.class, KeyNullifier.class] )
 @NamedQueries( value = [
     @NamedQuery(name = "ConceptMetadata.findById",
                 query = "SELECT v FROM ConceptMetadata v WHERE v.id = :id")
@@ -163,32 +166,35 @@ class ConceptMetadata implements Serializable, IConceptMetadata, JPAEntity {
 
     public void removeHistory(IHistory history) {
         if (getHistories().remove(history)) {
-            history.conceptMetadata = null
+            history?.conceptMetadata = null
         }
     }
 
     public void removeLinkRealization(ILinkRealization linkRealization) {
         if (getLinkRealizations().remove(linkRealization)) {
-            linkRealization.conceptMetadata = null
+            linkRealization?.conceptMetadata = null
         }
     }
 
     public void removeLinkTemplate(ILinkTemplate linkTemplate) {
         if (getLinkTemplates().remove(linkTemplate)) {
-            linkTemplate.conceptMetadata = null
+            linkTemplate?.conceptMetadata = null
         }
     }
 
     public void removeMedia(IMedia media) {
         if (getMedias().remove(media)) {
-            media.conceptMetadata = null
+            media?.conceptMetadata = null
         }
     }
 
 
     void setUsage(IUsage usage) {
+        if (this.usage != null) {
+            this.usage.conceptMetadata = null
+        }
         this.usage = usage;
-        usage.conceptMetadata = this
+        usage?.conceptMetadata = this
     }
 
     @Override

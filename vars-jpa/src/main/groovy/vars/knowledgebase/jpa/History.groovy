@@ -18,10 +18,12 @@ import javax.persistence.JoinColumn
 import vars.knowledgebase.IConceptMetadata
 import vars.knowledgebase.IHistory
 import vars.jpa.JPAEntity
-import vars.knowledgebase.IConceptMetadata
 import vars.EntityToStringCategory
 import java.text.DateFormat
-import java.text.SimpleDateFormat;
+import java.text.SimpleDateFormat
+import javax.persistence.EntityListeners;
+import org.mbari.jpax.TransactionLogger
+import vars.KeyNullifier
 
 /**
  * CREATE TABLE HISTORY (
@@ -46,6 +48,7 @@ import java.text.SimpleDateFormat;
  */
 @Entity(name = "History")
 @Table(name = "History")
+@EntityListeners( value = [TransactionLogger.class, KeyNullifier.class] )
 @NamedQueries( value = [
     @NamedQuery(name = "History.findById",
                 query = "SELECT v FROM History v WHERE v.id = :id"),

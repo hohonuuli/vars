@@ -103,13 +103,6 @@ public interface IConcept extends IKnowledgebaseObject, ILazy {
     Set<? extends IConceptName> getConceptNames();
 
     /**
-     *
-     * @return A Collection of ConceptNames representing the primary names of this
-     * Concept and the primary names of all descendent Concepts
-     */
-    Set<? extends IConceptName> getDescendentPrimaryNames();
-
-    /**
      * Gets the nodcCode attribute of the Concept object
      * @return  The nodcCode value
      * @uml.property  name="nodcCode"

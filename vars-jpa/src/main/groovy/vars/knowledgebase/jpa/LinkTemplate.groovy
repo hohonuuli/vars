@@ -18,7 +18,9 @@ import vars.LinkCategory
 import vars.knowledgebase.IConceptMetadata
 import vars.knowledgebase.ILinkTemplate
 import vars.jpa.JPAEntity
-import vars.knowledgebase.IConceptMetadata;
+import javax.persistence.EntityListeners;
+import org.mbari.jpax.TransactionLogger
+import vars.KeyNullifier
 
 /**
  * Created by IntelliJ IDEA.
@@ -29,6 +31,7 @@ import vars.knowledgebase.IConceptMetadata;
  */
 @Entity(name = "LinkTemplate")
 @Table(name = "LinkTemplate")
+@EntityListeners( value = [TransactionLogger.class, KeyNullifier.class] )
 @NamedQueries( value = [
     @NamedQuery(name = "LinkTemplate.findById",
                 query = "SELECT v FROM LinkTemplate v WHERE v.id = :id"),

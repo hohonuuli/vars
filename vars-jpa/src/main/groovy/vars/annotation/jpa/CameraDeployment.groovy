@@ -19,9 +19,13 @@ import vars.annotation.ICameraDeployment
 import vars.annotation.IVideoArchiveSet
 import vars.jpa.JPAEntity
 import vars.EntityToStringCategory
+import javax.persistence.EntityListeners
+import org.mbari.jpax.TransactionLogger
+import vars.KeyNullifier
 
 @Entity(name = "CameraDeployment")
 @Table(name = "CameraPlatformDeployment")
+@EntityListeners( value = [TransactionLogger.class, KeyNullifier.class] )
 @NamedQueries( value = [
     @NamedQuery(name = "CameraDeployment.findById",
                 query = "SELECT v FROM CameraDeployment v WHERE v.id = :id"),

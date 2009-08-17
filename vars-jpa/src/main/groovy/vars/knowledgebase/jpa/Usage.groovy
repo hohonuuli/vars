@@ -19,7 +19,10 @@ import javax.persistence.OneToOne
 import vars.knowledgebase.IConceptMetadata
 import vars.knowledgebase.IUsage
 import vars.jpa.JPAEntity
-import vars.EntityToStringCategory;
+import vars.EntityToStringCategory
+import javax.persistence.EntityListeners;
+import org.mbari.jpax.TransactionLogger
+import vars.KeyNullifier
 
 /**
  * CREATE TABLE USAGE (
@@ -36,6 +39,7 @@ import vars.EntityToStringCategory;
  */
 @Entity(name = "Usage")
 @Table(name = "Usage")
+@EntityListeners( value = [TransactionLogger.class, KeyNullifier.class] )
 @NamedQueries( value = [
     @NamedQuery(name = "Usage.findById",
                 query = "SELECT v FROM Usage v WHERE v.id = :id"),
