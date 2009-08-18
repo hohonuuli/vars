@@ -2,7 +2,6 @@ package vars.jpa;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.jpa.JPAEntity;
 
 import javax.persistence.PostRemove;
 import java.lang.reflect.Method;

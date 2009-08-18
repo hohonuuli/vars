@@ -17,6 +17,8 @@ public interface IConceptDAO extends IDAO {
 
     IConcept findRoot();
 
+    Collection<IConcept> findAll();
+
     /**
      * Lookup all @{link IConceptName}s objects that are associated with
      * this {@link IConcept} and its children

@@ -1,0 +1,29 @@
+About DAO: 
+	As currently implemented. The makePersistent/makeTransient/update/findByPrimaryKey methods
+are exactly the same for all the DAO's so any DAO will work with any Entity object. However,
+each DAO implements some methods that are specific for a particular entity. Usually, these
+methods are query methods. 
+
+
+Working with the Concepts:
+
+To insert into the database:
+	NOTE: inserts cascade. Inserting a concept will insert all it's children.
+  Example:
+	// Assume you've already created a concept here
+	IConcept concept; 
+	// ---- Step 1: You need to make sure you're working with a persisted parent concept!!
+	IConcept parentConcept = dao.findByName('something') 
+	// ---- Step 2: Add Concept to parent
+	parentConcept.addChildConcept(concept);
+	// ---- Step 3: insert
+	dao.makePersistent(concept) // OR dao.update(parentConcept)
+		
+To delete from the database:
+	NOTE: Deletes cascade to the childConcepts but NOT to the parent.
+  Example:
+	// ---- Step 1: Detach from the parent
+	concept.getParentConcept().removeChildConcept(concept);
+	// ---- Step 2: Execute delete
+	dao.makeTransient(concept);
+	

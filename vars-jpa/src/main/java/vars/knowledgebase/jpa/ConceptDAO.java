@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -86,4 +87,13 @@ public class ConceptDAO extends DAO implements IConceptDAO {
             findDescendentNames(concept.getChildConcepts(), conceptNames);
         }
     }
+
+
+    public Collection<IConcept> findAll() {
+        Map<String, Object> params = new HashMap<String, Object>();
+        return getEAO().findByNamedQuery("Concept.findAll", params);
+    }
+
+
+
 }

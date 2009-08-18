@@ -79,7 +79,10 @@ import vars.jpa.KeyNullifier
     @NamedQuery(name = "Concept.findByTaxonomyType",
                 query = "SELECT c FROM Concept c WHERE c.taxonomyType = :taxonomyType"),
     @NamedQuery(name = "Concept.findRoot",
-                query = "SELECT c FROM Concept c WHERE c.parentConcept IS NULL")
+                query = "SELECT c FROM Concept c WHERE c.parentConcept IS NULL"),
+    @NamedQuery( name = "Concept.findAll", 
+                query = "SELECT c FROM Concept c")
+
 ])
 class Concept implements Serializable, IConcept, JPAEntity {
 
@@ -96,7 +99,7 @@ class Concept implements Serializable, IConcept, JPAEntity {
     @Column(name = "LAST_UPDATED_TIME")
     private Timestamp updatedTime
 
-    @ManyToOne(optional = true, targetEntity = Concept.class, cascade = [CascadeType.ALL])
+    @ManyToOne(optional = true, targetEntity = Concept.class, cascade = [CascadeType.MERGE])
     @JoinColumn(name = "ParentConceptID_FK")
     IConcept parentConcept
 
