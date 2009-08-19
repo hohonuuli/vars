@@ -85,6 +85,9 @@
         <version>1.2.1</version>
         <scope>test</scope>
     </dependency> -->
+
+      <!-- Eclipselink bombs on the datamodel (bug!!). OpenJPA works but the enhancer build step needed to
+        create lazy-loading proxies bombs on the groovy classes. Hibernate works fine though -->
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-entitymanager</artifactId>
@@ -114,6 +117,19 @@
       <artifactId>sqljdbc4</artifactId>
       <version>2.0</version>
       <scope>test</scope>
+    </dependency>
+      <!-- For password encryption -->
+      <dependency>
+      <groupId>org.jasypt</groupId>
+      <artifactId>jasypt</artifactId>
+      <version>1.5</version>
+      <scope>compile</scope>
+    </dependency>
+      <!-- jasypt needs ICU4J for Java 5, it's not required for Java 6 -->
+      <dependency>
+      <groupId>com.ibm.icu</groupId>
+      <artifactId>icu4j</artifactId>
+      <version>4.0.1</version>
     </dependency>
   </dependencies>
 </project>

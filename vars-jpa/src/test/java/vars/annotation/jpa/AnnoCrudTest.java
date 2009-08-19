@@ -56,6 +56,7 @@ public class AnnoCrudTest {
     @Test
     public void bigTest() {
 
+        log.info("---------- TEST: bigTest ----------");
         IVideoArchiveSet vas = testObjectFactory.makeObjectGraph("BIG-TEST", 2);
         IVideoArchiveSetDAO dao = daoFactory.newVideoArchiveSetDAO();
         EntityUtilities eu = new EntityUtilities(eao);
@@ -75,6 +76,7 @@ public class AnnoCrudTest {
     @Test
     public void bottomUpDelete() {
 
+        log.info("---------- TEST: bottomUpDelete ----------");
         IVideoArchiveSet vas = testObjectFactory.makeObjectGraph("BIG-TEST", 2);
         IDAO dao = daoFactory.newVideoArchiveSetDAO();
         vas = dao.makePersistent(vas);

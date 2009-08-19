@@ -47,13 +47,13 @@ public interface IUserAccount extends IVARSObject {
      * Gets the password for this <code>UserAccount</code>.
      * @return     The password for this <code>UserAccount</code>.
      */
-    char[] getPassword();
+    String getPassword();
 
     /**
      * Gets the KB Maint <code>Role</code> for this <code>UserAccount</code>.
      * @return     The KB Maint <code>Role</code> for this <code>UserAccount</code>.
      */
-    IRole getRole();
+    String getRole();
 
     /**
      * Gets the user name for this <code>UserAccount</code>.
@@ -78,16 +78,16 @@ public interface IUserAccount extends IVARSObject {
 
     /**
      * Sets the password for this <code>UserAccount</code>.
-     * @param password    The password for this <code>UserAccount</code>.
+     * @param unencryptedPassword    The password for this <code>UserAccount</code>. Implementations
+     *      of this method should encrypt the passwrd
      */
-    void setPassword(char[] password);
+    void setPassword(String unencryptedPassword);
 
     /**
      * Sets the permissible <code>Role</code> for this <code>UserAccount</code>.
      * @param role  The role to set.
-     * @uml.property  name="role"
      */
-    void setRole(final IRole role);
+    void setRole(String role);
 
     /**
      * Sets the username for this <code>UserAccount</code>.
@@ -99,4 +99,6 @@ public interface IUserAccount extends IVARSObject {
     void setFirstName(String firstName);
     void setLastName(String lastName);
     void setAffiliation(String affiliation);
+
+    boolean authenticate(String unencryptedPassword);
 }
