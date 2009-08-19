@@ -16,11 +16,12 @@ import javax.persistence.JoinColumn
 import vars.knowledgebase.IConceptMetadata
 import vars.knowledgebase.IMedia
 import vars.jpa.JPAEntity
-import vars.EntityToStringCategory
+import vars.EntitySupportCategory
 import javax.persistence.EntityListeners;
 import org.mbari.jpax.TransactionLogger
 import vars.jpa.KeyNullifier
 import vars.jpa.KeyNullifier
+import javax.persistence.Transient
 
 /**
  * Created by IntelliJ IDEA.
@@ -43,6 +44,9 @@ import vars.jpa.KeyNullifier
     @NamedQuery(name = "Media.findByCaption", query = "SELECT m FROM Media m WHERE m.caption = :caption")
 ])
 public class Media implements Serializable, IMedia, JPAEntity {
+
+    @Transient
+    private static final PROPS = Collections.unmodifiableList([IMedia.PROP_URL])
 
     @Id
     @Column(name = "id", nullable = false, updatable=false)
@@ -90,7 +94,17 @@ public class Media implements Serializable, IMedia, JPAEntity {
 
     @Override
     String toString() {
-        return EntityToStringCategory.basicToString(this, [PROP_URL, PROP_TYPE])
+        return EntitySupportCategory.basicToString(this, [PROP_URL, PROP_TYPE])
+    }
+
+    @Override
+    boolean equals(that) {
+        return EntitySupportCategory.equals(this, that, PROPS)
+    }
+
+    @Override
+    int hashCode() {
+        return EntitySupportCategory.hashCode(this, PROPS)
     }
 
 

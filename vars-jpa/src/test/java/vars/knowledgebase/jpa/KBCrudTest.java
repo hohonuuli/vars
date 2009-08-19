@@ -191,7 +191,6 @@ public class KBCrudTest {
 
 
     @Test
-    @Ignore
     public void bottomUpDelete() {
 
         log.info("---------- TEST: bottomUpDelete ----------");

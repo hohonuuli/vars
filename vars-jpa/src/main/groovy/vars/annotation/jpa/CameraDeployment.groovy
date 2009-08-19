@@ -18,11 +18,12 @@ import javax.persistence.TableGenerator
 import vars.annotation.ICameraDeployment
 import vars.annotation.IVideoArchiveSet
 import vars.jpa.JPAEntity
-import vars.EntityToStringCategory
+import vars.EntitySupportCategory
 import javax.persistence.EntityListeners
 import org.mbari.jpax.TransactionLogger
 import vars.jpa.KeyNullifier
 import vars.jpa.KeyNullifier
+import javax.persistence.Transient
 
 @Entity(name = "CameraDeployment")
 @Table(name = "CameraPlatformDeployment")
@@ -40,6 +41,11 @@ import vars.jpa.KeyNullifier
                 query = "SELECT v FROM CameraDeployment v WHERE v.endDate = :endDate")
 ])
 class CameraDeployment implements Serializable, ICameraDeployment, JPAEntity {
+
+    @Transient
+    private static final PROPS = Collections.unmodifiableList([ICameraDeployment.PROP_SEQUENCE_NUMBER,
+            ICameraDeployment.PROP_CHIEF_SCIENTIST_NAME, ICameraDeployment.PROP_START_DATE,
+            ICameraDeployment.PROP_END_DATE])
 
     @Id
     @Column(name = "id", nullable = false, updatable = false)
@@ -74,7 +80,18 @@ class CameraDeployment implements Serializable, ICameraDeployment, JPAEntity {
 
     @Override
     String toString() {
-        return EntityToStringCategory.basicToString(this, [PROP_SEQUENCE_NUMBER, PROP_CHIEF_SCIENTIST_NAME, PROP_START_DATE, PROP_END_DATE])
+        return EntitySupportCategory.basicToString(this, PROPS)
+    }
+
+
+    @Override
+    boolean equals(that) {
+        return EntitySupportCategory.equals(this, that, PROPS)
+    }
+
+    @Override
+    int hashCode() {
+        return EntitySupportCategory.hashCode(this, PROPS)
     }
 
 

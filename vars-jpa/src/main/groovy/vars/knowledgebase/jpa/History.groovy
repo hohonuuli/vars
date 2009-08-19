@@ -18,13 +18,14 @@ import javax.persistence.JoinColumn
 import vars.knowledgebase.IConceptMetadata
 import vars.knowledgebase.IHistory
 import vars.jpa.JPAEntity
-import vars.EntityToStringCategory
+import vars.EntitySupportCategory
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import javax.persistence.EntityListeners;
 import org.mbari.jpax.TransactionLogger
 import vars.jpa.KeyNullifier
 import vars.jpa.KeyNullifier
+import javax.persistence.Transient
 
 /**
  * CREATE TABLE HISTORY (
@@ -74,6 +75,10 @@ import vars.jpa.KeyNullifier
 ])
 class History implements Serializable, IHistory, JPAEntity {
 
+    @Transient
+    private static final PROPS = Collections.unmodifiableList([IHistory.PROP_ACTION, IHistory.PROP_FIELD,
+            IHistory.PROP_NEW_VALUE, IHistory.PROP_OLD_VALUE, IHistory.PROP_CREATOR_NAME, IHistory.PROP_CREATION_DATE])
+
     @Id
     @Column(name = "id", nullable = false, updatable=false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "History_Gen")
@@ -116,7 +121,7 @@ class History implements Serializable, IHistory, JPAEntity {
     @Column(name = "Action", length = 16)
     String action
 
-    @Column(name = "Commnet", length = 2048)
+    @Column(name = "Comment", length = 2048)
     String comment
 
     @Column(name = "Rejected")
@@ -176,6 +181,16 @@ class History implements Serializable, IHistory, JPAEntity {
 
     @Override
     String toString() {
-        return EntityToStringCategory.basicToString(this, [PROP_ACTION, PROP_FIELD, PROP_NEW_VALUE, PROP_OLD_VALUE])
+        return EntitySupportCategory.basicToString(this, PROPS)
+    }
+
+    @Override
+    boolean equals(that) {
+        return EntitySupportCategory.equals(this, that, PROPS)
+    }
+
+    @Override
+    int hashCode() {
+        return EntitySupportCategory.hashCode(this, PROPS)
     }
 }

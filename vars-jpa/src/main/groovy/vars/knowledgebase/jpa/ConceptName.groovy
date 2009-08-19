@@ -17,11 +17,12 @@ import groovy.beans.Bindable
 import vars.knowledgebase.IConcept
 import vars.knowledgebase.IConceptName
 import vars.jpa.JPAEntity
-import vars.EntityToStringCategory
+import vars.EntitySupportCategory
 import javax.persistence.EntityListeners;
 import org.mbari.jpax.TransactionLogger
 import vars.jpa.KeyNullifier
 import vars.jpa.KeyNullifier
+import javax.persistence.Transient
 
 /**
  * <pre>
@@ -55,6 +56,9 @@ import vars.jpa.KeyNullifier
                 query = "SELECT c FROM ConceptName c WHERE c.nameType = :nameType")
 ])
 public class ConceptName implements Serializable, IConceptName, JPAEntity {
+
+    @Transient
+    private static final PROPS = Collections.unmodifiableList([IConceptName.PROP_NAME])
 
     @Id
     @Column(name = "id", nullable = false, updatable=false)
@@ -91,7 +95,17 @@ public class ConceptName implements Serializable, IConceptName, JPAEntity {
 
     @Override
     String toString() {
-        return EntityToStringCategory.basicToString(this, [PROP_NAME, PROP_NAME_TYPE])
+        return EntitySupportCategory.basicToString(this, [PROP_NAME, PROP_NAME_TYPE])
+    }
+
+    @Override
+    boolean equals(that) {
+        return EntitySupportCategory.equals(this, that, PROPS)
+    }
+
+    @Override
+    int hashCode() {
+        return EntitySupportCategory.hashCode(this, PROPS)
     }
 
 

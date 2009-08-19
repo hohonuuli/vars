@@ -23,6 +23,8 @@ import org.mbari.jpax.TransactionLogger
 import vars.jpa.KeyNullifier
 import vars.jpa.KeyNullifier
 import javax.persistence.CascadeType
+import javax.persistence.Transient
+import vars.EntitySupportCategory
 
 /**
  * <pre>
@@ -55,6 +57,10 @@ import javax.persistence.CascadeType
                 query = "SELECT l FROM LinkRealization l WHERE l.linkValue = :linkValue")
 ])
 class LinkRealization implements Serializable, ILinkRealization, JPAEntity {
+
+    @Transient
+    private static final PROPS = Collections.unmodifiableList([ILinkRealization.PROP_LINKNAME,
+            ILinkRealization.PROP_TOCONCEPT, ILinkRealization.PROP_LINKVALUE])    
 
     @Id
     @Column(name = "id", nullable = false, updatable=false)
@@ -95,5 +101,15 @@ class LinkRealization implements Serializable, ILinkRealization, JPAEntity {
     @Override
     String toString() {
         return stringValue()
+    }
+
+    @Override
+    boolean equals(that) {
+        return EntitySupportCategory.equals(this, that, PROPS)
+    }
+
+    @Override
+    int hashCode() {
+        return EntitySupportCategory.hashCode(this, PROPS)
     }
 }

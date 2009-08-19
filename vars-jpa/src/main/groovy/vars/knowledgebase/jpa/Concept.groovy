@@ -23,11 +23,12 @@ import vars.knowledgebase.IConceptMetadata
 import vars.knowledgebase.ConceptNameTypes
 import vars.jpa.JPAEntity
 import vars.knowledgebase.IConceptMetadata
-import vars.EntityToStringCategory
+import vars.EntitySupportCategory
 import javax.persistence.EntityListeners
 import org.mbari.jpax.TransactionLogger
 import vars.jpa.KeyNullifier
 import vars.jpa.KeyNullifier
+import javax.persistence.Transient
 
 /**
  *
@@ -231,6 +232,54 @@ class Concept implements Serializable, IConcept, JPAEntity {
 
     @Override
     String toString() {
-        return EntityToStringCategory.basicToString(this, [PROP_ORIGINATOR, PROP_RANK_LEVEL, PROP_RANK_NAME])
+        return EntitySupportCategory.basicToString(this, [PROP_ORIGINATOR, PROP_RANK_LEVEL, PROP_RANK_NAME])
     }
+
+
+//    boolean equals(that) {
+//
+//        def isEqual = true
+//
+//        if (this.is(that)) {
+//            // Do nothing isEqual is already true
+//            //isEqual = true
+//        }
+//        else if (!that || this.getClass() != that.getClass()) {
+//            isEqual = false
+//        }
+//        else {
+//
+//            /*
+//             * Check ID. If they are both null use primary concept name
+//             */
+//            if(this.id ? !this.id.equals(that.id) : that.id != null) {
+//                isEqual = false
+//            }
+//
+//            if (isEqual &&
+//                    (this.primaryConceptName ? !this.primaryConceptName.equals(that.primaryConceptName) : that.primaryConceptName != null)) {
+//                isEqual = false
+//            }
+//        }
+//
+//        return isEqual
+//
+//    }
+//
+//    int hashCode() {
+//        int result
+//
+//        /*
+//         * Use id has hash. If it's null use the primaryConceptName instead
+//         */
+//        if (id) {
+//            result = 3 * id
+//        }
+//        else  {
+//            result = primaryConceptName?.hashCode() ?: 0
+//        }
+//
+//        return result
+//
+//    }
 }

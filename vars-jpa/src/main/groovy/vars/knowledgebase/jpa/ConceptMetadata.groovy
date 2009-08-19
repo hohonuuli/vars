@@ -27,7 +27,7 @@ import vars.jpa.JPAEntity
 import javax.persistence.OrderBy
 import vars.knowledgebase.HistoryCreationDateComparator
 import vars.knowledgebase.MediaTypes
-import vars.EntityToStringCategory
+import vars.EntitySupportCategory
 import javax.persistence.EntityListeners;
 import org.mbari.jpax.TransactionLogger
 import vars.jpa.KeyNullifier
@@ -199,7 +199,54 @@ class ConceptMetadata implements Serializable, IConceptMetadata, JPAEntity {
 
     @Override
     String toString() {
-        return EntityToStringCategory.basicToString(this, [])
+        return EntitySupportCategory.basicToString(this, [])
+    }
+
+    boolean equals(that) {
+
+        def isEqual = true
+
+        if (this.is(that)) {
+            // Do nothing isEqual is already true
+            //isEqual = true
+        }
+        else if (!that || this.getClass() != that.getClass()) {
+            isEqual = false
+        }
+        else {
+
+            /*
+             * Check ID. If they are both null use concept id
+             */
+            if(this.id ? !this.id.equals(that.id) : that.id != null) {
+                isEqual = false
+            }
+
+            if (isEqual &&
+                    (this.concept?.id ? !this.concept.id.equals(that.concept?.id) : that.concept.id != null)) {
+                isEqual = false
+            }
+        }
+
+        return isEqual
+
+    }
+
+    int hashCode() {
+        int result
+
+        /*
+         * Use id has hash. If it's null use the concept id hash instead
+         */
+        if (id) {
+            result = 3 * id
+        }
+        else  {
+            result = concept?.hashCode() ?: 0
+        }
+
+        return result
+
     }
 
 

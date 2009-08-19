@@ -23,6 +23,8 @@ import javax.persistence.EntityListeners
 import org.mbari.jpax.TransactionLogger
 import vars.jpa.KeyNullifier
 import vars.jpa.KeyNullifier
+import vars.EntitySupportCategory
+import javax.persistence.Transient
 
 @Entity(name = "Association")
 @Table(name = "Association")
@@ -38,6 +40,9 @@ import vars.jpa.KeyNullifier
                 query = "SELECT a FROM Association a WHERE a.linkValue = :linkValue")
 ])
 class Association implements Serializable, IAssociation, JPAEntity {
+
+    @Transient
+    private static final PROPS = Collections.unmodifiableList([IAssociation.PROP_LINKNAME, IAssociation.PROP_TOCONCEPT, IAssociation.PROP_TOCONCEPT])
 
     @Id
     @Column(name = "id", nullable = false, updatable=false)
@@ -83,5 +88,13 @@ class Association implements Serializable, IAssociation, JPAEntity {
         return stringValue()
     }
 
+    @Override
+    boolean equals(that) {
+        return EntitySupportCategory.equals(this, that, PROPS)
+    }
 
+    @Override
+    int hashCode() {
+        return EntitySupportCategory.hashCode(this, PROPS)
+    }
 }

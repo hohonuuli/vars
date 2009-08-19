@@ -21,6 +21,8 @@ import vars.jpa.JPAEntity
 import javax.persistence.EntityListeners;
 import org.mbari.jpax.TransactionLogger
 import vars.jpa.KeyNullifier
+import javax.persistence.Transient
+import vars.EntitySupportCategory
 
 /**
  * Created by IntelliJ IDEA.
@@ -45,6 +47,10 @@ import vars.jpa.KeyNullifier
                 query = "SELECT l FROM LinkTemplate l WHERE l.linkName = :linkName AND l.toConcept = :toConcept AND l.linkValue = :linkValue")
 ])
 class LinkTemplate implements Serializable, ILinkTemplate, JPAEntity {
+
+    @Transient
+    private static final PROPS = Collections.unmodifiableList([ILinkTemplate.PROP_LINKNAME,
+            ILinkTemplate.PROP_TOCONCEPT, ILinkTemplate.PROP_LINKVALUE])
 
     @Id
     @Column(name = "id", nullable = false, updatable=false)
@@ -85,5 +91,15 @@ class LinkTemplate implements Serializable, ILinkTemplate, JPAEntity {
     @Override
     String toString() {
         return stringValue()
+    }
+
+    @Override
+    boolean equals(that) {
+        return EntitySupportCategory.equals(this, that, PROPS)
+    }
+
+    @Override
+    int hashCode() {
+        return EntitySupportCategory.hashCode(this, PROPS)
     }
 }

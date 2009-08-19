@@ -16,11 +16,12 @@ import javax.persistence.Version
 import vars.annotation.jpa.VideoFrame
 import vars.annotation.IPhysicalData
 import vars.annotation.IVideoFrame
-import vars.EntityToStringCategory
+import vars.EntitySupportCategory
 import vars.jpa.JPAEntity
 import javax.persistence.EntityListeners
 import org.mbari.jpax.TransactionLogger
 import vars.jpa.KeyNullifier
+import javax.persistence.Transient
 
 @Entity(name = "PhysicalData")
 @Table(name = "PhysicalData")
@@ -30,6 +31,10 @@ import vars.jpa.KeyNullifier
                 query = "SELECT v FROM PhysicalData v WHERE v.id = :id")
 ])
 class PhysicalData implements Serializable, IPhysicalData, JPAEntity {
+
+    @Transient
+    private static final PROPS = Collections.unmodifiableList([IPhysicalData.PROP_LATITUDE, IPhysicalData.PROP_LONGITUDE,
+            IPhysicalData.PROP_DEPTH])
 
     @Id
     @Column(name = "id", nullable = false, updatable = false)
@@ -62,7 +67,17 @@ class PhysicalData implements Serializable, IPhysicalData, JPAEntity {
 
     @Override
     String toString() {
-        return EntityToStringCategory.basicToString(this, [PROP_LATITUDE, PROP_LONGITUDE, PROP_DEPTH])
+        return EntitySupportCategory.basicToString(this, PROPS)
+    }
+
+    @Override
+    boolean equals(that) {
+        return EntitySupportCategory.equals(this, that, PROPS)
+    }
+
+    @Override
+    int hashCode() {
+        return EntitySupportCategory.hashCode(this, PROPS)
     }
     
 }

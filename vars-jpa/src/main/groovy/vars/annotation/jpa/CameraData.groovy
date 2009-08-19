@@ -18,10 +18,11 @@ import javax.persistence.TableGenerator
 import vars.annotation.ICameraData
 import vars.annotation.IVideoFrame
 import vars.jpa.JPAEntity
-import vars.EntityToStringCategory
+import vars.EntitySupportCategory
 import javax.persistence.EntityListeners
 import org.mbari.jpax.TransactionLogger
 import vars.jpa.KeyNullifier
+import javax.persistence.Transient
 
 @Entity(name = "CameraData")
 @Table(name = "CameraData")
@@ -39,6 +40,10 @@ import vars.jpa.KeyNullifier
                 query = "SELECT c FROM CameraData c WHERE c.frameGrabURL LIKE :frameGrabURL")
 ])
 class CameraData implements Serializable, ICameraData, JPAEntity {
+
+    @Transient
+    private static final PROPS = Collections.unmodifiableList([ICameraData.PROP_FRAME_GRAB_URL, ICameraData.PROP_ZOOM,
+            ICameraData.PROP_FOCUS, ICameraData.PROP_IRIS])
 
     @Id
     @Column(name = "id", nullable = false, updatable = false)
@@ -81,8 +86,17 @@ class CameraData implements Serializable, ICameraData, JPAEntity {
 
     @Override
     String toString() {
-        return EntityToStringCategory.basicToString(this, [PROP_DIRECTION, PROP_NAME, PROP_FRAME_GRAB_URL])
+        return EntitySupportCategory.basicToString(this, [PROP_DIRECTION, PROP_NAME, PROP_FRAME_GRAB_URL])
     }
 
+    @Override
+    boolean equals(that) {
+        return EntitySupportCategory.equals(this, that, PROPS)
+    }
+
+    @Override
+    int hashCode() {
+        return EntitySupportCategory.hashCode(this, PROPS)
+    }
 
 }

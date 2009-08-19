@@ -23,11 +23,13 @@ import vars.annotation.IObservation
 import vars.annotation.IAssociation
 import vars.annotation.IVideoFrame
 import vars.jpa.JPAEntity
-import vars.EntityToStringCategory
+import vars.EntitySupportCategory
 import javax.persistence.EntityListeners
 import org.mbari.jpax.TransactionLogger
 import vars.jpa.KeyNullifier
 import vars.jpa.KeyNullifier
+import vars.EntitySupportCategory
+import javax.persistence.Transient
 
 @Entity(name = "Observation")
 @Table(name = "Observation")
@@ -44,6 +46,10 @@ import vars.jpa.KeyNullifier
                 query = "SELECT o FROM Observation o WHERE o.observer = :observer")
 ])
 class Observation implements Serializable, IObservation, JPAEntity {
+
+    @Transient
+    private static final PROPS = Collections.unmodifiableList([IObservation.PROP_CONCEPT_NAME,
+            IObservation.PROP_OBSERVATION_DATE, IObservation.PROP_OBSERVER])
 
     @Id
     @Column(name = "id", nullable = false, updatable = false)
@@ -111,7 +117,18 @@ class Observation implements Serializable, IObservation, JPAEntity {
     }
 
     String toString() {
-        return EntityToStringCategory.basicToString(this, [PROP_CONCEPT_NAME, PROP_OBSERVER, PROP_OBSERVATION_DATE])
+        return EntitySupportCategory.basicToString(this, PROPS)
+    }
+
+
+    @Override
+    boolean equals(that) {
+        return EntitySupportCategory.equals(this, that, PROPS)
+    }
+
+    @Override
+    int hashCode() {
+        return EntitySupportCategory.hashCode(this, PROPS)
     }
 
 }

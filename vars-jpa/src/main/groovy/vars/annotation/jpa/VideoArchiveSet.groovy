@@ -22,11 +22,12 @@ import vars.annotation.ICameraDeployment
 import vars.annotation.IVideoArchive
 import vars.annotation.IVideoFrame
 import vars.jpa.JPAEntity
-import vars.EntityToStringCategory
+import vars.EntitySupportCategory
 import javax.persistence.EntityListeners
 import org.mbari.jpax.TransactionLogger
 import vars.jpa.KeyNullifier
 import vars.jpa.KeyNullifier
+import javax.persistence.Transient
 
 @Entity(name = "VideoArchiveSet")
 @Table(name = "VideoArchiveSet")
@@ -54,6 +55,11 @@ import vars.jpa.KeyNullifier
                 query = "SELECT v FROM VideoArchiveSet v, IN (v.cameraDeployments) c WHERE v.platformName = :platformName AND c.sequenceNumber = :sequenceNumber")
 ])
 class VideoArchiveSet implements Serializable, IVideoArchiveSet, JPAEntity {
+
+    @Transient
+    private static final PROPS = Collections.unmodifiableList([IVideoArchiveSet.PROP_PLATFORM_NAME,
+            IVideoArchiveSet.PROP_TRACKING_NUMBER, IVideoArchiveSet.PROP_START_DATE])
+
 
     @Id 
     @Column(name = "id", nullable = false, updatable = false)
@@ -161,7 +167,17 @@ class VideoArchiveSet implements Serializable, IVideoArchiveSet, JPAEntity {
 
     @Override
     String toString() {
-        return EntityToStringCategory.basicToString(this, [PROP_PLATFORM_NAME, PROP_TRACKING_NUMBER, PROP_START_DATE])
+        return EntitySupportCategory.basicToString(this, PROPS)
+    }
+
+    @Override
+    boolean equals(that) {
+        return EntitySupportCategory.equals(this, that, PROPS)
+    }
+
+    @Override
+    int hashCode() {
+        return EntitySupportCategory.hashCode(this, PROPS)
     }
 
 }

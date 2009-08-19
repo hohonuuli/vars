@@ -19,11 +19,13 @@ import javax.persistence.OneToOne
 import vars.knowledgebase.IConceptMetadata
 import vars.knowledgebase.IUsage
 import vars.jpa.JPAEntity
-import vars.EntityToStringCategory
+import vars.EntitySupportCategory
 import javax.persistence.EntityListeners;
 import org.mbari.jpax.TransactionLogger
 import vars.jpa.KeyNullifier
 import vars.jpa.KeyNullifier
+import vars.EntitySupportCategory
+import javax.persistence.Transient
 
 /**
  * CREATE TABLE USAGE (
@@ -51,6 +53,10 @@ import vars.jpa.KeyNullifier
 ])
 class Usage implements Serializable, IUsage, JPAEntity {
 
+    @Transient
+    private static final PROPS = Collections.unmodifiableList([IUsage.PROP_EMBARGO_EXPIRATION_DATE,
+            IUsage.PROP_SPECIFICATION]) 
+
     @Id
     @Column(name = "id", nullable = false, updatable=false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "Usage_Gen")
@@ -77,7 +83,18 @@ class Usage implements Serializable, IUsage, JPAEntity {
 
     @Override
     String toString() {
-        return EntityToStringCategory.basicToString(this, [PROP_EMBARGO_EXPIRATION_DATE, PROP_SPECIFICATION])
+        return EntitySupportCategory.basicToString(this, PROPS)
+    }
+
+
+    @Override
+    boolean equals(that) {
+        return EntitySupportCategory.equals(this, that, PROPS)
+    }
+
+    @Override
+    int hashCode() {
+        return EntitySupportCategory.hashCode(this, PROPS)
     }
     
 }

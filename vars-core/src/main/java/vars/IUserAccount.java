@@ -36,6 +36,12 @@ public interface IUserAccount extends IVARSObject {
      */
     String USERNAME_DEFAULT = "default";
 
+    String PROP_FIRST_NAME = "firstName";
+    String PROP_LAST_NAME = "lastName";
+    String PROP_PASSWORD = "password";
+    String PROP_USER_NAME = "userName";
+    String PROP_ROLE = "role";
+    String PROP_AFFILIATION = "affiliation";
 
     /**
      * Gets the password for this <code>UserAccount</code>.

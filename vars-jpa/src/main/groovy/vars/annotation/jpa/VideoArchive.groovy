@@ -21,10 +21,12 @@ import vars.annotation.IVideoArchiveSet
 import vars.annotation.IVideoArchive
 import vars.annotation.IVideoFrame
 import vars.jpa.JPAEntity
-import vars.EntityToStringCategory
+import vars.EntitySupportCategory
 import javax.persistence.EntityListeners
 import org.mbari.jpax.TransactionLogger
 import vars.jpa.KeyNullifier
+import vars.EntitySupportCategory
+import javax.persistence.Transient
 
 @Entity(name = "VideoArchive")
 @Table(name = "VideoArchive")
@@ -36,6 +38,9 @@ import vars.jpa.KeyNullifier
                 query = "SELECT v FROM VideoArchive v WHERE v.name = :name")
 ])
 class VideoArchive implements Serializable, IVideoArchive, JPAEntity {
+
+    @Transient
+    private static final PROPS = Collections.unmodifiableList([IVideoArchive.PROP_NAME]) 
 
     @Id
     @Column(name = "id", nullable = false, updatable = false)
@@ -120,7 +125,17 @@ class VideoArchive implements Serializable, IVideoArchive, JPAEntity {
 
     @Override
     String toString() {
-        return EntityToStringCategory.basicToString(this, [PROP_NAME, PROP_START_TIME_CODE])
+        return EntitySupportCategory.basicToString(this, [PROP_NAME, PROP_START_TIME_CODE])
+    }
+
+    @Override
+    boolean equals(that) {
+        return EntitySupportCategory.equals(this, that, PROPS)
+    }
+
+    @Override
+    int hashCode() {
+        return EntitySupportCategory.hashCode(this, PROPS)
     }
 
 }
