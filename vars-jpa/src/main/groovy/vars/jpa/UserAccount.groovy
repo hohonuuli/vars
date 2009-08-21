@@ -43,8 +43,8 @@ public class UserAccount implements Serializable, IUserAccount, JPAEntity {
 
     @Id
     @Column(name = "id", nullable = false, updatable = false)
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "UserName_Gen")
-    @TableGenerator(name = "UserName_Gen", table = "UniqueID",
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "UserAccount_Gen")
+    @TableGenerator(name = "UserAccount_Gen", table = "UniqueID",
             pkColumnName = "TableName", valueColumnName = "NextID",
             pkColumnValue = "UserName", allocationSize = 1)
     Long id

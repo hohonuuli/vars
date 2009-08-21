@@ -22,9 +22,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.Ignore;
 import org.mbari.jpax.NonManagedEAO;
-import org.mbari.jpax.NonManagedEAOImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.jpa.DAO;
@@ -66,7 +64,7 @@ public class KBCrudTest {
         kbFactory = injector.getInstance(KnowledgebaseFactory.class);
         testObjectFactory = new KnowledgebaseTestObjectFactory(kbFactory);
         daoFactory = injector.getInstance(KnowledgebaseDAOFactory.class);
-        eao = new NonManagedEAOImpl("test");
+        eao = injector.getInstance(KnowledgebaseEAO.class);
         entityUtilities = new EntityUtilities(eao);
     }
 

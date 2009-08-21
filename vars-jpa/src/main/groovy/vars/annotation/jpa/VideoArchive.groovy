@@ -82,7 +82,7 @@ class VideoArchive implements Serializable, IVideoArchive, JPAEntity {
         return videoFrames
     }
 
-    void addVideoFrame(VideoFrame videoFrame) {
+    void addVideoFrame(IVideoFrame videoFrame) {
         if (getVideoFrames().find {VideoFrame vf -> vf.timecode.equals(videoFrame.timecode)}) {
             throw new IllegalArgumentException("A VideoFrame with a timecode of ${videoFrame.timecode} already exists in ${this}.")
         }
@@ -96,11 +96,11 @@ class VideoArchive implements Serializable, IVideoArchive, JPAEntity {
         }
     }
 
-    void addVideoFrame(IVideoFrame videoFrame) {
-        if (getVideoFrames().add(videoFrame)) {
-            videoFrame.videoArchive = this
-        }
-    }
+//    void addVideoFrame(IVideoFrame videoFrame) {
+//        if (getVideoFrames().add(videoFrame)) {
+//            videoFrame.videoArchive = this
+//        }
+//    }
 
     IVideoFrame findVideoFrameByTimeCode(String timecode) {
         return videoFrames.find { it.timecode == timecode }

@@ -66,7 +66,7 @@ public class KnowledgebaseTestObjectFactory {
         c.setNodcCode("dunno");
         c.setOriginator("Unit test");
         c.setRankLevel("1");
-        c.setRankName("Phylum" + name);
+        c.setRankName("phylum");
         c.setReference("Some reference");
         c.setStructureType(ConceptTypes.TAXONOMY.getName());
         return c;

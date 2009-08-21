@@ -3,15 +3,11 @@ package vars.jpa;
 import org.junit.Before;
 import org.junit.Assert;
 import org.junit.Test;
-import org.mbari.jpax.NonManagedEAOImpl;
 import org.mbari.jpax.NonManagedEAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.inject.Injector;
 import com.google.inject.Guice;
-import vars.knowledgebase.KnowledgebaseFactory;
-import vars.knowledgebase.KnowledgebaseDAOFactory;
-import vars.testing.KnowledgebaseTestObjectFactory;
 import vars.MiscFactory;
 import vars.MiscDAOFactory;
 import vars.IUserAccount;
@@ -39,7 +35,7 @@ public class UserAccountCrudTest {
 
         miscFactory = injector.getInstance(MiscFactory.class);
         daoFactory = injector.getInstance(MiscDAOFactory.class);
-        eao = new NonManagedEAOImpl("test");
+        eao = injector.getInstance(MiscEAO.class);
     }
 
     @Test

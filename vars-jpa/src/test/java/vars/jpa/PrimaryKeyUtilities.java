@@ -19,7 +19,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.logging.Logger;
 import vars.annotation.IVideoArchive;
 import vars.annotation.IVideoFrame;
 import vars.annotation.jpa.Association;
@@ -39,6 +38,8 @@ import vars.knowledgebase.jpa.LinkRealization;
 import vars.knowledgebase.jpa.LinkTemplate;
 import vars.knowledgebase.jpa.Media;
 import vars.knowledgebase.jpa.Usage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by IntelliJ IDEA.
@@ -49,7 +50,7 @@ import vars.knowledgebase.jpa.Usage;
  */
 public class PrimaryKeyUtilities {
 
-    private static final Logger log = Logger.getLogger("test");
+    private static final Logger log = LoggerFactory.getLogger(PrimaryKeyUtilities.class);
 
     /**
      * Checks the database for the presence of all the primary keys supplied

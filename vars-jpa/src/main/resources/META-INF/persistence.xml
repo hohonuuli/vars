@@ -3,47 +3,47 @@
              xmlns="http://java.sun.com/xml/ns/persistence"
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd">
-    <persistence-unit name="vars-hibernate-test" transaction-type="RESOURCE_LOCAL">
-        <description>VARS Data Model</description>
-        <provider>org.hibernate.ejb.HibernatePersistence</provider>
-        <properties>
-            <!--<property name="hibernate.ejb.cfgfile" value="/hibernate.cfg.xml"/>-->
-            <property name="hibernate.hbm2ddl.auto" value="create"/>
-            <property name="hibernate.archive.autodetection" value="class"/>
-            <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
-            <property name="hibernate.show_sql" value="true"/>
-            <property name="hibernate.connection.driver_class" value="org.apache.derby.jdbc.ClientDriver"/>
-            <property name="hibernate.connection.password" value="vars4mbari"/>
-            <property name="hibernate.connection.url" value="jdbc:derby://localhost:1527/VARS-JPA;create=true"/>
-            <property name="hibernate.connection.username" value="varsuser"/>
-            <property name="hibernate.dialect" value="org.hibernate.dialect.DerbyDialect"/>
-            <property name="hibernate.c3p0.min_size" value="5"/>
-            <property name="hibernate.c3p0.max_size" value="20"/>
-            <property name="hibernate.c3p0.timeout" value="300"/>
-            <property name="hibernate.c3p0.max_statements" value="50"/>
-            <property name="hibernate.c3p0.idle_test_period" value="3000"/>
-        </properties>
-    </persistence-unit>
     <persistence-unit name="vars-hibernate-production" transaction-type="RESOURCE_LOCAL">
         <description>VARS Data Model</description>
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
         <properties>
             <property name="hibernate.archive.autodetection" value="class"/>
-            <property name="hibernate.hbm2ddl.auto" value="update"/>
-            <property name="hibernate.show_sql" value="true"/>
-            <property name="hibernate.connection.driver_class" value="org.apache.derby.jdbc.ClientDriver"/>
-            <property name="hibernate.connection.password" value="vars4mbari"/>
-            <property name="hibernate.connection.url" value="jdbc:derby://localhost:1527/VARS-JPA;create=true"/>
-            <property name="hibernate.connection.username" value="varsuser"/>
-            <property name="hibernate.dialect" value="org.hibernate.dialect.DerbyDialect"/>
-            <property name="hibernate.c3p0.min_size" value="5"/>
-            <property name="hibernate.c3p0.max_size" value="20"/>
-            <property name="hibernate.c3p0.timeout" value="300"/>
-            <property name="hibernate.c3p0.max_statements" value="50"/>
             <property name="hibernate.c3p0.idle_test_period" value="3000"/>
+            <property name="hibernate.c3p0.max_size" value="20"/>
+            <property name="hibernate.c3p0.max_statements" value="50"/>
+            <property name="hibernate.c3p0.min_size" value="5"/>
+            <property name="hibernate.c3p0.timeout" value="300"/>
+            <property name="hibernate.connection.driver_class" value="${PRODUCTION_JDBC_DRIVER}"/>
+            <property name="hibernate.connection.password" value="${PRODUCTION_JDBC_PASSWORD}"/>
+            <property name="hibernate.connection.url" value="${PRODUCTION_JDBC_URL}"/>
+            <property name="hibernate.connection.username" value="${PRODUCTION_JDBC_USERNAME}"/>
+            <property name="hibernate.dialect" value="${PRODUCTION_HIBERNATE_DIALECT}"/>
+            <!-- <property name="hibernate.hbm2ddl.auto" value="validate"/> -->
+            <property name="hibernate.show_sql" value="false"/>
         </properties>
     </persistence-unit>
-    <persistence-unit name="test" transaction-type="RESOURCE_LOCAL">
+    <persistence-unit name="vars-hibernate-development" transaction-type="RESOURCE_LOCAL">
+        <description>VARS Data Model</description>
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <properties>
+            <!--<property name="hibernate.ejb.cfgfile" value="/hibernate.cfg.xml"/>-->
+            <property name="hibernate.archive.autodetection" value="class"/>
+            <property name="hibernate.c3p0.idle_test_period" value="3000"/>
+            <property name="hibernate.c3p0.max_size" value="20"/>
+            <property name="hibernate.c3p0.max_statements" value="50"/>
+            <property name="hibernate.c3p0.min_size" value="5"/>
+            <property name="hibernate.c3p0.timeout" value="300"/>
+            <property name="hibernate.connection.driver_class" value="${DEVELOPMENT_JDBC_DRIVER}"/>
+            <property name="hibernate.connection.password" value="${DEVELOPMENT_JDBC_PASSWORD}"/>
+            <property name="hibernate.connection.url" value="${DEVELOPMENT_JDBC_URL}"/>
+            <property name="hibernate.connection.username" value="${DEVELOPMENT_JDBC_USERNAME}"/>
+            <property name="hibernate.dialect" value="${DEVELOPMENT_HIBERNATE_DIALECT}"/>
+            <!-- <property name="hibernate.hbm2ddl.auto" value="validate"/> bombs on derby-->
+            <property name="hibernate.hbm2ddl.auto" value="create"/>
+            <property name="hibernate.show_sql" value="false"/>
+        </properties>
+    </persistence-unit>
+    <persistence-unit name="vars-hibernate-test" transaction-type="RESOURCE_LOCAL">
         <!-- <class>vars.User</class> -->
         <properties>
             <property name="hibernate.archive.autodetection" value="class"/>

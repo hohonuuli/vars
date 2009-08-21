@@ -26,12 +26,14 @@ public class VarsJpaTestModule implements Module {
 
     public void configure(Binder binder) {
 
-        // Bind the names of the persistence units
-	    binder.bindConstant().annotatedWith(Names.named("annotationPersistenceUnit")).to("test");
-        binder.bindConstant().annotatedWith(Names.named("knowledgebasePersistenceUnit")).to("test");
-        binder.bindConstant().annotatedWith(Names.named("miscPersistenceUnit")).to("test");
+        final String puName = "vars-hibernate-development";
 
-        // Bind annotation DAO
+        // Bind the names of the persistence units
+	    binder.bindConstant().annotatedWith(Names.named("annotationPersistenceUnit")).to(puName);
+        binder.bindConstant().annotatedWith(Names.named("knowledgebasePersistenceUnit")).to(puName);
+        binder.bindConstant().annotatedWith(Names.named("miscPersistenceUnit")).to(puName);
+
+        // Bind annotation object and DAO factories
         binder.bind(MiscDAOFactory.class).to(MiscDAOFactoryImpl.class);
         binder.bind(MiscFactory.class).to(MiscFactoryImpl.class);
         binder.bind(AnnotationDAOFactory.class).to(AnnotationDAOFactoryImpl.class);

@@ -6,7 +6,24 @@
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <name>vars-redux</name>
-    <url>http://maven.apache.org</url>
+    <url>http://code.google.com/p/vars-redux/</url>
+	<scm>
+	  <connection>scm:hg:https://vars-redux.googlecode.com/hg/</connection>
+	  <developerConnection>scm:hg:https://vars-redux.googlecode.com/hg/</developerConnection>
+	  <url>https://vars-redux.googlecode.com/hg/</url>
+	</scm>
+	<developers>
+        <developer>
+            <id>brian</id>
+            <name>Brian Schlining</name>
+            <email>bschlining@gmail.com</email>
+            <roles>
+                <role>Lead Engineer</role>
+            </roles>
+            <organization>MBARI</organization>
+            <timezone>-8</timezone>
+        </developer>
+    </developers>
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -41,7 +58,44 @@
                     <target>1.5</target>
                 </configuration>
             </plugin>
+            <!-- Create source jars when deploying -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Add Manifest information -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                        </manifest>
+                        <manifestEntries>
+                            <environment>${environment}</environment>
+                            <url>${pom.url}</url>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+            <!-- Filter resources using UTF-8 encoding -->
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
         </plugins>
+        
     </build>
     <repositories>
         <repository>
@@ -107,4 +161,56 @@
             </snapshots>
         </repository>
     </repositories>
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <links>
+                        <link>http://java.sun.com/j2se/1.5.0/docs/api/</link>
+                    </links>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>taglist-maven-plugin</artifactId>
+                <configuration>
+                    <tags>
+                        <tag>TODO</tag>
+                        <tag>RxINC</tag>
+                        <tag>@todo</tag>
+                        <tag>FIXME</tag>
+                        <tag>XXX</tag>
+                    </tags>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jxr-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <configuration>
+                    <linkXref>true</linkXref>
+                    <targetJdk>1.5</targetJdk>
+                    <rulesets>
+                        <ruleset>/rulesets/basic.xml</ruleset>
+                        <ruleset>/rulesets/imports.xml</ruleset>
+                        <ruleset>/rulesets/unusedcode.xml</ruleset>
+                        <ruleset>/rulesets/finalizers.xml</ruleset>
+                    </rulesets>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jdepend-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </reporting>
 </project>

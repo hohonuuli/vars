@@ -65,7 +65,7 @@ class Observation implements Serializable, IObservation, JPAEntity {
     private Timestamp updatedTime
 
     @ManyToOne(optional = false, targetEntity = VideoFrame.class)
-    @JoinColumn(name = "VideoArchiveSetID_FK")
+    @JoinColumn(name = "VideoFrameID_FK")
     @Bindable
     IVideoFrame videoFrame
 

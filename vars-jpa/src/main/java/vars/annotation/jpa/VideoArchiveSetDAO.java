@@ -23,13 +23,10 @@ import java.util.List;
 
 import com.google.inject.Inject;
 
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
 
 public class VideoArchiveSetDAO extends DAO implements IVideoArchiveSetDAO {
 
     private final IVideoArchiveDAO videoArchiveDAO;
-    public  final Logger log = LoggerFactory.getLogger(getClass());
 
     @Inject
     public VideoArchiveSetDAO(EAO eao, IVideoArchiveDAO videoArchiveDAO) {

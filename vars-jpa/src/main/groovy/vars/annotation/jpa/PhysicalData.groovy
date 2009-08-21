@@ -22,6 +22,8 @@ import javax.persistence.EntityListeners
 import org.mbari.jpax.TransactionLogger
 import vars.jpa.KeyNullifier
 import javax.persistence.Transient
+import javax.persistence.TemporalType
+import javax.persistence.Temporal
 
 @Entity(name = "PhysicalData")
 @Table(name = "PhysicalData")
@@ -52,7 +54,11 @@ class PhysicalData implements Serializable, IPhysicalData, JPAEntity {
     @OneToOne(targetEntity = VideoFrame.class)
     @JoinColumn(name = "VideoFrameID_FK")
     IVideoFrame videoFrame
-    
+
+    @Column(name = "LogDTG")
+    @Temporal(value = TemporalType.TIMESTAMP)
+    Date logDate
+
     Float depth
     Float temperature
     Float salinity

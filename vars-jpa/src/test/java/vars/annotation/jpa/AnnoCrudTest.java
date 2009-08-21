@@ -15,10 +15,7 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.Assert;
 import org.junit.Before;
-import org.mbari.jpax.EAO;
 import org.mbari.jpax.NonManagedEAO;
-import org.mbari.jpax.NonManagedEAOImpl;
-import org.mbari.util.IObservable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.IDAO;
@@ -50,7 +47,7 @@ public class AnnoCrudTest {
         annotationFactory = injector.getInstance(AnnotationFactory.class);
         testObjectFactory = new AnnotationTestObjectFactory(annotationFactory);
         daoFactory = injector.getInstance(AnnotationDAOFactory.class);
-        eao = new NonManagedEAOImpl("test");
+        eao = injector.getInstance(AnnotationEAO.class);
     }
 
     @Test

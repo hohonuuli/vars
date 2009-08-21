@@ -63,4 +63,12 @@ public interface IVideoArchiveDAO extends IDAO {
      * @return The matching object. <b>null</b> is returned if no match exists
      */
     IVideoArchive findByName(String name);
+
+    /**
+     * Removes VideoFrames that do not contain observations.
+     *
+     * @param videoArchive
+     * @return The updated VideoArchive
+     */
+    IVideoArchive deleteEmptyVideoFrames(IVideoArchive videoArchive);
 }

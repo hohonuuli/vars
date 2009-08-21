@@ -123,4 +123,43 @@ public class VideoArchiveDAO extends DAO implements IVideoArchiveDAO {
 
         return videoArchive;
     }
+
+    public IVideoArchive deleteEmptyVideoFrames(IVideoArchive videoArchive) {
+
+        Collection<IVideoFrame> emptyFrames = (Collection<IVideoFrame>) videoArchive.getEmptyVideoFrames();
+        int n = 0;
+        boolean doFetch = emptyFrames.size() > 0;
+        for (IVideoFrame videoFrame : emptyFrames) {
+            videoArchive.removeVideoFrame(videoFrame);
+            n++;
+        }
+
+        /*
+         * Delete in a single transaction if possible
+         */
+        if (doFetch) {
+            try {
+                if (!getEAO().isManaged()) {
+                    NonManagedEAO nmEao = (NonManagedEAO) getEAO();
+                    nmEao.startTransaction();
+                    for (IVideoFrame videoFrame : emptyFrames) {
+                        nmEao.delete(videoFrame, false);
+                    }
+                    nmEao.endTransaction();
+                }
+                else {
+                    for (IVideoFrame videoFrame : emptyFrames) {
+                        getEAO().delete(videoFrame);
+                    }
+                }
+                log.debug("Deleted " + n + " empty VideoFrames from " + videoArchive);
+            }
+            finally {
+                videoArchive = findByPrimaryKey(videoArchive.getClass(), ((JPAEntity) videoArchive).getId());
+            }
+        }
+        return videoArchive;
+
+    }
+
 }

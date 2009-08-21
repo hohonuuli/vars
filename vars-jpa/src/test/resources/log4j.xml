@@ -13,9 +13,13 @@
         <level value="warn" />
     </logger>
     
-    <!--  <logger name="org.mbari">
-        <level value="debug" />
-    </logger> -->
+    <logger name="vars">
+        <level value="info" />
+    </logger>
+
+    <logger name="org.mbari">
+        <level value="info" />
+    </logger>
     
     <root>
         <priority value="debug" />

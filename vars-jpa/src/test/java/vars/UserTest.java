@@ -25,7 +25,6 @@ import org.mbari.jpax.EAO;
 import org.mbari.jpax.NonManagedEAOImpl;
 import org.junit.Test;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import static org.junit.Assert.*;
 
 /**
@@ -37,7 +36,7 @@ import static org.junit.Assert.*;
  */
 public class UserTest {
 
-    private final EntityManagerFactory emf = Persistence.createEntityManagerFactory("test");
+    private final EntityManagerFactory emf = Persistence.createEntityManagerFactory("vars-hibernate-test");
 
     private final Date date = new Date();
 

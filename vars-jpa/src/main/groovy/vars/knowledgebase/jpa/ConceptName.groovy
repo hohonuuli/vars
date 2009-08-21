@@ -73,7 +73,7 @@ public class ConceptName implements Serializable, IConceptName, JPAEntity {
     @Column(name = "LAST_UPDATED_TIME")
     private Timestamp updatedTime
 
-    @Column(name = "ConceptName", nullable = false, length = 50, unique = true)
+    @Column(name = "ConceptName", nullable = false, length = 64, unique = true)
     @Bindable
     String name
 
