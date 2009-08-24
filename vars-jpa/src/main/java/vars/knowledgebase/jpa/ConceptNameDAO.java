@@ -5,11 +5,12 @@ import vars.knowledgebase.IConceptNameDAO;
 import vars.knowledgebase.IConceptName;
 import org.mbari.jpax.EAO;
 
-import java.util.Set;
 import java.util.HashMap;
 import java.util.List;
 
 import com.google.inject.Inject;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -28,5 +29,10 @@ public class ConceptNameDAO extends DAO implements IConceptNameDAO {
     public IConceptName findByName(final String name) {
         List<IConceptName> names = getEAO().findByNamedQuery("ConceptName.findByName", new HashMap<String, Object>() {{ put("name", name);}} );
         return names.size() == 0 ? null : names.get(0);
+    }
+
+    public Collection<IConceptName> findAll() {
+        Map<String, Object> params = new HashMap<String, Object>();
+        return getEAO().findByNamedQuery("ConceptName.findAll", params);
     }
 }

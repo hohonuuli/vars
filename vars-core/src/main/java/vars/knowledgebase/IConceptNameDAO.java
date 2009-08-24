@@ -1,8 +1,8 @@
 package vars.knowledgebase;
 
+import java.util.Collection;
 import vars.IDAO;
 
-import java.util.Set;
 
 
 public interface IConceptNameDAO extends IDAO {
@@ -18,5 +18,7 @@ public interface IConceptNameDAO extends IDAO {
 
 
     IConceptName findByName(String name);
+
+    Collection<IConceptName> findAll();
 
 }

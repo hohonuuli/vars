@@ -53,7 +53,9 @@ import javax.persistence.Transient
                 query = "SELECT c FROM ConceptName c WHERE c.name = :name"),
     @NamedQuery(name = "ConceptName.findByAuthor", query = "SELECT c FROM ConceptName c WHERE c.author = :author"),
     @NamedQuery(name = "ConceptName.findByNameType",
-                query = "SELECT c FROM ConceptName c WHERE c.nameType = :nameType")
+                query = "SELECT c FROM ConceptName c WHERE c.nameType = :nameType"),
+    @NamedQuery(name = "ConceptName.findAll",
+                query = "SELECT c FROM ConceptName c")
 ])
 public class ConceptName implements Serializable, IConceptName, JPAEntity {
 

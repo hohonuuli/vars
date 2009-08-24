@@ -9,6 +9,7 @@ import vars.annotation.IObservationDAO;
 import vars.annotation.IPhysicalDataDAO;
 import vars.annotation.IVideoArchiveDAO;
 import vars.annotation.IVideoArchiveSetDAO;
+import vars.annotation.IVideoFrameDAO;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import org.mbari.jpax.EAO;
 import com.google.inject.Inject;
@@ -63,4 +64,9 @@ public class AnnotationDAOFactoryImpl implements AnnotationDAOFactory {
     public IVideoArchiveSetDAO newVideoArchiveSetDAO() {
         return new VideoArchiveSetDAO(eao, newVideoArchiveDAO());
     }
+
+    public IVideoFrameDAO newVideoFrameDAO() {
+        return new VideoFrameDAO(eao);
+    }
+
 }

@@ -7,9 +7,7 @@
         <groupId>vars-redux</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <groupId>vars</groupId>
     <artifactId>vars-jpa</artifactId>
-    <version>1.0-SNAPSHOT</version>
     <name>vars-jpa [Library]</name>
 <!--
     Build settings

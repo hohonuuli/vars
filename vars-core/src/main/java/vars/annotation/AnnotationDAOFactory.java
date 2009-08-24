@@ -14,6 +14,7 @@ public interface AnnotationDAOFactory {
     ICameraDeploymentDAO newCameraDeploymentDAO();
     IObservationDAO newObservationDAO();
     IPhysicalDataDAO newPhysicalDataDAO();
+    IVideoFrameDAO newVideoFrameDAO();
     IVideoArchiveDAO newVideoArchiveDAO();
     IVideoArchiveSetDAO newVideoArchiveSetDAO();
 
