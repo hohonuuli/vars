@@ -33,7 +33,7 @@ import org.mbari.jpax.TransactionLogger;
                 query = "SELECT c FROM UserAccount c WHERE c.lastName = :lastName"),
     @NamedQuery(name = "UserAccount.findByAffiliation",
                 query = "SELECT c FROM UserAccount c WHERE c.affiliation LIKE :affiliation"),
-@NamedQuery(name = "UserAccount.findByRole",
+    @NamedQuery(name = "UserAccount.findByRole",
                 query = "SELECT c FROM UserAccount c WHERE c.role LIKE :role")
 ])
 public class UserAccount implements Serializable, IUserAccount, JPAEntity {

@@ -26,7 +26,7 @@ public class VarsJpaTestModule implements Module {
 
     public void configure(Binder binder) {
 
-        final String puName = "vars-hibernate-development";
+        final String puName = "vars-hibernate-test";
 
         // Bind the names of the persistence units
 	    binder.bindConstant().annotatedWith(Names.named("annotationPersistenceUnit")).to(puName);
