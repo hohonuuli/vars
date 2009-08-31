@@ -3,3 +3,6 @@ syntax: regexp
 target/ 
 ^test 
 ^.*patch$
+
+syntax: glob
+.DS_Store

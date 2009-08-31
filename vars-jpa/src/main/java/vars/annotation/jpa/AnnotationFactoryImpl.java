@@ -2,7 +2,9 @@ package vars.annotation.jpa;
 
 import vars.annotation.AnnotationFactory;
 import vars.annotation.IAssociation;
+import vars.annotation.ICameraData;
 import vars.annotation.IObservation;
+import vars.annotation.IPhysicalData;
 import vars.annotation.IVideoFrame;
 import vars.annotation.IVideoArchive;
 import vars.annotation.IVideoArchiveSet;
@@ -19,6 +21,10 @@ public class AnnotationFactoryImpl implements AnnotationFactory {
 
     public IAssociation newAssociation() {
         return new Association();
+    }
+
+    public IAssociation newAssociation(String linkName, String toConcept, String linkValue) {
+        return new Association(linkName, toConcept, linkValue);
     }
 
     public IObservation newObservation() {
@@ -40,4 +46,5 @@ public class AnnotationFactoryImpl implements AnnotationFactory {
     public ICameraDeployment newCameraDeployment() {
         return new CameraDeployment();
     }
+
 }

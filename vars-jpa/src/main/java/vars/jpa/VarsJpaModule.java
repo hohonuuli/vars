@@ -30,7 +30,7 @@ public class VarsJpaModule implements Module {
     public void configure(Binder binder) {
 
         // Bind the names of the persistence units
-	    binder.bindConstant().annotatedWith(Names.named("annotationPersistenceUnit")).to("vars-hibernate-test");
+	binder.bindConstant().annotatedWith(Names.named("annotationPersistenceUnit")).to("vars-hibernate-test");
         binder.bindConstant().annotatedWith(Names.named("knowledgebasePersistenceUnit")).to("vars-hibernate-test");
         binder.bindConstant().annotatedWith(Names.named("miscPersistenceUnit")).to("vars-hibernate-test");
 
@@ -43,7 +43,6 @@ public class VarsJpaModule implements Module {
         binder.bind(KnowledgebaseFactory.class).to(KnowledgebaseFactoryImpl.class);
         binder.bind(EAO.class).annotatedWith(Names.named("annotationEAO")).to(AnnotationEAO.class).in(Scopes.SINGLETON);
         binder.bind(EAO.class).annotatedWith(Names.named("knowledgebaseEAO")).to(KnowledgebaseEAO.class).in(Scopes.SINGLETON);
-        binder.bind(EAO.class).annotatedWith(Names.named("miscEAO")).to(MiscEAO.class).in(Scopes.SINGLETON);
         binder.bind(EAO.class).annotatedWith(Names.named("miscEAO")).to(MiscEAO.class).in(Scopes.SINGLETON);
 
     }

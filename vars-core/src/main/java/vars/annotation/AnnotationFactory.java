@@ -1,10 +1,5 @@
 package vars.annotation;
 
-import vars.annotation.IAssociation;
-import vars.annotation.IObservation;
-import vars.annotation.IVideoFrame;
-import vars.annotation.IVideoArchive;
-import vars.annotation.IVideoArchiveSet;
 
 /**
  * Created by IntelliJ IDEA.
@@ -18,6 +13,8 @@ public interface AnnotationFactory {
     /* --- Annotation --- */
 
     IAssociation newAssociation();
+
+    IAssociation newAssociation(String linkName, String toConcept, String linkValue);
 
     IObservation newObservation();
 

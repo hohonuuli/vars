@@ -74,6 +74,16 @@ class Association implements Serializable, IAssociation, JPAEntity {
     @Bindable
     String linkValue
 
+    Association() {
+        // Default constructor
+    }
+
+    Association(String linkName, String toConcept, String linkValue) {
+        this.linkName = linkName
+        this.toConcept = toConcept
+        this.linkValue = linkValue
+    }
+
     String getFromConcept() {
         return observation?.getConceptName()
     }
