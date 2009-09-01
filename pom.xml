@@ -48,7 +48,6 @@
         <module>vars-jpa</module>
         <module>vars-core</module>
     </modules>
-
     <build>
         <plugins>
             <plugin>
