@@ -2,9 +2,7 @@ package vars.annotation.jpa;
 
 import vars.annotation.AnnotationFactory;
 import vars.annotation.IAssociation;
-import vars.annotation.ICameraData;
 import vars.annotation.IObservation;
-import vars.annotation.IPhysicalData;
 import vars.annotation.IVideoFrame;
 import vars.annotation.IVideoArchive;
 import vars.annotation.IVideoArchiveSet;

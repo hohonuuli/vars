@@ -181,7 +181,7 @@ public class PrimaryKeyUtilities {
         map.get(Usage.class).add(((JPAEntity) metadata.getUsage()).getId());
 
         // Process the child conceptNames
-        for (IConcept child : concept.getChildConcepts()) {
+        for (Object child : concept.getChildConcepts()) {
             primaryKeyMap((Concept) child, map);
         }
 

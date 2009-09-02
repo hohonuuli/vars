@@ -7,12 +7,12 @@
     <version>1.0-SNAPSHOT</version>
     <name>vars-redux</name>
     <url>http://code.google.com/p/vars-redux/</url>
-	<scm>
-	  <connection>scm:hg:https://vars-redux.googlecode.com/hg/</connection>
-	  <developerConnection>scm:hg:https://vars-redux.googlecode.com/hg/</developerConnection>
-	  <url>https://vars-redux.googlecode.com/hg/</url>
-	</scm>
-	<developers>
+    <scm>
+        <connection>scm:hg:https://vars-redux.googlecode.com/hg/</connection>
+        <developerConnection>scm:hg:https://vars-redux.googlecode.com/hg/</developerConnection>
+        <url>https://vars-redux.googlecode.com/hg/</url>
+    </scm>
+    <developers>
         <developer>
             <id>brian</id>
             <name>Brian Schlining</name>
@@ -93,8 +93,30 @@
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
+            <!-- Generate a manifest so we can write OSGI info into it -->
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+                    </archive>
+                </configuration>
+            </plugin>
+            <!-- Write OSGI info to manifest -->
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>bundle-manifest</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>manifest</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
-        
     </build>
     <repositories>
         <repository>
@@ -209,6 +231,13 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>jdepend-maven-plugin</artifactId>
+            </plugin>
+            <!-- Java 6 64bit requires more memory to run tests -->
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>-Xmx712M</argLine>
+                </configuration>
             </plugin>
         </plugins>
     </reporting>

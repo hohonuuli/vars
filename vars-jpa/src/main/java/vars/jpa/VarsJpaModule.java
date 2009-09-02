@@ -27,14 +27,26 @@ import vars.knowledgebase.jpa.KnowledgebaseEAO;
  */
 public class VarsJpaModule implements Module {
 
+
+    private final String annotationPersistenceUnit;
+    private final String knowledgebasePersistenceUnit;
+    private final String miscPersistenceUnit;
+
+    public VarsJpaModule(String annotationPersistenceUnit, String knowledgebasePersistenceUnit, String miscPersistenceUnit) {
+        this.annotationPersistenceUnit = annotationPersistenceUnit;
+        this.knowledgebasePersistenceUnit = knowledgebasePersistenceUnit;
+        this.miscPersistenceUnit = miscPersistenceUnit;
+    }
+
     public void configure(Binder binder) {
 
         // Bind the names of the persistence units
-	binder.bindConstant().annotatedWith(Names.named("annotationPersistenceUnit")).to("vars-hibernate-test");
-        binder.bindConstant().annotatedWith(Names.named("knowledgebasePersistenceUnit")).to("vars-hibernate-test");
-        binder.bindConstant().annotatedWith(Names.named("miscPersistenceUnit")).to("vars-hibernate-test");
+	binder.bindConstant().annotatedWith(Names.named("annotationPersistenceUnit")).to(annotationPersistenceUnit);
+        binder.bindConstant().annotatedWith(Names.named("knowledgebasePersistenceUnit")).to(knowledgebasePersistenceUnit);
+        binder.bindConstant().annotatedWith(Names.named("miscPersistenceUnit")).to(miscPersistenceUnit);
 
         // Bind annotation object and DAO factories
+        binder.bind(VarsUserPreferencesFactory.class).to(VarsUserPreferencesFactoryImpl.class);
         binder.bind(MiscDAOFactory.class).to(MiscDAOFactoryImpl.class);
         binder.bind(MiscFactory.class).to(MiscFactoryImpl.class);
         binder.bind(AnnotationDAOFactory.class).to(AnnotationDAOFactoryImpl.class);
