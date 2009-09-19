@@ -23,12 +23,13 @@ package vars.annotation;
 
 import java.util.Date;
 import java.util.Set;
+import vars.IVideoMoment;
 
 /**
  *
  * @author brian
  */
-public interface IVideoFrame extends IAnnotationObject {
+public interface IVideoFrame extends IAnnotationObject, IVideoMoment {
 
     String PROP_CAMERA_DATA = "cameraData";
     String PROP_ALTERNATE_TIMECODE = "alternateTimecode";
@@ -53,12 +54,6 @@ public interface IVideoFrame extends IAnnotationObject {
     ICameraData getCameraData();
 
 
-    /**
-     * Get the HD <code>Timecode</code> associated with this <code>VideoFrame</code>.
-     * @return  The HD <code>TTimecode/code> associated with this <code>VideoFrame</code>.
-     */
-    String getAlternateTimecode();
-
 
     /**
      * @return  The observations associated with this annotated frame. This  collection is synchronized.
@@ -72,16 +67,6 @@ public interface IVideoFrame extends IAnnotationObject {
      */
     IPhysicalData getPhysicalData();
 
-    /**
-     * @return  The date that annotated frame was recorded.
-     */
-    Date getRecordedDate();
-
-
-    /**
-     * @return
-     */
-    String getTimecode();
 
     /**
      * @return

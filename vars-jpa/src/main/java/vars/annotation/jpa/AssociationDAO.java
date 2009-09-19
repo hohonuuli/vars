@@ -6,8 +6,6 @@ import vars.jpa.DAO;
 import vars.knowledgebase.IConceptDAO;
 import vars.knowledgebase.IConcept;
 import org.mbari.jpax.EAO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import com.google.inject.Inject;
 
 /**
@@ -20,7 +18,6 @@ import com.google.inject.Inject;
 public class AssociationDAO extends DAO implements IAssociationDAO {
 
     private final IConceptDAO conceptDAO;
-    private final Logger log = LoggerFactory.getLogger(getClass());
 
     @Inject
     public AssociationDAO(EAO eao, IConceptDAO conceptDao) {
