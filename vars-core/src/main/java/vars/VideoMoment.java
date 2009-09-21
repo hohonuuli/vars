@@ -36,4 +36,12 @@ public class VideoMoment implements IVideoMoment {
         return timecode;
     }
 
+    @Override
+    public String toString() {
+        return "VideoMoment[recordedDate=" + recordedDate + ", timecode=" + timecode +
+                ", alternateTimecode=" + alternateTimecode + "]";
+    }
+
+
+
 }

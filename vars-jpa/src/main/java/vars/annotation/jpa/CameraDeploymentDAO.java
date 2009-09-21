@@ -2,15 +2,12 @@ package vars.annotation.jpa;
 
 import vars.annotation.ICameraDeploymentDAO;
 import vars.annotation.ICameraDeployment;
-import vars.IDAO;
 import vars.jpa.DAO;
 import org.mbari.jpax.EAO;
 
-import java.util.Set;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Collection;
 
 import com.google.inject.Inject;
 

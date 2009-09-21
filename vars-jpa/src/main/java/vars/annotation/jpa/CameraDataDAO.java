@@ -5,7 +5,6 @@ import vars.annotation.ICameraDataDAO;
 import vars.annotation.ICameraData;
 import org.mbari.jpax.EAO;
 
-import java.util.Set;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;

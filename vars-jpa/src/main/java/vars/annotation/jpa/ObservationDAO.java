@@ -7,11 +7,7 @@ import vars.knowledgebase.IConcept;
 import vars.knowledgebase.IConceptDAO;
 import vars.knowledgebase.IConceptName;
 import org.mbari.jpax.EAO;
-import org.mbari.jpax.NonManagedEAO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.Set;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -34,7 +30,6 @@ import javax.persistence.EntityTransaction;
 public class ObservationDAO extends DAO implements IObservationDAO{
 
     private final IConceptDAO conceptDAO;
-    private final Logger log = LoggerFactory.getLogger(getClass());
 
     @Inject
     public ObservationDAO(EAO eao, IConceptDAO conceptDao) {

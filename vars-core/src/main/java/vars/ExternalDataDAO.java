@@ -17,6 +17,9 @@ import java.util.List;
  */
 public interface ExternalDataDAO {
 
+    /**
+     * Interpolate a timecode based on a given date. I
+     */
     IVideoMoment interpolateTimecodeByDate(String cameraIdentifier, Date date, int millisecTolerance, double frameRate);
 
     List<IVideoMoment> findTimecodesNearDate(String platform, Date date, int millisecTolerance);

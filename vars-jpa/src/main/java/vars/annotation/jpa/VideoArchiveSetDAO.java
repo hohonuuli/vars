@@ -9,8 +9,6 @@ import vars.annotation.ICameraDeployment;
 import vars.knowledgebase.IConcept;
 import org.mbari.jpax.EAO;
 import org.mbari.jpax.NonManagedEAO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 import java.util.Date;
@@ -18,7 +16,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.TreeSet;
 import java.util.List;
 
 import com.google.inject.Inject;

@@ -160,6 +160,13 @@
             <artifactId>icu4j</artifactId>
             <version>4.0.1</version>
         </dependency>
+        <!-- Used by ExternalDataDaoExpdImpl! Needed for database testing -->
+        <dependency>
+            <groupId>net.sourceforge.jtds</groupId>
+            <artifactId>jtds</artifactId>
+            <version>1.2.3</version>
+            <scope>runtime</scope>
+        </dependency>
     </dependencies>
 <!--
     PROFILES
@@ -205,7 +212,7 @@
                 <dependency>
                     <groupId>net.sourceforge.jtds</groupId>
                     <artifactId>jtds</artifactId>
-                    <version>1.2.2</version>
+                    <version>1.2.3</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -218,7 +225,7 @@
                 <dependency>
                     <groupId>net.sourceforge.jtds</groupId>
                     <artifactId>jtds</artifactId>
-                    <version>1.2.2</version>
+                    <version>1.2.3</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -231,7 +238,7 @@
                 <dependency>
                     <groupId>net.sourceforge.jtds</groupId>
                     <artifactId>jtds</artifactId>
-                    <version>1.2.2</version>
+                    <version>1.2.3</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -244,7 +251,7 @@
                 <dependency>
                     <groupId>net.sourceforge.jtds</groupId>
                     <artifactId>jtds</artifactId>
-                    <version>1.2.2</version>
+                    <version>1.2.3</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -257,11 +264,12 @@
                 <dependency>
                     <groupId>net.sourceforge.jtds</groupId>
                     <artifactId>jtds</artifactId>
-                    <version>1.2.2</version>
+                    <version>1.2.3</version>
                 </dependency>
             </dependencies>
         </profile>
     </profiles>
 
 </project>
+
 
