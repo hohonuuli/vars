@@ -6,7 +6,7 @@ import vars.annotation.IVideoArchiveSet;
 import vars.annotation.IVideoArchiveDAO;
 import vars.annotation.IVideoArchive;
 import vars.annotation.ICameraDeployment;
-import vars.knowledgebase.IConcept;
+import vars.knowledgebase.Concept;
 import org.mbari.jpax.EAO;
 import org.mbari.jpax.NonManagedEAO;
 
@@ -35,7 +35,7 @@ public class VideoArchiveSetDAO extends DAO implements IVideoArchiveSetDAO {
         return findAllLinkValues(videoArchiveSet, linkName, null);
     }
 
-    public Set<String> findAllLinkValues(IVideoArchiveSet videoArchiveSet, String linkName, IConcept concept) {
+    public Set<String> findAllLinkValues(IVideoArchiveSet videoArchiveSet, String linkName, Concept concept) {
         Set<String> linkValues = new HashSet<String>();
         for (IVideoArchive videoArchive : videoArchiveSet.getVideoArchives()) {
             linkValues.addAll(videoArchiveDAO.findAllLinkValues(videoArchive, linkName, concept));

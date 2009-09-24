@@ -1,12 +1,12 @@
 package vars.knowledgebase;
 
-import vars.knowledgebase.IConcept;
-import vars.knowledgebase.IConceptName;
-import vars.knowledgebase.IHistory;
-import vars.knowledgebase.ILinkRealization;
-import vars.knowledgebase.ILinkTemplate;
-import vars.knowledgebase.IMedia;
-import vars.knowledgebase.IUsage;
+import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptName;
+import vars.knowledgebase.History;
+import vars.knowledgebase.LinkRealization;
+import vars.knowledgebase.LinkTemplate;
+import vars.knowledgebase.Media;
+import vars.knowledgebase.Usage;
 
 /**
  * Created by IntelliJ IDEA.
@@ -19,18 +19,18 @@ public interface KnowledgebaseFactory {
 
     /* --- Knowledgebase --- */
 
-    IConcept newConcept();
+    Concept newConcept();
 
-    IConceptName newConceptName();
+    ConceptName newConceptName();
 
-    IHistory newHistory();
+    History newHistory();
 
-    ILinkRealization newLinkRealization();
+    LinkRealization newLinkRealization();
 
-    ILinkTemplate newLinkTemplate();
+    LinkTemplate newLinkTemplate();
 
-    IMedia newMedia();
+    Media newMedia();
 
 
-    IUsage newUsage();
+    Usage newUsage();
 }

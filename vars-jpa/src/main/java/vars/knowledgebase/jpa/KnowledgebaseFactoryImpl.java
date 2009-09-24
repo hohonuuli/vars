@@ -1,41 +1,41 @@
 package vars.knowledgebase.jpa;
 
 import vars.knowledgebase.KnowledgebaseFactory;
-import vars.knowledgebase.IConcept;
-import vars.knowledgebase.IConceptName;
-import vars.knowledgebase.IHistory;
-import vars.knowledgebase.ILinkRealization;
-import vars.knowledgebase.ILinkTemplate;
-import vars.knowledgebase.IMedia;
-import vars.knowledgebase.IUsage;
+import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptName;
+import vars.knowledgebase.History;
+import vars.knowledgebase.LinkRealization;
+import vars.knowledgebase.LinkTemplate;
+import vars.knowledgebase.Media;
+import vars.knowledgebase.Usage;
 
 public class KnowledgebaseFactoryImpl implements KnowledgebaseFactory {
 
-    public IConcept newConcept() {
-        return new Concept();
+    public Concept newConcept() {
+        return new GConcept();
     }
 
-    public IConceptName newConceptName() {
-        return new ConceptName();
+    public ConceptName newConceptName() {
+        return new GConceptName();
     }
 
-    public IHistory newHistory() {
-        return new History();
+    public History newHistory() {
+        return new GHistory();
     }
 
-    public ILinkRealization newLinkRealization() {
-        return new LinkRealization();
+    public LinkRealization newLinkRealization() {
+        return new GLinkRealization();
     }
 
-    public ILinkTemplate newLinkTemplate() {
-        return new LinkTemplate();
+    public LinkTemplate newLinkTemplate() {
+        return new GLinkTemplate();
     }
 
-    public IMedia newMedia() {
-        return new Media();
+    public Media newMedia() {
+        return new GMedia();
     }
 
-    public IUsage newUsage() {
-        return new Usage();
+    public Usage newUsage() {
+        return new GUsage();
     }
 }

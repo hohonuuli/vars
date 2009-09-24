@@ -25,8 +25,8 @@ import java.util.Collection;
 import org.mbari.swing.FancyComboBox;
 import org.mbari.swing.SortedComboBoxModel;
 import org.mbari.text.IgnoreCaseToStringComparator;
-import vars.knowledgebase.IConcept;
-import vars.knowledgebase.IConceptName;
+import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptName;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -72,7 +72,7 @@ public class ConceptNameComboBox extends FancyComboBox
      *
      * @param  item   The item to add to the model.
      */
-    public void addItem(IConceptName item) {
+    public void addItem(ConceptName item) {
         ((SortedComboBoxModel) getModel()).addElement(item.getName());
     }
 
@@ -83,9 +83,9 @@ public class ConceptNameComboBox extends FancyComboBox
      *
      * @param  concept Description of the Parameter
      */
-    public void addedConcept(IConcept concept) {
-        Collection<? extends IConceptName> conceptNames = concept.getConceptNames();
-        for (IConceptName cn : conceptNames) {
+    public void addedConcept(Concept concept) {
+        Collection<? extends ConceptName> conceptNames = concept.getConceptNames();
+        for (ConceptName cn : conceptNames) {
             addItem(cn);
         }
     }
@@ -97,7 +97,7 @@ public class ConceptNameComboBox extends FancyComboBox
      *
      * @param  conceptName Description of the Parameter
      */
-    public void addedConceptName(IConceptName conceptName) {
+    public void addedConceptName(ConceptName conceptName) {
         addItem(conceptName);
     }
 
@@ -126,7 +126,7 @@ public class ConceptNameComboBox extends FancyComboBox
      *
      * @param  item   The item to remove from the model.
      */
-    public void removeItem(IConceptName item) {
+    public void removeItem(ConceptName item) {
         ((SortedComboBoxModel) getModel()).removeElement(item.getName());
     }
 
@@ -137,16 +137,16 @@ public class ConceptNameComboBox extends FancyComboBox
      *
      * @param  concept Description of the Parameter
      */
-    public void removedConcept(IConcept concept) {
+    public void removedConcept(Concept concept) {
         // Recursive for all children Concept objects.
-        Collection<IConcept> concepts = concept.getChildConcepts();
-        for (IConcept c : concepts) {
+        Collection<Concept> concepts = concept.getChildConcepts();
+        for (Concept c : concepts) {
             removedConcept(c);
         }
 
         // Remove all names of the specified Concept
-        Collection<IConceptName> conceptNames = concept.getConceptNames();
-        for (IConceptName cn : conceptNames) {
+        Collection<ConceptName> conceptNames = concept.getConceptNames();
+        for (ConceptName cn : conceptNames) {
             removeItem(cn);
         }
 
@@ -159,7 +159,7 @@ public class ConceptNameComboBox extends FancyComboBox
      *
      * @param  conceptName Description of the Parameter
      */
-    public void removedConceptName(IConceptName conceptName) {
+    public void removedConceptName(ConceptName conceptName) {
         removeItem(conceptName);
     }
 

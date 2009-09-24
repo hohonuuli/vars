@@ -11,8 +11,8 @@ import org.junit.Test;
 import org.mbari.util.Dispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.knowledgebase.IConcept;
-import vars.knowledgebase.IConceptDAO;
+import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.query.ui.Lookup;
 
@@ -37,8 +37,8 @@ public class DAOTests {
     @Test
     public void test1() {
 
-        IConceptDAO dao = knowledgebaseDAOFactory.newConceptDAO();
-        IConcept concept = dao.findRoot();
+        ConceptDAO dao = knowledgebaseDAOFactory.newConceptDAO();
+        Concept concept = dao.findRoot();
         log.info("Found root concept: " + concept);
 
     }

@@ -8,51 +8,51 @@ package vars.query;
 import java.util.HashSet;
 import java.util.Set;
 import vars.knowledgebase.ConceptNameTypes;
-import vars.knowledgebase.IConcept;
-import vars.knowledgebase.IConceptMetadata;
-import vars.knowledgebase.IConceptName;
+import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptMetadata;
+import vars.knowledgebase.ConceptName;
 
 /**
  *
  * @author brian
  */
-public class SimpleConcept implements IConcept {
+public class SimpleConcept implements Concept {
 
-    private Set<IConceptName> conceptNames = new HashSet<IConceptName>();
-    private Set<IConcept> childConcepts = new HashSet<IConcept>();
+    private Set<ConceptName> conceptNames = new HashSet<ConceptName>();
+    private Set<Concept> childConcepts = new HashSet<Concept>();
 
-    private IConcept parentConcept;
+    private Concept parentConcept;
 
     public SimpleConcept() {
     }
 
-    public SimpleConcept(IConceptName conceptName) {
+    public SimpleConcept(ConceptName conceptName) {
         conceptName.setNameType(ConceptNameTypes.PRIMARY.toString());
         addConceptName(conceptName);
     }
 
 
-    public void addChildConcept(IConcept child) {
+    public void addChildConcept(Concept child) {
         childConcepts.add(child);
     }
 
-    public void addConceptName(IConceptName conceptName) {
+    public void addConceptName(ConceptName conceptName) {
         conceptNames.add(conceptName);
     }
 
-    public Set<IConcept> getChildConcepts() {
+    public Set<Concept> getChildConcepts() {
         return childConcepts;
     }
 
-    public IConceptMetadata getConceptMetadata() {
+    public ConceptMetadata getConceptMetadata() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public IConceptName getConceptName(String name) {
+    public ConceptName getConceptName(String name) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public Set<IConceptName> getConceptNames() {
+    public Set<ConceptName> getConceptNames() {
         return conceptNames;
     }
 
@@ -64,13 +64,13 @@ public class SimpleConcept implements IConcept {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public IConcept getParentConcept() {
+    public Concept getParentConcept() {
         return parentConcept;
     }
 
-    public IConceptName getPrimaryConceptName() {
-        IConceptName primaryName = null;
-        for (IConceptName cn : conceptNames) {
+    public ConceptName getPrimaryConceptName() {
+        ConceptName primaryName = null;
+        for (ConceptName cn : conceptNames) {
             if (cn.getNameType().equalsIgnoreCase(ConceptNameTypes.PRIMARY.toString())) {
                 primaryName = cn;
                 break;
@@ -91,7 +91,7 @@ public class SimpleConcept implements IConcept {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public IConcept getRootConcept() {
+    public Concept getRootConcept() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -115,12 +115,12 @@ public class SimpleConcept implements IConcept {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public void removeChildConcept(IConcept childConcept) {
+    public void removeChildConcept(Concept childConcept) {
         childConcepts.remove(childConcept);
         ((SimpleConcept) childConcept).setParentConcept(null);
     }
 
-    public void removeConceptName(IConceptName conceptName) {
+    public void removeConceptName(ConceptName conceptName) {
         conceptNames.remove(conceptName);
         conceptName.setConcept(null);
     }
@@ -153,7 +153,7 @@ public class SimpleConcept implements IConcept {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    protected void setParentConcept(IConcept parentConcept) {
+    protected void setParentConcept(Concept parentConcept) {
         this.parentConcept = parentConcept;
     }
 

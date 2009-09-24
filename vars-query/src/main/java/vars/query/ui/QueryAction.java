@@ -24,7 +24,7 @@ import org.mbari.util.ExceptionHandler;
 import org.mbari.util.ExceptionHandlerSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.knowledgebase.IConceptDAO;
+import vars.knowledgebase.ConceptDAO;
 import vars.query.QueryResultsDecorator;
 
 /**
@@ -127,7 +127,7 @@ public class QueryAction extends ActionAdapter {
      * @param  queryable Description of the Parameter
      * @param conceptDAO
      */
-    public QueryAction(final String query, IQueryable queryable, IConceptDAO conceptDAO) {
+    public QueryAction(final String query, IQueryable queryable, ConceptDAO conceptDAO) {
         this(query, queryable, conceptDAO, false, false, false);
     }
 
@@ -141,7 +141,7 @@ public class QueryAction extends ActionAdapter {
      * @param showBasicPhylogeny
      * @param showFullPhylogeny
      */
-    public QueryAction(final String query, IQueryable queryable, IConceptDAO conceptDAO, boolean showHiearchy,
+    public QueryAction(final String query, IQueryable queryable, ConceptDAO conceptDAO, boolean showHiearchy,
                        boolean showBasicPhylogeny, boolean showFullPhylogeny) {
         this.query = query;
         this.queryable = queryable;

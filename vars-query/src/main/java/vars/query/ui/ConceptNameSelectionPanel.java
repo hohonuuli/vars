@@ -31,9 +31,9 @@ import javax.swing.JPanel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.shared.ui.ConceptNameComboBox;
-import vars.knowledgebase.IConcept;
-import vars.knowledgebase.IConceptDAO;
-import vars.knowledgebase.IConceptName;
+import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptDAO;
+import vars.knowledgebase.ConceptName;
 import vars.query.IQueryDAO;
 
 //~--- classes ----------------------------------------------------------------
@@ -96,7 +96,7 @@ public class ConceptNameSelectionPanel extends JPanel {
     private JCheckBox cChildren = null;
 
     private final IQueryDAO queryDAO;
-    private final IConceptDAO conceptDAO;
+    private final ConceptDAO conceptDAO;
 
     //~--- constructors -------------------------------------------------------
 
@@ -104,7 +104,7 @@ public class ConceptNameSelectionPanel extends JPanel {
      *
      */
     @Inject
-    public ConceptNameSelectionPanel(IQueryDAO queryDAO, IConceptDAO conceptDAO) {
+    public ConceptNameSelectionPanel(IQueryDAO queryDAO, ConceptDAO conceptDAO) {
         super();
         this.queryDAO = queryDAO;
         this.conceptDAO = conceptDAO;
@@ -121,10 +121,10 @@ public class ConceptNameSelectionPanel extends JPanel {
      * @param storage
      * @param concept
      */
-    private void addConceptNames(Collection storage, IConcept concept) {
+    private void addConceptNames(Collection storage, Concept concept) {
         Collection conceptNames = concept.getConceptNames();
         for (Iterator i = conceptNames.iterator(); i.hasNext(); ) {
-            IConceptName conceptName = (IConceptName) i.next();
+            ConceptName conceptName = (ConceptName) i.next();
             storage.add(conceptName.getName());
         }
     }
@@ -136,11 +136,11 @@ public class ConceptNameSelectionPanel extends JPanel {
      * @param storage
      * @param concept
      */
-    private void addDescendants(Collection storage, IConcept concept) {
+    private void addDescendants(Collection storage, Concept concept) {
         addConceptNames(storage, concept);
         Collection childConcepts = concept.getChildConcepts();
         for (Iterator i = childConcepts.iterator(); i.hasNext(); ) {
-            IConcept child = (IConcept) i.next();
+            Concept child = (Concept) i.next();
             addDescendants(storage, child);
         }
     }
@@ -269,7 +269,7 @@ public class ConceptNameSelectionPanel extends JPanel {
     public Collection getSelectedConceptNamesAsStrings() {
         Collection nameStorage = new HashSet();
         String name = (String) getCbConceptName().getSelectedItem();
-        IConcept concept = conceptDAO.findByName(name);
+        Concept concept = conceptDAO.findByName(name);
 
         /*
          * Concept is null if it was not found in the knowledgebase. In general
@@ -287,7 +287,7 @@ public class ConceptNameSelectionPanel extends JPanel {
              * Add the parent
              */
             if (getCParent().isSelected()) {
-                IConcept parent = concept.getParentConcept();
+                Concept parent = concept.getParentConcept();
                 addConceptNames(nameStorage, parent);
             }
 
@@ -295,14 +295,14 @@ public class ConceptNameSelectionPanel extends JPanel {
              * Add Siblings
              */
             if (getCSiblings().isSelected()) {
-                IConcept parent = concept.getParentConcept();
-                Collection<IConcept> siblings = parent.getChildConcepts();
+                Concept parent = concept.getParentConcept();
+                Collection<Concept> siblings = parent.getChildConcepts();
                 for (Iterator i = siblings.iterator(); i.hasNext(); ) {
                     /*
                      * Note, we're nto worried about processing our original
                      * concept here because we're storing names in a Set.
                      */
-                    IConcept sibling = (IConcept) i.next();
+                    Concept sibling = (Concept) i.next();
                     addConceptNames(nameStorage, sibling);
                 }
             }
@@ -317,9 +317,9 @@ public class ConceptNameSelectionPanel extends JPanel {
                  * Add children. We don't need to add children if we've already
                  * processed the descendants.
                  */
-                Collection<IConcept> siblings = concept.getChildConcepts();
+                Collection<Concept> siblings = concept.getChildConcepts();
                 for (Iterator i = siblings.iterator(); i.hasNext(); ) {
-                    IConcept sibling = (IConcept) i.next();
+                    Concept sibling = (Concept) i.next();
                     addConceptNames(nameStorage, sibling);
                 }
             }

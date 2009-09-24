@@ -26,9 +26,9 @@ import java.util.Collection;
 import java.util.List;
 
 import org.mbari.swing.SortedComboBoxModel;
-import vars.knowledgebase.IConcept;
-import vars.knowledgebase.IConceptDAO;
-import vars.knowledgebase.IConceptName;
+import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptDAO;
+import vars.knowledgebase.ConceptName;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -45,8 +45,8 @@ public class HierachicalConceptNameComboBox extends ConceptNameComboBox {
 	 * @uml.property  name="concept"
 	 * @uml.associationEnd  
 	 */
-    private IConcept concept;
-    private final IConceptDAO conceptDAO;
+    private Concept concept;
+    private final ConceptDAO conceptDAO;
 
     //~--- constructors -------------------------------------------------------
 
@@ -54,7 +54,7 @@ public class HierachicalConceptNameComboBox extends ConceptNameComboBox {
      * Constructs ...
      *
      */
-    public HierachicalConceptNameComboBox(IConceptDAO conceptDAO) {
+    public HierachicalConceptNameComboBox(ConceptDAO conceptDAO) {
         super();
         this.conceptDAO = conceptDAO;
         initialize();
@@ -65,7 +65,7 @@ public class HierachicalConceptNameComboBox extends ConceptNameComboBox {
      *
      * @param concept
      */
-    public HierachicalConceptNameComboBox(IConcept concept, IConceptDAO conceptDAO) {
+    public HierachicalConceptNameComboBox(Concept concept, ConceptDAO conceptDAO) {
         // WARNING!! getDescendentNames can be very slow the first time it is called.
         super();
         this.conceptDAO = conceptDAO;
@@ -80,7 +80,7 @@ public class HierachicalConceptNameComboBox extends ConceptNameComboBox {
 	 * @return
 	 * @uml.property  name="concept"
 	 */
-    public IConcept getConcept() {
+    public Concept getConcept() {
         return concept;
     }
 
@@ -122,13 +122,13 @@ public class HierachicalConceptNameComboBox extends ConceptNameComboBox {
 	 * @param  concept
 	 * @uml.property  name="concept"
 	 */
-    public void setConcept(IConcept concept) {
+    public void setConcept(Concept concept) {
         this.concept = concept;
 
         if (concept != null) {
-            Collection<IConceptName> conceptNames = conceptDAO.findDescendentNames(concept);
+            Collection<ConceptName> conceptNames = conceptDAO.findDescendentNames(concept);
             List<String> namesAsStrings = new ArrayList<String>(conceptNames.size());
-            for (IConceptName cn : conceptNames) {
+            for (ConceptName cn : conceptNames) {
                 namesAsStrings.add(cn.getName());
             }
             ((SortedComboBoxModel) getModel()).setItems(namesAsStrings);

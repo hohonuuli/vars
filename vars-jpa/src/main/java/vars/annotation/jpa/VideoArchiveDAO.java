@@ -10,7 +10,7 @@ import vars.annotation.IAssociation;
 import vars.annotation.AnnotationFactory;
 import vars.annotation.IVideoArchiveSet;
 import vars.annotation.ICameraDeployment;
-import vars.knowledgebase.IConcept;
+import vars.knowledgebase.Concept;
 import vars.VARSPersistenceException;
 import org.mbari.jpax.EAO;
 import org.mbari.jpax.NonManagedEAO;
@@ -46,7 +46,7 @@ public class VideoArchiveDAO extends DAO implements IVideoArchiveDAO {
         return findAllLinkValues(videoArchive, linkName, null);
     }
 
-    public Set<String> findAllLinkValues(IVideoArchive videoArchive, String linkName, IConcept concept) {
+    public Set<String> findAllLinkValues(IVideoArchive videoArchive, String linkName, Concept concept) {
 
         // Due to lazy loading we want to iterate through all objects in a collection
         if (!getEAO().isManaged()) {

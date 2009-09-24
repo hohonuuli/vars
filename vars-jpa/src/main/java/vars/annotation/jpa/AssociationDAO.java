@@ -3,8 +3,8 @@ package vars.annotation.jpa;
 import vars.annotation.IAssociationDAO;
 import vars.annotation.IAssociation;
 import vars.jpa.DAO;
-import vars.knowledgebase.IConceptDAO;
-import vars.knowledgebase.IConcept;
+import vars.knowledgebase.ConceptDAO;
+import vars.knowledgebase.Concept;
 import org.mbari.jpax.EAO;
 import com.google.inject.Inject;
 
@@ -17,16 +17,16 @@ import com.google.inject.Inject;
  */
 public class AssociationDAO extends DAO implements IAssociationDAO {
 
-    private final IConceptDAO conceptDAO;
+    private final ConceptDAO conceptDAO;
 
     @Inject
-    public AssociationDAO(EAO eao, IConceptDAO conceptDao) {
+    public AssociationDAO(EAO eao, ConceptDAO conceptDao) {
         super(eao);
         this.conceptDAO = conceptDao;
     }
 
     public void validateName(IAssociation ass) {
-        IConcept concept = conceptDAO.findByName(ass.getToConcept());
+        Concept concept = conceptDAO.findByName(ass.getToConcept());
         if (concept != null) {
             ass.setToConcept(concept.getPrimaryConceptName().getName());
         }

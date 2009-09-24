@@ -29,15 +29,14 @@ import vars.annotation.jpa.PhysicalData;
 import vars.annotation.jpa.VideoArchive;
 import vars.annotation.jpa.VideoArchiveSet;
 import vars.annotation.jpa.VideoFrame;
-import vars.knowledgebase.IConcept;
-import vars.knowledgebase.jpa.Concept;
-import vars.knowledgebase.jpa.ConceptMetadata;
-import vars.knowledgebase.jpa.ConceptName;
-import vars.knowledgebase.jpa.History;
-import vars.knowledgebase.jpa.LinkRealization;
-import vars.knowledgebase.jpa.LinkTemplate;
-import vars.knowledgebase.jpa.Media;
-import vars.knowledgebase.jpa.Usage;
+import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptMetadata;
+import vars.knowledgebase.ConceptName;
+import vars.knowledgebase.History;
+import vars.knowledgebase.LinkRealization;
+import vars.knowledgebase.LinkTemplate;
+import vars.knowledgebase.Media;
+import vars.knowledgebase.Usage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -113,7 +112,7 @@ public class PrimaryKeyUtilities {
     }
 
     @SuppressWarnings("unchecked")
-    public static Map<Class, Collection> primaryKeyMap(IConcept concept) {
+    public static Map<Class, Collection> primaryKeyMap(Concept concept) {
 
         // Map for Concepts
         Map<Class, Collection> map = new HashMap<Class, Collection>() {

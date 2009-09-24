@@ -1,17 +1,17 @@
 package vars.testing;
 
 import vars.knowledgebase.KnowledgebaseFactory;
-import vars.knowledgebase.IConcept;
-import vars.knowledgebase.IConceptName;
+import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.ConceptNameTypes;
 import vars.knowledgebase.ConceptTypes;
-import vars.knowledgebase.IHistory;
-import vars.knowledgebase.IMedia;
+import vars.knowledgebase.History;
+import vars.knowledgebase.Media;
 import vars.knowledgebase.MediaTypes;
-import vars.knowledgebase.IUsage;
-import vars.knowledgebase.ILinkTemplate;
-import vars.knowledgebase.ILinkRealization;
-import vars.knowledgebase.IConceptMetadata;
+import vars.knowledgebase.Usage;
+import vars.knowledgebase.LinkTemplate;
+import vars.knowledgebase.LinkRealization;
+import vars.knowledgebase.ConceptMetadata;
 
 import java.util.Date;
 
@@ -34,7 +34,7 @@ public class KnowledgebaseTestObjectFactory {
     }
 
 
-    public IConcept makeObjectGraph(int i) {
+    public Concept makeObjectGraph(int i) {
         return makeObjectGraph("TEST", i);
     }
 
@@ -46,19 +46,19 @@ public class KnowledgebaseTestObjectFactory {
      * @param name
      * @return
      */
-    public IConcept makeConcept(String name) {
-        IConcept c = factory.newConcept();
-        IConceptName cn1 = factory.newConceptName();
+    public Concept makeConcept(String name) {
+        Concept c = factory.newConcept();
+        ConceptName cn1 = factory.newConceptName();
         cn1.setName(name + "-primary");
         cn1.setNameType(ConceptNameTypes.PRIMARY.getName());
         c.addConceptName(cn1);
 
-        IConceptName cn2 = factory.newConceptName();
+        ConceptName cn2 = factory.newConceptName();
         cn2.setName(name + "-common");
         cn2.setNameType(ConceptNameTypes.COMMON.getName());
         c.addConceptName(cn2);
 
-        IConceptName cn3 = factory.newConceptName();
+        ConceptName cn3 = factory.newConceptName();
         cn3.setName(name + "-synonym");
         cn3.setNameType(ConceptNameTypes.SYNONYM.getName());
         c.addConceptName(cn3);
@@ -72,11 +72,11 @@ public class KnowledgebaseTestObjectFactory {
         return c;
     }
 
-    public IHistory makeHistory() {
+    public History makeHistory() {
 
-        IHistory h = factory.newHistory();
+        History h = factory.newHistory();
         h.setCreationDate(new Date());
-        h.setAction(IHistory.ACTION_ADD);
+        h.setAction(History.ACTION_ADD);
         h.setComment("test");
         h.setCreatorName("testy-the-testor");
         h.setField("TEST");
@@ -86,8 +86,8 @@ public class KnowledgebaseTestObjectFactory {
         return h;
     }
 
-    public IMedia makeMedia() {
-        IMedia m = factory.newMedia();
+    public Media makeMedia() {
+        Media m = factory.newMedia();
         m.setCaption("Caption " + randomNumber(0, 99999999));
         m.setCredit("Credit " + randomNumber(0, 9999999));
         m.setUrl("filename" + randomNumber(0, 99999999));
@@ -96,43 +96,43 @@ public class KnowledgebaseTestObjectFactory {
         return m;
     }
 
-    public IUsage makeUsage() {
-        IUsage u = factory.newUsage();
+    public Usage makeUsage() {
+        Usage u = factory.newUsage();
         u.setEmbargoExpirationDate(new Date());
         u.setSpecification("Specification can be a looooooong message." + randomNumber(0, 99999999));
         return u;
     }
 
-    public ILinkTemplate makeLinkTemplate() {
-        ILinkTemplate lt = factory.newLinkTemplate();
+    public LinkTemplate makeLinkTemplate() {
+        LinkTemplate lt = factory.newLinkTemplate();
         lt.setLinkName("link-template");
         lt.setLinkValue("0");
         lt.setToConcept("self");
         return lt;
     }
 
-    public ILinkRealization makeLinkRealization() {
-        ILinkRealization lr = factory.newLinkRealization();
+    public LinkRealization makeLinkRealization() {
+        LinkRealization lr = factory.newLinkRealization();
         lr.setLinkName("link-realization");
         lr.setLinkValue(randomNumber(0, 9999) + "");
         lr.setToConcept("self");
         return lr;
     }
 
-    public IConcept makeObjectGraph(String name, int depth) {
+    public Concept makeObjectGraph(String name, int depth) {
 
-        IConcept root = makeFancyConcept(name, depth);
+        Concept root = makeFancyConcept(name, depth);
         for (int i = 0; i < depth; i++) {
-            IConcept child = makeObjectGraph(name + "_" + i + "_" + randomNumber(0, 1000), depth - 1);
+            Concept child = makeObjectGraph(name + "_" + i + "_" + randomNumber(0, 1000), depth - 1);
             root.addChildConcept(child);
         }
 
         return root;
     }
 
-    public IConcept makeFancyConcept(String name, int x) {
-        IConcept c = makeConcept(name);
-        IConceptMetadata cm = c.getConceptMetadata();
+    public Concept makeFancyConcept(String name, int x) {
+        Concept c = makeConcept(name);
+        ConceptMetadata cm = c.getConceptMetadata();
         cm.setUsage(makeUsage());
         for (int i = 0; i < x; i++) {
             cm.addHistory(makeHistory());

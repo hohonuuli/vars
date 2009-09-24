@@ -2,7 +2,7 @@ package vars.annotation;
 
 import vars.IDAO;
 import vars.IConceptNameValidator;
-import vars.knowledgebase.IConcept;
+import vars.knowledgebase.Concept;
 
 import java.util.List;
 
@@ -27,7 +27,7 @@ public interface IObservationDAO extends IDAO, IConceptNameValidator<IObservatio
      * @return A Set<IObservation> containing all matching observations. If none are found an empty collection 
      *      is returned
      */
-    List<IObservation> findAllByConcept(IConcept concept, boolean cascade);
+    List<IObservation> findAllByConcept(Concept concept, boolean cascade);
 
      /**
      * Retrieves all conceptnames actually used in annotations. This query

@@ -1,7 +1,7 @@
 package vars.annotation;
 
 import vars.IDAO;
-import vars.knowledgebase.IConcept;
+import vars.knowledgebase.Concept;
 
 import java.util.Set;
 import java.util.Date;
@@ -18,7 +18,7 @@ public interface IVideoArchiveSetDAO extends IDAO {
 
     Set<String> findAllLinkValues(IVideoArchiveSet videoArchiveSet, String linkName);
 
-    Set<String> findAllLinkValues(IVideoArchiveSet videoArchiveSet, String linkName, IConcept concept);
+    Set<String> findAllLinkValues(IVideoArchiveSet videoArchiveSet, String linkName, Concept concept);
 
     Collection<IVideoArchiveSet> findAllBetweenDates(Date startDate, Date endDate);
 

@@ -3,9 +3,9 @@ package vars.annotation.jpa;
 import vars.jpa.DAO;
 import vars.annotation.IObservationDAO;
 import vars.annotation.IObservation;
-import vars.knowledgebase.IConcept;
-import vars.knowledgebase.IConceptDAO;
-import vars.knowledgebase.IConceptName;
+import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptDAO;
+import vars.knowledgebase.ConceptName;
 import org.mbari.jpax.EAO;
 
 import java.util.List;
@@ -29,10 +29,10 @@ import javax.persistence.EntityTransaction;
  */
 public class ObservationDAO extends DAO implements IObservationDAO{
 
-    private final IConceptDAO conceptDAO;
+    private final ConceptDAO conceptDAO;
 
     @Inject
-    public ObservationDAO(EAO eao, IConceptDAO conceptDao) {
+    public ObservationDAO(EAO eao, ConceptDAO conceptDao) {
         super(eao);
         this.conceptDAO = conceptDao;
     }
@@ -43,20 +43,20 @@ public class ObservationDAO extends DAO implements IObservationDAO{
         return getEAO().findByNamedQuery("Observation.findByConceptName", map);
     }
 
-    public List<IObservation> findAllByConcept(final IConcept concept, final boolean cascade) {
+    public List<IObservation> findAllByConcept(final Concept concept, final boolean cascade) {
 
-        Collection<IConceptName> conceptNames = null;
+        Collection<ConceptName> conceptNames = null;
         if (cascade) {
             conceptNames = conceptDAO.findDescendentNames(concept);
         }
         else {
-            conceptNames = new HashSet<IConceptName>();
+            conceptNames = new HashSet<ConceptName>();
             conceptNames.addAll(concept.getConceptNames());
         }
 
         String jpql = "SELECT o FROM Observation o WHERE o.conceptName IN (";
         int n = 0;
-        for (IConceptName cn : conceptNames) {
+        for (ConceptName cn : conceptNames) {
             jpql += cn.getName();
             if (n < conceptNames.size() - 1) {
                 jpql += ", ";
@@ -94,7 +94,7 @@ public class ObservationDAO extends DAO implements IObservationDAO{
     }
 
     public void validateName(IObservation object) {
-        IConcept concept = conceptDAO.findByName(object.getConceptName());
+        Concept concept = conceptDAO.findByName(object.getConceptName());
         if (concept != null) {
             object.setConceptName(concept.getPrimaryConceptName().getName());
         }

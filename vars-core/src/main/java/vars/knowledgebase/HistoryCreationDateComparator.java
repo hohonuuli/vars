@@ -9,9 +9,9 @@ import java.util.Comparator;
  * Time: 1:42:27 PM
  * To change this template use File | Settings | File Templates.
  */
-public class HistoryCreationDateComparator implements Comparator<IHistory> {
+public class HistoryCreationDateComparator implements Comparator<History> {
 
-    public int compare(IHistory h0, IHistory h1) {
+    public int compare(History h0, History h1) {
         return h0.getCreationDate().compareTo(h1.getCreationDate());
     }
 }

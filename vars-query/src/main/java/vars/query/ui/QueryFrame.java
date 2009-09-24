@@ -40,7 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.util.Dispatcher;
-import vars.knowledgebase.IConceptDAO;
+import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.query.IQueryDAO;
 
@@ -140,7 +140,7 @@ public class QueryFrame extends JFrame {
     private ActionMap actionMap = new ActionMap();
 
     private final IQueryDAO queryDAO;
-    private final IConceptDAO conceptDAO;
+    private final ConceptDAO conceptDAO;
 
     //~--- constructors -------------------------------------------------------
 

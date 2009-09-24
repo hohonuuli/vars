@@ -17,8 +17,8 @@
 
 package vars.shared.ui;
 
-import vars.knowledgebase.IConcept;
-import vars.knowledgebase.IConceptName;
+import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptName;
 
 //~--- interfaces -------------------------------------------------------------
 
@@ -34,26 +34,26 @@ public interface ConceptChangeListener {
      *
      * @param concept
      */
-    void addedConcept(IConcept concept);
+    void addedConcept(Concept concept);
 
     /**
      * Call back for notification a <code>ConceptName</code> has been added.
      *
      * @param conceptName
      */
-    void addedConceptName(IConceptName conceptName);
+    void addedConceptName(ConceptName conceptName);
 
     /**
      * Call back for notification a <code>Concept</code> has been removed.
      *
      * @param concept
      */
-    void removedConcept(IConcept concept);
+    void removedConcept(Concept concept);
 
     /**
      * Call back for notification a <code>ConceptName</code> has been removed.
      *
      * @param conceptName
      */
-    void removedConceptName(IConceptName conceptName);
+    void removedConceptName(ConceptName conceptName);
 }

@@ -1,14 +1,14 @@
 package vars.knowledgebase.jpa;
 
 import vars.knowledgebase.KnowledgebaseDAOFactory;
-import vars.knowledgebase.IConceptDAO;
-import vars.knowledgebase.IConceptMetadataDAO;
-import vars.knowledgebase.IConceptNameDAO;
-import vars.knowledgebase.IHistoryDAO;
-import vars.knowledgebase.ILinkRealizationDAO;
-import vars.knowledgebase.ILinkTemplateDAO;
-import vars.knowledgebase.IMediaDAO;
-import vars.knowledgebase.IUsageDAO;
+import vars.knowledgebase.ConceptDAO;
+import vars.knowledgebase.ConceptMetadataDAO;
+import vars.knowledgebase.ConceptNameDAO;
+import vars.knowledgebase.HistoryDAO;
+import vars.knowledgebase.LinkRealizationDAO;
+import vars.knowledgebase.LinkTemplateDAO;
+import vars.knowledgebase.MediaDAO;
+import vars.knowledgebase.UsageDAO;
 import org.mbari.jpax.EAO;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -29,35 +29,35 @@ import com.google.inject.name.Named;
         this.eao = eao;
     }
 
-    public IConceptDAO newConceptDAO() {
-        return new ConceptDAO(eao, newConceptNameDAO());
+    public ConceptDAO newConceptDAO() {
+        return new ConceptDAOImpl(eao, newConceptNameDAO());
     }
 
-    public IConceptMetadataDAO newConceptMetadataDAO() {
-        return new ConceptMetadataDAO(eao);
+    public ConceptMetadataDAO newConceptMetadataDAO() {
+        return new ConceptMetadataDAOImpl(eao);
     }
 
-    public IConceptNameDAO newConceptNameDAO() {
-        return new ConceptNameDAO(eao);
+    public ConceptNameDAO newConceptNameDAO() {
+        return new ConceptNameDAOImpl(eao);
     }
 
-    public IHistoryDAO newHistoryDAO() {
-        return new HistoryDAO(eao);
+    public HistoryDAO newHistoryDAO() {
+        return new HistoryDAOImpl(eao);
     }
 
-    public ILinkRealizationDAO newLinkRealizationDAO() {
-        return new LinkRealizationDAO(eao, newConceptDAO());
+    public LinkRealizationDAO newLinkRealizationDAO() {
+        return new LinkRealizationDAOImpl(eao, newConceptDAO());
     }
 
-    public ILinkTemplateDAO newLinkTemplateDAO() {
-        return new LinkTemplateDAO(eao, newConceptDAO());
+    public LinkTemplateDAO newLinkTemplateDAO() {
+        return new LinkTemplateDAOImpl(eao, newConceptDAO());
     }
 
-    public IMediaDAO newMediaDAO() {
-        return new MediaDAO(eao);
+    public MediaDAO newMediaDAO() {
+        return new MediaDAOImpl(eao);
     }
 
-    public IUsageDAO newUsageDAO() {
-        return new UsageDAO(eao);
+    public UsageDAO newUsageDAO() {
+        return new UsageDAOImpl(eao);
     }
 }

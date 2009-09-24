@@ -25,8 +25,8 @@ import java.awt.event.FocusEvent;
 import java.util.Collection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.knowledgebase.IConceptName;
-import vars.knowledgebase.IConceptNameDAO;
+import vars.knowledgebase.ConceptName;
+import vars.knowledgebase.ConceptNameDAO;
 
 /**
  * <h2><u>Description </u></h2>
@@ -58,14 +58,14 @@ public class AllConceptNamesComboBox extends ConceptNameComboBox {
      *
      */
     private final Logger log = LoggerFactory.getLogger(getClass());
-    private final IConceptNameDAO conceptNameDAO;
+    private final ConceptNameDAO conceptNameDAO;
 
     /**
      *
      *
      * @param conceptNameDAO
      */
-    public AllConceptNamesComboBox(IConceptNameDAO conceptNameDAO) {
+    public AllConceptNamesComboBox(ConceptNameDAO conceptNameDAO) {
         super();
         this.conceptNameDAO = conceptNameDAO;
         updateConceptNames();
@@ -97,10 +97,10 @@ public class AllConceptNamesComboBox extends ConceptNameComboBox {
 
         // Get ALL concept names (not just primary names). This is a FAST
         // lookup.
-        Collection<IConceptName> cnc = conceptNameDAO.findAll();
+        Collection<ConceptName> cnc = conceptNameDAO.findAll();
         String[] conceptNames = new String[cnc.size()];
         int i = 0;
-        for (IConceptName cn : cnc) {
+        for (ConceptName cn : cnc) {
             conceptNames[i] = cn.getName();
             i++;
         }

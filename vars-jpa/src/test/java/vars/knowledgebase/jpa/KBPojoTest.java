@@ -9,7 +9,7 @@ import vars.annotation.IVideoArchiveSet;
 import vars.testing.AnnotationTestObjectFactory;
 import vars.testing.KnowledgebaseTestObjectFactory;
 import vars.knowledgebase.KnowledgebaseFactory;
-import vars.knowledgebase.IConcept;
+import vars.knowledgebase.Concept;
 import vars.jpa.VarsJpaTestModule;
 import vars.jpa.EntityUtilities;
 
@@ -29,7 +29,7 @@ public class KBPojoTest {
         Injector injector = Guice.createInjector(new VarsJpaTestModule());
         KnowledgebaseFactory af = injector.getInstance(KnowledgebaseFactory.class);
         KnowledgebaseTestObjectFactory factory = new KnowledgebaseTestObjectFactory(af);
-        IConcept c = factory.makeObjectGraph("BIG-TEST", 3);
+        Concept c = factory.makeObjectGraph("BIG-TEST", 3);
 
         EntityUtilities eu = new EntityUtilities(null);
         log.info("KNOWLEDGEBASE TREE FOR toString TEST:\n" + eu.buildTextTree(c)); 

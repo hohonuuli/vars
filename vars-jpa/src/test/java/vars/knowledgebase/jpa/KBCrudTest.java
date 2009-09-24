@@ -30,14 +30,14 @@ import vars.jpa.EntityUtilities;
 import vars.jpa.JPAEntity;
 import vars.jpa.PrimaryKeyUtilities;
 import vars.jpa.VarsJpaTestModule;
-import vars.knowledgebase.IConcept;
-import vars.knowledgebase.IConceptDAO;
-import vars.knowledgebase.IConceptMetadata;
-import vars.knowledgebase.IConceptName;
-import vars.knowledgebase.IHistory;
-import vars.knowledgebase.ILinkRealization;
-import vars.knowledgebase.ILinkTemplate;
-import vars.knowledgebase.IMedia;
+import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptDAO;
+import vars.knowledgebase.ConceptMetadata;
+import vars.knowledgebase.ConceptName;
+import vars.knowledgebase.History;
+import vars.knowledgebase.LinkRealization;
+import vars.knowledgebase.LinkTemplate;
+import vars.knowledgebase.Media;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.KnowledgebaseFactory;
 import vars.testing.KnowledgebaseTestObjectFactory;
@@ -71,12 +71,12 @@ public class KBCrudTest {
 
     @After
     public void report() {
-        Collection<IConcept> badData = daoFactory.newConceptDAO().findAll();
+        Collection<Concept> badData = daoFactory.newConceptDAO().findAll();
 
         if (badData.size() > 0) {
 
             String s = "Concepts that shouldn't still be in the database:\n";
-            for (IConcept c : badData) {
+            for (Concept c : badData) {
                 s += "\n" + entityUtilities.buildTextTree(c) + "\n";
             }
             log.info(s);
@@ -87,8 +87,8 @@ public class KBCrudTest {
     public void bigTest() {
         log.info("---------- TEST: bigTest ----------");
 
-        IConcept c = testObjectFactory.makeObjectGraph("BIG-TEST", 2);
-        IConceptDAO dao = daoFactory.newConceptDAO();
+        Concept c = testObjectFactory.makeObjectGraph("BIG-TEST", 2);
+        ConceptDAO dao = daoFactory.newConceptDAO();
 
         log.info("KNOWLEDGEBASE TREE BEFORE TEST:\n" + entityUtilities.buildTextTree(c));
         c = dao.makePersistent(c);
@@ -102,7 +102,7 @@ public class KBCrudTest {
         log.info("KNOWLEDGEBASE TREE AFTER INSERT:\n" + entityUtilities.buildTextTree(c));
 
         // Exercise the DAO methods
-        IConcept root = dao.findRoot();
+        Concept root = dao.findRoot();
         Assert.assertNotNull("Whoops, couldn't get root", root);
 
         //Collection<IConcept> allConcepts = dao.findAll();
@@ -124,34 +124,34 @@ public class KBCrudTest {
     public void incrementalBuildAndDeleteByConcept() {
 
         log.info("---------- TEST: incrementalBuildAndDeleteByConcept ----------");
-        IConceptDAO dao = daoFactory.newConceptDAO();
+        ConceptDAO dao = daoFactory.newConceptDAO();
 
         setup: {
-            IConcept root = testObjectFactory.makeConcept("__ROOT__");
+            Concept root = testObjectFactory.makeConcept("__ROOT__");
             root.getPrimaryConceptName().setName("__ROOT__");
             root = dao.makePersistent(root);
             log.info("BUILDING KNOWLEDGEBASE TREE:\n" + entityUtilities.buildTextTree(root));
 
             // ---- Step 1: Build up each node in the database
             log.info("---------- Add 2A ----------");
-            IConcept concept2A = testObjectFactory.makeConcept("LEVEL 2 A");
+            Concept concept2A = testObjectFactory.makeConcept("LEVEL 2 A");
             concept2A.getPrimaryConceptName().setName("2A");
             root.addChildConcept(concept2A);
             concept2A = dao.makePersistent(concept2A);
             log.info("BUILDING KNOWLEDGEBASE TREE:\n" + entityUtilities.buildTextTree(root));
 
             log.info("---------- Add 3AA and 3AB ----------");
-            IConcept concept3AA = testObjectFactory.makeConcept("LEVEL 3 A A");
+            Concept concept3AA = testObjectFactory.makeConcept("LEVEL 3 A A");
             concept3AA.getPrimaryConceptName().setName("3AA");
             concept2A.addChildConcept(concept3AA);
-            IConcept concept3AB = testObjectFactory.makeConcept("LEVEL 3 A B");
+            Concept concept3AB = testObjectFactory.makeConcept("LEVEL 3 A B");
             concept3AB.getPrimaryConceptName().setName("3AB");
             concept2A.addChildConcept(concept3AB);
             concept2A = dao.update(concept2A);
             log.info("BUILDING KNOWLEDGEBASE TREE:\n" + entityUtilities.buildTextTree(root));
 
             log.info("---------- Add 4A ----------");
-            IConcept concept4A = testObjectFactory.makeConcept("LEVEL 4 A");
+            Concept concept4A = testObjectFactory.makeConcept("LEVEL 4 A");
             concept4A.getPrimaryConceptName().setName("4A");
             concept3AA = dao.findByName("3AA");
             concept3AA.addChildConcept(concept4A);
@@ -159,7 +159,7 @@ public class KBCrudTest {
             log.info("BUILDING KNOWLEDGEBASE TREE:\n" + entityUtilities.buildTextTree(root));
 
             log.info("---------- Add 2B ----------");
-            IConcept concept2B = testObjectFactory.makeConcept("LEVEL 2 B");
+            Concept concept2B = testObjectFactory.makeConcept("LEVEL 2 B");
             concept2B.getPrimaryConceptName().setName("2B");
             root.addChildConcept(concept2B);
             concept2B = dao.makePersistent(concept2B);
@@ -170,11 +170,11 @@ public class KBCrudTest {
 
         execute: {
 
-            IConcept root = dao.findByName("__ROOT__");
-            IConcept concept2B = dao.findByName("2B");
-            IConcept concept3AB = dao.findByName("3AB");
-            IConcept concept3AA = dao.findByName("3AA");
-            IConcept concept2A = dao.findByName("2A");
+            Concept root = dao.findByName("__ROOT__");
+            Concept concept2B = dao.findByName("2B");
+            Concept concept3AB = dao.findByName("3AB");
+            Concept concept3AA = dao.findByName("3AA");
+            Concept concept2A = dao.findByName("2A");
 
             // Tear down each node in the database
             log.info("---------- Remove 2B ----------");
@@ -205,14 +205,14 @@ public class KBCrudTest {
 
         log.info("---------- TEST: bottomUpDelete ----------");
 
-        IConcept concept = testObjectFactory.makeObjectGraph("BIG-TEST", 1);
-        IConceptDAO dao = daoFactory.newConceptDAO();
+        Concept concept = testObjectFactory.makeObjectGraph("BIG-TEST", 1);
+        ConceptDAO dao = daoFactory.newConceptDAO();
         concept = dao.makePersistent(concept);
 
-        final Collection<IHistory> histories = new ArrayList<IHistory>();
-        final Collection<IMedia> medias = new ArrayList<IMedia>();
-        final Collection<ILinkTemplate> linkTemplates = new ArrayList<ILinkTemplate>();
-        final Collection<ILinkRealization> linkRealizations = new ArrayList<ILinkRealization>();
+        final Collection<History> histories = new ArrayList<History>();
+        final Collection<Media> medias = new ArrayList<Media>();
+        final Collection<LinkTemplate> linkTemplates = new ArrayList<LinkTemplate>();
+        final Collection<LinkRealization> linkRealizations = new ArrayList<LinkRealization>();
 
         /*
          * Handy 'Closure' to do all the dirty work of recursively filling in
@@ -220,13 +220,13 @@ public class KBCrudTest {
          */
         class Collector {
             
-            void collect(IConcept c) {
-                IConceptMetadata metadata = c.getConceptMetadata();
+            void collect(Concept c) {
+                ConceptMetadata metadata = c.getConceptMetadata();
                 histories.addAll(metadata.getHistories());
                 medias.addAll(metadata.getMedias());
                 linkTemplates.addAll(metadata.getLinkTemplates());
                 linkRealizations.addAll(metadata.getLinkRealizations());
-                for (IConcept child : c.getChildConcepts()) {
+                for (Concept child : c.getChildConcepts()) {
                     collect(child);
                 }
             }
@@ -238,26 +238,26 @@ public class KBCrudTest {
 
         log.info("KNOWLEDGEBASE TREE AFTER INITIAL INSERT:\n" + entityUtilities.buildTextTree(concept));
 
-        for (ILinkRealization linkRealization : linkRealizations) {
+        for (LinkRealization linkRealization : linkRealizations) {
             linkRealization.getConceptMetadata().removeLinkRealization(linkRealization);
             dao.makeTransient(linkRealization);
         }
         log.info("KNOWLEDGEBASE TREE AFTER LINKREALIZATION DELETE:\n" + entityUtilities.buildTextTree(concept));
 
-        for (ILinkTemplate linkTemplate : linkTemplates) {
+        for (LinkTemplate linkTemplate : linkTemplates) {
             linkTemplate.getConceptMetadata().removeLinkTemplate(linkTemplate);
             dao.makeTransient(linkTemplate);
         }
         log.info("KNOWLEDGEBASE TREE AFTER LINKTEMPLATE DELETE:\n" + entityUtilities.buildTextTree(concept));
 
 
-        for (IMedia media : medias) {
+        for (Media media : medias) {
             media.getConceptMetadata().removeMedia(media);
             dao.makeTransient(media);
         }
         log.info("KNOWLEDGEBASE TREE AFTER MEDIA DELETE:\n" + entityUtilities.buildTextTree(concept));
 
-        for (IHistory history : histories) {
+        for (History history : histories) {
             history.getConceptMetadata().removeHistory(history);
             dao.makeTransient(history);
         }

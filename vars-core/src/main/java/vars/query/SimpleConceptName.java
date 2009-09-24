@@ -5,18 +5,18 @@
 
 package vars.query;
 
-import vars.knowledgebase.IConcept;
-import vars.knowledgebase.IConceptName;
+import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptName;
 
 /**
  *
  * @author brian
  */
-public class SimpleConceptName implements IConceptName {
+public class SimpleConceptName implements ConceptName {
 
     private String name;
     private String nameType;
-    private IConcept concept;
+    private Concept concept;
 
     public SimpleConceptName(String name, String nameType) {
         this.name = name;
@@ -27,7 +27,7 @@ public class SimpleConceptName implements IConceptName {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public IConcept getConcept() {
+    public Concept getConcept() {
         return concept;
     }
 
@@ -43,7 +43,7 @@ public class SimpleConceptName implements IConceptName {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public void setConcept(IConcept concept) {
+    public void setConcept(Concept concept) {
         this.concept = concept;
     }
 

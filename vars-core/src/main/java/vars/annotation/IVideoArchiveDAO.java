@@ -1,6 +1,6 @@
 package vars.annotation;
 
-import vars.knowledgebase.IConcept;
+import vars.knowledgebase.Concept;
 import vars.IDAO;
 
 import java.util.Set;
@@ -45,7 +45,7 @@ public interface IVideoArchiveDAO extends IDAO {
      *          this concept are returned
      * @return  A collection (SortedSet) of String objects
      */
-    Set<String> findAllLinkValues(IVideoArchive videoArchive, String linkName, IConcept concept);
+    Set<String> findAllLinkValues(IVideoArchive videoArchive, String linkName, Concept concept);
 
     /**
      * Looks up the @link{IVideoArchive} by name. If no match is found a new one is created and returned.

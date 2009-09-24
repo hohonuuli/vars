@@ -9,13 +9,13 @@ package vars.knowledgebase;
  */
 public interface KnowledgebaseDAOFactory {
 
-    IConceptDAO newConceptDAO();
-    IConceptMetadataDAO newConceptMetadataDAO();
-    IConceptNameDAO newConceptNameDAO();
-    IHistoryDAO newHistoryDAO();
-    ILinkRealizationDAO newLinkRealizationDAO();
-    ILinkTemplateDAO newLinkTemplateDAO();
-    IMediaDAO newMediaDAO();
-    IUsageDAO newUsageDAO();
+    ConceptDAO newConceptDAO();
+    ConceptMetadataDAO newConceptMetadataDAO();
+    ConceptNameDAO newConceptNameDAO();
+    HistoryDAO newHistoryDAO();
+    LinkRealizationDAO newLinkRealizationDAO();
+    LinkTemplateDAO newLinkTemplateDAO();
+    MediaDAO newMediaDAO();
+    UsageDAO newUsageDAO();
 
 }

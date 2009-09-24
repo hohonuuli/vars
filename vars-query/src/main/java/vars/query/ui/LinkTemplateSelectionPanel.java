@@ -38,10 +38,10 @@ import org.slf4j.LoggerFactory;
 import org.mbari.swing.SearchableComboBoxModel;
 import vars.ILink;
 import vars.knowledgebase.ConceptNameTypes;
-import vars.knowledgebase.IConcept;
-import vars.knowledgebase.IConceptDAO;
-import vars.knowledgebase.IConceptName;
-import vars.knowledgebase.ILinkTemplateDAO;
+import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptDAO;
+import vars.knowledgebase.ConceptName;
+import vars.knowledgebase.LinkTemplateDAO;
 import vars.query.IQueryDAO;
 import vars.query.LinkBean;
 import vars.query.SimpleConcept;
@@ -60,13 +60,13 @@ public class LinkTemplateSelectionPanel extends JPanel {
      *
      */
     private static final long serialVersionUID = 3736494989429665881L;
-    private static final IConcept selfConcept = new SimpleConcept(
+    private static final Concept selfConcept = new SimpleConcept(
         new SimpleConceptName(ILink.VALUE_SELF, ConceptNameTypes.PRIMARY.toString()));
     private static final ILink nilLinkTemplate = new LinkBean(
         ConceptConstraints.WILD_CARD_STRING,
         ConceptConstraints.WILD_CARD_STRING,
         ConceptConstraints.WILD_CARD_STRING);
-    private static final IConcept nilConcept = new SimpleConcept(
+    private static final Concept nilConcept = new SimpleConcept(
         new SimpleConceptName(
             ConceptConstraints.WILD_CARD_STRING,
             ConceptNameTypes.PRIMARY.toString()));
@@ -135,16 +135,16 @@ public class LinkTemplateSelectionPanel extends JPanel {
 	 */
     private JPanel bottomPanel = null;
 
-    private final IConceptDAO conceptDAO;
+    private final ConceptDAO conceptDAO;
     private final IQueryDAO queryDAO;
-    private final ILinkTemplateDAO linkTemplateDAO;
+    private final LinkTemplateDAO linkTemplateDAO;
 
     //~--- constructors -------------------------------------------------------
 
     /**
      *
      */
-    public LinkTemplateSelectionPanel(IConceptDAO conceptDAO, ILinkTemplateDAO linkTemplateDAO, IQueryDAO queryDAO) {
+    public LinkTemplateSelectionPanel(ConceptDAO conceptDAO, LinkTemplateDAO linkTemplateDAO, IQueryDAO queryDAO) {
         super();
         this.conceptDAO = conceptDAO;
         this.queryDAO = queryDAO;
@@ -155,7 +155,7 @@ public class LinkTemplateSelectionPanel extends JPanel {
     /**
      * @param isDoubleBuffered
      */
-    public LinkTemplateSelectionPanel(IConceptDAO conceptDAO, ILinkTemplateDAO linkTemplateDAO, IQueryDAO queryDAO,boolean isDoubleBuffered) {
+    public LinkTemplateSelectionPanel(ConceptDAO conceptDAO, LinkTemplateDAO linkTemplateDAO, IQueryDAO queryDAO,boolean isDoubleBuffered) {
         super(isDoubleBuffered);
         this.conceptDAO = conceptDAO;
         this.queryDAO = queryDAO;
@@ -166,7 +166,7 @@ public class LinkTemplateSelectionPanel extends JPanel {
     /**
      * @param layout
      */
-    public LinkTemplateSelectionPanel(IConceptDAO conceptDAO, ILinkTemplateDAO linkTemplateDAO, IQueryDAO queryDAO,LayoutManager layout) {
+    public LinkTemplateSelectionPanel(ConceptDAO conceptDAO, LinkTemplateDAO linkTemplateDAO, IQueryDAO queryDAO,LayoutManager layout) {
         super(layout);
         this.conceptDAO = conceptDAO;
         this.queryDAO = queryDAO;
@@ -178,7 +178,7 @@ public class LinkTemplateSelectionPanel extends JPanel {
      * @param layout
      * @param isDoubleBuffered
      */
-    public LinkTemplateSelectionPanel(IConceptDAO conceptDAO, ILinkTemplateDAO linkTemplateDAO, IQueryDAO queryDAO, LayoutManager layout,
+    public LinkTemplateSelectionPanel(ConceptDAO conceptDAO, LinkTemplateDAO linkTemplateDAO, IQueryDAO queryDAO, LayoutManager layout,
             boolean isDoubleBuffered) {
         super(layout, isDoubleBuffered);
         this.conceptDAO = conceptDAO;
@@ -394,7 +394,7 @@ public class LinkTemplateSelectionPanel extends JPanel {
      *
      * @param concept
      */
-    public void setConcept(IConcept concept) {
+    public void setConcept(Concept concept) {
         log.info("Retrieveing LinkTemplates from " + concept);
 
         if (concept == null) {
@@ -409,7 +409,7 @@ public class LinkTemplateSelectionPanel extends JPanel {
          * This step may take quite a while the first time it is called since it
          * has to load the entire knowledgebase
          */
-        final IConcept fConcept = concept;
+        final Concept fConcept = concept;
         Collection linkTemplates = (Collection) Worker.post(new Job() {
 
             public Object run() {
@@ -441,7 +441,7 @@ public class LinkTemplateSelectionPanel extends JPanel {
         }
 
         getTfLinkName().setText(linkTemplate.getLinkName());
-        IConcept toConcept = null;
+        Concept toConcept = null;
         if (linkTemplate.getToConcept().equalsIgnoreCase(ILink.VALUE_SELF)) {
             toConcept = selfConcept;
         } else if (
@@ -463,7 +463,7 @@ public class LinkTemplateSelectionPanel extends JPanel {
                  * so that the GUI continues to function in a predicatable manner
                  */
                 toConcept = new SimpleConcept();
-                IConceptName conceptName = new SimpleConceptName(ILink.VALUE_NIL, ConceptNameTypes.PRIMARY.toString());
+                ConceptName conceptName = new SimpleConceptName(ILink.VALUE_NIL, ConceptNameTypes.PRIMARY.toString());
                 conceptName.setName(ConceptConstraints.WILD_CARD_STRING);
                 conceptName.setNameType(ConceptNameTypes.PRIMARY.toString());
                 toConcept.addConceptName(conceptName);
@@ -473,7 +473,7 @@ public class LinkTemplateSelectionPanel extends JPanel {
         /*
          * This may take a while, we'll do it in a seperate thread.
          */
-        final IConcept fToConcept = toConcept;
+        final Concept fToConcept = toConcept;
         Worker.post(new Job() {
 
             public Object run() {

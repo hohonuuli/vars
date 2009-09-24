@@ -13,16 +13,16 @@ import java.util.Set;
 import org.mbari.sql.QueryResults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.knowledgebase.IConcept;
-import vars.knowledgebase.IConceptDAO;
+import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptDAO;
 
 public class QueryResultsDecorator {
     
     private static final Logger log = LoggerFactory.getLogger(QueryResultsDecorator.class);
 
-    private final IConceptDAO conceptDAO;
+    private final ConceptDAO conceptDAO;
 
-    public QueryResultsDecorator(IConceptDAO conceptDAO) {
+    public QueryResultsDecorator(ConceptDAO conceptDAO) {
         this.conceptDAO = conceptDAO;
     }
 
@@ -45,12 +45,12 @@ public class QueryResultsDecorator {
                 Map<String, String> map = new HashMap<String, String>();
                 for (String n : uniqueNames) {
 
-                    IConcept concept = conceptDAO.findByName(n);
+                    Concept concept = conceptDAO.findByName(n);
 
                     /*
                      * Generate a List of Concepts as we walk up the heirarchy
                      */
-                    List<IConcept> ancestors = new ArrayList<IConcept>();
+                    List<Concept> ancestors = new ArrayList<Concept>();
                     while (concept != null) {
                         ancestors.add(concept);
                         concept = concept.getParentConcept();
@@ -63,7 +63,7 @@ public class QueryResultsDecorator {
                      */
                     StringBuilder sb = new StringBuilder();
                     for (int i = 0; i < ancestors.size() - 1; i++) {
-                        IConcept c = ancestors.get(i);
+                        Concept c = ancestors.get(i);
                         sb.append(c.getPrimaryConceptName().getName()).append(",");
                     }
                     sb.append(ancestors.get(ancestors.size() - 1).getPrimaryConceptName().getName()); // Append last element without a trailing ','
@@ -145,7 +145,7 @@ public class QueryResultsDecorator {
                  */
                 Map<String, List<String>> map = new HashMap<String, List<String>>();
                 for (String n : uniqueNames) {
-                    IConcept concept = conceptDAO.findByName(n);
+                    Concept concept = conceptDAO.findByName(n);
 
                     /*
                      * Generate a List of Concepts as we walk up the heirarchy.
@@ -255,7 +255,7 @@ public class QueryResultsDecorator {
                  */
                 Map<String, List<String>> map = new HashMap<String, List<String>>();
                 for (String n : uniqueNames) {
-                    IConcept concept = conceptDAO.findByName(n);
+                    Concept concept = conceptDAO.findByName(n);
 
                     /*
                      * Generate a List of Concepts as we walk up the heirarchy.
