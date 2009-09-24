@@ -125,7 +125,7 @@ class History implements Serializable, IHistory, JPAEntity {
     String comment
 
     @Column(name = "Rejected")
-    private Short rejected
+    private Short rejected = 0
 
     @ManyToOne(optional = false, targetEntity = ConceptMetadata.class)
     @JoinColumn(name = "ConceptDelegateID_FK")

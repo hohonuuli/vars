@@ -1,0 +1,29 @@
+#!/bin/sh
+###############################################################################
+# $Id: $
+# GSH: Execute groovy script using the projects library directory.
+
+source `dirname "$0"`/varsSetup
+
+GSH_CLASSPATH=${HOME}/.groovy/lib
+for jar in $(ls ${HOME}/.groovy/lib/*.jar)
+do
+    GSH_CLASSPATH=$GSH_CLASSPATH:$jar
+done
+
+GSH_CLASSPATH=$GSH_CLASSPATH:${VARS_HOME}/scripts/groovy:$VARS_CLASSPATH
+
+if [ -z $1 ]; then
+    echo $FNAME " Starting Groovy shell"
+    ${JAVACMD:=java} -Xms16m -Xmx512m \
+         -Duser.timezone="UTC" \
+         -Dfile.encoding=UTF8 \
+         -classpath "$GSH_CLASSPATH" \
+         groovy.ui.GroovyMain "$VARS_HOME/scripts/groovy/openshell.groovy"
+else
+    ${JAVACMD:=java} -Xms16m -Xmx512m \
+         -Duser.timezone="UTC" \
+         -Dfile.encoding=UTF8 \
+         -classpath "$GSH_CLASSPATH" \
+         groovy.ui.GroovyMain "$@"
+fi

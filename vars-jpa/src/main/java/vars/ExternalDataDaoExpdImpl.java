@@ -10,8 +10,6 @@
  * limitations under the License.
  */
 
-
-
 package vars;
 
 import com.google.common.base.Predicate;

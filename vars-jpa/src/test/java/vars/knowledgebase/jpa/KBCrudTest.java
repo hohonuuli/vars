@@ -33,6 +33,7 @@ import vars.jpa.VarsJpaTestModule;
 import vars.knowledgebase.IConcept;
 import vars.knowledgebase.IConceptDAO;
 import vars.knowledgebase.IConceptMetadata;
+import vars.knowledgebase.IConceptName;
 import vars.knowledgebase.IHistory;
 import vars.knowledgebase.ILinkRealization;
 import vars.knowledgebase.ILinkTemplate;
@@ -99,6 +100,17 @@ public class KBCrudTest {
         Assert.assertTrue("Not all objects were inserted",
                           PrimaryKeyUtilities.checkDbForAllPks(PrimaryKeyUtilities.primaryKeyMap(c), (DAO) dao));
         log.info("KNOWLEDGEBASE TREE AFTER INSERT:\n" + entityUtilities.buildTextTree(c));
+
+        // Exercise the DAO methods
+        IConcept root = dao.findRoot();
+        Assert.assertNotNull("Whoops, couldn't get root", root);
+
+        //Collection<IConcept> allConcepts = dao.findAll();
+        //log.info("All concepts: " + allConcepts);
+
+        //Collection<IConceptName> names = dao.findDescendentNames(c);
+        //log.info("Descendent names from root:" + names);
+
         c = dao.makeTransient(c);
         log.info("KNOWLEDGEBASE TREE AFTER DELETE:\n" + entityUtilities.buildTextTree(c));
         c = dao.findByPrimaryKey(c.getClass(), cId);
@@ -115,8 +127,8 @@ public class KBCrudTest {
         IConceptDAO dao = daoFactory.newConceptDAO();
 
         setup: {
-            IConcept root = testObjectFactory.makeConcept("ROOT");
-            root.getPrimaryConceptName().setName("ROOT");
+            IConcept root = testObjectFactory.makeConcept("__ROOT__");
+            root.getPrimaryConceptName().setName("__ROOT__");
             root = dao.makePersistent(root);
             log.info("BUILDING KNOWLEDGEBASE TREE:\n" + entityUtilities.buildTextTree(root));
 
@@ -158,7 +170,7 @@ public class KBCrudTest {
 
         execute: {
 
-            IConcept root = dao.findByName("ROOT");
+            IConcept root = dao.findByName("__ROOT__");
             IConcept concept2B = dao.findByName("2B");
             IConcept concept3AB = dao.findByName("3AB");
             IConcept concept3AA = dao.findByName("3AA");
@@ -180,7 +192,7 @@ public class KBCrudTest {
             root = dao.findByPrimaryKey(root.getClass(), ((JPAEntity) root).getId());
             log.info("KNOWLEDGEBASE TREE:\n" + entityUtilities.buildTextTree(root));
 
-            log.info("---------- Remove ROOT ----------");
+            log.info("---------- Remove __ROOT__ ----------");
             dao.makeTransient(root);
         }
 

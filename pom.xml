@@ -45,9 +45,14 @@
         </dependency>
     </dependencies>
     <modules>
-        <module>vars-jpa</module>
         <module>vars-core</module>
-    </modules>
+        <module>vars-jpa</module>
+        <module>vars-shared-ui</module>
+        <module>vars-query</module>
+        <module>vars-knowledgebase</module>
+        <module>vars-annotation</module>
+        <module>vars-standalone</module>
+  </modules>
     <build>
         <plugins>
             <plugin>
@@ -236,7 +241,7 @@
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <argLine>-Xmx712M</argLine>
+                    <argLine>-Xmx1048M</argLine>
                 </configuration>
             </plugin>
         </plugins>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : standalone-app.xml
+    Created on : August 28, 2008
+    Author     : brian
+    Description:
+        Maven assembly descriptor for building a standalone app for 
+        scripting calls.
+-->
+<assembly>
+    <id>scripting</id>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <!-- copy assembly files -->
+    <fileSets>
+        <fileSet>
+            <directory>src/main/assembly/files</directory>
+            <outputDirectory></outputDirectory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+        </fileSet>
+    </fileSets>
+    <dependencySets>
+        <!-- Grab dependencies libraries -->
+        <dependencySet>
+            <outputDirectory>lib</outputDirectory>
+            <unpack>false</unpack>
+            <scope>runtime</scope>
+        </dependencySet>
+    </dependencySets>
+</assembly>

@@ -20,8 +20,6 @@
 
 package vars.annotation;
 
-import java.beans.PropertyChangeListener;
-import java.util.Collection;
 import vars.ILink;
 
 /**

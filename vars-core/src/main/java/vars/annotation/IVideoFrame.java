@@ -58,7 +58,7 @@ public interface IVideoFrame extends IAnnotationObject, IVideoMoment {
     /**
      * @return  The observations associated with this annotated frame. This  collection is synchronized.
      */
-    Set<? extends IObservation> getObservations();
+    Set<IObservation> getObservations();
 
     /**
      * Get the <code>PhysicalData</code> associated with this <code>VideoFrame</code>.

@@ -34,7 +34,6 @@ public enum ConceptNameTypes {
 
     PRIMARY("primary"), ALTERNATE("alternate"), COMMON("common"), FORMER("former"), SYNONYM("synonym");
 
-
     private final String name;
 
     ConceptNameTypes(String name) {
@@ -45,5 +44,12 @@ public enum ConceptNameTypes {
     public String getName() {
         return name;
     }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
+
+
 }
 

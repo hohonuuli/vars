@@ -28,4 +28,6 @@ public interface ILinkTemplateDAO extends IDAO, IConceptNameValidator<ILinkTempl
      */
     Collection<ILinkTemplate> findAllByLinkName(String linkName, IConcept concept);
 
+    Collection<ILinkTemplate> findAllApplicableToConcept(IConcept concept);
+
 }

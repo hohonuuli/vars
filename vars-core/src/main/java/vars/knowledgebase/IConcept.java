@@ -100,7 +100,7 @@ public interface IConcept extends IKnowledgebaseObject, ILazy {
      * @return  The collection of ConceptNames associated with this Concept. This  a syncrhonized collection so you will need to synchronize on it before iterating.
      * @uml.property  name="conceptNameColl"
      */
-    Set<? extends IConceptName> getConceptNames();
+    Set<IConceptName> getConceptNames();
 
     /**
      * Gets the nodcCode attribute of the Concept object

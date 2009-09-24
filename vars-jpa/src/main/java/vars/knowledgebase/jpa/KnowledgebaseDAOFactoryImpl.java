@@ -20,7 +20,7 @@ import com.google.inject.name.Named;
  * Time: 9:37:10 AM
  * To change this template use File | Settings | File Templates.
  */
-public class KnowledgebaseDAOFactoryImpl implements KnowledgebaseDAOFactory {
+    public class KnowledgebaseDAOFactoryImpl implements KnowledgebaseDAOFactory {
 
     private final EAO eao;
 

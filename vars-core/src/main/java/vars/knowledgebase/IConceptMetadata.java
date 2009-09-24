@@ -21,7 +21,6 @@
 package vars.knowledgebase;
 
 import java.util.Set;
-import java.util.List;
 
 /**
  *
@@ -98,23 +97,23 @@ public interface IConceptMetadata extends IKnowledgebaseObject {
     /**
      * @return
      */
-    Set<? extends IHistory> getHistories();
+    Set<IHistory> getHistories();
 
 
     /**
      * @return
      */
-    Set<? extends ILinkRealization> getLinkRealizations();
+    Set<ILinkRealization> getLinkRealizations();
 
     /**
      * @return
      */
-    Set<? extends ILinkTemplate> getLinkTemplates();
+    Set<ILinkTemplate> getLinkTemplates();
 
     /**
      * @return
      */
-    Set<? extends IMedia> getMedias();
+    Set<IMedia> getMedias();
 
 
     /**

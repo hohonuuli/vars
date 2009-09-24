@@ -67,7 +67,7 @@ public interface IVideoArchiveSet extends IAnnotationObject {
      * @return     The cameraPlatformDeploymentColl. This is a synchronized list of  <code>CameraPlatformDeployment</code> objects. Remember to synchronize  on it before using it's iterator.
      * @uml.property  name="cameraPlatformDeploymentColl"
      */
-    Set<? extends ICameraDeployment> getCameraDeployments();
+    Set<ICameraDeployment> getCameraDeployments();
 
     /**
      * Gets the endDTG attribute of the VideoArchiveSet object
@@ -130,7 +130,7 @@ public interface IVideoArchiveSet extends IAnnotationObject {
      * @return     The videoArchiveColl value
      * @uml.property  name="videoArchiveColl"
      */
-    Set<? extends IVideoArchive> getVideoArchives();
+    Set<IVideoArchive> getVideoArchives();
 
     /**
      * This is a convience method to retrieve all <code>VideoFrames</code> that are
@@ -138,7 +138,7 @@ public interface IVideoArchiveSet extends IAnnotationObject {
      *
      * @return A collection of <i>ALL</i> VideoFrames that are part of this VideoArchiveSet
      */
-    List<? extends IVideoFrame> getVideoFrames();
+    List<IVideoFrame> getVideoFrames();
 
     //void setVideoFrames(Collection<? extends IVideoFrame> videoFrames);
 

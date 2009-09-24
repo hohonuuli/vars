@@ -75,6 +75,7 @@ public class ConceptDAO extends DAO implements IConceptDAO {
 
     }
 
+
     /**
      * Private method for recursively collecting conceptnames
      * @param concepts A collection of concepts. Normally this is from concept.getChildConcepts()

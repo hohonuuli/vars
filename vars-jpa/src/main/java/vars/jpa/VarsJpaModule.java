@@ -36,6 +36,8 @@ import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.jpa.KnowledgebaseDAOFactoryImpl;
 import vars.knowledgebase.jpa.KnowledgebaseEAO;
 import vars.knowledgebase.jpa.KnowledgebaseFactoryImpl;
+import vars.query.IQueryDAO;
+import vars.query.QueryDAOImpl;
 
 /**
  * Created by IntelliJ IDEA.
@@ -92,7 +94,8 @@ public class VarsJpaModule implements Module {
         binder.bind(KnowledgebaseFactory.class).to(KnowledgebaseFactoryImpl.class);
         binder.bind(MiscDAOFactory.class).to(MiscDAOFactoryImpl.class);
         binder.bind(MiscFactory.class).to(MiscFactoryImpl.class);
-        binder.bind(VarsUserPreferencesFactory.class).to(VarsUserPreferencesFactoryImpl.class);
+        binder.bind(IQueryDAO.class).to(QueryDAOImpl.class);
+        binder.bind(VarsUserPreferencesFactory.class).to(VarsUserPreferencesFactoryImpl.class).in(Scopes.SINGLETON);
 
     }
 }

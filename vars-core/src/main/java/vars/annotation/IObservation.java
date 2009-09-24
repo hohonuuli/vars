@@ -55,7 +55,7 @@ public interface IObservation extends IAnnotationObject {
      * WARNING! Do not add or remove directly from this collection.
      * @return  A synchronized collection
      */
-    Set<? extends IAssociation> getAssociations();
+    Set<IAssociation> getAssociations();
 
     /**
      * @return  The fromConcept of this observation.

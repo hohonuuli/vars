@@ -167,6 +167,12 @@
             <version>1.2.3</version>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>javax.transaction</groupId>
+            <artifactId>jta</artifactId>
+            <version>1.1</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 <!--
     PROFILES
@@ -271,5 +277,6 @@
     </profiles>
 
 </project>
+
 
 

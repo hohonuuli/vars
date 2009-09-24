@@ -116,8 +116,8 @@ class Concept implements Serializable, IConcept, JPAEntity {
             cascade = CascadeType.ALL)
     Set<IConceptName> conceptNames
 
-    @Column(name = "Field", length = 255)
-    String field
+    //@Column(name = "Field", length = 255)
+    //String field
 
     @Column(name = "Originator", length = 255)
     String originator
