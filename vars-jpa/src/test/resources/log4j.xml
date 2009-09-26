@@ -8,23 +8,22 @@
         </layout>
     </appender>
 
-    
-    <logger name="org.hibernate">
-        <level value="debug" />
-    </logger>
 
-    
     <logger name="org.hibernate.connection.DriverManagerConnectionProvider">
         <level value="info" />
     </logger>
+
+    <logger name="org.hibernate">
+        <level value="warn" />
+    </logger>
     
-    <logger name="vars">
+    <!-- <logger name="vars">
         <level value="info" />
     </logger>
 
     <logger name="org.mbari">
         <level value="info" />
-    </logger>
+    </logger> -->
     
     <root>
         <priority value="debug" />

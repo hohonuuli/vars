@@ -72,7 +72,7 @@ import vars.knowledgebase.ConceptNameTypes;
 public class ConceptImpl implements Serializable, Concept, JPAEntity {
 
     @Transient
-    private List<String> PROP_NAMES = new ArrayList<String>() {{
+    private final List<String> PROP_NAMES = new ArrayList<String>() {{
 
             //PROP_ORIGINATOR, PROP_RANK_LEVEL, PROP_RANK_NAME
             add(PROP_ORIGINATOR);
@@ -91,7 +91,7 @@ public class ConceptImpl implements Serializable, Concept, JPAEntity {
     @OneToOne(
         mappedBy = "concept",
         fetch = FetchType.LAZY,
-        cascade = CascadeType.ALL,
+        cascade = { CascadeType.ALL },
         targetEntity = GConceptMetadata.class
     )
     private ConceptMetadata conceptMetadata;
