@@ -15,7 +15,7 @@
  */
 
 
-package vars.shared.ui;
+package vars.shared.ui; 
 
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptName;

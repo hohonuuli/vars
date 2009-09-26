@@ -1,6 +1,6 @@
 package vars.jpa
 
-import org.mbari.jpax.NonManagedEAO
+import org.mbari.jpaxx.NonManagedEAO
 import vars.annotation.IVideoArchiveSet
 import vars.knowledgebase.Concept
 

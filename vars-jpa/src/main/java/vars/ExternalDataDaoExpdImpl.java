@@ -86,7 +86,7 @@ public class ExternalDataDaoExpdImpl implements ExternalDataDAO {
      * Constructs ...
      */
     public ExternalDataDaoExpdImpl() {
-        ResourceBundle bundle = ResourceBundle.getBundle("external-data");
+        ResourceBundle bundle = ResourceBundle.getBundle("external-dao");
         jdbcUrl = bundle.getString("jdbc.url");
         jdbcUsername = bundle.getString("jdbc.username");
         jdbcPassword = bundle.getString("jdbc.password");

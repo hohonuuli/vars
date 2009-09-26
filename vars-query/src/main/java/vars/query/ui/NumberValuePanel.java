@@ -33,7 +33,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.List;
-import vars.query.IQueryDAO;
+import vars.query.QueryDAO;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -69,7 +69,7 @@ public class NumberValuePanel extends ValuePanel {
 
     private static final Logger log = LoggerFactory.getLogger(NumberValuePanel.class);
 
-    private final IQueryDAO queryDAO;
+    private final QueryDAO queryDAO;
 
     private final String coalesceKey;
     
@@ -81,7 +81,7 @@ public class NumberValuePanel extends ValuePanel {
      * @param name
      */
     @Inject
-    public NumberValuePanel(String name, IQueryDAO queryDAO, String coalesceKey) {
+    public NumberValuePanel(String name, QueryDAO queryDAO, String coalesceKey) {
         super(name);
         this.queryDAO = queryDAO;
         this.coalesceKey = coalesceKey;

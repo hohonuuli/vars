@@ -9,7 +9,7 @@ import javax.persistence.Entity
 import javax.persistence.Table
 import javax.persistence.EntityListeners
 import javax.persistence.Id
-import org.mbari.jpax.TransactionLogger
+import org.mbari.jpaxx.TransactionLogger
 import javax.persistence.Column
 import javax.persistence.AttributeOverride
 import javax.persistence.AttributeOverrides

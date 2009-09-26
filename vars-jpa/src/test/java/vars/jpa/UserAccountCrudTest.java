@@ -3,7 +3,7 @@ package vars.jpa;
 import org.junit.Before;
 import org.junit.Assert;
 import org.junit.Test;
-import org.mbari.jpax.NonManagedEAO;
+import org.mbari.jpaxx.NonManagedEAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.inject.Injector;
@@ -51,7 +51,7 @@ public class UserAccountCrudTest {
         dao.makePersistent(userAccount);
         Assert.assertNotNull(((JPAEntity) userAccount).getId());
 
-        userAccount = dao.findByPrimaryKey(UserAccount.class, ((JPAEntity) userAccount).getId());
+        userAccount = dao.findByPrimaryKey(GUserAccount.class, ((JPAEntity) userAccount).getId());
         log.info("Password stored in database as '" + userAccount.getPassword() + "'");
         Assert.assertEquals("UserName wasn't stored correctly", testString, userAccount.getUserName());
         Assert.assertEquals("Role wasn't stored correctly", UserAccountRoles.ADMINISTRATOR.getRoleName(),

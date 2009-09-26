@@ -42,7 +42,7 @@ import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.LinkTemplateDAO;
-import vars.query.IQueryDAO;
+import vars.query.QueryDAO;
 import vars.query.LinkBean;
 import vars.query.SimpleConcept;
 import vars.query.SimpleConceptName;
@@ -136,7 +136,7 @@ public class LinkTemplateSelectionPanel extends JPanel {
     private JPanel bottomPanel = null;
 
     private final ConceptDAO conceptDAO;
-    private final IQueryDAO queryDAO;
+    private final QueryDAO queryDAO;
     private final LinkTemplateDAO linkTemplateDAO;
 
     //~--- constructors -------------------------------------------------------
@@ -144,7 +144,7 @@ public class LinkTemplateSelectionPanel extends JPanel {
     /**
      *
      */
-    public LinkTemplateSelectionPanel(ConceptDAO conceptDAO, LinkTemplateDAO linkTemplateDAO, IQueryDAO queryDAO) {
+    public LinkTemplateSelectionPanel(ConceptDAO conceptDAO, LinkTemplateDAO linkTemplateDAO, QueryDAO queryDAO) {
         super();
         this.conceptDAO = conceptDAO;
         this.queryDAO = queryDAO;
@@ -155,7 +155,7 @@ public class LinkTemplateSelectionPanel extends JPanel {
     /**
      * @param isDoubleBuffered
      */
-    public LinkTemplateSelectionPanel(ConceptDAO conceptDAO, LinkTemplateDAO linkTemplateDAO, IQueryDAO queryDAO,boolean isDoubleBuffered) {
+    public LinkTemplateSelectionPanel(ConceptDAO conceptDAO, LinkTemplateDAO linkTemplateDAO, QueryDAO queryDAO,boolean isDoubleBuffered) {
         super(isDoubleBuffered);
         this.conceptDAO = conceptDAO;
         this.queryDAO = queryDAO;
@@ -166,7 +166,7 @@ public class LinkTemplateSelectionPanel extends JPanel {
     /**
      * @param layout
      */
-    public LinkTemplateSelectionPanel(ConceptDAO conceptDAO, LinkTemplateDAO linkTemplateDAO, IQueryDAO queryDAO,LayoutManager layout) {
+    public LinkTemplateSelectionPanel(ConceptDAO conceptDAO, LinkTemplateDAO linkTemplateDAO, QueryDAO queryDAO,LayoutManager layout) {
         super(layout);
         this.conceptDAO = conceptDAO;
         this.queryDAO = queryDAO;
@@ -178,7 +178,7 @@ public class LinkTemplateSelectionPanel extends JPanel {
      * @param layout
      * @param isDoubleBuffered
      */
-    public LinkTemplateSelectionPanel(ConceptDAO conceptDAO, LinkTemplateDAO linkTemplateDAO, IQueryDAO queryDAO, LayoutManager layout,
+    public LinkTemplateSelectionPanel(ConceptDAO conceptDAO, LinkTemplateDAO linkTemplateDAO, QueryDAO queryDAO, LayoutManager layout,
             boolean isDoubleBuffered) {
         super(layout, isDoubleBuffered);
         this.conceptDAO = conceptDAO;

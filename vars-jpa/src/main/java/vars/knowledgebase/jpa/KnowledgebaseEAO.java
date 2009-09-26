@@ -1,7 +1,7 @@
 package vars.knowledgebase.jpa;
 
-import org.mbari.jpax.NonManagedEAO;
-import org.mbari.jpax.NonManagedEAOImpl;
+import org.mbari.jpaxx.NonManagedEAO;
+import org.mbari.jpaxx.NonManagedEAOImpl;
 import com.google.inject.name.Named;
 import com.google.inject.Inject;
 

@@ -34,7 +34,7 @@ import vars.shared.ui.ConceptNameComboBox;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptName;
-import vars.query.IQueryDAO;
+import vars.query.QueryDAO;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -95,7 +95,7 @@ public class ConceptNameSelectionPanel extends JPanel {
 	 */
     private JCheckBox cChildren = null;
 
-    private final IQueryDAO queryDAO;
+    private final QueryDAO queryDAO;
     private final ConceptDAO conceptDAO;
 
     //~--- constructors -------------------------------------------------------
@@ -104,7 +104,7 @@ public class ConceptNameSelectionPanel extends JPanel {
      *
      */
     @Inject
-    public ConceptNameSelectionPanel(IQueryDAO queryDAO, ConceptDAO conceptDAO) {
+    public ConceptNameSelectionPanel(QueryDAO queryDAO, ConceptDAO conceptDAO) {
         super();
         this.queryDAO = queryDAO;
         this.conceptDAO = conceptDAO;

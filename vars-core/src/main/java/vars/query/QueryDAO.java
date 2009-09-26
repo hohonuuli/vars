@@ -6,6 +6,7 @@
 package vars.query;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import vars.ILink;
 
@@ -13,7 +14,7 @@ import vars.ILink;
  *
  * @author brian
  */
-public interface IQueryDAO extends IQueryable {
+public interface QueryDAO extends IQueryable {
 
     Integer getCountOfUniqueValuesByColumn(String columnName);
 
@@ -33,5 +34,7 @@ public interface IQueryDAO extends IQueryable {
     String getURL();
 
     Collection<String> findAllNamesUsedInAnnotations();
+
+    List<String> findAllConceptNamesAsStrings();
 
 }

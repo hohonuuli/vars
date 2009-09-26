@@ -29,16 +29,18 @@ import vars.annotation.jpa.PhysicalData;
 import vars.annotation.jpa.VideoArchive;
 import vars.annotation.jpa.VideoArchiveSet;
 import vars.annotation.jpa.VideoFrame;
-import vars.knowledgebase.Concept;
-import vars.knowledgebase.ConceptMetadata;
-import vars.knowledgebase.ConceptName;
-import vars.knowledgebase.History;
-import vars.knowledgebase.LinkRealization;
-import vars.knowledgebase.LinkTemplate;
-import vars.knowledgebase.Media;
-import vars.knowledgebase.Usage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptMetadata;
+import vars.knowledgebase.jpa.ConceptImpl;
+import vars.knowledgebase.jpa.GConceptMetadata;
+import vars.knowledgebase.jpa.GConceptName;
+import vars.knowledgebase.jpa.GHistory;
+import vars.knowledgebase.jpa.GLinkRealization;
+import vars.knowledgebase.jpa.GLinkTemplate;
+import vars.knowledgebase.jpa.GMedia;
+import vars.knowledgebase.jpa.GUsage;
 
 /**
  * Created by IntelliJ IDEA.
@@ -118,14 +120,14 @@ public class PrimaryKeyUtilities {
         Map<Class, Collection> map = new HashMap<Class, Collection>() {
 
             {
-                put(Concept.class, new ArrayList());
-                put(ConceptName.class, new ArrayList());
-                put(ConceptMetadata.class, new ArrayList());
-                put(History.class, new ArrayList());
-                put(LinkRealization.class, new ArrayList());
-                put(LinkTemplate.class, new ArrayList());
-                put(Media.class, new ArrayList());
-                put(Usage.class, new ArrayList());
+                put(ConceptImpl.class, new ArrayList());
+                put(GConceptName.class, new ArrayList());
+                put(GConceptMetadata.class, new ArrayList());
+                put(GHistory.class, new ArrayList());
+                put(GLinkRealization.class, new ArrayList());
+                put(GLinkTemplate.class, new ArrayList());
+                put(GMedia.class, new ArrayList());
+                put(GUsage.class, new ArrayList());
             }
         };
 
@@ -167,17 +169,18 @@ public class PrimaryKeyUtilities {
 
     @SuppressWarnings("unchecked")
     private static void primaryKeyMap(Concept concept, Map<Class, Collection> map) {
-        map.get(Concept.class).add(new Long(concept.getId()));
-        map.get(ConceptName.class).addAll(primaryKeys(concept.getConceptNames()));
+        JPAEntity c = (JPAEntity) concept;
+        map.get(ConceptImpl.class).add(new Long(c.getId()));
+        map.get(GConceptName.class).addAll(primaryKeys(concept.getConceptNames()));
 
-        ConceptMetadata metadata = (ConceptMetadata) concept.getConceptMetadata();
-
-        map.get(ConceptMetadata.class).add(metadata.getId());
-        map.get(History.class).addAll(primaryKeys(metadata.getHistories()));
-        map.get(LinkRealization.class).addAll(primaryKeys(metadata.getLinkRealizations()));
-        map.get(LinkTemplate.class).addAll(primaryKeys(metadata.getLinkTemplates()));
-        map.get(Media.class).addAll(primaryKeys(metadata.getMedias()));
-        map.get(Usage.class).add(((JPAEntity) metadata.getUsage()).getId());
+        ConceptMetadata metadata = (GConceptMetadata) concept.getConceptMetadata();
+        JPAEntity cm = (JPAEntity) metadata;
+        map.get(GConceptMetadata.class).add(cm.getId());
+        map.get(GHistory.class).addAll(primaryKeys(metadata.getHistories()));
+        map.get(GLinkRealization.class).addAll(primaryKeys(metadata.getLinkRealizations()));
+        map.get(GLinkTemplate.class).addAll(primaryKeys(metadata.getLinkTemplates()));
+        map.get(GMedia.class).addAll(primaryKeys(metadata.getMedias()));
+        map.get(GUsage.class).add(((JPAEntity) metadata.getUsage()).getId());
 
         // Process the child conceptNames
         for (Object child : concept.getChildConcepts()) {

@@ -7,8 +7,8 @@ import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.ConceptNameDAO;
 import vars.VARSPersistenceException;
-import org.mbari.jpax.EAO;
-import org.mbari.jpax.NonManagedEAO;
+import org.mbari.jpaxx.EAO;
+import org.mbari.jpaxx.NonManagedEAO;
 import com.google.inject.Inject;
 
 import java.util.Collection;
@@ -63,7 +63,7 @@ public class ConceptDAOImpl extends DAO implements ConceptDAO {
             nmEao.startTransaction();
         }
 
-        Concept mergedConcept = eao.find(Concept.class, ((JPAEntity) concept).getId());
+        Concept mergedConcept = eao.find(ConceptImpl.class, ((JPAEntity) concept).getId());
         conceptNames.addAll(mergedConcept.getConceptNames());
         findDescendentNames(mergedConcept.getChildConcepts(), conceptNames);
 
@@ -92,6 +92,7 @@ public class ConceptDAOImpl extends DAO implements ConceptDAO {
 
     public Collection<Concept> findAll() {
         Map<String, Object> params = new HashMap<String, Object>();
+        // TODO this may not be memory efficient (may return lots of disconnected objet graphs
         return getEAO().findByNamedQuery("Concept.findAll", params);
     }
 

@@ -13,6 +13,6 @@ import vars.IUserAccount;
 public class MiscFactoryImpl implements MiscFactory {
 
     public IUserAccount newUserAccount() {
-        return new UserAccount();
+        return new GUserAccount();
     }
 }

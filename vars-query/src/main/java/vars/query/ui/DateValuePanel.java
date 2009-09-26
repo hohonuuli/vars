@@ -40,7 +40,7 @@ import org.mbari.sql.QueryResults;
 import org.mbari.swingworker.SwingWorker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.query.IQueryDAO;
+import vars.query.QueryDAO;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -87,7 +87,7 @@ public class DateValuePanel extends ValuePanel {
 
     private JButton scanButton;
 
-    private final IQueryDAO queryDAO;
+    private final QueryDAO queryDAO;
     //~--- constructors -------------------------------------------------------
 
     /**
@@ -95,7 +95,7 @@ public class DateValuePanel extends ValuePanel {
      *
      * @param name
      */
-    public DateValuePanel(String name, IQueryDAO queryDAO) {
+    public DateValuePanel(String name, QueryDAO queryDAO) {
         super(name);
         this.queryDAO = queryDAO;
         initialize();

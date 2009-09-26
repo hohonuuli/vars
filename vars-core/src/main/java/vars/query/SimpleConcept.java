@@ -157,4 +157,12 @@ public class SimpleConcept implements Concept {
         this.parentConcept = parentConcept;
     }
 
+    public void setTaxonomyType(String taxonomyType) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public String getTaxonomyType() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
 }

@@ -11,7 +11,7 @@ import vars.annotation.IVideoArchiveDAO;
 import vars.annotation.IVideoArchiveSetDAO;
 import vars.annotation.IVideoFrameDAO;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
-import org.mbari.jpax.EAO;
+import org.mbari.jpaxx.EAO;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 

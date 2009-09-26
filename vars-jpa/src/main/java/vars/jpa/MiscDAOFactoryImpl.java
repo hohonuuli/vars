@@ -4,7 +4,7 @@ import vars.MiscDAOFactory;
 import vars.IUserAccountDAO;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import org.mbari.jpax.EAO;
+import org.mbari.jpaxx.EAO;
 
 /**
  * Created by IntelliJ IDEA.

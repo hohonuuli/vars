@@ -24,14 +24,14 @@ public class DAOTests {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
     KnowledgebaseDAOFactory knowledgebaseDAOFactory;
-    IQueryDAO queryDAO;
+    QueryDAO queryDAO;
 
     @Before
     public void setup() {
         Dispatcher dispatcher = Lookup.getGuiceInjectorDispatcher();
         Injector injector = (Injector) dispatcher.getValueObject();
         knowledgebaseDAOFactory = injector.getInstance(KnowledgebaseDAOFactory.class);
-        queryDAO = injector.getInstance(IQueryDAO.class);
+        queryDAO = injector.getInstance(QueryDAO.class);
     }
 
     @Test

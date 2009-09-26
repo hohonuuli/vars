@@ -5,8 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.junit.Test;
 import com.google.inject.Injector;
 import com.google.inject.Guice;
-import vars.annotation.IVideoArchiveSet;
-import vars.testing.AnnotationTestObjectFactory;
 import vars.testing.KnowledgebaseTestObjectFactory;
 import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.Concept;

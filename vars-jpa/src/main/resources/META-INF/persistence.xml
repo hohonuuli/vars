@@ -40,7 +40,7 @@
             <property name="hibernate.dialect" value="${DEVELOPMENT_HIBERNATE_DIALECT}"/>
             <!-- <property name="hibernate.hbm2ddl.auto" value="validate"/> bombs on derby-->
             <!-- <property name="hibernate.hbm2ddl.auto" value="create"/> -->
-            <property name="hibernate.show_sql" value="false"/>
+            <property name="hibernate.show_sql" value="true"/>
         </properties>
     </persistence-unit>
     <persistence-unit name="vars-hibernate-test" transaction-type="RESOURCE_LOCAL">

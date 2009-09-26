@@ -2,7 +2,7 @@ package vars.jpa;
 
 import vars.IDAO;
 import vars.VARSPersistenceException;
-import org.mbari.jpax.EAO;
+import org.mbari.jpaxx.EAO;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -10,7 +10,12 @@
 
     
     <logger name="org.hibernate">
-        <level value="warn" />
+        <level value="debug" />
+    </logger>
+
+    
+    <logger name="org.hibernate.connection.DriverManagerConnectionProvider">
+        <level value="info" />
     </logger>
     
     <logger name="vars">

@@ -12,8 +12,8 @@ import vars.annotation.IVideoArchiveSet;
 import vars.annotation.ICameraDeployment;
 import vars.knowledgebase.Concept;
 import vars.VARSPersistenceException;
-import org.mbari.jpax.EAO;
-import org.mbari.jpax.NonManagedEAO;
+import org.mbari.jpaxx.EAO;
+import org.mbari.jpaxx.NonManagedEAO;
 
 import java.util.Set;
 import java.util.Collection;

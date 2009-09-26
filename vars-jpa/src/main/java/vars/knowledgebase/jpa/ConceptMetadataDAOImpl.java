@@ -2,7 +2,7 @@ package vars.knowledgebase.jpa;
 
 import vars.knowledgebase.ConceptMetadataDAO;
 import vars.jpa.DAO;
-import org.mbari.jpax.EAO;
+import org.mbari.jpaxx.EAO;
 import com.google.inject.Inject;
 
 /**

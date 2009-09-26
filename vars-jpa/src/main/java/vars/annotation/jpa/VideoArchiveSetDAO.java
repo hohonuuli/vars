@@ -7,8 +7,8 @@ import vars.annotation.IVideoArchiveDAO;
 import vars.annotation.IVideoArchive;
 import vars.annotation.ICameraDeployment;
 import vars.knowledgebase.Concept;
-import org.mbari.jpax.EAO;
-import org.mbari.jpax.NonManagedEAO;
+import org.mbari.jpaxx.EAO;
+import org.mbari.jpaxx.NonManagedEAO;
 
 import java.util.Set;
 import java.util.Date;

@@ -3,7 +3,7 @@ package vars.annotation.jpa;
 import vars.annotation.ICameraDeploymentDAO;
 import vars.annotation.ICameraDeployment;
 import vars.jpa.DAO;
-import org.mbari.jpax.EAO;
+import org.mbari.jpaxx.EAO;
 
 import java.util.Map;
 import java.util.HashMap;

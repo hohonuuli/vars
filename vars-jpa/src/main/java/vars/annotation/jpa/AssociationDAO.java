@@ -5,7 +5,7 @@ import vars.annotation.IAssociation;
 import vars.jpa.DAO;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.Concept;
-import org.mbari.jpax.EAO;
+import org.mbari.jpaxx.EAO;
 import com.google.inject.Inject;
 
 /**

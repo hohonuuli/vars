@@ -16,7 +16,7 @@ package vars.jpa;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import java.util.prefs.Preferences;
-import org.mbari.jpax.EAO;
+import org.mbari.jpaxx.EAO;
 
 /**
  *

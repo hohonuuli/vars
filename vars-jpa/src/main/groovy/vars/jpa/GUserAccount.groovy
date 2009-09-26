@@ -17,7 +17,7 @@ import javax.persistence.TableGenerator
 import org.jasypt.util.password.BasicPasswordEncryptor
 import vars.UserAccountRoles
 import javax.persistence.GenerationType
-import org.mbari.jpax.TransactionLogger;
+import org.mbari.jpaxx.TransactionLogger;
 
 @Entity(name = "UserAccount")
 @Table(name = "UserAccount")

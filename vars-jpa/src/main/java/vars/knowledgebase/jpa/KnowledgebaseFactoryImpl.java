@@ -12,7 +12,7 @@ import vars.knowledgebase.Usage;
 public class KnowledgebaseFactoryImpl implements KnowledgebaseFactory {
 
     public Concept newConcept() {
-        return new GConcept();
+        return new ConceptImpl();
     }
 
     public ConceptName newConceptName() {

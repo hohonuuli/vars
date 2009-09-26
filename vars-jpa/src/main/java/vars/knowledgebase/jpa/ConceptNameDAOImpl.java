@@ -3,7 +3,7 @@ package vars.knowledgebase.jpa;
 import vars.jpa.DAO;
 import vars.knowledgebase.ConceptNameDAO;
 import vars.knowledgebase.ConceptName;
-import org.mbari.jpax.EAO;
+import org.mbari.jpaxx.EAO;
 
 import java.util.HashMap;
 import java.util.List;

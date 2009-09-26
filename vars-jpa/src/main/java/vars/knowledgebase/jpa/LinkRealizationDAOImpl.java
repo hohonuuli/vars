@@ -5,7 +5,7 @@ import vars.knowledgebase.LinkRealizationDAO;
 import vars.knowledgebase.LinkRealization;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.Concept;
-import org.mbari.jpax.EAO;
+import org.mbari.jpaxx.EAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -21,7 +21,7 @@ import com.google.inject.name.Names;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
-import org.mbari.jpax.EAO;
+import org.mbari.jpaxx.EAO;
 import vars.ExternalDataDAO;
 import vars.ExternalDataDaoExpdImpl;
 import vars.MiscDAOFactory;
@@ -36,7 +36,7 @@ import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.jpa.KnowledgebaseDAOFactoryImpl;
 import vars.knowledgebase.jpa.KnowledgebaseEAO;
 import vars.knowledgebase.jpa.KnowledgebaseFactoryImpl;
-import vars.query.IQueryDAO;
+import vars.query.QueryDAO;
 import vars.query.QueryDAOImpl;
 
 /**
@@ -94,7 +94,7 @@ public class VarsJpaModule implements Module {
         binder.bind(KnowledgebaseFactory.class).to(KnowledgebaseFactoryImpl.class);
         binder.bind(MiscDAOFactory.class).to(MiscDAOFactoryImpl.class);
         binder.bind(MiscFactory.class).to(MiscFactoryImpl.class);
-        binder.bind(IQueryDAO.class).to(QueryDAOImpl.class);
+        binder.bind(QueryDAO.class).to(QueryDAOImpl.class);
         binder.bind(VarsUserPreferencesFactory.class).to(VarsUserPreferencesFactoryImpl.class).in(Scopes.SINGLETON);
 
     }

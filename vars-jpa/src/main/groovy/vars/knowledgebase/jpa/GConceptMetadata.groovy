@@ -29,7 +29,7 @@ import vars.knowledgebase.HistoryCreationDateComparator
 import vars.knowledgebase.MediaTypes
 import vars.EntitySupportCategory
 import javax.persistence.EntityListeners;
-import org.mbari.jpax.TransactionLogger
+import org.mbari.jpaxx.TransactionLogger
 import vars.jpa.KeyNullifier
 
 /**
@@ -100,7 +100,7 @@ class GConceptMetadata implements Serializable, ConceptMetadata, JPAEntity {
             cascade = CascadeType.ALL)
     Set<LinkRealization> linkRealizations
 
-    @OneToOne(targetEntity = GConcept.class)
+    @OneToOne(targetEntity = ConceptImpl.class)
     @JoinColumn(name = "ConceptID_FK")
     Concept concept
 

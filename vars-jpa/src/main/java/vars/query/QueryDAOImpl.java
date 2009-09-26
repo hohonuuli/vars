@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.TimeZone;
@@ -37,10 +38,11 @@ import vars.ILink;
 import vars.VARSException;
 
 /**
- *
+ * DAO for use by the query app. This drops out of hibernate and uses a lot of
+ * SQL internally for speed reasons.
  * @author brian
  */
-public class QueryDAOImpl implements IQueryDAO {
+public class QueryDAOImpl implements QueryDAO {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
@@ -237,6 +239,23 @@ public class QueryDAOImpl implements IQueryDAO {
         sb.append(" ORDER BY LinkName, toConcept, linkValue");
 
         return (Collection<ILink>) executeQueryFunction(sb.toString(), queryFunction);
+    }
+
+    public List<String> findAllConceptNamesAsStrings() {
+        final QueryFunction queryFunction = new QueryFunction() {
+
+            public Object apply(ResultSet resultSet) throws SQLException {
+                List<String> conceptNamesAsStrings = new ArrayList<String>();
+                while (resultSet.next()) {
+                    conceptNamesAsStrings.add(resultSet.getString(1));
+                }
+                return conceptNamesAsStrings;
+            }
+        };
+
+        String query = "SELECT ConceptName FROM ConceptName ORDER BY ConceptName";
+
+        return (List<String>) executeQueryFunction(query, queryFunction);
     }
 
     /**

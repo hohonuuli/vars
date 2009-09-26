@@ -9,7 +9,7 @@ import vars.knowledgebase.LinkRealizationDAO;
 import vars.knowledgebase.LinkTemplateDAO;
 import vars.knowledgebase.MediaDAO;
 import vars.knowledgebase.UsageDAO;
-import org.mbari.jpax.EAO;
+import org.mbari.jpaxx.EAO;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 

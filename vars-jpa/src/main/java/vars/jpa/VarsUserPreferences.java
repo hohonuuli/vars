@@ -12,7 +12,7 @@ import java.util.Collection;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import org.mbari.jpax.EAO;
+import org.mbari.jpaxx.EAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

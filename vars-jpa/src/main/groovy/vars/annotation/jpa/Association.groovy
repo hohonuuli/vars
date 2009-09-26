@@ -20,7 +20,7 @@ import vars.annotation.IAssociation
 import vars.annotation.IObservation
 import vars.jpa.JPAEntity
 import javax.persistence.EntityListeners
-import org.mbari.jpax.TransactionLogger
+import org.mbari.jpaxx.TransactionLogger
 import vars.jpa.KeyNullifier
 import vars.jpa.KeyNullifier
 import vars.EntitySupportCategory

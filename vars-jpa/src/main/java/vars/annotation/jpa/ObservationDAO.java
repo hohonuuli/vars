@@ -6,7 +6,7 @@ import vars.annotation.IObservation;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptName;
-import org.mbari.jpax.EAO;
+import org.mbari.jpaxx.EAO;
 
 import java.util.List;
 import java.util.Map;

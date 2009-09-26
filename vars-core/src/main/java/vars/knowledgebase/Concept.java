@@ -271,5 +271,9 @@ public interface Concept extends KnowledgebaseObject, ILazy {
      */
     void setStructureType(String structureType);
 
+    void setTaxonomyType(String taxonomyType);
+
+    String getTaxonomyType();
+
   
 }

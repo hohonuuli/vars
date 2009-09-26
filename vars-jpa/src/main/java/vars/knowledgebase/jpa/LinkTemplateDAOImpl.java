@@ -5,7 +5,7 @@ import vars.knowledgebase.LinkTemplate;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 import vars.jpa.DAO;
-import org.mbari.jpax.EAO;
+import org.mbari.jpaxx.EAO;
 
 import java.util.Collection;
 import java.util.Map;
@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.ArrayList;
 
 import com.google.inject.Inject;
-import org.mbari.jpax.NonManagedEAO;
+import org.mbari.jpaxx.NonManagedEAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

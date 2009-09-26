@@ -37,7 +37,7 @@ import java.util.List;
 import javax.swing.event.ListSelectionListener;
 import org.mbari.swingworker.SwingWorker;
 import vars.VARSException;
-import vars.query.IQueryDAO;
+import vars.query.QueryDAO;
 
 /**
  * <p><!-- Insert Description --></p>
@@ -47,7 +47,7 @@ import vars.query.IQueryDAO;
  */
 public class AdvancedStringValuePanel extends ValuePanel {
 
-    private final IQueryDAO queryDAO;
+    private final QueryDAO queryDAO;
 
     private JTextField textField;
     private JList list;
@@ -66,7 +66,7 @@ public class AdvancedStringValuePanel extends ValuePanel {
      * @param name
      */
     @Inject
-    public AdvancedStringValuePanel(String name, IQueryDAO queryDAO) {
+    public AdvancedStringValuePanel(String name, QueryDAO queryDAO) {
         super(name);
         this.queryDAO = queryDAO;
         listIcon = new ImageIcon(getClass().getResource("/images/vars/query/16px/table_view.png"));

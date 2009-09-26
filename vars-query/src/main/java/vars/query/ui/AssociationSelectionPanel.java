@@ -39,7 +39,7 @@ import vars.knowledgebase.ConceptNameTypes;
 import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.KnowledgebaseFactory;
-import vars.query.IQueryDAO;
+import vars.query.QueryDAO;
 import vars.query.SimpleConceptName;
 import vars.shared.ui.AllConceptNamesComboBox;
 
@@ -134,7 +134,7 @@ public class AssociationSelectionPanel extends JPanel {
 
     private final KnowledgebaseFactory knowledgebaseFactory;
     private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
-    private final IQueryDAO queryDAO;
+    private final QueryDAO queryDAO;
 
     //~--- constructors -------------------------------------------------------
 
@@ -143,7 +143,7 @@ public class AssociationSelectionPanel extends JPanel {
      */
     @Inject
     public AssociationSelectionPanel(KnowledgebaseDAOFactory knowledgebaseDAOFactory,
-            KnowledgebaseFactory knowledgebaseFactory, IQueryDAO queryDAO) {
+            KnowledgebaseFactory knowledgebaseFactory, QueryDAO queryDAO) {
         super();
         this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
         this.knowledgebaseFactory = knowledgebaseFactory;
@@ -230,7 +230,7 @@ public class AssociationSelectionPanel extends JPanel {
 	 */
     private AllConceptNamesComboBox getCbToConcept() {
         if (cbToConcept == null) {
-            cbToConcept = new AllConceptNamesComboBox(knowledgebaseDAOFactory.newConceptNameDAO());
+            cbToConcept = new AllConceptNamesComboBox(queryDAO);
             cbToConcept.addItem(nilConceptName);
             cbToConcept.addItem(selfConceptName);
         }

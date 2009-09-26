@@ -2,7 +2,7 @@ package vars.annotation.jpa;
 
 import vars.jpa.DAO;
 import vars.annotation.IPhysicalDataDAO;
-import org.mbari.jpax.EAO;
+import org.mbari.jpaxx.EAO;
 import com.google.inject.Inject;
 
 /**

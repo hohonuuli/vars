@@ -18,11 +18,9 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import java.util.ArrayList;
 import java.util.Collection;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.mbari.jpax.NonManagedEAO;
+
+import org.junit.*;
+import org.mbari.jpaxx.NonManagedEAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.jpa.DAO;
@@ -87,7 +85,7 @@ public class KBCrudTest {
     public void bigTest() {
         log.info("---------- TEST: bigTest ----------");
 
-        Concept c = testObjectFactory.makeObjectGraph("BIG-TEST", 2);
+        Concept c = testObjectFactory.makeObjectGraph("BIG-TEST", 4);
         ConceptDAO dao = daoFactory.newConceptDAO();
 
         log.info("KNOWLEDGEBASE TREE BEFORE TEST:\n" + entityUtilities.buildTextTree(c));
@@ -121,6 +119,7 @@ public class KBCrudTest {
     
 
     @Test
+    @Ignore
     public void incrementalBuildAndDeleteByConcept() {
 
         log.info("---------- TEST: incrementalBuildAndDeleteByConcept ----------");
@@ -201,6 +200,7 @@ public class KBCrudTest {
 
 
     @Test
+    @Ignore
     public void bottomUpDelete() {
 
         log.info("---------- TEST: bottomUpDelete ----------");

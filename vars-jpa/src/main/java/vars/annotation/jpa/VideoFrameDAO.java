@@ -3,7 +3,7 @@ package vars.annotation.jpa;
 import vars.jpa.DAO;
 import vars.annotation.IVideoFrameDAO;
 import vars.annotation.IVideoFrame;
-import org.mbari.jpax.EAO;
+import org.mbari.jpaxx.EAO;
 
 import java.util.Set;
 import java.util.Map;

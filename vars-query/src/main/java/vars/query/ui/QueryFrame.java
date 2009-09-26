@@ -42,7 +42,7 @@ import org.mbari.awt.event.ActionAdapter;
 import org.mbari.util.Dispatcher;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
-import vars.query.IQueryDAO;
+import vars.query.QueryDAO;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -139,7 +139,7 @@ public class QueryFrame extends JFrame {
 	 */
     private ActionMap actionMap = new ActionMap();
 
-    private final IQueryDAO queryDAO;
+    private final QueryDAO queryDAO;
     private final ConceptDAO conceptDAO;
 
     //~--- constructors -------------------------------------------------------
@@ -149,7 +149,7 @@ public class QueryFrame extends JFrame {
      * @throws HeadlessException
      */
     @Inject
-    public QueryFrame(KnowledgebaseDAOFactory knowledgebaseDAOFactory, IQueryDAO queryDAO) throws HeadlessException {
+    public QueryFrame(KnowledgebaseDAOFactory knowledgebaseDAOFactory, QueryDAO queryDAO) throws HeadlessException {
         super();
         this.conceptDAO = knowledgebaseDAOFactory.newConceptDAO();
         this.queryDAO = queryDAO;

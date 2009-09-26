@@ -18,7 +18,7 @@ import vars.knowledgebase.Media
 import vars.jpa.JPAEntity
 import vars.EntitySupportCategory
 import javax.persistence.EntityListeners;
-import org.mbari.jpax.TransactionLogger
+import org.mbari.jpaxx.TransactionLogger
 import vars.jpa.KeyNullifier
 import vars.jpa.KeyNullifier
 import javax.persistence.Transient
@@ -46,7 +46,7 @@ import javax.persistence.Transient
 public class GMedia implements Serializable, Media, JPAEntity {
 
     @Transient
-    private static final PROPS = Collections.unmodifiableList([IMedia.PROP_URL])
+    private static final PROPS = Collections.unmodifiableList([Media.PROP_URL])
 
     @Id
     @Column(name = "id", nullable = false, updatable=false)

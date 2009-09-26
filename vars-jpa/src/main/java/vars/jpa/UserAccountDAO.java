@@ -18,7 +18,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.mbari.jpax.EAO;
+import org.mbari.jpaxx.EAO;
 import vars.IUserAccount;
 import vars.IUserAccountDAO;
 

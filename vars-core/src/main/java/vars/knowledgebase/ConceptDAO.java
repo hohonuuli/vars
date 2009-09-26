@@ -20,8 +20,8 @@ public interface ConceptDAO extends IDAO {
     Collection<Concept> findAll();
 
     /**
-     * Lookup all @{link IConceptName}s objects that are associated with
-     * this {@link IConcept} and its children
+     * Lookup all @{link ConceptName}s objects that are associated with
+     * this {@link Concept} and its children
      *
      *
      * @param concept The concept whos descendant names are returne

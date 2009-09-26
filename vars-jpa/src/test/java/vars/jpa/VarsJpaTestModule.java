@@ -5,7 +5,7 @@ package vars.jpa;
  */
 public class VarsJpaTestModule extends VarsJpaModule {
     
-    private static final String puName = "vars-hibernate-development";
+    private static final String puName = "vars-hibernate-test";
 
     public VarsJpaTestModule() {
         super(puName, puName, puName);

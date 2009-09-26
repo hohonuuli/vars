@@ -19,7 +19,7 @@ import vars.knowledgebase.ConceptName
 import vars.jpa.JPAEntity
 import vars.EntitySupportCategory
 import javax.persistence.EntityListeners;
-import org.mbari.jpax.TransactionLogger
+import org.mbari.jpaxx.TransactionLogger
 import vars.jpa.KeyNullifier
 import vars.jpa.KeyNullifier
 import javax.persistence.Transient
@@ -87,7 +87,7 @@ public class GConceptName implements Serializable, ConceptName, JPAEntity {
     @Bindable
     String author
 
-    @ManyToOne(optional = false, targetEntity = GConcept.class)
+    @ManyToOne(optional = false, targetEntity = ConceptImpl.class)
     @JoinColumn(name = "ConceptID_FK")
     Concept concept
 
