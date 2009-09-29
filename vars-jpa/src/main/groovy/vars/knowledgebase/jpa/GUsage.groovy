@@ -77,7 +77,7 @@ class GUsage implements Serializable, Usage, JPAEntity {
     @Column(name = "Specification", length = 1000)
     String specification
 
-    @OneToOne(targetEntity = GConceptMetadata.class, optional = false)
+    @OneToOne(targetEntity = ConceptMetadataImpl.class, optional = false)
     @JoinColumn(name = "ConceptDelegateID_FK")
     ConceptMetadata conceptMetadata
 

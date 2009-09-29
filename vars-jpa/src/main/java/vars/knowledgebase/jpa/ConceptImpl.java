@@ -92,7 +92,7 @@ public class ConceptImpl implements Serializable, Concept, JPAEntity {
         mappedBy = "concept",
         fetch = FetchType.LAZY,
         cascade = { CascadeType.ALL },
-        targetEntity = GConceptMetadata.class
+        targetEntity = ConceptMetadataImpl.class
     )
     private ConceptMetadata conceptMetadata;
 
@@ -193,7 +193,7 @@ public class ConceptImpl implements Serializable, Concept, JPAEntity {
 
     public ConceptMetadata getConceptMetadata() {
         if (conceptMetadata == null) {
-            conceptMetadata = new GConceptMetadata();
+            conceptMetadata = new ConceptMetadataImpl();
         }
 
         return conceptMetadata;

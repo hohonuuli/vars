@@ -84,7 +84,7 @@ class GLinkRealization implements Serializable, LinkRealization, JPAEntity {
     @Column(name = "LinkValue", length = 255)
     String linkValue
 
-    @ManyToOne(optional = false, targetEntity = GConceptMetadata.class, cascade = CascadeType.ALL)
+    @ManyToOne(optional = false, targetEntity = ConceptMetadataImpl.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "ConceptDelegateID_FK")
     ConceptMetadata conceptMetadata
 

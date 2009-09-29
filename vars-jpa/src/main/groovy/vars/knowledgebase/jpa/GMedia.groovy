@@ -76,7 +76,7 @@ public class GMedia implements Serializable, Media, JPAEntity {
     @Column(name = "Caption", length = 1000)
     String caption
 
-    @ManyToOne(optional = false, targetEntity = GConceptMetadata.class)
+    @ManyToOne(optional = false, targetEntity = ConceptMetadataImpl.class)
     @JoinColumn(name = "ConceptDelegateID_FK")
     ConceptMetadata conceptMetadata
 

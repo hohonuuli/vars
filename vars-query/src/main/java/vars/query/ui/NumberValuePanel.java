@@ -71,7 +71,6 @@ public class NumberValuePanel extends ValuePanel {
 
     private final QueryDAO queryDAO;
 
-    private final String coalesceKey;
     
     //~--- constructors -------------------------------------------------------
 
@@ -81,10 +80,9 @@ public class NumberValuePanel extends ValuePanel {
      * @param name
      */
     @Inject
-    public NumberValuePanel(String name, QueryDAO queryDAO, String coalesceKey) {
+    public NumberValuePanel(String name, QueryDAO queryDAO) {
         super(name);
         this.queryDAO = queryDAO;
-        this.coalesceKey = coalesceKey;
         initialize();
     }
 
@@ -252,10 +250,6 @@ public class NumberValuePanel extends ValuePanel {
                         protected Object doInBackground() throws Exception {
                             try {
                                 queryResults = queryDAO.executeQuery(sql);
-                                // Coallese down some rows. Usually by ObservationID_FK
-                                if (coalesceKey != null) {
-                                    queryResults.coalesce(coalesceKey);
-                                }
                             } catch (Exception e1) {
                                 // TODO Log exception to EventBus
                                 log.error("An error occurred while executing the SQL statement: '" + sql + "'", e1);

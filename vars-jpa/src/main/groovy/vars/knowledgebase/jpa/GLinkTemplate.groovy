@@ -74,7 +74,7 @@ class GLinkTemplate implements Serializable, LinkTemplate, JPAEntity {
     @Column(name = "LinkValue", length = 255)
     String linkValue
 
-    @ManyToOne(optional = false, targetEntity = GConceptMetadata.class)
+    @ManyToOne(optional = false, targetEntity = ConceptMetadataImpl.class)
     @JoinColumn(name = "ConceptDelegateID_FK")
     ConceptMetadata conceptMetadata
 

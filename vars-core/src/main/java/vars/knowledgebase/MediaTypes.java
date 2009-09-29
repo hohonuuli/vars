@@ -20,4 +20,11 @@ public enum MediaTypes {
     public String getType() {
         return type;
     }
+
+    @Override
+    public String toString() {
+        return type;
+    }
+
+
 }

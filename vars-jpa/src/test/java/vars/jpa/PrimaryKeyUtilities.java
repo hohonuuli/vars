@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptMetadata;
 import vars.knowledgebase.jpa.ConceptImpl;
-import vars.knowledgebase.jpa.GConceptMetadata;
+import vars.knowledgebase.jpa.ConceptMetadataImpl;
 import vars.knowledgebase.jpa.GConceptName;
 import vars.knowledgebase.jpa.GHistory;
 import vars.knowledgebase.jpa.GLinkRealization;
@@ -122,7 +122,7 @@ public class PrimaryKeyUtilities {
             {
                 put(ConceptImpl.class, new ArrayList());
                 put(GConceptName.class, new ArrayList());
-                put(GConceptMetadata.class, new ArrayList());
+                put(ConceptMetadataImpl.class, new ArrayList());
                 put(GHistory.class, new ArrayList());
                 put(GLinkRealization.class, new ArrayList());
                 put(GLinkTemplate.class, new ArrayList());
@@ -173,9 +173,9 @@ public class PrimaryKeyUtilities {
         map.get(ConceptImpl.class).add(new Long(c.getId()));
         map.get(GConceptName.class).addAll(primaryKeys(concept.getConceptNames()));
 
-        ConceptMetadata metadata = (GConceptMetadata) concept.getConceptMetadata();
+        ConceptMetadata metadata = (ConceptMetadataImpl) concept.getConceptMetadata();
         JPAEntity cm = (JPAEntity) metadata;
-        map.get(GConceptMetadata.class).add(cm.getId());
+        map.get(ConceptMetadataImpl.class).add(cm.getId());
         map.get(GHistory.class).addAll(primaryKeys(metadata.getHistories()));
         map.get(GLinkRealization.class).addAll(primaryKeys(metadata.getLinkRealizations()));
         map.get(GLinkTemplate.class).addAll(primaryKeys(metadata.getLinkTemplates()));

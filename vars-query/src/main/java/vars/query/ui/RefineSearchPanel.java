@@ -193,8 +193,6 @@ public class RefineSearchPanel extends JPanel {
 
     private final QueryDAO queryDAO;
 
-    private final String coalesceKey;
-
     /**
      * This is the default constructor
      */
@@ -203,8 +201,6 @@ public class RefineSearchPanel extends JPanel {
         super();
         constraintNames = Arrays.asList(stringConstraints);
         this.queryDAO = queryDAO;
-        ResourceBundle bundle = ResourceBundle.getBundle("query-app");
-        coalesceKey = bundle.getString("queryresults.coalesce.key");
         initialize();
     }
     //~--- methods ------------------------------------------------------------
@@ -379,7 +375,7 @@ public class RefineSearchPanel extends JPanel {
         } else if (type.equals("java.lang.Boolean")) {
             valuePanel = new BooleanValuePanel(name);
         } else {
-            valuePanel = new NumberValuePanel(name, queryDAO, coalesceKey);
+            valuePanel = new NumberValuePanel(name, queryDAO);
         }
 
         if (DEFAULT_RETURNS.contains(name)) {

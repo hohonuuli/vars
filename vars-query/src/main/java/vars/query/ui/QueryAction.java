@@ -17,6 +17,7 @@ package vars.query.ui;
 import vars.query.IQueryable;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.ResourceBundle;
 import javax.swing.SwingUtilities;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.sql.QueryResults;
@@ -115,6 +116,8 @@ public class QueryAction extends ActionAdapter {
     private boolean showFullPhylogeny;
     private boolean showHierarchy;
 
+    private final String coalesceKey;
+
     /**
          * @uml.property  name="thread"
          */
@@ -149,6 +152,9 @@ public class QueryAction extends ActionAdapter {
         this.showHierarchy = showHiearchy;
         this.showBasicPhylogeny = showBasicPhylogeny;
         this.showFullPhylogeny = showFullPhylogeny;
+
+        ResourceBundle bundle = ResourceBundle.getBundle("query-app");
+        coalesceKey = bundle.getString("queryresults.coalesce.key");
     }
 
     /**
@@ -212,7 +218,7 @@ public class QueryAction extends ActionAdapter {
                 QueryResults queryResults = null;
                 try {
                     queryResults = queryable.executeQuery(query);
-                    queryResults.coalesce(query);
+                    queryResults.coalesce(coalesceKey);
 
                     if (showHierarchy) {
                         queryResultsDecorator.addHierarchy(queryResults);
@@ -284,6 +290,7 @@ public class QueryAction extends ActionAdapter {
      *
      * @param  listener Description of the Parameter
      */
+    @Override
     public synchronized void removePropertyChangeListener(PropertyChangeListener listener) {
         changeSupport2.removePropertyChangeListener(listener);
     }

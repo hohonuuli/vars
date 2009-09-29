@@ -127,7 +127,7 @@ class GHistory implements Serializable, History, JPAEntity {
     @Column(name = "Rejected")
     private Short rejected = 0
 
-    @ManyToOne(optional = false, targetEntity = GConceptMetadata.class)
+    @ManyToOne(optional = false, targetEntity = ConceptMetadataImpl.class)
     @JoinColumn(name = "ConceptDelegateID_FK")
     ConceptMetadata conceptMetadata
 
