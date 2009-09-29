@@ -1,7 +1,7 @@
 package vars.jpa;
 
 import vars.MiscFactory;
-import vars.IUserAccount;
+import vars.UserAccount;
 
 /**
  * Created by IntelliJ IDEA.
@@ -12,7 +12,7 @@ import vars.IUserAccount;
  */
 public class MiscFactoryImpl implements MiscFactory {
 
-    public IUserAccount newUserAccount() {
+    public UserAccount newUserAccount() {
         return new GUserAccount();
     }
 }

@@ -8,7 +8,7 @@ import com.google.inject.Guice;
 import vars.jpa.VarsJpaTestModule;
 import vars.jpa.EntityUtilities;
 import vars.annotation.AnnotationFactory;
-import vars.annotation.IVideoArchiveSet;
+import vars.annotation.VideoArchiveSet;
 import vars.testing.AnnotationTestObjectFactory;
 
 /**
@@ -27,7 +27,7 @@ public class AnnoPojoTest {
         Injector injector = Guice.createInjector(new VarsJpaTestModule());
         AnnotationFactory af = injector.getInstance(AnnotationFactory.class);
         AnnotationTestObjectFactory factory = new AnnotationTestObjectFactory(af);
-        IVideoArchiveSet vas = factory.makeObjectGraph("BIG-TEST", 2);
+        VideoArchiveSet vas = factory.makeObjectGraph("BIG-TEST", 2);
 
         EntityUtilities eu = new EntityUtilities(null);
         log.info("ANNOTATION TREE FOR toString TEST:\n" + eu.buildTextTree(vas));

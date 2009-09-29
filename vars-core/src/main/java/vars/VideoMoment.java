@@ -8,40 +8,28 @@ package vars;
 import java.util.Date;
 
 /**
- * Bean class for holding Dates and timecodes. This is analagous to a
- * videoframe's information
+ * Represents a moment of time on a videotape
  * @author brian
  */
-public class VideoMoment implements IVideoMoment {
+public interface VideoMoment {
 
-    private final String timecode;
-    private final String alternateTimecode;
-    private final Date recordedDate;
+    String TIMECODE_INVALID = "--:--:--:--";
 
-    public VideoMoment(Date recordedDate, String timecode, String alternateTimecode) {
-        this.timecode = timecode;
-        this.alternateTimecode = alternateTimecode;
-        this.recordedDate = recordedDate;
-    }
+    /**
+     *
+     * @return The timecode for this moment
+     */
+    String getTimecode();
 
-    public String getAlternateTimecode() {
-        return alternateTimecode;
-    }
+    /**
+     * @return The alternate timecode for this moment
+     */
+    String getAlternateTimecode();
 
-    public Date getRecordedDate() {
-        return recordedDate;
-    }
-
-    public String getTimecode() {
-        return timecode;
-    }
-
-    @Override
-    public String toString() {
-        return "VideoMoment[recordedDate=" + recordedDate + ", timecode=" + timecode +
-                ", alternateTimecode=" + alternateTimecode + "]";
-    }
-
-
+    /**
+     * The date that this videoframe was actually recorded
+     * @return
+     */
+    Date getRecordedDate();
 
 }

@@ -56,23 +56,23 @@ public class ExternalDataDaoExpdImpl implements ExternalDataDAO {
     }};
 
     /**
-     * Filter for google-collections to remove {@link IVideoMoment} with
+     * Filter for google-collections to remove {@link VideoMoment} with
      * null timecodes
      */
-    private final Predicate<IVideoMoment> nonNullTimecodePredicate = new Predicate<IVideoMoment>() {
+    private final Predicate<VideoMoment> nonNullTimecodePredicate = new Predicate<VideoMoment>() {
         @Override
-        public boolean apply(IVideoMoment arg0) {
+        public boolean apply(VideoMoment arg0) {
             return arg0.getTimecode() != null;
         }
     };
 
     /**
-     * Filter for google-collections to remove {@link IVideoMoment} with
+     * Filter for google-collections to remove {@link VideoMoment} with
      * null alternateTimecodes
      */
-    private final Predicate<IVideoMoment> nonNullAlternateTimecodePredicate = new Predicate<IVideoMoment>() {
+    private final Predicate<VideoMoment> nonNullAlternateTimecodePredicate = new Predicate<VideoMoment>() {
         @Override
-        public boolean apply(IVideoMoment arg0) {
+        public boolean apply(VideoMoment arg0) {
             return arg0.getAlternateTimecode() != null;
         }
     };
@@ -105,16 +105,16 @@ public class ExternalDataDaoExpdImpl implements ExternalDataDAO {
      * @return The HD Timcode closest to the Date. <b>null</b> is returned if no
      *      timcode is found within the tolerance bounds
      */
-    public IVideoMoment findTimecodeNearDate(String platform, Date date, int millisecTolerance) {
+    public VideoMoment findTimecodeNearDate(String platform, Date date, int millisecTolerance) {
 
-        List<IVideoMoment> tapeTimes = findTimecodesNearDate(platform, date, millisecTolerance);
+        List<VideoMoment> tapeTimes = findTimecodesNearDate(platform, date, millisecTolerance);
 
         /*
          * Find the nearest time to our date
          */
-        IVideoMoment nearestDateTimecode = null;
+        VideoMoment nearestDateTimecode = null;
         long dtMin = Long.MAX_VALUE;
-        for (IVideoMoment tapeTime : tapeTimes) {
+        for (VideoMoment tapeTime : tapeTimes) {
             Date d = tapeTime.getRecordedDate();
             long dt = Math.abs(d.getTime() - date.getTime());
             if (dt < dtMin) {
@@ -126,13 +126,13 @@ public class ExternalDataDaoExpdImpl implements ExternalDataDAO {
         return nearestDateTimecode;
     }
 
-    public List<IVideoMoment> findTimecodesNearDate(String platform, Date date, int millisecTolerance) {
+    public List<VideoMoment> findTimecodesNearDate(String platform, Date date, int millisecTolerance) {
 
         /*
          * Retrive HDTimecode and GMT from the EXPD Database and store in a
          * map for us to work with later.
          */
-        List<IVideoMoment> dateTimecodes = new ArrayList<IVideoMoment>();
+        List<VideoMoment> dateTimecodes = new ArrayList<VideoMoment>();
         String table = platform + "CamlogData";    // TODO map platforms to table names
         Date startDate = new Date(date.getTime() - millisecTolerance);
         Date endDate = new Date(date.getTime() + millisecTolerance);
@@ -158,7 +158,7 @@ public class ExternalDataDaoExpdImpl implements ExternalDataDAO {
                               "\n\tTimecode:           " + timecode + "\n\tAlternate Timecode: " + alternateTimecode);
                 }
 
-                dateTimecodes.add(new VideoMoment(rovDate, timecode, alternateTimecode));
+                dateTimecodes.add(new VideoMomentBean(rovDate, timecode, alternateTimecode));
             }
 
             resultSet.close();
@@ -211,28 +211,28 @@ public class ExternalDataDaoExpdImpl implements ExternalDataDAO {
      * @param frameRate The Frame rate to use. At MBARI, we use NTSC (29.97 fps)
      * @return The interpolated tape time value.
      */
-    public IVideoMoment interpolateTimecodeByDate(String cameraIdentifier, Date date, int millisecTolerance,
+    public VideoMoment interpolateTimecodeByDate(String cameraIdentifier, Date date, int millisecTolerance,
             double frameRate) {
 
         /*
          * Retrieve the tapetimes and sort by date
          */
-        List<IVideoMoment> videoTimes = findTimecodesNearDate(cameraIdentifier, date, millisecTolerance);
+        List<VideoMoment> videoTimes = findTimecodesNearDate(cameraIdentifier, date, millisecTolerance);
 
-        IVideoMoment returnTapeTime = null;
+        VideoMoment returnTapeTime = null;
         if (videoTimes.size() > 1) {
 
             /*
              * Extract the dates and timecodes (as frames) for interpolation
              */
             Timecode timecode = null;
-            List<IVideoMoment> nonNullTimecodes = new ArrayList<IVideoMoment>(Collections2.filter(videoTimes,
+            List<VideoMoment> nonNullTimecodes = new ArrayList<VideoMoment>(Collections2.filter(videoTimes,
                 nonNullTimecodePredicate));
             Collections.sort(nonNullTimecodes, new VideoMomentByDateComparator());
             BigDecimal[] dates = new BigDecimal[nonNullTimecodes.size()];
             BigDecimal[] frames = new BigDecimal[nonNullTimecodes.size()];
             for (int i = 0; i < nonNullTimecodes.size(); i++) {
-                IVideoMoment tapeTime = nonNullTimecodes.get(i);
+                VideoMoment tapeTime = nonNullTimecodes.get(i);
                 dates[i] = new BigDecimal(tapeTime.getRecordedDate().getTime());
                 Timecode tc = new Timecode(tapeTime.getTimecode(), frameRate);
                 frames[i] = new BigDecimal(tc.getFrames());
@@ -248,14 +248,14 @@ public class ExternalDataDaoExpdImpl implements ExternalDataDAO {
              * Extract the dates and alternateTimecodes as frames for interpolation
              */
             Timecode alternateTimecode = null;
-            List<IVideoMoment> nonNullAltTimecodes = new ArrayList<IVideoMoment>(Collections2.filter(videoTimes,
+            List<VideoMoment> nonNullAltTimecodes = new ArrayList<VideoMoment>(Collections2.filter(videoTimes,
                 nonNullAlternateTimecodePredicate));
             Collections.sort(nonNullAltTimecodes, new VideoMomentByDateComparator());
             dates = new BigDecimal[nonNullAltTimecodes.size()];
             frames = new BigDecimal[nonNullAltTimecodes.size()];
 
             for (int i = 0; i < nonNullAltTimecodes.size(); i++) {
-                IVideoMoment tapeTime = nonNullAltTimecodes.get(i);
+                VideoMoment tapeTime = nonNullAltTimecodes.get(i);
                 dates[i] = new BigDecimal(tapeTime.getRecordedDate().getTime());
                 Timecode tc = new Timecode(tapeTime.getTimecode(), frameRate);
                 frames[i] = new BigDecimal(tc.getFrames());
@@ -270,9 +270,9 @@ public class ExternalDataDaoExpdImpl implements ExternalDataDAO {
             /*
              * Interpolate to the new frame
              */
-            String tc = (timecode == null) ? IVideoMoment.TIMECODE_INVALID : timecode.toString();
-            String altTc = (alternateTimecode == null) ? IVideoMoment.TIMECODE_INVALID : alternateTimecode.toString();
-            returnTapeTime = new VideoMoment(date, tc, altTc);
+            String tc = (timecode == null) ? VideoMoment.TIMECODE_INVALID : timecode.toString();
+            String altTc = (alternateTimecode == null) ? VideoMoment.TIMECODE_INVALID : alternateTimecode.toString();
+            returnTapeTime = new VideoMomentBean(date, tc, altTc);
         }
 
         return returnTapeTime;

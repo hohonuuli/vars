@@ -12,10 +12,28 @@
   <name>vars-knowledgebase [Library]</name>
   <dependencies>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
+      <groupId>org.mbari</groupId>
+      <artifactId>mbarix4j</artifactId>
+      <version>1.7</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>vars-redux</groupId>
+      <artifactId>vars-core</artifactId>
+      <version>${project.version}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>vars-redux</groupId>
+      <artifactId>vars-shared-ui</artifactId>
+      <version>${project.version}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>vars-redux</groupId>
+      <artifactId>vars-jpa</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
     </dependency>
   </dependencies>
 </project>

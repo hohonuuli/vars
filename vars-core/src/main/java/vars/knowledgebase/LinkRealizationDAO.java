@@ -1,7 +1,7 @@
 package vars.knowledgebase;
 
-import vars.IConceptNameValidator;
-import vars.IDAO;
+import vars.ConceptNameValidator;
+import vars.DAO;
 
 import java.util.Collection;
 
@@ -12,7 +12,7 @@ import java.util.Collection;
  * Time: 3:08:26 PM
  * To change this template use File | Settings | File Templates.
  */
-public interface LinkRealizationDAO extends IDAO, IConceptNameValidator<LinkRealization> {
+public interface LinkRealizationDAO extends DAO, ConceptNameValidator<LinkRealization> {
 
     Collection<LinkRealization> findAllByLinkName();
 

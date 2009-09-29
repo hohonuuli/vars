@@ -1,12 +1,7 @@
 package vars.annotation.jpa;
 
-import vars.annotation.AnnotationFactory;
-import vars.annotation.IAssociation;
-import vars.annotation.IObservation;
-import vars.annotation.IVideoFrame;
-import vars.annotation.IVideoArchive;
-import vars.annotation.IVideoArchiveSet;
-import vars.annotation.ICameraDeployment;
+import vars.annotation.*;
+
 
 /**
  * Created by IntelliJ IDEA.
@@ -17,32 +12,32 @@ import vars.annotation.ICameraDeployment;
  */
 public class AnnotationFactoryImpl implements AnnotationFactory {
 
-    public IAssociation newAssociation() {
-        return new Association();
+    public Association newAssociation() {
+        return new GAssociation();
     }
 
-    public IAssociation newAssociation(String linkName, String toConcept, String linkValue) {
-        return new Association(linkName, toConcept, linkValue);
+    public Association newAssociation(String linkName, String toConcept, String linkValue) {
+        return new GAssociation(linkName, toConcept, linkValue);
     }
 
-    public IObservation newObservation() {
-        return new Observation();
+    public Observation newObservation() {
+        return new GObservation();
     }
 
-    public IVideoFrame newVideoFrame() {
-        return new VideoFrame();
+    public VideoFrame newVideoFrame() {
+        return new GVideoFrame();
     }
 
-    public IVideoArchive newVideoArchive() {
-        return new VideoArchive();
+    public VideoArchive newVideoArchive() {
+        return new GVideoArchive();
     }
 
-    public IVideoArchiveSet newVideoArchiveSet() {
-        return new VideoArchiveSet();
+    public VideoArchiveSet newVideoArchiveSet() {
+        return new GVideoArchiveSet();
     }
 
-    public ICameraDeployment newCameraDeployment() {
-        return new CameraDeployment();
+    public CameraDeployment newCameraDeployment() {
+        return new GCameraDeployment();
     }
 
 }

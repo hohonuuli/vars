@@ -37,4 +37,9 @@ public enum FormatCodes {
     public char getCode() {
         return code;
     }
+
+    @Override
+    public String toString() {
+        return String.valueOf(code);
+    }
 }

@@ -64,7 +64,7 @@ public class ExternalDataDaoExpdTest {
         }
 
         for (TimecodeBean b : beans) {
-            IVideoMoment videoMoment = dao.findTimecodeNearDate(b.platform, b.date, millisecTolerance);
+            VideoMoment videoMoment = dao.findTimecodeNearDate(b.platform, b.date, millisecTolerance);
             Timecode tc = new Timecode(videoMoment.getAlternateTimecode(), framerate);
             double dt = Math.abs(tc.diffFrames(b.timecode));
             log.debug("EXPECTED: " + b.timecode + " FOUND: " + tc);

@@ -1,7 +1,6 @@
 package vars.jpa;
 
-import vars.MiscDAOFactory;
-import vars.IUserAccountDAO;
+import vars.*;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.mbari.jpaxx.EAO;
@@ -22,7 +21,7 @@ public class MiscDAOFactoryImpl implements MiscDAOFactory {
         this.eao = eao;
     }
 
-    public IUserAccountDAO newUserAccountDAO() {
-        return new UserAccountDAO(eao);
+    public vars.UserAccountDAO newUserAccountDAO() {
+        return new UserAccountDAOImpl(eao);
     }
 }

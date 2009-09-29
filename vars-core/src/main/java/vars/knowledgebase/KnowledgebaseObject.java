@@ -1,6 +1,6 @@
 package vars.knowledgebase;
 
-import vars.IVARSObject;
+import vars.VARSObject;
 
 /**
  * Created by IntelliJ IDEA.
@@ -9,5 +9,5 @@ import vars.IVARSObject;
  * Time: 1:31:28 PM
  * To change this template use File | Settings | File Templates.
  */
-public interface KnowledgebaseObject extends IVARSObject {
+public interface KnowledgebaseObject extends VARSObject {
 }

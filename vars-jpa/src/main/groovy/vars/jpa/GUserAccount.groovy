@@ -3,8 +3,8 @@ package vars.jpa;
 import javax.persistence.Column;
 import javax.persistence.Version;
 import java.sql.Timestamp
-import vars.IUserAccount
-import vars.IRole
+import vars.UserAccount
+import vars.Role
 import javax.persistence.Transient
 import javax.persistence.Entity
 import javax.persistence.Table
@@ -36,10 +36,10 @@ import org.mbari.jpaxx.TransactionLogger;
     @NamedQuery(name = "UserAccount.findByRole",
                 query = "SELECT c FROM UserAccount c WHERE c.role LIKE :role")
 ])
-public class GUserAccount implements Serializable, IUserAccount, JPAEntity {
+public class GUserAccount implements Serializable, UserAccount, JPAEntity {
 
     @Transient
-    private static final PROPS = Collections.unmodifiableList([IUserAccount.PROP_USER_NAME])
+    private static final PROPS = Collections.unmodifiableList([UserAccount.PROP_USER_NAME])
 
     @Id
     @Column(name = "id", nullable = false, updatable = false)

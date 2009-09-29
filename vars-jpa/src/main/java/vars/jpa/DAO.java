@@ -1,6 +1,5 @@
 package vars.jpa;
 
-import vars.IDAO;
 import vars.VARSPersistenceException;
 import org.mbari.jpaxx.EAO;
 import com.google.inject.Inject;
@@ -10,7 +9,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Persistence service implementation for use in Java SE environments
  */
-public class DAO implements IDAO {
+public class DAO implements vars.DAO {
 
     private final EAO eao;
 

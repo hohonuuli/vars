@@ -1,6 +1,6 @@
 package vars.knowledgebase;
 
-import vars.IDAO;
+import vars.DAO;
 
 /**
  * Created by IntelliJ IDEA.
@@ -9,5 +9,5 @@ import vars.IDAO;
  * Time: 3:14:34 PM
  * To change this template use File | Settings | File Templates.
  */
-public interface UsageDAO extends IDAO {
+public interface UsageDAO extends DAO {
 }

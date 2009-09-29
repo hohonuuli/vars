@@ -20,10 +20,10 @@ public interface ExternalDataDAO {
     /**
      * Interpolate a timecode based on a given date. I
      */
-    IVideoMoment interpolateTimecodeByDate(String cameraIdentifier, Date date, int millisecTolerance, double frameRate);
+    VideoMoment interpolateTimecodeByDate(String cameraIdentifier, Date date, int millisecTolerance, double frameRate);
 
-    List<IVideoMoment> findTimecodesNearDate(String platform, Date date, int millisecTolerance);
+    List<VideoMoment> findTimecodesNearDate(String platform, Date date, int millisecTolerance);
 
-    IVideoMoment findTimecodeNearDate(String platform, Date date, int millisecTolerance);
+    VideoMoment findTimecodeNearDate(String platform, Date date, int millisecTolerance);
 
 }

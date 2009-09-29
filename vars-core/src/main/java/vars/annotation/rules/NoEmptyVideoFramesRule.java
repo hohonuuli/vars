@@ -1,8 +1,8 @@
 package vars.annotation.rules;
 
-import vars.IPersistenceRule;
-import vars.annotation.IVideoArchive;
-import vars.annotation.IVideoFrame;
+import vars.PersistenceRule;
+import vars.annotation.VideoArchive;
+import vars.annotation.VideoFrame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,19 +11,19 @@ import java.util.Collection;
 /**
  * A rule the removes empty videoFrames (i.e. it contains no observations) from your VideoArchive
  */
-public class NoEmptyVideoFramesRule implements IPersistenceRule<IVideoArchive> {
+public class NoEmptyVideoFramesRule implements PersistenceRule<VideoArchive> {
 
     public final Logger log = LoggerFactory.getLogger(getClass());
 
-    public IVideoArchive apply(IVideoArchive object) {
+    public VideoArchive apply(VideoArchive object) {
 
-        Collection<? extends IVideoFrame> videoFrames = object.getEmptyVideoFrames();
+        Collection<? extends VideoFrame> videoFrames = object.getEmptyVideoFrames();
 
         if (videoFrames.size() > 0) {
             log.warn("Removing " + videoFrames.size() + " empty videoframes from " + object);
         }
 
-        for (IVideoFrame vf : videoFrames) {
+        for (VideoFrame vf : videoFrames) {
             object.removeVideoFrame(vf);
         }
 

@@ -1,15 +1,7 @@
 package vars.annotation.jpa;
 
-import vars.annotation.AnnotationFactory;
-import vars.annotation.AnnotationDAOFactory;
-import vars.annotation.IAssociationDAO;
-import vars.annotation.ICameraDataDAO;
-import vars.annotation.ICameraDeploymentDAO;
-import vars.annotation.IObservationDAO;
-import vars.annotation.IPhysicalDataDAO;
-import vars.annotation.IVideoArchiveDAO;
-import vars.annotation.IVideoArchiveSetDAO;
-import vars.annotation.IVideoFrameDAO;
+import vars.annotation.CameraDataDAO;
+import vars.annotation.*;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import org.mbari.jpaxx.EAO;
 import com.google.inject.Inject;
@@ -37,36 +29,36 @@ public class AnnotationDAOFactoryImpl implements AnnotationDAOFactory {
         this.kbFactory = knowledgebaseDAOFactory;
     }
 
-    public IAssociationDAO newAssociationDAO() {
-        return new AssociationDAO(eao, kbFactory.newConceptDAO());
+    public AssociationDAO newAssociationDAO() {
+        return new AssociationDAOImpl(eao, kbFactory.newConceptDAO());
     }
 
-    public ICameraDataDAO newCameraDataDAO() {
-        return new CameraDataDAO(eao);
+    public CameraDataDAO newCameraDataDAO() {
+        return new CameraDataDAOImpl(eao);
     }
 
-    public ICameraDeploymentDAO newCameraDeploymentDAO() {
-        return new CameraDeploymentDAO(eao);
+    public CameraDeploymentDAO newCameraDeploymentDAO() {
+        return new CameraDeploymentDAOImpl(eao);
     }
 
-    public IObservationDAO newObservationDAO() {
-        return new ObservationDAO(eao, kbFactory.newConceptDAO());
+    public ObservationDAO newObservationDAO() {
+        return new ObservationDAOImpl(eao, kbFactory.newConceptDAO());
     }
 
-    public IPhysicalDataDAO newPhysicalDataDAO() {
-        return new PhysicalDataDAO(eao);
+    public PhysicalDataDAO newPhysicalDataDAO() {
+        return new PhysicalDataDAOImpl(eao);
     }
 
-    public IVideoArchiveDAO newVideoArchiveDAO() {
-        return new VideoArchiveDAO(eao, annotationFactory);
+    public VideoArchiveDAO newVideoArchiveDAO() {
+        return new VideoArchiveDAOImpl(eao, annotationFactory);
     }
 
-    public IVideoArchiveSetDAO newVideoArchiveSetDAO() {
-        return new VideoArchiveSetDAO(eao, newVideoArchiveDAO());
+    public VideoArchiveSetDAO newVideoArchiveSetDAO() {
+        return new VideoArchiveSetDAOImpl(eao, newVideoArchiveDAO());
     }
 
-    public IVideoFrameDAO newVideoFrameDAO() {
-        return new VideoFrameDAO(eao);
+    public VideoFrameDAO newVideoFrameDAO() {
+        return new VideoFrameDAOImpl(eao);
     }
 
 }

@@ -23,4 +23,8 @@ public enum CameraDirections {
         return direction;
     }
 
+    @Override
+    public String toString() {
+        return direction;
+    }
 }

@@ -19,16 +19,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import vars.annotation.IVideoArchive;
-import vars.annotation.IVideoFrame;
-import vars.annotation.jpa.Association;
-import vars.annotation.jpa.CameraData;
-import vars.annotation.jpa.CameraDeployment;
-import vars.annotation.jpa.Observation;
-import vars.annotation.jpa.PhysicalData;
-import vars.annotation.jpa.VideoArchive;
-import vars.annotation.jpa.VideoArchiveSet;
-import vars.annotation.jpa.VideoFrame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.knowledgebase.Concept;
@@ -41,6 +31,11 @@ import vars.knowledgebase.jpa.GLinkRealization;
 import vars.knowledgebase.jpa.GLinkTemplate;
 import vars.knowledgebase.jpa.GMedia;
 import vars.knowledgebase.jpa.GUsage;
+import vars.annotation.VideoArchiveSet;
+import vars.annotation.VideoArchive;
+import vars.annotation.VideoFrame;
+import vars.annotation.Observation;
+import vars.annotation.jpa.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -140,26 +135,26 @@ public class PrimaryKeyUtilities {
         Map<Class, Collection> map = new HashMap<Class, Collection>() {
 
             {
-                put(VideoArchiveSet.class, new ArrayList());
-                put(CameraDeployment.class, new ArrayList());
-                put(VideoArchive.class, new ArrayList());
-                put(VideoFrame.class, new ArrayList());
-                put(PhysicalData.class, new ArrayList());
-                put(CameraData.class, new ArrayList());
-                put(Observation.class, new ArrayList());
-                put(Association.class, new ArrayList());
+                put(GVideoArchiveSet.class, new ArrayList());
+                put(GCameraDeployment.class, new ArrayList());
+                put(GVideoArchive.class, new ArrayList());
+                put(GVideoFrame.class, new ArrayList());
+                put(GPhysicalData.class, new ArrayList());
+                put(GCameraData.class, new ArrayList());
+                put(GObservation.class, new ArrayList());
+                put(GAssociation.class, new ArrayList());
             }
         };
 
-        map.get(VideoArchiveSet.class).add(videoArchiveSet.getId());
-        map.get(CameraDeployment.class).addAll(primaryKeys(videoArchiveSet.getCameraDeployments()));
+        map.get(GVideoArchiveSet.class).add(((JPAEntity) videoArchiveSet).getId());
+        map.get(GCameraDeployment.class).addAll(primaryKeys(videoArchiveSet.getCameraDeployments()));
 
-        Collection<IVideoArchive> videoArchives = videoArchiveSet.getVideoArchives();
+        Collection<VideoArchive> videoArchives = videoArchiveSet.getVideoArchives();
 
-        map.get(VideoArchive.class).addAll(primaryKeys(videoArchives));
+        map.get(GVideoArchive.class).addAll(primaryKeys(videoArchives));
 
-        for (IVideoArchive va : videoArchives) {
-            for (IVideoFrame videoFrame : va.getVideoFrames()) {
+        for (VideoArchive va : videoArchives) {
+            for (VideoFrame videoFrame : va.getVideoFrames()) {
                 primaryKeyMap((VideoFrame) videoFrame, map);
             }
         }
@@ -190,15 +185,15 @@ public class PrimaryKeyUtilities {
     }
 
     private static void primaryKeyMap(VideoFrame videoFrame, Map<Class, Collection> map) {
-        map.get(VideoFrame.class).add(videoFrame.getId());
-        map.get(PhysicalData.class).add(((JPAEntity) videoFrame.getPhysicalData()).getId());
-        map.get(PhysicalData.class).add(((JPAEntity) videoFrame.getPhysicalData()).getId());
+        map.get(GVideoFrame.class).add(((JPAEntity) videoFrame).getId());
+        map.get(GPhysicalData.class).add(((JPAEntity) videoFrame.getPhysicalData()).getId());
+        map.get(GPhysicalData.class).add(((JPAEntity) videoFrame.getPhysicalData()).getId());
 
         Collection obs = videoFrame.getObservations();
 
-        map.get(Observation.class).add(primaryKeys(obs));
+        map.get(GObservation.class).add(primaryKeys(obs));
 
-        Collection ass = map.get(Association.class);
+        Collection ass = map.get(GAssociation.class);
 
         for (Object o : obs) {
             Observation observation = (Observation) o;

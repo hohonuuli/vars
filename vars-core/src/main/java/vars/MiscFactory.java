@@ -8,5 +8,5 @@ package vars;
  * To change this template use File | Settings | File Templates.
  */
 public interface MiscFactory {
-    IUserAccount newUserAccount();
+    UserAccount newUserAccount();
 }

@@ -9,13 +9,13 @@ package vars.annotation;
  */
 public interface AnnotationDAOFactory {
 
-    IAssociationDAO newAssociationDAO();
-    ICameraDataDAO newCameraDataDAO();
-    ICameraDeploymentDAO newCameraDeploymentDAO();
-    IObservationDAO newObservationDAO();
-    IPhysicalDataDAO newPhysicalDataDAO();
-    IVideoFrameDAO newVideoFrameDAO();
-    IVideoArchiveDAO newVideoArchiveDAO();
-    IVideoArchiveSetDAO newVideoArchiveSetDAO();
+    AssociationDAO newAssociationDAO();
+    CameraDataDAO newCameraDataDAO();
+    CameraDeploymentDAO newCameraDeploymentDAO();
+    ObservationDAO newObservationDAO();
+    PhysicalDataDAO newPhysicalDataDAO();
+    VideoFrameDAO newVideoFrameDAO();
+    VideoArchiveDAO newVideoArchiveDAO();
+    VideoArchiveSetDAO newVideoArchiveSetDAO();
 
 }

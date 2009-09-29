@@ -1,6 +1,6 @@
 package vars.knowledgebase;
 
-import vars.IDAO;
+import vars.DAO;
 
 import java.util.Collection;
 
@@ -11,7 +11,7 @@ import java.util.Collection;
  * Time: 2:59:37 PM
  * To change this template use File | Settings | File Templates.
  */
-public interface ConceptDAO extends IDAO {
+public interface ConceptDAO extends DAO {
 
     Concept findByName(String name);
 

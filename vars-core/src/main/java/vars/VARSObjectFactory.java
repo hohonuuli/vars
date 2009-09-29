@@ -1,6 +1,6 @@
 package vars;
 
-import vars.IUserAccount;
+import vars.UserAccount;
 
 /**
  * Created by IntelliJ IDEA.
@@ -13,5 +13,5 @@ public interface VARSObjectFactory {
 
     /* --- Misc --- */
 
-    IUserAccount newUserAccount();
+    UserAccount newUserAccount();
 }

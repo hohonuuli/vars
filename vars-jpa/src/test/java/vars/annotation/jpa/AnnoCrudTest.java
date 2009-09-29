@@ -1,10 +1,6 @@
 package vars.annotation.jpa;
 
 import vars.testing.AnnotationTestObjectFactory;
-import vars.annotation.AnnotationFactory;
-import vars.annotation.IVideoArchiveSet;
-import vars.annotation.IVideoArchiveSetDAO;
-import vars.annotation.AnnotationDAOFactory;
 import vars.jpa.VarsJpaTestModule;
 import vars.jpa.EntityUtilities;
 import vars.jpa.JPAEntity;
@@ -18,12 +14,9 @@ import org.junit.Before;
 import org.mbari.jpaxx.NonManagedEAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.IDAO;
-import vars.annotation.IAssociation;
-import vars.annotation.ICameraDeployment;
-import vars.annotation.IObservation;
-import vars.annotation.IVideoArchive;
-import vars.annotation.IVideoFrame;
+import vars.DAO;
+import vars.annotation.Observation;
+import vars.annotation.*;
 
 
 /**
@@ -54,14 +47,14 @@ public class AnnoCrudTest {
     public void bigTest() {
 
         log.info("---------- TEST: bigTest ----------");
-        IVideoArchiveSet vas = testObjectFactory.makeObjectGraph("BIG-TEST", 2);
-        IVideoArchiveSetDAO dao = daoFactory.newVideoArchiveSetDAO();
+        VideoArchiveSet vas = testObjectFactory.makeObjectGraph("BIG-TEST", 2);
+        VideoArchiveSetDAO dao = daoFactory.newVideoArchiveSetDAO();
         EntityUtilities eu = new EntityUtilities(eao);
         log.info("ANNOTATION TREE BEFORE TEST:\n" + eu.buildTextTree(vas));
         vas = dao.makePersistent(vas);
         Long vasKey = ((JPAEntity) vas).getId();
         Assert.assertNotNull("Primary Key [ID] was not set!", vasKey);
-        vas = dao.findByPrimaryKey(vas.getClass(), ((VideoArchiveSet) vas).getId());
+        vas = dao.findByPrimaryKey(vas.getClass(), ((JPAEntity) vas).getId());
         log.info("ANNOTATION TREE AFTER INSERT:\n" + eu.buildTextTree(vas));
         vas = dao.makeTransient(vas);
         log.info("KNOWLEDGEBASE TREE AFTER DELETE:\n" + eu.buildTextTree(vas));
@@ -74,27 +67,27 @@ public class AnnoCrudTest {
     public void bottomUpDelete() {
 
         log.info("---------- TEST: bottomUpDelete ----------");
-        IVideoArchiveSet vas = testObjectFactory.makeObjectGraph("BIG-TEST", 2);
-        IDAO dao = daoFactory.newVideoArchiveSetDAO();
+        VideoArchiveSet vas = testObjectFactory.makeObjectGraph("BIG-TEST", 2);
+        DAO dao = daoFactory.newVideoArchiveSetDAO();
         vas = dao.makePersistent(vas);
 
         // Gather all the objects
-        Collection<IVideoArchive> videoArchives = new ArrayList<IVideoArchive>(vas.getVideoArchives());
+        Collection<VideoArchive> videoArchives = new ArrayList<VideoArchive>(vas.getVideoArchives());
 
-        Collection<IVideoFrame> videoFrames = new ArrayList<IVideoFrame>(vas.getVideoFrames());
+        Collection<VideoFrame> videoFrames = new ArrayList<VideoFrame>(vas.getVideoFrames());
 
-        Collection<IObservation> observations = new ArrayList<IObservation>();
-        for (IVideoFrame videoFrame : videoFrames) {
+        Collection<Observation> observations = new ArrayList<Observation>();
+        for (VideoFrame videoFrame : videoFrames) {
             observations.addAll(videoFrame.getObservations());
         }
 
-        Collection<IAssociation> associations = new ArrayList<IAssociation>();
-        for (IObservation observation : observations) {
+        Collection<Association> associations = new ArrayList<Association>();
+        for (Observation observation : observations) {
             associations.addAll(observation.getAssociations());
         }
 
         // Start deleting
-        for (IAssociation association : associations) {
+        for (Association association : associations) {
             association.getObservation().removeAssociation(association);
             association = dao.makeTransient(association);
         }
@@ -102,21 +95,21 @@ public class AnnoCrudTest {
         EntityUtilities eu = new EntityUtilities(eao);
         log.info("KNOWLEDGEBASE TREE AFTER ASSOCIATION DELETE:\n" + eu.buildTextTree(vas));
 
-        for (IObservation observation : observations) {
+        for (Observation observation : observations) {
             observation.getVideoFrame().removeObservation(observation);
             observation = dao.makeTransient(observation);
 
         }
         log.info("KNOWLEDGEBASE TREE AFTER OBSERVATION DELETE:\n" + eu.buildTextTree(vas));
 
-        for (IVideoFrame videoFrame : videoFrames) {
+        for (VideoFrame videoFrame : videoFrames) {
             videoFrame.getVideoArchive().removeVideoFrame(videoFrame);
             videoFrame = dao.makeTransient(videoFrame);
 
         }
         log.info("KNOWLEDGEBASE TREE AFTER VIDEOFRAME DELETE:\n" + eu.buildTextTree(vas));
 
-        for (IVideoArchive videoArchive : videoArchives) {
+        for (VideoArchive videoArchive : videoArchives) {
             videoArchive.getVideoArchiveSet().removeVideoArchive(videoArchive);
             videoArchive = dao.makeTransient(videoArchive);
 
@@ -126,7 +119,7 @@ public class AnnoCrudTest {
         vas = dao.findByPrimaryKey(vas.getClass(), ((JPAEntity) vas).getId());
         log.info("KNOWLEDGEBASE TREE AFTER DATABASE LOOKUP:\n" + eu.buildTextTree(vas));
 
-        for(ICameraDeployment cameraDeployment : vas.getCameraDeployments()) {
+        for(CameraDeployment cameraDeployment : vas.getCameraDeployments()) {
             cameraDeployment.getVideoArchiveSet().removeCameraDeployment(cameraDeployment);
             cameraDeployment = dao.makeTransient(cameraDeployment);
             break;

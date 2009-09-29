@@ -12,18 +12,18 @@ public interface AnnotationFactory {
 
     /* --- Annotation --- */
 
-    IAssociation newAssociation();
+    Association newAssociation();
 
-    IAssociation newAssociation(String linkName, String toConcept, String linkValue);
+    Association newAssociation(String linkName, String toConcept, String linkValue);
 
-    IObservation newObservation();
+    Observation newObservation();
 
-    IVideoFrame newVideoFrame();
+    VideoFrame newVideoFrame();
 
-    IVideoArchive newVideoArchive();
+    VideoArchive newVideoArchive();
 
-    IVideoArchiveSet newVideoArchiveSet();
+    VideoArchiveSet newVideoArchiveSet();
 
-    ICameraDeployment newCameraDeployment();
+    CameraDeployment newCameraDeployment();
     
 }

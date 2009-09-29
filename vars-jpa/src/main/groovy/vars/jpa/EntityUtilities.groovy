@@ -1,8 +1,9 @@
 package vars.jpa
 
 import org.mbari.jpaxx.NonManagedEAO
-import vars.annotation.IVideoArchiveSet
+import vars.annotation.VideoArchiveSet
 import vars.knowledgebase.Concept
+import vars.annotation.VideoArchiveSet
 
 /**
  * Created by IntelliJ IDEA.
@@ -23,7 +24,7 @@ class EntityUtilities {
     /**
      * Builds a text tree of the videoArchiveSet
      */
-    def buildTextTree(IVideoArchiveSet videoArchiveSet) {
+    def buildTextTree(VideoArchiveSet videoArchiveSet) {
         def s = "${videoArchiveSet}\n"
 
         videoArchiveSet.cameraDeployments.each { cd ->

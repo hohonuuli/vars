@@ -1,6 +1,6 @@
 package vars.knowledgebase;
 
-import vars.IDAO;
+import vars.DAO;
 
 import java.util.Set;
 
@@ -11,7 +11,7 @@ import java.util.Set;
  * Time: 3:07:36 PM
  * To change this template use File | Settings | File Templates.
  */
-public interface HistoryDAO extends IDAO {
+public interface HistoryDAO extends DAO {
 
     Set<History> findPendingHistories();
 

@@ -1,11 +1,10 @@
 package vars.knowledgebase;
 
 import java.util.Collection;
-import vars.IDAO;
+import vars.DAO;
 
 
-
-public interface ConceptNameDAO extends IDAO {
+public interface ConceptNameDAO extends DAO {
 
     /**
      * Retrives all conceptnames actually used in annotations. This query

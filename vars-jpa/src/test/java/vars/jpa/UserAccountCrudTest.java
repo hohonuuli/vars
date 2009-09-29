@@ -8,11 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.inject.Injector;
 import com.google.inject.Guice;
-import vars.MiscFactory;
-import vars.MiscDAOFactory;
-import vars.IUserAccount;
-import vars.UserAccountRoles;
-import vars.IDAO;
+import vars.UserAccount;
+import vars.*;
+import vars.DAO;
 
 /**
  * Created by IntelliJ IDEA.
@@ -42,12 +40,12 @@ public class UserAccountCrudTest {
     public void basicCrud() {
         log.info("---------- TEST: basicCrud ----------");
         String testString = "test";
-        IUserAccount userAccount = miscFactory.newUserAccount();
+        UserAccount userAccount = miscFactory.newUserAccount();
         userAccount.setPassword(testString);
         log.info("Password '" + testString + "' encrypted as '" + userAccount.getPassword() + "'");
         userAccount.setUserName(testString);
         userAccount.setRole(UserAccountRoles.ADMINISTRATOR.getRoleName());
-        IDAO dao = daoFactory.newUserAccountDAO();
+        DAO dao = daoFactory.newUserAccountDAO();
         dao.makePersistent(userAccount);
         Assert.assertNotNull(((JPAEntity) userAccount).getId());
 

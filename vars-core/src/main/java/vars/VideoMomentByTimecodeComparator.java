@@ -11,9 +11,9 @@ import java.util.Comparator;
  *
  * @author brian
  */
-public class VideoMomentByTimecodeComparator implements Comparator<IVideoMoment> {
+public class VideoMomentByTimecodeComparator implements Comparator<VideoMoment> {
 
-    public int compare(IVideoMoment o1, IVideoMoment o2) {
+    public int compare(VideoMoment o1, VideoMoment o2) {
         return o1.getTimecode().compareTo(o2.getTimecode());
     }
 

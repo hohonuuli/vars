@@ -5,16 +5,8 @@ import org.mbari.movie.Timecode;
 import java.text.NumberFormat;
 import java.util.Date;
 
-import vars.annotation.AnnotationFactory;
-import vars.annotation.IVideoArchiveSet;
-import vars.annotation.FormatCodes;
-import vars.annotation.IVideoArchive;
-import vars.annotation.ICameraDeployment;
-import vars.annotation.IVideoFrame;
-import vars.annotation.IPhysicalData;
-import vars.annotation.ICameraData;
-import vars.annotation.IObservation;
-import vars.annotation.IAssociation;
+import vars.annotation.VideoFrame;
+import vars.annotation.*;
 
 /**
  * Factory for generating prepopulated annotation objects for use in Unit tests
@@ -51,13 +43,13 @@ public class AnnotationTestObjectFactory {
                 + nf.format(frame));
     }
 
-    public IVideoArchiveSet makeVideoArchiveSet() {
+    public VideoArchiveSet makeVideoArchiveSet() {
          // VideoArchiveSet represents a collection of Related Tapes
         String trackingNumber = randomNumber(0, 10000) + ""; // what is this?
         String shipName = "TEST";
         String platformName = "TEST";
         char formatCode = FormatCodes.DETAILED.getCode();
-        IVideoArchiveSet vas = factory.newVideoArchiveSet();
+        VideoArchiveSet vas = factory.newVideoArchiveSet();
         vas.setTrackingNumber(trackingNumber);
         vas.setShipName(shipName);
         vas.setPlatformName(platformName);
@@ -68,25 +60,25 @@ public class AnnotationTestObjectFactory {
         return vas;
     }
 
-    public IVideoArchive makeVideoArchive() {
+    public VideoArchive makeVideoArchive() {
         //      An VideoArchive represents a single Tape
         String name = "T" + Integer.valueOf((int) randomNumber(1, 1500000));
         // 1-based not 0-based
         Timecode timeCode = makeTimecode();
-        IVideoArchive va = factory.newVideoArchive();
+        VideoArchive va = factory.newVideoArchive();
         va.setStartTimecode(timeCode.toString());
         va.setName(name);
         return va;
     }
 
-    public ICameraDeployment makeCameraPlatformDeployment() {
+    public CameraDeployment makeCameraPlatformDeployment() {
         //      CameraPlatformDeployment describes the Camera platform.
         int seqNumber = (int) randomNumber(1, 3000); // Dive Number
         Date start = new Date(randomNumber(0, TEST_EPOCH));
         // Start of Dive in epic seconds
         Date end = new Date(randomNumber(TEST_EPOCH, (new Date().getTime())));
         // End of Dive in epic seconds
-        ICameraDeployment cd = factory.newCameraDeployment();
+        CameraDeployment cd = factory.newCameraDeployment();
         cd.setChiefScientistName("MBARI Scientest");
         cd.setStartDate(start);
         cd.setEndDate(end);
@@ -94,19 +86,19 @@ public class AnnotationTestObjectFactory {
         return cd;
     }
 
-    public IVideoFrame makeVideoFrame() {
+    public VideoFrame makeVideoFrame() {
         
         //		An annotation represents desriptions of a Frame
         long recordedEpoch = randomNumber(TEST_EPOCH, new Date().getTime());
         // UTC time in epic seconds of Frame.
-        IVideoFrame videoFrame = factory.newVideoFrame();
+        VideoFrame videoFrame = factory.newVideoFrame();
         videoFrame.setRecordedDate(new Date(recordedEpoch));
         videoFrame.setTimecode(makeTimecode().toString());
         videoFrame.setInSequence(true);
         videoFrame.setAlternateTimecode(makeTimecode().toString());
 
         // Populate the physicalData
-        IPhysicalData physicalData = videoFrame.getPhysicalData();
+        PhysicalData physicalData = videoFrame.getPhysicalData();
         physicalData.setDepth(new Float(randomNumber(0, 90000) / 100F));
         physicalData.setLatitude(new Float(randomNumber(0, 9000) / 100F));
         physicalData.setLongitude(new Float(randomNumber(0, -18000) / 100F));
@@ -116,7 +108,7 @@ public class AnnotationTestObjectFactory {
         physicalData.setTemperature(new Float(randomNumber(30000, 150000) / 10000F));
 
         // populate the cameraData
-        ICameraData camera = videoFrame.getCameraData();
+        CameraData camera = videoFrame.getCameraData();
         camera.setName("Test");
         camera.setDirection("cruise");
         camera.setFieldWidth(new Double(randomNumber(0, 100)));
@@ -128,8 +120,8 @@ public class AnnotationTestObjectFactory {
         return videoFrame;
     }
 
-    public IObservation makeObservation(String conceptName) {
-        IObservation observation = factory.newObservation();
+    public Observation makeObservation(String conceptName) {
+        Observation observation = factory.newObservation();
         observation.setObserver("Testy the Tester");
         observation.setConceptName(conceptName);
         observation.setObservationDate(new Date());
@@ -137,48 +129,48 @@ public class AnnotationTestObjectFactory {
         return observation;
     }
 
-    public IAssociation makeAssociation() {
+    public Association makeAssociation() {
         //      An association associaties an Observatoin or Association with
         // Another Object
-        IAssociation association = factory.newAssociation();
+        Association association = factory.newAssociation();
         association.setLinkName("pop-count");
         association.setLinkValue(randomNumber(1, 1000) + "");
         association.setToConcept("nil");
         return association;
     }
 
-    public  IVideoArchiveSet makeObjectGraph(String prefix) {
+    public VideoArchiveSet makeObjectGraph(String prefix) {
 	    return makeObjectGraph(prefix, 2);
 	}
 
-    public IVideoArchiveSet makeObjectGraph(String prefix, int depth) {
+    public VideoArchiveSet makeObjectGraph(String prefix, int depth) {
 
-           IVideoArchiveSet vas = makeVideoArchiveSet();
+           VideoArchiveSet vas = makeVideoArchiveSet();
            String shortPrefix = prefix;
            vas.setShipName(shortPrefix);
            vas.setPlatformName(shortPrefix);
 
            for (int n = 0; n < depth; n++) {
 
-               IVideoArchive va = makeVideoArchive();
+               VideoArchive va = makeVideoArchive();
                va = makeVideoArchive();
                vas.addVideoArchive(va);
 
                for (int i = 0; i < depth; i++) {
-                   ICameraDeployment cpd = makeCameraPlatformDeployment();
+                   CameraDeployment cpd = makeCameraPlatformDeployment();
                    cpd.setChiefScientistName(prefix + "_scientist_" + n + "_" + i);
                    vas.addCameraDeployment(cpd);
                }
 
                for (int i = 0; i < depth; i++) {
-                   IVideoFrame vf = makeVideoFrame();
+                   VideoFrame vf = makeVideoFrame();
                    va.addVideoFrame(vf);
 
                    for (int j = 0; j < depth; j++) {
-                       IObservation obs = makeObservation(prefix + "_observation_" + n + "_" + i + "_" + j);
+                       Observation obs = makeObservation(prefix + "_observation_" + n + "_" + i + "_" + j);
                        vf.addObservation(obs);
                        for (int k = 0; k < depth; k++) {
-                           IAssociation a = makeAssociation();
+                           Association a = makeAssociation();
                            a.setLinkName(prefix);
                            a.setLinkValue(n + "_" + i + "_" + j + "_" + k);
                            obs.addAssociation(a);
