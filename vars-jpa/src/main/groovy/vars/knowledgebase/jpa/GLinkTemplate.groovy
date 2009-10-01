@@ -78,7 +78,8 @@ class GLinkTemplate implements Serializable, LinkTemplate, JPAEntity {
     @JoinColumn(name = "ConceptDelegateID_FK")
     ConceptMetadata conceptMetadata
 
-    public String getFromConcept() {
+
+   public String getFromConcept() {
         return conceptMetadata.concept.primaryConceptName.name
     }
 
@@ -102,4 +103,6 @@ class GLinkTemplate implements Serializable, LinkTemplate, JPAEntity {
     int hashCode() {
         return EntitySupportCategory.hashCode(this, PROPS)
     }
+
+ 
 }

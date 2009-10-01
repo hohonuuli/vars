@@ -37,15 +37,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.mbari.swing.SearchableComboBoxModel;
 import vars.ILink;
-import vars.knowledgebase.ConceptNameTypes;
-import vars.knowledgebase.Concept;
-import vars.knowledgebase.ConceptDAO;
-import vars.knowledgebase.ConceptName;
-import vars.knowledgebase.LinkTemplateDAO;
 import vars.query.QueryDAO;
 import vars.query.LinkBean;
-import vars.query.SimpleConcept;
-import vars.query.SimpleConceptName;
+import vars.knowledgebase.*;
+import vars.knowledgebase.SimpleConceptNameBean;
 import vars.shared.ui.HierachicalConceptNameComboBox;
 
 //~--- classes ----------------------------------------------------------------
@@ -60,14 +55,14 @@ public class LinkTemplateSelectionPanel extends JPanel {
      *
      */
     private static final long serialVersionUID = 3736494989429665881L;
-    private static final Concept selfConcept = new SimpleConcept(
-        new SimpleConceptName(ILink.VALUE_SELF, ConceptNameTypes.PRIMARY.toString()));
+    private static final Concept selfConcept = new SimpleConceptBean(
+        new SimpleConceptNameBean(ILink.VALUE_SELF, ConceptNameTypes.PRIMARY.toString()));
     private static final ILink nilLinkTemplate = new LinkBean(
         ConceptConstraints.WILD_CARD_STRING,
         ConceptConstraints.WILD_CARD_STRING,
         ConceptConstraints.WILD_CARD_STRING);
-    private static final Concept nilConcept = new SimpleConcept(
-        new SimpleConceptName(
+    private static final Concept nilConcept = new SimpleConceptBean(
+        new SimpleConceptNameBean(
             ConceptConstraints.WILD_CARD_STRING,
             ConceptNameTypes.PRIMARY.toString()));
     private static final Logger log = LoggerFactory.getLogger(LinkTemplateSelectionPanel.class);
@@ -462,8 +457,8 @@ public class LinkTemplateSelectionPanel extends JPanel {
                  * In case the database lookup fails will create a Concept objecdt
                  * so that the GUI continues to function in a predicatable manner
                  */
-                toConcept = new SimpleConcept();
-                ConceptName conceptName = new SimpleConceptName(ILink.VALUE_NIL, ConceptNameTypes.PRIMARY.toString());
+                toConcept = new SimpleConceptBean();
+                ConceptName conceptName = new SimpleConceptNameBean(ILink.VALUE_NIL, ConceptNameTypes.PRIMARY.toString());
                 conceptName.setName(ConceptConstraints.WILD_CARD_STRING);
                 conceptName.setNameType(ConceptNameTypes.PRIMARY.toString());
                 toConcept.addConceptName(conceptName);

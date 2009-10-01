@@ -29,4 +29,14 @@ public interface ConceptDAO extends DAO {
      */
     Collection<ConceptName> findDescendentNames(Concept concept);
 
+
+    /**
+     * Get a Set of {@link Concept} objects from the specifed name on down to the end of
+     * the branches that starts at the concept with the specifiec name
+     *
+     * @param name The name of the concept
+     * @return A Set of {@link Concept} objects from the named one to the end of the branch.
+     * @throws DAOException
+     */
+    Collection<Concept> findDescendents(Concept concept);
 }

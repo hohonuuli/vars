@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
+import vars.VARSPersistenceException;
 
 /**
  * A rule the removes empty videoFrames (i.e. it contains no observations) from your VideoArchive
@@ -19,12 +20,8 @@ public class NoEmptyVideoFramesRule implements PersistenceRule<VideoArchive> {
 
         Collection<? extends VideoFrame> videoFrames = object.getEmptyVideoFrames();
 
-        if (videoFrames.size() > 0) {
-            log.warn("Removing " + videoFrames.size() + " empty videoframes from " + object);
-        }
-
-        for (VideoFrame vf : videoFrames) {
-            object.removeVideoFrame(vf);
+        if (videoFrames.size() == 0) {
+            throw new VARSPersistenceException(object + " does not contain any video frames. This is not allowed");
         }
 
         return object;

@@ -88,6 +88,14 @@ class GLinkRealization implements Serializable, LinkRealization, JPAEntity {
     @JoinColumn(name = "ConceptDelegateID_FK")
     ConceptMetadata conceptMetadata
 
+    def GLinkRealization() {}
+
+    def GLinkRealization(String linkName, String toConcept, String linkValue) {
+        this.linkName = linkName;
+        this.toConcept = toConcept;
+        this.linkValue = linkValue;
+    }
+
     public String getFromConcept() {
         return conceptMetadata?.concept.primaryConceptName.name
     }
@@ -112,4 +120,6 @@ class GLinkRealization implements Serializable, LinkRealization, JPAEntity {
     int hashCode() {
         return EntitySupportCategory.hashCode(this, PROPS)
     }
+
+
 }

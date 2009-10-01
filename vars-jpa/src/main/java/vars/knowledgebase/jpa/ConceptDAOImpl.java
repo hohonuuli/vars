@@ -96,6 +96,35 @@ public class ConceptDAOImpl extends DAO implements ConceptDAO {
         return getEAO().findByNamedQuery("Concept.findAll", params);
     }
 
+    public Collection<Concept> findDescendents(Concept concept) {
+        Collection<Concept> concepts = new ArrayList<Concept>();
+
+        EAO eao = getEAO();
+
+        // Do all lookup in a single transaction to account for lazy loading
+        NonManagedEAO nmEao = null;
+        if (eao instanceof NonManagedEAO) {
+            nmEao = (NonManagedEAO) eao;
+            nmEao.startTransaction();
+        }
+
+        Concept mergedConcept = eao.find(ConceptImpl.class, ((JPAEntity) concept).getId());
+        findDescendents(mergedConcept, concepts);
+
+        if (nmEao != null) {
+            nmEao.endTransaction();
+        }
+
+        return concepts;
+    }
+
+    private void findDescendents(Concept concept, Collection<Concept> concepts) {
+        concepts.add(concept);
+        for (Concept child : concept.getChildConcepts()) {
+            findDescendents(child, concepts);
+        }
+    }
+
 
 
 }

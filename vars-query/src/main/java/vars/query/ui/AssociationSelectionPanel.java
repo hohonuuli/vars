@@ -35,12 +35,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.mbari.swing.SearchableComboBoxModel;
 import vars.ILink;
-import vars.knowledgebase.ConceptNameTypes;
-import vars.knowledgebase.ConceptName;
-import vars.knowledgebase.KnowledgebaseDAOFactory;
-import vars.knowledgebase.KnowledgebaseFactory;
+import vars.knowledgebase.*;
 import vars.query.QueryDAO;
-import vars.query.SimpleConceptName;
+import vars.knowledgebase.SimpleConceptNameBean;
 import vars.shared.ui.AllConceptNamesComboBox;
 
 
@@ -59,9 +56,9 @@ public class AssociationSelectionPanel extends JPanel {
     private final Logger log = LoggerFactory.getLogger(AssociationSelectionPanel.class);
     private final LinkBean nilAssociationBean = new LinkBean(
         ILink.VALUE_NIL, ILink.VALUE_NIL, ILink.VALUE_NIL);
-    private final ConceptName nilConceptName = new SimpleConceptName(
+    private final ConceptName nilConceptName = new SimpleConceptNameBean(
         ILink.VALUE_NIL.toUpperCase(), ConceptNameTypes.PRIMARY.getName());
-    private final ConceptName selfConceptName = new SimpleConceptName(ILink.VALUE_SELF,
+    private final ConceptName selfConceptName = new SimpleConceptNameBean(ILink.VALUE_SELF,
         ConceptNameTypes.PRIMARY.getName());
 
     //~--- fields -------------------------------------------------------------

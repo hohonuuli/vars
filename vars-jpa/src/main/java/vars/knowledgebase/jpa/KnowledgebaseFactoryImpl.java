@@ -38,4 +38,5 @@ public class KnowledgebaseFactoryImpl implements KnowledgebaseFactory {
     public Usage newUsage() {
         return new GUsage();
     }
+
 }

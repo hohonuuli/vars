@@ -13,6 +13,10 @@
             <property name="hibernate.c3p0.max_statements" value="50"/>
             <property name="hibernate.c3p0.min_size" value="5"/>
             <property name="hibernate.c3p0.timeout" value="300"/>
+            <property name="hibernate.cache.provider_class" value="net.sf.ehcache.hibernate.SingletonEhCacheProvider"/>
+            <property name="hibernate.cache.use_query_cache" value="true"/>
+            <property name="hibernate.cache.use_second_level_cache" value="true"/>
+            <property name="hibernate.generate_statistics" value="true"/>
             <property name="hibernate.connection.driver_class" value="${PRODUCTION_JDBC_DRIVER}"/>
             <property name="hibernate.connection.password" value="${PRODUCTION_JDBC_PASSWORD}"/>
             <property name="hibernate.connection.url" value="${PRODUCTION_JDBC_URL}"/>
@@ -33,6 +37,10 @@
             <property name="hibernate.c3p0.max_statements" value="50"/>
             <property name="hibernate.c3p0.min_size" value="5"/>
             <property name="hibernate.c3p0.timeout" value="300"/>
+            <property name="hibernate.cache.provider_class" value="net.sf.ehcache.hibernate.SingletonEhCacheProvider"/>
+            <property name="hibernate.cache.use_query_cache" value="true"/>
+            <property name="hibernate.cache.use_second_level_cache" value="true"/>
+            <property name="hibernate.generate_statistics" value="true"/>
             <property name="hibernate.connection.driver_class" value="${DEVELOPMENT_JDBC_DRIVER}"/>
             <property name="hibernate.connection.password" value="${DEVELOPMENT_JDBC_PASSWORD}"/>
             <property name="hibernate.connection.url" value="${DEVELOPMENT_JDBC_URL}"/>
@@ -48,6 +56,7 @@
         <properties>
             <property name="hibernate.archive.autodetection" value="class"/>
             <property name="hibernate.dialect" value="org.hibernate.dialect.HSQLDialect" />
+            <property name="hibernate.cache.provider_class" value="net.sf.ehcache.hibernate.SingletonEhCacheProvider" />
             <property name="hibernate.connection.driver_class" value="org.hsqldb.jdbcDriver" />
             <property name="hibernate.connection.username" value="sa" />
             <property name="hibernate.connection.password" value="" />

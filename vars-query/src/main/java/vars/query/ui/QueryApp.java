@@ -36,7 +36,7 @@ import org.mbari.util.SystemUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
-import vars.query.AppModule;
+import vars.query.QueryModule;
 import vars.shared.ui.FatalErrorSubscriber;
 import vars.shared.ui.NonFatalErrorSubscriber;
 
@@ -137,7 +137,7 @@ public class QueryApp {
         Dispatcher dispatcher = Lookup.getGuiceInjectorDispatcher();
         Injector injector = (Injector) dispatcher.getValueObject();
         if (injector == null) {
-            injector = Guice.createInjector(new AppModule());
+            injector = Guice.createInjector(new QueryModule());
             dispatcher.setValueObject(injector);
         }
 

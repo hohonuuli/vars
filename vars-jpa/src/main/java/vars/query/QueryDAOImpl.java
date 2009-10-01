@@ -36,99 +36,41 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.ILink;
 import vars.VARSException;
+import vars.QueryableImpl;
 
 /**
  * DAO for use by the query app. This drops out of hibernate and uses a lot of
  * SQL internally for speed reasons.
  * @author brian
  */
-public class QueryDAOImpl implements QueryDAO {
+public class QueryDAOImpl extends QueryableImpl implements QueryDAO {
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
+    private static final String jdbcPassword;
+    private static final String jdbcUrl;
+    private static final String jdbcUsername;
+    private static final String jdbcDriver;
 
-    /**
-     * Standard format for all Dates. No timezone is displayed.
-     * THe date will be formatted for the UTC timezone
-     */
-    private final DateFormat dateFormatUTC = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss") {
-
-        {
-            setTimeZone(TimeZone.getTimeZone("UTC"));
-        }
-    };
-    private final ThreadLocal<Connection> connections = new ThreadLocal<Connection>();
-    private final String jdbcPassword;
-    private final String jdbcUrl;
-    private final String jdbcUsername;
+    static {
+        ResourceBundle bundle = ResourceBundle.getBundle("query-dao");
+        jdbcUrl = bundle.getString("jdbc.url");
+        jdbcUsername = bundle.getString("jdbc.username");
+        jdbcPassword = bundle.getString("jdbc.password");
+        jdbcDriver = bundle.getString("jdbc.driver");
+    }
 
     /**
      * Constructs ...
      */
     public QueryDAOImpl() {
-        ResourceBundle bundle = ResourceBundle.getBundle("query-dao");
-        jdbcUrl = bundle.getString("jdbc.url");
-        jdbcUsername = bundle.getString("jdbc.username");
-        jdbcPassword = bundle.getString("jdbc.password");
-
-        try {
-            Class.forName(bundle.getString("jdbc.driver"));
-        }
-        catch (ClassNotFoundException ex) {
-            throw new VARSException("Failed to initialize driver class:" + bundle.getString("jdbc.driver"), ex);
-        }
+        super(jdbcUrl, jdbcUsername, jdbcPassword, jdbcDriver);
     }
 
-    public QueryResults executeQuery(String sql) {
-
-        // Just wrap the QueryResults returned by the sql query with a QueryResults object
-        QueryFunction queryFunction = new QueryFunction() {
-
-            public Object apply(ResultSet resultsSet) throws SQLException {
-                return new QueryResults(resultsSet);
-            }
-        };
-
-        return (QueryResults) executeQueryFunction(sql, queryFunction);
-
-    }
-
-    private Object executeQueryFunction(String query, QueryFunction queryFunction) {
-
-        Object object = null;
-        Connection connection = null;
-        try {
-            connection = getConnection();
-            final Statement stmt = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-            ResultSet rs = stmt.executeQuery(query);
-            object = queryFunction.apply(rs);
-            rs.close();
-            stmt.close();
-            connection.close();
-        }
-        catch (Exception e) {
-            if (connection != null) {
-                log.error("Failed to execute the following SQL on EXPD:\n" + query, e);
-
-                try {
-                    connection.close();
-                }
-                catch (SQLException ex) {
-                    log.error("Failed to close database connection", ex);
-                }
-            }
-
-            throw new VARSException("Failed to execute the following SQL on EXPD: " + query, e);
-        }
-
-        return object;
-    }
 
     /**
      * Similar to findByConceptNames. However, this looksup all LinkTemplates rather
      * that Associations.
      *
      * @return A Collection of <code>AssociationBean</code>s
-     * @throws DAOException
      */
     public Collection<ILink> findAllLinkTemplates() {
 
@@ -198,7 +140,6 @@ public class QueryDAOImpl implements QueryDAO {
      * @return A collection of <code>AssociationBean</code>s representing the
      *  associations actually used to annotate Observations with the specifed
      *  conceptNames.
-     * @throws DAOException Thrown if the query fails.
      */
     public Collection<ILink> findByConceptNames(Collection<String> conceptNames) {
 
@@ -258,29 +199,12 @@ public class QueryDAOImpl implements QueryDAO {
         return (List<String>) executeQueryFunction(query, queryFunction);
     }
 
-    /**
-     * @return A {@link Connection} to the EXPD database. The connection should
-     *      be closed when you're done with it.
-     */
-    private Connection getConnection() throws SQLException {
-        Connection connection = connections.get();
-        if ((connection == null) || connection.isClosed()) {
-            if (log.isDebugEnabled()) {
-                log.debug("Opening JDBC connection:" + jdbcUsername + " @ " + jdbcUrl);
-            }
 
-            connection = DriverManager.getConnection(jdbcUrl, jdbcUsername, jdbcPassword);
-            connections.set(connection);
-        }
-
-        return connection;
-    }
 
     /**
      * Returns the count of unique columns found in the table for a given column
      * @param columnName
      * @return
-     * @throws DAOException
      */
     public Integer getCountOfUniqueValuesByColumn(String columnName) {
 
@@ -309,7 +233,6 @@ public class QueryDAOImpl implements QueryDAO {
      * @return A Map where key is the columns name as a String, value is the columns
      *  Object type as a String (e.g. "java.lang.String". (This would be the type returned by
      *  resultSet.getObject())
-     * @throws DAOException
      */
     public Map<String, String> getMetaData() {
 
@@ -337,14 +260,11 @@ public class QueryDAOImpl implements QueryDAO {
     }
 
     /**
-     * <p><!-- Method description --></p>
-     *
      *
      * @param columnName
      *
      * @return
      *
-     * @throws DAOException
      */
     public Collection<?> getUniqueValuesByColumn(String columnName) {
         String query = "SELECT DISTINCT " + columnName + " FROM Annotations WHERE " + columnName +
@@ -367,11 +287,5 @@ public class QueryDAOImpl implements QueryDAO {
 
     }
 
-    /**
-     * Simple function that does some unit of work with a ResultSet and returns
-     * a result.
-     */
-    private interface QueryFunction {
-        Object apply(ResultSet resultSet) throws SQLException;
-    }
+
 }

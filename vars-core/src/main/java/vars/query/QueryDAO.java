@@ -11,8 +11,7 @@ import java.util.Map;
 import vars.ILink;
 
 /**
- *
- * @author brian
+ * DAO used by the Query Application for special operations
  */
 public interface QueryDAO extends IQueryable {
 

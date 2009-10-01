@@ -21,7 +21,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import vars.query.AppModule;
+import vars.query.QueryModule;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -55,7 +55,7 @@ public class ConceptConstraintsPanelDemo extends JFrame {
      */
     public ConceptConstraintsPanelDemo() {
         super();
-        injector = Guice.createInjector(new AppModule());
+        injector = Guice.createInjector(new QueryModule());
         initialize();
     }
 

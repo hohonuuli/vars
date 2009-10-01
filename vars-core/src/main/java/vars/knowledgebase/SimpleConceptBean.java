@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package vars.query;
+package vars.knowledgebase;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -16,17 +16,17 @@ import vars.knowledgebase.ConceptName;
  *
  * @author brian
  */
-public class SimpleConcept implements Concept {
+public class SimpleConceptBean implements Concept {
 
     private Set<ConceptName> conceptNames = new HashSet<ConceptName>();
     private Set<Concept> childConcepts = new HashSet<Concept>();
 
     private Concept parentConcept;
 
-    public SimpleConcept() {
+    public SimpleConceptBean() {
     }
 
-    public SimpleConcept(ConceptName conceptName) {
+    public SimpleConceptBean(ConceptName conceptName) {
         conceptName.setNameType(ConceptNameTypes.PRIMARY.toString());
         addConceptName(conceptName);
     }
@@ -117,7 +117,7 @@ public class SimpleConcept implements Concept {
 
     public void removeChildConcept(Concept childConcept) {
         childConcepts.remove(childConcept);
-        ((SimpleConcept) childConcept).setParentConcept(null);
+        ((SimpleConceptBean) childConcept).setParentConcept(null);
     }
 
     public void removeConceptName(ConceptName conceptName) {

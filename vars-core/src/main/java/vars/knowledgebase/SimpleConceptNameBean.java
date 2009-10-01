@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package vars.query;
+package vars.knowledgebase;
 
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptName;
@@ -12,13 +12,13 @@ import vars.knowledgebase.ConceptName;
  *
  * @author brian
  */
-public class SimpleConceptName implements ConceptName {
+public class SimpleConceptNameBean implements ConceptName {
 
     private String name;
     private String nameType;
     private Concept concept;
 
-    public SimpleConceptName(String name, String nameType) {
+    public SimpleConceptNameBean(String name, String nameType) {
         this.name = name;
         this.nameType = nameType;
     }

@@ -8,7 +8,7 @@ package vars.query.ui;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.mbari.util.Dispatcher;
-import vars.query.AppModule;
+import vars.query.QueryModule;
 import vars.shared.ui.FatalErrorSubscriber;
 import vars.shared.ui.NonFatalErrorSubscriber;
 
@@ -48,7 +48,7 @@ public class Lookup {
         final Dispatcher dispatcher = Dispatcher.getDispatcher(KEY_DISPATCHER_GUICE_INJECTOR);
         Injector injector = (Injector) dispatcher.getValueObject();
         if (injector == null) {
-            injector = Guice.createInjector(new AppModule());
+            injector = Guice.createInjector(new QueryModule());
             dispatcher.setValueObject(injector);
         }
         return Dispatcher.getDispatcher(KEY_DISPATCHER_GUICE_INJECTOR);

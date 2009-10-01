@@ -10,6 +10,11 @@ public interface ILink {
     String PROP_TOCONCEPT = "toConcept";
     String VALUE_NIL = "nil";
     String VALUE_SELF = "self";
+    /**
+     * Delimiter for String representations
+     */
+    String DELIMITER = " | ";
+    String DELIMITER_REGEXP = " \\| ";
 
     String getFromConcept();
 

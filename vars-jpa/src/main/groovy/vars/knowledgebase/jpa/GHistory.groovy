@@ -26,6 +26,7 @@ import org.mbari.jpaxx.TransactionLogger
 import vars.jpa.KeyNullifier
 import vars.jpa.KeyNullifier
 import javax.persistence.Transient
+import vars.UserAccount
 
 /**
  * CREATE TABLE HISTORY (
@@ -136,6 +137,7 @@ class GHistory implements Serializable, History, JPAEntity {
     static {
         DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC")); 
     }
+
 
     boolean isAdd() {
         return ACTION_ADD.equalsIgnoreCase(action)

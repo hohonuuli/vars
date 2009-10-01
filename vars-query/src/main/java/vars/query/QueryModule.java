@@ -23,7 +23,7 @@ import vars.jpa.VarsJpaModule;
  *
  * @author brian
  */
-public class AppModule implements Module {
+public class QueryModule implements Module {
 
     public final Logger log = LoggerFactory.getLogger(getClass());
 
@@ -32,7 +32,7 @@ public class AppModule implements Module {
     private final String miscPersistenceUnit;
 
 
-    public AppModule() {
+    public QueryModule() {
         ResourceBundle bundle = ResourceBundle.getBundle("query-app");
         annotationPersistenceUnit = bundle.getString("annotation.persistence.unit");
         knowledgebasePersistenceUnit = bundle.getString("knowledgebase.persistence.unit");

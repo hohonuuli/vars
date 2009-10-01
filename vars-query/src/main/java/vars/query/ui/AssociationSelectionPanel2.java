@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import vars.ILink;
 import vars.knowledgebase.ConceptNameTypes;
 import vars.knowledgebase.ConceptName;
-import vars.query.SimpleConceptName;
+import vars.knowledgebase.SimpleConceptNameBean;
 
 /**
  *
@@ -23,9 +23,9 @@ public class AssociationSelectionPanel2 extends javax.swing.JPanel {
     private static final Logger log = LoggerFactory.getLogger(AssociationSelectionPanel2.class);
     private static final LinkBean nilAssociationBean = new LinkBean(
         ILink.VALUE_NIL, ILink.VALUE_NIL, ILink.VALUE_NIL);
-    private static final ConceptName nilConceptName = new SimpleConceptName(
+    private static final ConceptName nilConceptName = new SimpleConceptNameBean(
         ILink.VALUE_NIL.toUpperCase(), ConceptNameTypes.PRIMARY.toString());
-    private static final ConceptName selfConceptName = new SimpleConceptName(ILink.VALUE_SELF,
+    private static final ConceptName selfConceptName = new SimpleConceptNameBean(ILink.VALUE_SELF,
         ConceptNameTypes.PRIMARY.toString());
     
     /** Creates new form AssociationSelectionPanel2 */
