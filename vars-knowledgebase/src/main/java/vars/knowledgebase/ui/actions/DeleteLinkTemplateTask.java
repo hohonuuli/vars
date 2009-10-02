@@ -1,27 +1,27 @@
 package vars.knowledgebase.ui.actions;
 
+import java.awt.Frame;
 import javax.swing.JOptionPane;
 
+import org.bushe.swing.event.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.mbari.vars.dao.DAOException;
-import org.mbari.vars.knowledgebase.model.Concept;
-import org.mbari.vars.knowledgebase.model.LinkTemplate;
-import org.mbari.vars.knowledgebase.model.dao.ConceptDAO;
-import org.mbari.vars.util.AppFrameDispatcher;
-import vars.knowledgebase.IConcept;
+import vars.knowledgebase.LinkTemplate;
+import vars.knowledgebase.LinkTemplateDAO;
+import vars.knowledgebase.ui.Lookup;
 
 public class DeleteLinkTemplateTask {
 	
-    private static final Logger log = LoggerFactory.getLogger(DeleteLinkTemplateTask.class);
+    private final Logger log = LoggerFactory.getLogger(getClass());
+
+    private final LinkTemplateDAO linkTemplateDAO;
     
-    private DeleteLinkTemplateTask() {
-        // NO instantiation allowed
+    public DeleteLinkTemplateTask(LinkTemplateDAO linkTemplateDAO) {
+        this.linkTemplateDAO = linkTemplateDAO;
     }
     
-    public static boolean delete(final LinkTemplate linkTemplate) {
+    public boolean delete(final LinkTemplate linkTemplate) {
         boolean okToProceed = (linkTemplate != null);
-        final IConcept concept = linkTemplate.getConceptDelegate().getConcept();
 
         // TODO get count of associations and linkRealizations that use this template and notify user before delete
 
@@ -31,7 +31,8 @@ public class DeleteLinkTemplateTask {
          * Let the user know just how much damage their about to do to the database
          */
         if (okToProceed) {
-            final int option = JOptionPane.showConfirmDialog(AppFrameDispatcher.getFrame(), 
+            final Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
+            final int option = JOptionPane.showConfirmDialog(frame,
             		"Are you sure you want to delete '" + linkTemplate.stringValue() + 
             		"' ? Be aware that this will not effect existing annotations that use it.", 
                     "VARS - Delete LinkTemplate", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
@@ -43,13 +44,13 @@ public class DeleteLinkTemplateTask {
          */
         if (okToProceed) {
             try {
-            	concept.removeLinkTemplate(linkTemplate);
-                ConceptDAO.getInstance().update((Concept) concept);
+                linkTemplate.getConceptMetadata().removeLinkTemplate(linkTemplate);
+                linkTemplateDAO.makeTransient(linkTemplate);
             }
-            catch (DAOException e) {
+            catch (Exception e) {
                 final String msg = "Failed to delete '" + linkTemplate.stringValue() + "'";
                 log.error(msg, e);
-                AppFrameDispatcher.showErrorDialog(msg);
+                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, msg);
                 okToProceed = false;
             }
         }        

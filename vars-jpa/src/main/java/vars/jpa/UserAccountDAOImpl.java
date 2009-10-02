@@ -1,5 +1,5 @@
 /*
- * @(#)UserAccountDAOImpl.java   2009.09.02 at 04:26:52 PDT
+ * @(#)UserAccountDAOImpl.java   2009.10.01 at 04:47:44 PDT
  *
  * Copyright 2009 MBARI
  *
@@ -40,27 +40,25 @@ public class UserAccountDAOImpl extends DAO implements UserAccountDAO {
         super(eao);
     }
 
+    public Collection<UserAccount> findAll() {
+        return getEAO().findByNamedQuery("UserAccount.findAll", new HashMap<String, Object>());
+    }
+
     public Collection<UserAccount> findAllByFirstName(String firstName) {
         Map<String, Object> params = new HashMap<String, Object>();
-
         params.put("firstName", firstName);
-
         return getEAO().findByNamedQuery("UserAccount.findByFirstName", params);
     }
 
     public Collection<UserAccount> findAllByLastName(String lastName) {
         Map<String, Object> params = new HashMap<String, Object>();
-
         params.put("lastName", lastName);
-
         return getEAO().findByNamedQuery("UserAccount.findByLastName", params);
     }
 
     public Collection<UserAccount> findAllByRole(String role) {
         Map<String, Object> params = new HashMap<String, Object>();
-
         params.put("role", role);
-
         return getEAO().findByNamedQuery("UserAccount.findByRole", params);
     }
 
@@ -71,11 +69,8 @@ public class UserAccountDAOImpl extends DAO implements UserAccountDAO {
      */
     public UserAccount findByUserName(String userName) {
         Map<String, Object> params = new HashMap<String, Object>();
-
         params.put("userName", userName);
-
         List<UserAccount> accounts = getEAO().findByNamedQuery("UserAccount.findByUserName", params);
-
         return (accounts.size() == 0) ? null : accounts.get(0);
     }
 }

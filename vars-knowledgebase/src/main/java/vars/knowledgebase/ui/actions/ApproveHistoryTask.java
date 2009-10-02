@@ -27,6 +27,7 @@ import vars.LinkBean;
 import vars.ILink;
 import com.google.inject.Inject;
 import org.bushe.swing.event.EventBus;
+import vars.annotation.AnnotationDAOFactory;
 
 
 // ~--- classes ----------------------------------------------------------------
@@ -48,13 +49,17 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
     
     private final GenericApproveTask DEFAULT_TASK;
 
+    private final AnnotationDAOFactory annotationDAOFactory;
     private final KnowledgebaseDAO knowledgebaseDAO;
     private final KnowledgebaseFactory knowledgebaseFactory;
+    private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
     
     @Inject
-    public ApproveHistoryTask(KnowledgebaseDAOFactory knowledgebaseDAOFactory, KnowledgebaseDAO knowledgebaseDAO,
+    public ApproveHistoryTask(AnnotationDAOFactory annotationDAOFactory, KnowledgebaseDAOFactory knowledgebaseDAOFactory, KnowledgebaseDAO knowledgebaseDAO,
                               KnowledgebaseFactory knowledgebaseFactory) {
         super(knowledgebaseDAOFactory);
+        this.annotationDAOFactory = annotationDAOFactory;
+        this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
         this.knowledgebaseDAO = knowledgebaseDAO;
         this.knowledgebaseFactory = knowledgebaseFactory;
 
@@ -193,7 +198,10 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
             }
             
             if (concept != null) {
-                if (vars.knowledgebase.ui.actions.DeleteConceptTask.delete(concept)) {
+                vars.knowledgebase.ui.actions.DeleteConceptTask dct = 
+                        new vars.knowledgebase.ui.actions.DeleteConceptTask(knowledgebaseDAOFactory.newConceptDAO(),
+                        annotationDAOFactory.newObservationDAO());
+                if (dct.delete(concept)) {
                     super.approve(userAccount, history);
                 } else {
                     EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, "Failed to delete the concept, " +

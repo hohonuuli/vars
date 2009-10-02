@@ -1,15 +1,16 @@
 package vars.knowledgebase.ui.actions;
 
+import java.awt.Frame;
+import javax.swing.JOptionPane;
+import org.bushe.swing.event.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.mbari.vars.knowledgebase.model.LinkRealization;
-import org.mbari.vars.knowledgebase.model.dao.ConceptDAO;
-import org.mbari.vars.util.AppFrameDispatcher;
-import org.mbari.vars.dao.DAOException;
 
-import javax.swing.*;
-import org.mbari.vars.knowledgebase.model.Concept;
-import vars.knowledgebase.IConcept;
+
+import vars.knowledgebase.ConceptMetadata;
+import vars.knowledgebase.LinkRealization;
+import vars.knowledgebase.LinkRealizationDAO;
+import vars.knowledgebase.ui.Lookup;
 
 /**
  * @author brian
@@ -18,22 +19,23 @@ import vars.knowledgebase.IConcept;
  */
 public class DeleteLinkRealizationTask {
 
-    private static final Logger log = LoggerFactory.getLogger(DeleteLinkRealizationTask.class);
+    private  final Logger log = LoggerFactory.getLogger(getClass());
+    private final LinkRealizationDAO linkRealizationDAO;
 
-     private DeleteLinkRealizationTask() {
-        // NO instantiation allowed
+     public DeleteLinkRealizationTask(LinkRealizationDAO linkRealizationDAO) {
+         this.linkRealizationDAO = linkRealizationDAO;
     }
 
-    public static boolean delete(final LinkRealization linkRealization) {
+    public boolean delete(final LinkRealization linkRealization) {
         boolean okToProceed = (linkRealization != null);
-        final IConcept concept = linkRealization.getConceptDelegate().getConcept();
-
+        final ConceptMetadata conceptMetadata = linkRealization.getConceptMetadata();
 
         /*
          * Let the user know just how much damage their about to do to the database
          */
         if (okToProceed) {
-            final int option = JOptionPane.showConfirmDialog(AppFrameDispatcher.getFrame(),
+            Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
+            final int option = JOptionPane.showConfirmDialog(frame,
             		"Are you sure you want to delete '" + linkRealization.stringValue() + "' ? ", 
                     "VARS - Delete LinkTemplate", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
             okToProceed = (option == JOptionPane.YES_OPTION);
@@ -44,13 +46,13 @@ public class DeleteLinkRealizationTask {
          */
         if (okToProceed) {
             try {
-            	concept.removeLinkRealization(linkRealization);
-                ConceptDAO.getInstance().update((Concept) concept);
+            	conceptMetadata.removeLinkRealization(linkRealization);
+                linkRealizationDAO.makeTransient(linkRealization);
             }
-            catch (DAOException e) {
+            catch (Exception e) {
                 final String msg = "Failed to delete '" + linkRealization.stringValue() + "'";
                 log.error(msg, e);
-                AppFrameDispatcher.showErrorDialog(msg);
+                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, msg);
                 okToProceed = false;
             }
         }

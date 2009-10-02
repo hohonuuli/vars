@@ -1,33 +1,35 @@
 package vars.knowledgebase.ui.actions;
 
+import java.awt.Frame;
 import javax.swing.JOptionPane;
 
+import org.bushe.swing.event.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.mbari.vars.dao.DAOException;
-import org.mbari.vars.knowledgebase.model.Concept;
-import org.mbari.vars.knowledgebase.model.Media;
-import org.mbari.vars.knowledgebase.model.dao.ConceptDAO;
-import org.mbari.vars.util.AppFrameDispatcher;
-import vars.knowledgebase.IConcept;
+import vars.knowledgebase.ConceptMetadata;
+import vars.knowledgebase.Media;
+import vars.knowledgebase.MediaDAO;
+import vars.knowledgebase.ui.Lookup;
 
 public class DeleteMediaTask {
 	
-private static final Logger log = LoggerFactory.getLogger(DeleteMediaTask.class);
-    
-    private DeleteMediaTask() {
-        // NO instantiation allowed
+    private final Logger log = LoggerFactory.getLogger(getClass());
+
+    private final MediaDAO mediaDAO;
+
+    public DeleteMediaTask(MediaDAO mediaDAO) {
+        this.mediaDAO = mediaDAO;
     }
     
-    public static boolean delete(final Media media) {
+    public boolean delete(final Media media) {
         boolean okToProceed = (media != null);
-        final IConcept concept = media.getConceptDelegate().getConcept();
         
         /*
          * Let the user know just how much damage their about to do to the database
          */
         if (okToProceed) {
-            final int option = JOptionPane.showConfirmDialog(AppFrameDispatcher.getFrame(), 
+            final Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
+            final int option = JOptionPane.showConfirmDialog(frame,
             		"Are you sure you want to delete '" + media.stringValue() + 
             		"' ? Be aware that this will not effect existing annotations that use it.", 
                     "VARS - Delete LinkTemplate", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
@@ -37,16 +39,17 @@ private static final Logger log = LoggerFactory.getLogger(DeleteMediaTask.class)
         /*
          * Delete the linkTemplate
          */
+        final ConceptMetadata conceptMetadata = media.getConceptMetadata();
         if (okToProceed) {
-        	concept.removeMedia(media);
+            conceptMetadata.removeMedia(media);
             try {
-                ConceptDAO.getInstance().update((Concept) concept);
+                mediaDAO.makeTransient(media);
             }
-            catch (DAOException e) {
-            	concept.addMedia(media);
+            catch (Exception e) {
+            	conceptMetadata.addMedia(media);
                 final String msg = "Failed to delete '" + media.stringValue() + "'";
                 log.error(msg, e);
-                AppFrameDispatcher.showErrorDialog(msg);
+                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, msg);
                 okToProceed = false;
             }
         }        

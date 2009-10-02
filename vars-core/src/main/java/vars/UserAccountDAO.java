@@ -18,4 +18,6 @@ public interface UserAccountDAO extends DAO {
     Collection<UserAccount> findAllByFirstName(String firstName);
 
     Collection<UserAccount> findAllByRole(String role);
+
+    Collection<UserAccount> findAll();
 }
