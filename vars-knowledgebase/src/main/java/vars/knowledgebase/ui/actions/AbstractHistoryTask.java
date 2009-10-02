@@ -43,4 +43,9 @@ public abstract class AbstractHistoryTask {
         return userAccount != null && userAccount.isAdministrator() && history != null;
     }
 
+    public KnowledgebaseDAOFactory getKnowledgebaseDAOFactory() {
+        return knowledgebaseDAOFactory;
+    }
+
+
 }

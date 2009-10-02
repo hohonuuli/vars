@@ -81,4 +81,6 @@ public class LinkBean implements ILink {
         this.fromConcept = fromConcept;
     }
 
+
+
 }

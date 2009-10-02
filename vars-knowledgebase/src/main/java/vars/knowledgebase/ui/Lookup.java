@@ -17,11 +17,15 @@ package vars.knowledgebase.ui;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import java.awt.Frame;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import org.bushe.swing.event.EventBus;
+import org.bushe.swing.event.EventTopicSubscriber;
 import org.mbari.swing.ProgressDialog;
 import org.mbari.util.Dispatcher;
+import vars.knowledgebase.Concept;
 import vars.knowledgebase.KnowledgebaseModule;
-import vars.shared.ui.FatalErrorSubscriber;
-import vars.shared.ui.NonFatalErrorSubscriber;
+import vars.shared.ui.GlobalLookup;
 
 /**
  * Created by IntelliJ IDEA.
@@ -30,31 +34,63 @@ import vars.shared.ui.NonFatalErrorSubscriber;
  * Time: 11:39:10 AM
  * To change this template use File | Settings | File Templates.
  */
-public class Lookup {
+public class Lookup extends GlobalLookup {
 
     protected static final Object KEY_DISPATCHER_APPLICATION_FRAME = KnowledgebaseFrame.class;
     protected static final Object KEY_DISPATCHER_APPLICATION = KnowledgebaseApp.class;
+    protected static final Object KEY_DISPATCHER_SELECTED_CONCEPT = Concept.class;
     public static final String RESOURCE_BUNDLE = "knowlegebase-app";
     public static final Object KEY_DISPATCHER_GUICE_INJECTOR = Injector.class;
-    public static final String TOPIC_DELETE_CONCEPT = "Delete Concepts";
-    public static final String TOPIC_DELETE_CONCEPT_NAME = "Delete ConceptNames";
-    public static final String TOPIC_DELETE_HISTORY = "Delete Histories";
-    public static final String TOPIC_DELETE_LINK_REALIZATION = "Delete LinkRealizations";
-    public static final String TOPIC_DELETE_LINK_TEMPLATE = "Delete LinkTemplates";
-    public static final String TOPIC_DELETE_MEDIA = "Delete Medias";
+    public static final String TOPIC_DELETE_MEDIA = Lookup.class.getName() + "-DeleteMedia";
+    public static final String TOPIC_DELETE_CONCEPT = Lookup.class.getName() + "-DeleteConcept";
+    public static final String TOPIC_DELETE_CONCEPT_NAME = Lookup.class.getName() +"-DeleteConceptName";
+    public static final String TOPIC_DELETE_HISTORY = Lookup.class.getName() + "-DeleteHistorie";
+    public static final String TOPIC_DELETE_LINK_REALIZATION = Lookup.class.getName() + "-DeleteLinkRealization";
+    public static final String TOPIC_DELETE_LINK_TEMPLATE = Lookup.class.getName() + "-DeleteLinkTemplate";
+    public static final String TOPIC_SELECTED_CONCEPT = Lookup.class.getName() + "-SelectedConcept";
 
-    /**
-     * Subscribers to this topic will get a {@link String} as the data
-     */
-    public static final String TOPIC_NONFATAL_ERROR = NonFatalErrorSubscriber.TOPIC_NONFATAL_ERROR;
+    static {
+        getApplicationDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (!(evt.getNewValue() instanceof KnowledgebaseApp)) {
+                    throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
+                            ", EXPECTED: " + KnowledgebaseApp.class.getName());
+                }
+            }
+        });
 
-    /**
-     * Subscribers to this topic will get and {@link Exception} as the data
-     */
-    public static final String TOPIC_FATAL_ERROR = FatalErrorSubscriber.TOPIC_FATAL_ERROR;
+        getApplicationFrameDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (!(evt.getNewValue() instanceof KnowledgebaseFrame)) {
+                    throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
+                            ", EXPECTED: " + KnowledgebaseFrame.class.getName());
+                }
+            }
+        });
+
+        getGuiceInjectorDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (!(evt.getNewValue() instanceof Injector)) {
+                    throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
+                            ", EXPECTED: " + Injector.class.getName());
+                }
+            }
+        });
+
+        /*
+         * When a Concept is sent to this topic on event bus make sure it gets
+         * relayed to the correct Dispatcher
+         */
+        EventBus.subscribe(TOPIC_SELECTED_CONCEPT, new EventTopicSubscriber<Concept>() {
+            public void onEvent(String topic, Concept data) {
+                getSelectedConceptDispatcher().setValueObject(data);
+            }
+        });
+    }
+
     private static ProgressDialog progressDialog;
 
-    protected static Dispatcher getApplicationDispatcher() {
+    public static Dispatcher getApplicationDispatcher() {
         return Dispatcher.getDispatcher(KEY_DISPATCHER_APPLICATION);
     }
 
@@ -82,4 +118,18 @@ public class Lookup {
 
         return progressDialog;
     }
+
+    /**
+     * You can set this directly but the recommended method for watching for
+     * changes to the selected concept is to register an {@link EventTopicSubscriber}
+     * to the TOPIC_SELECTED_CONCEPT topic. THe same for setting the selected
+     * concept, publish to the {@link EventBus}
+     * 
+     * @return A {@link Dispatcher} that contains a reference to the currently
+     *      selected concept.
+     */
+    public static Dispatcher getSelectedConceptDispatcher() {
+        return Dispatcher.getDispatcher(KEY_DISPATCHER_SELECTED_CONCEPT);
+    }
+
 }

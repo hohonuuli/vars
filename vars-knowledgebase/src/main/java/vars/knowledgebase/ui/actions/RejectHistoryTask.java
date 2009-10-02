@@ -17,35 +17,44 @@
 
 package vars.knowledgebase.ui.actions;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
+import com.google.inject.Inject;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import javax.swing.JProgressBar;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.mbari.swing.ProgressDialog;
-import org.mbari.vars.dao.DAOException;
-import org.mbari.vars.knowledgebase.model.dao.ConceptDAO;
-import org.mbari.vars.knowledgebase.model.dao.ConceptDelegateDAO;
-import org.mbari.vars.knowledgebase.model.dao.ConceptNameDAO;
-import org.mbari.vars.knowledgebase.model.dao.IKnowledgeBaseCache;
-import org.mbari.vars.knowledgebase.model.dao.KnowledgeBaseCache;
-import org.mbari.vars.knowledgebase.ui.KnowledgebaseApp;
-import org.mbari.vars.util.AppFrameDispatcher;
 import foxtrot.Task;
 import foxtrot.Worker;
-import org.mbari.vars.knowledgebase.model.Concept;
-import org.mbari.vars.knowledgebase.model.ConceptDelegate;
-import org.mbari.vars.knowledgebase.model.ConceptName;
-import org.mbari.vars.knowledgebase.model.LinkRealization;
-import org.mbari.vars.knowledgebase.model.LinkTemplate;
-import org.mbari.vars.knowledgebase.model.Media;
-import vars.IUserAccount;
-import vars.knowledgebase.IConcept;
-import vars.knowledgebase.IConceptName;
-import vars.knowledgebase.IHistory;
+
+import java.util.Collection;
+import java.util.HashSet;
+import org.bushe.swing.event.EventBus;
+import vars.LinkBean;
+import vars.LinkComparator;
+import vars.UserAccount;
+import vars.VARSException;
+import vars.annotation.AnnotationDAOFactory;
+import vars.annotation.ObservationDAO;
+import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptDAO;
+import vars.knowledgebase.ConceptMetadata;
+import vars.knowledgebase.ConceptName;
+import vars.knowledgebase.ConceptNameDAO;
+import vars.knowledgebase.History;
+import vars.knowledgebase.HistoryDAO;
+import vars.knowledgebase.KnowledgebaseDAO;
+import vars.knowledgebase.KnowledgebaseDAOFactory;
+import vars.knowledgebase.KnowledgebaseFactory;
+import vars.knowledgebase.LinkRealization;
+import vars.knowledgebase.LinkTemplate;
+import vars.knowledgebase.Media;
+import vars.knowledgebase.MediaDAO;
+import vars.knowledgebase.ui.KnowledgebaseApp;
+import vars.knowledgebase.ui.Lookup; 
 
 //~--- classes ----------------------------------------------------------------
 /**
@@ -57,68 +66,71 @@ import vars.knowledgebase.IHistory;
  */
 public class RejectHistoryTask extends AbstractHistoryTask {
 
-    private static final Logger log = LoggerFactory.getLogger(RejectHistoryTask.class);
-
     /*
      * Map<String, IAction>
      */
-    private static final Map actionMap = new HashMap();
+    private final Map actionMap = new HashMap();
 
-    private static final GenericRejectTask DEFAULT_TASK = new GenericRejectTask();
-    static {
+    private final GenericRejectTask DEFAULT_TASK;
+
+    @Inject
+    public RejectHistoryTask(AnnotationDAOFactory annotationDAOFactory, 
+            KnowledgebaseDAO knowledgebaseDAO,
+            KnowledgebaseDAOFactory knowledgebaseDAOFactory,
+            KnowledgebaseFactory knowledgebaseFactory) {
+        super(knowledgebaseDAOFactory);
+        DEFAULT_TASK = new GenericRejectTask(knowledgebaseDAOFactory);
+
 
         /*
          * This Map holds actions that process approval of add action. addMap<String,
-         * IAction> String defines which field was added. See History.FIELD_*
+         * IAction> String defines which field was added. See History.FIELD_* 
          * for acceptabe values. The Map holds that process the approval
          */
         final Map addMap = new HashMap();
-        actionMap.put(IHistory.ACTION_ADD, addMap);
-        addMap.put(IHistory.FIELD_CONCEPT, DEFAULT_TASK);
-        addMap.put(IHistory.FIELD_CONCEPT_CHILD, new AddConceptTask());
-        addMap.put(IHistory.FIELD_CONCEPTNAME, new AddConceptNameTask());
-        addMap.put(IHistory.FIELD_LINKREALIZATION, new AddLinkRealizationTask());
-        addMap.put(IHistory.FIELD_LINKTEMPLATE, new AddLinkTemplateTask());
-        addMap.put(IHistory.FIELD_MEDIA, new AddMediaTask());
-        addMap.put(IHistory.FIELD_SECTIONINFO, DEFAULT_TASK);
+        actionMap.put(History.ACTION_ADD, addMap);
+        addMap.put(History.FIELD_CONCEPT, DEFAULT_TASK);
+        addMap.put(History.FIELD_CONCEPT_CHILD, new AddConceptTask(knowledgebaseDAOFactory, annotationDAOFactory.newObservationDAO()));
+        addMap.put(History.FIELD_CONCEPTNAME, new AddConceptNameTask(knowledgebaseDAOFactory, knowledgebaseDAO));
+        addMap.put(History.FIELD_LINKREALIZATION, new AddLinkRealizationTask(knowledgebaseDAOFactory));
+        addMap.put(History.FIELD_LINKTEMPLATE, new AddLinkTemplateTask(knowledgebaseFactory, knowledgebaseDAOFactory));
+        addMap.put(History.FIELD_MEDIA, new AddMediaTask(knowledgebaseDAOFactory));
+        addMap.put(History.FIELD_SECTIONINFO, DEFAULT_TASK);
 
         /*
          * This map holds actions that process the approval of remove actions
          * deleteMap<String, IAction> String defines which field was Added
          */
         final Map deleteMap = new HashMap();
-        actionMap.put(IHistory.ACTION_DELETE, deleteMap);
+        actionMap.put(History.ACTION_DELETE, deleteMap);
         /*
          * A concept is never deleted directly. It's deleted from the parent
-         * concept. This allows us to track IHistory better.
-         * deleteMap.put(IHistory.FIELD_CONCEPT, new RemoveConceptAction());
+         * concept. This allows us to track History better.
+         * deleteMap.put(History.FIELD_CONCEPT, new RemoveConceptAction());
          */
-        deleteMap.put(IHistory.FIELD_CONCEPT_CHILD, DEFAULT_TASK);
-        deleteMap.put(IHistory.FIELD_CONCEPTNAME, DEFAULT_TASK);
-        deleteMap.put(IHistory.FIELD_LINKREALIZATION, DEFAULT_TASK);
-        deleteMap.put(IHistory.FIELD_LINKTEMPLATE, DEFAULT_TASK);
-        deleteMap.put(IHistory.FIELD_MEDIA, DEFAULT_TASK);
-        deleteMap.put(IHistory.FIELD_SECTIONINFO, DEFAULT_TASK);
+        deleteMap.put(History.FIELD_CONCEPT_CHILD, DEFAULT_TASK);
+        deleteMap.put(History.FIELD_CONCEPTNAME, DEFAULT_TASK);
+        deleteMap.put(History.FIELD_LINKREALIZATION, DEFAULT_TASK);
+        deleteMap.put(History.FIELD_LINKTEMPLATE, DEFAULT_TASK);
+        deleteMap.put(History.FIELD_MEDIA, DEFAULT_TASK);
+        deleteMap.put(History.FIELD_SECTIONINFO, DEFAULT_TASK);
 
         final Map replaceMap = new HashMap();
-        actionMap.put(IHistory.ACTION_REPLACE, replaceMap);
-        replaceMap.put(IHistory.FIELD_CONCEPT_PARENT, new ReplaceParentConceptTask());
-        replaceMap.put(IHistory.FIELD_CONCEPT_NODCCODE, new ReplaceNodcCodeTask());
-        replaceMap.put(IHistory.FIELD_CONCEPT_RANKNAME, new ReplaceRankNameTask());
-        replaceMap.put(IHistory.FIELD_CONCEPT_RANKLEVEL, new ReplaceRankLevelTask());
-        replaceMap.put(IHistory.FIELD_CONCEPT_REFERENCE, new ReplaceReferenceTask());
-        actionMap.put(IHistory.FIELD_CONCEPTNAME, new ReplaceConceptNameTask());
+        actionMap.put(History.ACTION_REPLACE, replaceMap);
+        replaceMap.put(History.FIELD_CONCEPT_PARENT, new ReplaceParentConceptTask(knowledgebaseDAOFactory));
+        replaceMap.put(History.FIELD_CONCEPT_NODCCODE, new ReplaceNodcCodeTask(knowledgebaseDAOFactory));
+        replaceMap.put(History.FIELD_CONCEPT_RANKNAME, new ReplaceRankNameTask(knowledgebaseDAOFactory));
+        replaceMap.put(History.FIELD_CONCEPT_RANKLEVEL, new ReplaceRankLevelTask(knowledgebaseDAOFactory));
+        replaceMap.put(History.FIELD_CONCEPT_REFERENCE, new ReplaceReferenceTask(knowledgebaseDAOFactory));
+        actionMap.put(History.FIELD_CONCEPTNAME, new ReplaceConceptNameTask(knowledgebaseDAO, knowledgebaseDAOFactory));
+
     }
 
-    private RejectHistoryTask() {
-        // DO nothing. DO not allow instatiation
-    }
-
-    public void doTask(final IUserAccount userAccount, final IHistory history) {
+    public void doTask(final UserAccount userAccount, final History history) {
         reject(userAccount, history);
     }
 
-    public static void reject(final IUserAccount userAccount, final IHistory history) {
+    public void reject(final UserAccount userAccount, final History history) {
         if ((history != null) && !history.isApproved() && !history.isRejected()) {
             if (log.isDebugEnabled()) {
                 log.debug("Rejecting " + history);
@@ -133,41 +145,50 @@ public class RejectHistoryTask extends AbstractHistoryTask {
     }
 
 
-    private static class GenericRejectTask extends AbstractHistoryTask {
+    private class GenericRejectTask extends AbstractHistoryTask {
 
-        public void doTask(final IUserAccount userAccount, final IHistory history) {
+        public GenericRejectTask(KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
+            super(knowledgebaseDAOFactory);
+        }
+
+        public void doTask(final UserAccount userAccount, final History history) {
             reject(userAccount, history);
         }
 
-        public void reject(final IUserAccount userAccount, final IHistory history) {
+        public void reject(final UserAccount userAccount, final History history) {
             if (canDo(userAccount, history)) {
                 history.setApprovalDate(new Date());
                 history.setRejected(true);
                 history.setApproverName(userAccount.getUserName());
                 try {
-                    ConceptDelegateDAO.getInstance().update((ConceptDelegate) history.getConceptDelegate());
+                    HistoryDAO historyDAO = knowledgebaseDAOFactory.newHistoryDAO();
+                    historyDAO.update(history);
                 }
-                catch (DAOException e) {
-                    final TaskException re = new TaskException("Unable to update history in database");
-                    re.initCause(e);
-                    throw re;
+                catch (Exception e) {
+                    throw new TaskException("Unable to update history in database", e);
                 }
             }
         }
     }
 
-    private static class AddConceptNameTask extends GenericRejectTask {
+    private class AddConceptNameTask extends GenericRejectTask {
+
+        private final KnowledgebaseDAO knowledgebaseDAO;
+
+        public AddConceptNameTask(KnowledgebaseDAOFactory knowledgebaseDAOFactory, KnowledgebaseDAO knowledgebaseDAO) {
+            super(knowledgebaseDAOFactory);
+            this.knowledgebaseDAO = knowledgebaseDAO;
+        }
 
 
         @Override
-        public void reject(final IUserAccount userAccount, final IHistory history) {
+        public void reject(final UserAccount userAccount, final History history) {
 
             if (!canDo(userAccount, history)) {
                 return;
             }
 
-
-            final ProgressDialog dialog = AppFrameDispatcher.getProgressDialog();
+            final ProgressDialog dialog = Lookup.getProgressDialog();
             final JProgressBar progressBar = dialog.getProgressBar();
             progressBar.setIndeterminate(false);
             progressBar.setMinimum(0);
@@ -178,6 +199,10 @@ public class RejectHistoryTask extends AbstractHistoryTask {
             dialog.setSize(350, 40);
             dialog.setVisible(true);
 
+            final ConceptDAO conceptDAO = getKnowledgebaseDAOFactory().newConceptDAO();
+            final ConceptNameDAO conceptNameDAO = getKnowledgebaseDAOFactory().newConceptNameDAO();
+            final HistoryDAO historyDAO = getKnowledgebaseDAOFactory().newHistoryDAO();
+
             /*
              * Verify that the concept name still exists in the knowledgebase
              */
@@ -186,11 +211,12 @@ public class RejectHistoryTask extends AbstractHistoryTask {
             progressBar.setValue(1);
             Concept thatConcept = null;
             try {
-                thatConcept = KnowledgeBaseCache.getInstance().findConceptByName(name);
+                thatConcept = conceptDAO.findByName(name);
             }
-            catch (DAOException e1) {
-                AppFrameDispatcher.showErrorDialog("There is a problem with the database connection. Error message given is: " + e1.getMessage());
+            catch (Exception e1) {
+                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e1);
             }
+
             if (thatConcept == null) {
                 dropHistory(history, "The concept-name, '" + name + "' no longer exists in the knowledgebase. I'll remove this history from the database");
                 return;
@@ -201,12 +227,12 @@ public class RejectHistoryTask extends AbstractHistoryTask {
              * We need to check that the concept-name that we're dropping is still associated with the correct
              * concept.
              */
-            final IConcept thisConcept = history.getConceptDelegate().getConcept();
+            final Concept thisConcept = history.getConceptMetadata().getConcept();
             if (thisConcept.equals(thatConcept)) {
                 /*
                  * A primary conceptname can not be dropped. If it's a primary name we remove the history.
                  */
-                if (!thisConcept.getPrimaryConceptNameAsString().equals(name)) {
+                if (!thisConcept.getPrimaryConceptName().getName().equals(name)) {
 
                     /*
                      * When dropping a concept-name we first want to make sure that no annotations are
@@ -219,7 +245,7 @@ public class RejectHistoryTask extends AbstractHistoryTask {
                         Worker.post(new Task() {
 
                             public Object run() throws Exception {
-                                ConceptDAO.getInstance().updateConceptNameUsedByAnnotations((Concept) thisConcept);
+                                knowledgebaseDAO.updateConceptNameUsedByAnnotations(thisConcept);
                                 return null;
                             }
                         });
@@ -228,11 +254,11 @@ public class RejectHistoryTask extends AbstractHistoryTask {
                         ok = false;
                         progressBar.setIndeterminate(false);
                         dialog.setVisible(false);
-                        AppFrameDispatcher.showErrorDialog("Failed to remove uses of '" + name + "' from the database. Reason: " + e.getMessage());
+                        EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, "Failed to remove uses of '" + name + "' from the database. Reason: " + e.getMessage());
                     }
 
                     if (ok) {
-                        final IConceptName conceptName = thisConcept.getConceptName(name);
+                        final ConceptName conceptName = thisConcept.getConceptName(name);
                         if (conceptName != null) {
 
                             // Delete the name
@@ -242,7 +268,7 @@ public class RejectHistoryTask extends AbstractHistoryTask {
                                 Worker.post(new Task() {
 
                                     public Object run() throws Exception {
-                                        ConceptNameDAO.getInstance().delete((ConceptName) conceptName);
+                                        conceptNameDAO.makeTransient(conceptName);
                                         return null;
                                     }
                                 });
@@ -251,7 +277,8 @@ public class RejectHistoryTask extends AbstractHistoryTask {
                                 ok = false;
                                 progressBar.setIndeterminate(false);
                                 dialog.setVisible(false);
-                                AppFrameDispatcher.showErrorDialog("Unable to delete '" + name + "' from the database. Reason: " + e.getMessage());
+                                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, "Unable to delete '" +
+                                        name + "' from the database. Reason: " + e.getMessage());
                             }
 
                             if (ok) {
@@ -264,7 +291,7 @@ public class RejectHistoryTask extends AbstractHistoryTask {
                                         public Object run() throws Exception {
                                             history.setApprovalDate(new Date());
                                             history.setRejected(true);
-                                            ConceptDAO.getInstance().update((Concept) thisConcept);
+                                            historyDAO.update(history);
                                             return null;
                                         }
                                     });
@@ -272,7 +299,11 @@ public class RejectHistoryTask extends AbstractHistoryTask {
                                 catch (Exception e) {
                                     progressBar.setIndeterminate(false);
                                     dialog.setVisible(false);
-                                    AppFrameDispatcher.showWarningDialog("Failed to update '" + thisConcept.getPrimaryConceptNameAsString() + "'. Reason: " + e.getMessage() + ". I'll refresh the knowledgebase to resynchronize it.");
+                                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR,
+                                            "Failed to update '" +
+                                            thisConcept.getPrimaryConceptName().getName() +
+                                            "'. Reason: " + e.getMessage() +
+                                            ". I'll refresh the knowledgebase to resynchronize it.");
                                 }
                             }
                         }
@@ -280,14 +311,16 @@ public class RejectHistoryTask extends AbstractHistoryTask {
 
                     progressBar.setString("Refreshing");
                     progressBar.setValue(5);
-                    ((KnowledgebaseApp) KnowledgebaseApp.DISPATCHER.getValueObject()).getKnowledgebaseFrame().refreshTreeAndOpenNode(thisConcept.getPrimaryConceptNameAsString());
+                    KnowledgebaseApp app = (KnowledgebaseApp) Lookup.getApplicationDispatcher().getValueObject();
+                    app.getKnowledgebaseFrame().refreshTreeAndOpenNode(thisConcept.getPrimaryConceptName().getName());
                 }
                 else {
                     dropHistory(history, "Unable to delete a primary concept name! I'll remove this history from the database.");
                 }
             }
             else {
-                dropHistory(history, "This History refers to a concept name that has been moved to '" + thatConcept.getPrimaryConceptNameAsString() + "'. I'll remove this history from the database.");
+                dropHistory(history, "This History refers to a concept name that has been moved to '" + 
+                        thatConcept.getPrimaryConceptName().getName() + "'. I'll remove this history from the database.");
             }
 
             // Get count of usages in the Annotation database. Collection<Observation>
@@ -302,10 +335,18 @@ public class RejectHistoryTask extends AbstractHistoryTask {
      * @author brian
      *
      */
-    private static class AddConceptTask extends GenericRejectTask {
+    private class AddConceptTask extends GenericRejectTask {
+
+        final DeleteConceptTask deleteConceptTask;
+
+        public AddConceptTask(KnowledgebaseDAOFactory knowledgebaseDAOFactory, ObservationDAO observationDAO) {
+            super(knowledgebaseDAOFactory);
+            this.deleteConceptTask = new DeleteConceptTask(knowledgebaseDAOFactory.newConceptDAO(), observationDAO);
+        }
+
 
         @Override
-        public void reject(final IUserAccount userAccount, final IHistory history) {
+        public void reject(final UserAccount userAccount, final History history) {
             boolean okToProceed = canDo(userAccount, history);
             final String rejectedName = history.getNewValue();
 
@@ -318,14 +359,14 @@ public class RejectHistoryTask extends AbstractHistoryTask {
                     rejectedConcept = findRejectedConcept(history);
                     okToProceed = (rejectedConcept != null && rejectedConcept.getConceptName(ConceptName.NAME_DEFAULT) == null);
                 }
-                catch (DAOException e) {
+                catch (Exception e) {
                     log.error("Problem occurred when looking up '" + rejectedName + "'", e);
                     okToProceed = false;
                 }
             }
 
             if (okToProceed) {
-                okToProceed = DeleteConceptTask.delete(rejectedConcept);
+                okToProceed = deleteConceptTask.delete(rejectedConcept);
             }
 
             /*
@@ -336,15 +377,19 @@ public class RejectHistoryTask extends AbstractHistoryTask {
             }
         }
 
-        private Concept findRejectedConcept(final IHistory history) throws DAOException {
+        private Concept findRejectedConcept(final History history) {
             final String rejectedName = history.getNewValue();
-            final IConcept parentConcept = history.getConceptDelegate().getConcept();
-            Concept rejectedConcept = KnowledgeBaseCache.getInstance().findConceptByName(rejectedName);
+            final Concept parentConcept = history.getConceptMetadata().getConcept();
+            final ConceptDAO conceptDAO = getKnowledgebaseDAOFactory().newConceptDAO();
+            Concept rejectedConcept = conceptDAO.findByName(rejectedName);
             if (rejectedConcept == null) {
-                dropHistory(history, "Unable to find a concept with the name '" + rejectedName + "' in the knowledgebase. I'll drop the history reference");
+                dropHistory(history, "Unable to find a concept with the name '" +
+                        rejectedName + "' in the knowledgebase. I'll drop the history reference");
             }
-            if (!parentConcept.getChildConceptColl().contains(rejectedConcept)) {
-                dropHistory(history, "The concept with the name '" + rejectedName + "' is no longer a child of '" + parentConcept.getPrimaryConceptNameAsString() + "'. Unable to process the history reference.");
+            if (!parentConcept.getChildConcepts().contains(rejectedConcept)) {
+                dropHistory(history, "The concept with the name '" + rejectedName + 
+                        "' is no longer a child of '" + parentConcept.getPrimaryConceptName().getName() +
+                        "'. Unable to process the history reference.");
                 rejectedConcept = null;
             }
 
@@ -352,20 +397,34 @@ public class RejectHistoryTask extends AbstractHistoryTask {
         }
     }
 
-    private static class AddLinkTemplateTask extends GenericRejectTask {
+    private class AddLinkTemplateTask extends GenericRejectTask {
+
+        private final KnowledgebaseFactory knowledgebaseFactory;
+        private final DeleteLinkTemplateTask deleteLinkTemplateTask;
+
+        public AddLinkTemplateTask(KnowledgebaseFactory knowledgebaseFactory, KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
+            super(knowledgebaseDAOFactory);
+            this.knowledgebaseFactory = knowledgebaseFactory;
+            this.deleteLinkTemplateTask = new DeleteLinkTemplateTask(knowledgebaseDAOFactory.newLinkTemplateDAO());
+        }
 
         @Override
-        public void reject(IUserAccount userAccount, IHistory history) {
+        public void reject(UserAccount userAccount, History history) {
 
             if (canDo(userAccount, history)) {
                 // Convienet means to parse the string stored in the history
-                final LinkTemplate exampleTemplate = LinkTemplate.createFromString(history.getNewValue());
-                final IConcept concept = history.getConceptDelegate().getConcept();
+                final LinkBean linkBean = new LinkBean(history.getNewValue());
+                final LinkTemplate exampleTemplate = knowledgebaseFactory.newLinkTemplate();
+                exampleTemplate.setLinkName(linkBean.getLinkName());
+                exampleTemplate.setToConcept(linkBean.getToConcept());
+                exampleTemplate.setLinkValue(linkBean.getLinkValue());
+
+                final ConceptMetadata conceptMetadata = history.getConceptMetadata();
 
                 /*
                  * Find the matching linkTemplate
                  */
-                Set linkTemplates = concept.getLinkTemplateSet();
+                Set<LinkTemplate> linkTemplates = conceptMetadata.getLinkTemplates();
                 LinkTemplate linkTemplate = null;
                 for (Iterator i = linkTemplates.iterator(); i.hasNext();) {
                     LinkTemplate t = (LinkTemplate) i.next();
@@ -377,85 +436,112 @@ public class RejectHistoryTask extends AbstractHistoryTask {
                 }
 
                 if (linkTemplate == null) {
-                    dropHistory(history, "Unable to locate '" + history.getNewValue() + "'. It may have been moved. I'll remove the History reference.");
+                    dropHistory(history, "Unable to locate '" + history.getNewValue() +
+                            "'. It may have been moved. I'll remove the History reference.");
                 }
                 else {
-                    DeleteLinkTemplateTask.delete(linkTemplate);
+                    deleteLinkTemplateTask.delete(linkTemplate);
                     super.reject(userAccount, history);
                 }
             }
         }
     }
 
-    private static class AddLinkRealizationTask extends GenericRejectTask {
+    private class AddLinkRealizationTask extends GenericRejectTask {
+
+        private final DeleteLinkRealizationTask deleteLinkRealizationTask;
+
+        public AddLinkRealizationTask(KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
+            super(knowledgebaseDAOFactory);
+            this.deleteLinkRealizationTask = new DeleteLinkRealizationTask(knowledgebaseDAOFactory.newLinkRealizationDAO());
+        }
 
         @Override
-        public void reject(IUserAccount userAccount, IHistory history) {
+        public void reject(UserAccount userAccount, History history) {
 
             if (canDo(userAccount, history)) {
                 // Convienet means to parse the string stored in the history
-                final LinkRealization exampleTemplate = LinkRealization.createFromString(history.getNewValue());
-                final IConcept concept = history.getConceptDelegate().getConcept();
+                LinkBean exampleTemplate = new LinkBean(history.getNewValue());
+                
+                // Work on copy collection to avoid synchronization issues
+                final Set<LinkRealization> linkRealizations = new HashSet<LinkRealization>(history.getConceptMetadata().getLinkRealizations());
 
                 /*
                  * Find the matching linkRealization
                  */
-                Set<LinkRealization> linkRealizations = concept.getLinkRealizationSet();
                 LinkRealization linkRealization = null;
+                LinkComparator linkComparator = new LinkComparator();
                 for (LinkRealization t : linkRealizations) {
-                    if (t.getLinkName().equals(exampleTemplate.getLinkName()) && t.getToConcept().equals(exampleTemplate.getToConcept()) && t.getLinkValue().equals(exampleTemplate.getLinkValue())) {
-
+                    if (linkComparator.compare(exampleTemplate, linkRealization) == 0) {
                         linkRealization = t;
                         break;
                     }
                 }
 
                 if (linkRealization == null) {
-                    dropHistory(history, "Unable to locate \'" + history.getNewValue() + "\'. It may have been moved. I\'ll remove the History reference.");
+                    dropHistory(history, "Unable to locate \'" + history.getNewValue() +
+                            "\'. It may have been moved. I\'ll remove the History reference.");
                 }
                 else {
-                    DeleteLinkRealizationTask.delete(linkRealization);
+                    deleteLinkRealizationTask.delete(linkRealization);
                     super.reject(userAccount, history);
                 }
             }
         }
     }
 
-    private static class AddMediaTask extends GenericRejectTask {
+    private class AddMediaTask extends GenericRejectTask {
+
+
+        public AddMediaTask(KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
+            super(knowledgebaseDAOFactory);
+        }
 
         @Override
-        public void reject(IUserAccount userAccount, IHistory history) {
+        public void reject(UserAccount userAccount, final History history) {
             if (canDo(userAccount, history)) {
-                final IConcept concept = history.getConceptDelegate().getConcept();
-                final Set mediaSet = concept.getMediaSet();
-                for (Iterator i = mediaSet.iterator(); i.hasNext();) {
-                    Media media = (Media) i.next();
-                    if (media.getUrl().equals(history.getNewValue())) {
-                        concept.removeMedia(media);
-                        // Don't break out. Remove ALL matching references.
+                final ConceptMetadata conceptMetadata = history.getConceptMetadata();
+                
+                // Iterate on copy to avoid threading issues
+                final Set<Media> mediaSet = new HashSet<Media>(conceptMetadata.getMedias());
+
+                final Collection<Media> matches = Collections2.filter(mediaSet, new Predicate<Media>() {
+                    @Override
+                    public boolean apply(Media input) {
+                        return input.getUrl().equals(history.getNewValue());
                     }
+                });
+
+                MediaDAO mediaDAO = getKnowledgebaseDAOFactory().newMediaDAO();
+                for (Media media : matches) {
+                    conceptMetadata.removeMedia(media);
+                    mediaDAO.makeTransient(media);
                 }
 
                 try {
-                    ConceptDAO.getInstance().update((Concept) concept);
                     super.reject(userAccount, history);
                 }
-                catch (DAOException e) {
-                    AppFrameDispatcher.showErrorDialog("Failed to upate database!");
+                catch (Exception e) {
+                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
                 }
                 
             }
         }
     }
 
-    private static class ReplaceParentConceptTask extends GenericRejectTask {
+    private class ReplaceParentConceptTask extends GenericRejectTask {
+
+        public ReplaceParentConceptTask(KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
+            super(knowledgebaseDAOFactory);
+        }
 
         @Override
-        public void reject(IUserAccount userAccount, IHistory history) {
+        public void reject(UserAccount userAccount, final History history) {
             if (canDo(userAccount, history)) {
-                final IKnowledgeBaseCache cache = KnowledgeBaseCache.getInstance();
-                final IConcept concept = history.getConceptDelegate().getConcept();
-                final IConcept currentParent = concept.getParentConcept();
+                final ConceptDAO conceptDAO = getKnowledgebaseDAOFactory().newConceptDAO();
+
+                final Concept concept = history.getConceptMetadata().getConcept();
+                final Concept currentParent = concept.getParentConcept();
 
                 /*
                  * Need to do a little database lookup.
@@ -463,42 +549,56 @@ public class RejectHistoryTask extends AbstractHistoryTask {
                 Concept newParent = null;
                 Concept oldParent = null;
                 try {
-                    newParent = cache.findConceptByName(history.getNewValue());
-                    oldParent = cache.findConceptByName(history.getOldValue());
+                    newParent = conceptDAO.findByName(history.getNewValue());
+                    oldParent = conceptDAO.findByName(history.getOldValue());
                 }
-                catch (DAOException e) {
-                    AppFrameDispatcher.showErrorDialog("An error occured while fetching information from the database. " + "Unable to process your request.");
+                catch (Exception e) {
+                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
                 }
 
                 if (currentParent.equals(newParent)) {
                     if (oldParent != null) {
 
-                        if (oldParent.hasDescendent(concept.getPrimaryConceptNameAsString())) {
-                            AppFrameDispatcher.showWarningDialog("\'" + oldParent.getPrimaryConceptNameAsString() + "\' already has a child named \'" + concept.getPrimaryConceptNameAsString() + "\'. Unable to process your request.");
+                        Collection<Concept> descendents = conceptDAO.findDescendents(oldParent);
+                        Collection<Concept> matches = Collections2.filter(descendents, new Predicate<Concept>(){
+                            @Override
+                            public boolean apply(Concept input) {
+                                return input.getPrimaryConceptName().getName().equals(concept.getPrimaryConceptName().getName());
+                            }
+
+                        });
+
+                        if (matches.size() > 0) {
+                            EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, "\'" + oldParent.getPrimaryConceptName().getName() +
+                                    "\' already has a child named \'" + concept.getPrimaryConceptName().getName() +
+                                    "\'. Unable to process your request.");
                             return;
                         }
 
                         /*
-                         * UPdate the database.
+                         * Update the database.
                          */
                         currentParent.removeChildConcept(concept);
                         super.reject(userAccount, history);
                         try {
-                            ConceptDAO.getInstance().update((Concept) currentParent);
+                            conceptDAO.update(currentParent);
                             oldParent.addChildConcept(concept);
-                            ConceptDAO.getInstance().update(oldParent);
+                            conceptDAO.update(oldParent);
                         }
-                        catch (DAOException e) {
+                        catch (Exception e) {
                             currentParent.addChildConcept(concept);
                             oldParent.removeChildConcept(concept);
-                            AppFrameDispatcher.showErrorDialog("An error occured while processing updating the database." + " Your change was not successful");
+                            EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, "An error occured while processing updating the database." +
+                                    " Your change was not successful");
                         }
                     }
                     else {
                         /*
                          * We can't reject the change if we can't find the original parent
                          */
-                        AppFrameDispatcher.showWarningDialog("Unable to find the original parent, \'" + oldParent.getPrimaryConceptNameAsString() + "\'. Unable to move \'" + concept.getPrimaryConceptNameAsString() + "\' back to it\'s previous state.");
+                        EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, "Unable to find the original parent, \'" +
+                                oldParent.getPrimaryConceptName().getName() + "\'. Unable to move \'" +
+                                concept.getPrimaryConceptName().getName() + "\' back to it\'s previous state.");
                     }
                 }
                 else {
@@ -508,163 +608,203 @@ public class RejectHistoryTask extends AbstractHistoryTask {
                      */
                     String message = null;
                     if (newParent != null) {
-                        message = "The concept, \'" + concept.getPrimaryConceptNameAsString() + "\' was a child of \'" + newParent.getPrimaryConceptNameAsString() + "\' when this history was created. However, it\'s now a child of \'" + currentParent.getPrimaryConceptNameAsString() + "\'. Unable to move it back to it\'s previous state.";
+                        message = "The concept, \'" + concept.getPrimaryConceptName().getName() + "\' was a child of \'" +
+                                newParent.getPrimaryConceptName().getName() + "\' when this history was created. However, it\'s now a child of \'" +
+                                currentParent.getPrimaryConceptName().getName() + "\'. Unable to move it back to it\'s previous state.";
                     }
                     else {
-                        message = "The concept, \'" + history.getNewValue() + "\' was not found in the knowledgebase. It may " + "have been deleted or renamed. Unable to move \'" + concept.getPrimaryConceptNameAsString() + "\' back to it\'s previous state.";
+                        message = "The concept, \'" + history.getNewValue() + "\' was not found in the knowledgebase. It may " + 
+                                "have been deleted or renamed. Unable to move \'" + concept.getPrimaryConceptName().getName() +
+                                "\' back to it\'s previous state.";
                     }
-                    AppFrameDispatcher.showWarningDialog(message);
+                    EventBus.publish(Lookup.TOPIC_WARNING, message);
                 }
             }
         }
     }
 
-    private static class ReplaceNodcCodeTask extends GenericRejectTask {
+    private class ReplaceNodcCodeTask extends GenericRejectTask {
+
+        public ReplaceNodcCodeTask(KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
+            super(knowledgebaseDAOFactory);
+        }
+
 
         @Override
-        public void reject(IUserAccount userAccount, IHistory history) {
+        public void reject(UserAccount userAccount, History history) {
             if (canDo(userAccount, history)) {
-                final IConcept concept = history.getConceptDelegate().getConcept();
+                final ConceptDAO conceptDAO = getKnowledgebaseDAOFactory().newConceptDAO();
+                final Concept concept = history.getConceptMetadata().getConcept();
                 String currentValue = concept.getNodcCode();
                 final String newValue = history.getNewValue();
                 if ((currentValue != null && currentValue.equals(newValue)) || (newValue != null && newValue.equals(currentValue))) {
                     concept.setNodcCode(history.getOldValue());
                     try {
-                        ConceptDAO.getInstance().update((Concept) concept);
+                        conceptDAO.update((Concept) concept);
                         super.reject(userAccount, history);
                     }
-                    catch (DAOException e) {
-                        AppFrameDispatcher.showErrorDialog("Failed to upate database!");
+                    catch (Exception e) {
+                        EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
                     }
                     
                 }
                 else {
-                    AppFrameDispatcher.showWarningDialog("Unable to reject this history. The NODC Code has been modified" + " since this history was created.");
+                    EventBus.publish(Lookup.TOPIC_WARNING,"Unable to reject this history. The NODC Code has been modified" +
+                            " since this history was created.");
                 }
             }
         }
     }
 
-    private static class ReplaceRankNameTask extends GenericRejectTask {
+    private class ReplaceRankNameTask extends GenericRejectTask {
+
+        public ReplaceRankNameTask(KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
+            super(knowledgebaseDAOFactory);
+        }
 
         @Override
-        public void reject(IUserAccount userAccount, IHistory history) {
+        public void reject(UserAccount userAccount, History history) {
             if (canDo(userAccount, history)) {
-                final IConcept concept = history.getConceptDelegate().getConcept();
+                final ConceptDAO conceptDAO = getKnowledgebaseDAOFactory().newConceptDAO();
+                final Concept concept = history.getConceptMetadata().getConcept();
                 String currentValue = concept.getRankName();
                 final String newValue = history.getNewValue();
                 if ((currentValue != null && currentValue.equals(newValue)) || (newValue != null && newValue.equals(currentValue))) {
                     concept.setRankName(history.getOldValue());
                     try {
-                        ConceptDAO.getInstance().update((Concept) concept);
+                        conceptDAO.update((Concept) concept);
                         super.reject(userAccount, history);
                     }
-                    catch (DAOException e) {
-                        AppFrameDispatcher.showErrorDialog("Failed to upate database!");
+                    catch (Exception e) {
+                        EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
                     }
                     
                 }
                 else {
-                    AppFrameDispatcher.showWarningDialog("Unable to reject this history. The Rank Name has been modified" + " since this history was created.");
+                    EventBus.publish(Lookup.TOPIC_WARNING, "Unable to reject this history. The Rank Name has been modified" +
+                            " since this history was created.");
                 }
             }
         }
     }
 
-    private static class ReplaceRankLevelTask extends GenericRejectTask {
+    private class ReplaceRankLevelTask extends GenericRejectTask {
+
+        public ReplaceRankLevelTask(KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
+            super(knowledgebaseDAOFactory);
+        }
 
         @Override
-        public void reject(IUserAccount userAccount, IHistory history) {
+        public void reject(UserAccount userAccount, History history) {
             if (canDo(userAccount, history)) {
-                final IConcept concept = history.getConceptDelegate().getConcept();
+                final ConceptDAO conceptDAO = getKnowledgebaseDAOFactory().newConceptDAO();
+                final Concept concept = history.getConceptMetadata().getConcept();
                 String currentValue = concept.getRankLevel();
                 final String newValue = history.getNewValue();
                 if ((currentValue != null && currentValue.equals(newValue)) || (newValue != null && newValue.equals(currentValue))) {
                     concept.setRankLevel(history.getOldValue());
                     try {
-                        ConceptDAO.getInstance().update((Concept) concept);
+                        conceptDAO.update((Concept) concept);
                         super.reject(userAccount, history);
                     }
-                    catch (DAOException e) {
-                        AppFrameDispatcher.showErrorDialog("Failed to upate database!");
+                    catch (Exception e) {
+                        EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
                     }
                     
                 }
                 else {
-                    AppFrameDispatcher.showWarningDialog("Unable to reject this history. The Rank Level has been modified" + " since this history was created.");
+                    EventBus.publish(Lookup.TOPIC_WARNING, "Unable to reject this history. The Rank Level has been modified" +
+                            " since this history was created.");
                 }
             }
         }
     }
 
-    private static class ReplaceReferenceTask extends GenericRejectTask {
+    private class ReplaceReferenceTask extends GenericRejectTask {
+
+        public ReplaceReferenceTask(KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
+            super(knowledgebaseDAOFactory);
+        }
 
         @Override
-        public void reject(IUserAccount userAccount, IHistory history) {
+        public void reject(UserAccount userAccount, History history) {
             if (canDo(userAccount, history)) {
-                final IConcept concept = history.getConceptDelegate().getConcept();
+                final ConceptDAO conceptDAO = getKnowledgebaseDAOFactory().newConceptDAO();
+                final Concept concept = history.getConceptMetadata().getConcept();
                 String currentValue = concept.getReference();
                 final String newValue = history.getNewValue();
                 if ((currentValue != null && currentValue.equals(newValue)) || (newValue != null && newValue.equals(currentValue))) {
                     concept.setReference(history.getOldValue());
                     try {
-                        ConceptDAO.getInstance().update((Concept) concept);
+                        conceptDAO.update((Concept) concept);
                         super.reject(userAccount, history);
                     }
-                    catch (DAOException e) {
-                        AppFrameDispatcher.showErrorDialog("Failed to upate database!");
+                    catch (Exception e) {
+                        EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
                     }
                     
                 }
                 else {
-                    AppFrameDispatcher.showWarningDialog("Unable to reject this history. The Reference has been modified" + " since this history was created.");
+                    EventBus.publish(Lookup.TOPIC_WARNING, "Unable to reject this history. The Reference has been modified" +
+                            " since this history was created.");
                 }
             }
         }
     }
 
-    private static class ReplaceConceptNameTask extends GenericRejectTask {
+    private class ReplaceConceptNameTask extends GenericRejectTask {
+        private final KnowledgebaseDAO knowledgebaseDAO;
+
+        public ReplaceConceptNameTask(KnowledgebaseDAO knowledgebaseDAO, KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
+            super(knowledgebaseDAOFactory);
+            this.knowledgebaseDAO = knowledgebaseDAO;
+        }
 
         @Override
-        public void reject(IUserAccount userAccount, IHistory history) {
+        public void reject(UserAccount userAccount, History history) {
             if (canDo(userAccount, history)) {
-                
-                final IConcept concept = history.getConceptDelegate().getConcept();
-                final IConceptName conceptName = concept.getConceptName(history.getNewValue());
+
+                final ConceptDAO conceptDAO = getKnowledgebaseDAOFactory().newConceptDAO();
+                final Concept concept = history.getConceptMetadata().getConcept();
+                final ConceptName conceptName = concept.getConceptName(history.getNewValue());
                 
                 if (conceptName == null) {
-                    AppFrameDispatcher.showWarningDialog("Unable to find a concept named '" + history.getNewValue() + "'" + "associated with '" + concept.getPrimaryConceptNameAsString() + "'. Unable to reject this history.");
+                    EventBus.publish(Lookup.TOPIC_WARNING, "Unable to find a concept named '" +
+                            history.getNewValue() + "'" + "associated with '" + concept.getPrimaryConceptName().getName() +
+                            "'. Unable to reject this history.");
                 }
                 else {
                     
                     // Verify that the old name is not being used by another concept in the database. If it is return
                     Concept duplicate = null;
                     try {
-                        duplicate = KnowledgeBaseCache.getInstance().findConceptByName(history.getOldValue());
+                        duplicate = conceptDAO.findByName(history.getOldValue());
                     }
-                    catch (DAOException e1) {
-                        AppFrameDispatcher.showErrorDialog("An error occured while attempting to look up '" + conceptName.getName() + "' from the database.");
+                    catch (Exception e1) {
+                        EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e1);
                         log.error("A database error occured while looking up '" + conceptName.getName() + "'", e1);
                     }
                     
                     if (duplicate == null) {
                             conceptName.setName(history.getOldValue());
                         try {
-                            ConceptDAO.getInstance().updateConceptNameUsedByAnnotations((Concept) concept);
-                            ConceptDAO.getInstance().update((Concept) concept);
+                            knowledgebaseDAO.updateConceptNameUsedByAnnotations(concept);
+                            conceptDAO.update(concept);
                             super.reject(userAccount, history);
                         }
-                        catch (DAOException e) {
+                        catch (Exception e) {
                             String s = "The attempt to change " + history.getNewValue() + 
                                     " to " + history.getOldValue() + " failed.";
                             conceptName.setName(history.getNewValue());
-                            AppFrameDispatcher.showErrorDialog(s);
+                            Exception ne = new VARSException(s, e);
+                            EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, ne);
                             log.error(s, e);
                         }
                         
                     }
                     else {
-                        AppFrameDispatcher.showWarningDialog("Unable to reject this history. The name '" + history.getOldValue() + "' exists in the knowledgebase.");
+                        EventBus.publish(Lookup.TOPIC_WARNING, "Unable to reject this history. The name '" +
+                                history.getOldValue() + "' exists in the knowledgebase.");
                     }
                 }
             }

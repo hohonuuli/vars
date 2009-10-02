@@ -10,24 +10,25 @@
 
 package vars.knowledgebase.ui.actions;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.Frame;
 import java.util.Collection;
-
-import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
 import org.mbari.awt.event.ActionAdapter;
-import org.mbari.vars.ui.NewUserDialog;
-import org.mbari.vars.dao.DAOException;
-import org.mbari.vars.knowledgebase.model.Concept;
-import org.mbari.vars.knowledgebase.model.ConceptName;
-import org.mbari.vars.knowledgebase.model.dao.ConceptDAO;
-import org.mbari.vars.knowledgebase.model.dao.KnowledgeBaseCache;
-import vars.Role;
-import org.mbari.vars.model.UserAccount;
-import org.mbari.vars.model.dao.UserAccountDAO;
-import org.mbari.vars.util.AppFrameDispatcher;
+
+import vars.MiscFactory;
+import vars.UserAccount;
+import vars.UserAccountDAO;
+import vars.UserAccountRoles;
+import vars.VARSPersistenceException;
+import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptDAO;
+import vars.knowledgebase.ConceptName;
+import vars.knowledgebase.ConceptNameTypes;
+import vars.knowledgebase.KnowledgebaseFactory;
+import vars.knowledgebase.ui.Lookup;
+import vars.shared.ui.dialogs.NewUserDialog;
+
 
 /**
  * This action generates a default database that can be used for the knowledgebase.
@@ -35,10 +36,18 @@ import org.mbari.vars.util.AppFrameDispatcher;
  */
 public class PopulateDatabaseAction extends ActionAdapter {
 
-    private static final long serialVersionUID = 2286120036607506672L;
+    private final ConceptDAO conceptDAO;
+    private final UserAccountDAO userAccountDAO;
+    private final KnowledgebaseFactory knowledgebaseFactory;
+    private final MiscFactory miscFactory;
 
-    /** Creates a new instance of PopulateDatabaseAction */
-    public PopulateDatabaseAction() {}
+    public PopulateDatabaseAction(ConceptDAO conceptDAO, KnowledgebaseFactory knowledgebaseFactory, MiscFactory miscFactory, UserAccountDAO userAccountDAO) {
+        this.conceptDAO = conceptDAO;
+        this.knowledgebaseFactory = knowledgebaseFactory;
+        this.miscFactory = miscFactory;
+        this.userAccountDAO = userAccountDAO;
+    }
+    
 
     /**
      *     Method description
@@ -50,14 +59,12 @@ public class PopulateDatabaseAction extends ActionAdapter {
         try {
             ok = checkRootConcept();
             ok = checkAdmin();
-        } catch (DAOException ex) {
-            RuntimeException re = new RuntimeException("Failed to fully initialize knowledgebase");
-            re.initCause(ex);
-            throw re;
+        } catch (Exception ex) {
+            throw new VARSPersistenceException("Failed to fully initialize knowledgebase", ex);
         }
         
         if (!ok) {
-            throw new RuntimeException("Failed to fully initialize the knowledgbase");
+            throw new VARSPersistenceException("Failed to fully initialize the knowledgbase");
         }
     }
     
@@ -65,29 +72,31 @@ public class PopulateDatabaseAction extends ActionAdapter {
     /**
      * @throws RuntimeException - Thrown if unable to find or create a root concept
      */
-    private boolean checkRootConcept() throws DAOException{
+    private boolean checkRootConcept() {
         
         /*
          * The Knowledgebase needs to have a root concept
          */
-        Concept root = KnowledgeBaseCache.getInstance().findRootConcept();
+        Concept root = conceptDAO.findRoot();
         boolean gotRoot = (root != null);
         
         if (!gotRoot) {
 
-            int ok = JOptionPane.showConfirmDialog(AppFrameDispatcher.getFrame(),
+            final Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
+
+            int ok = JOptionPane.showConfirmDialog(frame,
                          "Unable to find the root of the knowledgebase. Do you want to create one?",
                          "VARS - No Root Found", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
             
             if (ok == JOptionPane.YES_OPTION) {
-                ConceptName name = new ConceptName(ConceptName.NAME_DEFAULT, ConceptName.NAMETYPE_PRIMARY);
-                name.setAuthor("VARS");
-                Concept concept = new Concept();
-                concept.addConceptName(name);
+                ConceptName conceptName = knowledgebaseFactory.newConceptName();
+                conceptName.setNameType(ConceptNameTypes.PRIMARY.toString());
+                conceptName.setName(ConceptName.NAME_DEFAULT);
+                conceptName.setAuthor("VARS");
+                Concept concept = knowledgebaseFactory.newConcept();
+                concept.addConceptName(conceptName);
                 concept.setOriginator("VARS");
-
-                ConceptDAO.getInstance().insert(concept);
-                KnowledgeBaseCache.getInstance().clear();
+                conceptDAO.makePersistent(concept);
                 gotRoot = true;
 
             }
@@ -99,24 +108,26 @@ public class PopulateDatabaseAction extends ActionAdapter {
     /**
      * @throws RuntimeException if unable to find or create an Administrator
      */
-    private boolean checkAdmin() throws DAOException {
+    private boolean checkAdmin() {
         
-        Collection admins = UserAccountDAO.getInstance().findAdmins();
+        Collection<UserAccount> admins = userAccountDAO.findAllByRole(UserAccountRoles.ADMINISTRATOR.toString());
         boolean gotAdmins = (admins.size() != 0);
         
         if (!gotAdmins) {
             
+            final Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
+
             // create an admin
-            int ok = JOptionPane.showConfirmDialog(AppFrameDispatcher.getFrame(),
+            int ok = JOptionPane.showConfirmDialog(frame,
                          "Unable to find any Administrator accounts. Do you want to create one?",
                          "VARS - No Administrator Found", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
             
             if (ok == JOptionPane.YES_OPTION) {
-                UserAccount admin = NewUserDialog.showDialog(AppFrameDispatcher.getFrame(), true, 
-                        "VARS - Create Administrator Account");
+                UserAccount admin = NewUserDialog.showDialog(frame, true,
+                        "VARS - Create Administrator Account", userAccountDAO, miscFactory);
                 if (admin != null) {
-                    admin.setRole(Role.ADMINISTRATOR);
-                    UserAccountDAO.getInstance().update(admin);
+                    admin.setRole(UserAccountRoles.ADMINISTRATOR.toString());
+                    userAccountDAO.update(admin);
                     gotAdmins = true;
                 }
 

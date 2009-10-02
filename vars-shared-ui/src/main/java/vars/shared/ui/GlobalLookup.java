@@ -8,11 +8,14 @@ package vars.shared.ui;
 import java.awt.Frame;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import org.bushe.swing.event.EventBus;
+import org.bushe.swing.event.EventTopicSubscriber;
 import org.mbari.util.Dispatcher;
 import vars.UserAccount;
 
 /**
- *
+ * Central lookup for coordinating shared UI resources.
+ * 
  * @author brian
  */
 public class GlobalLookup {
@@ -23,12 +26,16 @@ public class GlobalLookup {
     /**
      * Subscribers to this topic will get a {@link String} as the data
      */
-    public static final String TOPIC_NONFATAL_ERROR = NonFatalErrorSubscriber.TOPIC_NONFATAL_ERROR;
+    public static final String TOPIC_NONFATAL_ERROR = GlobalLookup.class.getName() + "-TopicNonfatalError";
 
     /**
      * Subscribers to this topic will get and {@link Exception} as the data
      */
-    public static final String TOPIC_FATAL_ERROR = FatalErrorSubscriber.TOPIC_FATAL_ERROR;
+    public static final String TOPIC_FATAL_ERROR = GlobalLookup.class.getName() + "-TopicFatalError";
+
+    public static final String TOPIC_WARNING = GlobalLookup.class.getName() + "-TopicWarning";
+
+    public static final String TOPIC_USERACCOUNT = GlobalLookup.class.getName() + "-UserAccount";
 
     /*
      * Throw an exception if the wrong parameter type is set
@@ -53,10 +60,20 @@ public class GlobalLookup {
                 }
             }
         });
+
+        /*
+         * When a UserAccount is sent to this topic on event bus make sure it gets
+         * relayed to the correct Dispatcher
+         */
+        EventBus.subscribe(TOPIC_USERACCOUNT, new EventTopicSubscriber<UserAccount>() {
+            public void onEvent(String topic, UserAccount data) {
+                getUserAccountDispatcher().setValueObject(data);
+            }
+        });
     }
 
     /**
-     *
+     * Reference to a Dispatcher that should be used to manage the currently selected frame
      * @return A Dispatcher refering to a java.awt.Frame object
      */
     public static Dispatcher getSelectedFrameDispatcher() {
@@ -71,7 +88,5 @@ public class GlobalLookup {
     public static Dispatcher getUserAccountDispatcher() {
         return Dispatcher.getDispatcher(KEY_DISPATCHER_USERACCOUNT);
     }
-
-
 
 }

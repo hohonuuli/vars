@@ -39,8 +39,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.mbari.swing.ListListModel;
 import vars.UserAccount;
+import vars.annotation.AnnotationDAOFactory;
+import vars.knowledgebase.Concept;
 import vars.knowledgebase.History;
+import vars.knowledgebase.KnowledgebaseDAO;
+import vars.knowledgebase.KnowledgebaseDAOFactory;
+import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.ui.actions.ApproveHistoryTask;
+import vars.knowledgebase.ui.actions.RejectHistoryTask;
 import vars.shared.ui.OkCancelButtonPanel;
 
 
@@ -72,15 +78,22 @@ public class HistoryEditorPanel extends EditorPanel implements ILockableEditor {
     
     private JScrollPane scrollPane = null;
 
+    private final ApproveHistoryTask approveHistoryTask;
+    private final RejectHistoryTask rejectHistoryTask;
+
     //~--- constructors -------------------------------------------------------
 
     /**
      * This is the default constructor
      */
-    public HistoryEditorPanel() {
+    public HistoryEditorPanel(AnnotationDAOFactory annotationDAOFactory,
+            KnowledgebaseDAO knowledgebaseDAO, KnowledgebaseDAOFactory knowledgebaseDAOFactory,
+            KnowledgebaseFactory knowledgebaseFactory) {
         super();
         initialize();
         setLocked(isLocked());
+        approveHistoryTask = new ApproveHistoryTask(annotationDAOFactory, knowledgebaseDAO, knowledgebaseDAOFactory, knowledgebaseFactory);
+        rejectHistoryTask = new RejectHistoryTask(annotationDAOFactory, knowledgebaseDAO, knowledgebaseDAOFactory, knowledgebaseFactory);
     }
 
     //~--- get methods --------------------------------------------------------
@@ -116,7 +129,7 @@ public class HistoryEditorPanel extends EditorPanel implements ILockableEditor {
                     final UserAccount userAccount = getUserAccount();
                     final History history = (History) getHistoryList().getSelectedValue();
                     String name = history.getConceptMetadata().getConcept().getPrimaryConceptName().getName();
-                    ApproveHistoryTask.approve(userAccount, history);
+                    approveHistoryTask.approve(userAccount, history);
                     final KnowledgebaseApp app = (KnowledgebaseApp) KnowledgebaseApp.DISPATCHER.getValueObject();
 
                     /*
@@ -124,7 +137,7 @@ public class HistoryEditorPanel extends EditorPanel implements ILockableEditor {
                      * check fails we'll end up using the name fetched earlier
                      */
                     try {
-                        String newName = history.getConceptDelegate().getConcept().getPrimaryConceptNameAsString();
+                        String newName = history.getConceptMetadata().getConcept().getPrimaryConceptName().getName();
                         name = newName;
                     }
                     catch (NullPointerException e1) {
@@ -147,8 +160,8 @@ public class HistoryEditorPanel extends EditorPanel implements ILockableEditor {
                 public void actionPerformed(ActionEvent e) {
                     final UserAccount userAccount = getUserAccount();
                     final History history = (History) getHistoryList().getSelectedValue();
-                    String name = history.getConceptDelegate().getConcept().getPrimaryConceptNameAsString();
-                    RejectHistoryTask.reject(userAccount, history);
+                    String name = history.getConceptMetadata().getConcept().getPrimaryConceptName().getName();
+                    rejectHistoryTask.reject(userAccount, history);
                     final KnowledgebaseApp app = (KnowledgebaseApp) KnowledgebaseApp.DISPATCHER.getValueObject();
 
 /*
@@ -156,7 +169,7 @@ public class HistoryEditorPanel extends EditorPanel implements ILockableEditor {
                      * check fails we'll end up using the name fetched earlier
                      */
                     try {
-                        String newName = history.getConceptDelegate().getConcept().getPrimaryConceptNameAsString();
+                        String newName = history.getConceptMetadata().getConcept().getPrimaryConceptName().getName();
                         name = newName;
                     }
                     catch (NullPointerException e1) {
@@ -199,7 +212,7 @@ public class HistoryEditorPanel extends EditorPanel implements ILockableEditor {
                      * Toggle the buttons off if no action needs to be taken
                      */
                     
-                    if (!isLocked() && getUserAccount().isAdmin()) {
+                    if (!isLocked() && getUserAccount().isAdministrator()) {
                         final OkCancelButtonPanel panel = getButtonPanel();
                         panel.getOkButton().setEnabled(history != null && !history.isApproved());
                         panel.getCancelButton().setEnabled(history != null && !history.isApproved());
@@ -303,7 +316,7 @@ public class HistoryEditorPanel extends EditorPanel implements ILockableEditor {
     public void setConcept(final Concept concept) {
         super.setConcept(concept);
         histories.clear();
-        Set historySet = getConcept().getHistorySet();
+        Set<History> historySet = getConcept().getConceptMetadata().getHistories();
         histories.addAll(historySet);
         final ListListModel listModel = (ListListModel) getHistoryList().getModel();
         listModel.clear();
@@ -316,6 +329,7 @@ public class HistoryEditorPanel extends EditorPanel implements ILockableEditor {
      *
      * @param locked
      */
+    @Override
     public void setLocked(final boolean locked) {
         super.setLocked(locked);
         getButtonPanel().getOkButton().setEnabled(!locked);
@@ -331,7 +345,7 @@ public class HistoryEditorPanel extends EditorPanel implements ILockableEditor {
     public void setUserAccount(final UserAccount userAccount) {
         this.userAccount = userAccount;
         boolean enable = false;
-        if ((userAccount != null) && userAccount.isAdmin() &&!isLocked()) {
+        if ((userAccount != null) && userAccount.isAdministrator() &&!isLocked()) {
             enable = true;
         }
 
@@ -380,7 +394,7 @@ public class HistoryEditorPanel extends EditorPanel implements ILockableEditor {
             int c =  t0.compareTo(t1);
             // If it's the same creation date, then compare by the default history compareTo
             if (c == 0) {
-                c = h0.compareTo(h1);
+                c = h0.toString().compareTo(h1.toString());
             }
             return c;
         }
@@ -390,7 +404,6 @@ public class HistoryEditorPanel extends EditorPanel implements ILockableEditor {
     private static final class HistoryListCellRenderer
             extends DefaultListCellRenderer {
 
-        private static final long serialVersionUID = 4985016993680806019L;
         // Selection colors for JList cell renderer
         private static final Color BACKGROUND = (Color) UIManager.get("List.background");
         private static final Color FOREGROUND = (Color) UIManager.get("List.foreground");

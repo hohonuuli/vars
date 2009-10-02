@@ -1,11 +1,20 @@
 /*
- * AddConceptDialog.java
+ * @(#)AddConceptDialog.java   2009.10.02 at 04:53:59 PDT
  *
- * Created on May 18, 2006, 3:45 PM
+ * Copyright 2009 MBARI
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
+
 
 package vars.knowledgebase.ui.dialogs;
 
+import com.google.inject.Inject;
 import foxtrot.Job;
 import foxtrot.Worker;
 import java.awt.Frame;
@@ -13,27 +22,27 @@ import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.ImageIcon;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.bushe.swing.event.EventBus;
 import org.mbari.swing.JFancyButton;
 import org.mbari.util.Dispatcher;
-import org.mbari.vars.dao.DAOException;
-import org.mbari.vars.dao.IDataObject;
-import org.mbari.vars.knowledgebase.model.Concept;
-import org.mbari.vars.knowledgebase.model.ConceptName;
-import org.mbari.vars.knowledgebase.model.HistoryFactory;
-import vars.knowledgebase.IConceptName;
-import org.mbari.vars.knowledgebase.model.dao.ConceptDAO;
-import org.mbari.vars.knowledgebase.model.dao.KnowledgeBaseCache;
-import org.mbari.vars.knowledgebase.ui.KnowledgebaseApp;
-import org.mbari.vars.knowledgebase.ui.KnowledgebaseFrame;
-import org.mbari.vars.knowledgebase.ui.actions.ApproveHistoryTask;
-import org.mbari.vars.model.UserAccount;
-import org.mbari.vars.ui.AllConceptNamesComboBox;
-import org.mbari.vars.util.AppFrameDispatcher;
-import vars.IUserAccount;
-import vars.knowledgebase.IConcept;
-import vars.knowledgebase.IHistory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import vars.UserAccount;
+import vars.VARSException;
+import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptDAO;
+import vars.knowledgebase.ConceptName;
+import vars.knowledgebase.ConceptNameTypes;
+import vars.knowledgebase.History;
+import vars.knowledgebase.HistoryFactory;
+import vars.knowledgebase.KnowledgebaseDAOFactory;
+import vars.knowledgebase.KnowledgebaseFactory;
+import vars.knowledgebase.ui.KnowledgebaseFrame;
+import vars.knowledgebase.ui.Lookup;
+import vars.knowledgebase.ui.actions.ApproveHistoryTask;
+import vars.query.QueryDAO;
+import vars.shared.ui.AllConceptNamesComboBox;
+import vars.shared.ui.GlobalLookup;
 
 /**
  * @author brian
@@ -42,44 +51,84 @@ public class AddConceptDialog extends javax.swing.JDialog {
 
     private static final long serialVersionUID = 6993327643414741677L;
     private static final Logger log = LoggerFactory.getLogger(AddConceptDialog.class);
-    /**
-	 * @uml.property  name="actionSupport"
-	 * @uml.associationEnd  multiplicity="(1 1)" inverse="this$0:org.mbari.vars.knowledgebase.ui.dialogs.AddConceptDialog$ActionSupport"
-	 */
-    private final ActionSupport actionSupport = new ActionSupport();  //  @jve:decl-index=0:
-    /**
-	 * @uml.property  name="concept"
-	 * @uml.associationEnd  
-	 */
-    private IConcept concept;  //  @jve:decl-index=0:
+    private final AddConceptDialogController controller = new AddConceptDialogController();
+    private final ApproveHistoryTask approveHistoryTask;
+
+ 
+    private javax.swing.JTextField authorField;
+    private javax.swing.JLabel authorLabel;
+    private javax.swing.JButton cancelButton;
+    private Concept concept;
+    private javax.swing.JComboBox conceptComboBox;
+    private final HistoryFactory historyFactory;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
+    private final KnowledgebaseFactory knowledgebaseFactory;
+    private javax.swing.JTextField nameField;
+    private javax.swing.JLabel nameLabel;
+    private javax.swing.JTextField nodcField;
+    private javax.swing.JButton okButton;
+    private javax.swing.JLabel parentLabel;
+    private final QueryDAO queryDAO;
+    private javax.swing.JComboBox rankLevelComboBox;
+    private javax.swing.JComboBox rankNameComboBox;
+    private javax.swing.JTextArea referenceText;
+    private javax.swing.JTextArea titleText;
 
 
     /**
      * Creates new form AddConceptDialog
+     *
+     * @param approveHistoryTask
+     * @param knowledgebaseDAOFactory
+     * @param knowledgebaseFactory
+     * @param queryDAO
      */
-    public AddConceptDialog() {
-        super(AppFrameDispatcher.getFrame(), true);
+    @Inject
+    public AddConceptDialog(ApproveHistoryTask approveHistoryTask, KnowledgebaseDAOFactory knowledgebaseDAOFactory,
+                            KnowledgebaseFactory knowledgebaseFactory, QueryDAO queryDAO) {
+        super((Frame) Lookup.getApplicationDispatcher().getValueObject(), true);
+        this.approveHistoryTask = approveHistoryTask;
+        this.knowledgebaseFactory = knowledgebaseFactory;
+        this.queryDAO = queryDAO;
+        this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
+        this.historyFactory = new HistoryFactory(knowledgebaseFactory);
         initComponents();
         initModel();
-        setLocationRelativeTo(AppFrameDispatcher.getFrame());
+        setLocationRelativeTo((Frame) Lookup.getApplicationDispatcher().getValueObject());
         pack();
     }
 
+    private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {    
+        setVisible(false);
+        setConcept(null);
+    }                                                                     
+
+    private void cancelButtonKeyReleased(java.awt.event.KeyEvent evt) {    
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            cancelButtonActionPerformed(null);
+        }
+    }    
 
     /**
-     * This method is called from within the constructor to
-     * initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is
-     * always regenerated by the Form Editor.
+     * @return  the conceptComboBox
      */
-    // <editor-fold defaultstate="collapsed" desc=" Generated Code ">//GEN-BEGIN:initComponents
-    private void initComponents() {
+    public javax.swing.JComboBox getConceptComboBox() {
+        return conceptComboBox;
+    }
+
+     private void initComponents() {
         nameLabel = new javax.swing.JLabel();
         authorLabel = new javax.swing.JLabel();
         authorField = new javax.swing.JTextField();
         nameField = new javax.swing.JTextField();
         parentLabel = new javax.swing.JLabel();
-        conceptComboBox = new AllConceptNamesComboBox();
+        conceptComboBox = new AllConceptNamesComboBox(queryDAO);
         cancelButton = new JFancyButton();
         okButton = new JFancyButton();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -106,12 +155,12 @@ public class AddConceptDialog extends javax.swing.JDialog {
         parentLabel.setText("Author:");
 
         getConceptComboBox().setModel(getConceptComboBox().getModel());
-        getConceptComboBox().setSelectedItem(IConceptName.NAME_DEFAULT);
+        getConceptComboBox().setSelectedItem(ConceptName.NAME_DEFAULT);
         getConceptComboBox().setToolTipText("The parent concept. This concept will be a child of this parent.");
 
         cancelButton.setText("Cancel");
         cancelButton.setIcon(new ImageIcon(getClass().getResource("/images/vars/knowledgebase/delete2.png")));
-        
+
         cancelButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cancelButtonActionPerformed(evt);
@@ -245,106 +294,94 @@ public class AddConceptDialog extends javax.swing.JDialog {
         );
         pack();
     }// </editor-fold>//GEN-END:initComponents
-    
-    @Override
-    public void setVisible(boolean b) {
-        if (b) {
-           nameField.requestFocus();
+
+    private void initModel() {
+
+        final Dispatcher conceptDispatcher = Lookup.getSelectedConceptDispatcher();
+
+        /*
+        * Listen for the node in the tree that's been selected to set the
+        * selection in the combobox
+        */
+        conceptDispatcher.addPropertyChangeListener(new PropertyChangeListener() {
+
+            public void propertyChange(final PropertyChangeEvent evt) {
+                final Concept selectedConcept = (Concept) evt.getNewValue();
+                String conceptName = ConceptName.NAME_DEFAULT;
+                if (selectedConcept != null) {
+                    conceptName = selectedConcept.getPrimaryConceptName().getName();
+                }
+
+                getConceptComboBox().getModel().setSelectedItem(conceptName);
+            }
+
+        });
+
+        /*
+         * It's important to do this. Otherwise when the dialog is first displayed
+         * the conceptComboBox will have 'object' selected no matter what node is
+         * being edited.
+         */
+        final Concept selectedConcept = (Concept) conceptDispatcher.getValueObject();
+        String conceptName = ConceptName.NAME_DEFAULT;
+        if (selectedConcept != null) {
+            conceptName = selectedConcept.getPrimaryConceptName().getName();
         }
-        super.setVisible(b);
+
+        getConceptComboBox().getModel().setSelectedItem(conceptName);
+
+
     }
 
-    private void cancelButtonKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_cancelButtonKeyReleased
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            cancelButtonActionPerformed(null);
-        }
-    }//GEN-LAST:event_cancelButtonKeyReleased
+    private boolean isValidString(String s) {
+        return (s != null) && (s.length() > 0) && !s.matches("\\A\\s+");
+    }
 
-    private void okButtonKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_okButtonKeyReleased
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            okButtonActionPerformed(null);
-        }
-    }//GEN-LAST:event_okButtonKeyReleased
-
-    private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
+    private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {    //GEN-FIRST:event_okButtonActionPerformed
         setVisible(false);
-        setConcept(null);
-    }//GEN-LAST:event_cancelButtonActionPerformed
 
-    private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
-        setVisible(false);
         if (concept == null) {
-            concept = actionSupport.createConcept();
+            concept = controller.createConcept();
         }
+
         try {
             if (concept != null) {
-                actionSupport.updateValues(concept);
+                controller.updateValues(concept);
             }
         }
-        catch (DAOException ex) {
+        catch (Exception ex) {
             log.error("Update failed for " + concept, ex);
-            AppFrameDispatcher.showErrorDialog("Failed to update all the " +
-                    "values in the concept '" +
-                    concept.getPrimaryConceptNameAsString() + "'");
+            EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, ex);
         }
 
-        final Frame frame = AppFrameDispatcher.getFrame();
+        final Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
         if ((frame != null) && (frame instanceof KnowledgebaseFrame)) {
-            final String name = concept.getPrimaryConceptNameAsString();
+            final String name = concept.getPrimaryConceptName().getName();
             Worker.post(new Job() {
+
                 public Object run() {
                     ((KnowledgebaseFrame) frame).refreshTreeAndOpenNode(name);
+
                     return null;
                 }
+
 
             });
         }
 
         setConcept(null);
 
-    }//GEN-LAST:event_okButtonActionPerformed
+    }                                                                  
 
-    private void initModel() {
-    	
-    	final Dispatcher conceptDispatcher = KnowledgebaseApp.DISPATCHER_SELECTED_CONCEPT;
-    	
-        /*
-        * Listen for the node in the tree that's been selected to set the
-        * selection in the combobox
-        */
-    	conceptDispatcher.addPropertyChangeListener(new PropertyChangeListener() {
-            public void propertyChange(final PropertyChangeEvent evt) {
-                final Concept selectedConcept = (Concept) evt.getNewValue();
-                String conceptName = IConceptName.NAME_DEFAULT;
-                if (selectedConcept != null) {
-                    conceptName = selectedConcept.getPrimaryConceptNameAsString();
-                }
-                getConceptComboBox().getModel().setSelectedItem(conceptName);
-            }
-        });
-    	
-    	/*
-    	 * It's important to do this. Otherwise when the dialog is first displayed
-    	 * the conceptComboBox will have 'object' selected no matter what node is
-    	 * being edited.
-    	 */
-    	final Concept selectedConcept = (Concept) KnowledgebaseApp.DISPATCHER_SELECTED_CONCEPT.getValueObject();
-    	String conceptName = IConceptName.NAME_DEFAULT;
-    	if (selectedConcept != null) {
-    		conceptName = selectedConcept.getPrimaryConceptNameAsString();
-    	}
-    	getConceptComboBox().getModel().setSelectedItem(conceptName);
-        
+    private void okButtonKeyReleased(java.awt.event.KeyEvent evt) {    
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            okButtonActionPerformed(null);
+        }
+    }    
 
-    }
-
-
-    /**
-	 * @param concept  the concept to set
-	 * @uml.property  name="concept"
-	 */
-    public void setConcept(IConcept concept) {
+    public void setConcept(Concept concept) {
         this.concept = concept;
+
         if (concept == null) {
             nameField.setEnabled(true);
             nameField.setText("");
@@ -357,329 +394,252 @@ public class AddConceptDialog extends javax.swing.JDialog {
         }
         else {
             nameField.setEnabled(false);
-            nameField.setText(concept.getPrimaryConceptNameAsString());
+            nameField.setText(concept.getPrimaryConceptName().getName());
             authorField.setText(concept.getPrimaryConceptName().getAuthor());
             nodcField.setText(concept.getNodcCode());
             rankLevelComboBox.setSelectedItem(concept.getRankLevel());
             rankNameComboBox.setSelectedItem(concept.getRankName());
             referenceText.setText(concept.getReference());
-            getConceptComboBox().setSelectedItem(concept.getParentConcept().getPrimaryConceptNameAsString());
+            getConceptComboBox().setSelectedItem(concept.getParentConcept().getPrimaryConceptName().getName());
             setTitle("VARS - Edit an Existing Concept");
         }
 
     }
 
+    @Override
+    public void setVisible(boolean b) {
+        if (b) {
+            nameField.requestFocus();
+        }
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new AddConceptDialog().setVisible(true);
-            }
-        });
+        super.setVisible(b);
     }
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    /**
-	 * @uml.property  name="authorField"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private javax.swing.JTextField authorField;
-    /**
-	 * @uml.property  name="authorLabel"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private javax.swing.JLabel authorLabel;
-    /**
-	 * @uml.property  name="cancelButton"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private javax.swing.JButton cancelButton;
-    /**
-	 * @uml.property  name="conceptComboBox"
-	 * @uml.associationEnd  multiplicity="(0 -1)" elementType="java.lang.String"
-	 */
-    private javax.swing.JComboBox conceptComboBox;
-    /**
-	 * @uml.property  name="jLabel1"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private javax.swing.JLabel jLabel1;
-    /**
-	 * @uml.property  name="jLabel2"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private javax.swing.JLabel jLabel2;
-    /**
-	 * @uml.property  name="jLabel3"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private javax.swing.JLabel jLabel3;
-    /**
-	 * @uml.property  name="jLabel4"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private javax.swing.JLabel jLabel4;
-    /**
-	 * @uml.property  name="jScrollPane1"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private javax.swing.JScrollPane jScrollPane1;
-    /**
-	 * @uml.property  name="jScrollPane2"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private javax.swing.JScrollPane jScrollPane2;
-    /**
-	 * @uml.property  name="nameField"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private javax.swing.JTextField nameField;
-    /**
-	 * @uml.property  name="nameLabel"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private javax.swing.JLabel nameLabel;
-    /**
-	 * @uml.property  name="nodcField"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private javax.swing.JTextField nodcField;
-    /**
-	 * @uml.property  name="okButton"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private javax.swing.JButton okButton;
-    /**
-	 * @uml.property  name="parentLabel"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private javax.swing.JLabel parentLabel;
-    /**
-	 * @uml.property  name="rankLevelComboBox"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private javax.swing.JComboBox rankLevelComboBox;
-    /**
-	 * @uml.property  name="rankNameComboBox"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private javax.swing.JComboBox rankNameComboBox;
-    /**
-	 * @uml.property  name="referenceText"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private javax.swing.JTextArea referenceText;
-    /**
-	 * @uml.property  name="titleText"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private javax.swing.JTextArea titleText;
-    // End of variables declaration//GEN-END:variables
+    private class AddConceptDialogController {
 
+        private final ConceptDAO conceptDAO;
 
-    private class ActionSupport {
-        public IConcept createConcept() {
+        /**
+         * Constructs ...
+         */
+        public AddConceptDialogController() {
+            conceptDAO = knowledgebaseDAOFactory.newConceptDAO();
+        }
+
+        public Concept createConcept() {
 
             /*
              * Get the parent concept
              */
-            IConcept concept = null;
-            IConcept parentConcept = null;
+            Concept concept = null;
+            Concept parentConcept = null;
             try {
-                parentConcept = KnowledgeBaseCache.getInstance().findConceptByName((String) getConceptComboBox().getSelectedItem());
+                parentConcept = conceptDAO.findByName((String) getConceptComboBox().getSelectedItem());
             }
-            catch (DAOException ex) {
-                AppFrameDispatcher.showErrorDialog("Failed to lookup '" + getConceptComboBox().getSelectedItem() + "'. Canceling your request");
+            catch (Exception ex) {
+                String msg = "Failed to lookup '" + getConceptComboBox().getSelectedItem() +
+                             "'. Canceling your request";
+                log.error(msg, ex);
+                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, msg);
+
                 return concept;
             }
 
             if (parentConcept == null) {
+
                 // TODO brian: Make sure that there are no existing root concepts
-                throw new RuntimeException("No parent Concept was specified. You MUST Specify a parent Concept");
+                throw new VARSException("No parent Concept was specified. You MUST Specify a parent Concept");
             }
 
             /*
              * Check userAccount status
              */
-            UserAccount userAccount = (UserAccount) KnowledgebaseApp.DISPATCHER_USERACCOUNT.getValueObject();
+            UserAccount userAccount = (UserAccount) GlobalLookup.getUserAccountDispatcher().getValueObject();
             boolean okToProceed = (userAccount != null);
 
             String primaryName = nameField.getText();
             if (okToProceed && (primaryName != null)) {
 
                 // Do not add a concept with a name that already exists in the database
-                IConcept existingConcept = null;
+                Concept existingConcept = null;
                 try {
-                    existingConcept = KnowledgeBaseCache.getInstance().findConceptByName(primaryName);
+
+                    existingConcept = conceptDAO.findByName(primaryName);
                 }
-                catch (DAOException e) {
+                catch (Exception e) {
                     if (log.isErrorEnabled()) {
-                        log.error( "Failed to lookup '" + primaryName +
-                                "' in the knowledgebase", e);
+                        log.error("Failed to lookup '" + primaryName + "' in the knowledgebase", e);
                     }
 
-                    AppFrameDispatcher.showErrorDialog("Unable to complete " +
-                                "your request. An error occured while attempting " +
-                                "to query the database");
+                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR,
+                                     "Unable to complete " + "your request. An error occured while attempting " +
+                                     "to query the database");
                     okToProceed = false;
                 }
 
                 if (okToProceed && (existingConcept != null)) {
-                    AppFrameDispatcher.showErrorDialog( "Unable to complete your " + 
-                            "request. The name, '" + primaryName +
-                            "' already exists in the knowledgebase.");
+                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR,
+                                     "Unable to complete your " + "request. The name, '" + primaryName +
+                                     "' already exists in the knowledgebase.");
                     okToProceed = false;
                 }
 
                 // Add the concept to the database;
 
                 if (okToProceed) {
-                    concept = new Concept();
+                    concept = knowledgebaseFactory.newConcept();
+
                     // Set reuired fields
-                    IConceptName conceptName = new ConceptName();
+                    ConceptName conceptName = knowledgebaseFactory.newConceptName();
                     conceptName.setName(primaryName);
-                    conceptName.setNameType(IConceptName.NAMETYPE_PRIMARY);
+                    conceptName.setNameType(ConceptNameTypes.PRIMARY.toString());
                     concept.addConceptName(conceptName);
                     concept.setOriginator(userAccount.getUserName());
                     parentConcept.addChildConcept(concept);
 
                     try {
-                        ConceptDAO.getInstance().insert((IDataObject) concept);
+                        conceptDAO.makePersistent(concept);
                     }
-                    catch (DAOException e) {
+                    catch (Exception e) {
                         log.error("Failed to insert " + concept, e);
-                        AppFrameDispatcher.showErrorDialog("Unable to complete " +
-                                "your request. There was a problem with the " +
-                                "database transaction.");
+                        EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR,
+                                         "Unable to complete " + "your request. There was a problem with the " +
+                                         "database transaction.");
                         parentConcept.removeChildConcept(concept);
                         okToProceed = false;
                     }
                 }
 
                 // Generate a history for the new Concept
-                IHistory history = null;
+                History history = null;
                 if (okToProceed) {
-                    history = HistoryFactory.add(userAccount, concept);
-                    parentConcept.addHistory(history);
+                    history = historyFactory.add(userAccount, concept);
+                    parentConcept.getConceptMetadata().addHistory(history);
+
                     if (log.isDebugEnabled()) {
-                    	log.debug("Adding " + history + " to " + parentConcept);
+                        log.debug("Adding " + history + " to " + parentConcept);
                     }
+
                     try {
-                        ConceptDAO.getInstance().update((IDataObject) parentConcept);
-                        ConceptDAO.getInstance().update((IDataObject) parentConcept);
+                        conceptDAO.update(parentConcept);
                     }
-                    catch (DAOException e) {
+                    catch (Exception e) {
                         log.error("Failed to update " + parentConcept, e);
-                        AppFrameDispatcher.showWarningDialog("There is a problem " +
-                                "with the database connection. Unable to add history" +
-                                " information to the database.");
+                        EventBus.publish(Lookup.TOPIC_WARNING,
+                                         "There is a problem " +
+                                         "with the database connection. Unable to add history" +
+                                         " information to the database.");
                     }
 
                     /*
                      * If the user is an admin then you can approve
                      */
-                    if (userAccount.isAdmin()) {
-                        ApproveHistoryTask.approve(userAccount, history);
+                    if (userAccount.isAdministrator()) {
+                        approveHistoryTask.approve(userAccount, history);
                     }
                 }
 
 
             }
+
             return concept;
         }
 
+        void updateValues(final Concept concept) {
 
-        void updateValues(final IConcept concept) throws DAOException {
-
-            final ConceptDAO dao = ConceptDAO.getInstance();
-            final IUserAccount userAccount = (UserAccount) KnowledgebaseApp.DISPATCHER_USERACCOUNT.getValueObject();
+            final UserAccount userAccount = (UserAccount) GlobalLookup.getUserAccountDispatcher().getValueObject();
 
             /*
             * Modify the parent concept
             */
             final String parentName = (String) getConceptComboBox().getSelectedItem();
             final Concept oldParentConcept = (Concept) concept.getParentConcept();
-            final Concept newParentConcept = KnowledgeBaseCache.getInstance().findConceptByName(parentName);
+            final Concept newParentConcept = conceptDAO.findByName(parentName);
 
             /*
              * Make sure that you didn't tyr to add it to a descendant
              */
             if (concept.hasDescendent(parentName)) {
-                AppFrameDispatcher.showWarningDialog("The parent that you specified, '" + parentName + "', is already a child" +
-                        " of '" + concept.getPrimaryConceptNameAsString() + "'. This is not allowed. Your request to move" +
-                        " the concept is being ignored.");
+                EventBus.publish(Lookup.TOPIC_WARNING,
+                                 "The parent that you specified, '" + parentName + "', is already a child" + " of '" +
+                                 concept.getPrimaryConceptName().getName() +
+                                 "'. This is not allowed. Your request to move" + " the concept is being ignored.");
             }
-            else if (!newParentConcept.equals(oldParentConcept) &&
-                    !newParentConcept.equals(concept)) {
+            else if (!newParentConcept.equals(oldParentConcept) && !newParentConcept.equals(concept)) {
 
                 if (oldParentConcept != null) {
                     oldParentConcept.removeChildConcept(concept);
-                    dao.update(oldParentConcept);
+                    conceptDAO.update(oldParentConcept);
                 }
+
                 newParentConcept.addChildConcept(concept);
-                dao.update(newParentConcept);
-                final IHistory history = HistoryFactory.replaceParentConcept(userAccount, oldParentConcept, newParentConcept);
-                concept.addHistory(history);
+                conceptDAO.update(newParentConcept);
+                final History history = historyFactory.replaceParentConcept(userAccount, oldParentConcept,
+                    newParentConcept);
+                concept.getConceptMetadata().addHistory(history);
 
                 /*
                  * If the user is an admin then you can approve
                  */
-                if (userAccount.isAdmin()) {
-                    ApproveHistoryTask.approve(userAccount, history);
+                if (userAccount.isAdministrator()) {
+                    approveHistoryTask.approve(userAccount, history);
                 }
             }
 
             // Set optional fields
             final String oldNodcCode = concept.getNodcCode();
             final String nodcCode = isValidString(nodcField.getText()) ? nodcField.getText() : null;
-        	if ((nodcCode != null && !nodcCode.equals(oldNodcCode)) || 
-        			(nodcCode == null && oldNodcCode != null)) {
-        		final IHistory history = HistoryFactory.replaceNodcCode(userAccount, oldNodcCode, nodcCode);
-        		concept.addHistory(history);
-        		concept.setNodcCode(nodcCode);
-        		if (userAccount.isAdmin()) {
-        			ApproveHistoryTask.approve(userAccount, history);
-        		}
-        	}
+            if (((nodcCode != null) && !nodcCode.equals(oldNodcCode)) ||
+                    ((nodcCode == null) && (oldNodcCode != null))) {
+                final History history = historyFactory.replaceNodcCode(userAccount, oldNodcCode, nodcCode);
+                concept.getConceptMetadata().addHistory(history);
+                concept.setNodcCode(nodcCode);
 
-        	final String oldRankName = concept.getRankName();
-            final String rankName = isValidString((String) rankNameComboBox.getSelectedItem()) ? (String) rankNameComboBox.getSelectedItem() : null;
-        	if ((rankName != null && !rankName.equals(oldRankName)) || 
-        			(rankName == null && oldRankName != null)) {
-        		final IHistory history = HistoryFactory.replaceRankName(userAccount, oldRankName, rankName);
-        		concept.addHistory(history);
-        		concept.setRankName(rankName);
-        		if (userAccount.isAdmin()) {
-        			ApproveHistoryTask.approve(userAccount, history);
-        		}
-        	}
+                if (userAccount.isAdministrator()) {
+                    approveHistoryTask.approve(userAccount, history);
+                }
+            }
 
-        	final String oldRankLevel = concept.getRankLevel();
-            final String rankLevel = isValidString((String) rankLevelComboBox.getSelectedItem()) ? (String) rankLevelComboBox.getSelectedItem() : null;
-        	if ((rankLevel != null && !rankLevel.equals(oldRankLevel)) || 
-        			(rankLevel == null && oldRankLevel != null)) {
-        		final IHistory history = HistoryFactory.replaceRankLevel(userAccount, oldRankLevel, rankLevel);
-        		concept.addHistory(history);
-        		concept.setRankLevel(rankLevel);
-        		if (userAccount.isAdmin()) {
-        			ApproveHistoryTask.approve(userAccount, history);
-        		}
-        	}
-        	
-        	final String oldReference = concept.getReference();
+            final String oldRankName = concept.getRankName();
+            final String rankName = isValidString((String) rankNameComboBox.getSelectedItem())
+                                    ? (String) rankNameComboBox.getSelectedItem() : null;
+            if (((rankName != null) && !rankName.equals(oldRankName)) ||
+                    ((rankName == null) && (oldRankName != null))) {
+                final History history = historyFactory.replaceRankName(userAccount, oldRankName, rankName);
+                concept.getConceptMetadata().addHistory(history);
+                concept.setRankName(rankName);
+
+                if (userAccount.isAdministrator()) {
+                    approveHistoryTask.approve(userAccount, history);
+                }
+            }
+
+            final String oldRankLevel = concept.getRankLevel();
+            final String rankLevel = isValidString((String) rankLevelComboBox.getSelectedItem())
+                                     ? (String) rankLevelComboBox.getSelectedItem() : null;
+            if (((rankLevel != null) && !rankLevel.equals(oldRankLevel)) ||
+                    ((rankLevel == null) && (oldRankLevel != null))) {
+                final History history = historyFactory.replaceRankLevel(userAccount, oldRankLevel, rankLevel);
+                concept.getConceptMetadata().addHistory(history);
+                concept.setRankLevel(rankLevel);
+
+                if (userAccount.isAdministrator()) {
+                    approveHistoryTask.approve(userAccount, history);
+                }
+            }
+
+            final String oldReference = concept.getReference();
             final String reference = isValidString(referenceText.getText()) ? referenceText.getText() : null;
-        	if ((reference != null && !reference.equals(oldReference)) || 
-        			(reference == null && oldReference != null)) {
-        		final IHistory history = HistoryFactory.replaceReference(userAccount, oldReference, reference);
-        		concept.addHistory(history);
-        		concept.setReference(reference);
-        		if (userAccount.isAdmin()) {
-        			ApproveHistoryTask.approve(userAccount, history);
-        		}
-        	}
+            if (((reference != null) && !reference.equals(oldReference)) ||
+                    ((reference == null) && (oldReference != null))) {
+                final History history = historyFactory.replaceReference(userAccount, oldReference, reference);
+                concept.getConceptMetadata().addHistory(history);
+                concept.setReference(reference);
+
+                if (userAccount.isAdministrator()) {
+                    approveHistoryTask.approve(userAccount, history);
+                }
+            }
 
             final String author = authorField.getText();
             final ConceptName primaryName = (ConceptName) concept.getPrimaryConceptName();
@@ -690,22 +650,7 @@ public class AddConceptDialog extends javax.swing.JDialog {
                 primaryName.setAuthor(null);
             }
 
-            dao.update((IDataObject) concept);
+            conceptDAO.update(concept);
         }
     }
-
-    private boolean isValidString(String s) {
-        return s != null && s.length() > 0 && !s.matches("\\A\\s+");
-    }
-
-
-	/**
-	 * @return  the conceptComboBox
-	 * @uml.property  name="conceptComboBox"
-	 */
-	public javax.swing.JComboBox getConceptComboBox() {
-		return conceptComboBox;
-	}
-
-
 }

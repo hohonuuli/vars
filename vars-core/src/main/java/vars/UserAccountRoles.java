@@ -21,4 +21,11 @@ public enum UserAccountRoles {
     public String getRoleName() {
         return roleName;
     }
+
+    @Override
+    public String toString() {
+        return roleName;
+    }
+
+
 }

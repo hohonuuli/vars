@@ -21,7 +21,6 @@ import java.awt.BorderLayout;
 
 import javax.swing.JPanel;
 
-import vars.knowledgebase.SimpleConceptBean;
 import vars.knowledgebase.*;
 
 

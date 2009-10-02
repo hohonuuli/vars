@@ -9,14 +9,13 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.mbari.util.Dispatcher;
 import vars.query.QueryModule;
-import vars.shared.ui.FatalErrorSubscriber;
-import vars.shared.ui.NonFatalErrorSubscriber;
+import vars.shared.ui.GlobalLookup;
 
 /**
  *
  * @author brian
  */
-public class Lookup {
+public class Lookup extends GlobalLookup {
 
     protected static final Object KEY_DISPATCHER_APPLICATION_FRAME = QueryFrame.class;
 
@@ -26,15 +25,6 @@ public class Lookup {
 
     public static final Object KEY_DISPATCHER_GUICE_INJECTOR = Injector.class;
 
-    /**
-     * Subscribers to this topic will get a {@link String} as the data
-     */
-    public static final String TOPIC_NONFATAL_ERROR = NonFatalErrorSubscriber.TOPIC_NONFATAL_ERROR;
-
-    /**
-     * Subscribers to this topic will get and {@link Exception} as the data
-     */
-    public static final String TOPIC_FATAL_ERROR = FatalErrorSubscriber.TOPIC_FATAL_ERROR;
 
     protected static Dispatcher getApplicationFrameDispatcher() {
         return Dispatcher.getDispatcher(KEY_DISPATCHER_APPLICATION_FRAME);
