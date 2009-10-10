@@ -16,24 +16,17 @@ import javax.swing.BorderFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.mbari.awt.event.ActionAdapter;
-import org.mbari.vars.dao.DAOException;
-import org.mbari.vars.knowledgebase.model.Concept;
-import org.mbari.vars.knowledgebase.model.HistoryFactory;
-import vars.knowledgebase.IConceptName;
-import org.mbari.vars.knowledgebase.model.LinkTemplate;
-import org.mbari.vars.knowledgebase.model.dao.ConceptDAO;
-import org.mbari.vars.knowledgebase.model.dao.KnowledgeBaseCache;
-import org.mbari.vars.knowledgebase.model.dao.LinkTemplateDAO;
-import org.mbari.vars.knowledgebase.ui.actions.ApproveHistoryTask;
-import org.mbari.vars.knowledgebase.ui.dialogs.AddLinkTemplateDialog;
+import vars.knowledgebase.ConceptName;
 import vars.ILink;
-import org.mbari.vars.model.UserAccount;
-import org.mbari.vars.util.AppFrameDispatcher;
 import org.mbari.swing.WaitIndicator;
 import org.mbari.swing.SpinningDialWaitIndicator;
 import foxtrot.Worker;
 import foxtrot.Job;
-import vars.knowledgebase.IHistory;
+import java.awt.Frame;
+import vars.knowledgebase.Concept;
+import vars.knowledgebase.History;
+import vars.knowledgebase.LinkTemplate;
+import vars.knowledgebase.ui.dialogs.AddLinkTemplateDialog;
 
 /**
  *
@@ -70,9 +63,12 @@ public class LinkTemplateEditorPanel extends EditorPanel {
      */
     private ActionAdapter deleteAction;
 
+    private final ToolBelt toolBelt;
+
     /** Creates a new instance of LinkTemplateEditorPanel */
-    public LinkTemplateEditorPanel() {
+    public LinkTemplateEditorPanel(final ToolBelt toolBelt) {
         initialize();
+        this.toolBelt = toolBelt;
         setLocked(isLocked());
     }
 
@@ -140,6 +136,7 @@ public class LinkTemplateEditorPanel extends EditorPanel {
         return linkEditorPanel;
     }
 
+    @Override
     public void setLocked(boolean locked) {
         super.setLocked(locked);
         getEditorButtonPanel().getNewButton().setEnabled(!locked);
@@ -148,6 +145,7 @@ public class LinkTemplateEditorPanel extends EditorPanel {
         getLinkEditorPanel().setLocked(locked);
     }
 
+    @Override
     public void setConcept(Concept concept) {
         super.setConcept(concept);
         linkEditorPanel.setConcept(concept);
@@ -172,7 +170,8 @@ public class LinkTemplateEditorPanel extends EditorPanel {
          */
         private AddLinkTemplateDialog getDialog() {
             if (dialog == null) {
-                dialog = new AddLinkTemplateDialog(AppFrameDispatcher.getFrame());
+                Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
+                dialog = new AddLinkTemplateDialog(frame, toolBelt);
             }
             return dialog;
         }

@@ -6,7 +6,6 @@
 
 package vars.knowledgebase.ui.dialogs;
 
-import foxtrot.Job;
 import foxtrot.Worker;
 import foxtrot.Task;
 
@@ -15,24 +14,23 @@ import java.awt.event.KeyEvent;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.bushe.swing.event.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.mbari.swing.JFancyButton;
 import org.mbari.swing.WaitIndicator;
 import org.mbari.swing.SpinningDialWaitIndicator;
-import org.mbari.vars.dao.DAOException;
-import org.mbari.vars.knowledgebase.model.Concept;
-import org.mbari.vars.knowledgebase.model.ConceptName;
-import org.mbari.vars.knowledgebase.model.History;
-import org.mbari.vars.knowledgebase.model.HistoryFactory;
-import org.mbari.vars.knowledgebase.model.dao.ConceptDAO;
-import org.mbari.vars.knowledgebase.model.dao.KnowledgeBaseCache;
-import org.mbari.vars.knowledgebase.ui.KnowledgebaseApp;
-import org.mbari.vars.knowledgebase.ui.KnowledgebaseFrame;
-import org.mbari.vars.knowledgebase.ui.actions.ApproveHistoryTask;
-import org.mbari.vars.model.UserAccount;
-import org.mbari.vars.util.AppFrameDispatcher;
-import vars.knowledgebase.IHistory;
+import vars.UserAccount;
+import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptName;
+import vars.knowledgebase.ConceptNameTypes;
+import vars.knowledgebase.History;
+import vars.knowledgebase.HistoryFactory;
+import vars.knowledgebase.KnowledgebaseDAOFactory;
+import vars.knowledgebase.KnowledgebaseFactory;
+import vars.knowledgebase.ui.KnowledgebaseFrame;
+import vars.knowledgebase.ui.Lookup;
+import vars.knowledgebase.ui.actions.ApproveHistoryTask;
 
 /**
  *
@@ -47,13 +45,23 @@ public class AddConceptNameDialog2 extends javax.swing.JDialog {
 	 */
     private Concept concept;
     private static final Logger log = LoggerFactory.getLogger(AddConceptNameDialog2.class);
+    private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
+    private final KnowledgebaseFactory knowledgebaseFactory;
+    private final HistoryFactory historyFactory;
+    private final ApproveHistoryTask approveHistoryTask;
     
     /** Creates new form AddConceptNameDialog2 */
-    public AddConceptNameDialog2(java.awt.Frame parent, boolean modal) {
+    public AddConceptNameDialog2(java.awt.Frame parent, boolean modal, ApproveHistoryTask approveHistoryTask,
+            KnowledgebaseDAOFactory knowledgebaseDAOFactory, KnowledgebaseFactory knowledgebaseFactory) {
         super(parent, modal);
+        this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
+        this.knowledgebaseFactory = knowledgebaseFactory;
+        this.historyFactory = new HistoryFactory(knowledgebaseFactory);
+        this.approveHistoryTask = approveHistoryTask;
         initComponents();
         initModel();
-        setLocationRelativeTo(AppFrameDispatcher.getFrame());
+        Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
+        setLocationRelativeTo(frame);
         pack();
     }
     
@@ -128,6 +136,7 @@ public class AddConceptNameDialog2 extends javax.swing.JDialog {
             }
         });
         cancelButton.addKeyListener(new java.awt.event.KeyAdapter() {
+            @Override
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 cancelButtonKeyReleased(evt);
             }
@@ -142,6 +151,7 @@ public class AddConceptNameDialog2 extends javax.swing.JDialog {
             }
         });
         okButton.addKeyListener(new java.awt.event.KeyAdapter() {
+            @Override
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 okButtonKeyReleased(evt);
             }
@@ -215,6 +225,7 @@ public class AddConceptNameDialog2 extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
     
+    @Override
     public void setVisible(boolean b) {
         if (b) {
             nameField.requestFocus();
@@ -241,7 +252,7 @@ public class AddConceptNameDialog2 extends javax.swing.JDialog {
 
     private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
         final String name = nameField.getText();
-        final Concept concept = getConcept();
+        final Concept myConcept = getConcept();
         boolean okToProceed = true;
 
         /*
@@ -250,8 +261,8 @@ public class AddConceptNameDialog2 extends javax.swing.JDialog {
         Concept preexistingConcept = null;
         try {
             preexistingConcept = (Concept) Worker.post(new Task(){
-                public Object run() throws DAOException {
-                    return KnowledgeBaseCache.getInstance().findConceptByName(name);
+                public Object run() throws Exception {
+                    return knowledgebaseDAOFactory.newConceptDAO().findByName(name);
                 }
             });
         }
@@ -265,7 +276,7 @@ public class AddConceptNameDialog2 extends javax.swing.JDialog {
 
 
         if (okToProceed && (preexistingConcept != null)) {
-            String preexistingName = preexistingConcept.getPrimaryConceptNameAsString();
+            String preexistingName = preexistingConcept.getPrimaryConceptName().getName();
             msgLabel.setText("The name, " + preexistingName + ", already exits in the knowledgebase");
             okToProceed = false;
         }
@@ -275,23 +286,24 @@ public class AddConceptNameDialog2 extends javax.swing.JDialog {
             /*
              * Creat the new conceptName
              */
-            ConceptName conceptName = new ConceptName();
+            ConceptName conceptName = knowledgebaseFactory.newConceptName();
             conceptName.setName(nameField.getText());
             conceptName.setAuthor(authorField.getText());
-            String nameType = ConceptName.NAMETYPE_COMMON;
+            String nameType = ConceptNameTypes.COMMON.toString();
             if (synonymRb.isSelected()) {
-                nameType = ConceptName.NAMETYPE_SYNONYM;
+                nameType = ConceptNameTypes.SYNONYM.toString();
             }
 
             conceptName.setNameType(nameType);
-            concept.addConceptName(conceptName);
+            myConcept.addConceptName(conceptName);
 
             /*
              * Add a History object to track the change.
              */
-            final UserAccount userAccount = (UserAccount) KnowledgebaseApp.DISPATCHER_USERACCOUNT.getValueObject();
-            final IHistory history = HistoryFactory.add(userAccount, conceptName);
-            concept.addHistory(history);
+            final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+            final History history = historyFactory.add(userAccount, conceptName);
+            myConcept.getConceptMetadata().addHistory(history);
+            knowledgebaseDAOFactory.newHistoryDAO().makePersistent(history);
 
             close();
             /*
@@ -301,33 +313,24 @@ public class AddConceptNameDialog2 extends javax.swing.JDialog {
 
             try {
                 Worker.post(new Task() {
-                    public Object run() throws DAOException {
-                        if (userAccount.isAdmin()) {
-                            ApproveHistoryTask.approve(userAccount, history);
-                        }
-                        else {
-                            ConceptDAO.getInstance().update(concept);
+                    public Object run() throws Exception {
+                        if (userAccount.isAdministrator()) {
+                            approveHistoryTask.approve(userAccount, history);
                         }
                         return null;
                     }
                 });
             }
-            catch (DAOException e) {
-                concept.removeConceptName(conceptName);
-                concept.removeHistory(history);
-                log.error("Failed to update " + concept, e);
-                AppFrameDispatcher.showErrorDialog(
-                        "Failed to save" +
-                        " changes. Rolling back to previous state");
-            }
             catch (Exception e) {
-                log.error("Failed to approve and update " + concept, e);
-                AppFrameDispatcher.showErrorDialog("Failed to approve and update " + concept);
+                myConcept.removeConceptName(conceptName);
+                myConcept.getConceptMetadata().removeHistory(history);
+                log.error("Failed to update " + myConcept, e);
+                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
             }
             waitIndicator.dispose();
-            final Frame frame = AppFrameDispatcher.getFrame();
+            final Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
             if ((frame != null) && (frame instanceof KnowledgebaseFrame)) {
-                    ((KnowledgebaseFrame) frame).refreshTreeAndOpenNode(concept.getPrimaryConceptNameAsString());
+                    ((KnowledgebaseFrame) frame).refreshTreeAndOpenNode(myConcept.getPrimaryConceptName().getName());
             }
 
         }
@@ -341,16 +344,7 @@ public class AddConceptNameDialog2 extends javax.swing.JDialog {
         authorField.setText("");
     }
     
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new AddConceptNameDialog2(new javax.swing.JFrame(), true).setVisible(true);
-            }
-        });
-    }
+
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     /**

@@ -306,4 +306,15 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
     public String toString() {
         return EntitySupportCategory.basicToString(this, new ArrayList());
     }
+
+    public Media getPrimaryMedia(MediaTypes mediaType) {
+        Media primaryMedia = null;
+        Set<Media> ms = new HashSet<Media>(getMedias());
+        for (Media media : ms) {
+            if (media.isPrimary() && media.getType().equals(mediaType.toString())) {
+                primaryMedia = media;
+            }
+        }
+        return primaryMedia;
+    }
 }

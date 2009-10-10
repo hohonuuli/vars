@@ -1,29 +1,51 @@
-/**
+/*
+ * @(#)LinkEditorDialog.java   2009.10.09 at 11:27:50 PDT
  *
+ * Copyright 2009 MBARI
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
+
+
 package vars.knowledgebase.ui.dialogs;
 
+import java.awt.BorderLayout;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.HeadlessException;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Collection;
+import java.util.HashSet;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import org.bushe.swing.event.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.mbari.vars.dao.DAOException;
-import org.mbari.vars.knowledgebase.model.Concept;
-import org.mbari.vars.knowledgebase.model.ConceptName;
-import org.mbari.vars.knowledgebase.model.LinkTemplate;
-import org.mbari.vars.knowledgebase.model.dao.KnowledgeBaseCache;
-import org.mbari.vars.knowledgebase.model.dao.LinkTemplateDAO;
-import org.mbari.vars.knowledgebase.ui.ILockableEditor;
 import vars.ILink;
-import org.mbari.vars.query.ui.ConceptConstraints;
-import org.mbari.vars.ui.HierachicalConceptNameComboBox;
-import org.mbari.vars.ui.OkCancelButtonPanel;
-import org.mbari.vars.util.AppFrameDispatcher;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.util.HashSet;
-import java.util.Set;
+import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptDAO;
+import vars.knowledgebase.ConceptNameTypes;
+import vars.knowledgebase.KnowledgebaseDAOFactory;
+import vars.knowledgebase.LinkTemplate;
+import vars.knowledgebase.SimpleConceptBean;
+import vars.knowledgebase.SimpleConceptNameBean;
+import vars.knowledgebase.ui.ILockableEditor;
+import vars.knowledgebase.ui.Lookup;
+import vars.shared.ui.HierachicalConceptNameComboBox;
+import vars.shared.ui.OkCancelButtonPanel;
 
 /**
  * @author brian
@@ -31,39 +53,22 @@ import java.util.Set;
  */
 public class LinkEditorDialog extends JDialog implements ILockableEditor {
 
-    private static final Concept SELF_CONCEPT = new Concept(new ConceptName(
-            "self", ConceptName.NAMETYPE_PRIMARY), null);
-
-    private static final Concept NIL_CONCEPT = new Concept(new ConceptName(
-            ConceptConstraints.WILD_CARD_STRING, ConceptName.NAMETYPE_PRIMARY),
-            null);
-    
+    private static final Concept SELF_CONCEPT = new SimpleConceptBean(new SimpleConceptNameBean("self",
+        ConceptNameTypes.PRIMARY.toString()));
+    private static final Concept NIL_CONCEPT = new SimpleConceptBean(new SimpleConceptNameBean(ILink.VALUE_NIL,
+        ConceptNameTypes.PRIMARY.toString()));
     private static final Logger log = LoggerFactory.getLogger(LinkEditorDialog.class);
-
     private static final long serialVersionUID = 1L;
-
-    private JPanel jContentPane = null;
-
-    private JPanel editorPanel = null;
-
     private OkCancelButtonPanel buttonPanel = null;
-
+    private JPanel editorPanel = null;
+    private JPanel jContentPane = null;
     private JLabel linkNameLabel = null;
-
-    private JLabel toConceptLabel = null;
-
-    private JLabel linkValueLabel = null;
-
     private JTextField linkNameTextField = null;
-
-    private HierachicalConceptNameComboBox toConceptComboBox = null;
-
-    private JScrollPane scrollPane = null;
-
+    private JLabel linkValueLabel = null;
     private JTextArea linkValueTextArea = null;
-
-    private ILink link;
-
+    private JScrollPane scrollPane = null;
+    private HierachicalConceptNameComboBox toConceptComboBox = null;
+    private JLabel toConceptLabel = null;
     private ILink EMPTY_LINK = new ILink() {
 
         public String getFromConcept() {
@@ -71,164 +76,109 @@ public class LinkEditorDialog extends JDialog implements ILockableEditor {
         }
 
         public String getLinkName() {
-            return ConceptConstraints.WILD_CARD_STRING;
+            return ILink.VALUE_NIL;
         }
 
         public String getLinkValue() {
-            return ConceptConstraints.WILD_CARD_STRING;
+            return ILink.VALUE_NIL;
         }
 
         public String getToConcept() {
-            return ConceptConstraints.WILD_CARD_STRING;
+            return ILink.VALUE_NIL;
         }
 
         public void setLinkName(String linkName_) {
+
             // Do nothing
 
         }
 
         public void setLinkValue(String linkValue_) {
+
             // Do nothing
         }
 
         public void setToConcept(String toConcept_) {
+
             // Do nothing
         }
 
     };
+    private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
+    private ILink link;
 
     /**
+     *
+     * @param knowledgebaseDAOFactory
      * @throws HeadlessException
      */
-    public LinkEditorDialog() throws HeadlessException {
-
+    public LinkEditorDialog(KnowledgebaseDAOFactory knowledgebaseDAOFactory) throws HeadlessException {
         super();
+        this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
         setModal(true);
         initialize();
     }
 
     /**
      * @param owner
+     * @param knowledgebaseDAOFactory
      * @throws HeadlessException
      */
-    public LinkEditorDialog(Frame owner) throws HeadlessException {
+    public LinkEditorDialog(Frame owner, KnowledgebaseDAOFactory knowledgebaseDAOFactory) throws HeadlessException {
         super(owner);
+        this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
         setModal(true);
         initialize();
     }
 
     /**
-     *
-     * @param link The link to be edited
-     * @return 
-     */
-    public void setLink(ILink link) {
-
-        this.link = link;
-
-        if (link == null) {
-            getLinkNameTextField().setText("");
-            getLinkValueTextArea().setText("");
-            getToConceptComboBox().setConcept(SELF_CONCEPT);
-            return;
-        }
-
-        // FInd matching link template and use it to populate the toConceptComboBox
-        /*
-         * Find the LinkTemplate that the LinkRealization is based on.
-         */
-        Set<LinkTemplate> matchingLinkTemplates = null;
-        try {
-            matchingLinkTemplates = LinkTemplateDAO.getInstance().findByLinkName(link.getLinkName());
-        }
-        catch (DAOException e) {
-            log.error("Failed to lookup LinkTemplates with linkName = " + link.getLinkName(), e);
-            matchingLinkTemplates = new HashSet<LinkTemplate>();
-        }
-
-        /*
-        * Get the toConceptAsString that's used. It will be a child of the toConceptAsString in the LinkTemplate
-        */
-        String toConceptAsString = null;
-        if (matchingLinkTemplates.isEmpty()) {
-            AppFrameDispatcher.showWarningDialog("Unable to find a LinkTemplate that matches '" + link + "'");
-            toConceptAsString = link.getToConcept();
-        }
-        else {
-            ILink matchingLink = (ILink) matchingLinkTemplates.iterator().next();
-            toConceptAsString = matchingLink.getToConcept();
-        }
-
-        /*
-        *
-        */
-        Concept concept = null;
-        Concept selectedConcept = null;
-        HierachicalConceptNameComboBox cb = getToConceptComboBox();
-        cb.removeAllItems();
-        if (toConceptAsString.equalsIgnoreCase("self")) {
-            concept = SELF_CONCEPT;
-            selectedConcept = SELF_CONCEPT;
-            cb.addItem(SELF_CONCEPT.getPrimaryConceptName());
-        }
-        else if (toConceptAsString.equalsIgnoreCase(ConceptConstraints.WILD_CARD_STRING)) {
-            concept = NIL_CONCEPT;
-            selectedConcept = NIL_CONCEPT;
-            cb.addItem(NIL_CONCEPT.getPrimaryConceptName());
-        }
-        else {
-            try {
-                concept = KnowledgeBaseCache.getInstance().findConceptByName(toConceptAsString);
-                selectedConcept = KnowledgeBaseCache.getInstance().findConceptByName(link.getToConcept());
-                cb.setConcept(concept);
-            }
-            catch (DAOException e) {
-                log.error("", e);
-                AppFrameDispatcher.showWarningDialog("A database error occurred. Try refreshing the knowledgebase");
-                concept = NIL_CONCEPT;
-                selectedConcept = NIL_CONCEPT;
-                cb.addItem(NIL_CONCEPT.getPrimaryConceptName());
-            }
-        }
-        cb.setSelectedItem(selectedConcept);
-
-        // And here we set the other 2 fields
-        getLinkNameTextField().setText(link.getLinkName());
-        getLinkValueTextArea().setText(link.getLinkValue());
-
-    }
-
-    public ILink getLink() {
-        return link;
-    }
-
-    /**
-     * This method initializes this
-     *
-     * @return void
-     */
-    private void initialize() {
-        this.setSize(300, 200);
-        this.setContentPane(getJContentPane());
-    }
-
-    /**
-     * This method initializes jContentPane
+     * This method initializes buttonPanel
      *
      * @return javax.swing.JPanel
      */
-    private JPanel getJContentPane() {
-        if (jContentPane == null) {
-            jContentPane = new JPanel();
-            jContentPane.setLayout(new BorderLayout());
-            jContentPane.add(getEditorPanel(), BorderLayout.CENTER);
-            jContentPane.add(getButtonPanel(), BorderLayout.SOUTH);
+    private OkCancelButtonPanel getButtonPanel() {
+        if (buttonPanel == null) {
+            buttonPanel = new OkCancelButtonPanel();
+            JButton okButton = buttonPanel.getOkButton();
+
+            /*
+             * Handle an OK click
+             */
+            okButton.addActionListener(new ActionListener() {
+
+                public void actionPerformed(ActionEvent e) {
+                    link.setLinkName(getLinkNameTextField().getText());
+                    link.setLinkValue(getLinkValueTextArea().getText());
+                    link.setToConcept((String) getToConceptComboBox().getSelectedItem());
+                    onOkClick();
+                    setLink(null);
+                    setVisible(false);
+                }
+
+            });
+
+            /*
+             * Handle a cancel click
+             */
+            final JButton cancelButton = buttonPanel.getCancelButton();
+            cancelButton.addActionListener(new ActionListener() {
+
+                public void actionPerformed(ActionEvent e) {
+                    onCancelClick();
+                    setLink(null);
+                    setVisible(false);
+                }
+
+            });
+
+
         }
-        return jContentPane;
+
+        return buttonPanel;
     }
 
     /**
-     * This method initializes editorPanel	
+     * This method initializes editorPanel
      *
      * @return javax.swing.JPanel
      */
@@ -284,71 +234,32 @@ public class LinkEditorDialog extends JDialog implements ILockableEditor {
             editorPanel.add(getToConceptComboBox(), gridBagConstraints4);
             editorPanel.add(getScrollPane(), gridBagConstraints5);
         }
+
         return editorPanel;
     }
 
-
     /**
-     * This method initializes buttonPanel	
+     * This method initializes jContentPane
      *
      * @return javax.swing.JPanel
      */
-    private OkCancelButtonPanel getButtonPanel() {
-        if (buttonPanel == null) {
-            buttonPanel = new OkCancelButtonPanel();
-            JButton okButton = buttonPanel.getOkButton();
-
-            /*
-             * Handle an OK click
-             */
-            okButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    link.setLinkName(getLinkNameTextField().getText());
-                    link.setLinkValue(getLinkValueTextArea().getText());
-                    link.setToConcept((String) getToConceptComboBox().getSelectedItem());
-                    onOkClick();
-                    setLink(null);
-                    setVisible(false);
-                }
-            });
-
-            /*
-             * Handle a cancel click
-             */
-            final JButton cancelButton = buttonPanel.getCancelButton();
-            cancelButton.addActionListener(new ActionListener(){
-                public void actionPerformed(ActionEvent e) {
-                    onCancelClick();
-                    setLink(null);
-                    setVisible(false);
-                }
-            });
-
-
+    private JPanel getJContentPane() {
+        if (jContentPane == null) {
+            jContentPane = new JPanel();
+            jContentPane.setLayout(new BorderLayout());
+            jContentPane.add(getEditorPanel(), BorderLayout.CENTER);
+            jContentPane.add(getButtonPanel(), BorderLayout.SOUTH);
         }
-        return buttonPanel;
+
+        return jContentPane;
+    }
+
+    public ILink getLink() {
+        return link;
     }
 
     /**
-     * When the OK button is clicked the fields of the ILink are updated. If further
-     * action is needed then override this method. okOkClick is called after the fields
-     * of the link have been set
-     */
-    public void onOkClick() {
-        // By default do nothing
-    }
-
-    /**
-     * When the Cancel button is clicked the dialog is hidden. If further action is
-     * needed the override this method.
-     */
-    public void onCancelClick() {
-        // by default do nothing
-    }
-
-
-    /**
-     * This method initializes linkNameTextField	
+     * This method initializes linkNameTextField
      *
      * @return javax.swing.JTextField
      */
@@ -356,23 +267,25 @@ public class LinkEditorDialog extends JDialog implements ILockableEditor {
         if (linkNameTextField == null) {
             linkNameTextField = new JTextField();
         }
+
         return linkNameTextField;
     }
 
     /**
-     * This method initializes toConceptComboBox	
+     * This method initializes linkValueTextArea
      *
-     * @return javax.swing.JComboBox
+     * @return javax.swing.JTextArea
      */
-    public HierachicalConceptNameComboBox getToConceptComboBox() {
-        if (toConceptComboBox == null) {
-            toConceptComboBox = new HierachicalConceptNameComboBox();
+    private JTextArea getLinkValueTextArea() {
+        if (linkValueTextArea == null) {
+            linkValueTextArea = new JTextArea();
         }
-        return toConceptComboBox;
+
+        return linkValueTextArea;
     }
 
     /**
-     * This method initializes scrollPane	
+     * This method initializes scrollPane
      *
      * @return javax.swing.JScrollPane
      */
@@ -381,29 +294,147 @@ public class LinkEditorDialog extends JDialog implements ILockableEditor {
             scrollPane = new JScrollPane();
             scrollPane.setViewportView(getLinkValueTextArea());
         }
+
         return scrollPane;
     }
 
     /**
-     * This method initializes linkValueTextArea	
+     * This method initializes toConceptComboBox
      *
-     * @return javax.swing.JTextArea
+     * @return javax.swing.JComboBox
      */
-    private JTextArea getLinkValueTextArea() {
-        if (linkValueTextArea == null) {
-            linkValueTextArea = new JTextArea();
+    public HierachicalConceptNameComboBox getToConceptComboBox() {
+        if (toConceptComboBox == null) {
+            toConceptComboBox = new HierachicalConceptNameComboBox(knowledgebaseDAOFactory.newConceptDAO());
         }
-        return linkValueTextArea;
+
+        return toConceptComboBox;
+    }
+
+    /**
+     * This method initializes this
+     *
+     * @return void
+     */
+    private void initialize() {
+        this.setSize(300, 200);
+        this.setContentPane(getJContentPane());
     }
 
     public boolean isLocked() {
+
         // TODO Auto-generated method stub
         return false;
     }
 
-    public void setLocked(boolean locked) {
-        // TODO Auto-generated method stub
+    /**
+     * When the Cancel button is clicked the dialog is hidden. If further action is
+     * needed the override this method.
+     */
+    public void onCancelClick() {
+
+        // by default do nothing
+    }
+
+    /**
+     * When the OK button is clicked the fields of the ILink are updated. If further
+     * action is needed then override this method. okOkClick is called after the fields
+     * of the link have been set
+     */
+    public void onOkClick() {
+
+        // By default do nothing
+    }
+
+    /**
+     *
+     * @param link The link to be edited
+     * @return
+     */
+    public void setLink(ILink link) {
+
+        this.link = link;
+
+        if (link == null) {
+            getLinkNameTextField().setText("");
+            getLinkValueTextArea().setText("");
+            getToConceptComboBox().setConcept(SELF_CONCEPT);
+
+            return;
+        }
+
+        // FInd matching link template and use it to populate the toConceptComboBox
+
+        /*
+         * Find the LinkTemplate that the LinkRealization is based on.
+         */
+        Collection<LinkTemplate> matchingLinkTemplates = null;
+        try {
+            matchingLinkTemplates = knowledgebaseDAOFactory.newLinkTemplateDAO().findAllByLinkName(link.getLinkName());
+        }
+        catch (Exception e) {
+            log.error("Failed to lookup LinkTemplates with linkName = " + link.getLinkName(), e);
+            matchingLinkTemplates = new HashSet<LinkTemplate>();
+        }
+
+        /*
+        * Get the toConceptAsString that's used. It will be a child of the toConceptAsString in the LinkTemplate
+        */
+        String toConceptAsString = null;
+        if (matchingLinkTemplates.isEmpty()) {
+            EventBus.publish(Lookup.TOPIC_WARNING, "Unable to find a LinkTemplate that matches '" + link + "'");
+            toConceptAsString = link.getToConcept();
+        }
+        else {
+            ILink matchingLink = (ILink) matchingLinkTemplates.iterator().next();
+            toConceptAsString = matchingLink.getToConcept();
+        }
+
+        /*
+        *
+        */
+        Concept concept = null;
+        Concept selectedConcept = null;
+        HierachicalConceptNameComboBox cb = getToConceptComboBox();
+        cb.removeAllItems();
+
+        if (toConceptAsString.equalsIgnoreCase("self")) {
+            concept = SELF_CONCEPT;
+            selectedConcept = SELF_CONCEPT;
+            cb.addItem(SELF_CONCEPT.getPrimaryConceptName());
+        }
+        else if (toConceptAsString.equalsIgnoreCase(ILink.VALUE_NIL)) {
+            concept = NIL_CONCEPT;
+            selectedConcept = NIL_CONCEPT;
+            cb.addItem(NIL_CONCEPT.getPrimaryConceptName());
+        }
+        else {
+            try {
+                ConceptDAO conceptDAO = knowledgebaseDAOFactory.newConceptDAO();
+                concept = conceptDAO.findByName(toConceptAsString);
+                selectedConcept = conceptDAO.findByName(link.getToConcept());
+                cb.setConcept(concept);
+            }
+            catch (Exception e) {
+                log.error("", e);
+                EventBus.publish(Lookup.TOPIC_WARNING, "A database error occurred. Try refreshing the knowledgebase");
+                concept = NIL_CONCEPT;
+                selectedConcept = NIL_CONCEPT;
+                cb.addItem(NIL_CONCEPT.getPrimaryConceptName());
+            }
+        }
+
+        cb.setSelectedItem(selectedConcept);
+
+        // And here we set the other 2 fields
+        getLinkNameTextField().setText(link.getLinkName());
+        getLinkValueTextArea().setText(link.getLinkValue());
 
     }
 
+    public void setLocked(boolean locked) {
+
+        // TODO Auto-generated method stub
+
+    }
 }

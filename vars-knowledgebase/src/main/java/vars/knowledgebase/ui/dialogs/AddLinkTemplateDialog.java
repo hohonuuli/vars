@@ -1,30 +1,36 @@
 package vars.knowledgebase.ui.dialogs;
 
+import java.awt.BorderLayout;
+import java.awt.Frame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.mbari.vars.dao.DAOException;
-import org.mbari.vars.knowledgebase.model.Concept;
-import org.mbari.vars.knowledgebase.model.History;
-import org.mbari.vars.knowledgebase.model.HistoryFactory;
-import org.mbari.vars.knowledgebase.model.LinkTemplate;
-import org.mbari.vars.knowledgebase.model.dao.ConceptDAO;
-import org.mbari.vars.knowledgebase.model.dao.KnowledgeBaseCache;
-import org.mbari.vars.knowledgebase.model.dao.LinkTemplateDAO;
-import org.mbari.vars.knowledgebase.ui.KnowledgebaseApp;
-import org.mbari.vars.knowledgebase.ui.LinkEditorPanel;
-import org.mbari.vars.knowledgebase.ui.actions.ApproveHistoryTask;
-import org.mbari.vars.model.UserAccount;
-import org.mbari.vars.ui.OkCancelButtonPanel;
-import org.mbari.vars.util.AppFrameDispatcher;
 
-import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import vars.knowledgebase.IHistory;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
+import org.bushe.swing.event.EventBus;
+import vars.ILink;
+import vars.LinkBean;
+import vars.UserAccount;
+import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptDAO;
+import vars.knowledgebase.History;
+import vars.knowledgebase.HistoryDAO;
+import vars.knowledgebase.HistoryFactory;
+import vars.knowledgebase.KnowledgebaseDAOFactory;
+import vars.knowledgebase.KnowledgebaseFactory;
+import vars.knowledgebase.LinkTemplate;
+import vars.knowledgebase.LinkTemplateDAO;
+import vars.knowledgebase.ui.KnowledgebaseApp;
+import vars.knowledgebase.ui.LinkEditorPanel;
+import vars.knowledgebase.ui.Lookup;
+import vars.knowledgebase.ui.ToolBelt;
+import vars.knowledgebase.ui.actions.ApproveHistoryTask;
+import vars.shared.ui.OkCancelButtonPanel;
 
 public class AddLinkTemplateDialog extends JDialog {
 
@@ -54,23 +60,36 @@ public class AddLinkTemplateDialog extends JDialog {
 	 */
     private Concept concept;
     
-    private static final Logger log = LoggerFactory.getLogger(AddLinkTemplateDialog.class);
+    private final Logger log = LoggerFactory.getLogger(getClass());
+
+    private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
+    private final KnowledgebaseFactory knowledgebaseFactory;
+    private final HistoryFactory historyFactory;
+    private final ApproveHistoryTask approveHistoryTask;
     
     /**
      * A placeholder that provides default values in the UI
      */
-    private static final LinkTemplate EMPTY_LINKTEMPLATE = new LinkTemplate("", "self", "nil");
+    private final LinkTemplate emptyLinkTemplate;
 
     /**
      * @param owner
      */
-    public AddLinkTemplateDialog(Frame owner) {
+    public AddLinkTemplateDialog(Frame owner, ToolBelt toolBelt) {
         super(owner);
+        this.knowledgebaseDAOFactory = toolBelt.getKnowledgebaseDAOFactory();
+        this.knowledgebaseFactory = toolBelt.getKnowledgebaseFactory();
+        this.historyFactory = toolBelt.getHistoryFactory();
+        this.approveHistoryTask = toolBelt.getApproveHistoryTask();
+        emptyLinkTemplate = knowledgebaseFactory.newLinkTemplate();
+        emptyLinkTemplate.setLinkName("");
+        emptyLinkTemplate.setToConcept(ILink.VALUE_SELF);
+        emptyLinkTemplate.setLinkValue(ILink.VALUE_NIL);
         initialize();
     }
     
-    public AddLinkTemplateDialog() {
-        this(null);
+    public AddLinkTemplateDialog(ToolBelt toolBelt) {
+        this(null, toolBelt);
     }
 
     /**
@@ -85,7 +104,8 @@ public class AddLinkTemplateDialog extends JDialog {
         this.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
         this.setModal(true);
         this.setContentPane(getJContentPane());
-        setLocationRelativeTo(AppFrameDispatcher.getFrame());
+        Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
+        setLocationRelativeTo(frame);
         pack();
     }
 
@@ -116,7 +136,7 @@ public class AddLinkTemplateDialog extends JDialog {
 
                 public void actionPerformed(ActionEvent e) {
                     setVisible(false);
-                    LinkTemplate linkTemplate = new LinkTemplate();
+                    LinkTemplate linkTemplate = knowledgebaseFactory.newLinkTemplate();
                     final LinkEditorPanel p = getLinkEditorPanel();
                     linkTemplate.setLinkName(p.getLinkName());
                     linkTemplate.setToConcept(p.getToConcept());
@@ -125,18 +145,19 @@ public class AddLinkTemplateDialog extends JDialog {
                     
                     // A little house cleaning. We don't want the empty_linktemplate to be stored in the db.
                     if (cOld != null) {
-                        getConcept().removeLinkTemplate(EMPTY_LINKTEMPLATE);
+                        getConcept().getConceptMetadata().removeLinkTemplate(emptyLinkTemplate);
                     }
                     
                     /*
                      * Lookup the fromConcept
                      */
                     Concept c = null;
+                    ConceptDAO conceptDAO = knowledgebaseDAOFactory.newConceptDAO();
                     try {
-                        c = KnowledgeBaseCache.getInstance().findConceptByName(p.getFromConcept());
+                        c = conceptDAO.findByName(p.getFromConcept());
                     }
-                    catch (DAOException e2) {
-                        AppFrameDispatcher.showErrorDialog("Failed to lookup '" + p.getFromConcept() + "' from the" +
+                    catch (Exception e2) {
+                        EventBus.publish(Lookup.TOPIC_FATAL_ERROR, "Failed to lookup '" + p.getFromConcept() + "' from the" +
                                 " database. Unable to add '" + linkTemplate.stringValue() + "'");
                     }
                     
@@ -146,12 +167,13 @@ public class AddLinkTemplateDialog extends JDialog {
                     if (c != null) {
                         // Verify that the linkName isn't already being used.
                         Collection links = new ArrayList();
+                        LinkTemplateDAO linkTemplateDAO = knowledgebaseDAOFactory.newLinkTemplateDAO();
                         try {
-                            links = LinkTemplateDAO.getInstance().findByLinkName(linkTemplate.getLinkName());
+                            links = linkTemplateDAO.findAllByLinkName(linkTemplate.getLinkName());
                         }
-                        catch (DAOException e1) {
+                        catch (Exception e1) {
                             log.error("Failed to look up linkname", e1);
-                            AppFrameDispatcher.showErrorDialog("A database error occurred. Unable to complete your request");
+                            EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e1);
                         }
                         
                         // verify that the linkName and linkValue aren't already used.
@@ -167,31 +189,33 @@ public class AddLinkTemplateDialog extends JDialog {
 
                         if (matchExists) {
                             // Don't allow duplicate link names
-                            AppFrameDispatcher.showWarningDialog(links.size() + " LinkTemplate(s) with a LinkName of '" +
+                            EventBus.publish(Lookup.TOPIC_WARNING, links.size() + " LinkTemplate(s) with a LinkName of '" +
                                 linkTemplate.getLinkName() + "' and LinkValue of '" + linkTemplate.getLinkValue() + 
                                 "' already exist. Unable to complete your request");
                         }
                         else {
-                            c.addLinkTemplate(linkTemplate);
-                            UserAccount userAccount = (UserAccount) KnowledgebaseApp.DISPATCHER_USERACCOUNT.getValueObject();
-                            IHistory history = HistoryFactory.add(userAccount, linkTemplate);
-                            c.addHistory(history);
+                            c.getConceptMetadata().addLinkTemplate(linkTemplate);
+                            linkTemplateDAO.makePersistent(linkTemplate);
+                            UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+                            History history = historyFactory.add(userAccount, linkTemplate);
+                            c.getConceptMetadata().addHistory(history);
                             try {
-                                ConceptDAO.getInstance().update(c);
+                                HistoryDAO historyDAO = knowledgebaseDAOFactory.newHistoryDAO();
+                                historyDAO.makePersistent(history);
                             }
-                            catch (DAOException e1) {
-                                c.removeLinkTemplate(linkTemplate);
-                                AppFrameDispatcher.showErrorDialog("Failed to update '" + c.getPrimaryConceptNameAsString() +
+                            catch (Exception e1) {
+                                c.getConceptMetadata().removeLinkTemplate(linkTemplate);
+                                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, "Failed to update '" + c.getPrimaryConceptName().getName() +
                                         "' in the database. Rolling back your changes.");
 
                             }
 
-                            if (userAccount != null && userAccount.isAdmin()) {
-                                ApproveHistoryTask.approve(userAccount, history);
+                            if (userAccount != null && userAccount.isAdministrator()) {
+                                approveHistoryTask.approve(userAccount, history);
                             }
 
                             KnowledgebaseApp app = (KnowledgebaseApp) KnowledgebaseApp.DISPATCHER.getValueObject();
-                            app.getKnowledgebaseFrame().refreshTreeAndOpenNode(c.getPrimaryConceptNameAsString());
+                            app.getKnowledgebaseFrame().refreshTreeAndOpenNode(c.getPrimaryConceptName().getName());
                         }
                     }
                     
@@ -202,7 +226,7 @@ public class AddLinkTemplateDialog extends JDialog {
             buttonPanel.getCancelButton().addActionListener(new ActionListener() {
 
                 public void actionPerformed(ActionEvent e) {
-                    getConcept().removeLinkTemplate(EMPTY_LINKTEMPLATE);
+                    getConcept().getConceptMetadata().removeLinkTemplate(emptyLinkTemplate);
                     setVisible(false);
                     setConcept(null);
                 }
@@ -232,10 +256,10 @@ public class AddLinkTemplateDialog extends JDialog {
 	 */
     public void setConcept(Concept concept) {
         if (concept != null) {
-            concept.addLinkTemplate(EMPTY_LINKTEMPLATE);
+            concept.getConceptMetadata().addLinkTemplate(emptyLinkTemplate);
         }
         getLinkEditorPanel().setConcept(concept);
-        getLinkEditorPanel().setLink(EMPTY_LINKTEMPLATE);
+        getLinkEditorPanel().setLink(emptyLinkTemplate);
         this.concept = concept;
     }
 

@@ -1,11 +1,7 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)AddConceptNameDialog.java   2009.10.05 at 10:37:05 PDT
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1 
- * (the "License"); you may not use this file except in compliance 
- * with the License. You may obtain a copy of the License at
- *
- * http://www.gnu.org/copyleft/lesser.html
+ * Copyright 2009 MBARI
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,6 +9,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 
 
 package vars.knowledgebase.ui.dialogs;
@@ -37,149 +34,91 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.bushe.swing.event.EventBus;
+import org.mbari.awt.event.ActionAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.mbari.awt.event.ActionAdapter;
-import org.mbari.vars.dao.DAOException;
-import org.mbari.vars.knowledgebase.model.Concept;
-import org.mbari.vars.knowledgebase.model.ConceptName;
-import org.mbari.vars.knowledgebase.model.HistoryFactory;
-import org.mbari.vars.knowledgebase.model.dao.ConceptDAO;
-import org.mbari.vars.knowledgebase.model.dao.KnowledgeBaseCache;
-import org.mbari.vars.knowledgebase.ui.KnowledgebaseApp;
-import org.mbari.vars.knowledgebase.ui.KnowledgebaseFrame;
-import org.mbari.vars.model.UserAccount;
-import org.mbari.vars.util.AppFrameDispatcher;
-import vars.knowledgebase.IHistory;
-
-//~--- classes ----------------------------------------------------------------
+import vars.UserAccount;
+import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptDAO;
+import vars.knowledgebase.ConceptName;
+import vars.knowledgebase.ConceptNameDAO;
+import vars.knowledgebase.ConceptNameTypes;
+import vars.knowledgebase.History;
+import vars.knowledgebase.HistoryDAO;
+import vars.knowledgebase.HistoryFactory;
+import vars.knowledgebase.KnowledgebaseDAOFactory;
+import vars.knowledgebase.KnowledgebaseFactory;
+import vars.knowledgebase.ui.KnowledgebaseFrame;
+import vars.knowledgebase.ui.Lookup;
 
 /**
  * <!-- Class Description -->
  *
  *
  * @version    $Id: AddConceptNameDialog.java 295 2006-07-06 23:47:31Z hohonuuli $
- * @author     MBARI    
+ * @author     MBARI
  */
 public class AddConceptNameDialog extends JDialog {
 
     private static final long serialVersionUID = -2636179816517133686L;
-
     private static final Logger log = LoggerFactory.getLogger(AddConceptNameDialog.class);
 
-    //~--- fields -------------------------------------------------------------
-
-    /**
-	 * @uml.property  name="concept"
-	 * @uml.associationEnd  
-	 */
-    private Concept concept;
-    /**
-	 * @uml.property  name="jContentPane"
-	 * @uml.associationEnd  
-	 */
-    private JPanel jContentPane = null;
-    /**
-	 * @uml.property  name="nameLabel"
-	 * @uml.associationEnd  
-	 */
-    private JLabel nameLabel = null;
-    /**
-	 * @uml.property  name="authorLabel"
-	 * @uml.associationEnd  
-	 */
-    private JLabel authorLabel = null;
-    /**
-	 * @uml.property  name="typeLabel"
-	 * @uml.associationEnd  
-	 */
-    private JLabel typeLabel = null;
-    /**
-	 * @uml.property  name="synonymRb"
-	 * @uml.associationEnd  
-	 */
-    private JRadioButton synonymRb = null;
-    /**
-	 * @uml.property  name="synonymLabel"
-	 * @uml.associationEnd  
-	 */
-    private JLabel synonymLabel = null;
-    /**
-	 * @uml.property  name="rbPanel"
-	 * @uml.associationEnd  
-	 */
-    private JPanel rbPanel = null;
-    /**
-	 * @uml.property  name="nameField"
-	 * @uml.associationEnd  
-	 */
-    private JTextField nameField = null;
-    /**
-	 * @uml.property  name="commonRb"
-	 * @uml.associationEnd  
-	 */
-    private JRadioButton commonRb = null;
-    /**
-	 * @uml.property  name="commonLabel"
-	 * @uml.associationEnd  
-	 */
-    private JLabel commonLabel = null;
-    /**
-	 * @uml.property  name="authorField"
-	 * @uml.associationEnd  
-	 */
-    private JTextField authorField = null;
-    /**
-	 * @uml.property  name="viewPanel"
-	 * @uml.associationEnd  
-	 */
-    private JPanel viewPanel = null;    // @jve:decl-index=0:visual-constraint="405,283"
-    /**
-	 * @uml.property  name="createButton"
-	 * @uml.associationEnd  
-	 */
-    private JButton createButton = null;
-    /**
-	 * @uml.property  name="cancelButton"
-	 * @uml.associationEnd  
-	 */
-    private JButton cancelButton = null;
-    /**
-	 * @uml.property  name="actionPanel"
-	 * @uml.associationEnd  
-	 */
     private JPanel actionPanel = null;
 
-    //~--- constructors -------------------------------------------------------
+    private JTextField authorField = null;
+    private JLabel authorLabel = null;
+    private JButton cancelButton = null;
+    private JLabel commonLabel = null;
+    private JRadioButton commonRb = null;
+    private JButton createButton = null;
+    private JPanel jContentPane = null;
+    private JTextField nameField = null;
+    private JLabel nameLabel = null;
+    private JPanel rbPanel = null;
+    private JLabel synonymLabel = null;
+    private JRadioButton synonymRb = null;
+    private JLabel typeLabel = null;
+    private JPanel viewPanel = null;
+    private Concept concept;
+    private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
+    private final KnowledgebaseFactory knowledgebaseFactory;
 
     /**
      *     This is the default constructor
+     *
+     * @param knowledgebaseDAOFactory
+     * @param knowledgebaseFactory
      */
-    public AddConceptNameDialog() {
-        this(null);
+    public AddConceptNameDialog(KnowledgebaseDAOFactory knowledgebaseDAOFactory,
+                                KnowledgebaseFactory knowledgebaseFactory) {
+        this(null, knowledgebaseDAOFactory, knowledgebaseFactory);
     }
 
     /**
      * @param owner
+     * @param knowledgebaseDAOFactory
+     * @param knowledgebaseFactory
      * @throws HeadlessException
      */
-    public AddConceptNameDialog(Frame owner) throws HeadlessException {
+    public AddConceptNameDialog(Frame owner, KnowledgebaseDAOFactory knowledgebaseDAOFactory,
+                                KnowledgebaseFactory knowledgebaseFactory)
+            throws HeadlessException {
         super(owner, "VARS - Add Concept-name");
+        this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
+        this.knowledgebaseFactory = knowledgebaseFactory;
         initialize();
     }
 
-    //~--- get methods --------------------------------------------------------
-
     /**
-	 * This method initializes actionPanel
-	 * @return  javax.swing.JPanel
-	 * @uml.property  name="actionPanel"
-	 */
+         * This method initializes actionPanel
+         * @return  javax.swing.JPanel
+         * @uml.property  name="actionPanel"
+         */
     private JPanel getActionPanel() {
         if (actionPanel == null) {
             actionPanel = new JPanel();
-            actionPanel.setLayout(
-                    new BoxLayout(getActionPanel(), BoxLayout.X_AXIS));
+            actionPanel.setLayout(new BoxLayout(getActionPanel(), BoxLayout.X_AXIS));
             actionPanel.add(Box.createHorizontalGlue());
             actionPanel.add(getCreateButton(), null);
             actionPanel.add(Box.createHorizontalStrut(10));
@@ -191,10 +130,10 @@ public class AddConceptNameDialog extends JDialog {
     }
 
     /**
-	 * This method initializes authorField
-	 * @return  javax.swing.JTextField
-	 * @uml.property  name="authorField"
-	 */
+         * This method initializes authorField
+         * @return  javax.swing.JTextField
+         * @uml.property  name="authorField"
+         */
     protected JTextField getAuthorField() {
         if (authorField == null) {
             authorField = new JTextField();
@@ -204,10 +143,10 @@ public class AddConceptNameDialog extends JDialog {
     }
 
     /**
-	 * This method initializes cancelButton
-	 * @return  javax.swing.JButton
-	 * @uml.property  name="cancelButton"
-	 */
+         * This method initializes cancelButton
+         * @return  javax.swing.JButton
+         * @uml.property  name="cancelButton"
+         */
     private JButton getCancelButton() {
         if (cancelButton == null) {
             cancelButton = new JButton();
@@ -228,10 +167,10 @@ public class AddConceptNameDialog extends JDialog {
     }
 
     /**
-	 * This method initializes commonRb
-	 * @return  javax.swing.JRadioButton
-	 * @uml.property  name="commonRb"
-	 */
+         * This method initializes commonRb
+         * @return  javax.swing.JRadioButton
+         * @uml.property  name="commonRb"
+         */
     protected JRadioButton getCommonRb() {
         if (commonRb == null) {
             commonRb = new JRadioButton();
@@ -241,22 +180,22 @@ public class AddConceptNameDialog extends JDialog {
     }
 
     /**
-	 * @return  Returns the concept.
-	 * @uml.property  name="concept"
-	 */
+         * @return  Returns the concept.
+         * @uml.property  name="concept"
+         */
     public Concept getConcept() {
         return concept;
     }
 
     /**
-	 * This method initializes okButton
-	 * @return  javax.swing.JButton
-	 * @uml.property  name="createButton"
-	 */
+         * This method initializes okButton
+         * @return  javax.swing.JButton
+         * @uml.property  name="createButton"
+         */
     private JButton getCreateButton() {
         if (createButton == null) {
             createButton = new JButton();
-            createButton.setAction(new AddConceptNameAction());
+            createButton.setAction(new AddConceptNameAction(knowledgebaseFactory));
 
             /*
              * Hide the Dialog when the create button is pressed.
@@ -274,10 +213,10 @@ public class AddConceptNameDialog extends JDialog {
     }
 
     /**
-	 * This method initializes viewPanel
-	 * @return  javax.swing.JPanel
-	 * @uml.property  name="jContentPane"
-	 */
+         * This method initializes viewPanel
+         * @return  javax.swing.JPanel
+         * @uml.property  name="jContentPane"
+         */
     private JPanel getJContentPane() {
         if (jContentPane == null) {
             jContentPane = new JPanel();
@@ -290,10 +229,10 @@ public class AddConceptNameDialog extends JDialog {
     }
 
     /**
-	 * This method initializes nameField
-	 * @return  javax.swing.JTextField
-	 * @uml.property  name="nameField"
-	 */
+         * This method initializes nameField
+         * @return  javax.swing.JTextField
+         * @uml.property  name="nameField"
+         */
     protected JTextField getNameField() {
         if (nameField == null) {
             nameField = new JTextField();
@@ -302,8 +241,7 @@ public class AddConceptNameDialog extends JDialog {
              * The create button should only be enabled if actual text was
              * entered into the name field.
              */
-            nameField.getDocument().addDocumentListener(
-                    new DocumentListener() {
+            nameField.getDocument().addDocumentListener(new DocumentListener() {
 
                 public void insertUpdate(DocumentEvent e) {
                     update();
@@ -326,10 +264,10 @@ public class AddConceptNameDialog extends JDialog {
     }
 
     /**
-	 * This method initializes rbPanel
-	 * @return  javax.swing.JPanel
-	 * @uml.property  name="rbPanel"
-	 */
+         * This method initializes rbPanel
+         * @return  javax.swing.JPanel
+         * @uml.property  name="rbPanel"
+         */
     private JPanel getRbPanel() {
         if (rbPanel == null) {
             synonymLabel = new JLabel();
@@ -351,10 +289,10 @@ public class AddConceptNameDialog extends JDialog {
     }
 
     /**
-	 * This method initializes synonymRb
-	 * @return  javax.swing.JRadioButton
-	 * @uml.property  name="synonymRb"
-	 */
+         * This method initializes synonymRb
+         * @return  javax.swing.JRadioButton
+         * @uml.property  name="synonymRb"
+         */
     protected JRadioButton getSynonymRb() {
         if (synonymRb == null) {
             synonymRb = new JRadioButton();
@@ -365,10 +303,10 @@ public class AddConceptNameDialog extends JDialog {
     }
 
     /**
-	 * This method initializes jContentPane
-	 * @return  javax.swing.JPanel
-	 * @uml.property  name="viewPanel"
-	 */
+         * This method initializes jContentPane
+         * @return  javax.swing.JPanel
+         * @uml.property  name="viewPanel"
+         */
     private JPanel getViewPanel() {
         if (viewPanel == null) {
             GridBagConstraints gridBagConstraints5 = new GridBagConstraints();
@@ -412,26 +350,24 @@ public class AddConceptNameDialog extends JDialog {
         return viewPanel;
     }
 
-    //~--- methods ------------------------------------------------------------
-
     /**
      * This method initializes this
      *
      * @return void
      */
     private void initialize() {
+
         //this.setSize(300, 200);
         this.setContentPane(getJContentPane());
-        setLocationRelativeTo(AppFrameDispatcher.getFrame());
+        Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
+        setLocationRelativeTo(frame);
         pack();
     }
 
-    //~--- set methods --------------------------------------------------------
-
     /**
-	 * @param concept  The concept to set.
-	 * @uml.property  name="concept"
-	 */
+         * @param concept  The concept to set.
+         * @uml.property  name="concept"
+         */
     public void setConcept(Concept concept) {
         this.concept = concept;
         getCreateButton().setEnabled(concept != null);
@@ -451,11 +387,18 @@ public class AddConceptNameDialog extends JDialog {
         }
     }
 
-    //~--- inner classes ------------------------------------------------------
-
     private class AddConceptNameAction extends ActionAdapter {
 
-        private static final long serialVersionUID = -8067840245552321972L;
+        private final HistoryFactory historyFactory;
+
+        /**
+         * Constructs ...
+         *
+         * @param knowledgebaseFactory
+         */
+        public AddConceptNameAction(KnowledgebaseFactory knowledgebaseFactory) {
+            this.historyFactory = new HistoryFactory(knowledgebaseFactory);
+        }
 
         public void doAction() {
             final String name = getNameField().getText();
@@ -466,30 +409,24 @@ public class AddConceptNameDialog extends JDialog {
              * Verify that the name is not already used in the database.
              */
             Concept preexistingConcept = null;
+            ConceptDAO conceptDAO = knowledgebaseDAOFactory.newConceptDAO();
             try {
-                preexistingConcept = KnowledgeBaseCache.getInstance().findConceptByName(name);
-            } catch (DAOException e) {
+                preexistingConcept = conceptDAO.findByName(name);
+            }
+            catch (Exception e) {
                 if (log.isErrorEnabled()) {
-                    log.error(
-                            "Failed attempt to look up the concept '" + name +
-                            "'",
-                            e);
-                    AppFrameDispatcher.showErrorDialog(
-                            "Unable to connect " +
-                            "to the knowledgebase database");
+                    log.error("Failed attempt to look up the concept '" + name + "'", e);
+                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
                     okToProceed = false;
                 }
             }
 
             if (okToProceed && (preexistingConcept != null)) {
-                String preexistingName = preexistingConcept.getPrimaryConceptNameAsString();
-                AppFrameDispatcher.showErrorDialog(
-                        "The name '" + name + "' is already used by '" +
-                        preexistingName +
-                            "'. If you want to add the name to '" +
-                                concept.getPrimaryConceptNameAsString() +
-                                    "' you must" + "remove it from '" +
-                                        preexistingName + "' first.");
+                String preexistingName = preexistingConcept.getPrimaryConceptName().getName();
+                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR,
+                                 "The name '" + name + "' is already used by '" + preexistingName +
+                                 "'. If you want to add the name to '" + concept.getPrimaryConceptName().getName() +
+                                 "' you must" + "remove it from '" + preexistingName + "' first.");
                 okToProceed = false;
             }
 
@@ -498,12 +435,12 @@ public class AddConceptNameDialog extends JDialog {
                 /*
                  * Creat the new conceptName
                  */
-                ConceptName conceptName = new ConceptName();
+                ConceptName conceptName = knowledgebaseFactory.newConceptName();
                 conceptName.setName(getNameField().getText());
                 conceptName.setAuthor(getAuthorField().getText());
-                String nameType = ConceptName.NAMETYPE_COMMON;
+                String nameType = ConceptNameTypes.COMMON.toString();
                 if (getSynonymRb().isSelected()) {
-                    nameType = ConceptName.NAMETYPE_SYNONYM;
+                    nameType = ConceptNameTypes.SYNONYM.toString();
                 }
 
                 conceptName.setNameType(nameType);
@@ -512,33 +449,36 @@ public class AddConceptNameDialog extends JDialog {
                 /*
                  * Add a History object to track the change.
                  */
-                UserAccount userAccount = (UserAccount) KnowledgebaseApp.DISPATCHER_USERACCOUNT.getValueObject();
-                IHistory history = HistoryFactory.add(userAccount, conceptName);
-                concept.addHistory(history);
+                UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+                History history = historyFactory.add(userAccount, conceptName);
+                concept.getConceptMetadata().addHistory(history);
 
                 /*
                  * Store the new name in the database.
                  */
+
                 try {
-                    ConceptDAO.getInstance().update(concept);
-                } catch (DAOException e) {
-                    if (log.isErrorEnabled()) {
-                        concept.removeConceptName(conceptName);
-                        concept.removeHistory(history);
-                        log.error("Failed to update " + concept, e);
-                        AppFrameDispatcher.showErrorDialog(
-                                "Failed to save" +
-                                " changes. Rolling back to previous state");
-                    }
+                    ConceptNameDAO conceptNameDAO = knowledgebaseDAOFactory.newConceptNameDAO();
+                    conceptNameDAO.makePersistent(conceptName);
+                    HistoryDAO historyDAO = knowledgebaseDAOFactory.newHistoryDAO();
+                    historyDAO.makePersistent(history);
+                }
+                catch (Exception e) {
+                    concept.removeConceptName(conceptName);
+                    concept.getConceptMetadata().removeHistory(history);
+                    log.error("Failed to update " + concept, e);
+                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR,
+                                     "Failed to save" + " changes. Rolling back to previous state");
                 }
 
-                final Frame frame = AppFrameDispatcher.getFrame();
+                final Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
                 if ((frame != null) && (frame instanceof KnowledgebaseFrame)) {
                     Worker.post(new Job() {
 
                         public Object run() {
                             ((KnowledgebaseFrame) frame).refreshTreeAndOpenNode(
-                                    concept.getPrimaryConceptNameAsString());
+                                concept.getPrimaryConceptName().getName());
+
                             return null;
                         }
 

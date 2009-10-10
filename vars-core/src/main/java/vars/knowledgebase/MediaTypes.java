@@ -9,7 +9,7 @@ package vars.knowledgebase;
  */
 public enum MediaTypes {
 
-    ICON("Icon"), IMAGE("Image"), VIDEO("Video");
+    ICON("Icon"), IMAGE("Image"), VIDEO("Video"), UNDEFINED("Undefined");
 
     private String type;
 
@@ -19,6 +19,17 @@ public enum MediaTypes {
 
     public String getType() {
         return type;
+    }
+
+    public static MediaTypes getType(String type) {
+        MediaTypes mediaType = UNDEFINED;
+        for (MediaTypes t : values()) {
+            if (t.getType().equalsIgnoreCase(type)) {
+                mediaType = t;
+                break;
+            }
+        }
+        return mediaType;
     }
 
     @Override

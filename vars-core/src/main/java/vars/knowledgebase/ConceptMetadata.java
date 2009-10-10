@@ -39,6 +39,8 @@ public interface ConceptMetadata extends KnowledgebaseObject {
      */
     boolean hasPrimaryImage();
 
+    Media getPrimaryMedia(MediaTypes mediaType);
+
 
     Media getPrimaryImage();
 

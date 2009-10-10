@@ -1,3 +1,17 @@
+/*
+ * @(#)MediaViewPanel.java   2009.10.09 at 05:00:26 PDT
+ *
+ * Copyright 2009 MBARI
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
+
 package vars.knowledgebase.ui;
 
 import java.awt.Dimension;
@@ -11,75 +25,32 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import org.mbari.vars.knowledgebase.model.Media;
+import vars.knowledgebase.Media;
 
+/**
+ * Class description
+ *
+ *
+ * @version        $date$, 2009.10.09 at 05:00:26 PDT
+ * @author         Brian Schlining [brian@mbari.org]
+ */
 public class MediaViewPanel extends JPanel implements ILockableEditor {
 
-    /**
-	 * @uml.property  name="locked"
-	 */
-    private boolean locked;
     private static final long serialVersionUID = 1L;
-    /**
-	 * @uml.property  name="urlLabel"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private JLabel urlLabel = null;
-    /**
-	 * @uml.property  name="typeLabel"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private JLabel typeLabel = null;
-    /**
-	 * @uml.property  name="captionLabel"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private JLabel captionLabel = null;
-    /**
-	 * @uml.property  name="creditLabel"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private JLabel creditLabel = null;
-    /**
-	 * @uml.property  name="urlField"
-	 * @uml.associationEnd  
-	 */
-    private JTextField urlField = null;
-    /**
-	 * @uml.property  name="typeComboBox"
-	 * @uml.associationEnd  multiplicity="(0 -1)" elementType="java.lang.String"
-	 */
-    private JComboBox typeComboBox = null;
-    /**
-	 * @uml.property  name="captionScrollPane"
-	 * @uml.associationEnd  
-	 */
-    private JScrollPane captionScrollPane = null;
-    /**
-	 * @uml.property  name="captionArea"
-	 * @uml.associationEnd  
-	 */
     private JTextArea captionArea = null;
-    /**
-	 * @uml.property  name="creditScrollPane"
-	 * @uml.associationEnd  
-	 */
-    private JScrollPane creditScrollPane = null;
-    /**
-	 * @uml.property  name="creditArea"
-	 * @uml.associationEnd  
-	 */
+    private JLabel captionLabel = null;
+    private JScrollPane captionScrollPane = null;
     private JTextArea creditArea = null;
-    /**
-	 * @uml.property  name="primaryCheckBox"
-	 * @uml.associationEnd  
-	 */
+    private JLabel creditLabel = null;
+    private JScrollPane creditScrollPane = null;
     private JCheckBox primaryCheckBox = null;
-    /**
-	 * @uml.property  name="media"
-	 * @uml.associationEnd  
-	 */
+    private JComboBox typeComboBox = null;
+    private JLabel typeLabel = null;
+    private JTextField urlField = null;
+    private JLabel urlLabel = null;
+    private boolean locked;
     private Media media;
+
     /**
      * This is the default constructor
      */
@@ -89,8 +60,111 @@ public class MediaViewPanel extends JPanel implements ILockableEditor {
     }
 
     /**
+     * This method initializes captionArea
+     * @return  javax.swing.JTextArea
+     */
+    public JTextArea getCaptionArea() {
+        if (captionArea == null) {
+            captionArea = new JTextArea();
+            captionArea.setPreferredSize(new Dimension(60, 60));
+        }
+
+        return captionArea;
+    }
+
+    /**
+     * This method initializes captionScrollPane
+     * @return  javax.swing.JScrollPane
+     */
+    private JScrollPane getCaptionScrollPane() {
+        if (captionScrollPane == null) {
+            captionScrollPane = new JScrollPane();
+            captionScrollPane.setViewportView(getCaptionArea());
+        }
+
+        return captionScrollPane;
+    }
+
+    /**
+     * This method initializes creditArea
+     * @return  javax.swing.JTextArea
+     */
+    public JTextArea getCreditArea() {
+        if (creditArea == null) {
+            creditArea = new JTextArea();
+            creditArea.setPreferredSize(new Dimension(60, 60));
+        }
+
+        return creditArea;
+    }
+
+    /**
+     * This method initializes creditScrollPane
+     * @return  javax.swing.JScrollPane
+     */
+    private JScrollPane getCreditScrollPane() {
+        if (creditScrollPane == null) {
+            creditScrollPane = new JScrollPane();
+            creditScrollPane.setViewportView(getCreditArea());
+        }
+
+        return creditScrollPane;
+    }
+
+    /**
+     * @return  the media
+     */
+    public Media getMedia() {
+        return media;
+    }
+
+    /**
+     * This method initializes primaryCheckBox
+     * @return  javax.swing.JCheckBox
+     */
+    public JCheckBox getPrimaryCheckBox() {
+        if (primaryCheckBox == null) {
+            primaryCheckBox = new JCheckBox();
+            primaryCheckBox.setText("Primary");
+        }
+
+        return primaryCheckBox;
+    }
+
+    /**
+     * This method initializes typeComboBox
+     * @return  javax.swing.JComboBox
+     */
+    public JComboBox getTypeComboBox() {
+        if (typeComboBox == null) {
+            typeComboBox = new JComboBox();
+
+            // Populate with media types
+            String types[] = Media.TYPES;
+            for (int i = 0; i < types.length; i++) {
+                typeComboBox.addItem(types[i]);
+            }
+
+        }
+
+        return typeComboBox;
+    }
+
+    /**
+     * This method initializes urlField
+     * @return  javax.swing.JTextField
+     */
+    public JTextField getUrlField() {
+        if (urlField == null) {
+            urlField = new JTextField();
+        }
+
+        return urlField;
+    }
+
+    /**
      * This method initializes this
-     * 
+     *
      * @return void
      */
     private void initialize() {
@@ -166,108 +240,28 @@ public class MediaViewPanel extends JPanel implements ILockableEditor {
         this.add(getPrimaryCheckBox(), gridBagConstraints8);
     }
 
-    /**
-	 * This method initializes urlField	
-	 * @return  javax.swing.JTextField
-	 * @uml.property  name="urlField"
-	 */
-    public JTextField getUrlField() {
-        if (urlField == null) {
-            urlField = new JTextField();
-        }
-        return urlField;
+    public boolean isLocked() {
+        return locked;
     }
 
     /**
-	 * This method initializes typeComboBox	
-	 * @return  javax.swing.JComboBox
-	 * @uml.property  name="typeComboBox"
-	 */
-    public JComboBox getTypeComboBox() {
-        if (typeComboBox == null) {
-            typeComboBox = new JComboBox();
-            
-            // Populate with media types
-            String types[] = Media.TYPES;
-            for (int i = 0; i < types.length; i++) {
-                typeComboBox.addItem(types[i]);
-            }
-            
-        }
-        return typeComboBox;
+     * @param locked  the locked to set
+     */
+    public void setLocked(boolean locked) {
+        getUrlField().setEditable(!locked);
+        getTypeComboBox().setEnabled(!locked);
+        getCreditArea().setEditable(!locked);
+        getCaptionArea().setEditable(!locked);
+        getPrimaryCheckBox().setEnabled(!locked);
+        this.locked = locked;
     }
 
     /**
-	 * This method initializes captionScrollPane	
-	 * @return  javax.swing.JScrollPane
-	 * @uml.property  name="captionScrollPane"
-	 */
-    private JScrollPane getCaptionScrollPane() {
-        if (captionScrollPane == null) {
-            captionScrollPane = new JScrollPane();
-            captionScrollPane.setViewportView(getCaptionArea());
-        }
-        return captionScrollPane;
-    }
-
-    /**
-	 * This method initializes captionArea	
-	 * @return  javax.swing.JTextArea
-	 * @uml.property  name="captionArea"
-	 */
-    public JTextArea getCaptionArea() {
-        if (captionArea == null) {
-            captionArea = new JTextArea();
-            captionArea.setPreferredSize(new Dimension(60, 60));
-        }
-        return captionArea;
-    }
-
-    /**
-	 * This method initializes creditScrollPane	
-	 * @return  javax.swing.JScrollPane
-	 * @uml.property  name="creditScrollPane"
-	 */
-    private JScrollPane getCreditScrollPane() {
-        if (creditScrollPane == null) {
-            creditScrollPane = new JScrollPane();
-            creditScrollPane.setViewportView(getCreditArea());
-        }
-        return creditScrollPane;
-    }
-
-    /**
-	 * This method initializes creditArea	
-	 * @return  javax.swing.JTextArea
-	 * @uml.property  name="creditArea"
-	 */
-    public JTextArea getCreditArea() {
-        if (creditArea == null) {
-            creditArea = new JTextArea();
-            creditArea.setPreferredSize(new Dimension(60, 60));
-        }
-        return creditArea;
-    }
-
-    /**
-	 * This method initializes primaryCheckBox	
-	 * @return  javax.swing.JCheckBox
-	 * @uml.property  name="primaryCheckBox"
-	 */
-    public JCheckBox getPrimaryCheckBox() {
-        if (primaryCheckBox == null) {
-            primaryCheckBox = new JCheckBox();
-            primaryCheckBox.setText("Primary");
-        }
-        return primaryCheckBox;
-    }
-
-    /**
-	 * @param media  the media to set
-	 * @uml.property  name="media"
-	 */
+     * @param media  the media to set
+     */
     public void setMedia(Media media) {
         this.media = media;
+
         if (media != null) {
             getUrlField().setText(media.getUrl());
             getCaptionArea().setText(media.getCaption());
@@ -284,29 +278,5 @@ public class MediaViewPanel extends JPanel implements ILockableEditor {
         }
     }
 
-    /**
-	 * @return  the media
-	 * @uml.property  name="media"
-	 */
-    public Media getMedia() {
-        return media;
-    }
+} 
 
-    public boolean isLocked() {
-        return locked;
-    }
-
-    /**
-	 * @param locked  the locked to set
-	 * @uml.property  name="locked"
-	 */
-    public void setLocked(boolean locked) {
-        getUrlField().setEditable(!locked);
-        getTypeComboBox().setEnabled(!locked);
-        getCreditArea().setEditable(!locked);
-        getCaptionArea().setEditable(!locked);
-        getPrimaryCheckBox().setEnabled(!locked);
-        this.locked = locked;
-    }
-
-}  //  @jve:decl-index=0:visual-constraint="10,10"
