@@ -124,10 +124,9 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
     }
 
     /**
-         * This method initializes authorField
-         * @return  javax.swing.JTextField
-         * @uml.property  name="authorField"
-         */
+     * This method initializes authorField
+     * @return  javax.swing.JTextField
+     */
     private JTextField getAuthorField() {
         if (authorField == null) {
             authorField = new JTextField();
@@ -137,10 +136,9 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
     }
 
     /**
-         * This method initializes buttonPanel
-         * @return  javax.swing.JPanel
-         * @uml.property  name="buttonPanel"
-         */
+     * This method initializes buttonPanel
+     * @return  javax.swing.JPanel
+     */
     private EditorButtonPanel getButtonPanel() {
         if (buttonPanel == null) {
             buttonPanel = new EditorButtonPanel();
@@ -161,10 +159,9 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
     }
 
     /**
-         * This method initializes commonRb
-         * @return  javax.swing.JRadioButton
-         * @uml.property  name="commonRb"
-         */
+     * This method initializes commonRb
+     * @return  javax.swing.JRadioButton
+     */
     private JRadioButton getCommonRb() {
         if (commonRb == null) {
             commonRb = new JRadioButton();
@@ -184,10 +181,9 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
     }
 
     /**
-         * This method initializes nameField
-         * @return  javax.swing.JTextField
-         * @uml.property  name="nameField"
-         */
+     * This method initializes nameField
+     * @return  javax.swing.JTextField
+     */
     private JTextField getNameField() {
         if (nameField == null) {
             nameField = new JTextField();
@@ -196,11 +192,6 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
         return nameField;
     }
 
-    /**
-         * This method initializes namesList
-         * @return  javax.swing.JList
-         * @uml.property  name="namesList"
-         */
     private JList getNamesList() {
         if (namesList == null) {
             namesList = new JList();
@@ -250,11 +241,7 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
         return namesList;
     }
 
-    /**
-         * This method initializes mainPanel
-         * @return  javax.swing.JPanel
-         * @uml.property  name="namesPanel"
-         */
+
     private JPanel getNamesPanel() {
         if (namesPanel == null) {
             namesPanel = new JPanel();
@@ -269,20 +256,11 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
         return namesPanel;
     }
 
-    /**
-     * This method initializes addButton
-     *
-     * @return javax.swing.JButton
-     */
+ 
     private JButton getNewButton() {
         return getButtonPanel().getNewButton();
     }
 
-    /**
-         * This method initializes primaryRb
-         * @return  javax.swing.JRadioButton
-         * @uml.property  name="primaryRb"
-         */
     private JRadioButton getPrimaryRb() {
         if (primaryRb == null) {
             primaryRb = new JRadioButton();
@@ -293,10 +271,9 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
     }
 
     /**
-         * The primary radiobutton toggles the state of other components. For example we don't want to allow people to delete the primary conceptname.
-         * @return
-         * @uml.property  name="rbItemListener"
-         */
+     * The primary radiobutton toggles the state of other components. For example we don't want to allow people to delete the primary conceptname.
+     * @return
+     */
     private ItemListener getRbItemListener() {
         if (rbItemListener == null) {
             rbItemListener = new ItemListener() {
@@ -320,11 +297,7 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
         return rbItemListener;
     }
 
-    /**
-         * This method initializes rbPanel
-         * @return  javax.swing.JPanel
-         * @uml.property  name="rbPanel"
-         */
+
     private JPanel getRbPanel() {
         if (rbPanel == null) {
             primaryLabel = new JLabel();
@@ -350,11 +323,6 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
         return rbPanel;
     }
 
-    /**
-         * This method initializes scrollPane
-         * @return  javax.swing.JScrollPane
-         * @uml.property  name="scrollPane"
-         */
     private JScrollPane getScrollPane() {
         if (scrollPane == null) {
             scrollPane = new JScrollPane();
@@ -364,11 +332,6 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
         return scrollPane;
     }
 
-    /**
-         * This method initializes synonymRb
-         * @return  javax.swing.JRadioButton
-         * @uml.property  name="synonymRb"
-         */
     private JRadioButton getSynonymRb() {
         if (synonymRb == null) {
             synonymRb = new JRadioButton();
@@ -378,20 +341,10 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
         return synonymRb;
     }
 
-    /**
-     * This method initializes removeButton
-     *
-     * @return javax.swing.JButton
-     */
     private JButton getUpdateButton() {
         return getButtonPanel().getUpdateButton();
     }
 
-    /**
-         * This method initializes namePanel
-         * @return  javax.swing.JPanel
-         * @uml.property  name="viewPanel"
-         */
     private JPanel getViewPanel() {
         if (viewPanel == null) {
             GridBagConstraints gridBagConstraints5 = new GridBagConstraints();
@@ -451,10 +404,6 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
         return viewPanel;
     }
 
-    /**
-     * This method initializes this
-     *
-     */
     private void initialize() {
         this.setLayout(new BorderLayout());
         this.add(getNamesPanel(), java.awt.BorderLayout.CENTER);
@@ -466,8 +415,7 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
     }
 
     /**
-     * @param concept
-     *            The concept to set.
+     * @param concept The concept to set.
      */
     @Override
     public void setConcept(Concept concept) {
@@ -493,8 +441,7 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
     }
 
     /**
-     * @param locked
-     *            The locked to set.
+     * @param locked The locked to set.
      */
     @Override
     public void setLocked(boolean locked) {
@@ -516,7 +463,6 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
 
     /**
      * Actions that are taking when a name is selected in the namesList (JList)
-     *
      *
      * @param name
      */
@@ -555,11 +501,6 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
 
     private class DeleteAction extends ActionAdapter {
 
-        /**
-         *
-         */
-        private static final long serialVersionUID = -7373413523255594938L;
-
         public void doAction() {
 
             final String selectedName = (String) getNamesList().getSelectedValue();
@@ -582,8 +523,7 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
                 catch (Exception e) {
                     EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
 
-//                    AppFrameDispatcher.showErrorDialog("Failed to update database. Unable to mark '" +
-//                            selectedName + "' for deletion.");
+
                 }
 
                 if ((userAccount != null) && userAccount.isAdministrator()) {
@@ -591,9 +531,7 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
                 }
 
                 waitIndicator.dispose();
-                ((KnowledgebaseApp) Lookup.getApplicationDispatcher().getValueObject()).getKnowledgebaseFrame()
-                    .refreshTreeAndOpenNode(primaryName);
-
+                EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, primaryName);
             }
 
         }
@@ -605,20 +543,13 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
          */
     private class NewAction extends ActionAdapter {
 
-        /**
-         *
-         */
-        private static final long serialVersionUID = 6063954683256831686L;
+ 
         private AddConceptNameDialog2 dialog;
 
         public void doAction() {
             getDialog().setVisible(true);
         }
 
-        /**
-                 * @return  the dialog
-                 * @uml.property  name="dialog"
-                 */
         private AddConceptNameDialog2 getDialog() {
             if (dialog == null) {
                 final Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
@@ -655,16 +586,7 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
      * @author brian
      */
     private class UpdateAction extends ActionAdapter {
-
-        /**
-         *
-         */
-        private static final long serialVersionUID = 7974719628218732271L;
-
-        /**
-         * Constructs ...
-         *
-         */
+ 
         UpdateAction() {
             putValue(NAME, "Update");
         }
@@ -891,19 +813,14 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
                      * accurate and reopen the tree to the currently edited
                      * node.
                      */
-                    final Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
-                    if ((frame != null) && (frame instanceof KnowledgebaseFrame)) {
-                        Worker.post(new Job() {
+                    Worker.post(new Job() {
+                        public Object run() {
+                            EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, concept.getPrimaryConceptName().getName());
+                            return null;
+                        }
 
-                            public Object run() {
-                                ((KnowledgebaseFrame) frame).refreshTreeAndOpenNode(
-                                    concept.getPrimaryConceptName().getName());
-
-                                return null;
-                            }
-
-                        });
-                    }
+                    });
+                    
 
                 }
 

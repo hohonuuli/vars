@@ -49,6 +49,12 @@ public class Lookup extends GlobalLookup {
     public static final String TOPIC_DELETE_LINK_TEMPLATE = Lookup.class.getName() + "-DeleteLinkTemplate";
     public static final String TOPIC_SELECTED_CONCEPT = Lookup.class.getName() + "-SelectedConcept";
 
+    /**
+     * Refresh the knowledgebase (purge caceh) and open node to the conceptname provided.
+     * Calls this as EventBus.publish(TOPIC_REFRESH_KNOWLEGEBASE, String conceptName)
+     */
+    public static final String TOPIC_REFRESH_KNOWLEGEBASE = Lookup.class.getName() + "-RefreshKnowledgebase";
+
     static {
         getApplicationDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {

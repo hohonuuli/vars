@@ -1,26 +1,36 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * @(#)NamesEditorPanelController.java   2009.10.24 at 08:40:08 PDT
+ *
+ * Copyright 2009 MBARI
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
+
+
 package vars.knowledgebase.ui;
 
-import org.mbari.vars.dao.DAOException;
-import org.mbari.vars.knowledgebase.model.Concept;
-import org.mbari.vars.knowledgebase.model.ConceptDelegate;
-import org.mbari.vars.knowledgebase.model.ConceptName;
-import org.mbari.vars.knowledgebase.model.History;
-import org.mbari.vars.knowledgebase.model.HistoryFactory;
-import org.mbari.vars.knowledgebase.model.dao.ConceptDAO;
-import org.mbari.vars.knowledgebase.model.dao.KnowledgeBaseCache;
-import org.mbari.vars.knowledgebase.ui.actions.ApproveHistoryTask;
-import org.mbari.vars.util.AppFrameDispatcher;
+import org.bushe.swing.event.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.IUserAccount;
-import vars.knowledgebase.IConcept;
-import vars.knowledgebase.IConceptDelegate;
-import vars.knowledgebase.IConceptName;
-import vars.knowledgebase.IHistory;
+import vars.UserAccount;
+import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptDAO;
+import vars.knowledgebase.ConceptMetadata;
+import vars.knowledgebase.ConceptMetadataDAO;
+import vars.knowledgebase.ConceptName;
+import vars.knowledgebase.ConceptNameDAO;
+import vars.knowledgebase.ConceptNameTypes;
+import vars.knowledgebase.History;
+import vars.knowledgebase.HistoryDAO;
+import vars.knowledgebase.HistoryFactory;
+import vars.knowledgebase.KnowledgebaseDAO;
+import vars.knowledgebase.KnowledgebaseFactory;
+import vars.knowledgebase.ui.actions.ApproveHistoryTask;
 
 /**
  *
@@ -28,11 +38,21 @@ import vars.knowledgebase.IHistory;
  */
 public class NamesEditorPanelController {
 
-    private static final Logger log = LoggerFactory.getLogger(NamesEditorPanelController.class);
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    private final ToolBelt toolBelt;
+
+    /**
+     * Constructs ...
+     *
+     * @param toolBelt
+     */
+    public NamesEditorPanelController(ToolBelt toolBelt) {
+        this.toolBelt = toolBelt;
+    }
 
     /**
      * Update a conceptName
-     * 
+     *
      * @param concept
      * @param name
      * @param author
@@ -41,33 +61,44 @@ public class NamesEditorPanelController {
      * @return
      */
     public boolean updateConceptName(final Concept concept, final String newName, final String author,
-            final String nameType, final String oldName, final IUserAccount userAccount) {
-        
+                                     final String nameType, final String oldName, final UserAccount userAccount) {
+
         log.error("Entering updateConceptName method");
         boolean okToProceed = true;
+
+        ApproveHistoryTask approveHistoryTask = toolBelt.getApproveHistoryTask();
+        ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
+        ConceptNameDAO conceptNameDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptNameDAO();
+        HistoryDAO historyDAO = toolBelt.getKnowledgebaseDAOFactory().newHistoryDAO();
+        HistoryFactory historyFactory = toolBelt.getHistoryFactory();
+        KnowledgebaseDAO knowledgebaseDAO = toolBelt.getKnowledgebaseDAO();
+        KnowledgebaseFactory knowledgebaseFactory = toolBelt.getKnowledgebaseFactory();
+
 
         /*
          * Check that the name does not already exist in the database
          */
-        IConcept matchingConcept = null;
+        Concept matchingConcept = null;
         if (okToProceed) {
             log.debug("Verifying that '" + newName + "' does not already exist in the knowledgebase");
+
             try {
-                matchingConcept = KnowledgeBaseCache.getInstance().findConceptByName(newName);
+                matchingConcept = conceptDAO.findByName(newName);
             }
-            catch (DAOException e1) {
+            catch (Exception e1) {
                 if (log.isErrorEnabled()) {
                     log.error("A search for '" + newName + "' in the database failed", e1);
                 }
-                AppFrameDispatcher.showErrorDialog("Failed to connect to the database");
+
+                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e1);
                 okToProceed = false;
             }
         }
 
         if (okToProceed) {
-            if ((matchingConcept != null) && (matchingConcept.getId() != concept.getId())) {
-                AppFrameDispatcher.showWarningDialog("A concept with " + "the name '" + newName +
-                        "' already exists.");
+            if ((matchingConcept != null) && conceptDAO.equalInDatastore(matchingConcept, concept)) {
+                EventBus.publish(Lookup.TOPIC_WARNING,
+                                 "A concept with " + "the name '" + newName + "' already exists.");
                 okToProceed = false;
             }
             else {
@@ -75,24 +106,20 @@ public class NamesEditorPanelController {
             }
         }
 
-        IConceptName oldConceptName = concept.getConceptName(oldName);
+        ConceptName oldConceptName = concept.getConceptName(oldName);
         if (okToProceed) {
-            
+
             log.debug("Updating the conceptName");
 
-            if (concept.isConceptDelegateLoaded()) {
-                log.debug("ConceptDelegate is not yet loaded");
-            }
+            // TODO may need to load lazy relations.
 
-            IConceptDelegate conceptDelegate = concept.getConceptDelegate();
-            log.debug("Inspecting " + conceptDelegate + "\n" +
-                    conceptDelegate.getHistorySet().toString() + "\n");
+            ConceptMetadata conceptMetadata = concept.getConceptMetadata();
+            log.debug("Inspecting " + conceptMetadata + "\n" + conceptMetadata.getHistories().toString() + "\n");
 
             /*
              * Make the changes and update the database
              */
-            
-            ConceptName newConceptName = new ConceptName();
+            ConceptName newConceptName = knowledgebaseFactory.newConceptName();
             newConceptName.setName(newName);
             newConceptName.setAuthor(author);
             newConceptName.setNameType(nameType);
@@ -100,19 +127,21 @@ public class NamesEditorPanelController {
             /*
              * Add a History object to track the change.
              */
-            IHistory history = HistoryFactory.replaceConceptName(userAccount, oldConceptName, newConceptName);
-            concept.addHistory(history);
+            History history = historyFactory.replaceConceptName(userAccount, oldConceptName, newConceptName);
+            conceptMetadata.addHistory(history);
+            historyDAO.makePersistent(history);
 
             /*
              * When updating a primary name we want to keep the older
              * name, so we add a new Concept with the old values.
              */
 
-            if (nameType.equals(ConceptName.NAMETYPE_PRIMARY)) {
-                ConceptName copyCn = new ConceptName();
+
+            if (nameType.equals(ConceptNameTypes.PRIMARY.toString())) {
+                ConceptName copyCn = knowledgebaseFactory.newConceptName();
                 copyCn.setName(oldConceptName.getName());
                 copyCn.setAuthor(oldConceptName.getAuthor());
-                copyCn.setNameType(ConceptName.NAMETYPE_SYNONYM);
+                copyCn.setNameType(ConceptNameTypes.SYNONYM.toString());
 
                 /*
                  * Have to update the original concept before adding the
@@ -121,6 +150,7 @@ public class NamesEditorPanelController {
                  */
                 oldConceptName.setName(newName);
                 concept.addConceptName(copyCn);
+                conceptNameDAO.makePersistent(copyCn);
             }
             else {
                 oldConceptName.setName(newName);
@@ -128,17 +158,19 @@ public class NamesEditorPanelController {
 
             oldConceptName.setAuthor(author);
             oldConceptName.setNameType(nameType);
-            
+
             okToProceed = false;
+
             try {
-                ConceptDAO.getInstance().update(concept);
+                conceptDAO.update(concept);
                 okToProceed = true;
             }
-            catch (DAOException e) {
+            catch (Exception e) {
                 if (log.isErrorEnabled()) {
                     log.error("Failed to update " + concept, e);
                 }
-                AppFrameDispatcher.showErrorDialog("Update failed!! (Database error)");
+
+                EventBus.publish(Lookup.TOPIC_FATAL_ERROR, e);
             }
 
             if (okToProceed) {
@@ -152,15 +184,16 @@ public class NamesEditorPanelController {
                 }
 
                 okToProceed = false;
+
                 try {
-                    ConceptDAO.getInstance().updateConceptNameUsedByAnnotations(concept);
+                    knowledgebaseDAO.updateConceptNameUsedByAnnotations(concept);
                     okToProceed = true;
                 }
-                catch (DAOException e) {
-                    String msg = "Failed to change primary names of annotations from '" +
-                            oldName + "' to '" + newName + "'.";
+                catch (Exception e) {
+                    String msg = "Failed to change primary names of annotations from '" + oldName + "' to '" +
+                                 newName + "'.";
                     log.error(msg);
-                    AppFrameDispatcher.showErrorDialog(msg);
+                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, msg);
                 }
 
                 /*
@@ -168,14 +201,17 @@ public class NamesEditorPanelController {
                  * might have created if changing a primary name
                  */
                 if (okToProceed) {
-                    IConceptName oldPrimaryName = concept.getConceptName(history.getOldValue());
-                    if (oldPrimaryName != null && !oldPrimaryName.getNameType().equalsIgnoreCase(ConceptName.NAMETYPE_PRIMARY)) {
+                    ConceptName oldPrimaryName = concept.getConceptName(history.getOldValue());
+                    if ((oldPrimaryName != null) &&
+                            !oldPrimaryName.getNameType().equalsIgnoreCase(ConceptNameTypes.PRIMARY.toString())) {
                         concept.removeConceptName(oldPrimaryName);
+
                         try {
-                            ConceptDAO.getInstance().update(concept);
+                            conceptNameDAO.makeTransient(oldPrimaryName);
                         }
-                        catch (DAOException ex) {
-                            log.error("Failed to remove " + oldPrimaryName + " from the database. This will need to be done manually!!");
+                        catch (Exception ex) {
+                            log.error("Failed to remove " + oldPrimaryName +
+                                      " from the database. This will need to be done manually!!");
                         }
                     }
                 }
@@ -186,15 +222,16 @@ public class NamesEditorPanelController {
                  * or your database transaction will fail because of a timestamp mismatch. (ie. Cache does not
                  * match you instance)
                  */
-                if (userAccount != null && userAccount.isAdmin()) {
-                    ApproveHistoryTask.approve(userAccount, history);
+                if ((userAccount != null) && userAccount.isAdministrator()) {
+                    approveHistoryTask.approve(userAccount, history);
                 }
-                
+
 
             }
         }
+
         log.debug("Exiting updateConceptName method");
+
         return okToProceed;
     }
 }
-

@@ -70,4 +70,12 @@ public class DAO implements vars.DAO {
     protected EAO getEAO() {
         return eao;
     }
+
+    public boolean equalInDatastore(Object obj1, Object obj2) {
+        boolean isSame = false;
+        if ((obj1 != null) && (obj2 != null) && (obj1.getClass().equals(obj2.getClass()))) {
+            isSame = ((JPAEntity) obj1).getId().equals(((JPAEntity) obj2).getId());
+        }
+        return isSame;
+    }
 }

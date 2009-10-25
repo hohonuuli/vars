@@ -13,6 +13,7 @@ import vars.knowledgebase.KnowledgebaseDAO;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.ui.actions.ApproveHistoryTask;
+import vars.query.QueryDAO;
 
 /**
  * Container that holds on to a ton of shared objects that need to be widely
@@ -27,16 +28,18 @@ public class ToolBelt {
     private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
     private final KnowledgebaseFactory knowledgebaseFactory;
     private final HistoryFactory historyFactory;
+    private final QueryDAO queryDAO;
 
     @Inject
     public ToolBelt(AnnotationDAOFactory annotationDAOFactory, AnnotationFactory annotationFactory,
             KnowledgebaseDAO knowledgebaseDAO, KnowledgebaseDAOFactory knowledgebaseDAOFactory,
-            KnowledgebaseFactory knowledgebaseFactory) {
+            KnowledgebaseFactory knowledgebaseFactory, QueryDAO queryDAO) {
         this.annotationDAOFactory = annotationDAOFactory;
         this.annotationFactory = annotationFactory;
         this.knowledgebaseDAO = knowledgebaseDAO;
         this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
         this.knowledgebaseFactory = knowledgebaseFactory;
+        this.queryDAO = queryDAO;
         historyFactory = new HistoryFactory(knowledgebaseFactory);
         approveHistoryTask = new  ApproveHistoryTask(annotationDAOFactory, knowledgebaseDAO, knowledgebaseDAOFactory, knowledgebaseFactory);
     }
@@ -68,6 +71,11 @@ public class ToolBelt {
     public KnowledgebaseFactory getKnowledgebaseFactory() {
         return knowledgebaseFactory;
     }
+
+    public QueryDAO getQueryDAO() {
+        return queryDAO;
+    }
+
 
 
 }

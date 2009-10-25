@@ -34,4 +34,14 @@ public interface DAO {
 
     <T> T findByPrimaryKey(Class<T> clazz, Object primaryKey);
 
+    /**
+     * Compares 2 object tho see if they represent the same entity in the database.
+     * Normally, this would return true if both objects have the same primary key.
+     * 
+     * @param obj1
+     * @param obj2
+     * @return
+     */
+    boolean equalInDatastore(Object obj1, Object obj2);
+
 }

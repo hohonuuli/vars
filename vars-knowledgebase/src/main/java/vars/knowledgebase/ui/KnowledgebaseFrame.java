@@ -464,7 +464,7 @@ public class KnowledgebaseFrame extends JFrame {
 	 * @return  javax.swing.JPanel
 	 * @uml.property  name="treePanel"
 	 */
-    private SearchableTreePanel getTreePanel() {
+    protected SearchableTreePanel getTreePanel() {
         if (treePanel == null) {
             treePanel = new SearchableConceptTreePanel();
 

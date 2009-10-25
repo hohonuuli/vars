@@ -30,11 +30,15 @@ import vars.knowledgebase.MediaDAO;
  */
 public class KnowledgebaseAppController {
 
+    private final ToolBelt toolBelt;
     private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
 
+
+
     @Inject
-    protected KnowledgebaseAppController(KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
-        this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
+    protected KnowledgebaseAppController(ToolBelt toolBelt) {
+        this.toolBelt = toolBelt;
+        this.knowledgebaseDAOFactory = toolBelt.getKnowledgebaseDAOFactory();
         EventBus.subscribe(Lookup.TOPIC_DELETE_HISTORY, new DeleteHistorySubscriber());
         EventBus.subscribe(Lookup.TOPIC_DELETE_CONCEPT, new DeleteConceptSubscriber());
         EventBus.subscribe(Lookup.TOPIC_DELETE_CONCEPT_NAME, new DeleteConceptNameSubscriber());
@@ -42,6 +46,8 @@ public class KnowledgebaseAppController {
         EventBus.subscribe(Lookup.TOPIC_DELETE_LINK_TEMPLATE, new DeleteLinkTemplateSubscriber());
         EventBus.subscribe(Lookup.TOPIC_DELETE_MEDIA, new DeleteMediaSubscriber());
     }
+
+    
 
 
     /**
