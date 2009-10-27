@@ -15,34 +15,28 @@
  */
 
 
-package vars.knowledgebase.ui;
+package vars;
 
 //~--- interfaces -------------------------------------------------------------
 
 /**
- * Interface used to signal Editors if they are locked (i.e. no editing allowed)
- * or unlocked (edit away!)
- *
- * @author brian
+ * <p>Implement this class to listen for when the {@link PersistenceCache} cleared</p>
  *
  */
-public interface ILockableEditor {
+public interface CacheClearedListener {
 
     /**
-     * <p><!-- Method description --></p>
+     * <p>This method is invoked immediately after the cache is cleared.</p>
      *
-     *
-     * @return
+     * @param evt
      */
-    boolean isLocked();
-
-    //~--- set methods --------------------------------------------------------
+    void afterClear(CacheClearedEvent evt);
 
     /**
-     * <p><!-- Method description --></p>
+     * <p>This method is invoked immediately before the cache is cleared.</p>
      *
      *
-     * @param locked
+     * @param evt
      */
-    void setLocked(boolean locked);
+    void beforeClear(CacheClearedEvent evt);
 }

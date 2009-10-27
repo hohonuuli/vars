@@ -6,6 +6,8 @@
 package vars.knowledgebase.ui;
 
 import com.google.inject.Inject;
+import vars.MiscDAOFactory;
+import vars.MiscFactory;
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.AnnotationFactory;
 import vars.knowledgebase.HistoryFactory;
@@ -28,17 +30,23 @@ public class ToolBelt {
     private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
     private final KnowledgebaseFactory knowledgebaseFactory;
     private final HistoryFactory historyFactory;
+    private final MiscDAOFactory miscDAOFactory;
+    private final MiscFactory miscFactory;
+
     private final QueryDAO queryDAO;
 
     @Inject
     public ToolBelt(AnnotationDAOFactory annotationDAOFactory, AnnotationFactory annotationFactory,
             KnowledgebaseDAO knowledgebaseDAO, KnowledgebaseDAOFactory knowledgebaseDAOFactory,
-            KnowledgebaseFactory knowledgebaseFactory, QueryDAO queryDAO) {
+            KnowledgebaseFactory knowledgebaseFactory, MiscDAOFactory miscDAOFactory,
+            MiscFactory miscFactory, QueryDAO queryDAO) {
         this.annotationDAOFactory = annotationDAOFactory;
         this.annotationFactory = annotationFactory;
         this.knowledgebaseDAO = knowledgebaseDAO;
         this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
         this.knowledgebaseFactory = knowledgebaseFactory;
+        this.miscDAOFactory = miscDAOFactory;
+        this.miscFactory = miscFactory;
         this.queryDAO = queryDAO;
         historyFactory = new HistoryFactory(knowledgebaseFactory);
         approveHistoryTask = new  ApproveHistoryTask(annotationDAOFactory, knowledgebaseDAO, knowledgebaseDAOFactory, knowledgebaseFactory);
@@ -70,6 +78,14 @@ public class ToolBelt {
 
     public KnowledgebaseFactory getKnowledgebaseFactory() {
         return knowledgebaseFactory;
+    }
+
+    public MiscDAOFactory getMiscDAOFactory() {
+        return miscDAOFactory;
+    }
+
+    public MiscFactory getMiscFactory() {
+        return miscFactory;
     }
 
     public QueryDAO getQueryDAO() {

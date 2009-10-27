@@ -30,12 +30,12 @@ import vars.knowledgebase.History;
 import vars.knowledgebase.HistoryDAO;
 import vars.knowledgebase.HistoryFactory;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
-import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.LinkRealization;
 import vars.knowledgebase.LinkRealizationDAO;
 import vars.knowledgebase.ui.KnowledgebaseApp;
 import vars.knowledgebase.ui.LinkEditorPanel;
 import vars.knowledgebase.ui.Lookup;
+import vars.knowledgebase.ui.ToolBelt;
 import vars.knowledgebase.ui.actions.ApproveHistoryTask;
 import vars.shared.ui.OkCancelButtonPanel;
 
@@ -49,11 +49,8 @@ public class AddLinkRealizationDialog extends JDialog {
     private OkCancelButtonPanel buttonPanel = null;
     private JPanel jContentPane = null;
     private LinkEditorPanel linkEditorPanel = null;
-    private final ApproveHistoryTask approveHistoryTask;
     private Concept concept;
-    private final HistoryFactory historyFactory;
-    private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
-    private final KnowledgebaseFactory knowledgebaseFactory;
+    private final ToolBelt toolBelt;
 
     /**
      * Constructs ...
@@ -62,10 +59,8 @@ public class AddLinkRealizationDialog extends JDialog {
      * @param knowledgebaseDAOFactory
      * @param knowledgebaseFactory
      */
-    public AddLinkRealizationDialog(ApproveHistoryTask approveHistoryTask,
-                                    KnowledgebaseDAOFactory knowledgebaseDAOFactory,
-                                    KnowledgebaseFactory knowledgebaseFactory) {
-        this(null, approveHistoryTask, knowledgebaseDAOFactory, knowledgebaseFactory);
+    public AddLinkRealizationDialog(ToolBelt toolBelt) {
+        this(null, toolBelt);
     }
 
     /**
@@ -74,15 +69,10 @@ public class AddLinkRealizationDialog extends JDialog {
      * @param knowledgebaseDAOFactory
      * @param knowledgebaseFactory
      */
-    public AddLinkRealizationDialog(Frame owner, ApproveHistoryTask approveHistoryTask,
-                                    KnowledgebaseDAOFactory knowledgebaseDAOFactory,
-                                    KnowledgebaseFactory knowledgebaseFactory) {
+    public AddLinkRealizationDialog(Frame owner, ToolBelt toolBelt) {
         super(owner);
-        this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
-        this.knowledgebaseFactory = knowledgebaseFactory;
-        this.historyFactory = new HistoryFactory(knowledgebaseFactory);
-        this.approveHistoryTask = approveHistoryTask;
         setTitle("VARS - Add Description");
+        this.toolBelt = toolBelt;
         initialize();
     }
 
@@ -139,7 +129,7 @@ public class AddLinkRealizationDialog extends JDialog {
          */
     private LinkEditorPanel getLinkEditorPanel() {
         if (linkEditorPanel == null) {
-            linkEditorPanel = new LinkEditorPanel();
+            linkEditorPanel = new LinkEditorPanel(toolBelt);
             linkEditorPanel.getLinkNameField().setEditable(false);
         }
 
@@ -175,10 +165,14 @@ public class AddLinkRealizationDialog extends JDialog {
         UserAccount userAccount = (UserAccount) KnowledgebaseApp.DISPATCHER_USERACCOUNT.getValueObject();
         if ((userAccount != null) && !userAccount.isReadOnly()) {
 
+            KnowledgebaseDAOFactory knowledgebaseDAOFactory = toolBelt.getKnowledgebaseDAOFactory();
+            HistoryFactory historyFactory = toolBelt.getHistoryFactory();
+            ApproveHistoryTask approveHistoryTask = toolBelt.getApproveHistoryTask();
+
             /*
              * Create the linkRealization
              */
-            final LinkRealization linkRealization = knowledgebaseFactory.newLinkRealization();
+            final LinkRealization linkRealization = toolBelt.getKnowledgebaseFactory().newLinkRealization();
             final LinkEditorPanel p = getLinkEditorPanel();
             linkRealization.setLinkName(p.getLinkName());
             linkRealization.setToConcept(p.getToConcept());

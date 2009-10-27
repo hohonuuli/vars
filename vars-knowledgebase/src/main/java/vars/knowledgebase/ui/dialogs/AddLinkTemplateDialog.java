@@ -66,6 +66,7 @@ public class AddLinkTemplateDialog extends JDialog {
     private final KnowledgebaseFactory knowledgebaseFactory;
     private final HistoryFactory historyFactory;
     private final ApproveHistoryTask approveHistoryTask;
+    private final ToolBelt toolBelt;
     
     /**
      * A placeholder that provides default values in the UI
@@ -77,6 +78,7 @@ public class AddLinkTemplateDialog extends JDialog {
      */
     public AddLinkTemplateDialog(Frame owner, ToolBelt toolBelt) {
         super(owner);
+        this.toolBelt = toolBelt;
         this.knowledgebaseDAOFactory = toolBelt.getKnowledgebaseDAOFactory();
         this.knowledgebaseFactory = toolBelt.getKnowledgebaseFactory();
         this.historyFactory = toolBelt.getHistoryFactory();
@@ -243,7 +245,7 @@ public class AddLinkTemplateDialog extends JDialog {
 	 */
     private LinkEditorPanel getLinkEditorPanel() {
         if (linkEditorPanel == null) {
-            linkEditorPanel = new LinkEditorPanel();
+            linkEditorPanel = new LinkEditorPanel(toolBelt);
             linkEditorPanel.getSearchField().setEnabled(false);
             linkEditorPanel.getLinkComboBox().setEnabled(false);            
         }

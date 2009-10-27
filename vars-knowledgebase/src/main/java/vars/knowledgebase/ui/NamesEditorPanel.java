@@ -14,6 +14,7 @@
 
 package vars.knowledgebase.ui;
 
+import vars.shared.ui.ILockableEditor;
 import com.google.inject.Inject;
 import foxtrot.Job;
 import foxtrot.Worker;

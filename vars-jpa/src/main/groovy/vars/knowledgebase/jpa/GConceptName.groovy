@@ -55,7 +55,9 @@ import javax.persistence.Transient
     @NamedQuery(name = "ConceptName.findByNameType",
                 query = "SELECT c FROM ConceptName c WHERE c.nameType = :nameType"),
     @NamedQuery(name = "ConceptName.findAll",
-                query = "SELECT c FROM ConceptName c")
+                query = "SELECT c FROM ConceptName c"),
+    @NamedQuery(name = "ConceptName.findByNameLike",
+                query = "SELECT c FROM ConceptName c WHERE c.name LIKE :name")
 ])
 public class GConceptName implements Serializable, ConceptName, JPAEntity {
 

@@ -14,6 +14,7 @@
 
 package vars.knowledgebase.ui;
 
+import vars.shared.ui.ILockableEditor;
 import java.awt.BorderLayout;
 import java.awt.Frame;
 import java.awt.event.MouseAdapter;

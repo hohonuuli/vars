@@ -35,12 +35,11 @@ import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.ConceptNameTypes;
 import vars.knowledgebase.History;
 import vars.knowledgebase.HistoryFactory;
-import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.ui.KnowledgebaseFrame;
 import vars.knowledgebase.ui.Lookup;
+import vars.knowledgebase.ui.ToolBelt;
 import vars.knowledgebase.ui.actions.ApproveHistoryTask;
-import vars.query.QueryDAO;
 import vars.shared.ui.AllConceptNamesComboBox;
 import vars.shared.ui.GlobalLookup;
 
@@ -52,29 +51,24 @@ public class AddConceptDialog extends javax.swing.JDialog {
     private static final long serialVersionUID = 6993327643414741677L;
     private static final Logger log = LoggerFactory.getLogger(AddConceptDialog.class);
     private final AddConceptDialogController controller = new AddConceptDialogController();
-    private final ApproveHistoryTask approveHistoryTask;
-
+    private final ToolBelt toolBelt;
  
     private javax.swing.JTextField authorField;
     private javax.swing.JLabel authorLabel;
     private javax.swing.JButton cancelButton;
     private Concept concept;
     private javax.swing.JComboBox conceptComboBox;
-    private final HistoryFactory historyFactory;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
-    private final KnowledgebaseFactory knowledgebaseFactory;
     private javax.swing.JTextField nameField;
     private javax.swing.JLabel nameLabel;
     private javax.swing.JTextField nodcField;
     private javax.swing.JButton okButton;
     private javax.swing.JLabel parentLabel;
-    private final QueryDAO queryDAO;
     private javax.swing.JComboBox rankLevelComboBox;
     private javax.swing.JComboBox rankNameComboBox;
     private javax.swing.JTextArea referenceText;
@@ -90,14 +84,9 @@ public class AddConceptDialog extends javax.swing.JDialog {
      * @param queryDAO
      */
     @Inject
-    public AddConceptDialog(ApproveHistoryTask approveHistoryTask, KnowledgebaseDAOFactory knowledgebaseDAOFactory,
-                            KnowledgebaseFactory knowledgebaseFactory, QueryDAO queryDAO) {
+    public AddConceptDialog(ToolBelt toolBelt) {
         super((Frame) Lookup.getApplicationDispatcher().getValueObject(), true);
-        this.approveHistoryTask = approveHistoryTask;
-        this.knowledgebaseFactory = knowledgebaseFactory;
-        this.queryDAO = queryDAO;
-        this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
-        this.historyFactory = new HistoryFactory(knowledgebaseFactory);
+        this.toolBelt = toolBelt;
         initComponents();
         initModel();
         setLocationRelativeTo((Frame) Lookup.getApplicationDispatcher().getValueObject());
@@ -128,7 +117,7 @@ public class AddConceptDialog extends javax.swing.JDialog {
         authorField = new javax.swing.JTextField();
         nameField = new javax.swing.JTextField();
         parentLabel = new javax.swing.JLabel();
-        conceptComboBox = new AllConceptNamesComboBox(queryDAO);
+        conceptComboBox = new AllConceptNamesComboBox(toolBelt.getQueryDAO());
         cancelButton = new JFancyButton();
         okButton = new JFancyButton();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -423,7 +412,7 @@ public class AddConceptDialog extends javax.swing.JDialog {
          * Constructs ...
          */
         public AddConceptDialogController() {
-            conceptDAO = knowledgebaseDAOFactory.newConceptDAO();
+            conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
         }
 
         public Concept createConcept() {
@@ -487,6 +476,7 @@ public class AddConceptDialog extends javax.swing.JDialog {
                 // Add the concept to the database;
 
                 if (okToProceed) {
+                    KnowledgebaseFactory knowledgebaseFactory = toolBelt.getKnowledgebaseFactory();
                     concept = knowledgebaseFactory.newConcept();
 
                     // Set reuired fields
@@ -513,7 +503,7 @@ public class AddConceptDialog extends javax.swing.JDialog {
                 // Generate a history for the new Concept
                 History history = null;
                 if (okToProceed) {
-                    history = historyFactory.add(userAccount, concept);
+                    history = toolBelt.getHistoryFactory().add(userAccount, concept);
                     parentConcept.getConceptMetadata().addHistory(history);
 
                     if (log.isDebugEnabled()) {
@@ -535,7 +525,7 @@ public class AddConceptDialog extends javax.swing.JDialog {
                      * If the user is an admin then you can approve
                      */
                     if (userAccount.isAdministrator()) {
-                        approveHistoryTask.approve(userAccount, history);
+                        toolBelt.getApproveHistoryTask().approve(userAccount, history);
                     }
                 }
 
@@ -548,6 +538,8 @@ public class AddConceptDialog extends javax.swing.JDialog {
         void updateValues(final Concept concept) {
 
             final UserAccount userAccount = (UserAccount) GlobalLookup.getUserAccountDispatcher().getValueObject();
+            final HistoryFactory historyFactory = toolBelt.getHistoryFactory();
+            final ApproveHistoryTask approveHistoryTask = toolBelt.getApproveHistoryTask();
 
             /*
             * Modify the parent concept

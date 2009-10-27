@@ -1,43 +1,32 @@
+/*
+ * @(#)LinkRealizationEditorPanel.java   2009.10.26 at 10:54:16 PDT
+ *
+ * Copyright 2009 MBARI
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
+
 package vars.knowledgebase.ui;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.mbari.awt.event.ActionAdapter;
-import org.mbari.swing.ListListModel;
-import org.mbari.swing.WaitIndicator;
-import org.mbari.swing.SpinningDialWaitIndicator;
-import org.mbari.vars.dao.DAOException;
-import org.mbari.vars.knowledgebase.model.dao.KnowledgeBaseCache;
-import org.mbari.vars.knowledgebase.model.dao.LinkTemplateDAO;
-import org.mbari.vars.knowledgebase.model.dao.ConceptDAO;
-import org.mbari.vars.knowledgebase.ui.actions.ApproveHistoryTask;
-import org.mbari.vars.knowledgebase.ui.dialogs.LinkEditorDialog;
-import org.mbari.vars.knowledgebase.ui.dialogs.AddLinkRealizationDialog;
-import vars.ILink;
-import org.mbari.vars.model.UserAccount;
-import org.mbari.vars.query.ui.ConceptConstraints;
-import org.mbari.vars.ui.HierachicalConceptNameComboBox;
-import org.mbari.vars.util.AppFrameDispatcher;
-import org.mbari.util.Dispatcher;
-import org.mbari.vars.knowledgebase.model.Concept;
-import org.mbari.vars.knowledgebase.model.ConceptName;
-import org.mbari.vars.knowledgebase.model.HistoryFactory;
-import org.mbari.vars.knowledgebase.model.LinkRealization;
-import org.mbari.vars.knowledgebase.model.LinkTemplate;
-import javax.swing.border.EtchedBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import foxtrot.Worker;
 import foxtrot.Job;
+import foxtrot.Worker;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -47,44 +36,86 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
-import vars.knowledgebase.IConcept;
-import vars.knowledgebase.IConceptDelegate;
-import vars.knowledgebase.IHistory;
+import javax.swing.border.EtchedBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import org.bushe.swing.event.EventBus;
+import org.mbari.awt.event.ActionAdapter;
+import org.mbari.swing.ListListModel;
+import org.mbari.swing.SpinningDialWaitIndicator;
+import org.mbari.swing.WaitIndicator;
+import org.mbari.util.Dispatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import vars.ILink;
+import vars.LinkBean;
+import vars.UserAccount;
+import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptDAO;
+import vars.knowledgebase.ConceptMetadata;
+import vars.knowledgebase.ConceptName;
+import vars.knowledgebase.ConceptNameTypes;
+import vars.knowledgebase.History;
+import vars.knowledgebase.LinkRealization;
+import vars.knowledgebase.LinkRealizationDAO;
+import vars.knowledgebase.LinkTemplate;
+import vars.knowledgebase.LinkTemplateDAO;
+import vars.knowledgebase.SimpleConceptBean;
+import vars.knowledgebase.SimpleConceptNameBean;
+import vars.knowledgebase.ui.dialogs.AddLinkRealizationDialog;
+import vars.knowledgebase.ui.dialogs.LinkEditorDialog;
+import vars.shared.ui.HierachicalConceptNameComboBox;
 
-
+/**
+ * Class description
+ *
+ *
+ * @version        $date$, 2009.10.26 at 10:54:16 PDT
+ * @author         Brian Schlining [brian@mbari.org]
+ */
 public class LinkRealizationEditorPanel extends EditorPanel {
 
     private static final Logger log = LoggerFactory.getLogger(LinkRealizationEditorPanel.class);
+    private static final Concept SELF_CONCEPT = new SimpleConceptBean(new SimpleConceptNameBean(ILink.VALUE_SELF,
+        ConceptNameTypes.PRIMARY.toString()));
+    private static final ILink NIL_LINKREALIZATION = new LinkBean(ILink.VALUE_NIL, ILink.VALUE_NIL, ILink.VALUE_NIL);
+    private static final Concept NIL_CONCEPT = new SimpleConceptBean(new SimpleConceptNameBean(ILink.VALUE_NIL,
+        ConceptNameTypes.PRIMARY.toString()));
     private EditorButtonPanel editorButtonPanel = null;
-    private JList linkList = null;
-    private JPanel propertiesPanel = null;
-    private ListListModel listModel = null;
-    private JScrollPane scrollPane = null;
     private JPanel linkEditorPanel = null;
     private JTextField linkField = null;
-    private HierachicalConceptNameComboBox toConceptComboBox = null;
     private JLabel linkLabel = null;
-    private JLabel toConceptLabel = null;
-    private JLabel valueLabel = null;
-    private static final Concept SELF_CONCEPT = new Concept(new ConceptName("self", ConceptName.NAMETYPE_PRIMARY), null);
-    private static final LinkRealization NIL_LINKREALIZATION = new LinkRealization(ConceptConstraints.WILD_CARD_STRING, ConceptConstraints.WILD_CARD_STRING, ConceptConstraints.WILD_CARD_STRING);
-    private static final Concept NIL_CONCEPT = new Concept(new ConceptName(ConceptConstraints.WILD_CARD_STRING, ConceptName.NAMETYPE_PRIMARY), null);
-    private NewAction newAction;
-    private UpdateAction updateAction;
-    private DeleteAction deleteAction;
+    private JList linkList = null;
     private JScrollPane linkValueScrollPane = null;
     private JTextArea linkValueTextArea = null;
+    private ListListModel listModel = null;
+    private JPanel propertiesPanel = null;
+    private JScrollPane scrollPane = null;
+    private HierachicalConceptNameComboBox toConceptComboBox = null;
+    private JLabel toConceptLabel = null;
+    private JLabel valueLabel = null;
+    private DeleteAction deleteAction;
+    private NewAction newAction;
+    private final ToolBelt toolBelt;
+    private UpdateAction updateAction;
 
-    public LinkRealizationEditorPanel() {
+    /**
+     * Constructs ...
+     *
+     * @param toolBelt
+     */
+    public LinkRealizationEditorPanel(ToolBelt toolBelt) {
+        this.toolBelt = toolBelt;
         initialize();
         setLocked(isLocked());
     }
 
-    private void initialize() {
-        this.setLayout(new BorderLayout());
-        this.add(getPropertiesPanel(), BorderLayout.CENTER);
-        this.setMinimumSize(new Dimension(100, 100));
-        this.add(getEditorButtonPanel(), BorderLayout.SOUTH);
+    DeleteAction getDeleteAction() {
+        if (deleteAction == null) {
+            deleteAction = new DeleteAction();
+        }
+
+        return deleteAction;
     }
 
     /**
@@ -99,200 +130,8 @@ public class LinkRealizationEditorPanel extends EditorPanel {
             editorButtonPanel.getNewButton().addActionListener(getNewAction());
             editorButtonPanel.getUpdateButton().addActionListener(getUpdateAction());
         }
+
         return editorButtonPanel;
-    }
-
-    /**
-     * This method initializes linkList
-     *
-     * @return javax.swing.JList
-     */
-    private JList getLinkList() {
-        if (linkList == null) {
-            linkList = new JList();
-            linkList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            linkList.setModel(getListModel());
-
-            /*
-             * Add a listener to update the UI when a link is selected
-             */
-            linkList.addListSelectionListener(new ListSelectionListener() {
-
-                public void valueChanged(ListSelectionEvent e) {
-                    final LinkRealization link = (LinkRealization) linkList.getSelectedValue();
-                    updateUIWithSelectedLink(link);
-                }
-            });
-
-            /*
-             * Add a listener to toggle button state when items in the list are selected/unselected
-             */
-            linkList.addListSelectionListener(new ListSelectionListener() {
-
-                public void valueChanged(ListSelectionEvent e) {
-                    final LinkRealization link = (LinkRealization) linkList.getSelectedValue();
-                    boolean enable = !isLocked() && (link != null);
-                    getEditorButtonPanel().getDeleteButton().setEnabled(enable);
-                    getEditorButtonPanel().getUpdateButton().setEnabled(enable);
-                }
-            });
-        }
-        return linkList;
-    }
-
-    private ListListModel getListModel() {
-        if (listModel == null) {
-            List<LinkRealization> list = Collections.synchronizedList(new ArrayList<LinkRealization>());
-            listModel = new ListListModel(list);
-        }
-        return listModel;
-    }
-
-    /**
-     * This method initializes propertiesPanel
-     *
-     * @return javax.swing.JPanel
-     */
-    private JPanel getPropertiesPanel() {
-        if (propertiesPanel == null) {
-            propertiesPanel = new JPanel();
-            propertiesPanel.setLayout(new BorderLayout());
-            propertiesPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Descriptions", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, null, null));
-            propertiesPanel.add(getScrollPane(), BorderLayout.CENTER);
-            propertiesPanel.add(getLinkEditorPanel(), BorderLayout.SOUTH);
-        }
-        return propertiesPanel;
-    }
-
-    public void setConcept(Concept concept) {
-        getLinkList().clearSelection();
-        super.setConcept(concept);
-        listModel.clear();
-        if (concept != null) {
-            ListListModel listModel = getListModel();
-            listModel.addAll(concept.getLinkRealizationSet());
-        }
-    }
-
-    /**
-     * This method initializes scrollPane
-     *
-     * @return javax.swing.JScrollPane
-     */
-    private JScrollPane getScrollPane() {
-        if (scrollPane == null) {
-            scrollPane = new JScrollPane();
-            scrollPane.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-            scrollPane.setViewportView(getLinkList());
-            scrollPane.setViewportView(getLinkList());
-        }
-        return scrollPane;
-    }
-
-    /**
-     * Updates the UI when a Link is selected in the toConceptComboBox
-     *
-     * @param link The link that was selected in the toConceptComboBox
-     */
-    private void updateUIWithSelectedLink(final LinkRealization link) {
-
-        if (log.isDebugEnabled()) {
-            log.debug("Updating with " + link);
-        }
-
-        enableEditor:
-        {
-            boolean enable = !isLocked() && link != null;
-            getLinkField().setEnabled(enable);
-            getLinkValueTextArea().setEnabled(enable);
-            getToConceptComboBox().setEnabled(enable);
-        }
-
-        handleNullArg:
-        {
-            if (link == null) {
-                getLinkField().setText("");
-                getLinkValueTextArea().setText("");
-                getToConceptComboBox().removeAllItems();
-                return;
-            }
-        }
-
-        updateTextFields:
-        {
-            getLinkField().setText(link.getLinkName());
-            getLinkValueTextArea().setText(link.getLinkValue());
-        }
-
-        updateToConceptComboBox:
-        {
-
-            /*
-             * Find the LinkTemplate that the LinkRealization is based on.
-             */
-            IConcept toConcept = link.getConceptDelegate().getConcept();
-            Set<LinkTemplate> matchingLinkTemplates = LinkTemplateDAO.getInstance().findByLinkName((Concept) toConcept, link.getLinkName());
-
-            /*
-             * Get the toConceptAsString that's used. It will be a child of the toConceptAsString in the LinkTemplate
-             */
-            String toConceptAsString = null;
-            if (matchingLinkTemplates.isEmpty()) {
-                AppFrameDispatcher.showWarningDialog("Unable to find a LinkTemplate that matches '" + link + "'");
-                toConceptAsString = link.getToConcept();
-            }
-            else {
-                ILink matchingLink = (ILink) matchingLinkTemplates.iterator().next();
-                toConceptAsString = matchingLink.getToConcept();
-            }
-
-            /*
-             *
-             */
-            WaitIndicator waitIndicator = new SpinningDialWaitIndicator(this);
-            final String theToConcept = toConceptAsString;
-            Worker.post(new Job() {
-
-                public Object run() {
-                    Concept concept = null;
-                    Concept selectedConcept = null;
-                    HierachicalConceptNameComboBox cb = getToConceptComboBox();
-                    cb.removeAllItems();
-                    if (theToConcept.equalsIgnoreCase("self")) {
-                        concept = SELF_CONCEPT;
-                        selectedConcept = SELF_CONCEPT;
-                        cb.addItem(SELF_CONCEPT.getPrimaryConceptName());
-                    }
-                    else if (theToConcept.equalsIgnoreCase(ConceptConstraints.WILD_CARD_STRING)) {
-                        concept = NIL_CONCEPT;
-                        selectedConcept = NIL_CONCEPT;
-                        cb.addItem(NIL_CONCEPT.getPrimaryConceptName());
-                    }
-                    else {
-                        try {
-                            concept = KnowledgeBaseCache.getInstance().findConceptByName(theToConcept);
-                            selectedConcept = KnowledgeBaseCache.getInstance().findConceptByName(link.getToConcept());
-                            cb.setConcept(concept); // TODO app hangs up here. Need to optimize
-                        }
-                        catch (DAOException e) {
-                            log.error("", e);
-                            AppFrameDispatcher.showWarningDialog("A database error occurred. Try refreshing the knowledgebase");
-                            concept = NIL_CONCEPT;
-                            selectedConcept = NIL_CONCEPT;
-                            cb.addItem(NIL_CONCEPT.getPrimaryConceptName());
-                        }
-                    }
-
-                    cb.setSelectedItem(selectedConcept.getPrimaryConceptName());
-                    return null; // TODO Verify this default implementation is correct
-                }
-            });
-            waitIndicator.dispose();
-        }
-
-        if (log.isDebugEnabled()) {
-            log.debug("Update with " + link + " is complete");
-        }
     }
 
     /**
@@ -374,6 +213,7 @@ public class LinkRealizationEditorPanel extends EditorPanel {
             linkEditorPanel.add(valueLabel, gridBagConstraints2);
             linkEditorPanel.add(getLinkValueScrollPane(), gridBagConstraints11);
         }
+
         return linkEditorPanel;
     }
 
@@ -386,185 +226,47 @@ public class LinkRealizationEditorPanel extends EditorPanel {
         if (linkField == null) {
             linkField = new JTextField();
         }
+
         return linkField;
     }
 
     /**
-     * This method initializes toConceptComboBox
+     * This method initializes linkList
      *
-     * @return javax.swing.JComboBox
+     * @return javax.swing.JList
      */
-    private HierachicalConceptNameComboBox getToConceptComboBox() {
-        if (toConceptComboBox == null) {
-            toConceptComboBox = new HierachicalConceptNameComboBox();
-        }
-        return toConceptComboBox;
-    }
+    private JList getLinkList() {
+        if (linkList == null) {
+            linkList = new JList();
+            linkList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            linkList.setModel(getListModel());
 
-    DeleteAction getDeleteAction() {
-        if (deleteAction == null) {
-            deleteAction = new DeleteAction();
-        }
-        return deleteAction;
-    }
+            /*
+             * Add a listener to update the UI when a link is selected
+             */
+            linkList.addListSelectionListener(new ListSelectionListener() {
 
-    NewAction getNewAction() {
-        if (newAction == null) {
-            newAction = new NewAction();
-        }
-        return newAction;
-    }
-
-    UpdateAction getUpdateAction() {
-        if (updateAction == null) {
-            updateAction = new UpdateAction();
-        }
-        return updateAction;
-    }
-
-    private class DeleteAction extends ActionAdapter {
-
-        @Override
-        public void doAction() {
-            final UserAccount userAccount = (UserAccount) KnowledgebaseApp.DISPATCHER_USERACCOUNT.getValueObject();
-            if (userAccount != null && !userAccount.isReadOnly()) {
-
-                JList linkList = getLinkList();
-                LinkRealization linkRealization = (LinkRealization) linkList.getSelectedValue();
-                if (linkRealization != null) {
-                    IHistory history = HistoryFactory.delete(userAccount, linkRealization);
-                    IConceptDelegate conceptDelegate = linkRealization.getConceptDelegate();
-                    conceptDelegate.addHistory(history);
-
-                    if (userAccount.isAdmin()) {
-                        ApproveHistoryTask.approve(userAccount, history);
-                    }
-
-                    /*
-                     * Trigger a redraw
-                     */
-                    Dispatcher dispatcher = Dispatcher.getDispatcher(Concept.class);
-                    dispatcher.setValueObject(null);
-                    dispatcher.setValueObject(conceptDelegate.getConcept());
+                public void valueChanged(ListSelectionEvent e) {
+                    final LinkRealization link = (LinkRealization) linkList.getSelectedValue();
+                    updateUIWithSelectedLink(link);
                 }
-            }
-        }
-    }
+            });
 
-    private class UpdateAction extends ActionAdapter {
+            /*
+             * Add a listener to toggle button state when items in the list are selected/unselected
+             */
+            linkList.addListSelectionListener(new ListSelectionListener() {
 
-        @Override
-        public void doAction() {
-            final UserAccount userAccount = (UserAccount) KnowledgebaseApp.DISPATCHER_USERACCOUNT.getValueObject();
-            if (userAccount != null && !userAccount.isReadOnly()) {
-                JList linkList = getLinkList();
-                LinkRealization linkRealization = (LinkRealization) linkList.getSelectedValue();
-
-                // Create a copy of the old values to create a history
-                LinkRealization oldValue = new LinkRealization(linkRealization.getLinkName(), linkRealization.getToConcept(), linkRealization.getLinkValue());
-
-                //. Update the current linkRealization
-                linkRealization.setLinkName(getLinkField().getText());
-                String name = ((ConceptName) getToConceptComboBox().getSelectedItem()).getName();
-                if (ILink.NIL.equalsIgnoreCase(name) || ILink.SELF.equalsIgnoreCase(name)) {
-                    // Do nothing
+                public void valueChanged(ListSelectionEvent e) {
+                    final LinkRealization link = (LinkRealization) linkList.getSelectedValue();
+                    boolean enable = !isLocked() && (link != null);
+                    getEditorButtonPanel().getDeleteButton().setEnabled(enable);
+                    getEditorButtonPanel().getUpdateButton().setEnabled(enable);
                 }
-                else {
-                    Concept concept = null;
-                    try {
-                        concept = KnowledgeBaseCache.getInstance().findConceptByName(name);
-                        if (concept != null) {
-                            name = concept.getPrimaryConceptNameAsString();
-                        }
-                    }
-                    catch (DAOException e) {
-                        log.error("Unable to find Concept '" + name + "' in the database");
-                    }
-                }
-                linkRealization.setToConcept(name);
-                linkRealization.setLinkValue(getLinkValueTextArea().getText());
-
-                // Generate the appropriate history object
-                IHistory history = HistoryFactory.replaceLinkRealization(userAccount, oldValue, linkRealization);
-                linkRealization.getConceptDelegate().addHistory(history);
-
-                if (userAccount.isAdmin()) {
-                    ApproveHistoryTask.approve(userAccount, history);
-                }
-
-                /*
-                 * Trigger a redraw
-                 */
-                Dispatcher dispatcher = Dispatcher.getDispatcher(Concept.class);
-                dispatcher.setValueObject(null);
-                dispatcher.setValueObject(linkRealization.getConceptDelegate().getConcept());
-            }
-        }
-    }
-
-    private class ANewAction extends ActionAdapter {
-
-        private final LinkEditorDialog dialog = new MyLinkEditorDialog();
-
-        /**
-         * Show the dialog. The dialog  is used to set the properties of the link
-         */
-        @Override
-        public void doAction() {
-            final UserAccount userAccount = (UserAccount) KnowledgebaseApp.DISPATCHER_USERACCOUNT.getValueObject();
-            if (userAccount != null && !userAccount.isReadOnly()) {
-
-                LinkTemplate linkTemplate = (LinkTemplate) getLinkList().getSelectedValue();
-                LinkRealization linkRealization = new LinkRealization(linkTemplate);
-                // Show new dialog
-                dialog.setLink(linkRealization);
-                dialog.setVisible(true);
-            }
+            });
         }
 
-/**
-         * Class that adds some functionality to a LinkEditorDialog when it's
-         * okbutton is clicked.
-         */
-        private final class MyLinkEditorDialog extends LinkEditorDialog {
-
-            MyLinkEditorDialog() {
-                super(AppFrameDispatcher.getFrame());
-                getLinkField().setEditable(false);
-                setLocationRelativeTo(AppFrameDispatcher.getFrame());
-                this.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
-            }
-
-            public void onOkClick() {
-                /*
-                 * The dialog handles setting the link propertes. We just have to
-                 * save it in this method.
-                 */
-                Concept concept = getConcept();
-                LinkRealization linkRealization = (LinkRealization) getLink();
-                concept.addLinkRealization(linkRealization);
-                try {
-                    ConceptDAO.getInstance().update(concept);
-                }
-                catch (DAOException e) {
-                    concept.removeLinkRealization(linkRealization);
-                    log.error("Database transaction failed", e);
-                    AppFrameDispatcher.showErrorDialog("Failed to update " + concept + ". Rolling back changes.");
-                }
-            }
-        }
-        {
-        }
-    }
-
-    private class NewAction extends ActionAdapter {
-
-        private final AddLinkRealizationDialog dialog = new AddLinkRealizationDialog(AppFrameDispatcher.getFrame());
-
-        public void doAction() {
-            dialog.setConcept(getConcept());
-            dialog.setVisible(true);
-        }
+        return linkList;
     }
 
     /**
@@ -577,6 +279,7 @@ public class LinkRealizationEditorPanel extends EditorPanel {
             linkValueScrollPane = new JScrollPane();
             linkValueScrollPane.setViewportView(getLinkValueTextArea());
         }
+
         return linkValueScrollPane;
     }
 
@@ -590,7 +293,101 @@ public class LinkRealizationEditorPanel extends EditorPanel {
             linkValueTextArea = new JTextArea();
             linkValueTextArea.setPreferredSize(new Dimension(300, 48));
         }
+
         return linkValueTextArea;
+    }
+
+    private ListListModel getListModel() {
+        if (listModel == null) {
+            List<LinkRealization> list = Collections.synchronizedList(new ArrayList<LinkRealization>());
+            listModel = new ListListModel(list);
+        }
+
+        return listModel;
+    }
+
+    NewAction getNewAction() {
+        if (newAction == null) {
+            newAction = new NewAction();
+        }
+
+        return newAction;
+    }
+
+    /**
+     * This method initializes propertiesPanel
+     *
+     * @return javax.swing.JPanel
+     */
+    private JPanel getPropertiesPanel() {
+        if (propertiesPanel == null) {
+            propertiesPanel = new JPanel();
+            propertiesPanel.setLayout(new BorderLayout());
+            propertiesPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Descriptions",
+                    javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                    javax.swing.border.TitledBorder.DEFAULT_POSITION, null, null));
+            propertiesPanel.add(getScrollPane(), BorderLayout.CENTER);
+            propertiesPanel.add(getLinkEditorPanel(), BorderLayout.SOUTH);
+        }
+
+        return propertiesPanel;
+    }
+
+    /**
+     * This method initializes scrollPane
+     *
+     * @return javax.swing.JScrollPane
+     */
+    private JScrollPane getScrollPane() {
+        if (scrollPane == null) {
+            scrollPane = new JScrollPane();
+            scrollPane.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+            scrollPane.setViewportView(getLinkList());
+            scrollPane.setViewportView(getLinkList());
+        }
+
+        return scrollPane;
+    }
+
+    /**
+     * This method initializes toConceptComboBox
+     *
+     * @return javax.swing.JComboBox
+     */
+    private HierachicalConceptNameComboBox getToConceptComboBox() {
+        if (toConceptComboBox == null) {
+            toConceptComboBox = new HierachicalConceptNameComboBox(
+                toolBelt.getKnowledgebaseDAOFactory().newConceptDAO());
+        }
+
+        return toConceptComboBox;
+    }
+
+    UpdateAction getUpdateAction() {
+        if (updateAction == null) {
+            updateAction = new UpdateAction();
+        }
+
+        return updateAction;
+    }
+
+    private void initialize() {
+        this.setLayout(new BorderLayout());
+        this.add(getPropertiesPanel(), BorderLayout.CENTER);
+        this.setMinimumSize(new Dimension(100, 100));
+        this.add(getEditorButtonPanel(), BorderLayout.SOUTH);
+    }
+
+    @Override
+    public void setConcept(Concept concept) {
+        getLinkList().clearSelection();
+        super.setConcept(concept);
+        listModel.clear();
+
+        if (concept != null) {
+            ListListModel localListModel = getListModel();
+            localListModel.addAll(concept.getConceptMetadata().getLinkRealizations());
+        }
     }
 
     @Override
@@ -604,5 +401,284 @@ public class LinkRealizationEditorPanel extends EditorPanel {
         getLinkField().setEnabled(enable);
         getToConceptComboBox().setEnabled(enable);
         getLinkValueTextArea().setEnabled(enable);
+    }
+
+    /**
+     * Updates the UI when a Link is selected in the toConceptComboBox
+     *
+     * @param link The link that was selected in the toConceptComboBox
+     */
+    private void updateUIWithSelectedLink(final LinkRealization link) {
+
+        if (log.isDebugEnabled()) {
+            log.debug("Updating with " + link);
+        }
+
+        enableEditor:
+        {
+            boolean enable = !isLocked() && (link != null);
+            getLinkField().setEnabled(enable);
+            getLinkValueTextArea().setEnabled(enable);
+            getToConceptComboBox().setEnabled(enable);
+        }
+
+        handleNullArg:
+        {
+            if (link == null) {
+                getLinkField().setText("");
+                getLinkValueTextArea().setText("");
+                getToConceptComboBox().removeAllItems();
+
+                return;
+            }
+        }
+
+        updateTextFields:
+        {
+            getLinkField().setText(link.getLinkName());
+            getLinkValueTextArea().setText(link.getLinkValue());
+        }
+
+        updateToConceptComboBox:
+        {
+
+            /*
+             * Find the LinkTemplate that the LinkRealization is based on.
+             */
+            Concept toConcept = link.getConceptMetadata().getConcept();
+            LinkTemplateDAO linkTemplateDAO = toolBelt.getKnowledgebaseDAOFactory().newLinkTemplateDAO();
+            Collection<LinkTemplate> matchingLinkTemplates = linkTemplateDAO.findAllByLinkName(link.getLinkName(),
+                toConcept);
+
+            /*
+             * Get the toConceptAsString that's used. It will be a child of the toConceptAsString in the LinkTemplate
+             */
+            String toConceptAsString = null;
+            if (matchingLinkTemplates.isEmpty()) {
+                EventBus.publish(Lookup.TOPIC_WARNING, "Unable to find a LinkTemplate that matches '" + link + "'");
+                toConceptAsString = link.getToConcept();
+            }
+            else {
+                ILink matchingLink = (ILink) matchingLinkTemplates.iterator().next();
+                toConceptAsString = matchingLink.getToConcept();
+            }
+
+            /*
+             *
+             */
+            WaitIndicator waitIndicator = new SpinningDialWaitIndicator(this);
+            final String theToConcept = toConceptAsString;
+            Worker.post(new Job() {
+
+                public Object run() {
+                    Concept concept = null;
+                    Concept selectedConcept = null;
+                    HierachicalConceptNameComboBox cb = getToConceptComboBox();
+                    cb.removeAllItems();
+
+                    if (theToConcept.equalsIgnoreCase(ILink.VALUE_SELF)) {
+                        concept = SELF_CONCEPT;
+                        selectedConcept = SELF_CONCEPT;
+                        cb.addItem(SELF_CONCEPT.getPrimaryConceptName());
+                    }
+                    else if (theToConcept.equalsIgnoreCase(ILink.VALUE_NIL)) {
+                        concept = NIL_CONCEPT;
+                        selectedConcept = NIL_CONCEPT;
+                        cb.addItem(NIL_CONCEPT.getPrimaryConceptName());
+                    }
+                    else {
+                        try {
+                            ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
+                            concept = conceptDAO.findByName(theToConcept);
+                            selectedConcept = conceptDAO.findByName(link.getToConcept());
+                            cb.setConcept(concept);    // TODO app hangs up here. Need to optimize
+                        }
+                        catch (Exception e) {
+                            log.error("", e);
+                            EventBus.publish(Lookup.TOPIC_WARNING,
+                                             "A database error occurred. Try refreshing the knowledgebase");
+                            concept = NIL_CONCEPT;
+                            selectedConcept = NIL_CONCEPT;
+                            cb.addItem(NIL_CONCEPT.getPrimaryConceptName());
+                        }
+                    }
+
+                    cb.setSelectedItem(selectedConcept.getPrimaryConceptName());
+
+                    return null;    // TODO Verify this default implementation is correct
+                }
+            });
+            waitIndicator.dispose();
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug("Update with " + link + " is complete");
+        }
+    }
+
+    private class ANewAction extends ActionAdapter {
+
+        private final LinkEditorDialog dialog = new MyLinkEditorDialog();
+
+        /**
+         * Show the dialog. The dialog  is used to set the properties of the link
+         */
+        @Override
+        public void doAction() {
+            final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+            if ((userAccount != null) && !userAccount.isReadOnly()) {
+
+                LinkTemplate linkTemplate = (LinkTemplate) getLinkList().getSelectedValue();
+                LinkRealization linkRealization = toolBelt.getKnowledgebaseFactory().newLinkRealization();
+                linkRealization.setLinkName(linkTemplate.getLinkName());
+                linkRealization.setLinkValue(linkTemplate.getLinkValue());
+                linkRealization.setToConcept(linkTemplate.getToConcept());
+
+                // Show new dialog
+                dialog.setLink(linkRealization);
+                dialog.setVisible(true);
+            }
+        }
+
+        /**
+                 * Class that adds some functionality to a LinkEditorDialog when it's
+                 * okbutton is clicked.
+                 */
+        private final class MyLinkEditorDialog extends LinkEditorDialog {
+
+            MyLinkEditorDialog() {
+                super((Frame) Lookup.getApplicationFrameDispatcher().getValueObject(),
+                      toolBelt.getKnowledgebaseDAOFactory());
+                getLinkField().setEditable(false);
+                setLocationRelativeTo((Frame) Lookup.getApplicationFrameDispatcher().getValueObject());
+                this.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
+            }
+
+            @Override
+            public void onOkClick() {
+
+                /*
+                 * The dialog handles setting the link propertes. We just have to
+                 * save it in this method.
+                 */
+                Concept concept = getConcept();
+                LinkRealization linkRealization = (LinkRealization) getLink();
+                concept.getConceptMetadata().addLinkRealization(linkRealization);
+
+                try {
+                    LinkRealizationDAO linkRealizationDAO = toolBelt.getKnowledgebaseDAOFactory()
+                        .newLinkRealizationDAO();
+                    linkRealizationDAO.makePersistent(linkRealization);
+                }
+                catch (Exception e) {
+                    concept.getConceptMetadata().removeLinkRealization(linkRealization);
+                    log.error("Database transaction failed", e);
+                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR,
+                                     "Failed to update " + concept + ". Rolling back changes.");
+                }
+            }
+        }
+    }
+
+
+    private class DeleteAction extends ActionAdapter {
+
+        @Override
+        public void doAction() {
+            final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+            if ((userAccount != null) && !userAccount.isReadOnly()) {
+
+                JList linkList = getLinkList();
+                LinkRealization linkRealization = (LinkRealization) linkList.getSelectedValue();
+                if (linkRealization != null) {
+                    History history = toolBelt.getHistoryFactory().delete(userAccount, linkRealization);
+                    ConceptMetadata conceptDelegate = linkRealization.getConceptMetadata();
+                    conceptDelegate.addHistory(history);
+
+                    if (userAccount.isAdministrator()) {
+                        toolBelt.getApproveHistoryTask().approve(userAccount, history);
+                    }
+
+                    /*
+                     * Trigger a redraw
+                     */
+                    Dispatcher dispatcher = Dispatcher.getDispatcher(Concept.class);
+                    dispatcher.setValueObject(null);
+                    dispatcher.setValueObject(conceptDelegate.getConcept());
+                }
+            }
+        }
+    }
+
+
+    private class NewAction extends ActionAdapter {
+
+        private final AddLinkRealizationDialog dialog = new AddLinkRealizationDialog(
+            (Frame) Lookup.getApplicationFrameDispatcher().getValueObject(), toolBelt);
+
+        public void doAction() {
+            dialog.setConcept(getConcept());
+            dialog.setVisible(true);
+        }
+    }
+
+
+    private class UpdateAction extends ActionAdapter {
+
+        @Override
+        public void doAction() {
+            final UserAccount userAccount = (UserAccount) KnowledgebaseApp.DISPATCHER_USERACCOUNT.getValueObject();
+            if ((userAccount != null) && !userAccount.isReadOnly()) {
+                JList linkList = getLinkList();
+                LinkRealization linkRealization = (LinkRealization) linkList.getSelectedValue();
+
+                // Create a copy of the old values to create a history
+                LinkRealization oldValue = toolBelt.getKnowledgebaseFactory().newLinkRealization();
+                oldValue.setLinkName(linkRealization.getLinkName());
+                oldValue.setToConcept(linkRealization.getToConcept());
+                oldValue.setLinkValue(linkRealization.getLinkValue());
+
+                //. Update the current linkRealization
+                linkRealization.setLinkName(getLinkField().getText());
+                String name = ((ConceptName) getToConceptComboBox().getSelectedItem()).getName();
+                if (ILink.VALUE_NIL.equalsIgnoreCase(name) || ILink.VALUE_SELF.equalsIgnoreCase(name)) {
+
+                    // Do nothing
+                }
+                else {
+                    Concept concept = null;
+                    try {
+                        ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
+                        concept = conceptDAO.findByName(name);
+
+                        if (concept != null) {
+                            name = concept.getPrimaryConceptName().toString();
+                        }
+                    }
+                    catch (Exception e) {
+                        log.error("Unable to find Concept '" + name + "' in the database");
+                    }
+                }
+
+                linkRealization.setToConcept(name);
+                linkRealization.setLinkValue(getLinkValueTextArea().getText());
+
+                // Generate the appropriate history object
+                History history = toolBelt.getHistoryFactory().replaceLinkRealization(userAccount, oldValue,
+                    linkRealization);
+                linkRealization.getConceptMetadata().addHistory(history);
+
+                if (userAccount.isAdministrator()) {
+                    toolBelt.getApproveHistoryTask().approve(userAccount, history);
+                }
+
+                /*
+                 * Trigger a redraw
+                 */
+                Dispatcher dispatcher = Dispatcher.getDispatcher(Concept.class);
+                dispatcher.setValueObject(null);
+                dispatcher.setValueObject(linkRealization.getConceptMetadata().getConcept());
+            }
+        }
     }
 }

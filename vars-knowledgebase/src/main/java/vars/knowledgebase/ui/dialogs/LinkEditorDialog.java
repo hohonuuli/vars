@@ -42,7 +42,7 @@ import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.LinkTemplate;
 import vars.knowledgebase.SimpleConceptBean;
 import vars.knowledgebase.SimpleConceptNameBean;
-import vars.knowledgebase.ui.ILockableEditor;
+import vars.shared.ui.ILockableEditor;
 import vars.knowledgebase.ui.Lookup;
 import vars.shared.ui.HierachicalConceptNameComboBox;
 import vars.shared.ui.OkCancelButtonPanel;

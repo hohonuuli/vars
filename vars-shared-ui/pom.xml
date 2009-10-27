@@ -32,8 +32,14 @@
       <artifactId>swing-layout</artifactId>
       <version>1.0.3</version>
     </dependency>
+    <dependency>
+      <groupId>net.sourceforge.foxtrot</groupId>
+      <artifactId>foxtrot-core</artifactId>
+      <version>3.0</version>
+    </dependency>
   </dependencies>
 </project>
+
 
 
 

@@ -61,7 +61,7 @@
         <dependency>
             <groupId>com.google.collections</groupId>
             <artifactId>google-collections</artifactId>
-            <version>1.0-rc2</version>
+            <version>1.0-rc3</version>
         </dependency>
         <dependency>
             <groupId>org.dbunit</groupId>
@@ -72,7 +72,7 @@
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy</artifactId>
-            <version>1.6.4</version>
+            <version>1.6.5</version>
             <exclusions>
                 <exclusion>
                     <artifactId>ant</artifactId>

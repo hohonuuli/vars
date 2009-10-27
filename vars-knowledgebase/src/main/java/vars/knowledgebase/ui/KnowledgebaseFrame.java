@@ -19,6 +19,9 @@
 
 package vars.knowledgebase.ui;
 
+import vars.shared.ui.ILockableEditor;
+import com.google.inject.Inject;
+import com.sun.xml.internal.fastinfoset.stax.events.EventBase;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -42,27 +45,16 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
+import org.bushe.swing.event.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.swing.SearchableTreePanel;
 import org.mbari.util.Dispatcher;
-import org.mbari.vars.dao.DAOException;
-import org.mbari.vars.knowledgebase.model.Concept;
-import org.mbari.vars.knowledgebase.model.ConceptName;
-import org.mbari.vars.knowledgebase.model.dao.CacheClearedEvent;
-import org.mbari.vars.knowledgebase.model.dao.CacheClearedListener;
-import org.mbari.vars.knowledgebase.model.dao.IKnowledgeBaseCache;
-import org.mbari.vars.knowledgebase.model.dao.KnowledgeBaseCache;
-import org.mbari.vars.knowledgebase.ui.actions.LoginAction;
-import org.mbari.vars.model.UserAccount;
-import org.mbari.vars.ui.ConceptTree;
-import org.mbari.vars.ui.ConceptTree.ConceptPopupMenu;
-import org.mbari.vars.ui.ModifyUserDialog;
-import org.mbari.vars.ui.SearchableConceptTreePanel;
-import org.mbari.vars.ui.TreeConcept;
-import org.mbari.vars.util.AppFrameDispatcher;
-import vars.knowledgebase.IConcept;
+import vars.UserAccount;
+import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptDAO;
+import vars.shared.ui.dialogs.LoginAction;
 
 /**
  * <p><!-- Class description --></p>
@@ -78,79 +70,44 @@ public class KnowledgebaseFrame extends JFrame {
     private static final long serialVersionUID = -6933314608809904289L;
     private static final Logger log = LoggerFactory.getLogger(KnowledgebaseFrame.class);
     private static final int MAX_SEARCH_LOOP_COUNT = 1000;
-    /**
-	 * @uml.property  name="splitPane"
-	 * @uml.associationEnd  
-	 */
+ 
     private JSplitPane splitPane = null;
-    /**
-	 * @uml.property  name="treePanel"
-	 * @uml.associationEnd  
-	 */
+ 
     private SearchableTreePanel treePanel = null;
-    /**
-	 * @uml.property  name="tabbedPane"
-	 * @uml.associationEnd  
-	 */
+ 
     private JTabbedPane tabbedPane = null;
-    /**
-	 * @uml.property  name="namesEditorPanel"
-	 * @uml.associationEnd  
-	 */
+
     private NamesEditorPanel namesEditorPanel = null;
-    /**
-	 * @uml.property  name="mediaEditorPanel"
-	 * @uml.associationEnd  
-	 */
+
     private MediaEditorPanel mediaEditorPanel;
-    /**
-	 * @uml.property  name="linkTemplateEditorPanel"
-	 * @uml.associationEnd  
-	 */
+ 
     private LinkTemplateEditorPanel linkTemplateEditorPanel = null;
     private LinkRealizationEditorPanel linkRealizationEditorPanel = null;
-    /**
-	 * @uml.property  name="lockAction"
-	 * @uml.associationEnd  multiplicity="(1 1)" inverse="this$0:org.mbari.vars.knowledgebase.ui.KnowledgebaseFrame$LockAction"
-	 */
+ 
     private final LockAction lockAction = new LockAction();
-    /**
-	 * @uml.property  name="historyEditorPanel"
-	 * @uml.associationEnd  
-	 */
+
     private HistoryEditorPanel historyEditorPanel = null;
-    /**
-	 * @uml.property  name="loginAction"
-	 * @uml.associationEnd  
-	 */
+  
     private LoginAction loginAction;
-    /**
-	 * @uml.property  name="treeSelectionListener"
-	 * @uml.associationEnd  
-	 */
+ 
     private TreeSelectionListener treeSelectionListener;
-	/**
-	 * @uml.property  name="myMenuBar"
-	 * @uml.associationEnd  
-	 */
+
 	private JMenuBar myMenuBar = null;
-	/**
-	 * @uml.property  name="rightPanel"
-	 * @uml.associationEnd  
-	 */
+
 	private JPanel rightPanel = null;
-	/**
-	 * @uml.property  name="conceptPanel"
-	 * @uml.associationEnd  
-	 */
+
 	private ConceptPanel conceptPanel = null;
+
+        private final ToolBelt toolBelt;
 
 
     /**
      * Constructs ...
      *
      */
-    public KnowledgebaseFrame() {
+    @Inject
+    public KnowledgebaseFrame(ToolBelt toolBelt) {
+        this.toolBelt = toolBelt;
         initialize();
         initUserAccountDispatcher();
         KnowledgeBaseCache.getInstance().addCacheClearedListener(new ACacheClearedListener());
@@ -162,7 +119,7 @@ public class KnowledgebaseFrame extends JFrame {
      * the LockAction to toggle the editors.
      */
     private void initUserAccountDispatcher() {
-        Dispatcher dispatcher = Dispatcher.getDispatcher(UserAccount.class);
+        Dispatcher dispatcher = Lookup.getUserAccountDispatcher();
 
         dispatcher.addPropertyChangeListener(new PropertyChangeListener() {
 
@@ -208,15 +165,16 @@ public class KnowledgebaseFrame extends JFrame {
         Concept concept = null;
         try {
             KnowledgeBaseCache.getInstance().clear();
-            concept = KnowledgeBaseCache.getInstance().findConceptByName(name);
+            ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
+            concept = conceptDAO.findByName(name);
         }
-        catch (DAOException e) {
+        catch (Exception e) {
             if (log.isErrorEnabled()) {
                 log.error("Failed to clear cache", e);
             }
 
-            AppFrameDispatcher.showErrorDialog("Failed to clear" + " knowledgebase cache. Please close this " +
-                                               "application");
+            EventBus.publish(Lookup.TOPIC_FATAL_ERROR, "Failed to clear" +
+                    " knowledgebase cache. Please close this application");
         }
 
         
@@ -234,7 +192,7 @@ public class KnowledgebaseFrame extends JFrame {
 
                 final Concept selectedConcept = (Concept) dispatcher.getValueObject();
 
-                if ((selectedConcept != null) && (selectedConcept.getPrimaryConceptNameAsString().equals(concept.getPrimaryConceptNameAsString()))) {
+                if ((selectedConcept != null) && (selectedConcept.getPrimaryConceptName().toString().equals(concept.getPrimaryConceptName().toString()))) {
                     break;
                 }
 
@@ -242,7 +200,7 @@ public class KnowledgebaseFrame extends JFrame {
             }
 
             if (count >= MAX_SEARCH_LOOP_COUNT) {
-                AppFrameDispatcher.showErrorDialog("Failed to reopen '" + name + "'");
+                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, "Failed to reopen '" + name + "'");
             }
         }
     }
@@ -276,7 +234,7 @@ public class KnowledgebaseFrame extends JFrame {
     
     private LinkRealizationEditorPanel getLinkRealizationEditorPanel() {
         if (linkRealizationEditorPanel == null) {
-            linkRealizationEditorPanel = new LinkRealizationEditorPanel();
+            linkRealizationEditorPanel = new LinkRealizationEditorPanel(toolBelt);
             setupEditorPanel(linkRealizationEditorPanel);
         }
 
@@ -290,10 +248,9 @@ public class KnowledgebaseFrame extends JFrame {
 	 */
     private LoginAction getLoginAction() {
         if (loginAction == null) {
-            loginAction = new LoginAction() {
+            loginAction = new LoginAction(toolBelt.getMiscFactory(), toolBelt.getMiscDAOFactory().newUserAccountDAO()) {
 
-                private static final long serialVersionUID = -471621133459092015L;
-
+                @Override
                 public void doAction() {
                     if (lockAction.isLocked()) {
                         super.doAction();
@@ -315,7 +272,7 @@ public class KnowledgebaseFrame extends JFrame {
 	 */
     private NamesEditorPanel getNamesEditorPanel() {
         if (namesEditorPanel == null) {
-            namesEditorPanel = new NamesEditorPanel();
+            namesEditorPanel = new NamesEditorPanel(toolBelt);
             setupEditorPanel(namesEditorPanel);
         }
 
@@ -328,7 +285,7 @@ public class KnowledgebaseFrame extends JFrame {
 	 */
     private MediaEditorPanel getMediaEditorPanel() {
         if (mediaEditorPanel == null) {
-            mediaEditorPanel = new MediaEditorPanel();
+            mediaEditorPanel = new MediaEditorPanel(toolBelt);
             setupEditorPanel(mediaEditorPanel);
         }
         return mediaEditorPanel;
@@ -340,7 +297,7 @@ public class KnowledgebaseFrame extends JFrame {
 	 */
     private LinkTemplateEditorPanel getLinkTemplateEditorPanel() {
         if (linkTemplateEditorPanel == null) {
-            linkTemplateEditorPanel = new LinkTemplateEditorPanel();
+            linkTemplateEditorPanel = new LinkTemplateEditorPanel(toolBelt);
             setupEditorPanel(linkTemplateEditorPanel);
         }
         return linkTemplateEditorPanel;

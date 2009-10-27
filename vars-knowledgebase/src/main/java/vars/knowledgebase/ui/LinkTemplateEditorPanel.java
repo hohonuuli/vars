@@ -98,7 +98,7 @@ public class LinkTemplateEditorPanel extends EditorPanel {
      */
     private LinkEditorPanel getLinkEditorPanel() {
         if (linkEditorPanel == null) {
-            linkEditorPanel = new LinkEditorPanel();
+            linkEditorPanel = new LinkEditorPanel(toolBelt);
             linkEditorPanel.setBorder(BorderFactory.createTitledBorder("Allowed Associations"));
         }
 

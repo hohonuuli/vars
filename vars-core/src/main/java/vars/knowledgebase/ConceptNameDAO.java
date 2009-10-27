@@ -20,4 +20,8 @@ public interface ConceptNameDAO extends DAO {
 
     Collection<ConceptName> findAll();
 
+    Collection<ConceptName> findByNameContaining(String substring);
+
+    Collection<ConceptName> findByNameStartingWith(String s);
+
 }
