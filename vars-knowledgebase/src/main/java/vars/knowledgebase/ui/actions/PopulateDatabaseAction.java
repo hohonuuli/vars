@@ -27,6 +27,7 @@ import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.ConceptNameTypes;
 import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.ui.Lookup;
+import vars.knowledgebase.ui.ToolBelt;
 import vars.shared.ui.dialogs.NewUserDialog;
 
 
@@ -41,11 +42,11 @@ public class PopulateDatabaseAction extends ActionAdapter {
     private final KnowledgebaseFactory knowledgebaseFactory;
     private final MiscFactory miscFactory;
 
-    public PopulateDatabaseAction(ConceptDAO conceptDAO, KnowledgebaseFactory knowledgebaseFactory, MiscFactory miscFactory, UserAccountDAO userAccountDAO) {
-        this.conceptDAO = conceptDAO;
-        this.knowledgebaseFactory = knowledgebaseFactory;
-        this.miscFactory = miscFactory;
-        this.userAccountDAO = userAccountDAO;
+    public PopulateDatabaseAction(ToolBelt toolBelt) {
+        this.conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
+        this.knowledgebaseFactory = toolBelt.getKnowledgebaseFactory();
+        this.miscFactory = toolBelt.getMiscFactory();
+        this.userAccountDAO = toolBelt.getMiscDAOFactory().newUserAccountDAO();
     }
     
 

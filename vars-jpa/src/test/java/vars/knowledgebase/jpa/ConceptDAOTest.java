@@ -30,6 +30,7 @@ public class ConceptDAOTest {
     }
 
     @Test
+    @Ignore
     public void testFindByName() {
         String name = "Nanomia";
         Concept concept = conceptDAO.findByName(name);
@@ -37,6 +38,7 @@ public class ConceptDAOTest {
     }
 
     @Test
+    @Ignore
     public void testFindRoot() {
         Concept concept = conceptDAO.findRoot();
         log.info("conceptDAO.findRoot() returns: " + concept);

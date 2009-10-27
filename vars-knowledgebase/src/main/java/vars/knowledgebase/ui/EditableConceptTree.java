@@ -23,13 +23,12 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+import org.bushe.swing.event.EventBus;
 import vars.UserAccount;
 import vars.knowledgebase.Concept;
-import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.History;
-import vars.knowledgebase.HistoryFactory;
-import vars.knowledgebase.ui.actions.ApproveHistoryTask;
+import vars.knowledgebase.HistoryDAO;
 import vars.shared.ui.GlobalLookup;
 import vars.shared.ui.ILockableEditor;
 import vars.shared.ui.kbtree.ConceptTree;
@@ -154,20 +153,21 @@ public class EditableConceptTree extends ConceptTree implements ILockableEditor 
                         parentConcept.getConceptMetadata().addHistory(history);
 
                         try {
-                            ConceptDAO.getInstance().update((IDataObject) parentConcept);
+                            HistoryDAO historyDAO = toolBelt.getKnowledgebaseDAOFactory().newHistoryDAO();
+                            historyDAO.makePersistent(history);
 
-                            if (userAccount.isAdmin()) {
-                                ApproveHistoryTask.approve((UserAccount) userAccount, (History) history);
+                            if (userAccount.isAdministrator()) {
+                                toolBelt.getApproveHistoryTask().approve((UserAccount) userAccount, (History) history);
                             }
                         }
-                        catch (DAOException e) {
-                            AppFrameDispatcher.showErrorDialog("Failed to update database. Unable to mark '" +
+                        catch (Exception e) {
+                            EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, "Failed to update database. Unable to mark '" +
                                                                conceptName + "' for deletion");
-                            concept.removeHistory(history);
+                            parentConcept.getConceptMetadata().removeHistory(history);
                         }
 
-                        ((KnowledgebaseApp) KnowledgebaseApp.DISPATCHER.getValueObject()).getKnowledgebaseFrame()
-                            .refreshTreeAndOpenNode(parentConcept.getPrimaryConceptNameAsString());
+                        KnowledgebaseFrame f = (KnowledgebaseFrame) Lookup.getApplicationFrameDispatcher().getValueObject();
+                        f.refreshTreeAndOpenNode(parentConcept.getPrimaryConceptName().getName());
                     }
                 }
             }
@@ -181,7 +181,8 @@ public class EditableConceptTree extends ConceptTree implements ILockableEditor 
      *
      * @param  concept Description of the Parameter
      */
-    public void removedConcept(IConcept concept) {
+    @Override
+    public void removedConcept(Concept concept) {
 
         // RxNOTE It is assumed the removed Concept is the currently selected node.
         DefaultMutableTreeNode node = getSelectedNode();
@@ -218,6 +219,7 @@ public class EditableConceptTree extends ConceptTree implements ILockableEditor 
      *
      * @param  conceptName Description of the Parameter
      */
+    @Override
     public void removedConceptName(ConceptName conceptName) {
         updateTreeNode(getSelectedConcept());
     }
@@ -229,6 +231,6 @@ public class EditableConceptTree extends ConceptTree implements ILockableEditor 
          */
     public void setLocked(boolean locked) {
         this.locked = locked;
-        getPopupMenu().setLocked(locked);
+        ((EditableConceptTreePopupMenu) getPopupMenu()).setLocked(locked);
     }
 }

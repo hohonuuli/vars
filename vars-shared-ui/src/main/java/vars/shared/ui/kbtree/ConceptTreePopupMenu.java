@@ -85,4 +85,10 @@ public class ConceptTreePopupMenu extends JPopupMenu {
         add(collapseAllMenuItem);
 
     }
+
+    public ConceptTree getConceptTree() {
+        return conceptTree;
+    }
+
+    
 }

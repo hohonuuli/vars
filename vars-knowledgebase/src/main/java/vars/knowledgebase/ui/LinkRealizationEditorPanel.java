@@ -627,7 +627,7 @@ public class LinkRealizationEditorPanel extends EditorPanel {
 
         @Override
         public void doAction() {
-            final UserAccount userAccount = (UserAccount) KnowledgebaseApp.DISPATCHER_USERACCOUNT.getValueObject();
+            final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
             if ((userAccount != null) && !userAccount.isReadOnly()) {
                 JList linkList = getLinkList();
                 LinkRealization linkRealization = (LinkRealization) linkList.getSelectedValue();

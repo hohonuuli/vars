@@ -40,12 +40,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.mbari.swing.ListListModel;
 import vars.UserAccount;
-import vars.annotation.AnnotationDAOFactory;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.History;
-import vars.knowledgebase.KnowledgebaseDAO;
-import vars.knowledgebase.KnowledgebaseDAOFactory;
-import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.ui.actions.ApproveHistoryTask;
 import vars.knowledgebase.ui.actions.RejectHistoryTask;
 import vars.shared.ui.OkCancelButtonPanel;
@@ -87,14 +83,12 @@ public class HistoryEditorPanel extends EditorPanel implements ILockableEditor {
     /**
      * This is the default constructor
      */
-    public HistoryEditorPanel(AnnotationDAOFactory annotationDAOFactory,
-            KnowledgebaseDAO knowledgebaseDAO, KnowledgebaseDAOFactory knowledgebaseDAOFactory,
-            KnowledgebaseFactory knowledgebaseFactory) {
+    public HistoryEditorPanel(ToolBelt toolBelt) {
         super();
         initialize();
         setLocked(isLocked());
-        approveHistoryTask = new ApproveHistoryTask(annotationDAOFactory, knowledgebaseDAO, knowledgebaseDAOFactory, knowledgebaseFactory);
-        rejectHistoryTask = new RejectHistoryTask(annotationDAOFactory, knowledgebaseDAO, knowledgebaseDAOFactory, knowledgebaseFactory);
+        approveHistoryTask = toolBelt.getApproveHistoryTask();
+        rejectHistoryTask = toolBelt.getRejectHistoryTask();
     }
 
     //~--- get methods --------------------------------------------------------
@@ -131,7 +125,7 @@ public class HistoryEditorPanel extends EditorPanel implements ILockableEditor {
                     final History history = (History) getHistoryList().getSelectedValue();
                     String name = history.getConceptMetadata().getConcept().getPrimaryConceptName().getName();
                     approveHistoryTask.approve(userAccount, history);
-                    final KnowledgebaseApp app = (KnowledgebaseApp) KnowledgebaseApp.DISPATCHER.getValueObject();
+                    final KnowledgebaseApp app = (KnowledgebaseApp) Lookup.getApplicationDispatcher().getValueObject();
 
                     /*
                      * At this point the concept may be modified or removed. We'll check the name again; if the
@@ -163,7 +157,7 @@ public class HistoryEditorPanel extends EditorPanel implements ILockableEditor {
                     final History history = (History) getHistoryList().getSelectedValue();
                     String name = history.getConceptMetadata().getConcept().getPrimaryConceptName().getName();
                     rejectHistoryTask.reject(userAccount, history);
-                    final KnowledgebaseApp app = (KnowledgebaseApp) KnowledgebaseApp.DISPATCHER.getValueObject();
+                    final KnowledgebaseApp app = (KnowledgebaseApp) Lookup.getApplicationDispatcher().getValueObject();
 
 /*
                      * At this point the concept may be modified or removed. We'll check the name again; if the

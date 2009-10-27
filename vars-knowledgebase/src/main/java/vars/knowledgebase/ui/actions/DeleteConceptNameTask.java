@@ -22,7 +22,6 @@ import org.bushe.swing.event.EventBus;
 import org.mbari.swing.ProgressDialog;
 import org.mbari.util.Dispatcher;
 import vars.knowledgebase.HistoryFactory;
-import vars.knowledgebase.ui.KnowledgebaseApp;
 import vars.knowledgebase.ui.KnowledgebaseFrame;
 
 import org.slf4j.Logger;
@@ -68,7 +67,7 @@ public class DeleteConceptNameTask {
             /*
              * Add a History object to track changes
              */
-            UserAccount userAccount = (UserAccount) KnowledgebaseApp.DISPATCHER_USERACCOUNT.getValueObject();
+            UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
             History history = historyFactory.delete(userAccount, conceptName);
             final Concept concept = conceptName.getConcept();
             concept.getConceptMetadata().addHistory(history);

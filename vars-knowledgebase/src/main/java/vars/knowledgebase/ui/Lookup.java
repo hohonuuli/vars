@@ -26,6 +26,7 @@ import org.mbari.util.Dispatcher;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.KnowledgebaseModule;
 import vars.shared.ui.GlobalLookup;
+import vars.shared.ui.kbtree.ConceptTree;
 
 /**
  * Created by IntelliJ IDEA.
@@ -38,6 +39,7 @@ public class Lookup extends GlobalLookup {
 
     protected static final Object KEY_DISPATCHER_APPLICATION_FRAME = KnowledgebaseFrame.class;
     protected static final Object KEY_DISPATCHER_APPLICATION = KnowledgebaseApp.class;
+    protected static final Object KEY_DISPATCHER_CONCEPT_TREE = ConceptTree.class;
     protected static final Object KEY_DISPATCHER_SELECTED_CONCEPT = Concept.class;
     public static final String RESOURCE_BUNDLE = "knowlegebase-app";
     public static final Object KEY_DISPATCHER_GUICE_INJECTOR = Injector.class;
@@ -82,6 +84,27 @@ public class Lookup extends GlobalLookup {
                 }
             }
         });
+
+        getSelectedConceptDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (!(evt.getNewValue() instanceof Concept)) {
+                    throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
+                            ", EXPECTED: " + Concept.class.getName());
+                }
+            }
+        });
+
+        getConceptTreeDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (!(evt.getNewValue() instanceof ConceptTree)) {
+                    throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
+                            ", EXPECTED: " + ConceptTree.class.getName());
+                }
+            }
+        });
+
 
         /*
          * When a Concept is sent to this topic on event bus make sure it gets
@@ -136,6 +159,14 @@ public class Lookup extends GlobalLookup {
      */
     public static Dispatcher getSelectedConceptDispatcher() {
         return Dispatcher.getDispatcher(KEY_DISPATCHER_SELECTED_CONCEPT);
+    }
+
+    /**
+     * Stores a reference to the {@link ConceptTree} so that other componenets
+     * can reference it as needed.
+     */
+    public static Dispatcher getConceptTreeDispatcher() {
+        return Dispatcher.getDispatcher(KEY_DISPATCHER_CONCEPT_TREE);
     }
 
 }

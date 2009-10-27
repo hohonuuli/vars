@@ -21,6 +21,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import org.bushe.swing.event.EventBus;
+import org.mbari.util.Dispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.UserAccount;
@@ -32,7 +33,6 @@ import vars.knowledgebase.HistoryFactory;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.LinkRealization;
 import vars.knowledgebase.LinkRealizationDAO;
-import vars.knowledgebase.ui.KnowledgebaseApp;
 import vars.knowledgebase.ui.LinkEditorPanel;
 import vars.knowledgebase.ui.Lookup;
 import vars.knowledgebase.ui.ToolBelt;
@@ -162,7 +162,7 @@ public class AddLinkRealizationDialog extends JDialog {
     private void onOkClick() {
         setVisible(false);
 
-        UserAccount userAccount = (UserAccount) KnowledgebaseApp.DISPATCHER_USERACCOUNT.getValueObject();
+        UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
         if ((userAccount != null) && !userAccount.isReadOnly()) {
 
             KnowledgebaseDAOFactory knowledgebaseDAOFactory = toolBelt.getKnowledgebaseDAOFactory();
@@ -207,8 +207,9 @@ public class AddLinkRealizationDialog extends JDialog {
                     approveHistoryTask.approve(userAccount, history);
                 }
 
-                KnowledgebaseApp.DISPATCHER_SELECTED_CONCEPT.setValueObject(null);
-                KnowledgebaseApp.DISPATCHER_SELECTED_CONCEPT.setValueObject(c);
+                Dispatcher dispatcher = Lookup.getSelectedConceptDispatcher();
+                dispatcher.setValueObject(null);
+                dispatcher.setValueObject(c);
             }
             catch (Exception e) {
                 c.getConceptMetadata().removeLinkRealization(linkRealization);

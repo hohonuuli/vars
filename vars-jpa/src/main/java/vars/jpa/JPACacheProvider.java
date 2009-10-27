@@ -10,6 +10,8 @@ import org.hibernate.SessionFactory;
 import org.mbari.jpaxx.EAO;
 import vars.PersistenceCacheProvider;
 import com.google.common.collect.ImmutableSet;
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import java.util.Set;
 import vars.annotation.jpa.GAssociation;
 import vars.annotation.jpa.GCameraData;
@@ -58,7 +60,8 @@ public class JPACacheProvider implements PersistenceCacheProvider {
             GMedia.class,
             GUsage.class);
 
-    public JPACacheProvider(EAO eao) {
+    @Inject
+    public JPACacheProvider(@Named("miscEAO") EAO eao) {
         this.eao = eao;
     }
 

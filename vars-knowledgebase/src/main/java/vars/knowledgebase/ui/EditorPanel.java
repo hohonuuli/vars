@@ -21,8 +21,13 @@ import vars.shared.ui.ILockableEditor;
 import java.awt.BorderLayout;
 
 import javax.swing.JPanel;
+import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptName;
+import vars.knowledgebase.ConceptNameTypes;
+import vars.knowledgebase.SimpleConceptBean;
+import vars.knowledgebase.SimpleConceptNameBean;
 
-import vars.knowledgebase.*;
+
 
 
 /**

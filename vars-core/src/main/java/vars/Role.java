@@ -33,10 +33,4 @@ public interface Role {
      */
     String getName();
 
-    /**
-     * Description of the Method
-     *
-     * @return  Description of the Return Value
-     */
-    String toString();
 }

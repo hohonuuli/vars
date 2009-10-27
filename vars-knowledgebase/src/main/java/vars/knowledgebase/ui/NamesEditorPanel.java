@@ -512,7 +512,7 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
                 "Do you want to mark '" + selectedName + "' for deletion?", "VARS - Confirm",
                 JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE);
 
-            final UserAccount userAccount = (UserAccount) KnowledgebaseApp.DISPATCHER_USERACCOUNT.getValueObject();
+            final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
             if (value == JOptionPane.YES_OPTION) {
                 WaitIndicator waitIndicator = new WaitIndicator(NamesEditorPanel.this);
                 final History history = historyFactory.delete(userAccount, conceptName);
@@ -560,7 +560,7 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
                 /*
                  * Set the currently selected concept
                  */
-                Dispatcher dispatcher = KnowledgebaseApp.DISPATCHER_SELECTED_CONCEPT;
+                Dispatcher dispatcher = Lookup.getSelectedConceptDispatcher();
                 dialog.setConcept((Concept) dispatcher.getValueObject());
 
                 /*

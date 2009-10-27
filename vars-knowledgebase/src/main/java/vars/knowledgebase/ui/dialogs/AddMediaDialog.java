@@ -283,12 +283,11 @@ public class AddMediaDialog extends JDialog {
                     media = (Media) knowledgebaseDAOFactory.newMediaDAO().makePersistent(concept);
 
                     // Build the History
-                    history = historyFactory.add(
-                        (UserAccount) KnowledgebaseApp.DISPATCHER_USERACCOUNT.getValueObject(), media);
+                    final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+                    history = historyFactory.add(userAccount, media);
                     concept.getConceptMetadata().addHistory(history);
                     knowledgebaseDAOFactory.newHistoryDAO().makePersistent(history);
-                    final UserAccount userAccount = (UserAccount) KnowledgebaseApp.DISPATCHER_USERACCOUNT
-                        .getValueObject();
+                    
                     if (userAccount.isAdministrator()) {
                         approveHistoryTask.approve(userAccount, history);
                     }
@@ -314,10 +313,7 @@ public class AddMediaDialog extends JDialog {
 
             setConcept(null);
             progressDialog.setVisible(false);
-
-
-            ((KnowledgebaseApp) KnowledgebaseApp.DISPATCHER.getValueObject()).getKnowledgebaseFrame()
-                .refreshTreeAndOpenNode(concept.getPrimaryConceptName().getName());
+            EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, concept.getPrimaryConceptName().getName());
         }
     }
 }

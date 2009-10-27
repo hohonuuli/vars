@@ -26,6 +26,7 @@ import vars.ExternalDataDAO;
 import vars.ExternalDataDaoExpdImpl;
 import vars.MiscDAOFactory;
 import vars.MiscFactory;
+import vars.PersistenceCacheProvider;
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.AnnotationFactory;
 import vars.annotation.jpa.AnnotationDAOFactoryImpl;
@@ -96,6 +97,7 @@ public class VarsJpaModule implements Module {
         binder.bind(MiscFactory.class).to(MiscFactoryImpl.class);
         binder.bind(QueryDAO.class).to(QueryDAOImpl.class);
         binder.bind(VarsUserPreferencesFactory.class).to(VarsUserPreferencesFactoryImpl.class).in(Scopes.SINGLETON);
+        binder.bind(PersistenceCacheProvider.class).to(JPACacheProvider.class).in(Scopes.SINGLETON);
 
     }
 }

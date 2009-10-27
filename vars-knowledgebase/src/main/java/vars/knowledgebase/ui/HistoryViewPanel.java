@@ -1,3 +1,17 @@
+/*
+ * @(#)HistoryViewPanel.java   2009.10.27 at 11:32:46 PDT
+ *
+ * Copyright 2009 MBARI
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
+
 package vars.knowledgebase.ui;
 
 import java.awt.GridBagConstraints;
@@ -9,100 +23,34 @@ import java.util.Date;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import org.mbari.vars.knowledgebase.model.History;
+import vars.knowledgebase.History;
 
+/**
+ * @version        $date$, 2009.10.27 at 11:32:46 PDT
+ * @author         Brian Schlining [brian@mbari.org]
+ */
 public class HistoryViewPanel extends JPanel {
-    
-    /**
-	 * @uml.property  name="history"
-	 * @uml.associationEnd  
-	 */
-    private History history;  //  @jve:decl-index=0:
-    private static final String BLANK = "";
-    private static final DateFormat DATEFORMAT = new SimpleDateFormat(
-    "yyyy/MM/dd HH:mm:ss");  //  @jve:decl-index=0:
 
+    private static final String BLANK = "";
+    private static final DateFormat DATEFORMAT = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
     private static final long serialVersionUID = 1L;
-    /**
-	 * @uml.property  name="creatorNameLabel"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private JLabel creatorNameLabel = null;
-    /**
-	 * @uml.property  name="creationDateLabel"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private JLabel creationDateLabel = null;
-    /**
-	 * @uml.property  name="approverLabel"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private JLabel approverLabel = null;
-    /**
-	 * @uml.property  name="approvalDateLabel"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private JLabel approvalDateLabel = null;
-    /**
-	 * @uml.property  name="actionLabel"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private JLabel actionLabel = null;
-    /**
-	 * @uml.property  name="newValueLabel"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private JLabel newValueLabel = null;
-    /**
-	 * @uml.property  name="oldValueLabel"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private JLabel oldValueLabel = null;
-    /**
-	 * @uml.property  name="creatorField"
-	 * @uml.associationEnd  
-	 */
-    private JTextField creatorField = null;
-    /**
-	 * @uml.property  name="creationDateField"
-	 * @uml.associationEnd  
-	 */
-    private JTextField creationDateField = null;
-    /**
-	 * @uml.property  name="approverField"
-	 * @uml.associationEnd  
-	 */
-    private JTextField approverField = null;
-    /**
-	 * @uml.property  name="approvalDateField"
-	 * @uml.associationEnd  
-	 */
-    private JTextField approvalDateField = null;
-    /**
-	 * @uml.property  name="actionField"
-	 * @uml.associationEnd  
-	 */
     private JTextField actionField = null;
-    /**
-	 * @uml.property  name="newValueField"
-	 * @uml.associationEnd  
-	 */
+    private JLabel actionLabel = null;
+    private JTextField approvalDateField = null;
+    private JLabel approvalDateLabel = null;
+    private JTextField approverField = null;
+    private JLabel approverLabel = null;
+    private JTextField creationDateField = null;
+    private JLabel creationDateLabel = null;
+    private JTextField creatorField = null;
+    private JLabel creatorNameLabel = null;
+    private JTextField fieldField = null;
+    private JLabel fieldLabel = null;
     private JTextField newValueField = null;
-    /**
-	 * @uml.property  name="oldValueField"
-	 * @uml.associationEnd  
-	 */
+    private JLabel newValueLabel = null;
     private JTextField oldValueField = null;
-	/**
-	 * @uml.property  name="fieldLabel"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-	private JLabel fieldLabel = null;
-	/**
-	 * @uml.property  name="fieldField"
-	 * @uml.associationEnd  
-	 */
-	private JTextField fieldField = null;
+    private JLabel oldValueLabel = null;
+    private History history;
 
     /**
      * This is the default constructor
@@ -112,11 +60,85 @@ public class HistoryViewPanel extends JPanel {
         initialize();
     }
 
+    public JTextField getActionField() {
+        if (actionField == null) {
+            actionField = new JTextField();
+            actionField.setEditable(false);
+        }
+
+        return actionField;
+    }
+
+    public JTextField getApprovalDateField() {
+        if (approvalDateField == null) {
+            approvalDateField = new JTextField();
+            approvalDateField.setEditable(false);
+        }
+
+        return approvalDateField;
+    }
+
+    public JTextField getApproverField() {
+        if (approverField == null) {
+            approverField = new JTextField();
+            approverField.setEditable(false);
+        }
+
+        return approverField;
+    }
+
+    public JTextField getCreationDateField() {
+        if (creationDateField == null) {
+            creationDateField = new JTextField();
+            creationDateField.setEditable(false);
+        }
+
+        return creationDateField;
+    }
+
+    private JTextField getCreatorField() {
+        if (creatorField == null) {
+            creatorField = new JTextField();
+            creatorField.setEditable(false);
+        }
+
+        return creatorField;
+    }
+
+    private JTextField getFieldField() {
+        if (fieldField == null) {
+            fieldField = new JTextField();
+            fieldField.setEditable(false);
+        }
+
+        return fieldField;
+    }
+
     /**
-     * This method initializes this
-     * 
-     * @return void
+     * @return  the history
      */
+    public History getHistory() {
+        return history;
+    }
+
+    public JTextField getNewValueField() {
+        if (newValueField == null) {
+            newValueField = new JTextField();
+            newValueField.setEditable(false);
+        }
+
+        return newValueField;
+    }
+
+    public JTextField getOldValueField() {
+        if (oldValueField == null) {
+            oldValueField = new JTextField();
+            oldValueField.setEditable(false);
+        }
+
+        return oldValueField;
+    }
+
     private void initialize() {
         GridBagConstraints gridBagConstraints21 = new GridBagConstraints();
         gridBagConstraints21.fill = GridBagConstraints.BOTH;
@@ -243,103 +265,11 @@ public class HistoryViewPanel extends JPanel {
     }
 
     /**
-	 * This method initializes creatorField	
-	 * @return  javax.swing.JTextField
-	 * @uml.property  name="creatorField"
-	 */
-    private JTextField getCreatorField() {
-        if (creatorField == null) {
-            creatorField = new JTextField();
-            creatorField.setEditable(false);
-        }
-        return creatorField;
-    }
-
-    /**
-	 * This method initializes creationDateField	
-	 * @return  javax.swing.JTextField
-	 * @uml.property  name="creationDateField"
-	 */
-    public JTextField getCreationDateField() {
-        if (creationDateField == null) {
-            creationDateField = new JTextField();
-            creationDateField.setEditable(false);
-        }
-        return creationDateField;
-    }
-
-    /**
-	 * This method initializes approverField	
-	 * @return  javax.swing.JTextField
-	 * @uml.property  name="approverField"
-	 */
-    public JTextField getApproverField() {
-        if (approverField == null) {
-            approverField = new JTextField();
-            approverField.setEditable(false);
-        }
-        return approverField;
-    }
-
-    /**
-	 * This method initializes approvalDateField	
-	 * @return  javax.swing.JTextField
-	 * @uml.property  name="approvalDateField"
-	 */
-    public JTextField getApprovalDateField() {
-        if (approvalDateField == null) {
-            approvalDateField = new JTextField();
-            approvalDateField.setEditable(false);
-        }
-        return approvalDateField;
-    }
-
-    /**
-	 * This method initializes actionField	
-	 * @return  javax.swing.JTextField
-	 * @uml.property  name="actionField"
-	 */
-    public JTextField getActionField() {
-        if (actionField == null) {
-            actionField = new JTextField();
-            actionField.setEditable(false);
-        }
-        return actionField;
-    }
-
-    /**
-	 * This method initializes newValueField	
-	 * @return  javax.swing.JTextField
-	 * @uml.property  name="newValueField"
-	 */
-    public JTextField getNewValueField() {
-        if (newValueField == null) {
-            newValueField = new JTextField();
-            newValueField.setEditable(false);
-        }
-        return newValueField;
-    }
-
-    /**
-	 * This method initializes oldValueField	
-	 * @return  javax.swing.JTextField
-	 * @uml.property  name="oldValueField"
-	 */
-    public JTextField getOldValueField() {
-        if (oldValueField == null) {
-            oldValueField = new JTextField();
-            oldValueField.setEditable(false);
-        }
-        return oldValueField;
-    }
-
-    /**
-	 * @param history  the history to set
-	 * @uml.property  name="history"
-	 */
+     * @param history  the history to set
+     */
     public void setHistory(History history) {
-        
-        
+
+
         String creator = BLANK;
         String creationDate = BLANK;
         String approver = BLANK;
@@ -348,7 +278,7 @@ public class HistoryViewPanel extends JPanel {
         String field = BLANK;
         String newValue = BLANK;
         String oldValue = BLANK;
-        
+
         if (history != null) {
             creator = history.getCreatorName();
             Date creation = history.getCreationDate();
@@ -357,19 +287,21 @@ public class HistoryViewPanel extends JPanel {
                     creationDate = DATEFORMAT.format(creation);
                 }
             }
+
             approver = history.getApproverName();
             Date approval = history.getApprovalDate();
             if (approval != null) {
                 synchronized (DATEFORMAT) {
                     approvalDate = DATEFORMAT.format(approval);
                 }
-                
+
             }
+
             action = history.getAction();
             field = history.getField();
             newValue = history.getNewValue();
             oldValue = history.getOldValue();
-            
+
             if (history.isRejected()) {
                 approverLabel.setText("Rejected by:");
                 approvalDateLabel.setText("Rejected on");
@@ -379,7 +311,7 @@ public class HistoryViewPanel extends JPanel {
                 approvalDateLabel.setText("Approved on");
             }
         }
-        
+
         getCreatorField().setText(creator);
         getCreationDateField().setText(creationDate);
         getApproverField().setText(approver);
@@ -388,29 +320,7 @@ public class HistoryViewPanel extends JPanel {
         getFieldField().setText(field);
         getNewValueField().setText(newValue);
         getOldValueField().setText(oldValue);
-        
+
         this.history = history;
     }
-
-    /**
-	 * @return  the history
-	 * @uml.property  name="history"
-	 */
-    public History getHistory() {
-        return history;
-    }
-
-	/**
-	 * This method initializes fieldField	
-	 * @return  javax.swing.JTextField
-	 * @uml.property  name="fieldField"
-	 */
-	private JTextField getFieldField() {
-		if (fieldField == null) {
-			fieldField = new JTextField();
-			fieldField.setEditable(false);
-		}
-		return fieldField;
-	}
-
-}  //  @jve:decl-index=0:visual-constraint="10,10"
+}

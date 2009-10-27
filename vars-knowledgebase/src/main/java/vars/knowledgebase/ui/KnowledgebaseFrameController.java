@@ -1,7 +1,16 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * @(#)KnowledgebaseFrameController.java   2009.10.27 at 08:42:22 PDT
+ *
+ * Copyright 2009 MBARI
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
+
 
 package vars.knowledgebase.ui;
 
@@ -20,23 +29,31 @@ import vars.knowledgebase.ConceptDAO;
  */
 class KnowledgebaseFrameController {
 
+    private static final int MAX_SEARCH_LOOP_COUNT = 1000;
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    private final EventTopicSubscriber refreshTreeSubscriber = new RefreshTreeAndOpenNodeSubscriber();
     private final KnowledgebaseFrame knowledgebaseFrame;
     private final ToolBelt toolBelt;
-    private final Logger log = LoggerFactory.getLogger(getClass());
-    private static final int MAX_SEARCH_LOOP_COUNT = 1000;
-    private final EventTopicSubscriber refreshTreeSubscriber = new RefreshTreeAndOpenNodeSubscriber();
 
+    /**
+     * Constructs ...
+     *
+     * @param knowledgebaseFrame
+     * @param toolBelt
+     */
     public KnowledgebaseFrameController(KnowledgebaseFrame knowledgebaseFrame, ToolBelt toolBelt) {
         this.knowledgebaseFrame = knowledgebaseFrame;
         this.toolBelt = toolBelt;
+
+        // When a Refresh event is published refresh the knowledgbase
         EventBus.subscribe(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, refreshTreeSubscriber);
     }
 
-     /**
-     * This call clears the Knowledgebase cache, refreshes the Concept tree
-     * and opens the tree to the given node.
-     * @param name Representing the node that we want to open to.
-     */
+    /**
+    * This call clears the Knowledgebase cache, refreshes the Concept tree
+    * and opens the tree to the given node.
+    * @param name Representing the node that we want to open to.
+    */
     public void refreshTreeAndOpenNode(String name) {
 
         /**
@@ -44,22 +61,20 @@ class KnowledgebaseFrameController {
          */
         Concept concept = null;
         try {
-            KnowledgeBaseCache.getInstance().clear();
-
+            toolBelt.getPersistenceCache().clear();
             ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
             concept = conceptDAO.findByName(name);
         }
         catch (Exception e) {
-                log.error("Failed to clear cache", e);
-                EventBus.publish(Lookup.TOPIC_FATAL_ERROR, "Failed to clear" + " knowledgebase cache. Please close this " +
-                                               "application");
+            log.error("Failed to clear cache", e);
+            EventBus.publish(Lookup.TOPIC_FATAL_ERROR,
+                             "Failed to clear" + " knowledgebase cache. Please close this " + "application");
         }
-
 
 
         final SearchableTreePanel tp = knowledgebaseFrame.getTreePanel();
         if (tp != null) {
-            final Dispatcher dispatcher = KnowledgebaseApp.DISPATCHER_SELECTED_CONCEPT;
+            final Dispatcher dispatcher = Lookup.getSelectedConceptDispatcher();
             int count = 0;
 
             /*
@@ -70,7 +85,9 @@ class KnowledgebaseFrameController {
 
                 final Concept selectedConcept = (Concept) dispatcher.getValueObject();
 
-                if ((selectedConcept != null) && (selectedConcept.getPrimaryConceptName().getName().equals(concept.getPrimaryConceptName().getName()))) {
+                if ((selectedConcept != null) &&
+                        (selectedConcept.getPrimaryConceptName().getName().equals(
+                            concept.getPrimaryConceptName().getName()))) {
                     break;
                 }
 
@@ -83,7 +100,6 @@ class KnowledgebaseFrameController {
         }
     }
 
-
     /**
      * Listens for refresh messages.
      */
@@ -93,6 +109,4 @@ class KnowledgebaseFrameController {
             refreshTreeAndOpenNode(data);
         }
     }
-
-
 }

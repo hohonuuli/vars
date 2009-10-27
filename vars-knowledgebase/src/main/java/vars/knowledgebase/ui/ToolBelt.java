@@ -8,6 +8,8 @@ package vars.knowledgebase.ui;
 import com.google.inject.Inject;
 import vars.MiscDAOFactory;
 import vars.MiscFactory;
+import vars.PersistenceCache;
+import vars.PersistenceCacheProvider;
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.AnnotationFactory;
 import vars.knowledgebase.HistoryFactory;
@@ -15,6 +17,7 @@ import vars.knowledgebase.KnowledgebaseDAO;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.ui.actions.ApproveHistoryTask;
+import vars.knowledgebase.ui.actions.RejectHistoryTask;
 import vars.query.QueryDAO;
 
 /**
@@ -32,14 +35,15 @@ public class ToolBelt {
     private final HistoryFactory historyFactory;
     private final MiscDAOFactory miscDAOFactory;
     private final MiscFactory miscFactory;
-
+    private final PersistenceCache persistenceCache;
+    private final RejectHistoryTask rejectHistoryTask;
     private final QueryDAO queryDAO;
 
     @Inject
     public ToolBelt(AnnotationDAOFactory annotationDAOFactory, AnnotationFactory annotationFactory,
             KnowledgebaseDAO knowledgebaseDAO, KnowledgebaseDAOFactory knowledgebaseDAOFactory,
             KnowledgebaseFactory knowledgebaseFactory, MiscDAOFactory miscDAOFactory,
-            MiscFactory miscFactory, QueryDAO queryDAO) {
+            MiscFactory miscFactory, PersistenceCacheProvider persistenceCacheProvider, QueryDAO queryDAO) {
         this.annotationDAOFactory = annotationDAOFactory;
         this.annotationFactory = annotationFactory;
         this.knowledgebaseDAO = knowledgebaseDAO;
@@ -47,9 +51,11 @@ public class ToolBelt {
         this.knowledgebaseFactory = knowledgebaseFactory;
         this.miscDAOFactory = miscDAOFactory;
         this.miscFactory = miscFactory;
+        this.persistenceCache = new PersistenceCache(persistenceCacheProvider);
         this.queryDAO = queryDAO;
         historyFactory = new HistoryFactory(knowledgebaseFactory);
         approveHistoryTask = new  ApproveHistoryTask(annotationDAOFactory, knowledgebaseDAO, knowledgebaseDAOFactory, knowledgebaseFactory);
+        rejectHistoryTask = new RejectHistoryTask(annotationDAOFactory, knowledgebaseDAO, knowledgebaseDAOFactory, knowledgebaseFactory);
     }
 
     public AnnotationDAOFactory getAnnotationDAOFactory() {
@@ -88,8 +94,16 @@ public class ToolBelt {
         return miscFactory;
     }
 
+    public PersistenceCache getPersistenceCache() {
+        return persistenceCache;
+    }
+
     public QueryDAO getQueryDAO() {
         return queryDAO;
+    }
+
+    public RejectHistoryTask getRejectHistoryTask() {
+        return rejectHistoryTask;
     }
 
 
