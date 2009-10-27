@@ -89,7 +89,7 @@ public class EditableConceptTreePopupMenu extends ConceptTreePopupMenu implement
 		 */
         public JDialog getDialog() {
             if (dialog == null) {
-                dialog = new AddConceptDialog(null, null, null, null);
+                dialog = new AddConceptDialog(toolBelt);
             }
             return dialog;
         }
@@ -103,6 +103,8 @@ public class EditableConceptTreePopupMenu extends ConceptTreePopupMenu implement
 
         public void triggerRemoveAction() {
         	if (!isLocked()) {
+
+
         		conceptTree.removeConcept();
         	}
         }
