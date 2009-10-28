@@ -32,7 +32,9 @@ import vars.annotation.AnnotationFactory;
 import vars.annotation.jpa.AnnotationDAOFactoryImpl;
 import vars.annotation.jpa.AnnotationEAO;
 import vars.annotation.jpa.AnnotationFactoryImpl;
+import vars.knowledgebase.KnowledgebaseDAO;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
+import vars.knowledgebase.KnowledgebaseDAOImpl;
 import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.jpa.KnowledgebaseDAOFactoryImpl;
 import vars.knowledgebase.jpa.KnowledgebaseEAO;
@@ -91,6 +93,7 @@ public class VarsJpaModule implements Module {
         binder.bind(EAO.class).annotatedWith(Names.named("knowledgebaseEAO")).to(KnowledgebaseEAO.class).in(Scopes.SINGLETON);
         binder.bind(EAO.class).annotatedWith(Names.named("miscEAO")).to(MiscEAO.class).in(Scopes.SINGLETON);
         binder.bind(ExternalDataDAO.class).to(ExternalDataDaoExpdImpl.class);
+        binder.bind(KnowledgebaseDAO.class).to(KnowledgebaseDAOImpl.class);
         binder.bind(KnowledgebaseDAOFactory.class).to(KnowledgebaseDAOFactoryImpl.class);
         binder.bind(KnowledgebaseFactory.class).to(KnowledgebaseFactoryImpl.class);
         binder.bind(MiscDAOFactory.class).to(MiscDAOFactoryImpl.class);

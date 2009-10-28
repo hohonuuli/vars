@@ -62,40 +62,16 @@ public class TreeConcept implements Comparable {
 
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see java.lang.Comparable#compareTo(java.lang.Object)
-     */
-
-    /**
-     * <p><!-- Method description --></p>
-     *
-     *
-     * @param o
-     *
-     * @return
-     */
     public int compareTo(Object o) {
         return getName().compareTo(((TreeConcept) o).getName());
     }
 
-    /**
-         * <p><!-- Method description --></p>
-         * @return
-         * @uml.property  name="concept"
-         */
     public Concept getConcept() {
         return concept;
     }
 
-    /**
-     * <p><!-- Method description --></p>
-     *
-     *
-     * @return
-     */
     public String getName() {
-        return concept.getPrimaryConceptName().toString();
+        return concept.getPrimaryConceptName().getName();
     }
 
     /**
@@ -132,7 +108,6 @@ public class TreeConcept implements Comparable {
         Set<History> histories = new HashSet<History>(concept.getConceptMetadata().getHistories());
         for (History history : histories) {
             pendingApproval = !(history.isApproved() || history.isRejected());
-
             if (pendingApproval) {
                 break;
             }

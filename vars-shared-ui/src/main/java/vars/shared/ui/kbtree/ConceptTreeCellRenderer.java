@@ -123,4 +123,5 @@ public class ConceptTreeCellRenderer extends DefaultTreeCellRenderer {
 
         return this;
     }
+
 }

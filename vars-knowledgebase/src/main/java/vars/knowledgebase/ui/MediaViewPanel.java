@@ -29,7 +29,7 @@ import javax.swing.JTextField;
 import vars.knowledgebase.Media;
 
 /**
- * Class description
+ * Displays properties of a single media 
  *
  *
  * @version        $date$, 2009.10.09 at 05:00:26 PDT
@@ -73,10 +73,7 @@ public class MediaViewPanel extends JPanel implements ILockableEditor {
         return captionArea;
     }
 
-    /**
-     * This method initializes captionScrollPane
-     * @return  javax.swing.JScrollPane
-     */
+
     private JScrollPane getCaptionScrollPane() {
         if (captionScrollPane == null) {
             captionScrollPane = new JScrollPane();
@@ -99,10 +96,6 @@ public class MediaViewPanel extends JPanel implements ILockableEditor {
         return creditArea;
     }
 
-    /**
-     * This method initializes creditScrollPane
-     * @return  javax.swing.JScrollPane
-     */
     private JScrollPane getCreditScrollPane() {
         if (creditScrollPane == null) {
             creditScrollPane = new JScrollPane();

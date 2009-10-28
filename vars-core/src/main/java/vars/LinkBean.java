@@ -81,6 +81,13 @@ public class LinkBean implements ILink {
         this.fromConcept = fromConcept;
     }
 
+    @Override
+    public String toString() {
+        return linkName + ILink.DELIMITER + toConcept + ILink.DELIMITER + linkValue;
+    }
+
+
+
 
 
 }

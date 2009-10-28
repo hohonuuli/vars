@@ -10,7 +10,7 @@
     <artifactId>vars-jpa</artifactId>
     <name>vars-jpa [Library]</name>
     <properties>
-    	<derbyVersion>10.5.1.1</derbyVersion>
+    	<derbyVersion>10.5.3.0_1</derbyVersion>
     </properties>
 <!--
     Build settings
@@ -80,11 +80,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!-- <dependency>
-            <groupId>org.apache.derby</groupId>
-            <artifactId>derbyclient</artifactId>
-            <version>[10.5.3.0,)</version>
-        </dependency> -->
         <dependency>
             <groupId>javax.persistence</groupId>
             <artifactId>persistence-api</artifactId>
@@ -261,6 +256,19 @@
             <id>wf</id>
             <properties>
                 <environment>wf</environment>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>net.sourceforge.jtds</groupId>
+                    <artifactId>jtds</artifactId>
+                    <version>1.2.3</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>test</id>
+            <properties>
+                <environment>test</environment>
             </properties>
             <dependencies>
                 <dependency>

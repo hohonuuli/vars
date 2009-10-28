@@ -40,6 +40,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import org.bushe.swing.event.EventBus;
+import org.bushe.swing.event.EventTopicSubscriber;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.swing.SearchableTreePanel;
 import org.mbari.util.Dispatcher;
@@ -318,7 +319,7 @@ public class KnowledgebaseFrame extends JFrame {
 
     protected SearchableTreePanel getTreePanel() {
         if (treePanel == null) {
-            ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
+            final ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
             treePanel = new SearchableConceptTreePanel(conceptDAO,
                     toolBelt.getKnowledgebaseDAOFactory().newConceptNameDAO(), toolBelt.getPersistenceCache());
 
@@ -343,6 +344,15 @@ public class KnowledgebaseFrame extends JFrame {
              * notified when the concept changes.
              */
             final EditableConceptTree conceptTree = new EditableConceptTree(concept, toolBelt);
+            EventBus.subscribe(Lookup.TOPIC_SELECTED_CONCEPT, new EventTopicSubscriber<Concept>() {
+
+                public void onEvent(String topic, Concept data) {
+                    String value = data != null ? data.getPrimaryConceptName().getName() : conceptDAO.findRoot().getPrimaryConceptName().getName();
+                    conceptTree.setSelectedConcept(value);
+                }
+
+
+            });
             conceptTree.addTreeSelectionListener(getTreeSelectionListener());
             lockAction.addEditor(conceptTree);
             treePanel.setJTree(conceptTree);
@@ -408,7 +418,7 @@ public class KnowledgebaseFrame extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setContentPane(getSplitPane());
 
-        ResourceBundle bundle = ResourceBundle.getBundle("vars-knowledgebase");
+        ResourceBundle bundle = ResourceBundle.getBundle("knowledgebase-app");
         final String title = bundle.getString("frame.title");
         this.setTitle(title);
     }

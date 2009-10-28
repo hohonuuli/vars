@@ -14,6 +14,7 @@
 
 package vars.knowledgebase.ui;
 
+import java.awt.Component;
 import vars.shared.ui.ILockableEditor;
 import java.awt.BorderLayout;
 import java.awt.Frame;
@@ -25,6 +26,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -66,9 +69,6 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
     private final ToolBelt toolBelt;
 
     /**
-     * This method initializes
-     *
-     *
      * @param toolBelt
      */
     public MediaEditorPanel(ToolBelt toolBelt) {
@@ -78,11 +78,6 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
         setLocked(isLocked());
     }
 
-    /**
-     * This method initializes buttonPanel
-     * @return  javax.swing.JPanel
-     * @uml.property  name="buttonPanel"
-     */
     private EditorButtonPanel getButtonPanel() {
         if (buttonPanel == null) {
             buttonPanel = new EditorButtonPanel();
@@ -96,11 +91,7 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
         return buttonPanel;
     }
 
-    /**
-     * This method initializes mediaList
-     * @return  javax.swing.JList
-     * @uml.property  name="mediaList"
-     */
+
     private JList getMediaList() {
         if (mediaList == null) {
             mediaList = new JList();
@@ -121,6 +112,7 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
 
 
             });
+            mediaList.setCellRenderer(new MediaListCellRenderer());
 
             /*
              * Show images when a URL is double clicked.
@@ -189,11 +181,6 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
         return mediaList;
     }
 
-    /**
-     * This method initializes mediaPanel
-     * @return  javax.swing.JPanel
-     * @uml.property  name="mediaPanel"
-     */
     private JPanel getMediaPanel() {
         if (mediaPanel == null) {
             final BorderLayout borderLayout = new BorderLayout();
@@ -208,11 +195,6 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
         return mediaPanel;
     }
 
-    /**
-     * This method initializes mediaViewPanel
-     * @return  javax.swing.JPanel
-     * @uml.property  name="mediaViewPanel"
-     */
     private MediaViewPanel getMediaViewPanel() {
         if (mediaViewPanel == null) {
             mediaViewPanel = new MediaViewPanel();
@@ -222,11 +204,6 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
         return mediaViewPanel;
     }
 
-    /**
-     * This method initializes scrollPanel
-     * @return  javax.swing.JScrollPane
-     * @uml.property  name="scrollPanel"
-     */
     private JScrollPane getScrollPanel() {
         if (scrollPanel == null) {
             scrollPanel = new JScrollPane();
@@ -405,5 +382,18 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
         }
     }
 
-}    //  @jve:decl-index=0:visual-constraint="73,44"
+    private class MediaListCellRenderer extends DefaultListCellRenderer {
+
+        @Override
+        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            JLabel c =  (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            final Media media = (Media) value;
+            final String text = (media == null) ? "" : media.getUrl();
+            c.setText(text);
+            return c;
+        }
+
+    }
+
+}  
 

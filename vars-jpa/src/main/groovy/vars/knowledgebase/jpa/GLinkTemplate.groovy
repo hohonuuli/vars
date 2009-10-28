@@ -96,7 +96,12 @@ class GLinkTemplate implements Serializable, LinkTemplate, JPAEntity {
 
     @Override
     boolean equals(that) {
-        return EntitySupportCategory.equals(this, that, PROPS)
+        if (this.getClass() == that?.getClass()) {
+            return EntitySupportCategory.equals(this, that, PROPS)
+        }
+        else {
+            return false;
+        }
     }
 
     @Override

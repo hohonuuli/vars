@@ -25,6 +25,7 @@ import java.awt.event.ItemEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
 import org.mbari.swing.SearchableComboBoxModel;
@@ -36,9 +37,7 @@ import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.ConceptNameTypes;
-import vars.knowledgebase.KnowledgebaseDAO;
 import vars.knowledgebase.KnowledgebaseFactory;
-import vars.knowledgebase.LinkTemplate;
 import vars.knowledgebase.LinkTemplateDAO;
 import vars.knowledgebase.SimpleConceptBean;
 import vars.knowledgebase.SimpleConceptNameBean;
@@ -50,11 +49,11 @@ import vars.shared.ui.AllConceptNamesComboBox;
  */
 public class LinkEditorPanel extends javax.swing.JPanel implements ILockableEditor {
 
-    private static final Logger log = LoggerFactory.getLogger(LinkEditorPanel.class);
-    private static final Concept selfConcept = new SimpleConceptBean(new SimpleConceptNameBean(ILink.VALUE_SELF,
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    private final Concept selfConcept = new SimpleConceptBean(new SimpleConceptNameBean(ILink.VALUE_SELF,
         ConceptNameTypes.PRIMARY.toString()));
-    public static final ILink nilLinkTemplate = new LinkBean(ILink.VALUE_NIL, ILink.VALUE_NIL, ILink.VALUE_NIL);
-    private static final Concept nilConcept = new SimpleConceptBean(new SimpleConceptNameBean(ILink.VALUE_NIL,
+    private final ILink nilLinkTemplate = new LinkBean(ILink.VALUE_NIL, ILink.VALUE_NIL, ILink.VALUE_NIL);
+    private final Concept nilConcept = new SimpleConceptBean(new SimpleConceptNameBean(ILink.VALUE_NIL,
         ConceptNameTypes.PRIMARY.toString()));
     private String title = "";
     private Concept concept;
@@ -459,12 +458,12 @@ public class LinkEditorPanel extends javax.swing.JPanel implements ILockableEdit
          * has to load the entire knowledgebase
          */
         final Concept fConcept = concept;
-        Collection linkTemplates = (Collection) Worker.post(new Job() {
+        List<ILink> linkTemplates = (List<ILink>) Worker.post(new Job() {
 
             public Object run() {
                 LinkTemplateDAO linkTemplateDAO = toolBelt.getKnowledgebaseDAOFactory().newLinkTemplateDAO();
 
-                return Arrays.asList(linkTemplateDAO.findAllApplicableToConcept(fConcept));
+                return linkTemplateDAO.findAllApplicableToConcept(fConcept);
             }
 
         });
@@ -473,11 +472,10 @@ public class LinkEditorPanel extends javax.swing.JPanel implements ILockableEdit
          * Concepts return immutable lists from accessor methods. We need to add
          * to the collection so we generate a copy.
          */
-        linkTemplates = new ArrayList(linkTemplates);
         linkTemplates.add(nilLinkTemplate);
         SearchableComboBoxModel model = (SearchableComboBoxModel) linkComboBox.getModel();
         model.clear();
-        model.addAll(linkTemplates);
+        model.addAll(new ArrayList<ILink>(linkTemplates));
         model.setSelectedItem(nilLinkTemplate);
 
         this.concept = concept;
@@ -558,7 +556,7 @@ public class LinkEditorPanel extends javax.swing.JPanel implements ILockableEdit
          * Update the fromConceptCobmoBox
          */
         final AllConceptNamesComboBox toCb = (AllConceptNamesComboBox) toConceptComboBox;
-        toCb.setSelectedItem(toConcept.getPrimaryConceptName().toString());
+        toCb.setSelectedItem(toConcept.getPrimaryConceptName().getName());
         toCb.addItem(nilConcept.getPrimaryConceptName());
         toCb.addItem(selfConcept.getPrimaryConceptName());
 

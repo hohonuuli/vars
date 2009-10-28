@@ -60,7 +60,7 @@ public class Lookup extends GlobalLookup {
     static {
         getApplicationDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
-                if (!(evt.getNewValue() instanceof KnowledgebaseApp)) {
+                if (evt.getNewValue() != null && !(evt.getNewValue() instanceof KnowledgebaseApp)) {
                     throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
                             ", EXPECTED: " + KnowledgebaseApp.class.getName());
                 }
@@ -69,7 +69,7 @@ public class Lookup extends GlobalLookup {
 
         getApplicationFrameDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
-                if (!(evt.getNewValue() instanceof KnowledgebaseFrame)) {
+                if (evt.getNewValue() != null && !(evt.getNewValue() instanceof KnowledgebaseFrame)) {
                     throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
                             ", EXPECTED: " + KnowledgebaseFrame.class.getName());
                 }
@@ -78,7 +78,7 @@ public class Lookup extends GlobalLookup {
 
         getGuiceInjectorDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
-                if (!(evt.getNewValue() instanceof Injector)) {
+                if (evt.getNewValue() != null && !(evt.getNewValue() instanceof Injector)) {
                     throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
                             ", EXPECTED: " + Injector.class.getName());
                 }
@@ -88,7 +88,7 @@ public class Lookup extends GlobalLookup {
         getSelectedConceptDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
-                if (!(evt.getNewValue() instanceof Concept)) {
+                if (evt.getNewValue() != null && !(evt.getNewValue() instanceof Concept)) {
                     throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
                             ", EXPECTED: " + Concept.class.getName());
                 }

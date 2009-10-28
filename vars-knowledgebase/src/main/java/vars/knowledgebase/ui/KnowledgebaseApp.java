@@ -56,10 +56,13 @@ public class KnowledgebaseApp {
      */
     public KnowledgebaseApp() {
         super();
-        initialize();
 
         Injector injector = Guice.createInjector(new KnowledgebaseModule());
+        Lookup.getGuiceInjectorDispatcher().setValueObject(injector);
         toolBelt = injector.getInstance(ToolBelt.class);
+        initialize();
+
+        
 
         /*
          * We put this application into a dispatcher so that other components
@@ -138,7 +141,6 @@ public class KnowledgebaseApp {
 
                 public Object run() throws Exception {
                     toolBelt.getKnowledgebaseDAOFactory().newConceptDAO().findRoot();
-
                     return null;
                 }
 

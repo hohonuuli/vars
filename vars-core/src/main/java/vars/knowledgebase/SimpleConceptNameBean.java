@@ -5,8 +5,6 @@
 
 package vars.knowledgebase;
 
-import vars.knowledgebase.Concept;
-import vars.knowledgebase.ConceptName;
 
 /**
  *
@@ -17,6 +15,7 @@ public class SimpleConceptNameBean implements ConceptName {
     private String name;
     private String nameType;
     private Concept concept;
+    private String author;
 
     public SimpleConceptNameBean(String name, String nameType) {
         this.name = name;
@@ -24,7 +23,7 @@ public class SimpleConceptNameBean implements ConceptName {
     }
 
     public String getAuthor() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return author;
     }
 
     public Concept getConcept() {
@@ -40,7 +39,7 @@ public class SimpleConceptNameBean implements ConceptName {
     }
 
     public void setAuthor(String author) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        this.author = author;
     }
 
     public void setConcept(Concept concept) {
@@ -56,7 +55,7 @@ public class SimpleConceptNameBean implements ConceptName {
     }
 
     public String stringValue() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return name;
     }
 
 }

@@ -18,6 +18,7 @@
 package vars.shared.ui.kbtree;
 
 import com.google.inject.Inject;
+import com.sun.media.jai.opimage.LookupCRIF;
 import foxtrot.Job;
 import foxtrot.Worker;
 import java.awt.Frame;
@@ -36,7 +37,9 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import org.bushe.swing.event.EventBus;
+import org.mbari.swing.LabeledSpinningDialWaitIndicator;
 import org.mbari.swing.SearchableTreePanel;
+import org.mbari.swing.WaitIndicator;
 import org.mbari.util.Dispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -153,10 +156,13 @@ public class SearchableConceptTreePanel extends SearchableTreePanel {
         /*
          * Disable so that folks can't start multiple searches.
          */
+
         getSearchBtn().setEnabled(false);
         getSearchTextField().setEnabled(false);
+        WaitIndicator waitIndicator = new LabeledSpinningDialWaitIndicator(this, "Searching for '" + text + "'");
         loadNodes(text, useGlobSearch);
         boolean ok = super.goToMatchingNode(text, useGlobSearch);
+        waitIndicator.dispose();
         getSearchBtn().setEnabled(true);
         getSearchTextField().setEnabled(true);
         getSearchTextField().requestFocus();
@@ -170,27 +176,35 @@ public class SearchableConceptTreePanel extends SearchableTreePanel {
      * @param useGlobSearch
      */
     private void loadNodes(final String text, final boolean useGlobSearch) {
-        Collection matches = null;
-        try {
-            if (useGlobSearch) {
-                if (!cachedGlobSearches.contains(text)) {
-                    matches = conceptNameDAO.findByNameContaining(text);
-                    cachedGlobSearches.add(text);
-                    cachedWordSearches.add(text);
+        Collection<ConceptName> matches = (Collection) Worker.post(new Job() {
+            public Object run() {
+                Collection<ConceptName> matches = null;
+                try {
+
+                    if (useGlobSearch) {
+                        if (!cachedGlobSearches.contains(text)) {
+                            matches = conceptNameDAO.findByNameContaining(text);
+                            cachedGlobSearches.add(text);
+                            cachedWordSearches.add(text);
+                        }
+                    }
+                    else {
+                        if (!cachedWordSearches.contains(text)) {
+                            matches = conceptNameDAO.findByNameStartingWith(text);
+                            cachedWordSearches.add(text);
+                        }
+                    }
                 }
-            }
-            else {
-                if (!cachedWordSearches.contains(text)) {
-                    matches = conceptNameDAO.findByNameStartingWith(text);
-                    cachedWordSearches.add(text);
+                catch (Exception e) {
+                    if (log.isErrorEnabled()) {
+                        log.error("Database lookup of " + text + " failed", e);
+                        EventBus.publish(GlobalLookup.TOPIC_NONFATAL_ERROR, e);
+                    }
                 }
+                return matches;
             }
-        }
-        catch (Exception e) {
-            if (log.isErrorEnabled()) {
-                log.error("Database lookup of " + text + " failed", e);
-            }
-        }
+        });
+        
 
         /*
          * If we loaded the matched names from the database then we need

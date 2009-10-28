@@ -422,14 +422,15 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
     public void setConcept(Concept concept) {
         super.setConcept(concept);
 
-
         /*
          * Update the list of 'other' names
          */
         List<ConceptName> conceptNames = new ArrayList<ConceptName>(concept.getConceptNames());
         List<String> names = new ArrayList<String>(conceptNames.size());
+        for (ConceptName conceptName : conceptNames) {
+            names.add(conceptName.getName());
+        }
         Collections.sort(names, stringComparator);
-
 
         /*
          * We remove the ListSelectionListener here. If we don't we get errors
