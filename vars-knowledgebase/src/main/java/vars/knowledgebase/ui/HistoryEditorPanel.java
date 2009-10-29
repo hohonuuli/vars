@@ -84,7 +84,7 @@ public class HistoryEditorPanel extends EditorPanel implements ILockableEditor {
      * This is the default constructor
      */
     public HistoryEditorPanel(ToolBelt toolBelt) {
-        super();
+        super(toolBelt);
         initialize();
         setLocked(isLocked());
         approveHistoryTask = toolBelt.getApproveHistoryTask();

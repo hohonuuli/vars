@@ -14,18 +14,15 @@
 
 package vars.knowledgebase.ui;
 
+import java.awt.event.ActionEvent;
 import vars.shared.ui.ILockableEditor;
 import com.google.inject.Inject;
-import foxtrot.Job;
-import foxtrot.Worker;
 import java.awt.BorderLayout;
-import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -36,41 +33,22 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import org.bushe.swing.event.EventBus;
-import org.mbari.awt.event.ActionAdapter;
 import org.mbari.swing.ListListModel;
-import org.mbari.swing.SpinningDialWaitIndicator;
-import org.mbari.swing.WaitIndicator;
 import org.mbari.text.IgnoreCaseToStringComparator;
-import org.mbari.util.Dispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.UserAccount;
 import vars.knowledgebase.Concept;
-import vars.knowledgebase.ConceptDAO;
-import vars.knowledgebase.ConceptMetadata;
 import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.ConceptNameTypes;
-import vars.knowledgebase.History;
-import vars.knowledgebase.HistoryFactory;
-import vars.knowledgebase.KnowledgebaseDAO;
-import vars.knowledgebase.KnowledgebaseDAOFactory;
-import vars.knowledgebase.KnowledgebaseFactory;
-import vars.knowledgebase.ui.actions.ApproveHistoryTask;
-import vars.knowledgebase.ui.dialogs.AddConceptNameDialog2;
 
 /**
- * <p><!-- Class description --></p>
  *
- * @version    $Id: NamesEditorPanel.java 295 2006-07-06 23:47:31Z hohonuuli $
- * @author     <a href="http://www.mbari.org">Monterey Bay Aquarium Research Institute</a>
  */
 public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
 
@@ -97,12 +75,9 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
     private JLabel typeLabel = null;
     private JPanel viewPanel = null;
     private Comparator stringComparator = new IgnoreCaseToStringComparator();
-    private final ApproveHistoryTask approveHistoryTask;
-    private final HistoryFactory historyFactory;
-    private final KnowledgebaseDAO knowledgebaseDAO;
-    private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
-    private final KnowledgebaseFactory knowledgebaseFactory;
     private ItemListener rbItemListener;
+
+    private final NamesEditorPanelController controller;
 
     /**
      * This is the default constructor
@@ -114,12 +89,8 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
      */
     @Inject
     public NamesEditorPanel(ToolBelt toolBelt) {
-        super();
-        this.approveHistoryTask = toolBelt.getApproveHistoryTask();
-        this.knowledgebaseDAO = toolBelt.getKnowledgebaseDAO();
-        this.knowledgebaseDAOFactory = toolBelt.getKnowledgebaseDAOFactory();
-        this.knowledgebaseFactory = toolBelt.getKnowledgebaseFactory();
-        this.historyFactory = new HistoryFactory(knowledgebaseFactory);
+        super(toolBelt);
+        controller = new NamesEditorPanelController(this);
         initialize();
         setLocked(isLocked());
     }
@@ -145,15 +116,34 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
             buttonPanel = new EditorButtonPanel();
 
             JButton deleteButton = buttonPanel.getDeleteButton();
-            deleteButton.addActionListener(new DeleteAction());
+            deleteButton.addActionListener(new ActionListener() {
+
+                public void actionPerformed(ActionEvent e) {
+                    final String selectedName = (String) getNamesList().getSelectedValue();
+                    final Concept concept = getConcept();
+                    final String primaryName = concept.getPrimaryConceptName().getName();
+                    final ConceptName conceptName = concept.getConceptName(selectedName);
+                    controller.deleteConceptName(conceptName);
+                }
+            });
             deleteButton.setEnabled(false);
 
             JButton updateButton = buttonPanel.getUpdateButton();
             updateButton.setEnabled(false);
-            updateButton.addActionListener(new UpdateAction());
+            updateButton.addActionListener(new ActionListener() {
+
+                public void actionPerformed(ActionEvent e) {
+                    controller.updateConceptName();
+                }
+            });
 
             JButton newButton = buttonPanel.getNewButton();
-            newButton.addActionListener(new NewAction());
+            newButton.addActionListener(new ActionListener() {
+
+                public void actionPerformed(ActionEvent e) {
+                    controller.newConceptName();
+                }
+            });
         }
 
         return buttonPanel;
@@ -193,7 +183,7 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
         return nameField;
     }
 
-    private JList getNamesList() {
+    JList getNamesList() {
         if (namesList == null) {
             namesList = new JList();
             namesList.setPreferredSize(new java.awt.Dimension(0, 120));
@@ -425,7 +415,10 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
         /*
          * Update the list of 'other' names
          */
-        List<ConceptName> conceptNames = new ArrayList<ConceptName>(concept.getConceptNames());
+        List<ConceptName> conceptNames = new ArrayList<ConceptName>();
+        if (concept != null) {
+            conceptNames.addAll(concept.getConceptNames());
+        }
         List<String> names = new ArrayList<String>(conceptNames.size());
         for (ConceptName conceptName : conceptNames) {
             names.add(conceptName.getName());
@@ -439,7 +432,9 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
         ListListModel listModel = (ListListModel) getNamesList().getModel();
         listModel.clear();
         listModel.addAll(names);
-        getNamesList().setSelectedValue(concept.getPrimaryConceptName().getName(), true);
+        if (concept != null) {
+            getNamesList().setSelectedValue(concept.getPrimaryConceptName().getName(), true);
+        }
     }
 
     /**
@@ -501,333 +496,4 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
         getAuthorField().setEditable(!type.equals(ConceptNameTypes.PRIMARY.toString()));
     }
 
-    private class DeleteAction extends ActionAdapter {
-
-        public void doAction() {
-
-            final String selectedName = (String) getNamesList().getSelectedValue();
-            final Concept concept = getConcept();
-            final String primaryName = concept.getPrimaryConceptName().getName();
-            final ConceptName conceptName = concept.getConceptName(selectedName);
-            int value = JOptionPane.showConfirmDialog(NamesEditorPanel.this,
-                "Do you want to mark '" + selectedName + "' for deletion?", "VARS - Confirm",
-                JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE);
-
-            final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
-            if (value == JOptionPane.YES_OPTION) {
-                WaitIndicator waitIndicator = new WaitIndicator(NamesEditorPanel.this);
-                final History history = historyFactory.delete(userAccount, conceptName);
-                concept.getConceptMetadata().addHistory(history);
-
-                try {
-                    knowledgebaseDAOFactory.newHistoryDAO().makePersistent(history);
-                }
-                catch (Exception e) {
-                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
-
-
-                }
-
-                if ((userAccount != null) && userAccount.isAdministrator()) {
-                    approveHistoryTask.approve(userAccount, history);
-                }
-
-                waitIndicator.dispose();
-                EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, primaryName);
-            }
-
-        }
-    }
-
-
-    /**
-         * This action sets up the AddConceptNameDialog. Most of the work is done in the dialog, not here.
-         */
-    private class NewAction extends ActionAdapter {
-
- 
-        private AddConceptNameDialog2 dialog;
-
-        public void doAction() {
-            getDialog().setVisible(true);
-        }
-
-        private AddConceptNameDialog2 getDialog() {
-            if (dialog == null) {
-                final Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
-                dialog = new AddConceptNameDialog2(frame, true, approveHistoryTask, knowledgebaseDAOFactory,
-                                                   knowledgebaseFactory);
-
-                /*
-                 * Set the currently selected concept
-                 */
-                Dispatcher dispatcher = Lookup.getSelectedConceptDispatcher();
-                dialog.setConcept((Concept) dispatcher.getValueObject());
-
-                /*
-                 * The dialog needs a reference to the currently selected
-                 * concept. We do that by listening to the appropriate
-                 * dispatcher.
-                 */
-                dispatcher.addPropertyChangeListener(new PropertyChangeListener() {
-
-                    public void propertyChange(PropertyChangeEvent evt) {
-                        dialog.setConcept((Concept) evt.getNewValue());
-                    }
-                });
-            }
-
-            return dialog;
-        }
-    }
-
-
-    /**
-     * Handles updates to conceptnames.
-     *
-     * @author brian
-     */
-    private class UpdateAction extends ActionAdapter {
- 
-        UpdateAction() {
-            putValue(NAME, "Update");
-        }
-
-        /**
-         * <p><!-- Method description --></p>
-         *
-         */
-        public void doAction() {
-
-            final ConceptDAO conceptDAO = knowledgebaseDAOFactory.newConceptDAO();
-
-            /*
-             * Get the name that's selected in the UI for the current concept.
-             */
-            final String selectedName = (String) getNamesList().getSelectedValue();
-            final Concept concept = getConcept();
-            ConceptName oldConceptName = concept.getConceptName(selectedName);
-            boolean okToProceed = true;
-
-            /*
-             * Retrieve the parameters from the interface
-             */
-            final String name = getNameField().getText();
-            int value = JOptionPane.showConfirmDialog(NamesEditorPanel.this,
-                "Do want to change '" + selectedName + "' to '" + name + "'?", "VARS - Confirm",
-                JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE);
-            final String author = getAuthorField().getText();
-            String nameType = ConceptNameTypes.SYNONYM.toString();
-            if (getPrimaryRb().isSelected()) {
-                nameType = ConceptNameTypes.PRIMARY.toString();
-            }
-            else if (getCommonRb().isSelected()) {
-                nameType = ConceptNameTypes.COMMON.toString();
-            }
-
-
-            /*
-             * Exit if the values are invalid
-             */
-            okToProceed = (value == JOptionPane.YES_OPTION) && !name.equals(selectedName) && (name.equals("")) &&
-                          (selectedName != null) && (oldConceptName != null);
-
-
-            final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
-
-            /*
-             * Warn users if they are trying to change the primary name.
-             */
-            if (okToProceed && nameType.equals(ConceptNameTypes.PRIMARY.toString())) {
-                value = JOptionPane.showConfirmDialog(NamesEditorPanel.this,
-                        "Are you really sure that you want\n" + "to change the primary name?", "VARS - Confirm",
-                        JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-                okToProceed = (value == JOptionPane.YES_OPTION);
-            }
-
-            /*
-             * Check that the name does not already exist in the database
-             */
-            Concept matchingConcept = null;
-            if (okToProceed) {
-                try {
-                    matchingConcept = conceptDAO.findByName(name);
-                }
-                catch (Exception e1) {
-                    if (log.isErrorEnabled()) {
-                        log.error("A search for '" + name + "' in the database failed", e1);
-                    }
-
-                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e1);
-                    okToProceed = false;
-                }
-            }
-
-            if (okToProceed) {
-                if ((matchingConcept != null) && !(matchingConcept.equals(concept))) {
-                    EventBus.publish(Lookup.TOPIC_WARNING,
-                                     "A concept with " + "the name '" + name + "' already exists.");
-                    okToProceed = false;
-                }
-            }
-
-            if (okToProceed) {
-
-                /*
-                 * We really want to block the entire application with a wait indicator. But we have no guarentee
-                 * that this panel is contained in a Swing frame registered with the AppFrameDisplatcher. So
-                 * we COA here.
-                 */
-                final WaitIndicator waitIndicator = new SpinningDialWaitIndicator(NamesEditorPanel.this);
-
-                ConceptMetadata conceptDelegate = concept.getConceptMetadata();
-                log.debug("Inspecting " + conceptDelegate + "\n" + conceptDelegate.getHistories().toString() + "\n");
-
-                /*
-                 * Make the changes and update the database
-                 */
-                boolean success = false;
-                ConceptName newConceptName = knowledgebaseFactory.newConceptName();
-                newConceptName.setName(name);
-                newConceptName.setAuthor(author);
-                newConceptName.setNameType(nameType);
-
-                /*
-                 * Add a History object to track the change.
-                 */
-
-                History history = historyFactory.replaceConceptName(userAccount, oldConceptName, newConceptName);
-                concept.getConceptMetadata().addHistory(history);
-                knowledgebaseDAOFactory.newHistoryDAO().makePersistent(history);
-
-                /*
-                 * When updating a primary name we want to keep the older
-                 * name, so we add a new Concept with the old values.
-                 */
-                if (nameType.equals(ConceptNameTypes.PRIMARY.toString())) {
-                    ConceptName copyCn = knowledgebaseFactory.newConceptName();
-                    copyCn.setName(oldConceptName.getName());
-                    copyCn.setAuthor(oldConceptName.getAuthor());
-                    copyCn.setNameType(ConceptNameTypes.SYNONYM.toString());
-
-                    /*
-                     * Have to update the original concept before adding the
-                     * copy. Otherwise they will have the same names and the
-                     * concept won't allow duplicate names to be added.
-                     */
-                    oldConceptName.setName(name);
-                    concept.addConceptName(copyCn);
-                }
-                else {
-                    oldConceptName.setName(name);
-                }
-
-                oldConceptName.setAuthor(author);
-                oldConceptName.setNameType(nameType);
-                Boolean ok = (Boolean) Worker.post(new Job() {
-
-                    public Object run() {
-                        Boolean ok = Boolean.FALSE;
-                        try {
-                            conceptDAO.update(concept);
-                            ok = Boolean.TRUE;
-                        }
-                        catch (Exception e) {
-                            if (log.isErrorEnabled()) {
-                                log.error("Failed to update " + concept, e);
-                            }
-
-                            EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, "Update failed!! (Database error)");
-                        }
-
-                        return ok;
-                    }
-
-                });
-                success = ok.booleanValue();
-
-
-                if (success) {
-
-                    /*
-                     * Update the annotations that might use the name. Ideally, the database would only contain
-                     * primary names. But just in case we'll update common names and synonyms.
-                     */
-
-                    if (log.isDebugEnabled()) {
-                        log.debug("Changing all Observations that use '" + selectedName + "' to use '" + name + "'");
-                    }
-
-                    success = (Boolean) Worker.post(new Job() {
-
-                        public Object run() {
-                            Boolean ok = Boolean.FALSE;
-                            try {
-                                knowledgebaseDAO.updateConceptNameUsedByAnnotations(concept);
-                                ok = Boolean.TRUE;
-                            }
-                            catch (Exception e) {
-                                String msg = "Failed to change primary names of annotations from '" + selectedName +
-                                             "' to '" + name + "'.";
-                                log.error(msg);
-                                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, msg);
-                            }
-
-                            return ok;
-                        }
-
-                    });
-
-
-                    /*
-                     * If the annotation update was successful we can drop the old conceptname that we
-                     * might have created if changing a primary name
-                     */
-                    if (success) {
-                        ConceptName oldPrimaryName = concept.getConceptName(history.getOldValue());
-                        if ((oldPrimaryName != null) &&
-                                !oldPrimaryName.getNameType().equalsIgnoreCase(ConceptNameTypes.PRIMARY.toString())) {
-                            concept.removeConceptName(oldPrimaryName);
-
-                            try {
-                                conceptDAO.update(concept);
-                            }
-                            catch (Exception ex) {
-                                log.error("Failed to remove " + oldPrimaryName +
-                                          " from the database. This will need to be done manually!!");
-                            }
-                        }
-                    }
-
-
-                    /*
-                     * If the user is an admin go ahead and approve the change. Do this BEFORE you refresh the tree
-                     * or your database transaction will fail because of a timestamp mismatch. (ie. Cache does not
-                     * match you instance)
-                     */
-
-                    if ((userAccount != null) && userAccount.isAdministrator()) {
-                        approveHistoryTask.approve(userAccount, history);
-                    }
-
-                    /*
-                     * Clear the knowledgebasecache since it's no longer
-                     * accurate and reopen the tree to the currently edited
-                     * node.
-                     */
-                    Worker.post(new Job() {
-                        public Object run() {
-                            EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, concept.getPrimaryConceptName().getName());
-                            return null;
-                        }
-
-                    });
-                    
-
-                }
-
-                waitIndicator.dispose();
-            }
-        }
-    }
 }

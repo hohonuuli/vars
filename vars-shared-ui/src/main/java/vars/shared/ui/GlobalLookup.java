@@ -20,22 +20,22 @@ import vars.UserAccount;
  */
 public class GlobalLookup {
     
-    protected static final Object KEY_DISPATCHER_SELECTED_FRAME = GlobalLookup.class.getName() + "-SelectedFrame";
-    protected static final Object KEY_DISPATCHER_USERACCOUNT = GlobalLookup.class.getName() + "-UserAccount";
+    protected static final Object KEY_DISPATCHER_SELECTED_FRAME = "vars.shared.ui.GlobalLookup-SelectedFrame";
+    protected static final Object KEY_DISPATCHER_USERACCOUNT = "vars.shared.ui.GlobalLookup-UserAccount";
 
     /**
      * Subscribers to this topic will get a {@link String} as the data
      */
-    public static final String TOPIC_NONFATAL_ERROR = GlobalLookup.class.getName() + "-TopicNonfatalError";
+    public static final String TOPIC_NONFATAL_ERROR = "vars.shared.ui.GlobalLookup-TopicNonfatalError";
 
     /**
      * Subscribers to this topic will get and {@link Exception} as the data
      */
-    public static final String TOPIC_FATAL_ERROR = GlobalLookup.class.getName() + "-TopicFatalError";
+    public static final String TOPIC_FATAL_ERROR = "vars.shared.ui.GlobalLookup-TopicFatalError";
 
-    public static final String TOPIC_WARNING = GlobalLookup.class.getName() + "-TopicWarning";
+    public static final String TOPIC_WARNING = "vars.shared.ui.GlobalLookup-TopicWarning";
 
-    public static final String TOPIC_USERACCOUNT = GlobalLookup.class.getName() + "-UserAccount";
+    public static final String TOPIC_USERACCOUNT = "vars.shared.ui.GlobalLookup-UserAccount";
 
     /*
      * Throw an exception if the wrong parameter type is set

@@ -96,6 +96,9 @@ public class KnowledgebaseFrame extends JFrame {
      */
     @Inject
     public KnowledgebaseFrame(ToolBelt toolBelt) {
+        if (toolBelt == null) {
+            throw new IllegalArgumentException("ToolBelt argument can not be null");
+        }
         this.toolBelt = toolBelt;
         controller = new KnowledgebaseFrameController(this, toolBelt);
         initialize();
@@ -151,8 +154,7 @@ public class KnowledgebaseFrame extends JFrame {
              * are not verified. We register with the UserAccount Dispatcher
              * to keep track of credentials
              */
-            Dispatcher.getDispatcher(UserAccount.class).addPropertyChangeListener(new PropertyChangeListener() {
-
+            Lookup.getUserAccountDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
                 public void propertyChange(PropertyChangeEvent evt) {
                     historyEditorPanel.setUserAccount((UserAccount) evt.getNewValue());
                 }
@@ -198,7 +200,7 @@ public class KnowledgebaseFrame extends JFrame {
                         super.doAction();
                     }
                     else {
-                        Dispatcher.getDispatcher(UserAccount.class).setValueObject(null);
+                        EventBus.publish(Lookup.TOPIC_USERACCOUNT, null);
                     }
                 }
             };

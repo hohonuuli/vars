@@ -66,14 +66,12 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
     private JPanel mediaPanel = null;
     private MediaViewPanel mediaViewPanel = null;
     private JScrollPane scrollPanel = null;
-    private final ToolBelt toolBelt;
 
     /**
      * @param toolBelt
      */
     public MediaEditorPanel(ToolBelt toolBelt) {
-        super();
-        this.toolBelt = toolBelt;
+        super(toolBelt);
         initialize();
         setLocked(isLocked());
     }
@@ -256,13 +254,13 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
         public void doAction() {
             final Media media = (Media) getMediaList().getSelectedValue();
             final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
-            History history = toolBelt.getHistoryFactory().delete(userAccount, media);
+            History history = getToolBelt().getHistoryFactory().delete(userAccount, media);
             final Concept concept = media.getConceptMetadata().getConcept();
             concept.getConceptMetadata().addHistory(history);
-            history = toolBelt.getKnowledgebaseDAOFactory().newHistoryDAO().makePersistent(history);
+            history = getToolBelt().getKnowledgebaseDAOFactory().newHistoryDAO().makePersistent(history);
 
             if (userAccount.isAdministrator()) {
-                toolBelt.getApproveHistoryTask().approve(userAccount, history);
+                getToolBelt().getApproveHistoryTask().approve(userAccount, history);
             }
 
             ((KnowledgebaseApp) Lookup.getApplicationFrameDispatcher().getValueObject()).getKnowledgebaseFrame()
@@ -291,7 +289,7 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
         private AddMediaDialog getDialog() {
             if (dialog == null) {
                 final Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
-                dialog = new AddMediaDialog(frame, toolBelt);
+                dialog = new AddMediaDialog(frame, getToolBelt());
             }
 
             return dialog;
@@ -361,7 +359,7 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
             }
 
             try {
-                MediaDAO mediaDAO = toolBelt.getKnowledgebaseDAOFactory().newMediaDAO();
+                MediaDAO mediaDAO = getToolBelt().getKnowledgebaseDAOFactory().newMediaDAO();
                 mediaDAO.update(media);
                 mediaDAO.update(oldPrimaryMedia);
 

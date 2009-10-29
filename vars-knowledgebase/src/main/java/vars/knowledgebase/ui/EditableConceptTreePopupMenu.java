@@ -43,6 +43,9 @@ public class EditableConceptTreePopupMenu extends ConceptTreePopupMenu implement
      */
     public EditableConceptTreePopupMenu(final EditableConceptTree conceptTree, ToolBelt toolBelt) {
         super(conceptTree);
+        if (toolBelt == null) {
+            throw new IllegalArgumentException("ToolBelt argument can not be null");
+        }
         this.toolBelt = toolBelt;
 
         addConceptMenuItem = new JMenuItem(EditableConceptTree.ADD_CONCEPT, 'A');

@@ -78,4 +78,8 @@ public class DAO implements vars.DAO {
         }
         return isSame;
     }
+
+    public <T> T findInDatastore(T object) {
+        return (T) eao.find(object.getClass(), ((JPAEntity) object).getId());
+    }
 }

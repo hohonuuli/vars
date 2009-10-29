@@ -51,7 +51,6 @@ public class LinkTemplateEditorPanel extends EditorPanel {
     private EditorButtonPanel editorButtonPanel;
     private LinkEditorPanel linkEditorPanel;
     private ActionAdapter newAction;
-    private final ToolBelt toolBelt;
     private ActionAdapter updateAction;
 
     /**
@@ -60,7 +59,7 @@ public class LinkTemplateEditorPanel extends EditorPanel {
      * @param toolBelt
      */
     public LinkTemplateEditorPanel(final ToolBelt toolBelt) {
-        this.toolBelt = toolBelt;
+        super(toolBelt);
         initialize();
         setLocked(isLocked());
     }
@@ -98,7 +97,7 @@ public class LinkTemplateEditorPanel extends EditorPanel {
      */
     private LinkEditorPanel getLinkEditorPanel() {
         if (linkEditorPanel == null) {
-            linkEditorPanel = new LinkEditorPanel(toolBelt);
+            linkEditorPanel = new LinkEditorPanel(getToolBelt());
             linkEditorPanel.setBorder(BorderFactory.createTitledBorder("Allowed Associations"));
         }
 
@@ -166,15 +165,15 @@ public class LinkTemplateEditorPanel extends EditorPanel {
                     final Concept concept = (Concept) linkTemplate.getConceptMetadata().getConcept();
                     final ConceptMetadata conceptMetadata = linkTemplate.getConceptMetadata();
                     conceptMetadata.removeLinkTemplate(linkTemplate);
-                    final History history = toolBelt.getHistoryFactory().delete(userAccount, linkTemplate);
+                    final History history = getToolBelt().getHistoryFactory().delete(userAccount, linkTemplate);
                     conceptMetadata.addHistory(history);
 
                     try {
-                        HistoryDAO historyDAO = toolBelt.getKnowledgebaseDAOFactory().newHistoryDAO();
+                        HistoryDAO historyDAO = getToolBelt().getKnowledgebaseDAOFactory().newHistoryDAO();
                         historyDAO.makePersistent(history);
 
                         if (userAccount.isAdministrator()) {
-                            toolBelt.getApproveHistoryTask().approve(userAccount, history);
+                            getToolBelt().getApproveHistoryTask().approve(userAccount, history);
                         }
                     }
                     catch (Exception e) {
@@ -212,7 +211,7 @@ public class LinkTemplateEditorPanel extends EditorPanel {
         private AddLinkTemplateDialog getDialog() {
             if (dialog == null) {
                 Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
-                dialog = new AddLinkTemplateDialog(frame, toolBelt);
+                dialog = new AddLinkTemplateDialog(frame, getToolBelt());
             }
 
             return dialog;
@@ -265,7 +264,7 @@ public class LinkTemplateEditorPanel extends EditorPanel {
                         // Change the parent concept
                         if (!newFromConceptName.equals(oldFromConceptName)) {
                             try {
-                                final ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
+                                final ConceptDAO conceptDAO = getToolBelt().getKnowledgebaseDAOFactory().newConceptDAO();
                                 final Concept newFromConcept = conceptDAO.findByName(newFromConceptName);
                                 final ConceptMetadata conceptMetadata = linkTemplate.getConceptMetadata();
                                 conceptMetadata.removeLinkTemplate(linkTemplate);
@@ -284,7 +283,7 @@ public class LinkTemplateEditorPanel extends EditorPanel {
                         if (updateLink) {
 
                             // Verify that the link name/ link value combo is unique
-                            LinkTemplateDAO linkTemplateDAO = toolBelt.getKnowledgebaseDAOFactory()
+                            LinkTemplateDAO linkTemplateDAO = getToolBelt().getKnowledgebaseDAOFactory()
                                 .newLinkTemplateDAO();
                             Collection<LinkTemplate> links = new ArrayList<LinkTemplate>();
                             boolean okToProceed = true;

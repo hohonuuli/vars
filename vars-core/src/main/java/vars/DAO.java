@@ -44,4 +44,13 @@ public interface DAO {
      */
     boolean equalInDatastore(Object obj1, Object obj2);
 
+    /**
+     * Looks up the object in the data store and retrieves the latest and greatest
+     * copy of it.
+     *
+     * @param object The object to lookup
+     * @return The object retrived from the datastore
+     */
+    <T> T findInDatastore(T object);
+
 }

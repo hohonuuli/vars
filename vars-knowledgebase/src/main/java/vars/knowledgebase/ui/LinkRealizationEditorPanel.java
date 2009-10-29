@@ -96,7 +96,6 @@ public class LinkRealizationEditorPanel extends EditorPanel {
     private JLabel valueLabel = null;
     private DeleteAction deleteAction;
     private NewAction newAction;
-    private final ToolBelt toolBelt;
     private UpdateAction updateAction;
 
     /**
@@ -105,7 +104,7 @@ public class LinkRealizationEditorPanel extends EditorPanel {
      * @param toolBelt
      */
     public LinkRealizationEditorPanel(ToolBelt toolBelt) {
-        this.toolBelt = toolBelt;
+        super(toolBelt);
         initialize();
         setLocked(isLocked());
     }
@@ -357,7 +356,7 @@ public class LinkRealizationEditorPanel extends EditorPanel {
     private HierachicalConceptNameComboBox getToConceptComboBox() {
         if (toConceptComboBox == null) {
             toConceptComboBox = new HierachicalConceptNameComboBox(
-                toolBelt.getKnowledgebaseDAOFactory().newConceptDAO());
+                getToolBelt().getKnowledgebaseDAOFactory().newConceptDAO());
         }
 
         return toConceptComboBox;
@@ -446,7 +445,7 @@ public class LinkRealizationEditorPanel extends EditorPanel {
              * Find the LinkTemplate that the LinkRealization is based on.
              */
             Concept toConcept = link.getConceptMetadata().getConcept();
-            LinkTemplateDAO linkTemplateDAO = toolBelt.getKnowledgebaseDAOFactory().newLinkTemplateDAO();
+            LinkTemplateDAO linkTemplateDAO = getToolBelt().getKnowledgebaseDAOFactory().newLinkTemplateDAO();
             Collection<LinkTemplate> matchingLinkTemplates = linkTemplateDAO.findAllByLinkName(link.getLinkName(),
                 toConcept);
 
@@ -488,7 +487,7 @@ public class LinkRealizationEditorPanel extends EditorPanel {
                     }
                     else {
                         try {
-                            ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
+                            ConceptDAO conceptDAO = getToolBelt().getKnowledgebaseDAOFactory().newConceptDAO();
                             concept = conceptDAO.findByName(theToConcept);
                             selectedConcept = conceptDAO.findByName(link.getToConcept());
                             cb.setConcept(concept);    // TODO app hangs up here. Need to optimize
@@ -529,7 +528,7 @@ public class LinkRealizationEditorPanel extends EditorPanel {
             if ((userAccount != null) && !userAccount.isReadOnly()) {
 
                 LinkTemplate linkTemplate = (LinkTemplate) getLinkList().getSelectedValue();
-                LinkRealization linkRealization = toolBelt.getKnowledgebaseFactory().newLinkRealization();
+                LinkRealization linkRealization = getToolBelt().getKnowledgebaseFactory().newLinkRealization();
                 linkRealization.setLinkName(linkTemplate.getLinkName());
                 linkRealization.setLinkValue(linkTemplate.getLinkValue());
                 linkRealization.setToConcept(linkTemplate.getToConcept());
@@ -548,7 +547,7 @@ public class LinkRealizationEditorPanel extends EditorPanel {
 
             MyLinkEditorDialog() {
                 super((Frame) Lookup.getApplicationFrameDispatcher().getValueObject(),
-                      toolBelt.getKnowledgebaseDAOFactory());
+                      getToolBelt().getKnowledgebaseDAOFactory());
                 getLinkField().setEditable(false);
                 setLocationRelativeTo((Frame) Lookup.getApplicationFrameDispatcher().getValueObject());
                 this.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
@@ -566,7 +565,7 @@ public class LinkRealizationEditorPanel extends EditorPanel {
                 concept.getConceptMetadata().addLinkRealization(linkRealization);
 
                 try {
-                    LinkRealizationDAO linkRealizationDAO = toolBelt.getKnowledgebaseDAOFactory()
+                    LinkRealizationDAO linkRealizationDAO = getToolBelt().getKnowledgebaseDAOFactory()
                         .newLinkRealizationDAO();
                     linkRealizationDAO.makePersistent(linkRealization);
                 }
@@ -591,12 +590,12 @@ public class LinkRealizationEditorPanel extends EditorPanel {
                 JList linkList = getLinkList();
                 LinkRealization linkRealization = (LinkRealization) linkList.getSelectedValue();
                 if (linkRealization != null) {
-                    History history = toolBelt.getHistoryFactory().delete(userAccount, linkRealization);
+                    History history = getToolBelt().getHistoryFactory().delete(userAccount, linkRealization);
                     ConceptMetadata conceptDelegate = linkRealization.getConceptMetadata();
                     conceptDelegate.addHistory(history);
 
                     if (userAccount.isAdministrator()) {
-                        toolBelt.getApproveHistoryTask().approve(userAccount, history);
+                        getToolBelt().getApproveHistoryTask().approve(userAccount, history);
                     }
 
                     /*
@@ -614,7 +613,7 @@ public class LinkRealizationEditorPanel extends EditorPanel {
     private class NewAction extends ActionAdapter {
 
         private final AddLinkRealizationDialog dialog = new AddLinkRealizationDialog(
-            (Frame) Lookup.getApplicationFrameDispatcher().getValueObject(), toolBelt);
+            (Frame) Lookup.getApplicationFrameDispatcher().getValueObject(), getToolBelt());
 
         public void doAction() {
             dialog.setConcept(getConcept());
@@ -633,7 +632,7 @@ public class LinkRealizationEditorPanel extends EditorPanel {
                 LinkRealization linkRealization = (LinkRealization) linkList.getSelectedValue();
 
                 // Create a copy of the old values to create a history
-                LinkRealization oldValue = toolBelt.getKnowledgebaseFactory().newLinkRealization();
+                LinkRealization oldValue = getToolBelt().getKnowledgebaseFactory().newLinkRealization();
                 oldValue.setLinkName(linkRealization.getLinkName());
                 oldValue.setToConcept(linkRealization.getToConcept());
                 oldValue.setLinkValue(linkRealization.getLinkValue());
@@ -648,7 +647,7 @@ public class LinkRealizationEditorPanel extends EditorPanel {
                 else {
                     Concept concept = null;
                     try {
-                        ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
+                        ConceptDAO conceptDAO = getToolBelt().getKnowledgebaseDAOFactory().newConceptDAO();
                         concept = conceptDAO.findByName(name);
 
                         if (concept != null) {
@@ -664,12 +663,12 @@ public class LinkRealizationEditorPanel extends EditorPanel {
                 linkRealization.setLinkValue(getLinkValueTextArea().getText());
 
                 // Generate the appropriate history object
-                History history = toolBelt.getHistoryFactory().replaceLinkRealization(userAccount, oldValue,
+                History history = getToolBelt().getHistoryFactory().replaceLinkRealization(userAccount, oldValue,
                     linkRealization);
                 linkRealization.getConceptMetadata().addHistory(history);
 
                 if (userAccount.isAdministrator()) {
-                    toolBelt.getApproveHistoryTask().approve(userAccount, history);
+                    getToolBelt().getApproveHistoryTask().approve(userAccount, history);
                 }
 
                 /*

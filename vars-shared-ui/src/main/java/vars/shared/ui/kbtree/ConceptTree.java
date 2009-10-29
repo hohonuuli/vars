@@ -57,7 +57,7 @@ public class ConceptTree extends JTree implements ConceptChangeListener {
     public final static Cursor WAIT_CURSOR = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
     public final static Cursor DEFAULT_CURSOR = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
     private final Logger log = LoggerFactory.getLogger(getClass());
-    private final ConceptDAO conceptDAO;
+    protected ConceptDAO conceptDAO;
 
     /**
          * @uml.property  name="popupMenu"
@@ -84,6 +84,10 @@ public class ConceptTree extends JTree implements ConceptChangeListener {
         this.conceptDAO = conceptDAO;
         loadModel(rootConcept);
         initialize();
+    }
+
+    protected ConceptTree() {
+        // Hack to get EditableConceptTree working correctly. Don't delete this.
     }
 
     /**
@@ -237,30 +241,9 @@ public class ConceptTree extends JTree implements ConceptChangeListener {
          */
     public ConceptTreePopupMenu getPopupMenu() {
         if (popupMenu == null) {
-
+            log.debug(getClass().getName() + "getPopupMenu called");
             // Add Concept popup menu to this tree
-            final ConceptTreePopupMenu myPopupMenu = new ConceptTreePopupMenu(this);
-
-            addMouseListener(new MouseAdapter() {
-
-                @Override
-                public void mousePressed(MouseEvent event) {
-                    evalutePopup(event);
-                }
-                @Override
-                public void mouseReleased(MouseEvent event) {
-                    evalutePopup(event);
-                }
-                private void evalutePopup(MouseEvent e) {
-
-                    // Display popup menu next to selected item
-                    if (e.isPopupTrigger() && (getSelectedNode() != null)) {
-                        myPopupMenu.show(e.getComponent(), e.getX(), e.getY());
-                    }
-                }
-
-            });
-            this.popupMenu = myPopupMenu;
+            popupMenu = new ConceptTreePopupMenu(this);
         }
 
         return popupMenu;
@@ -316,7 +299,7 @@ public class ConceptTree extends JTree implements ConceptChangeListener {
         return node;
     }
 
-    private void initialize() {
+    protected void initialize() {
 
         /*
          * Initialize the properties of this conceptTree
@@ -330,7 +313,26 @@ public class ConceptTree extends JTree implements ConceptChangeListener {
         setRootVisible(true);
 
         setupListeners();
-        add(getPopupMenu());
+        addMouseListener(new MouseAdapter() {
+
+                @Override
+                public void mousePressed(MouseEvent event) {
+                    evalutePopup(event);
+                }
+                @Override
+                public void mouseReleased(MouseEvent event) {
+                    evalutePopup(event);
+                }
+                private void evalutePopup(MouseEvent e) {
+
+                    // Display popup menu next to selected item
+                    if (e.isPopupTrigger() && (getSelectedNode() != null)) {
+                        getPopupMenu().show(e.getComponent(), e.getX(), e.getY());
+                    }
+                }
+
+            });
+        //add(getPopupMenu());
 
     }
 
@@ -348,11 +350,12 @@ public class ConceptTree extends JTree implements ConceptChangeListener {
             TreeConcept treeConcept = new TreeConcept(rootConcept);
             DefaultMutableTreeNode rootNode = new SortedTreeNode(treeConcept);
 
-//          addChildrenNodes( rootNode, rootConcept );
-            // adding a boolean value as a child to this concept indicates that
-            // the node has children that will be loaded dynamically, start off by
-            // assuming this node has children, the rest will be taken care of in
-            // the ConceptTreeLazyLoader
+            /*
+             * Adding a boolean value as a child to this concept indicates that
+             * the node has children that will be loaded dynamically, start off by
+             * assuming this node has children, the rest will be taken care of in
+             * the ConceptTreeLazyLoader
+             */
             rootNode.add(new DefaultMutableTreeNode(Boolean.TRUE));
             treeConcept.lazyExpand(rootNode);
 

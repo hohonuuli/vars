@@ -101,7 +101,7 @@ class GHistory implements Serializable, History, JPAEntity {
     @Temporal(value = TemporalType.TIMESTAMP)
     Date creationDate
 
-    @Column(name = "Description", length = 1000)
+    @Column(name = "Description", length = 1000, nullable = true)
     String description
 
     @Column(name = "CreatorName", nullable = false, length = 50)

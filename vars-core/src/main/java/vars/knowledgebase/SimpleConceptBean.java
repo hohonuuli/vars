@@ -22,6 +22,7 @@ public class SimpleConceptBean implements Concept {
     private Set<Concept> childConcepts = new HashSet<Concept>();
 
     private Concept parentConcept;
+    private ConceptMetadata conceptMetadata = new SimpleConceptMetadataBean(this);
 
     public SimpleConceptBean() {
     }
@@ -45,7 +46,7 @@ public class SimpleConceptBean implements Concept {
     }
 
     public ConceptMetadata getConceptMetadata() {
-        throw new UnsupportedOperationException("Not supported yet.");
+       return conceptMetadata;
     }
 
     public ConceptName getConceptName(String name) {
@@ -57,11 +58,11 @@ public class SimpleConceptBean implements Concept {
     }
 
     public String getNodcCode() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return "NOT IMPLEMENTED";
     }
 
     public String getOriginator() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return "NOT IMPLEMENTED";
     }
 
     public Concept getParentConcept() {
@@ -80,27 +81,31 @@ public class SimpleConceptBean implements Concept {
     }
 
     public String getRankLevel() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return "NOT IMPLEMENTED";
     }
 
     public String getRankName() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return "NOT IMPLEMENTED";
     }
 
     public String getReference() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return "NOT IMPLEMENTED";
     }
 
     public Concept getRootConcept() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        Concept gotRoot = this;
+        while (gotRoot.getParentConcept() != null) {
+            gotRoot = gotRoot.getParentConcept();
+        }
+        return gotRoot;
     }
 
     public String getStructureType() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return "NOT IMPLEMENTED";
     }
 
     public boolean hasChildConcepts() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return childConcepts.size() > 0;
     }
 
     public boolean hasDescendent(String child) {
@@ -112,7 +117,7 @@ public class SimpleConceptBean implements Concept {
     }
 
     public boolean hasParent() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return parentConcept != null;
     }
 
     public void removeChildConcept(Concept childConcept) {
@@ -150,7 +155,7 @@ public class SimpleConceptBean implements Concept {
     }
 
     public void loadLazyRelations() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        // Do Nothing
     }
 
     protected void setParentConcept(Concept parentConcept) {
@@ -162,7 +167,7 @@ public class SimpleConceptBean implements Concept {
     }
 
     public String getTaxonomyType() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return "NOT IMPLEMENTED";
     }
 
 }

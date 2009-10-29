@@ -81,7 +81,7 @@ public class LoginAction extends ActionAdapter {
         try {
             userAccount = userAccountDAO.findByUserName(userName.trim());
 
-            if ((userAccount != null) && userAccount.getPassword().equals(password.trim())) {
+            if ((userAccount != null) && userAccount.authenticate(password)) {
                 ok = true;
             }
             else {
@@ -92,7 +92,6 @@ public class LoginAction extends ActionAdapter {
             if (log.isErrorEnabled()) {
                 log.error("Unable to login ", daoe);
             }
-
             userAccount = null;
         }
         finally {

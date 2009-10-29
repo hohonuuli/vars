@@ -51,7 +51,7 @@ public class AddConceptDialog extends javax.swing.JDialog {
     private static final long serialVersionUID = 6993327643414741677L;
     private static final Logger log = LoggerFactory.getLogger(AddConceptDialog.class);
     private final AddConceptDialogController controller = new AddConceptDialogController();
-    private final ToolBelt toolBelt;
+    final ToolBelt toolBelt;
  
     private javax.swing.JTextField authorField;
     private javax.swing.JLabel authorLabel;
@@ -85,11 +85,14 @@ public class AddConceptDialog extends javax.swing.JDialog {
      */
     @Inject
     public AddConceptDialog(ToolBelt toolBelt) {
-        super((Frame) Lookup.getApplicationDispatcher().getValueObject(), true);
+        super((Frame) Lookup.getApplicationFrameDispatcher().getValueObject(), true);
+        if (toolBelt == null) {
+            throw new IllegalArgumentException("ToolBelt argument can not be null");
+        }
         this.toolBelt = toolBelt;
         initComponents();
         initModel();
-        setLocationRelativeTo((Frame) Lookup.getApplicationDispatcher().getValueObject());
+        setLocationRelativeTo((Frame) Lookup.getApplicationFrameDispatcher().getValueObject());
         pack();
     }
 

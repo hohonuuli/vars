@@ -23,17 +23,29 @@ import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.EventTopicSubscriber;
 import org.mbari.swing.ProgressDialog;
 import org.mbari.util.Dispatcher;
+import vars.UserAccount;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.KnowledgebaseModule;
 import vars.shared.ui.GlobalLookup;
 import vars.shared.ui.kbtree.ConceptTree;
 
 /**
- * Created by IntelliJ IDEA.
- * User: brian
- * Date: Sep 29, 2009
- * Time: 11:39:10 AM
- * To change this template use File | Settings | File Templates.
+ * Lookup contains globally available resources for the Knowledgbebase application.
+ * These include:
+ * <ul>
+ *  <li>TOPIC - Topic objects used to publish or subscribe to eventbus messages</li>
+ *  <li>KEY - Keys used to lookup a Dispatcher object</li>
+ *  <li>static 'get' methods - Used for retrieving shared ui resources such as
+ *      {@link Dispatcher} objects</li>
+ * </ul>
+ *
+ * No buisness logic exists in the lookup other than enforcement of object types
+ * that can be stored in a dispatcher.
+ *
+ * The usage pattern between EventBus messages (used for notification) and {@link Dispatcher}
+ * objects (which can store values as well as register {@link PropertyChangeListener}s is:
+ * Objects published to {@link EventBus} will be set in the appropriate {@link Dispatcher}.
+ * However, objects set in a Dispatcher will not send a message via EventBus.
  */
 public class Lookup extends GlobalLookup {
 
@@ -43,19 +55,74 @@ public class Lookup extends GlobalLookup {
     protected static final Object KEY_DISPATCHER_SELECTED_CONCEPT = Concept.class;
     public static final String RESOURCE_BUNDLE = "knowlegebase-app";
     public static final Object KEY_DISPATCHER_GUICE_INJECTOR = Injector.class;
-    public static final String TOPIC_DELETE_MEDIA = Lookup.class.getName() + "-DeleteMedia";
-    public static final String TOPIC_DELETE_CONCEPT = Lookup.class.getName() + "-DeleteConcept";
-    public static final String TOPIC_DELETE_CONCEPT_NAME = Lookup.class.getName() +"-DeleteConceptName";
-    public static final String TOPIC_DELETE_HISTORY = Lookup.class.getName() + "-DeleteHistorie";
-    public static final String TOPIC_DELETE_LINK_REALIZATION = Lookup.class.getName() + "-DeleteLinkRealization";
-    public static final String TOPIC_DELETE_LINK_TEMPLATE = Lookup.class.getName() + "-DeleteLinkTemplate";
-    public static final String TOPIC_SELECTED_CONCEPT = Lookup.class.getName() + "-SelectedConcept";
+    
+    /** The data object should be a Collection&lt;Media&gt; */
+    public static final String TOPIC_DELETE_MEDIA = "vars.knowledgebase.ui.Lookup-DeleteMedia";
+
+    /** The data object should be a Collection&lt;Concept&gt; */
+    public static final String TOPIC_DELETE_CONCEPT = "vars.knowledgebase.ui.Lookup-DeleteConcept";
+
+    /** The data object should be a Collection&lt;ConceptName&gt; */
+    public static final String TOPIC_DELETE_CONCEPT_NAME = "vars.knowledgebase.ui.Lookup-DeleteConceptName";
+
+    /** The data object should be a Collection&lt;History&gt; */
+    public static final String TOPIC_DELETE_HISTORY = "vars.knowledgebase.ui.Lookup-DeleteHistory";
+
+    /** The data object should be a Collection&lt;LinkRealization&gt; */
+    public static final String TOPIC_DELETE_LINK_REALIZATION = "vars.knowledgebase.ui.Lookup-DeleteLinkRealization";
+
+    /** The data object should be a Collection&lt;LinkTemplate&gt; */
+    public static final String TOPIC_DELETE_LINK_TEMPLATE = "vars.knowledgebase.ui.Lookup-DeleteLinkTemplate";
+    
+    /** The data object should be a {@link Concept} */
+    public static final String TOPIC_SELECTED_CONCEPT = "vars.knowledgebase.ui.Lookup-SelectedConcept";
+
+     /** The data object should be a Collection&lt;Media&gt; */
+    public static final String TOPIC_UPDATE_MEDIA = "vars.knowledgebase.ui.Lookup-UpdateMedia";
+
+    /** The data object should be a Collection&lt;Concept&gt; */
+    public static final String TOPIC_UPDATE_CONCEPT = "vars.knowledgebase.ui.Lookup-UpdateConcept";
+
+    /** The data object should be a Collection&lt;ConceptName&gt; */
+    public static final String TOPIC_UPDATE_CONCEPT_NAME = "vars.knowledgebase.ui.Lookup-UpdateConceptName";
+
+    /** The data object should be a Collection&lt;History&gt; */
+    public static final String TOPIC_UPDATE_HISTORY = "vars.knowledgebase.ui.Lookup-UpdateHistory";
+
+    /** The data object should be a Collection&lt;LinkRealization&gt; */
+    public static final String TOPIC_UPDATE_LINK_REALIZATION = "vars.knowledgebase.ui.Lookup-UpdateLinkRealization";
+
+    /** The data object should be a Collection&lt;LinkTemplate&gt; */
+    public static final String TOPIC_UPDATE_LINK_TEMPLATE = "vars.knowledgebase.ui.Lookup-UpdateLinkTemplate";
+
+     /** The data object should be a Collection&lt;Media&gt; */
+    public static final String TOPIC_INSERT_MEDIA = "vars.knowledgebase.ui.Lookup-InsertMedia";
+
+    /** The data object should be a Collection&lt;Concept&gt; */
+    public static final String TOPIC_INSERT_CONCEPT = "vars.knowledgebase.ui.Lookup-InsertConcept";
+
+    /** The data object should be a Collection&lt;ConceptName&gt; */
+    public static final String TOPIC_INSERT_CONCEPT_NAME = "vars.knowledgebase.ui.Lookup-InsertConceptName";
+
+    /** The data object should be a Collection&lt;History&gt; */
+    public static final String TOPIC_INSERT_HISTORY = "vars.knowledgebase.ui.Lookup-InsertHistory";
+
+    /** The data object should be a Collection&lt;LinkRealization&gt; */
+    public static final String TOPIC_INSERT_LINK_REALIZATION = "vars.knowledgebase.ui.Lookup-InsertLinkRealization";
+
+    /** The data object should be a Collection&lt;LinkTemplate&gt; */
+    public static final String TOPIC_INSERT_LINK_TEMPLATE = "vars.knowledgebase.ui.Lookup-InsertLinkTemplate";
+
+    /** The data object should be a Collection&lt;History&gt; */
+    public static final String TOPIC_APPROVE_HISTORY = "vars.knowledgebase.ui.Lookup-ApproveHistory";
+
+    public static final String TOPIC_EXIT = "vars.knowledgebase.ui.Lookup-Exit";
 
     /**
      * Refresh the knowledgebase (purge caceh) and open node to the conceptname provided.
      * Calls this as EventBus.publish(TOPIC_REFRESH_KNOWLEGEBASE, String conceptName)
      */
-    public static final String TOPIC_REFRESH_KNOWLEGEBASE = Lookup.class.getName() + "-RefreshKnowledgebase";
+    public static final String TOPIC_REFRESH_KNOWLEGEBASE = "vars.knowledgebase.ui.Lookup-RefreshKnowledgebase";
 
     static {
         getApplicationDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
@@ -113,6 +180,17 @@ public class Lookup extends GlobalLookup {
         EventBus.subscribe(TOPIC_SELECTED_CONCEPT, new EventTopicSubscriber<Concept>() {
             public void onEvent(String topic, Concept data) {
                 getSelectedConceptDispatcher().setValueObject(data);
+            }
+        });
+
+
+        /*
+         * When a UserAccount is sent to this topic make sure it gets relayed
+         * to the correct dispatcher
+         */
+        EventBus.subscribe(TOPIC_USERACCOUNT, new EventTopicSubscriber<UserAccount>() {
+            public void onEvent(String topic, UserAccount data) {
+                getUserAccountDispatcher().setValueObject(data);
             }
         });
     }

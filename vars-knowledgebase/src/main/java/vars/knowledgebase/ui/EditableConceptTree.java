@@ -15,8 +15,6 @@
 package vars.knowledgebase.ui;
 
 import java.awt.Frame;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import javax.swing.JOptionPane;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -24,6 +22,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import org.bushe.swing.event.EventBus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import vars.UserAccount;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptName;
@@ -32,7 +32,6 @@ import vars.knowledgebase.HistoryDAO;
 import vars.shared.ui.GlobalLookup;
 import vars.shared.ui.ILockableEditor;
 import vars.shared.ui.kbtree.ConceptTree;
-import vars.shared.ui.kbtree.ConceptTreePopupMenu;
 import vars.shared.ui.kbtree.TreeConcept;
 
 /**
@@ -46,6 +45,7 @@ public class EditableConceptTree extends ConceptTree implements ILockableEditor 
     public final static String REMOVE_CONCEPT = "Delete";
     private boolean locked = true;
     private final ToolBelt toolBelt;
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     /**
      * Constructs ...
@@ -54,8 +54,11 @@ public class EditableConceptTree extends ConceptTree implements ILockableEditor 
      * @param toolBelt
      */
     public EditableConceptTree(Concept rootConcept, ToolBelt toolBelt) {
-        super(rootConcept, toolBelt.getKnowledgebaseDAOFactory().newConceptDAO());
         this.toolBelt = toolBelt;
+        conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
+        popupMenu = new EditableConceptTreePopupMenu(this, toolBelt);
+        loadModel(rootConcept);
+        initialize();
 
         /*
          * Don't let foks delete the root node!
@@ -74,41 +77,6 @@ public class EditableConceptTree extends ConceptTree implements ILockableEditor 
             }
 
         });
-    }
-
-    /**
-         * Method description
-         * @return
-         */
-    public ConceptTreePopupMenu getPopupMenu() {
-        if (popupMenu == null) {
-
-            // Add Concept popup menu to this tree
-            final ConceptTreePopupMenu myPopupMenu = new EditableConceptTreePopupMenu(this, toolBelt);
-
-            addMouseListener(new MouseAdapter() {
-
-                @Override
-                public void mousePressed(MouseEvent event) {
-                    evalutePopup(event);
-                }
-                @Override
-                public void mouseReleased(MouseEvent event) {
-                    evalutePopup(event);
-                }
-                private void evalutePopup(MouseEvent e) {
-
-                    // Display popup menu next to selected item
-                    if (e.isPopupTrigger() && (getSelectedNode() != null)) {
-                        myPopupMenu.show(e.getComponent(), e.getX(), e.getY());
-                    }
-                }
-
-            });
-            this.popupMenu = myPopupMenu;
-        }
-
-        return popupMenu;
     }
 
     /**
@@ -174,61 +142,11 @@ public class EditableConceptTree extends ConceptTree implements ILockableEditor 
         }
     }
 
-    // Impl for ConceptChangeListener
 
     /**
-     *  Description of the Method
-     *
-     * @param  concept Description of the Parameter
+     * Method description
+     * @param  locked
      */
-    @Override
-    public void removedConcept(Concept concept) {
-
-        // RxNOTE It is assumed the removed Concept is the currently selected node.
-        DefaultMutableTreeNode node = getSelectedNode();
-        DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) node.getParent();
-        int removedNodeIndex = parentNode.getIndex(node);
-
-        node.removeFromParent();
-
-        DefaultTreeModel model = (DefaultTreeModel) getModel();
-
-        model.nodeStructureChanged(parentNode);
-
-
-        int numChildren = parentNode.getChildCount();
-        DefaultMutableTreeNode nodeToSelect;
-        if (0 < numChildren) {
-            int displayNodeIndex = removedNodeIndex;
-
-            if (removedNodeIndex == numChildren) {
-                displayNodeIndex = removedNodeIndex - 1;
-            }
-
-            nodeToSelect = (DefaultMutableTreeNode) parentNode.getChildAt(displayNodeIndex);
-        }
-        else {
-            nodeToSelect = parentNode;
-        }
-
-        setSelectionPath(new TreePath(nodeToSelect.getPath()));
-    }
-
-    /**
-     *  Description of the Method
-     *
-     * @param  conceptName Description of the Parameter
-     */
-    @Override
-    public void removedConceptName(ConceptName conceptName) {
-        updateTreeNode(getSelectedConcept());
-    }
-
-    /**
-         * Method description
-         * @param  locked
-         * @uml.property  name="locked"
-         */
     public void setLocked(boolean locked) {
         this.locked = locked;
         ((EditableConceptTreePopupMenu) getPopupMenu()).setLocked(locked);

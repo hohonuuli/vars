@@ -384,7 +384,6 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
      */
     private class GenericApproveTask extends AbstractHistoryTask implements IApproveHistoryTask {
 
-        @Inject
         GenericApproveTask(KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
             super(knowledgebaseDAOFactory);
         }

@@ -14,14 +14,21 @@
 
 package vars.knowledgebase.ui;
 
+import com.google.common.collect.ImmutableList;
+import java.awt.Frame;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import javax.swing.JOptionPane;
 import org.bushe.swing.event.EventBus;
+import org.mbari.awt.event.ActionAdapter;
+import org.mbari.swing.WaitIndicator;
+import org.mbari.util.Dispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.UserAccount;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptMetadata;
-import vars.knowledgebase.ConceptMetadataDAO;
 import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.ConceptNameDAO;
 import vars.knowledgebase.ConceptNameTypes;
@@ -29,26 +36,66 @@ import vars.knowledgebase.History;
 import vars.knowledgebase.HistoryDAO;
 import vars.knowledgebase.HistoryFactory;
 import vars.knowledgebase.KnowledgebaseDAO;
+import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.ui.actions.ApproveHistoryTask;
+import vars.knowledgebase.ui.dialogs.AddConceptNameDialog2;
 
 /**
  *
  * @author brian
  */
-public class NamesEditorPanelController {
+class NamesEditorPanelController {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
     private final ToolBelt toolBelt;
+    private final NamesEditorPanel namesEditorPanel;
+    private NewAction newAction;
+
+    private final HistoryDAO historyDAO;
+    private final HistoryFactory historyFactory;
 
     /**
      * Constructs ...
      *
      * @param toolBelt
      */
-    public NamesEditorPanelController(ToolBelt toolBelt) {
-        this.toolBelt = toolBelt;
+    NamesEditorPanelController(NamesEditorPanel namesEditorPanel) {
+        this.namesEditorPanel = namesEditorPanel;
+        this.toolBelt = namesEditorPanel.getToolBelt();
+        historyFactory = toolBelt.getHistoryFactory();
+        KnowledgebaseDAOFactory knowledgebaseDAOFactory = toolBelt.getKnowledgebaseDAOFactory();
+        historyDAO = knowledgebaseDAOFactory.newHistoryDAO();
+
     }
+
+
+    void newConceptName() {
+        if (newAction == null) {
+            newAction = new NewAction();
+        }
+        newAction.doAction();
+    }
+
+    void deleteConceptName(ConceptName conceptName) {
+
+            int value = JOptionPane.showConfirmDialog(namesEditorPanel,
+                "Do you want to mark '" + conceptName.getName() + "' for deletion?", "VARS - Confirm",
+                JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+            final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+            if (value == JOptionPane.YES_OPTION) {
+                WaitIndicator waitIndicator = new WaitIndicator(namesEditorPanel);
+                final History history = historyFactory.delete(userAccount, conceptName);
+                conceptName.getConcept().getConceptMetadata().addHistory(history);
+                EventBus.publish(Lookup.TOPIC_INSERT_HISTORY, ImmutableList.of(history));
+                waitIndicator.dispose();
+            }
+
+    }
+    
+        
+    
 
     /**
      * Update a conceptName
@@ -60,8 +107,10 @@ public class NamesEditorPanelController {
      * @param userAccount
      * @return
      */
-    public boolean updateConceptName(final Concept concept, final String newName, final String author,
-                                     final String nameType, final String oldName, final UserAccount userAccount) {
+    boolean updateConceptName() {
+
+//            )final Concept concept, final String newName, final String author,
+//                                     final String nameType, final String oldName, final UserAccount userAccount) {
 
         log.error("Entering updateConceptName method");
         boolean okToProceed = true;
@@ -76,7 +125,7 @@ public class NamesEditorPanelController {
 
 
         /*
-         * Check that the name does not already exist in the database
+         * ---- Step 1: Check that the name does not already exist in the database
          */
         Concept matchingConcept = null;
         if (okToProceed) {
@@ -234,4 +283,45 @@ public class NamesEditorPanelController {
 
         return okToProceed;
     }
+    
+    /**
+     * This action sets up the AddConceptNameDialog. Most of the work is done in the dialog, not here.
+     */
+    private class NewAction extends ActionAdapter {
+
+ 
+        private AddConceptNameDialog2 dialog;
+
+        public void doAction() {
+            getDialog().setVisible(true);
+        }
+
+        private AddConceptNameDialog2 getDialog() {
+            if (dialog == null) {
+                final Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
+                dialog = new AddConceptNameDialog2(frame, true, toolBelt);
+
+                /*
+                 * Set the currently selected concept
+                 */
+                Dispatcher dispatcher = Lookup.getSelectedConceptDispatcher();
+                dialog.setConcept((Concept) dispatcher.getValueObject());
+
+                /*
+                 * The dialog needs a reference to the currently selected
+                 * concept. We do that by listening to the appropriate
+                 * dispatcher.
+                 */
+                dispatcher.addPropertyChangeListener(new PropertyChangeListener() {
+
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        dialog.setConcept((Concept) evt.getNewValue());
+                    }
+                });
+            }
+
+            return dialog;
+        }
+    }
+
 }

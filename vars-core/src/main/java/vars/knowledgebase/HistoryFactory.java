@@ -6,6 +6,7 @@
 package vars.knowledgebase;
 
 import com.google.inject.Inject;
+import java.util.Date;
 import vars.UserAccount;
 
 /**
@@ -24,6 +25,7 @@ public class HistoryFactory {
     private History newHistory(UserAccount userAccount, String action, String fieldName, String oldValue, String newValue) {
         final History history = knowledgebaseFactory.newHistory();
         history.setCreatorName(userAccount.getUserName());
+        history.setCreationDate(new Date());
         history.setAction(action);
         history.setField(fieldName);
         history.setOldValue(oldValue);

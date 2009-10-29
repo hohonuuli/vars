@@ -1,25 +1,32 @@
 /*
- * AddConceptNameDialog2.java
+ * @(#)AddConceptNameDialog2.java   2009.10.28 at 11:03:10 PDT
  *
- * Created on May 18, 2006, 4:08 PM
+ * Copyright 2009 MBARI
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
+
 
 package vars.knowledgebase.ui.dialogs;
 
-import foxtrot.Worker;
 import foxtrot.Task;
-
+import foxtrot.Worker;
 import java.awt.Frame;
 import java.awt.event.KeyEvent;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.bushe.swing.event.EventBus;
+import org.mbari.swing.JFancyButton;
+import org.mbari.swing.SpinningDialWaitIndicator;
+import org.mbari.swing.WaitIndicator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.mbari.swing.JFancyButton;
-import org.mbari.swing.WaitIndicator;
-import org.mbari.swing.SpinningDialWaitIndicator;
 import vars.UserAccount;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptName;
@@ -30,6 +37,7 @@ import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.ui.KnowledgebaseFrame;
 import vars.knowledgebase.ui.Lookup;
+import vars.knowledgebase.ui.ToolBelt;
 import vars.knowledgebase.ui.actions.ApproveHistoryTask;
 
 /**
@@ -38,60 +46,68 @@ import vars.knowledgebase.ui.actions.ApproveHistoryTask;
  */
 public class AddConceptNameDialog2 extends javax.swing.JDialog {
 
-    private static final long serialVersionUID = 530633107360033281L;
-    /**
-	 * @uml.property  name="concept"
-	 * @uml.associationEnd  
-	 */
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    private final ApproveHistoryTask approveHistoryTask;
+    private javax.swing.JTextField authorField;
+    private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JButton cancelButton;
+    private javax.swing.JRadioButton commonRb;
     private Concept concept;
-    private static final Logger log = LoggerFactory.getLogger(AddConceptNameDialog2.class);
+    private final HistoryFactory historyFactory;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextArea jTextArea1;
     private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
     private final KnowledgebaseFactory knowledgebaseFactory;
-    private final HistoryFactory historyFactory;
-    private final ApproveHistoryTask approveHistoryTask;
-    
-    /** Creates new form AddConceptNameDialog2 */
-    public AddConceptNameDialog2(java.awt.Frame parent, boolean modal, ApproveHistoryTask approveHistoryTask,
-            KnowledgebaseDAOFactory knowledgebaseDAOFactory, KnowledgebaseFactory knowledgebaseFactory) {
+    private javax.swing.JLabel msgLabel;
+    private javax.swing.JTextField nameField;
+    private javax.swing.JButton okButton;
+    private javax.swing.JRadioButton synonymRb;
+
+    /**
+     * Creates new form AddConceptNameDialog2
+     *
+     * @param parent
+     * @param modal
+     * @param toolBelt
+     */
+    public AddConceptNameDialog2(java.awt.Frame parent, boolean modal, ToolBelt toolBelt) {
         super(parent, modal);
-        this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
-        this.knowledgebaseFactory = knowledgebaseFactory;
-        this.historyFactory = new HistoryFactory(knowledgebaseFactory);
-        this.approveHistoryTask = approveHistoryTask;
+        this.knowledgebaseDAOFactory = toolBelt.getKnowledgebaseDAOFactory();
+        this.knowledgebaseFactory = toolBelt.getKnowledgebaseFactory();
+        this.historyFactory = toolBelt.getHistoryFactory();
+        this.approveHistoryTask = toolBelt.getApproveHistoryTask();
         initComponents();
         initModel();
         Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
         setLocationRelativeTo(frame);
         pack();
     }
-    
-    private void initModel() {
-        nameField.getDocument().addDocumentListener(new DocumentListener() {
-            public void changedUpdate(DocumentEvent e) {
-                update();
-            }
-            public void insertUpdate(DocumentEvent e) {
-                update();
-            }
-            public void removeUpdate(DocumentEvent e) {
-                update();
-            }
-            
-            void update() {
-                String text = nameField.getText();
-                okButton.setEnabled(text != null && text.length() > 0 && !text.matches("\\A\\s+"));
-            }
-            
-        });
+
+    private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {
+        close();
     }
-    
-    /** This method is called from within the constructor to
-     * initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is
-     * always regenerated by the Form Editor.
-     */
-    // <editor-fold defaultstate="collapsed" desc=" Generated Code ">//GEN-BEGIN:initComponents
-    private void initComponents() {
+
+    private void cancelButtonKeyReleased(java.awt.event.KeyEvent evt) {
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            cancelButtonActionPerformed(null);
+        }
+    }
+
+    private void close() {
+        setVisible(false);
+        nameField.setText("");
+        msgLabel.setText("");
+        authorField.setText("");
+    }
+
+    public Concept getConcept() {
+        return concept;
+    }
+
+private void initComponents() {
         buttonGroup1 = new javax.swing.ButtonGroup();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
@@ -223,34 +239,31 @@ public class AddConceptNameDialog2 extends javax.swing.JDialog {
                 .addContainerGap())
         );
         pack();
-    }// </editor-fold>//GEN-END:initComponents
-    
-    @Override
-    public void setVisible(boolean b) {
-        if (b) {
-            nameField.requestFocus();
-            commonRb.setSelected(true);
-        }
-        super.setVisible(b);
     }
 
-    private void cancelButtonKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_cancelButtonKeyReleased
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            cancelButtonActionPerformed(null);
-        }
-    }//GEN-LAST:event_cancelButtonKeyReleased
+    private void initModel() {
+        nameField.getDocument().addDocumentListener(new DocumentListener() {
 
-    private void okButtonKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_okButtonKeyReleased
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            okButtonActionPerformed(null);
-        }
-    }//GEN-LAST:event_okButtonKeyReleased
+            public void changedUpdate(DocumentEvent e) {
+                update();
+            }
+            public void insertUpdate(DocumentEvent e) {
+                update();
+            }
+            public void removeUpdate(DocumentEvent e) {
+                update();
+            }
 
-    private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
-        close();
-    }//GEN-LAST:event_cancelButtonActionPerformed
+            void update() {
+                String text = nameField.getText();
+                okButton.setEnabled((text != null) && (text.length() > 0) && !text.matches("\\A\\s+"));
+            }
 
-    private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
+
+        });
+    }
+
+    private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {
         final String name = nameField.getText();
         final Concept myConcept = getConcept();
         boolean okToProceed = true;
@@ -260,10 +273,12 @@ public class AddConceptNameDialog2 extends javax.swing.JDialog {
          */
         Concept preexistingConcept = null;
         try {
-            preexistingConcept = (Concept) Worker.post(new Task(){
+            preexistingConcept = (Concept) Worker.post(new Task() {
+
                 public Object run() throws Exception {
                     return knowledgebaseDAOFactory.newConceptDAO().findByName(name);
                 }
+
             });
         }
         catch (Exception e) {
@@ -271,6 +286,7 @@ public class AddConceptNameDialog2 extends javax.swing.JDialog {
                 log.error("Failed attempt to look up the concept '" + name + "'", e);
                 msgLabel.setText("Failed to connect to database");
             }
+
             okToProceed = false;
         }
 
@@ -303,9 +319,8 @@ public class AddConceptNameDialog2 extends javax.swing.JDialog {
             final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
             final History history = historyFactory.add(userAccount, conceptName);
             myConcept.getConceptMetadata().addHistory(history);
-            knowledgebaseDAOFactory.newHistoryDAO().makePersistent(history);
-
             close();
+
             /*
              * Store the new name in the database.
              */
@@ -314,11 +329,14 @@ public class AddConceptNameDialog2 extends javax.swing.JDialog {
             try {
                 Worker.post(new Task() {
                     public Object run() throws Exception {
+                        knowledgebaseDAOFactory.newHistoryDAO().makePersistent(history);
                         if (userAccount.isAdministrator()) {
                             approveHistoryTask.approve(userAccount, history);
                         }
+
                         return null;
                     }
+
                 });
             }
             catch (Exception e) {
@@ -327,109 +345,34 @@ public class AddConceptNameDialog2 extends javax.swing.JDialog {
                 log.error("Failed to update " + myConcept, e);
                 EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
             }
+
             waitIndicator.dispose();
             final Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
             if ((frame != null) && (frame instanceof KnowledgebaseFrame)) {
-                    ((KnowledgebaseFrame) frame).refreshTreeAndOpenNode(myConcept.getPrimaryConceptName().getName());
+                EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, myConcept.getPrimaryConceptName().getName());
             }
 
         }
-        
-    }//GEN-LAST:event_okButtonActionPerformed
-    
-    private void close() {
-        setVisible(false);
-        nameField.setText("");
-        msgLabel.setText("");
-        authorField.setText("");
-    }
-    
 
-    
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    /**
-	 * @uml.property  name="authorField"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private javax.swing.JTextField authorField;
-    /**
-	 * @uml.property  name="buttonGroup1"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private javax.swing.ButtonGroup buttonGroup1;
-    /**
-	 * @uml.property  name="cancelButton"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private javax.swing.JButton cancelButton;
-    /**
-	 * @uml.property  name="commonRb"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private javax.swing.JRadioButton commonRb;
-    /**
-	 * @uml.property  name="jLabel2"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private javax.swing.JLabel jLabel2;
-    /**
-	 * @uml.property  name="jLabel3"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private javax.swing.JLabel jLabel3;
-    /**
-	 * @uml.property  name="jLabel4"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private javax.swing.JLabel jLabel4;
-    /**
-	 * @uml.property  name="jScrollPane1"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private javax.swing.JScrollPane jScrollPane1;
-    /**
-	 * @uml.property  name="jTextArea1"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private javax.swing.JTextArea jTextArea1;
-    /**
-	 * @uml.property  name="msgLabel"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private javax.swing.JLabel msgLabel;
-    /**
-	 * @uml.property  name="nameField"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private javax.swing.JTextField nameField;
-    /**
-	 * @uml.property  name="okButton"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private javax.swing.JButton okButton;
-    /**
-	 * @uml.property  name="synonymRb"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private javax.swing.JRadioButton synonymRb;
-    // End of variables declaration//GEN-END:variables
- 
-    
-    
-
-    /**
-	 * @return  the concept
-	 * @uml.property  name="concept"
-	 */
-    public Concept getConcept() {
-        return concept;
     }
 
-    /**
-	 * @param concept  the concept to set
-	 * @uml.property  name="concept"
-	 */
+    private void okButtonKeyReleased(java.awt.event.KeyEvent evt) {
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            okButtonActionPerformed(null);
+        }
+    }
+
     public void setConcept(Concept concept) {
         this.concept = concept;
+    }
+
+    @Override
+    public void setVisible(boolean b) {
+        if (b) {
+            nameField.requestFocus();
+            commonRb.setSelected(true);
+        }
+
+        super.setVisible(b);
     }
 }
