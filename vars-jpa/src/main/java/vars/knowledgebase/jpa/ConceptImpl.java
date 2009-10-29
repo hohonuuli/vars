@@ -54,7 +54,7 @@ import vars.knowledgebase.ConceptNameTypes;
  */
 @Entity(name = "Concept")
 @Table(name = "Concept")
-@EntityListeners({ TransactionLogger.class, KeyNullifier.class })
+@EntityListeners({ TransactionLogger.class, KeyNullifier.class})
 @NamedQueries( {
     @NamedQuery(name = "Concept.findById", query = "SELECT v FROM Concept v WHERE v.id = :id") ,
     @NamedQuery(name = "Concept.findByOriginator", query = "SELECT c FROM Concept c WHERE c.originator = :originator") ,
@@ -194,6 +194,7 @@ public class ConceptImpl implements Serializable, Concept, JPAEntity {
     public ConceptMetadata getConceptMetadata() {
         if (conceptMetadata == null) {
             conceptMetadata = new ConceptMetadataImpl();
+            ((ConceptMetadataImpl) conceptMetadata).setConcept(this);
         }
 
         return conceptMetadata;

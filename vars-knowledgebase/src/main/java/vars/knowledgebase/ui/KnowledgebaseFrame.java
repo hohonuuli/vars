@@ -364,7 +364,7 @@ public class KnowledgebaseFrame extends JFrame {
             menuIteum.addActionListener(new ActionListener() {
 
                 public void actionPerformed(ActionEvent e) {
-                    refreshTreeAndOpenNode(conceptTree.getSelectedConcept().getPrimaryConceptName().toString());
+                    refreshTreeAndOpenNode(conceptTree.getSelectedConcept().getPrimaryConceptName().getName());
                 }
 
             });

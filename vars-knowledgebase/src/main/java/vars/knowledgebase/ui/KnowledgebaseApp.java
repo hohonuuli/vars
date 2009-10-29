@@ -46,6 +46,7 @@ import org.slf4j.LoggerFactory;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.KnowledgebaseModule;
 import vars.knowledgebase.ui.actions.PopulateDatabaseAction;
+import vars.knowledgebase.ui.persistence.PersistenceSubscriptions;
 
 /**
  *
@@ -57,6 +58,7 @@ public class KnowledgebaseApp {
     private static Logger log;
     private KnowledgebaseFrame knowledgebaseFrame;
     private final ToolBelt toolBelt;
+    private final PersistenceSubscriptions persistenceController;
 
         /**
      * To loosely couple our components, I'm using an event bus to
@@ -147,9 +149,12 @@ public class KnowledgebaseApp {
                 add("To have no errors\nWould be life without meaning\nNo struggle, no joy");
                 add("Error messages\ncannot completely convey.\nWe now know shared loss.");
                 add("The code was willing,\nIt considered your request,\nBut the chips were weak.");
-                add("wind catches lily\nscatt'ring petals to the wind:\napplication dies");
+                add("Wind catches lily\nScatt'ring petals to the wind:\nApplication dies");
                 add("Three things are certain:\nDeath, taxes and lost data.\nGuess which has occurred.");
-                add("Rather than a beep\nOr a rude error message,These words: \"Restart now.\"");
+                add("Rather than a beep\nOr a rude error message,\nThese words: \"Restart now.\"");
+                add("ABORTED effort:\nClose all that you have.\nYou ask way too much.");
+                add("The knowledgebase crashed.\nI am the Blue Screen of Death.\nNo one hears your screams.");
+                add("No-one can tell\nwhat God or Heaven will do\nIf you divide by zero.");
             }};
 
             return haikus.get((int) Math.floor(Math.random() * haikus.size()));
@@ -167,6 +172,7 @@ public class KnowledgebaseApp {
         Injector injector = Guice.createInjector(new KnowledgebaseModule());
         Lookup.getGuiceInjectorDispatcher().setValueObject(injector);
         toolBelt = injector.getInstance(ToolBelt.class);
+        persistenceController = new PersistenceSubscriptions(toolBelt);
 
         /*
          * Subscribe to all our favorite topics

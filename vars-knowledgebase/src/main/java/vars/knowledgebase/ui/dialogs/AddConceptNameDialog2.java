@@ -35,7 +35,6 @@ import vars.knowledgebase.History;
 import vars.knowledgebase.HistoryFactory;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.KnowledgebaseFactory;
-import vars.knowledgebase.ui.KnowledgebaseFrame;
 import vars.knowledgebase.ui.Lookup;
 import vars.knowledgebase.ui.ToolBelt;
 import vars.knowledgebase.ui.actions.ApproveHistoryTask;
@@ -274,7 +273,6 @@ private void initComponents() {
         Concept preexistingConcept = null;
         try {
             preexistingConcept = (Concept) Worker.post(new Task() {
-
                 public Object run() throws Exception {
                     return knowledgebaseDAOFactory.newConceptDAO().findByName(name);
                 }
@@ -299,6 +297,8 @@ private void initComponents() {
 
         if (okToProceed) {
 
+            WaitIndicator waitIndicator = new SpinningDialWaitIndicator((JFrame) getParent());
+            
             /*
              * Creat the new conceptName
              */
@@ -309,7 +309,6 @@ private void initComponents() {
             if (synonymRb.isSelected()) {
                 nameType = ConceptNameTypes.SYNONYM.toString();
             }
-
             conceptName.setNameType(nameType);
             myConcept.addConceptName(conceptName);
 
@@ -320,38 +319,8 @@ private void initComponents() {
             final History history = historyFactory.add(userAccount, conceptName);
             myConcept.getConceptMetadata().addHistory(history);
             close();
-
-            /*
-             * Store the new name in the database.
-             */
-            WaitIndicator waitIndicator = new SpinningDialWaitIndicator((JFrame) getParent());
-
-            try {
-                Worker.post(new Task() {
-                    public Object run() throws Exception {
-                        knowledgebaseDAOFactory.newHistoryDAO().makePersistent(history);
-                        if (userAccount.isAdministrator()) {
-                            approveHistoryTask.approve(userAccount, history);
-                        }
-
-                        return null;
-                    }
-
-                });
-            }
-            catch (Exception e) {
-                myConcept.removeConceptName(conceptName);
-                myConcept.getConceptMetadata().removeHistory(history);
-                log.error("Failed to update " + myConcept, e);
-                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
-            }
-
+            EventBus.publish(Lookup.TOPIC_UPDATE_CONCEPT, myConcept);
             waitIndicator.dispose();
-            final Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
-            if ((frame != null) && (frame instanceof KnowledgebaseFrame)) {
-                EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, myConcept.getPrimaryConceptName().getName());
-            }
-
         }
 
     }

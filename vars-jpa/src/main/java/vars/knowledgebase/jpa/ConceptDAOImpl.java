@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import vars.PersistenceRule;
+import vars.knowledgebase.rules.ExactlyOnePrimaryNameRule;
 
 /**
  * Created by IntelliJ IDEA.
@@ -27,11 +29,24 @@ import java.util.Map;
 public class ConceptDAOImpl extends DAO implements ConceptDAO {
 
     private final ConceptNameDAO conceptNameDAO;
+    private final PersistenceRule<Concept> thereCanBeOnlyOne = new ExactlyOnePrimaryNameRule();
 
     @Inject
     public ConceptDAOImpl(EAO eao, ConceptNameDAO conceptNameDAO) {
         super(eao);
         this.conceptNameDAO = conceptNameDAO;
+    }
+
+    @Override
+    public <T> T makePersistent(T object) {
+        thereCanBeOnlyOne.apply((Concept) object);
+        return super.makePersistent(object);
+    }
+
+    @Override
+    public <T> T update(T object) {
+        thereCanBeOnlyOne.apply((Concept) object);
+        return super.update(object);
     }
 
     public Concept findRoot() {

@@ -1,5 +1,5 @@
 /*
- * @(#)DeleteConceptTask.java   2009.10.01 at 01:47:48 PDT
+ * @(#)DeleteConceptTask.java   2009.10.29 at 01:10:32 PDT
  *
  * Copyright 2009 MBARI
  *
@@ -30,8 +30,6 @@ import vars.knowledgebase.ui.Lookup;
 
 /**
  * Class description
- *
- *
  * @version        $date$, 2009.10.01 at 01:47:48 PDT
  * @author         Brian Schlining [brian@mbari.org]
  */
@@ -73,11 +71,12 @@ public class DeleteConceptTask {
                 deletedConcepts = conceptDAO.findDescendents(concept);
                 Dispatcher dispatcher = Lookup.getApplicationFrameDispatcher();
                 Frame frame = (Frame) dispatcher.getValueObject();
-                final int option = JOptionPane
-                    .showConfirmDialog(
-                        frame, "You are about to delete " + deletedConcepts.size() +
-                        " concept(s) from the \nknowledgebase. Are you sure you want to continue?", "VARS - Delete Concepts", JOptionPane
-                            .YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                final int option = JOptionPane .showConfirmDialog( frame,
+                        "You are about to delete " + deletedConcepts.size() +
+                        " concept(s) from the \nknowledgebase. Are you sure you want to continue?",
+                        "VARS - Delete Concepts",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE);
                 okToProceed = (option == JOptionPane.YES_OPTION);
             }
             catch (Exception e) {
@@ -95,7 +94,7 @@ public class DeleteConceptTask {
         Collection observations = null;
         if (okToProceed) {
             try {
-                observationDAO.findAllByConcept(concept, true);
+                observations = observationDAO.findAllByConcept(concept, true);
             }
             catch (Exception e) {
                 log.error("Failed to fetch observations from database", e);

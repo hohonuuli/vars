@@ -53,7 +53,7 @@ import vars.knowledgebase.*;
 public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEntity {
 
     @OneToOne(targetEntity = ConceptImpl.class)
-    @JoinColumn(name = "ConceptID_FK")
+    @JoinColumn(name = "ConceptID_FK", nullable = false)
     private Concept concept;
 
     @OneToMany(
@@ -283,6 +283,10 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
         if (getMedias().remove(media)) {
             ((GMedia) media).setConceptMetadata(null);
         }
+    }
+
+    void setConcept(Concept concept) {
+        this.concept = concept;
     }
 
     public void setId(Long id) {

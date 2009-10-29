@@ -1,5 +1,5 @@
 /*
- * @(#)NamesEditorPanel.java   2009.10.09 at 04:58:46 PDT
+ * @(#)NamesEditorPanel.java   2009.10.29 at 12:43:22 PDT
  *
  * Copyright 2009 MBARI
  *
@@ -14,12 +14,11 @@
 
 package vars.knowledgebase.ui;
 
-import java.awt.event.ActionEvent;
-import vars.shared.ui.ILockableEditor;
 import com.google.inject.Inject;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -33,6 +32,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
@@ -43,9 +43,11 @@ import org.mbari.swing.ListListModel;
 import org.mbari.text.IgnoreCaseToStringComparator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.UserAccount;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.ConceptNameTypes;
+import vars.shared.ui.ILockableEditor;
 
 /**
  *
@@ -75,17 +77,14 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
     private JLabel typeLabel = null;
     private JPanel viewPanel = null;
     private Comparator stringComparator = new IgnoreCaseToStringComparator();
-    private ItemListener rbItemListener;
-
     private final NamesEditorPanelController controller;
+    private ItemListener rbItemListener;
 
     /**
      * This is the default constructor
      *
-     * @param approveHistoryTask
-     * @param knowledgebaseDAO
-     * @param knowledgebaseDAOFactory
-     * @param knowledgebaseFactory
+     *
+     * @param toolBelt
      */
     @Inject
     public NamesEditorPanel(ToolBelt toolBelt) {
@@ -99,7 +98,7 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
      * This method initializes authorField
      * @return  javax.swing.JTextField
      */
-    private JTextField getAuthorField() {
+    JTextField getAuthorField() {
         if (authorField == null) {
             authorField = new JTextField();
         }
@@ -133,13 +132,57 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
             updateButton.addActionListener(new ActionListener() {
 
                 public void actionPerformed(ActionEvent e) {
-                    controller.updateConceptName();
+
+
+                    /*
+                        * Get the name that's selected in the UI for the current concept.
+                        */
+                    final String selectedName = (String) getNamesList().getSelectedValue();
+                    final Concept concept = getConcept();
+                    ConceptName oldConceptName = concept.getConceptName(selectedName);
+                    boolean okToProceed = true;
+
+                    /*
+                     * Retrieve the parameters from the interface
+                     */
+                    final String name = getNameField().getText();
+                    int value = JOptionPane.showConfirmDialog(NamesEditorPanel.this,
+                        "Do want to change '" + selectedName + "' to '" + name + "'?", "VARS - Confirm",
+                        JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE);
+                    final String author = getAuthorField().getText();
+                    String nameType = ConceptNameTypes.SYNONYM.toString();
+                    if (getPrimaryRb().isSelected()) {
+                        nameType = ConceptNameTypes.PRIMARY.toString();
+                    }
+                    else if (getCommonRb().isSelected()) {
+                        nameType = ConceptNameTypes.COMMON.toString();
+                    }
+
+                    /*
+                     * Exit if the values are invalid
+                     */
+                    okToProceed = (value == JOptionPane.YES_OPTION) && !name.equals(selectedName) &&
+                                  (name.equals("")) && (selectedName != null) && (oldConceptName != null);
+
+                    final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+
+                    /*
+                     * Warn users if they are trying to change the primary name.
+                     */
+                    if (okToProceed && nameType.equals(ConceptNameTypes.PRIMARY.toString())) {
+                        value = JOptionPane.showConfirmDialog(NamesEditorPanel.this,
+                                "Are you really sure that you want\n" + "to change the primary name?",
+                                "VARS - Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                        okToProceed = (value == JOptionPane.YES_OPTION);
+                    }
+
+
+                    controller.updateConceptName(concept, name, author, nameType, selectedName, userAccount);
                 }
             });
 
             JButton newButton = buttonPanel.getNewButton();
             newButton.addActionListener(new ActionListener() {
-
                 public void actionPerformed(ActionEvent e) {
                     controller.newConceptName();
                 }
@@ -175,7 +218,7 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
      * This method initializes nameField
      * @return  javax.swing.JTextField
      */
-    private JTextField getNameField() {
+    JTextField getNameField() {
         if (nameField == null) {
             nameField = new JTextField();
         }
@@ -232,7 +275,6 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
         return namesList;
     }
 
-
     private JPanel getNamesPanel() {
         if (namesPanel == null) {
             namesPanel = new JPanel();
@@ -247,7 +289,6 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
         return namesPanel;
     }
 
- 
     private JButton getNewButton() {
         return getButtonPanel().getNewButton();
     }
@@ -287,7 +328,6 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
 
         return rbItemListener;
     }
-
 
     private JPanel getRbPanel() {
         if (rbPanel == null) {
@@ -419,10 +459,12 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
         if (concept != null) {
             conceptNames.addAll(concept.getConceptNames());
         }
+
         List<String> names = new ArrayList<String>(conceptNames.size());
         for (ConceptName conceptName : conceptNames) {
             names.add(conceptName.getName());
         }
+
         Collections.sort(names, stringComparator);
 
         /*
@@ -432,6 +474,7 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
         ListListModel listModel = (ListListModel) getNamesList().getModel();
         listModel.clear();
         listModel.addAll(names);
+
         if (concept != null) {
             getNamesList().setSelectedValue(concept.getPrimaryConceptName().getName(), true);
         }
@@ -495,5 +538,4 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
          */
         getAuthorField().setEditable(!type.equals(ConceptNameTypes.PRIMARY.toString()));
     }
-
 }

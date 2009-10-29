@@ -14,7 +14,6 @@
 
 package vars.knowledgebase.ui;
 
-import com.google.common.collect.ImmutableList;
 import java.awt.Frame;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -88,7 +87,7 @@ class NamesEditorPanelController {
                 WaitIndicator waitIndicator = new WaitIndicator(namesEditorPanel);
                 final History history = historyFactory.delete(userAccount, conceptName);
                 conceptName.getConcept().getConceptMetadata().addHistory(history);
-                EventBus.publish(Lookup.TOPIC_INSERT_HISTORY, ImmutableList.of(history));
+                EventBus.publish(Lookup.TOPIC_INSERT_HISTORY, history);
                 waitIndicator.dispose();
             }
 
@@ -107,7 +106,9 @@ class NamesEditorPanelController {
      * @param userAccount
      * @return
      */
-    boolean updateConceptName() {
+    public boolean updateConceptName(Concept concept, final String newName, final String author,
+            final String nameType, final String oldName, final UserAccount userAccount) {
+
 
 //            )final Concept concept, final String newName, final String author,
 //                                     final String nameType, final String oldName, final UserAccount userAccount) {
@@ -118,8 +119,6 @@ class NamesEditorPanelController {
         ApproveHistoryTask approveHistoryTask = toolBelt.getApproveHistoryTask();
         ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
         ConceptNameDAO conceptNameDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptNameDAO();
-        HistoryDAO historyDAO = toolBelt.getKnowledgebaseDAOFactory().newHistoryDAO();
-        HistoryFactory historyFactory = toolBelt.getHistoryFactory();
         KnowledgebaseDAO knowledgebaseDAO = toolBelt.getKnowledgebaseDAO();
         KnowledgebaseFactory knowledgebaseFactory = toolBelt.getKnowledgebaseFactory();
 
@@ -161,7 +160,6 @@ class NamesEditorPanelController {
             log.debug("Updating the conceptName");
 
             // TODO may need to load lazy relations.
-
             ConceptMetadata conceptMetadata = concept.getConceptMetadata();
             log.debug("Inspecting " + conceptMetadata + "\n" + conceptMetadata.getHistories().toString() + "\n");
 
@@ -178,14 +176,11 @@ class NamesEditorPanelController {
              */
             History history = historyFactory.replaceConceptName(userAccount, oldConceptName, newConceptName);
             conceptMetadata.addHistory(history);
-            historyDAO.makePersistent(history);
 
             /*
              * When updating a primary name we want to keep the older
              * name, so we add a new Concept with the old values.
              */
-
-
             if (nameType.equals(ConceptNameTypes.PRIMARY.toString())) {
                 ConceptName copyCn = knowledgebaseFactory.newConceptName();
                 copyCn.setName(oldConceptName.getName());
@@ -199,7 +194,6 @@ class NamesEditorPanelController {
                  */
                 oldConceptName.setName(newName);
                 concept.addConceptName(copyCn);
-                conceptNameDAO.makePersistent(copyCn);
             }
             else {
                 oldConceptName.setName(newName);
@@ -208,19 +202,19 @@ class NamesEditorPanelController {
             oldConceptName.setAuthor(author);
             oldConceptName.setNameType(nameType);
 
-            okToProceed = false;
-
+            EventBus.publish(Lookup.TOPIC_UPDATE_CONCEPT, concept);
             try {
-                conceptDAO.update(concept);
-                okToProceed = true;
+                concept = conceptDAO.findInDatastore(concept);
+                knowledgebaseDAO.updateConceptNameUsedByAnnotations(concept);
             }
             catch (Exception e) {
-                if (log.isErrorEnabled()) {
-                    log.error("Failed to update " + concept, e);
-                }
-
-                EventBus.publish(Lookup.TOPIC_FATAL_ERROR, e);
+                String msg = "Failed to change primary names of annotations from '" + oldName + "' to '" +
+                             newName + "'.";
+                log.error(msg);
+                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, msg);
             }
+
+            EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
 
             if (okToProceed) {
 
@@ -232,18 +226,6 @@ class NamesEditorPanelController {
                     log.debug("Changing all Observations that use '" + oldName + "' to use '" + newName + "'");
                 }
 
-                okToProceed = false;
-
-                try {
-                    knowledgebaseDAO.updateConceptNameUsedByAnnotations(concept);
-                    okToProceed = true;
-                }
-                catch (Exception e) {
-                    String msg = "Failed to change primary names of annotations from '" + oldName + "' to '" +
-                                 newName + "'.";
-                    log.error(msg);
-                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, msg);
-                }
 
                 /*
                  * If the annotation update was successful we can drop the old conceptname that we

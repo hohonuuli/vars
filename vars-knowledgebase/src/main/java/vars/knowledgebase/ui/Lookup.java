@@ -23,6 +23,8 @@ import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.EventTopicSubscriber;
 import org.mbari.swing.ProgressDialog;
 import org.mbari.util.Dispatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import vars.UserAccount;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.KnowledgebaseModule;
@@ -49,6 +51,7 @@ import vars.shared.ui.kbtree.ConceptTree;
  */
 public class Lookup extends GlobalLookup {
 
+    private static final EventTopicSubscriber LOGGING_SUBSCRIBER = new LoggingSubscriber();
     protected static final Object KEY_DISPATCHER_APPLICATION_FRAME = KnowledgebaseFrame.class;
     protected static final Object KEY_DISPATCHER_APPLICATION = KnowledgebaseApp.class;
     protected static final Object KEY_DISPATCHER_CONCEPT_TREE = ConceptTree.class;
@@ -56,67 +59,70 @@ public class Lookup extends GlobalLookup {
     public static final String RESOURCE_BUNDLE = "knowlegebase-app";
     public static final Object KEY_DISPATCHER_GUICE_INJECTOR = Injector.class;
     
-    /** The data object should be a Collection&lt;Media&gt; */
+    /** The data object should be a  Media  */
     public static final String TOPIC_DELETE_MEDIA = "vars.knowledgebase.ui.Lookup-DeleteMedia";
 
-    /** The data object should be a Collection&lt;Concept&gt; */
+    /** The data object should be a  Concept  */
     public static final String TOPIC_DELETE_CONCEPT = "vars.knowledgebase.ui.Lookup-DeleteConcept";
 
-    /** The data object should be a Collection&lt;ConceptName&gt; */
+    /** The data object should be a  ConceptName  */
     public static final String TOPIC_DELETE_CONCEPT_NAME = "vars.knowledgebase.ui.Lookup-DeleteConceptName";
 
-    /** The data object should be a Collection&lt;History&gt; */
+    /** The data object should be a  History  */
     public static final String TOPIC_DELETE_HISTORY = "vars.knowledgebase.ui.Lookup-DeleteHistory";
 
-    /** The data object should be a Collection&lt;LinkRealization&gt; */
+    /** The data object should be a  LinkRealization  */
     public static final String TOPIC_DELETE_LINK_REALIZATION = "vars.knowledgebase.ui.Lookup-DeleteLinkRealization";
 
-    /** The data object should be a Collection&lt;LinkTemplate&gt; */
+    /** The data object should be a  LinkTemplate  */
     public static final String TOPIC_DELETE_LINK_TEMPLATE = "vars.knowledgebase.ui.Lookup-DeleteLinkTemplate";
     
     /** The data object should be a {@link Concept} */
     public static final String TOPIC_SELECTED_CONCEPT = "vars.knowledgebase.ui.Lookup-SelectedConcept";
 
-     /** The data object should be a Collection&lt;Media&gt; */
+     /** The data object should be a  Media  */
     public static final String TOPIC_UPDATE_MEDIA = "vars.knowledgebase.ui.Lookup-UpdateMedia";
 
-    /** The data object should be a Collection&lt;Concept&gt; */
+    /** The data object should be a  Concept  */
     public static final String TOPIC_UPDATE_CONCEPT = "vars.knowledgebase.ui.Lookup-UpdateConcept";
 
-    /** The data object should be a Collection&lt;ConceptName&gt; */
+    /** The data object should be a  ConceptName  */
     public static final String TOPIC_UPDATE_CONCEPT_NAME = "vars.knowledgebase.ui.Lookup-UpdateConceptName";
 
-    /** The data object should be a Collection&lt;History&gt; */
+    /** The data object should be a  History  */
     public static final String TOPIC_UPDATE_HISTORY = "vars.knowledgebase.ui.Lookup-UpdateHistory";
 
-    /** The data object should be a Collection&lt;LinkRealization&gt; */
+    /** The data object should be a  LinkRealization  */
     public static final String TOPIC_UPDATE_LINK_REALIZATION = "vars.knowledgebase.ui.Lookup-UpdateLinkRealization";
 
-    /** The data object should be a Collection&lt;LinkTemplate&gt; */
+    /** The data object should be a  LinkTemplate  */
     public static final String TOPIC_UPDATE_LINK_TEMPLATE = "vars.knowledgebase.ui.Lookup-UpdateLinkTemplate";
 
-     /** The data object should be a Collection&lt;Media&gt; */
+     /** The data object should be a  Media  */
     public static final String TOPIC_INSERT_MEDIA = "vars.knowledgebase.ui.Lookup-InsertMedia";
 
-    /** The data object should be a Collection&lt;Concept&gt; */
+    /** The data object should be a  Concept  */
     public static final String TOPIC_INSERT_CONCEPT = "vars.knowledgebase.ui.Lookup-InsertConcept";
 
-    /** The data object should be a Collection&lt;ConceptName&gt; */
+    /** The data object should be a  ConceptName  */
     public static final String TOPIC_INSERT_CONCEPT_NAME = "vars.knowledgebase.ui.Lookup-InsertConceptName";
 
-    /** The data object should be a Collection&lt;History&gt; */
+    /** The data object should be a  History  */
     public static final String TOPIC_INSERT_HISTORY = "vars.knowledgebase.ui.Lookup-InsertHistory";
 
-    /** The data object should be a Collection&lt;LinkRealization&gt; */
+    /** The data object should be a  LinkRealization  */
     public static final String TOPIC_INSERT_LINK_REALIZATION = "vars.knowledgebase.ui.Lookup-InsertLinkRealization";
 
-    /** The data object should be a Collection&lt;LinkTemplate&gt; */
+    /** The data object should be a  LinkTemplate  */
     public static final String TOPIC_INSERT_LINK_TEMPLATE = "vars.knowledgebase.ui.Lookup-InsertLinkTemplate";
 
-    /** The data object should be a Collection&lt;History&gt; */
+    /** The data object should be a  History  */
     public static final String TOPIC_APPROVE_HISTORY = "vars.knowledgebase.ui.Lookup-ApproveHistory";
 
     public static final String TOPIC_EXIT = "vars.knowledgebase.ui.Lookup-Exit";
+
+    /** The data object should be a Concept */
+    public static final String TOPIC_UPDATE_OBSERVATIONS = "vars.knowledgebase.ui.Lookup-UpateObservations";
 
     /**
      * Refresh the knowledgebase (purge caceh) and open node to the conceptname provided.
@@ -193,6 +199,31 @@ public class Lookup extends GlobalLookup {
                 getUserAccountDispatcher().setValueObject(data);
             }
         });
+
+
+        EventBus.subscribe(TOPIC_APPROVE_HISTORY, LOGGING_SUBSCRIBER);
+        EventBus.subscribe(TOPIC_DELETE_CONCEPT, LOGGING_SUBSCRIBER);
+        EventBus.subscribe(TOPIC_DELETE_CONCEPT_NAME, LOGGING_SUBSCRIBER);
+        EventBus.subscribe(TOPIC_DELETE_HISTORY, LOGGING_SUBSCRIBER);
+        EventBus.subscribe(TOPIC_DELETE_LINK_REALIZATION, LOGGING_SUBSCRIBER);
+        EventBus.subscribe(TOPIC_DELETE_LINK_TEMPLATE, LOGGING_SUBSCRIBER);
+        EventBus.subscribe(TOPIC_EXIT, LOGGING_SUBSCRIBER);
+        EventBus.subscribe(TOPIC_FATAL_ERROR, LOGGING_SUBSCRIBER);
+        EventBus.subscribe(TOPIC_INSERT_CONCEPT, LOGGING_SUBSCRIBER);
+        EventBus.subscribe(TOPIC_INSERT_CONCEPT_NAME, LOGGING_SUBSCRIBER);
+        EventBus.subscribe(TOPIC_INSERT_HISTORY, LOGGING_SUBSCRIBER);
+        EventBus.subscribe(TOPIC_INSERT_LINK_REALIZATION, LOGGING_SUBSCRIBER);
+        EventBus.subscribe(TOPIC_INSERT_LINK_TEMPLATE, LOGGING_SUBSCRIBER);
+        EventBus.subscribe(TOPIC_INSERT_MEDIA, LOGGING_SUBSCRIBER);
+        EventBus.subscribe(TOPIC_SELECTED_CONCEPT, LOGGING_SUBSCRIBER);
+        EventBus.subscribe(TOPIC_UPDATE_CONCEPT, LOGGING_SUBSCRIBER);
+        EventBus.subscribe(TOPIC_UPDATE_CONCEPT_NAME, LOGGING_SUBSCRIBER);
+        EventBus.subscribe(TOPIC_UPDATE_HISTORY, LOGGING_SUBSCRIBER);
+        EventBus.subscribe(TOPIC_UPDATE_LINK_REALIZATION, LOGGING_SUBSCRIBER);
+        EventBus.subscribe(TOPIC_UPDATE_LINK_TEMPLATE, LOGGING_SUBSCRIBER);
+        EventBus.subscribe(TOPIC_UPDATE_MEDIA, LOGGING_SUBSCRIBER);
+        EventBus.subscribe(TOPIC_UPDATE_OBSERVATIONS, LOGGING_SUBSCRIBER);
+
     }
 
     private static ProgressDialog progressDialog;
@@ -245,6 +276,21 @@ public class Lookup extends GlobalLookup {
      */
     public static Dispatcher getConceptTreeDispatcher() {
         return Dispatcher.getDispatcher(KEY_DISPATCHER_CONCEPT_TREE);
+    }
+
+    /**
+     * Log events in debug mode
+     */
+    private static class LoggingSubscriber implements EventTopicSubscriber {
+
+        private final Logger log = LoggerFactory.getLogger(getClass());
+
+        public void onEvent(String topic, Object data) {
+            if (log.isDebugEnabled()) {
+                log.debug("Event Published:\n\tTOPIC: " + topic +  "\n\tDATA: " + data);
+            }
+        }
+
     }
 
 }

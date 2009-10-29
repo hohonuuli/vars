@@ -159,8 +159,8 @@ public class SearchableConceptTreePanel extends SearchableTreePanel {
 
         getSearchBtn().setEnabled(false);
         getSearchTextField().setEnabled(false);
-        WaitIndicator waitIndicator = new LabeledSpinningDialWaitIndicator(this, "Searching for '" + text + "'");
-        loadNodes(text, useGlobSearch);
+        LabeledSpinningDialWaitIndicator waitIndicator = new LabeledSpinningDialWaitIndicator(this, "Searching for '" + text + "'");
+        loadNodes(text, useGlobSearch, waitIndicator);
         boolean ok = super.goToMatchingNode(text, useGlobSearch);
         waitIndicator.dispose();
         getSearchBtn().setEnabled(true);
@@ -175,7 +175,7 @@ public class SearchableConceptTreePanel extends SearchableTreePanel {
      * @param text
      * @param useGlobSearch
      */
-    private void loadNodes(final String text, final boolean useGlobSearch) {
+    private void loadNodes(final String text, final boolean useGlobSearch, final LabeledSpinningDialWaitIndicator waitIndicator) {
         Collection<ConceptName> matches = (Collection) Worker.post(new Job() {
             public Object run() {
                 Collection<ConceptName> matches = null;
@@ -212,15 +212,11 @@ public class SearchableConceptTreePanel extends SearchableTreePanel {
          * concept.
          */
         if (matches != null) {
-            final ProgressMonitor progressMonitor = new ProgressMonitor(
-                (Frame) GlobalLookup.getSelectedFrameDispatcher().getValueObject(),
-                "Loading search results for '" + text + "'", "", 0, matches.size());
             int n = 0;
             for (Iterator i = matches.iterator(); i.hasNext(); ) {
                 n++;
                 final ConceptName cn = (ConceptName) i.next();
-                progressMonitor.setProgress(n);
-                progressMonitor.setNote("Loading '" + cn.getName() + "'");
+                waitIndicator.setLabel("Loading '" + cn.getName() + "'");
 
                 /*
                  * Have to open the node in a seperate thread for the
@@ -236,7 +232,6 @@ public class SearchableConceptTreePanel extends SearchableTreePanel {
                 });
             }
 
-            progressMonitor.close();
         }
     }
 
