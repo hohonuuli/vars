@@ -27,12 +27,10 @@ import org.mbari.jpaxx.TransactionLogger
 import vars.jpa.KeyNullifier
 import vars.EntitySupportCategory
 import javax.persistence.Transient
-import vars.annotation.VideoFrame
-import vars.annotation.VideoArchive
-import vars.annotation.VideoArchiveSet
+import javax.persistence.UniqueConstraint
 
 @Entity(name = "VideoArchive")
-@Table(name = "VideoArchive")
+@Table(name = "VideoArchive", uniqueConstraints = [@UniqueConstraint(columnNames = ["VideoArchiveName"])])
 @EntityListeners( value = [TransactionLogger.class, KeyNullifier.class] )
 @NamedQueries( value = [
     @NamedQuery(name = "VideoArchive.findById",
@@ -75,8 +73,6 @@ class GVideoArchive implements Serializable, VideoArchive, JPAEntity {
             cascade = CascadeType.ALL)
     @OrderBy(value = "recordedDate")
     List<VideoFrame> videoFrames
-
-
 
     List<VideoFrame> getVideoFrames() {
         if (videoFrames == null) {

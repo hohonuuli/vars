@@ -23,6 +23,7 @@ import org.mbari.jpaxx.TransactionLogger
 import vars.jpa.KeyNullifier
 import vars.jpa.KeyNullifier
 import javax.persistence.Transient
+import javax.persistence.UniqueConstraint
 
 /**
  * <pre>
@@ -44,7 +45,7 @@ import javax.persistence.Transient
  * </pre>
  */
 @Entity(name = "ConceptName")
-@Table(name = "ConceptName")
+@Table(name = "ConceptName", uniqueConstraints = [@UniqueConstraint(columnNames = ["ConceptName"])])
 @EntityListeners( value = [TransactionLogger.class, KeyNullifier.class] )
 @NamedQueries( value = [
     @NamedQuery(name = "ConceptName.findById",
