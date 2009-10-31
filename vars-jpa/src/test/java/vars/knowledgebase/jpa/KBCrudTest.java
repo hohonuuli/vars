@@ -28,16 +28,7 @@ import vars.jpa.EntityUtilities;
 import vars.jpa.JPAEntity;
 import vars.jpa.PrimaryKeyUtilities;
 import vars.jpa.VarsJpaTestModule;
-import vars.knowledgebase.Concept;
-import vars.knowledgebase.ConceptDAO;
-import vars.knowledgebase.ConceptMetadata;
-import vars.knowledgebase.ConceptName;
-import vars.knowledgebase.History;
-import vars.knowledgebase.LinkRealization;
-import vars.knowledgebase.LinkTemplate;
-import vars.knowledgebase.Media;
-import vars.knowledgebase.KnowledgebaseDAOFactory;
-import vars.knowledgebase.KnowledgebaseFactory;
+import vars.knowledgebase.*;
 import vars.testing.KnowledgebaseTestObjectFactory;
 
 /**
@@ -85,7 +76,7 @@ public class KBCrudTest {
     public void bigTest() {
         log.info("---------- TEST: bigTest ----------");
 
-        Concept c = testObjectFactory.makeObjectGraph("BIG-TEST", 4);
+        Concept c = testObjectFactory.makeObjectGraph("bigTest", 4);
         ConceptDAO dao = daoFactory.newConceptDAO();
 
         log.info("KNOWLEDGEBASE TREE BEFORE TEST:\n" + entityUtilities.buildTextTree(c));
@@ -106,8 +97,8 @@ public class KBCrudTest {
         //Collection<IConcept> allConcepts = dao.findAll();
         //log.info("All concepts: " + allConcepts);
 
-        //Collection<IConceptName> names = dao.findDescendentNames(c);
-        //log.info("Descendent names from root:" + names);
+//        Collection<ConceptName> names = dao.findDescendentNames(c);
+//        log.info("Descendent names from root:" + names);
 
         c = dao.makeTransient(c);
         log.info("KNOWLEDGEBASE TREE AFTER DELETE:\n" + entityUtilities.buildTextTree(c));
@@ -119,7 +110,6 @@ public class KBCrudTest {
     
 
     @Test
-    @Ignore
     public void incrementalBuildAndDeleteByConcept() {
 
         log.info("---------- TEST: incrementalBuildAndDeleteByConcept ----------");
@@ -200,7 +190,6 @@ public class KBCrudTest {
 
 
     @Test
-    @Ignore
     public void bottomUpDelete() {
 
         log.info("---------- TEST: bottomUpDelete ----------");
@@ -266,6 +255,7 @@ public class KBCrudTest {
         dao.makeTransient(concept);
 
     }
+
 
 
 }

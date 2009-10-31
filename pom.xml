@@ -20,8 +20,9 @@
             <roles>
                 <role>Lead Engineer</role>
             </roles>
-            <organization>MBARI</organization>
+            <organization>MBARI</organization> 
             <timezone>-8</timezone>
+            
         </developer>
     </developers>
     <dependencies>

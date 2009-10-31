@@ -42,7 +42,6 @@ import javax.swing.tree.TreePath;
 import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.EventTopicSubscriber;
 import org.mbari.awt.event.ActionAdapter;
-import org.mbari.swing.SearchableTreePanel;
 import org.mbari.util.Dispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,7 +79,7 @@ public class KnowledgebaseFrame extends JFrame {
     private JPanel rightPanel = null;
     private JSplitPane splitPane = null;
     private JTabbedPane tabbedPane = null;
-    private SearchableTreePanel treePanel = null;
+    private SearchableConceptTreePanel treePanel = null;
     private final LockAction lockAction = new LockAction();
     private final KnowledgebaseFrameController controller;
     private LoginAction loginAction;
@@ -319,11 +318,11 @@ public class KnowledgebaseFrame extends JFrame {
     }
 
 
-    protected SearchableTreePanel getTreePanel() {
+    protected SearchableConceptTreePanel getTreePanel() {
         if (treePanel == null) {
             final ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
             treePanel = new SearchableConceptTreePanel(conceptDAO,
-                    toolBelt.getKnowledgebaseDAOFactory().newConceptNameDAO(), toolBelt.getPersistenceCache());
+                    toolBelt.getKnowledgebaseDAOFactory().newConceptNameDAO());
 
             /*
              * Fetch the root concept. We need this to intialize the ConceptTree

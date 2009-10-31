@@ -18,10 +18,8 @@
 package vars.shared.ui.kbtree;
 
 import com.google.inject.Inject;
-import com.sun.media.jai.opimage.LookupCRIF;
 import foxtrot.Job;
 import foxtrot.Worker;
-import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -30,7 +28,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.ListIterator;
 import javax.swing.JTree;
-import javax.swing.ProgressMonitor;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -39,13 +36,9 @@ import javax.swing.tree.TreePath;
 import org.bushe.swing.event.EventBus;
 import org.mbari.swing.LabeledSpinningDialWaitIndicator;
 import org.mbari.swing.SearchableTreePanel;
-import org.mbari.swing.WaitIndicator;
 import org.mbari.util.Dispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.CacheClearedEvent;
-import vars.CacheClearedListener;
-import vars.PersistenceCache;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptName;
@@ -85,9 +78,8 @@ public class SearchableConceptTreePanel extends SearchableTreePanel {
          * @uml.associationEnd  multiplicity="(0 -1)" elementType="java.lang.String"
          */
     private final Collection<String> cachedWordSearches;
-    private final ConceptDAO conceptDAO;
     private final ConceptNameDAO conceptNameDAO;
-    private final PersistenceCache persistenceCache;
+    private final ConceptDAO conceptDAO;
 
     /**
      * Constructor
@@ -97,16 +89,26 @@ public class SearchableConceptTreePanel extends SearchableTreePanel {
      * @param persistenceCache
      */
     @Inject
-    public SearchableConceptTreePanel(ConceptDAO conceptDAO, ConceptNameDAO conceptNameDAO,
-                                      PersistenceCache persistenceCache) {
+    public SearchableConceptTreePanel(ConceptDAO conceptDAO, ConceptNameDAO conceptNameDAO) {
         super();
         this.conceptDAO = conceptDAO;
         this.conceptNameDAO = conceptNameDAO;
-        this.persistenceCache = persistenceCache;
-        persistenceCache.addCacheClearedListener(new CacheListener());
         cachedWordSearches = new HashSet<String>();
         cachedGlobSearches = new HashSet<String>();
         Dispatcher.getDispatcher(DISPATCHER_KEY).setValueObject(this);
+    }
+
+
+    public void refreshTree() {
+        refreshTreeAndOpenNode(conceptDAO.findRoot());
+    }
+
+    public void refreshTreeAndOpenNode(Concept concept) {
+        cachedGlobSearches.clear();
+        cachedWordSearches.clear();
+        ((ConceptTree) getJTree()).refresh();
+        openNode(concept);
+        validate();
     }
 
     /**
@@ -249,7 +251,7 @@ public class SearchableConceptTreePanel extends SearchableTreePanel {
      * </ol>
      * @param concept
      */
-    private void openNode(final Concept concept) {
+    public void openNode(final Concept concept) {
         if (log.isDebugEnabled()) {
             log.debug("Opening node containing " + concept);
         }
@@ -319,53 +321,4 @@ public class SearchableConceptTreePanel extends SearchableTreePanel {
         super.setJTree(tree);
     }
 
-    /**
-     * Resets the KNowledgebaseTree when the cache is cleared
-     * @author brian
-     *
-     */
-    private final class CacheListener implements CacheClearedListener {
-
-        /**
-         * @param evt
-         */
-        public void afterClear(CacheClearedEvent evt) {
-            cachedGlobSearches.clear();
-            cachedWordSearches.clear();
-            ConceptTree tree = (ConceptTree) getJTree();
-            try {
-                Concept rootConcept = conceptDAO.findRoot();
-                tree.loadModel(rootConcept);
-            }
-            catch (Exception e) {
-                if (log.isErrorEnabled()) {
-                    log.error("Failed to create a new concept tree", e);
-                }
-
-                EventBus.publish(GlobalLookup.TOPIC_FATAL_ERROR,
-                                 "The knowledgebase tree and the database are no longer \n" +
-                                 "in sync. Please restart the application.");
-            }
-
-            SearchableConceptTreePanel.this.validate();
-
-            /*
-             * Video lab requested that the physical object node be open
-             * so that users on a ship can see where the marine organisms are.
-             *
-             * TODO 20040518 brian: This is a hard-coded feature specific
-             * to the video la. If we ever export this out of MBARI we'll
-             * need to remove this.
-             */
-            goToMatchingNode(MARINE_ORGANISM, false);
-        }
-
-        /**
-         * @param evt
-         */
-        public void beforeClear(CacheClearedEvent evt) {
-
-            // Do nothing
-        }
-    }
 }

@@ -59,8 +59,8 @@ class GCameraData implements Serializable, CameraData, JPAEntity {
     @Column(name = "LAST_UPDATED_TIME")
     private Timestamp updatedTime
 
-    @OneToOne(targetEntity = GVideoFrame.class)
-    @JoinColumn(name = "VideoFrameID_FK")
+    @OneToOne(targetEntity = GVideoFrame.class, optional = false)
+    @JoinColumn(name = "VideoFrameID_FK", nullable = false)
     VideoFrame videoFrame
 
     @Column(name = "Name", length = 50)
@@ -82,7 +82,7 @@ class GCameraData implements Serializable, CameraData, JPAEntity {
     Date logDate
 
     boolean containsData() {
-        return (name || direction || zoon || focus || iris || fieldWidth || stillImage);
+        return (name || direction || zoom || focus || iris || fieldWidth || stillImage);
     }
 
     @Override

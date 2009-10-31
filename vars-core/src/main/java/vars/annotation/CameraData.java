@@ -70,6 +70,11 @@ public interface CameraData extends AnnotationObject {
      */
     Integer getIris();
 
+    /**
+     * 
+     * @return The date that the cameradata was recorded
+     */
+    Date getLogDate();
 
     /**
      * Get the String name for this <code>CameraData</code> object.
@@ -120,7 +125,6 @@ public interface CameraData extends AnnotationObject {
     void setIris(Integer iris);
 
     /**
-     * <p><!-- Method description --></p>
      * @param  logDate
      */
     void setLogDate(Date logDate);

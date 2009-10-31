@@ -51,7 +51,7 @@ class GPhysicalData implements Serializable, PhysicalData, JPAEntity {
     @Column(name = "LAST_UPDATED_TIME")
     private Timestamp updatedTime
 
-    @OneToOne(targetEntity = GVideoFrame.class)
+    @OneToOne(targetEntity = GVideoFrame.class, optional = false)
     @JoinColumn(name = "VideoFrameID_FK")
     VideoFrame videoFrame
 

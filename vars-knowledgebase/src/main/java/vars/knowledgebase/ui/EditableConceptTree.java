@@ -19,14 +19,12 @@ import javax.swing.JOptionPane;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import org.bushe.swing.event.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.UserAccount;
 import vars.knowledgebase.Concept;
-import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.History;
 import vars.knowledgebase.HistoryDAO;
 import vars.shared.ui.GlobalLookup;
@@ -90,9 +88,9 @@ public class EditableConceptTree extends ConceptTree implements ILockableEditor 
     }
 
     /**
- * Removes the <code>Concept</code> represented by the currently selected
- * node from the <code>KnowledgeBase</code>.
- */
+     * Removes the <code>Concept</code> represented by the currently selected
+     * node from the <code>KnowledgeBase</code>.
+     */
     public void removeConcept() {
         Frame frame = (Frame) GlobalLookup.getSelectedFrameDispatcher().getValueObject();
 
@@ -134,8 +132,8 @@ public class EditableConceptTree extends ConceptTree implements ILockableEditor 
                             parentConcept.getConceptMetadata().removeHistory(history);
                         }
 
-                        KnowledgebaseFrame f = (KnowledgebaseFrame) Lookup.getApplicationFrameDispatcher().getValueObject();
-                        f.refreshTreeAndOpenNode(parentConcept.getPrimaryConceptName().getName());
+                        EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, parentConcept.getPrimaryConceptName().getName());
+
                     }
                 }
             }

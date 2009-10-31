@@ -49,6 +49,8 @@ public class PersistenceSubscriptions {
     private final EventTopicSubscriber ilt;
     private final EventTopicSubscriber im;
 
+    private final EventTopicSubscriber ah;
+
     @Inject
     public PersistenceSubscriptions(ToolBelt toolBelt) {
 
@@ -73,6 +75,8 @@ public class PersistenceSubscriptions {
         ilr = new InsertLinkRealizationSubscriber(knowledgebaseDAOFactory.newLinkRealizationDAO());
         ilt = new InsertLinkTemplateSubscriber(knowledgebaseDAOFactory.newLinkTemplateDAO());
         im = new InsertMediaSubscriber(knowledgebaseDAOFactory.newMediaDAO());
+
+        ah = new ApproveHistorySubscriber(toolBelt.getApproveHistoryTask());
 
 
         // Delete subscriptions
@@ -100,7 +104,7 @@ public class PersistenceSubscriptions {
         EventBus.subscribe(Lookup.TOPIC_INSERT_MEDIA, im);
 
         // Approval subscription
-        EventBus.subscribe(Lookup.TOPIC_APPROVE_HISTORY, new ApproveHistorySubscriber(toolBelt.getApproveHistoryTask()));
+        EventBus.subscribe(Lookup.TOPIC_APPROVE_HISTORY, ah);
 
     }
 

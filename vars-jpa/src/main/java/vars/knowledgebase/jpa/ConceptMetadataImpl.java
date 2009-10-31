@@ -52,7 +52,7 @@ import vars.knowledgebase.*;
                             query = "SELECT v FROM ConceptMetadata v WHERE v.id = :id") })
 public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEntity {
 
-    @OneToOne(targetEntity = ConceptImpl.class)
+    @OneToOne(optional = false, targetEntity = ConceptImpl.class)
     @JoinColumn(name = "ConceptID_FK", nullable = false)
     private Concept concept;
 

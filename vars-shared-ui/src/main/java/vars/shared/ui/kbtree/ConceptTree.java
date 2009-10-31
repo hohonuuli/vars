@@ -86,8 +86,17 @@ public class ConceptTree extends JTree implements ConceptChangeListener {
         initialize();
     }
 
+
     protected ConceptTree() {
         // Hack to get EditableConceptTree working correctly. Don't delete this.
+    }
+
+    /**
+     * Refresh the tree from the database
+     */
+    public void refresh() {
+        // Reload from the root
+        loadModel(conceptDAO.findRoot());
     }
 
     /**

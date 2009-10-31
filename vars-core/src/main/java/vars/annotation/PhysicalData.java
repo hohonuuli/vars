@@ -20,6 +20,8 @@
 
 package vars.annotation;
 
+import java.util.Date;
+
 /**
  *
  * @author brian
@@ -61,6 +63,8 @@ public interface PhysicalData extends AnnotationObject {
      * @uml.property  name="light"
      */
     Float getLight();
+
+    Date getLogDate();
 
     /**
      * Get Decimal longitude
@@ -124,6 +128,12 @@ public interface PhysicalData extends AnnotationObject {
      * @uml.property  name="longitude"
      */
     void setLongitude(Float longitude);
+
+    /**
+     * Set the date that the physical data was logged.
+     * @param logDate
+     */
+    void setLogDate(Date logDate);
 
 
     /**

@@ -99,6 +99,7 @@ class GVideoFrame implements Serializable, vars.annotation.VideoFrame, JPAEntity
     CameraData getCameraData() {
         if (cameraData == null) {
             cameraData = new GCameraData()
+            cameraData.videoFrame = this
         }
         return cameraData
     }
@@ -106,6 +107,7 @@ class GVideoFrame implements Serializable, vars.annotation.VideoFrame, JPAEntity
     PhysicalData getPhysicalData() {
         if (physicalData == null) {
             physicalData = new GPhysicalData()
+            physicalData.videoFrame = this
         }
         return physicalData
     }
