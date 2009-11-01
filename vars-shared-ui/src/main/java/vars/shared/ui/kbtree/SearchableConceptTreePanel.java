@@ -104,10 +104,15 @@ public class SearchableConceptTreePanel extends SearchableTreePanel {
     }
 
     public void refreshTreeAndOpenNode(Concept concept) {
+        if (log.isDebugEnabled()) {
+            log.debug("Refreshing ConceptTree and opening it to '" +
+                    concept.getPrimaryConceptName().getName() + "', " + concept);
+        }
         cachedGlobSearches.clear();
         cachedWordSearches.clear();
-        ((ConceptTree) getJTree()).refresh();
-        openNode(concept);
+        ConceptTree conceptTree = (ConceptTree) getJTree();
+        conceptTree.refresh();
+        conceptTree.setSelectedConcept(concept.getPrimaryConceptName().getName());
         validate();
     }
 
@@ -227,7 +232,7 @@ public class SearchableConceptTreePanel extends SearchableTreePanel {
                 Worker.post(new Job() {
 
                     public Object run() {
-                        openNode((Concept) cn.getConcept());
+                        openNode(cn.getConcept());
 
                         return null;
                     }
@@ -251,14 +256,16 @@ public class SearchableConceptTreePanel extends SearchableTreePanel {
      * </ol>
      * @param concept
      */
-    public void openNode(final Concept concept) {
+    public synchronized void openNode(final Concept concept) {
         if (log.isDebugEnabled()) {
-            log.debug("Opening node containing " + concept);
+            log.debug("Opening node containing '" + concept.getPrimaryConceptName().getName() +
+                    "', " + concept);
         }
 
         if (concept == null) {
             return;
         }
+
 
         // Get the list of concepts up to root
         final LinkedList conceptList = new LinkedList();
@@ -297,12 +304,12 @@ public class SearchableConceptTreePanel extends SearchableTreePanel {
             }
         }
 
-        final TreeNode _parentNode = parentNode;
+        final DefaultMutableTreeNode fParentNode = parentNode;
         SwingUtilities.invokeLater(new Runnable() {
 
             public void run() {
-                treeModel.reload(_parentNode);
-                tree.scrollPathToVisible(new TreePath(_parentNode));
+                treeModel.reload(fParentNode);
+                tree.scrollPathToVisible(new TreePath(fParentNode));
             }
         });
     }

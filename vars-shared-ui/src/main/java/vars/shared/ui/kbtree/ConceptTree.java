@@ -195,7 +195,7 @@ public class ConceptTree extends JTree implements ConceptChangeListener {
         DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode) getModel().getRoot();
 
         while (familyTree.hasNext()) {
-            String nextConceptName = ((Concept) familyTree.next()).getPrimaryConceptName().toString();
+            String nextConceptName = ((Concept) familyTree.next()).getPrimaryConceptName().getName();
 
             // Need to ensure the tree node for the current family name is expanded.
             TreeConcept treeConcept = (TreeConcept) treeNode.getUserObject();

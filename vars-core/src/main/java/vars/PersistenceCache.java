@@ -18,6 +18,8 @@ import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * It's expected that there will be an underlying level 2 cache used for most
@@ -32,6 +34,7 @@ public class PersistenceCache {
     private final List<CacheClearedListener> clearCacheListeners = Collections.synchronizedList(
         new ArrayList<CacheClearedListener>());
     private final PersistenceCacheProvider provider;
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     /**
      * Constructs ...
@@ -48,6 +51,7 @@ public class PersistenceCache {
     }
 
     public void clear() {
+        log.debug("Clearing persistence cache");
         notifyCacheClearedListenersBeforeClear();
         provider.clear();
         notifyCacheClearedListenersAfterClear();

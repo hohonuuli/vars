@@ -18,6 +18,7 @@ import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.EventTopicSubscriber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.knowledgebase.ConceptDAO;
 import vars.shared.ui.kbtree.SearchableConceptTreePanel;
 
 /**
@@ -26,11 +27,11 @@ import vars.shared.ui.kbtree.SearchableConceptTreePanel;
  */
 class KnowledgebaseFrameController {
 
-    private static final int MAX_SEARCH_LOOP_COUNT = 1000;
     private final Logger log = LoggerFactory.getLogger(getClass());
     private final EventTopicSubscriber refreshTreeSubscriber = new RefreshTreeAndOpenNodeSubscriber();
     private final KnowledgebaseFrame knowledgebaseFrame;
     private final ToolBelt toolBelt;
+    private final ConceptDAO conceptDAO;
 
     /**
      * Constructs ...
@@ -41,6 +42,7 @@ class KnowledgebaseFrameController {
     public KnowledgebaseFrameController(KnowledgebaseFrame knowledgebaseFrame, ToolBelt toolBelt) {
         this.knowledgebaseFrame = knowledgebaseFrame;
         this.toolBelt = toolBelt;
+        this.conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
 
         // When a Refresh event is published refresh the knowledgbase
         EventBus.subscribe(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, refreshTreeSubscriber);
@@ -66,7 +68,7 @@ class KnowledgebaseFrameController {
         }
 
         final SearchableConceptTreePanel treePanel = knowledgebaseFrame.getTreePanel();
-        treePanel.refreshTreeAndOpenNode(toolBelt.getKnowledgebaseDAOFactory().newConceptDAO().findByName(name));
+        treePanel.refreshTreeAndOpenNode(conceptDAO.findByName(name));
 
     }
 
