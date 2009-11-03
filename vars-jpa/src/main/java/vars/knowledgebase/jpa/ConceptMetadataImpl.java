@@ -22,10 +22,10 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.persistence.*;
-import org.mbari.jpaxx.TransactionLogger;
 import vars.EntitySupportCategory;
 import vars.jpa.JPAEntity;
 import vars.jpa.KeyNullifier;
+import vars.jpa.TransactionLogger;
 import vars.knowledgebase.*;
 
 /**

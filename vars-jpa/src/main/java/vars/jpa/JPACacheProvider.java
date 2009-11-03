@@ -7,12 +7,12 @@ package vars.jpa;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.mbari.jpaxx.EAO;
 import vars.PersistenceCacheProvider;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import java.util.Set;
+import javax.persistence.EntityManagerFactory;
 import vars.annotation.jpa.GAssociation;
 import vars.annotation.jpa.GCameraData;
 import vars.annotation.jpa.GCameraDeployment;
@@ -39,7 +39,7 @@ import vars.knowledgebase.jpa.GUsage;
  */
 public class JPACacheProvider implements PersistenceCacheProvider {
 
-    private final EAO eao;
+    private final EntityManagerFactory entityManagerFactory;
 
     private final Set<?> persistentClasses = ImmutableSet.of(
             GUserAccount.class,
@@ -61,8 +61,8 @@ public class JPACacheProvider implements PersistenceCacheProvider {
             GUsage.class);
 
     @Inject
-    public JPACacheProvider(@Named("miscEAO") EAO eao) {
-        this.eao = eao;
+    public JPACacheProvider(@Named("miscEAO") EntityManagerFactory entityManagerFactory) {
+        this.entityManagerFactory = entityManagerFactory;
     }
 
 
@@ -78,13 +78,13 @@ public class JPACacheProvider implements PersistenceCacheProvider {
          * https://www.hibernate.org/hib_docs/v3/api/org/hibernate/cache/EhCache.html
          * http://bill.burkecentral.com/2007/07/06/co-existence-with-hibernate-jpa-and-ejb3/
          */
-        synchronized (eao) {
-            Session session = (Session) eao.createEntityManager().getDelegate();
-            SessionFactory sessionFactory = session.getSessionFactory();
-            for (Object clazz : persistentClasses) {
-                sessionFactory.evict((Class) clazz);
-            }
+
+        Session session = (Session) entityManagerFactory.createEntityManager().getDelegate();
+        SessionFactory sessionFactory = session.getSessionFactory();
+        for (Object clazz : persistentClasses) {
+            sessionFactory.evict((Class) clazz);
         }
+        
     }
 
 }

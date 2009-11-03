@@ -16,7 +16,8 @@ package vars.jpa;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import java.util.prefs.Preferences;
-import org.mbari.jpaxx.EAO;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 
 /**
  *
@@ -28,7 +29,7 @@ public class VarsUserPreferencesFactoryImpl implements VarsUserPreferencesFactor
      *  Description of the Field
      */
     public final static String DEFAULT_USER = "default";
-    private final EAO eao;
+    private final EntityManagerFactory entityManagerFactory;
 
     /**
      * Constructs ...
@@ -36,8 +37,8 @@ public class VarsUserPreferencesFactoryImpl implements VarsUserPreferencesFactor
      * @param eao
      */
     @Inject
-    public VarsUserPreferencesFactoryImpl(@Named("miscEAO") EAO eao) {
-        this.eao = eao;
+    public VarsUserPreferencesFactoryImpl(@Named("miscPersistenceUnit") String persistenceUnit) {
+        this.entityManagerFactory = Persistence.createEntityManagerFactory(persistenceUnit);
     }
 
     /**
@@ -47,7 +48,7 @@ public class VarsUserPreferencesFactoryImpl implements VarsUserPreferencesFactor
      * @return  Preferences that contain all the users preferences
      */
     public Preferences systemRoot() {
-        return new VarsUserPreferences(eao);
+        return new VarsUserPreferences(entityManagerFactory, null, "");
     }
 
     /**

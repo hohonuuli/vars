@@ -5,7 +5,6 @@ import vars.knowledgebase.LinkTemplate;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 import vars.jpa.DAO;
-import org.mbari.jpaxx.EAO;
 
 import java.util.Collection;
 import java.util.Map;
@@ -13,9 +12,7 @@ import java.util.HashMap;
 import java.util.ArrayList;
 
 import com.google.inject.Inject;
-import org.mbari.jpaxx.NonManagedEAO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import javax.persistence.EntityManager;
 
 /**
  * Created by IntelliJ IDEA.
@@ -27,11 +24,10 @@ import org.slf4j.LoggerFactory;
 public class LinkTemplateDAOImpl extends DAO implements LinkTemplateDAO {
 
     private final ConceptDAO conceptDAO;
-    private final Logger log = LoggerFactory.getLogger(getClass());
     
     @Inject
-    public LinkTemplateDAOImpl(EAO eao, ConceptDAO conceptDAO) {
-        super(eao);
+    public LinkTemplateDAOImpl(EntityManager entityManager, ConceptDAO conceptDAO) {
+        super(entityManager);
         this.conceptDAO = conceptDAO; 
     }
 
@@ -40,19 +36,19 @@ public class LinkTemplateDAOImpl extends DAO implements LinkTemplateDAO {
         params.put("linkName", linkName);
         params.put("toConcept", toConcept);
         params.put("linkValue", linkValue);
-        return getEAO().findByNamedQuery("LinkTemplate.findByFields", params);
+        return findByNamedQuery("LinkTemplate.findByFields", params);
     }
 
     public Collection<LinkTemplate> findAllByLinkName(String linkName) {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("linkName", linkName);
-        return getEAO().findByNamedQuery("LinkTemplate.findByLinkName", params);
+        return findByNamedQuery("LinkTemplate.findByLinkName", params);
     }
 
     public Collection<LinkTemplate> findAllByLinkName(String linkName, Concept concept) {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("linkName", linkName);
-        Collection<LinkTemplate> linkTemplates0 = getEAO().findByNamedQuery("LinkTemplate.findByLinkName", params);
+        Collection<LinkTemplate> linkTemplates0 = findByNamedQuery("LinkTemplate.findByLinkName", params);
         Collection<LinkTemplate> linkTemplates = new ArrayList<LinkTemplate>();
         for (LinkTemplate linkTemplate : linkTemplates0) {
             // TODO FInish implementation
@@ -64,19 +60,12 @@ public class LinkTemplateDAOImpl extends DAO implements LinkTemplateDAO {
     public Collection<LinkTemplate> findAllApplicableToConcept(Concept concept) {
 
         Collection<LinkTemplate> linkTemplates = new ArrayList<LinkTemplate>();
-        
-        if (!getEAO().isManaged()) {
-            ((NonManagedEAO) getEAO()).startTransaction();
-        }
-
+        startTransaction();
         while (concept != null) {
             linkTemplates.addAll(concept.getConceptMetadata().getLinkTemplates());
             concept = concept.getParentConcept();
         }
-
-        if (!getEAO().isManaged()) {
-            ((NonManagedEAO) getEAO()).endTransaction();
-        }
+        endTransaction();
 
         return linkTemplates;
     }

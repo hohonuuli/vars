@@ -5,6 +5,9 @@
 
 package vars;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  *
  * @author brian
@@ -52,5 +55,35 @@ public interface DAO {
      * @return The object retrived from the datastore
      */
     <T> T findInDatastore(T object);
+
+    /**
+     * Many one-to-many relations are lazy loaded in JPA. For convience, this
+     * method will load all lazy relations of an IEntity object. This method has
+     * no effect on objects that are not persistant
+     *
+     * @param entity
+     *            The persistent object whos children will be loaded from the
+     *            database.
+     */
+    <T> T loadLazyRelations(T entity);
+
+    /**
+     * Executes a named query using a map of named parameters
+     *
+     * @param name
+     *            The name of the query to execute
+     * @param namedParameters
+     *            A Map<String, Object> of the 'named' parameters to assign in
+     *            the query
+     * @param endTransaction if true the transaction wll be ended when the method exits. If
+     *     false then the transaction will be kept open and can be reused by the current thread.
+     * @return A list of objects returned by the query.
+     */
+    List findByNamedQuery(String name, Map<String, Object> namedParameters);
+
+
+    void startTransaction();
+    void endTransaction();
+
 
 }

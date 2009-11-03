@@ -27,6 +27,7 @@ import org.mbari.swing.SpinningDialWaitIndicator;
 import org.mbari.swing.WaitIndicator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.DAO;
 import vars.ILink;
 import vars.UserAccount;
 import vars.knowledgebase.Concept;
@@ -161,30 +162,31 @@ public class LinkTemplateEditorPanel extends EditorPanel {
                     EventBus.publish(Lookup.TOPIC_WARNING, "No LinkTemplate has been selected");
                 }
                 else {
-                    final LinkTemplate linkTemplate = (LinkTemplate) link;
-                    final Concept concept = (Concept) linkTemplate.getConceptMetadata().getConcept();
-                    final ConceptMetadata conceptMetadata = linkTemplate.getConceptMetadata();
-                    conceptMetadata.removeLinkTemplate(linkTemplate);
-                    final History history = getToolBelt().getHistoryFactory().delete(userAccount, linkTemplate);
-                    conceptMetadata.addHistory(history);
-
+                    LinkTemplate linkTemplate = (LinkTemplate) link;
+                    String name = linkTemplate.getConceptMetadata().getConcept().getPrimaryConceptName().getName();
                     try {
-                        HistoryDAO historyDAO = getToolBelt().getKnowledgebaseDAOFactory().newHistoryDAO();
-                        historyDAO.makePersistent(history);
 
-                        if (userAccount.isAdministrator()) {
-                            getToolBelt().getApproveHistoryTask().approve(userAccount, history);
-                        }
+                        DAO dao = getToolBelt().getKnowledgebaseDAOFactory().newDAO();
+                        dao.startTransaction();
+                        linkTemplate = dao.update(linkTemplate);
+                        ConceptMetadata conceptMetadata = linkTemplate.getConceptMetadata();
+                        conceptMetadata.removeLinkTemplate(linkTemplate);
+                        dao.makeTransient(linkTemplate);
+                        final History history = getToolBelt().getHistoryFactory().delete(userAccount, linkTemplate);
+                        conceptMetadata.addHistory(history);
+                        dao.makePersistent(history);
+                        dao.endTransaction();
+
                     }
                     catch (Exception e) {
-                        log.error("Failed to update " + concept + " in database");
+                        log.error("Failed to delete " + linkTemplate + " in database");
                         EventBus.publish(
                             Lookup.TOPIC_NONFATAL_ERROR,
                             "An error occured when trying to save History information " +
                             " to the database. The change was made but no History record for it will be available");
                     }
 
-                    EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, concept.getPrimaryConceptName().getName());
+                    EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, name);
                 }
             }
         }

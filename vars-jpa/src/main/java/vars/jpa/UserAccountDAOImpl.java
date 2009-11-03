@@ -18,7 +18,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.mbari.jpaxx.EAO;
+import javax.persistence.EntityManager;
 import vars.UserAccount;
 import vars.UserAccountDAO;
 
@@ -36,30 +36,30 @@ public class UserAccountDAOImpl extends DAO implements UserAccountDAO {
      *
      * @param eao
      */
-    public UserAccountDAOImpl(EAO eao) {
-        super(eao);
+    public UserAccountDAOImpl(EntityManager entityManager) {
+        super(entityManager);
     }
 
     public Collection<UserAccount> findAll() {
-        return getEAO().findByNamedQuery("UserAccount.findAll", new HashMap<String, Object>());
+        return findByNamedQuery("UserAccount.findAll", new HashMap<String, Object>());
     }
 
     public Collection<UserAccount> findAllByFirstName(String firstName) {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("firstName", firstName);
-        return getEAO().findByNamedQuery("UserAccount.findByFirstName", params);
+        return findByNamedQuery("UserAccount.findByFirstName", params);
     }
 
     public Collection<UserAccount> findAllByLastName(String lastName) {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("lastName", lastName);
-        return getEAO().findByNamedQuery("UserAccount.findByLastName", params);
+        return findByNamedQuery("UserAccount.findByLastName", params);
     }
 
     public Collection<UserAccount> findAllByRole(String role) {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("role", role);
-        return getEAO().findByNamedQuery("UserAccount.findByRole", params);
+        return findByNamedQuery("UserAccount.findByRole", params);
     }
 
     /**
@@ -70,7 +70,7 @@ public class UserAccountDAOImpl extends DAO implements UserAccountDAO {
     public UserAccount findByUserName(String userName) {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("userName", userName);
-        List<UserAccount> accounts = getEAO().findByNamedQuery("UserAccount.findByUserName", params);
+        List<UserAccount> accounts = findByNamedQuery("UserAccount.findByUserName", params);
         return (accounts.size() == 0) ? null : accounts.get(0);
     }
 }

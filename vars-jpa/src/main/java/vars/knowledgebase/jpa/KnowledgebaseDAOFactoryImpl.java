@@ -1,5 +1,6 @@
 package vars.knowledgebase.jpa;
 
+import vars.DAO;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptMetadataDAO;
@@ -9,9 +10,10 @@ import vars.knowledgebase.LinkRealizationDAO;
 import vars.knowledgebase.LinkTemplateDAO;
 import vars.knowledgebase.MediaDAO;
 import vars.knowledgebase.UsageDAO;
-import org.mbari.jpaxx.EAO;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 
 /**
  * Created by IntelliJ IDEA.
@@ -22,42 +24,46 @@ import com.google.inject.name.Named;
  */
     public class KnowledgebaseDAOFactoryImpl implements KnowledgebaseDAOFactory {
 
-    private final EAO eao;
+    private final EntityManagerFactory entityManagerFactory;
 
     @Inject
-    public KnowledgebaseDAOFactoryImpl(@Named("knowledgebaseEAO") EAO eao) {
-        this.eao = eao;
+    public KnowledgebaseDAOFactoryImpl(@Named("knowledgebaseEAO") String persistenceUnit) {
+        this.entityManagerFactory = Persistence.createEntityManagerFactory(persistenceUnit);
     }
 
     public ConceptDAO newConceptDAO() {
-        return new ConceptDAOImpl(eao, newConceptNameDAO());
+        return new ConceptDAOImpl(entityManagerFactory.createEntityManager(), newConceptNameDAO());
     }
 
     public ConceptMetadataDAO newConceptMetadataDAO() {
-        return new ConceptMetadataDAOImpl(eao);
+        return new ConceptMetadataDAOImpl(entityManagerFactory.createEntityManager());
     }
 
     public ConceptNameDAO newConceptNameDAO() {
-        return new ConceptNameDAOImpl(eao);
+        return new ConceptNameDAOImpl(entityManagerFactory.createEntityManager());
     }
 
     public HistoryDAO newHistoryDAO() {
-        return new HistoryDAOImpl(eao);
+        return new HistoryDAOImpl(entityManagerFactory.createEntityManager());
     }
 
     public LinkRealizationDAO newLinkRealizationDAO() {
-        return new LinkRealizationDAOImpl(eao, newConceptDAO());
+        return new LinkRealizationDAOImpl(entityManagerFactory.createEntityManager(), newConceptDAO());
     }
 
     public LinkTemplateDAO newLinkTemplateDAO() {
-        return new LinkTemplateDAOImpl(eao, newConceptDAO());
+        return new LinkTemplateDAOImpl(entityManagerFactory.createEntityManager(), newConceptDAO());
     }
 
     public MediaDAO newMediaDAO() {
-        return new MediaDAOImpl(eao);
+        return new MediaDAOImpl(entityManagerFactory.createEntityManager());
     }
 
     public UsageDAO newUsageDAO() {
-        return new UsageDAOImpl(eao);
+        return new UsageDAOImpl(entityManagerFactory.createEntityManager());
+    }
+
+    public DAO newDAO() {
+        return new vars.jpa.DAO(entityManagerFactory.createEntityManager());
     }
 }

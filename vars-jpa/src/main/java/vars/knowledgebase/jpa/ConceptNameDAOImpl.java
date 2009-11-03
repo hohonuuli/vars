@@ -3,7 +3,6 @@ package vars.knowledgebase.jpa;
 import vars.jpa.DAO;
 import vars.knowledgebase.ConceptNameDAO;
 import vars.knowledgebase.ConceptName;
-import org.mbari.jpaxx.EAO;
 
 import java.util.HashMap;
 import java.util.List;
@@ -11,6 +10,7 @@ import java.util.List;
 import com.google.inject.Inject;
 import java.util.Collection;
 import java.util.Map;
+import javax.persistence.EntityManager;
 
 /**
  * Created by IntelliJ IDEA.
@@ -22,27 +22,27 @@ import java.util.Map;
 public class ConceptNameDAOImpl extends DAO implements ConceptNameDAO {
 
     @Inject
-    public ConceptNameDAOImpl(EAO eao) {
-        super(eao);
+    public ConceptNameDAOImpl(EntityManager entityManager) {
+        super(entityManager);
     }
 
     public ConceptName findByName(final String name) {
-        List<ConceptName> names = getEAO().findByNamedQuery("ConceptName.findByName", new HashMap<String, Object>() {{ put("name", name);}} );
+        List<ConceptName> names = findByNamedQuery("ConceptName.findByName", new HashMap<String, Object>() {{ put("name", name);}} );
         return names.size() == 0 ? null : names.get(0);
     }
 
     public Collection<ConceptName> findAll() {
         Map<String, Object> params = new HashMap<String, Object>();
-        return getEAO().findByNamedQuery("ConceptName.findAll", params);
+        return findByNamedQuery("ConceptName.findAll", params);
     }
 
     public Collection<ConceptName> findByNameContaining(final String substring) {
         Map<String, Object> params = new HashMap<String, Object>() {{ put("name", "%" + substring + "%"); }};
-        return getEAO().findByNamedQuery("ConceptName.findByNameLike", params);
+        return findByNamedQuery("ConceptName.findByNameLike", params);
     }
 
     public Collection<ConceptName> findByNameStartingWith(final String s) {
         Map<String, Object> params = new HashMap<String, Object>() {{ put("name", s + "%"); }};
-        return getEAO().findByNamedQuery("ConceptName.findByNameLike", params);
+        return findByNamedQuery("ConceptName.findByNameLike", params);
     }
 }

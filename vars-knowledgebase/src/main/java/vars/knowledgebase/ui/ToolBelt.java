@@ -54,7 +54,7 @@ public class ToolBelt {
         this.persistenceCache = new PersistenceCache(persistenceCacheProvider);
         this.queryDAO = queryDAO;
         historyFactory = new HistoryFactory(knowledgebaseFactory);
-        approveHistoryTask = new  ApproveHistoryTask(annotationDAOFactory, knowledgebaseDAO, knowledgebaseDAOFactory, knowledgebaseFactory);
+        approveHistoryTask = new  ApproveHistoryTask(this);
         rejectHistoryTask = new RejectHistoryTask(annotationDAOFactory, knowledgebaseDAO, knowledgebaseDAOFactory, knowledgebaseFactory);
     }
 

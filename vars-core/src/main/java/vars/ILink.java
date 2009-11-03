@@ -30,4 +30,10 @@ public interface ILink {
 
     void setLinkValue(String linkValue);
 
+    /**
+     * @return A delimited representation of the data contents in the form:
+     * [fromConcept]DELIMITER[linkName]DELIMITER[toConcept]DELIMITER[linkValue]
+     */
+    String stringValue();
+
 }

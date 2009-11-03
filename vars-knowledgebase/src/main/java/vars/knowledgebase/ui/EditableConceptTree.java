@@ -53,7 +53,6 @@ public class EditableConceptTree extends ConceptTree implements ILockableEditor 
      */
     public EditableConceptTree(Concept rootConcept, ToolBelt toolBelt) {
         this.toolBelt = toolBelt;
-        conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
         popupMenu = new EditableConceptTreePopupMenu(this, toolBelt);
         loadModel(rootConcept);
         initialize();

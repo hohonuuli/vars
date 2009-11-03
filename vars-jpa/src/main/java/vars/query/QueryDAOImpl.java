@@ -14,14 +14,9 @@
 
 package vars.query;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -29,13 +24,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.TimeZone;
 import java.util.TreeMap;
-import org.mbari.sql.QueryResults;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import vars.ILink;
-import vars.VARSException;
+import vars.LinkBean;
 import vars.QueryableImpl;
 
 /**

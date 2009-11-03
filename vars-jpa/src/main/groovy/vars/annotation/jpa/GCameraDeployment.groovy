@@ -20,8 +20,7 @@ import vars.annotation.VideoArchiveSet
 import vars.jpa.JPAEntity
 import vars.EntitySupportCategory
 import javax.persistence.EntityListeners
-import org.mbari.jpaxx.TransactionLogger
-import vars.jpa.KeyNullifier
+import vars.jpa.TransactionLogger
 import vars.jpa.KeyNullifier
 import javax.persistence.Transient
 import vars.annotation.CameraDeployment

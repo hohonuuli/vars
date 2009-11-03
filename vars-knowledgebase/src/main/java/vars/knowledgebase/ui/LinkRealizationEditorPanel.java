@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -47,6 +46,7 @@ import org.mbari.swing.WaitIndicator;
 import org.mbari.util.Dispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.DAO;
 import vars.ILink;
 import vars.LinkBean;
 import vars.UserAccount;
@@ -591,12 +591,16 @@ public class LinkRealizationEditorPanel extends EditorPanel {
                 LinkRealization linkRealization = (LinkRealization) linkList.getSelectedValue();
                 if (linkRealization != null) {
                     History history = getToolBelt().getHistoryFactory().delete(userAccount, linkRealization);
+
+                    DAO dao = getToolBelt().getKnowledgebaseDAOFactory().newDAO();
+                    dao.startTransaction();
+                    linkRealization = dao.update(linkRealization);
                     ConceptMetadata conceptDelegate = linkRealization.getConceptMetadata();
                     conceptDelegate.addHistory(history);
+                    dao.makePersistent(history);
+                    dao.endTransaction();
 
-                    if (userAccount.isAdministrator()) {
-                        getToolBelt().getApproveHistoryTask().approve(userAccount, history);
-                    }
+                    EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
 
                     /*
                      * Trigger a redraw
@@ -631,14 +635,7 @@ public class LinkRealizationEditorPanel extends EditorPanel {
                 JList linkList = getLinkList();
                 LinkRealization linkRealization = (LinkRealization) linkList.getSelectedValue();
 
-                // Create a copy of the old values to create a history
-                LinkRealization oldValue = getToolBelt().getKnowledgebaseFactory().newLinkRealization();
-                oldValue.setLinkName(linkRealization.getLinkName());
-                oldValue.setToConcept(linkRealization.getToConcept());
-                oldValue.setLinkValue(linkRealization.getLinkValue());
 
-                //. Update the current linkRealization
-                linkRealization.setLinkName(getLinkField().getText());
                 String name = ((ConceptName) getToConceptComboBox().getSelectedItem()).getName();
                 if (ILink.VALUE_NIL.equalsIgnoreCase(name) || ILink.VALUE_SELF.equalsIgnoreCase(name)) {
 
@@ -659,6 +656,17 @@ public class LinkRealizationEditorPanel extends EditorPanel {
                     }
                 }
 
+                // Create a copy of the old values to create a history
+                LinkRealization oldValue = getToolBelt().getKnowledgebaseFactory().newLinkRealization();
+                oldValue.setLinkName(linkRealization.getLinkName());
+                oldValue.setToConcept(linkRealization.getToConcept());
+                oldValue.setLinkValue(linkRealization.getLinkValue());
+
+                //. Update the current linkRealization
+                DAO dao = getToolBelt().getKnowledgebaseDAOFactory().newDAO();
+                dao.startTransaction();
+                linkRealization = dao.update(linkRealization);
+                linkRealization.setLinkName(getLinkField().getText());
                 linkRealization.setToConcept(name);
                 linkRealization.setLinkValue(getLinkValueTextArea().getText());
 
@@ -666,15 +674,15 @@ public class LinkRealizationEditorPanel extends EditorPanel {
                 History history = getToolBelt().getHistoryFactory().replaceLinkRealization(userAccount, oldValue,
                     linkRealization);
                 linkRealization.getConceptMetadata().addHistory(history);
+                dao.makePersistent(history);
+                dao.endTransaction();
 
-                if (userAccount.isAdministrator()) {
-                    getToolBelt().getApproveHistoryTask().approve(userAccount, history);
-                }
+                EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
 
                 /*
                  * Trigger a redraw
                  */
-                Dispatcher dispatcher = Dispatcher.getDispatcher(Concept.class);
+                Dispatcher dispatcher = Lookup.getSelectedConceptDispatcher();
                 dispatcher.setValueObject(null);
                 dispatcher.setValueObject(linkRealization.getConceptMetadata().getConcept());
             }

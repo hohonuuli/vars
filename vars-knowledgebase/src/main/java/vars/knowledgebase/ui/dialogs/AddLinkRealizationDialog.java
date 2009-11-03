@@ -24,6 +24,7 @@ import org.bushe.swing.event.EventBus;
 import org.mbari.util.Dispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.DAO;
 import vars.UserAccount;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
@@ -177,8 +178,7 @@ public class AddLinkRealizationDialog extends JDialog {
             linkRealization.setLinkName(p.getLinkName());
             linkRealization.setToConcept(p.getToConcept());
             linkRealization.setLinkValue(p.getLinkValue());
-            final Concept c = getConcept();
-            c.getConceptMetadata().addLinkRealization(linkRealization);
+            Concept c = getConcept();
 
             try {
 
@@ -186,34 +186,37 @@ public class AddLinkRealizationDialog extends JDialog {
                  * Use the primary concept name of the 'toConcept'
                  */
                 ConceptDAO conceptDAO = knowledgebaseDAOFactory.newConceptDAO();
+                conceptDAO.startTransaction();
                 Concept toConcept = conceptDAO.findByName(linkRealization.getToConcept());
+                conceptDAO.endTransaction();
+                
                 if (toConcept != null) {
                     linkRealization.setToConcept(toConcept.getPrimaryConceptName().getName());
                 }
 
-                LinkRealizationDAO linkRealizationDAO = knowledgebaseDAOFactory.newLinkRealizationDAO();
-                linkRealizationDAO.makePersistent(linkRealization);
-
+                DAO dao = knowledgebaseDAOFactory.newDAO();
+                dao.startTransaction();
+                c = dao.update(c);
+                concept.getConceptMetadata().addLinkRealization(linkRealization);
+                dao.makePersistent(linkRealization);
+                
                 /*
                  * Create a History
                  */
                 History history = historyFactory.add(userAccount, linkRealization);
                 c.getConceptMetadata().addHistory(history);
-                HistoryDAO historyDAO = knowledgebaseDAOFactory.newHistoryDAO();
-                historyDAO.makePersistent(history);
+                dao.makePersistent(history);
+                dao.endTransaction();
 
-
-                if (userAccount.isAdministrator()) {
-                    approveHistoryTask.approve(userAccount, history);
-                }
+                EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
 
                 Dispatcher dispatcher = Lookup.getSelectedConceptDispatcher();
                 dispatcher.setValueObject(null);
                 dispatcher.setValueObject(c);
             }
             catch (Exception e) {
-                c.getConceptMetadata().removeLinkRealization(linkRealization);
                 EventBus.publish(Lookup.TOPIC_WARNING, e);
+                EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, c.getPrimaryConceptName().getName());
             }
 
             setConcept(null);

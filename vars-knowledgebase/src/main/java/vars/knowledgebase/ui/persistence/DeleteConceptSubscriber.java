@@ -32,9 +32,7 @@ class DeleteConceptSubscriber extends DeleteSubscriber<Concept> {
         obj = super.before(obj);
         Collection<Concept> descendants = ((ConceptDAO) dao).findDescendents(obj);
         log.info("Deleteing " + descendants.size() + " concepts from the persistent store");
-
         return obj;
     }
-
 
 }

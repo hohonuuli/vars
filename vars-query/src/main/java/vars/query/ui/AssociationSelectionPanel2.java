@@ -6,7 +6,7 @@
 
 package vars.query.ui;
 
-import vars.query.LinkBean;
+import vars.LinkBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.ILink;

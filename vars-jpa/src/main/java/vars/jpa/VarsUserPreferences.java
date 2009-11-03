@@ -12,7 +12,11 @@ import java.util.Collection;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import org.mbari.jpaxx.EAO;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
+import javax.persistence.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,8 +29,8 @@ import org.slf4j.LoggerFactory;
  */
 class VarsUserPreferences extends AbstractPreferences {
 
-    private final EAO eao;
     private final Logger log = LoggerFactory.getLogger(getClass());
+    private final EntityManagerFactory entityManagerFactory;
 
     /**
      * This is a default constructor that simply calls another constructor.  This is designed to
@@ -34,8 +38,8 @@ class VarsUserPreferences extends AbstractPreferences {
      * users)
      */
     @Inject
-    public VarsUserPreferences(@Named("miscEAO") EAO eao) {
-        this(eao, null, "");
+    public VarsUserPreferences(@Named("miscPersistenceUnit") String persistenceUnit) {
+        this(Persistence.createEntityManagerFactory(persistenceUnit), null, "");
     }
 
     /**
@@ -47,9 +51,9 @@ class VarsUserPreferences extends AbstractPreferences {
      * VARSPreferences object created with this constructor
      * @param  name This is the name that will be used for the new VARSPreferences node
      */
-    public VarsUserPreferences(EAO eao, VarsUserPreferences parent, String name) {
+    public VarsUserPreferences(EntityManagerFactory entityManagerFactory, VarsUserPreferences parent, String name) {
         super(parent, name);
-        this.eao = eao;
+        this.entityManagerFactory = entityManagerFactory;
     }
 
         /**
@@ -72,12 +76,12 @@ class VarsUserPreferences extends AbstractPreferences {
                 node.setNodeName(absolutePath());
                 node.setPrefKey(key);
                 node.setPrefValue(value);
-                eao.insert(node);
+                insert(node);
             }
             else {
                 if (!value.equals(node.getPrefValue())) {
                     node.setPrefValue(value);
-                    eao.update(node);
+                    update(node);
                 }
             }
         }
@@ -85,6 +89,66 @@ class VarsUserPreferences extends AbstractPreferences {
             log.error("Failed to on call of putSpi(" + key + ", " + value + ")",
                     e);
         }
+    }
+
+    private void insert(PreferenceNode node) {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        EntityTransaction entityTransaction = entityManager.getTransaction();
+        entityManager.persist(node);
+        entityTransaction.commit();
+        entityManager.close();
+    }
+
+    private void update(PreferenceNode node) {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        EntityTransaction entityTransaction = entityManager.getTransaction();
+        entityManager.merge(node);
+        entityTransaction.commit();
+        entityManager.close();
+    }
+
+    private void delete(PreferenceNode node) {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        EntityTransaction entityTransaction = entityManager.getTransaction();
+        entityManager.remove(node);
+        entityTransaction.commit();
+        entityManager.close();
+    }
+
+    /**
+     * Executes a named query using a map of named parameters
+     *
+     * @param name
+     *            The name of the query to execute
+     * @param namedParameters
+     *            A Map<String, Object> of the 'named' parameters to assign in
+     *            the query
+     * @param endTransaction if true the transaction wll be ended when the method exits. If
+     *     false then the transaction will be kept open and can be reused by the current thread.
+     * @return A list of objects returned by the query.
+     */
+    public List findByNamedQuery(String name, Map<String, Object> namedParameters) {
+        if (log.isDebugEnabled()) {
+            StringBuilder sb = new StringBuilder("Executing FIND using named query '");
+            sb.append(name).append("'");
+
+            if (namedParameters.size() > 0) {
+                sb.append(" with parameters:\n");
+                for (String string : namedParameters.keySet()) {
+                    sb.append("\t").append(string).append(" = ").append(namedParameters.get(string));
+                }
+            }
+            log.debug(sb.toString());
+        }
+        List resultList = null;
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        Query query = entityManager.createNamedQuery(name);
+        for (String key : namedParameters.keySet()) {
+            query.setParameter(key, namedParameters.get(key));
+        }
+        resultList = query.getResultList();
+
+        return resultList;
     }
 
      /**
@@ -122,7 +186,7 @@ class VarsUserPreferences extends AbstractPreferences {
     protected void removeSpi(String key) {
         try {
             PreferenceNode node = findByKey(key);
-            eao.delete(node);
+            delete(node);
         }
         catch (Exception e) {
             log.error("Failed to retrieve keys for " + absolutePath(), e);
@@ -141,7 +205,7 @@ class VarsUserPreferences extends AbstractPreferences {
         try {
             List<PreferenceNode> preferenceNodes = findByNodeNameLike(absolutePath());
             for(PreferenceNode node : preferenceNodes) {
-                eao.delete(node);
+                delete(node);
             }
         }
         catch (Exception e) {
@@ -233,7 +297,7 @@ class VarsUserPreferences extends AbstractPreferences {
      */
     protected AbstractPreferences childSpi(String name) {
         // Return a new VARSPreferences with the name of the node
-        return new VarsUserPreferences(eao, this, name);
+        return new VarsUserPreferences(entityManagerFactory, this, name);
     }
 
     protected void syncSpi() {
@@ -278,7 +342,7 @@ class VarsUserPreferences extends AbstractPreferences {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("nodeName", absolutePath());
         params.put("prefKey", key);
-        List<PreferenceNode> preferenceNodes = eao.findByNamedQuery("PreferenceNode.findByNodeNameAndPrefKey", params);
+        List<PreferenceNode> preferenceNodes = findByNamedQuery("PreferenceNode.findByNodeNameAndPrefKey", params);
         if (preferenceNodes.size() > 0) {
             node = preferenceNodes.get(0);
         }
@@ -288,13 +352,13 @@ class VarsUserPreferences extends AbstractPreferences {
     private List<PreferenceNode> findByNodeName(String nodeName) {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("nodeName", nodeName);
-        return eao.findByNamedQuery("PreferenceNode.findAllByNodeName", params);
+        return findByNamedQuery("PreferenceNode.findAllByNodeName", params);
     }
 
     private List<PreferenceNode> findByNodeNameLike(String nodeName) {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("nodeName", nodeName + "%");
-        return eao.findByNamedQuery("PreferencesNode.findAllLikeNodeName", params);
+        return findByNamedQuery("PreferencesNode.findAllLikeNodeName", params);
     }
 
 }

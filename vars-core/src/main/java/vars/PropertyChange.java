@@ -6,8 +6,7 @@
 package vars;
 
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
-import java.util.Collection;
+
 
 /**
  * Interface defining classes that have property change listeners

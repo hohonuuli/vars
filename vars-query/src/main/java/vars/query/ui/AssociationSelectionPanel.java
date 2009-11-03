@@ -18,7 +18,7 @@
 package vars.query.ui;
 
 import com.google.inject.Inject;
-import vars.query.LinkBean;
+import vars.LinkBean;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;

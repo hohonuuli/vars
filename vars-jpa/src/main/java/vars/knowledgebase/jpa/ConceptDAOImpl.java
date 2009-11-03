@@ -7,8 +7,6 @@ import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.ConceptNameDAO;
 import vars.VARSPersistenceException;
-import org.mbari.jpaxx.EAO;
-import org.mbari.jpaxx.NonManagedEAO;
 import com.google.inject.Inject;
 
 import java.util.Collection;
@@ -16,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.persistence.EntityManager;
 import vars.PersistenceRule;
 import vars.knowledgebase.rules.ExactlyOnePrimaryNameRule;
 
@@ -32,8 +31,8 @@ public class ConceptDAOImpl extends DAO implements ConceptDAO {
     private final PersistenceRule<Concept> thereCanBeOnlyOne = new ExactlyOnePrimaryNameRule();
 
     @Inject
-    public ConceptDAOImpl(EAO eao, ConceptNameDAO conceptNameDAO) {
-        super(eao);
+    public ConceptDAOImpl(EntityManager entityManager, ConceptNameDAO conceptNameDAO) {
+        super(entityManager);
         this.conceptNameDAO = conceptNameDAO;
     }
 
@@ -50,7 +49,7 @@ public class ConceptDAOImpl extends DAO implements ConceptDAO {
     }
 
     public Concept findRoot() {
-        List<Concept> roots = getEAO().findByNamedQuery("Concept.findRoot", new HashMap<String, Object>());
+        List<Concept> roots = findByNamedQuery("Concept.findRoot", new HashMap<String, Object>());
         if (roots.size() > 1) {
             throw new VARSPersistenceException("ERROR!! More than one root was found in the knowedgebase");
         }
@@ -69,22 +68,11 @@ public class ConceptDAOImpl extends DAO implements ConceptDAO {
 
         Collection<ConceptName> conceptNames = new ArrayList<ConceptName>();
 
-        EAO eao = getEAO();
-
-        // Do all lookup in a single transaction to account for lazy loading
-        NonManagedEAO nmEao = null;
-        if (eao instanceof NonManagedEAO) {
-            nmEao = (NonManagedEAO) eao;
-            nmEao.startTransaction();
-        }
-
-        Concept mergedConcept = eao.find(ConceptImpl.class, ((JPAEntity) concept).getId());
+        startTransaction();
+        Concept mergedConcept = findByPrimaryKey(ConceptImpl.class, ((JPAEntity) concept).getId());
         conceptNames.addAll(mergedConcept.getConceptNames());
         findDescendentNames(mergedConcept.getChildConcepts(), conceptNames);
-
-        if (nmEao != null) {
-            nmEao.endTransaction();
-        }
+        endTransaction();
 
         return conceptNames;
 
@@ -108,27 +96,15 @@ public class ConceptDAOImpl extends DAO implements ConceptDAO {
     public Collection<Concept> findAll() {
         Map<String, Object> params = new HashMap<String, Object>();
         // TODO this may not be memory efficient (may return lots of disconnected objet graphs
-        return getEAO().findByNamedQuery("Concept.findAll", params);
+        return findByNamedQuery("Concept.findAll", params);
     }
 
     public Collection<Concept> findDescendents(Concept concept) {
         Collection<Concept> concepts = new ArrayList<Concept>();
-
-        EAO eao = getEAO();
-
-        // Do all lookup in a single transaction to account for lazy loading
-        NonManagedEAO nmEao = null;
-        if (eao instanceof NonManagedEAO) {
-            nmEao = (NonManagedEAO) eao;
-            nmEao.startTransaction();
-        }
-
-        Concept mergedConcept = eao.find(ConceptImpl.class, ((JPAEntity) concept).getId());
+        startTransaction();
+        Concept mergedConcept = findByPrimaryKey(ConceptImpl.class, ((JPAEntity) concept).getId());
         findDescendents(mergedConcept, concepts);
-
-        if (nmEao != null) {
-            nmEao.endTransaction();
-        }
+        endTransaction();
 
         return concepts;
     }
@@ -140,6 +116,12 @@ public class ConceptDAOImpl extends DAO implements ConceptDAO {
         }
     }
 
-
+    public Concept addConceptName(Concept concept, ConceptName conceptName) {
+        startTransaction();
+        concept.addConceptName(conceptName);
+        concept = makePersistent(concept);
+        endTransaction();
+        return concept;
+    }
 
 }

@@ -1,6 +1,6 @@
 package vars.jpa
 
-import org.mbari.jpaxx.NonManagedEAO
+
 import vars.annotation.VideoArchiveSet
 import vars.knowledgebase.Concept
 import vars.annotation.VideoArchiveSet
@@ -14,12 +14,6 @@ import vars.annotation.VideoArchiveSet
  */
 
 class EntityUtilities {
-
-    final NonManagedEAO eao;
-
-    def EntityUtilities(NonManagedEAO eao) {
-        this.eao = eao;
-    }
 
     /**
      * Builds a text tree of the videoArchiveSet

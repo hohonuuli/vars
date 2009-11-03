@@ -3,13 +3,13 @@ package vars.annotation.jpa;
 import vars.annotation.CameraDeploymentDAO;
 import vars.annotation.CameraDeployment;
 import vars.jpa.DAO;
-import org.mbari.jpaxx.EAO;
 
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 
 import com.google.inject.Inject;
+import javax.persistence.EntityManager;
 
 /**
  * Created by IntelliJ IDEA.
@@ -21,14 +21,14 @@ import com.google.inject.Inject;
 public class CameraDeploymentDAOImpl extends DAO implements CameraDeploymentDAO {
 
     @Inject
-    public CameraDeploymentDAOImpl(EAO eao) {
-        super(eao);
+    public CameraDeploymentDAOImpl(EntityManager entityManager) {
+        super(entityManager);
     }
 
     public List<CameraDeployment> findAllByChiefScientistName(String name) {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("chiefScientistName", name);
-        return getEAO().findByNamedQuery("CameraDeployment.findByChiefScientistName", params);
+        return findByNamedQuery("CameraDeployment.findByChiefScientistName", params);
     }
 
 }

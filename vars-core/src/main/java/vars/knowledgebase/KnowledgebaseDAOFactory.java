@@ -1,5 +1,7 @@
 package vars.knowledgebase;
 
+import vars.DAO;
+
 /**
  * Created by IntelliJ IDEA.
  * User: brian
@@ -9,6 +11,7 @@ package vars.knowledgebase;
  */
 public interface KnowledgebaseDAOFactory {
 
+    DAO newDAO();
     ConceptDAO newConceptDAO();
     ConceptMetadataDAO newConceptMetadataDAO();
     ConceptNameDAO newConceptNameDAO();

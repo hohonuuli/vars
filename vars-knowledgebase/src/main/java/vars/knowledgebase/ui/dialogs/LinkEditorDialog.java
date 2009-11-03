@@ -76,15 +76,15 @@ public class LinkEditorDialog extends JDialog implements ILockableEditor {
         }
 
         public String getLinkName() {
-            return ILink.VALUE_NIL;
+            return VALUE_NIL;
         }
 
         public String getLinkValue() {
-            return ILink.VALUE_NIL;
+            return VALUE_NIL;
         }
 
         public String getToConcept() {
-            return ILink.VALUE_NIL;
+            return VALUE_NIL;
         }
 
         public void setLinkName(String linkName_) {
@@ -101,6 +101,10 @@ public class LinkEditorDialog extends JDialog implements ILockableEditor {
         public void setToConcept(String toConcept_) {
 
             // Do nothing
+        }
+
+        public String stringValue() {
+            return VALUE_NIL + DELIMITER + getLinkName() + DELIMITER + getToConcept() + DELIMITER + getLinkValue();
         }
 
     };

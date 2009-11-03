@@ -2,8 +2,8 @@ package vars.annotation.jpa;
 
 import vars.jpa.DAO;
 import vars.annotation.PhysicalDataDAO;
-import org.mbari.jpaxx.EAO;
 import com.google.inject.Inject;
+import javax.persistence.EntityManager;
 
 /**
  * Created by IntelliJ IDEA.
@@ -15,8 +15,8 @@ import com.google.inject.Inject;
 public class PhysicalDataDAOImpl extends DAO implements PhysicalDataDAO {
 
     @Inject
-    public PhysicalDataDAOImpl(EAO eao) {
-        super(eao);
+    public PhysicalDataDAOImpl(EntityManager entityManager) {
+        super(entityManager);
     }
 
 }

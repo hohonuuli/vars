@@ -2,8 +2,8 @@ package vars.knowledgebase.jpa;
 
 import vars.knowledgebase.MediaDAO;
 import vars.jpa.DAO;
-import org.mbari.jpaxx.EAO;
 import com.google.inject.Inject;
+import javax.persistence.EntityManager;
 
 /**
  * Created by IntelliJ IDEA.
@@ -15,8 +15,8 @@ import com.google.inject.Inject;
 public class MediaDAOImpl extends DAO implements MediaDAO {
 
     @Inject
-    public MediaDAOImpl(EAO eao) {
-        super(eao);
+    public MediaDAOImpl(EntityManager entityManager) {
+        super(entityManager);
     }
     
 }

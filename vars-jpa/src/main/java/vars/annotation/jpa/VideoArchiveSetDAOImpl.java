@@ -2,10 +2,7 @@ package vars.annotation.jpa;
 
 import vars.jpa.DAO;
 import vars.annotation.CameraDeployment;
-import vars.annotation.*;
 import vars.knowledgebase.Concept;
-import org.mbari.jpaxx.EAO;
-import org.mbari.jpaxx.NonManagedEAO;
 
 import java.util.Set;
 import java.util.Date;
@@ -16,6 +13,11 @@ import java.util.HashMap;
 import java.util.List;
 
 import com.google.inject.Inject;
+import javax.persistence.EntityManager;
+import vars.annotation.VideoArchive;
+import vars.annotation.VideoArchiveDAO;
+import vars.annotation.VideoArchiveSet;
+import vars.annotation.VideoArchiveSetDAO;
 
 
 public class VideoArchiveSetDAOImpl extends DAO implements VideoArchiveSetDAO {
@@ -23,8 +25,8 @@ public class VideoArchiveSetDAOImpl extends DAO implements VideoArchiveSetDAO {
     private final VideoArchiveDAO videoArchiveDAO;
 
     @Inject
-    public VideoArchiveSetDAOImpl(EAO eao, VideoArchiveDAO videoArchiveDAO) {
-        super(eao);
+    public VideoArchiveSetDAOImpl(EntityManager entityManager, VideoArchiveDAO videoArchiveDAO) {
+        super(entityManager);
         this.videoArchiveDAO = videoArchiveDAO;
     }
 
@@ -45,32 +47,32 @@ public class VideoArchiveSetDAOImpl extends DAO implements VideoArchiveSetDAO {
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put("date0", startDate);
         params.put("date1", endDate);
-        return getEAO().findByNamedQuery("VideoArchiveSet.findBetweenDates", params);
+        return findByNamedQuery("VideoArchiveSet.findBetweenDates", params);
     }
 
     public Collection<VideoArchiveSet> findAll() {
         final Map<String, Object> params = new HashMap<String, Object>();
-        return getEAO().findByNamedQuery("VideoArchiveSet.findAll", params);
+        return findByNamedQuery("VideoArchiveSet.findAll", params);
     }
 
     public Collection<VideoArchiveSet> findAllByPlatformAndSequenceNumber(String platform, int sequenceNumber) {
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put("platformName", platform);
         params.put("sequenceNumber", sequenceNumber);
-        return getEAO().findByNamedQuery("VideoArchiveSet.findByPlatformAndSequenceNumber", params);
+        return findByNamedQuery("VideoArchiveSet.findByPlatformAndSequenceNumber", params);
     }
 
     public Collection<VideoArchiveSet> findAllByPlatformAndTrackingNumber(String platform, String trackingNumber) {
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put("platformName", platform);
         params.put("trackingNumber", trackingNumber);
-        return getEAO().findByNamedQuery("VideoArchiveSet.findByPlatformAndTrackingNumber", params);
+        return findByNamedQuery("VideoArchiveSet.findByPlatformAndTrackingNumber", params);
     }
 
     public Collection<VideoArchiveSet> findAllByTrackingNumber(String trackingNumber) {
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put("trackingNumber", trackingNumber);
-        return getEAO().findByNamedQuery("VideoArchiveSet.findByTrackingNumber", params);
+        return findByNamedQuery("VideoArchiveSet.findByTrackingNumber", params);
     }
 
     public Set<Integer> findAllSequenceNumbersByPlatformName(String platformName) {
@@ -78,7 +80,7 @@ public class VideoArchiveSetDAOImpl extends DAO implements VideoArchiveSetDAO {
 
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put("platformName", platformName);
-        List<VideoArchiveSet> videoArchiveSets = getEAO().findByNamedQuery("VideoArchiveSet.findByPlatformName", params);
+        List<VideoArchiveSet> videoArchiveSets = findByNamedQuery("VideoArchiveSet.findByPlatformName", params);
         for (VideoArchiveSet videoArchiveSet : videoArchiveSets) {
             for (CameraDeployment cameraDeployment : videoArchiveSet.getCameraDeployments()) {
                 sequenceNumbers.add(cameraDeployment.getSequenceNumber());
@@ -96,15 +98,10 @@ public class VideoArchiveSetDAOImpl extends DAO implements VideoArchiveSetDAO {
         if (videoArchiveSet != null) {
 
             // Do inside of a transaction to account for lazy loading
-            if (!getEAO().isManaged()) {
-                ((NonManagedEAO) getEAO()).startTransaction();
-            }
-
+            startTransaction();
             count = videoArchiveSet.getVideoFrames().size();
-
-            if (!getEAO().isManaged()) {
-                ((NonManagedEAO) getEAO()).startTransaction();
-            }
+            endTransaction();
+            
         }
         else {
             log.info("No VideoArchiveSet with id = " + primaryKey + " was found in the database");

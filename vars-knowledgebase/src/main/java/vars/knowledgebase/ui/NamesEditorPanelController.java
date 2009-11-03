@@ -51,7 +51,6 @@ class NamesEditorPanelController {
     private final NamesEditorPanel namesEditorPanel;
     private NewAction newAction;
 
-    private final HistoryDAO historyDAO;
     private final HistoryFactory historyFactory;
 
     /**
@@ -63,9 +62,6 @@ class NamesEditorPanelController {
         this.namesEditorPanel = namesEditorPanel;
         this.toolBelt = namesEditorPanel.getToolBelt();
         historyFactory = toolBelt.getHistoryFactory();
-        KnowledgebaseDAOFactory knowledgebaseDAOFactory = toolBelt.getKnowledgebaseDAOFactory();
-        historyDAO = knowledgebaseDAOFactory.newHistoryDAO();
-
     }
 
 

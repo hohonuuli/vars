@@ -1,5 +1,7 @@
 package vars.annotation;
 
+import vars.DAO;
+
 /**
  * Created by IntelliJ IDEA.
  * User: brian
@@ -9,6 +11,7 @@ package vars.annotation;
  */
 public interface AnnotationDAOFactory {
 
+    DAO newDAO();
     AssociationDAO newAssociationDAO();
     CameraDataDAO newCameraDataDAO();
     CameraDeploymentDAO newCameraDeploymentDAO();

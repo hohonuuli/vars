@@ -19,7 +19,7 @@ import vars.knowledgebase.ConceptMetadata
 import vars.knowledgebase.LinkTemplate
 import vars.jpa.JPAEntity
 import javax.persistence.EntityListeners;
-import org.mbari.jpaxx.TransactionLogger
+import vars.jpa.TransactionLogger
 import vars.jpa.KeyNullifier
 import javax.persistence.Transient
 import vars.EntitySupportCategory

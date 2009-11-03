@@ -18,8 +18,7 @@ import vars.knowledgebase.Media
 import vars.jpa.JPAEntity
 import vars.EntitySupportCategory
 import javax.persistence.EntityListeners;
-import org.mbari.jpaxx.TransactionLogger
-import vars.jpa.KeyNullifier
+import vars.jpa.TransactionLogger
 import vars.jpa.KeyNullifier
 import javax.persistence.Transient
 

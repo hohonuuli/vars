@@ -21,8 +21,8 @@ import vars.jpa.JPAEntity
 import vars.EntitySupportCategory
 import java.text.DateFormat
 import java.text.SimpleDateFormat
-import javax.persistence.EntityListeners;
-import org.mbari.jpaxx.TransactionLogger
+import javax.persistence.EntityListeners
+import vars.jpa.TransactionLogger
 import vars.jpa.KeyNullifier
 import vars.jpa.KeyNullifier
 import javax.persistence.Transient

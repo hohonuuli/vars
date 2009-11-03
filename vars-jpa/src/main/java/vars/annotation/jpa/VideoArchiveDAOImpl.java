@@ -2,12 +2,8 @@ package vars.annotation.jpa;
 
 import vars.jpa.DAO;
 import vars.jpa.JPAEntity;
-import vars.annotation.VideoFrame;
-import vars.annotation.*;
 import vars.knowledgebase.Concept;
 import vars.VARSPersistenceException;
-import org.mbari.jpaxx.EAO;
-import org.mbari.jpaxx.NonManagedEAO;
 
 import java.util.Set;
 import java.util.Collection;
@@ -17,6 +13,15 @@ import java.util.Map;
 import java.util.HashMap;
 
 import com.google.inject.Inject;
+import javax.persistence.EntityManager;
+import vars.annotation.AnnotationFactory;
+import vars.annotation.Association;
+import vars.annotation.CameraDeployment;
+import vars.annotation.Observation;
+import vars.annotation.VideoArchive;
+import vars.annotation.VideoArchiveDAO;
+import vars.annotation.VideoArchiveSet;
+import vars.annotation.VideoFrame;
 
 /**
  * Created by IntelliJ IDEA.
@@ -30,8 +35,8 @@ public class VideoArchiveDAOImpl extends DAO implements VideoArchiveDAO {
     private final AnnotationFactory annotationFactory;
 
     @Inject
-    public VideoArchiveDAOImpl(EAO eao, AnnotationFactory annotationFactory) {
-        super(eao);
+    public VideoArchiveDAOImpl(EntityManager entityManager, AnnotationFactory annotationFactory) {
+        super(entityManager);
         this.annotationFactory = annotationFactory;
     }
 
@@ -43,9 +48,7 @@ public class VideoArchiveDAOImpl extends DAO implements VideoArchiveDAO {
     public Set<String> findAllLinkValues(VideoArchive videoArchive, String linkName, Concept concept) {
 
         // Due to lazy loading we want to iterate through all objects in a collection
-        if (!getEAO().isManaged()) {
-            ((NonManagedEAO) getEAO()).startTransaction();
-        }
+        startTransaction();
 
         videoArchive = findByPrimaryKey(VideoArchive.class, ((JPAEntity) videoArchive).getId()); // merge
         Collection<? extends VideoFrame> videoFrames = videoArchive.getVideoArchiveSet().getVideoFrames();
@@ -62,9 +65,8 @@ public class VideoArchiveDAOImpl extends DAO implements VideoArchiveDAO {
             }
         }
 
-        if (!getEAO().isManaged()) {
-            ((NonManagedEAO) getEAO()).endTransaction();
-        }
+        endTransaction();
+
 
         return linkValues;
     }
@@ -80,16 +82,14 @@ public class VideoArchiveDAOImpl extends DAO implements VideoArchiveDAO {
             Map<String, Object> params2 = new HashMap<String, Object>();
             params2.put("platform", platform);
             params2.put("sequenceNumber", sequenceNumber);
-            List<VideoArchiveSet> vas = getEAO().findByNamedQuery("VideoArchiveSet.findByPlatformAndSequenceNumber", params2);
+            List<VideoArchiveSet> vas = findByNamedQuery("VideoArchiveSet.findByPlatformAndSequenceNumber", params2);
             if (vas.size() == 1) {
                 videoArchiveSet = vas.get(0);
-            }
-            else if (vas.size() > 1) {
+            } else if (vas.size() > 1) {
                 throw new VARSPersistenceException("There's a problem!! More than one VideoArchvieSet " +
                         "with platform = " + platform + " and sequenceNumber = " + sequenceNumber +
                         " exists in the database");
-            }
-            else {
+            } else {
                 videoArchiveSet = annotationFactory.newVideoArchiveSet();
                 videoArchiveSet.setPlatformName(platform);
                 CameraDeployment cameraDeployment = annotationFactory.newCameraDeployment();
@@ -104,13 +104,17 @@ public class VideoArchiveDAOImpl extends DAO implements VideoArchiveDAO {
 
     public VideoArchive findByName(final String name) {
         VideoArchive videoArchive = null;
-        Map<String, Object> params = new HashMap<String, Object>() {{ put("name", name); }};
+        Map<String, Object> params = new HashMap<String, Object>() {
 
-        List<VideoArchive> videoArchives = getEAO().findByNamedQuery("VideoArchive.findByName", params);
+            {
+                put("name", name);
+            }
+        };
+
+        List<VideoArchive> videoArchives = findByNamedQuery("VideoArchive.findByName", params);
         if (videoArchives.size() == 1) {
             videoArchive = videoArchives.get(0);
-        }
-        else if (videoArchives.size() > 1) {
+        } else if (videoArchives.size() > 1) {
             throw new VARSPersistenceException("There's a problem!! More than one VideoArchive named " +
                     name + " exists in the database");
         }
@@ -133,27 +137,17 @@ public class VideoArchiveDAOImpl extends DAO implements VideoArchiveDAO {
          */
         if (doFetch) {
             try {
-                if (!getEAO().isManaged()) {
-                    NonManagedEAO nmEao = (NonManagedEAO) getEAO();
-                    nmEao.startTransaction();
-                    for (VideoFrame videoFrame : emptyFrames) {
-                        nmEao.delete(videoFrame, false);
-                    }
-                    nmEao.endTransaction();
+                startTransaction();
+                for (VideoFrame videoFrame : emptyFrames) {
+                    makeTransient(videoFrame);
                 }
-                else {
-                    for (VideoFrame videoFrame : emptyFrames) {
-                        getEAO().delete(videoFrame);
-                    }
-                }
+                endTransaction();
                 log.debug("Deleted " + n + " empty VideoFrames from " + videoArchive);
-            }
-            finally {
+            } finally {
                 videoArchive = findByPrimaryKey(videoArchive.getClass(), ((JPAEntity) videoArchive).getId());
             }
         }
         return videoArchive;
 
     }
-
 }

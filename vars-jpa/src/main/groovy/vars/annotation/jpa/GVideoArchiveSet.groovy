@@ -24,7 +24,7 @@ import vars.annotation.VideoFrame
 import vars.jpa.JPAEntity
 import vars.EntitySupportCategory
 import javax.persistence.EntityListeners
-import org.mbari.jpaxx.TransactionLogger
+import vars.jpa.TransactionLogger
 import vars.jpa.KeyNullifier
 import javax.persistence.Transient
 

@@ -20,8 +20,7 @@ import vars.annotation.Association
 import vars.annotation.Observation
 import vars.jpa.JPAEntity
 import javax.persistence.EntityListeners
-import org.mbari.jpaxx.TransactionLogger
-import vars.jpa.KeyNullifier
+import vars.jpa.TransactionLogger
 import vars.jpa.KeyNullifier
 import vars.EntitySupportCategory
 import javax.persistence.Transient
@@ -99,6 +98,7 @@ class GAssociation implements Serializable, Association, JPAEntity {
     public String toString() {
         return stringValue()
     }
+
 
     @Override
     boolean equals(that) {

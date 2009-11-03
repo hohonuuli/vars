@@ -39,4 +39,6 @@ public interface ConceptDAO extends DAO {
      * @throws DAOException
      */
     Collection<Concept> findDescendents(Concept concept);
+
+    Concept addConceptName(Concept concept, ConceptName conceptName);
 }

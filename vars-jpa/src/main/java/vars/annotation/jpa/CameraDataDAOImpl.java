@@ -3,13 +3,13 @@ package vars.annotation.jpa;
 import vars.jpa.DAO;
 import vars.annotation.CameraDataDAO;
 import vars.annotation.CameraData;
-import org.mbari.jpaxx.EAO;
 
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 
 import com.google.inject.Inject;
+import javax.persistence.EntityManager;
 
 /**
  * Created by IntelliJ IDEA.
@@ -21,25 +21,25 @@ import com.google.inject.Inject;
 public class CameraDataDAOImpl extends DAO implements CameraDataDAO {
 
     @Inject
-    public CameraDataDAOImpl(EAO eao) {
-        super(eao);
+    public CameraDataDAOImpl(EntityManager entityManager) {
+        super(entityManager);
     }
 
     public List<CameraData> findByFrameGrabURLContaining(String s) {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("frameGrabURL", "%" + s + "%");
-        return getEAO().findByNamedQuery("CameraData.findByFrameGrabURLLike", params);
+        return findByNamedQuery("CameraData.findByFrameGrabURLLike", params);
     }
 
     public List<CameraData> findByFrameGrabURLPostfix(String postfix) {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("frameGrabURL", "%" + postfix);
-        return getEAO().findByNamedQuery("CameraData.findByFrameGrabURLLike", params);
+        return findByNamedQuery("CameraData.findByFrameGrabURLLike", params);
     }
 
     public List<CameraData> findByFrameGrabURLPrefix(String prefix) {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("frameGrabURL", prefix + "%");
-        return getEAO().findByNamedQuery("CameraData.findByFrameGrabURLLike", params);
+        return findByNamedQuery("CameraData.findByFrameGrabURLLike", params);
     }
 }

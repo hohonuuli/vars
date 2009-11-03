@@ -1,11 +1,21 @@
 package vars.annotation.jpa;
 
-import vars.annotation.CameraDataDAO;
-import vars.annotation.*;
+import vars.DAO;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
-import org.mbari.jpaxx.EAO;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import vars.annotation.AnnotationDAOFactory;
+import vars.annotation.AnnotationFactory;
+import vars.annotation.AssociationDAO;
+import vars.annotation.CameraDataDAO;
+import vars.annotation.CameraDeploymentDAO;
+import vars.annotation.ObservationDAO;
+import vars.annotation.PhysicalDataDAO;
+import vars.annotation.VideoArchiveDAO;
+import vars.annotation.VideoArchiveSetDAO;
+import vars.annotation.VideoFrameDAO;
 
 /**
  * Created by IntelliJ IDEA.
@@ -16,49 +26,53 @@ import com.google.inject.name.Named;
  */
 public class AnnotationDAOFactoryImpl implements AnnotationDAOFactory {
 
-    private final EAO eao;
+    private final EntityManagerFactory entityManagerFactory;
     private final AnnotationFactory annotationFactory;
     private final KnowledgebaseDAOFactory kbFactory;
 
     @Inject
-    public AnnotationDAOFactoryImpl(@Named("annotationEAO") EAO eao,
+    public AnnotationDAOFactoryImpl(@Named("annotationPersistenceUnit") String persistenceUnit,
             AnnotationFactory annotationFactory,
             KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
-        this.eao = eao;
+        this.entityManagerFactory = Persistence.createEntityManagerFactory(persistenceUnit);
         this.annotationFactory = annotationFactory;
         this.kbFactory = knowledgebaseDAOFactory;
     }
 
     public AssociationDAO newAssociationDAO() {
-        return new AssociationDAOImpl(eao, kbFactory.newConceptDAO());
+        return new AssociationDAOImpl(entityManagerFactory.createEntityManager(), kbFactory.newConceptDAO());
     }
 
     public CameraDataDAO newCameraDataDAO() {
-        return new CameraDataDAOImpl(eao);
+        return new CameraDataDAOImpl(entityManagerFactory.createEntityManager());
     }
 
     public CameraDeploymentDAO newCameraDeploymentDAO() {
-        return new CameraDeploymentDAOImpl(eao);
+        return new CameraDeploymentDAOImpl(entityManagerFactory.createEntityManager());
     }
 
     public ObservationDAO newObservationDAO() {
-        return new ObservationDAOImpl(eao, kbFactory.newConceptDAO());
+        return new ObservationDAOImpl(entityManagerFactory.createEntityManager(), kbFactory.newConceptDAO());
     }
 
     public PhysicalDataDAO newPhysicalDataDAO() {
-        return new PhysicalDataDAOImpl(eao);
+        return new PhysicalDataDAOImpl(entityManagerFactory.createEntityManager());
     }
 
     public VideoArchiveDAO newVideoArchiveDAO() {
-        return new VideoArchiveDAOImpl(eao, annotationFactory);
+        return new VideoArchiveDAOImpl(entityManagerFactory.createEntityManager(), annotationFactory);
     }
 
     public VideoArchiveSetDAO newVideoArchiveSetDAO() {
-        return new VideoArchiveSetDAOImpl(eao, newVideoArchiveDAO());
+        return new VideoArchiveSetDAOImpl(entityManagerFactory.createEntityManager(), newVideoArchiveDAO());
     }
 
     public VideoFrameDAO newVideoFrameDAO() {
-        return new VideoFrameDAOImpl(eao);
+        return new VideoFrameDAOImpl(entityManagerFactory.createEntityManager());
+    }
+
+    public DAO newDAO() {
+        return new vars.jpa.DAO(entityManagerFactory.createEntityManager());
     }
 
 }

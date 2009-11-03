@@ -2,8 +2,8 @@ package vars.knowledgebase.jpa;
 
 import vars.knowledgebase.ConceptMetadataDAO;
 import vars.jpa.DAO;
-import org.mbari.jpaxx.EAO;
 import com.google.inject.Inject;
+import javax.persistence.EntityManager;
 
 /**
  * Created by IntelliJ IDEA.
@@ -15,8 +15,8 @@ import com.google.inject.Inject;
 public class ConceptMetadataDAOImpl extends DAO implements ConceptMetadataDAO {
 
     @Inject
-    public ConceptMetadataDAOImpl(EAO eao) {
-        super(eao);
+    public ConceptMetadataDAOImpl(EntityManager entityManager) {
+        super(entityManager);
     }
     
 }

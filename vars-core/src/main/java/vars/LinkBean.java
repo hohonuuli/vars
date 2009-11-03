@@ -86,8 +86,8 @@ public class LinkBean implements ILink {
         return linkName + ILink.DELIMITER + toConcept + ILink.DELIMITER + linkValue;
     }
 
-
-
-
+    public String stringValue() {
+            return ILink.VALUE_NIL + ILink.DELIMITER + toString();
+    }
 
 }

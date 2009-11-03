@@ -2,9 +2,8 @@ package vars.knowledgebase.jpa;
 
 import vars.knowledgebase.UsageDAO;
 import vars.jpa.DAO;
-import org.mbari.jpaxx.EAO;
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
+import javax.persistence.EntityManager;
 
 /**
  * Created by IntelliJ IDEA.
@@ -16,8 +15,8 @@ import com.google.inject.name.Named;
 public class UsageDAOImpl extends DAO implements UsageDAO {
 
     @Inject
-    public UsageDAOImpl(EAO eao) {
-        super(eao);
+    public UsageDAOImpl(EntityManager entityManager) {
+        super(entityManager);
     }
 
 }

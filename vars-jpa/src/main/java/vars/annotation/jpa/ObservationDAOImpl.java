@@ -6,7 +6,6 @@ import vars.annotation.Observation;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptName;
-import org.mbari.jpaxx.EAO;
 
 import java.util.List;
 import java.util.Map;
@@ -18,7 +17,6 @@ import com.google.inject.Inject;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-import javax.persistence.EntityTransaction;
 
 /**
  * Created by IntelliJ IDEA.
@@ -32,18 +30,20 @@ public class ObservationDAOImpl extends DAO implements ObservationDAO {
     private final ConceptDAO conceptDAO;
 
     @Inject
-    public ObservationDAOImpl(EAO eao, ConceptDAO conceptDao) {
-        super(eao);
+    public ObservationDAOImpl(EntityManager entityManager, ConceptDAO conceptDao) {
+        super(entityManager);
         this.conceptDAO = conceptDao;
     }
 
     public List<Observation> findAllByConceptName(String conceptName) {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("conceptName", conceptName);
-        return getEAO().findByNamedQuery("Observation.findByConceptName", map);
+        return findByNamedQuery("Observation.findByConceptName", map);
     }
 
     public List<Observation> findAllByConcept(final Concept concept, final boolean cascade) {
+
+        startTransaction();
 
         Collection<ConceptName> conceptNames = null;
         if (cascade) {
@@ -64,19 +64,18 @@ public class ObservationDAOImpl extends DAO implements ObservationDAO {
         }
         jpql += ")";
 
-        final EntityManager entityManager = getEAO().createEntityManager();
-        final EntityTransaction entityTransaction = entityManager.getTransaction();
-        entityTransaction.begin();
-        Query query = entityManager.createQuery(jpql);
+        startTransaction();
+        Query query = getEntityManager().createQuery(jpql);
         List<Observation> observations = query.getResultList();
-        entityManager.close();
+        endTransaction();
 
         return observations;
     }
 
     public List<String> findAllConceptNamesUsedInAnnotations() {
 
-        final EntityManager entityManager = getEAO().createEntityManager();
+        final EntityManager entityManager = getEntityManager();
+        startTransaction();
 
         // ---- Step 1: Fetch from Observation
         String sql = "SELECT DISTINCT conceptName FROM Observation";
@@ -88,7 +87,7 @@ public class ObservationDAOImpl extends DAO implements ObservationDAO {
         query = entityManager.createNativeQuery(sql);
         conceptNames.addAll(query.getResultList());
 
-        entityManager.close();
+        endTransaction();
 
         return conceptNames; 
     }

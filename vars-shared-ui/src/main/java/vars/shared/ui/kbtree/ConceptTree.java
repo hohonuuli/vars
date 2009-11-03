@@ -33,8 +33,8 @@ import org.bushe.swing.event.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.knowledgebase.Concept;
-import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptName;
+import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.shared.ui.ConceptChangeListener;
 import vars.shared.ui.GlobalLookup;
 
@@ -57,7 +57,7 @@ public class ConceptTree extends JTree implements ConceptChangeListener {
     public final static Cursor WAIT_CURSOR = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
     public final static Cursor DEFAULT_CURSOR = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
     private final Logger log = LoggerFactory.getLogger(getClass());
-    protected ConceptDAO conceptDAO;
+    private KnowledgebaseDAOFactory knowledgebaseDAOFactory;
 
     /**
          * @uml.property  name="popupMenu"
@@ -70,8 +70,8 @@ public class ConceptTree extends JTree implements ConceptChangeListener {
      *
      * @param conceptDAO
      */
-    public ConceptTree(ConceptDAO conceptDAO) {
-        this(conceptDAO.findRoot(), conceptDAO);
+    public ConceptTree(KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
+        this(knowledgebaseDAOFactory.newConceptDAO().findRoot(), knowledgebaseDAOFactory);
     }
 
     /**
@@ -80,8 +80,8 @@ public class ConceptTree extends JTree implements ConceptChangeListener {
      * @param  rootConcept
      * @param conceptDAO
      */
-    public ConceptTree(Concept rootConcept, ConceptDAO conceptDAO) {
-        this.conceptDAO = conceptDAO;
+    public ConceptTree(Concept rootConcept, KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
+        this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
         loadModel(rootConcept);
         initialize();
     }
@@ -96,7 +96,7 @@ public class ConceptTree extends JTree implements ConceptChangeListener {
      */
     public void refresh() {
         // Reload from the root
-        loadModel(conceptDAO.findRoot());
+        loadModel(knowledgebaseDAOFactory.newConceptDAO().findRoot());
     }
 
     /**
@@ -115,7 +115,7 @@ public class ConceptTree extends JTree implements ConceptChangeListener {
      * @param  conceptName Description of the Parameter
      */
     public void addedConceptName(ConceptName conceptName) {
-        updateTreeNode(conceptDAO.findByName(conceptName.getName()));
+        updateTreeNode(knowledgebaseDAOFactory.newConceptDAO().findByName(conceptName.getName()));
     }
 
     /**
@@ -233,7 +233,7 @@ public class ConceptTree extends JTree implements ConceptChangeListener {
      */
     List findConceptFamilyTree(final String name) {
         final LinkedList conceptList = new LinkedList();
-        Concept concept = conceptDAO.findByName(name);
+        Concept concept = knowledgebaseDAOFactory.newConceptDAO().findByName(name);
         conceptList.add(concept);
 
         while (concept.hasParent()) {

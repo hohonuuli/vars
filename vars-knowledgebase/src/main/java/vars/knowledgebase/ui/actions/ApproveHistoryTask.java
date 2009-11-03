@@ -27,19 +27,17 @@ import org.bushe.swing.event.EventBus;
 import vars.ILink;
 import vars.LinkBean;
 import vars.UserAccount;
-import vars.annotation.AnnotationDAOFactory;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.ConceptNameDAO;
 import vars.knowledgebase.History;
-import vars.knowledgebase.KnowledgebaseDAO;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
-import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.LinkRealization;
 import vars.knowledgebase.LinkTemplate;
 import vars.knowledgebase.Media;
 import vars.knowledgebase.ui.Lookup;
+import vars.knowledgebase.ui.ToolBelt;
 
 
 /**
@@ -57,9 +55,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
     private final Map<String, Map<String, AbstractHistoryTask>> actionMap = new HashMap<String,
         Map<String, AbstractHistoryTask>>();
     private final GenericApproveTask DEFAULT_TASK;
-    private final AnnotationDAOFactory annotationDAOFactory;
-    private final KnowledgebaseDAO knowledgebaseDAO;
-    private final KnowledgebaseFactory knowledgebaseFactory;
+    private final ToolBelt toolBelt;
 
     /**
      * Constructs ...
@@ -70,13 +66,10 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
      * @param knowledgebaseFactory
      */
     @Inject
-    public ApproveHistoryTask(AnnotationDAOFactory annotationDAOFactory, KnowledgebaseDAO knowledgebaseDAO,
-                              KnowledgebaseDAOFactory knowledgebaseDAOFactory,
-                              KnowledgebaseFactory knowledgebaseFactory) {
-        super(knowledgebaseDAOFactory);
-        this.annotationDAOFactory = annotationDAOFactory;
-        this.knowledgebaseDAO = knowledgebaseDAO;
-        this.knowledgebaseFactory = knowledgebaseFactory;
+    public ApproveHistoryTask(ToolBelt toolBelt) {
+        super(toolBelt.getKnowledgebaseDAOFactory());
+        this.toolBelt = toolBelt;
+
 
         DEFAULT_TASK = new GenericApproveTask(knowledgebaseDAOFactory);
 
@@ -163,7 +156,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
             if (concept != null) {
                 vars.knowledgebase.ui.actions.DeleteConceptTask dct = new vars.knowledgebase.ui.actions
                     .DeleteConceptTask(knowledgebaseDAOFactory.newConceptDAO(),
-                                       annotationDAOFactory.newObservationDAO());
+                                       toolBelt.getAnnotationDAOFactory().newObservationDAO());
                 if (dct.delete(concept)) {
                     super.approve(userAccount, history);
                 }
@@ -195,7 +188,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
             if (conceptName != null) {
 
                 // Make sure that the name you are deleting isn't used by any observations anymore
-                knowledgebaseDAO.updateConceptNameUsedByAnnotations(concept);
+                toolBelt.getKnowledgebaseDAO().updateConceptNameUsedByAnnotations(concept);
 
                 ConceptNameDAO conceptNameDAO = knowledgebaseDAOFactory.newConceptNameDAO();
                 concept.removeConceptName(conceptName);
@@ -227,7 +220,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
 
                 // Parse the string stored in the history
                 final ILink link = new LinkBean(history.getOldValue());
-                final LinkRealization exampleRealization = knowledgebaseFactory.newLinkRealization();
+                final LinkRealization exampleRealization = toolBelt.getKnowledgebaseFactory().newLinkRealization();
                 exampleRealization.setLinkName(link.getLinkName());
                 exampleRealization.setToConcept(link.getToConcept());
                 exampleRealization.setLinkValue(link.getLinkValue());
@@ -289,7 +282,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
 
                 // Convienet means to parse the string stored in the history
                 final LinkBean link = new LinkBean(history.getOldValue());
-                final LinkTemplate exampleTemplate = knowledgebaseFactory.newLinkTemplate();
+                final LinkTemplate exampleTemplate = toolBelt.getKnowledgebaseFactory().newLinkTemplate();
                 exampleTemplate.setLinkName(link.getLinkName());
                 exampleTemplate.setToConcept(link.getToConcept());
                 exampleTemplate.setLinkValue(link.getLinkValue());

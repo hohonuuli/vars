@@ -5,8 +5,8 @@ import vars.annotation.Association;
 import vars.jpa.DAO;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.Concept;
-import org.mbari.jpaxx.EAO;
 import com.google.inject.Inject;
+import javax.persistence.EntityManager;
 
 /**
  * Created by IntelliJ IDEA.
@@ -20,8 +20,8 @@ public class AssociationDAOImpl extends DAO implements AssociationDAO {
     private final ConceptDAO conceptDAO;
 
     @Inject
-    public AssociationDAOImpl(EAO eao, ConceptDAO conceptDao) {
-        super(eao);
+    public AssociationDAOImpl(EntityManager entityManager, ConceptDAO conceptDao) {
+        super(entityManager);
         this.conceptDAO = conceptDao;
     }
 

@@ -61,7 +61,6 @@ import vars.shared.ui.kbtree.SearchableConceptTreePanel;
 import vars.shared.ui.kbtree.TreeConcept;
 
 /**
- * <p><!-- Class description --></p>
  *
  * @version    $Id: KnowledgebaseFrame.java 295 2006-07-06 23:47:31Z hohonuuli $
  * @author     <a href="http://www.mbari.org">Monterey Bay Aquarium Research Institute</a>

@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 import org.mbari.swing.SearchableComboBoxModel;
 import vars.ILink;
 import vars.query.QueryDAO;
-import vars.query.LinkBean;
+import vars.LinkBean;
 import vars.knowledgebase.*;
 import vars.knowledgebase.SimpleConceptNameBean;
 import vars.shared.ui.HierachicalConceptNameComboBox;

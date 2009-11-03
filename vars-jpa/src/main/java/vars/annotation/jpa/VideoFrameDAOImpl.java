@@ -1,9 +1,6 @@
 package vars.annotation.jpa;
 
 import vars.jpa.DAO;
-import vars.annotation.VideoFrame;
-import vars.annotation.*;
-import org.mbari.jpaxx.EAO;
 
 import java.util.Set;
 import java.util.Map;
@@ -12,6 +9,9 @@ import java.util.List;
 import java.util.HashSet;
 
 import com.google.inject.Inject;
+import javax.persistence.EntityManager;
+import vars.annotation.VideoFrame;
+import vars.annotation.VideoFrameDAO;
 
 /**
  * Created by IntelliJ IDEA.
@@ -23,14 +23,14 @@ import com.google.inject.Inject;
 public class VideoFrameDAOImpl extends DAO implements VideoFrameDAO {
 
     @Inject
-    public VideoFrameDAOImpl(EAO eao) {
-        super(eao);
+    public VideoFrameDAOImpl(EntityManager entityManager) {
+        super(entityManager);
     }
 
     public Set<VideoFrame> findAllByVideoArchivePrimaryKey(Object primaryKey) {
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put("primaryKey", primaryKey);
-        List<VideoFrame> list= getEAO().findByNamedQuery("VideoFrame.findByVideoArchivePrimaryKey", params);
+        List<VideoFrame> list= findByNamedQuery("VideoFrame.findByVideoArchivePrimaryKey", params);
         Set<VideoFrame> set = new HashSet<vars.annotation.VideoFrame>();
         set.addAll(list);
         return set;

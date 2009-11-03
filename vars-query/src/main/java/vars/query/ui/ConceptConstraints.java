@@ -23,7 +23,7 @@
  */
 package vars.query.ui;
 
-import vars.query.LinkBean;
+import vars.LinkBean;
 import java.util.Collection;
 import java.util.Iterator;
 import vars.ILink;

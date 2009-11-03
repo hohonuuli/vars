@@ -5,17 +5,15 @@ import vars.knowledgebase.LinkRealizationDAO;
 import vars.knowledgebase.LinkRealization;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.Concept;
-import org.mbari.jpaxx.EAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Set;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Collection;
 
 import com.google.inject.Inject;
+import javax.persistence.EntityManager;
 
 /**
  * Created by IntelliJ IDEA.
@@ -27,17 +25,16 @@ import com.google.inject.Inject;
 public class LinkRealizationDAOImpl extends DAO implements LinkRealizationDAO {
 
     private final ConceptDAO conceptDAO;
-    public final Logger log = LoggerFactory.getLogger(getClass());
 
     @Inject
-    public LinkRealizationDAOImpl(EAO eao, ConceptDAO conceptDao) {
-        super(eao);
+    public LinkRealizationDAOImpl(EntityManager entityManager, ConceptDAO conceptDao) {
+        super(entityManager);
         this.conceptDAO = conceptDao;
     }
 
     public Collection<LinkRealization> findAllByLinkName() {
         Map<String, Object> params = new HashMap<String, Object>();
-        return getEAO().findByNamedQuery("LinkRealization.findByLinkName", params);
+        return findByNamedQuery("LinkRealization.findByLinkName", params);
     }
 
     public void validateName(LinkRealization object) {

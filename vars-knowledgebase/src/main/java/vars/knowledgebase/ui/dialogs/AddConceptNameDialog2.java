@@ -29,7 +29,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.UserAccount;
 import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptName;
+import vars.knowledgebase.ConceptNameDAO;
 import vars.knowledgebase.ConceptNameTypes;
 import vars.knowledgebase.History;
 import vars.knowledgebase.HistoryFactory;
@@ -264,7 +266,9 @@ private void initComponents() {
 
     private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {
         final String name = nameField.getText();
-        final Concept myConcept = getConcept();
+        Concept myConcept = getConcept();
+        final ConceptDAO conceptDAO = knowledgebaseDAOFactory.newConceptDAO();
+        final ConceptNameDAO conceptNameDAO = knowledgebaseDAOFactory.newConceptNameDAO();
         boolean okToProceed = true;
 
         /*
@@ -310,7 +314,10 @@ private void initComponents() {
                 nameType = ConceptNameTypes.SYNONYM.toString();
             }
             conceptName.setNameType(nameType);
+            myConcept = conceptDAO.findInDatastore(myConcept);
             myConcept.addConceptName(conceptName);
+            conceptNameDAO.makePersistent(conceptName);
+            //EventBus.publish(Lookup.TOPIC_INSERT_CONCEPT_NAME, myConcept);
 
             /*
              * Add a History object to track the change.
