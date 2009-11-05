@@ -6,51 +6,34 @@
 package vars.shared.ui.tree;
 
 import com.google.inject.Inject;
-import com.google.inject.internal.cglib.proxy.Dispatcher;
 import foxtrot.Job;
 import foxtrot.Worker;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import org.bushe.swing.event.EventBus;
 import org.mbari.swing.LabeledSpinningDialWaitIndicator;
 import org.mbari.swing.SearchableTreePanel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.DAO;
 import vars.knowledgebase.Concept;
-import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.ConceptNameDAO;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.shared.ui.GlobalLookup;
-import vars.shared.ui.kbtree.ConceptTree;
-import vars.shared.ui.kbtree.TreeConcept;
+
 
 /**
  *
  * @author brian
  */
 public class ConceptTreePanel extends SearchableTreePanel {
-
-    /**
-     * Hard-coded MBARI specific informaiton. The video labe requested that
-     * the Knowledgebase tree be open to the marin-organism node on startup,
-     * since that will be the most often used node.
-     *
-     * TODO 20050909 brian: THis needs to be pulled out into a configuration file.
-     *
-     */
-    private static final String MARINE_ORGANISM = "marine organism";
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
@@ -85,26 +68,20 @@ public class ConceptTreePanel extends SearchableTreePanel {
     }
 
 
-    public void refreshTree() {
-        ConceptDAO dao = knowledgebaseDAOFactory.newConceptDAO();
-        dao.startTransaction();
-        Concept root = dao.findRoot();
-        dao.endTransaction();
-
-        refreshTreeAndOpenNode(root);
+    public void refresh() {
+        cachedGlobSearches.clear();
+        cachedWordSearches.clear();
+        ConceptTreeModel model = (ConceptTreeModel) getJTree().getModel();
+        model.refresh();
     }
 
-    public void refreshTreeAndOpenNode(Concept concept) {
+    public void refreshAndOpenNode(Concept concept) {
         if (log.isDebugEnabled()) {
             log.debug("Refreshing ConceptTree and opening it to '" +
                     concept.getPrimaryConceptName().getName() + "', " + concept);
         }
-        cachedGlobSearches.clear();
-        cachedWordSearches.clear();
-        ConceptTree conceptTree = (ConceptTree) getJTree();
-        conceptTree.refresh();
-        conceptTree.setSelectedConcept(concept.getPrimaryConceptName().getName());
-        validate();
+        refresh();
+        openNode(concept);
     }
 
     /**
@@ -119,15 +96,14 @@ public class ConceptTreePanel extends SearchableTreePanel {
 
         // Objects whos children have not been loaded yet will return a Boolean
         // as a user object. We should ignore these as much as we can.
-        if (userObject instanceof TreeConcept) {
-            final TreeConcept concept = (TreeConcept) node.getUserObject();
-            final Concept c = concept.getConcept();
+        if (userObject instanceof Concept) {
+            final Concept concept = (Concept) node.getUserObject();
 
             /*
              * The text is actually a composite of all names,
              * including primary, secondary, and common
              */
-            final Collection<ConceptName> conceptNames = new ArrayList<ConceptName>(c.getConceptNames());
+            final Collection<ConceptName> conceptNames = new ArrayList<ConceptName>(concept.getConceptNames());
             for (ConceptName conceptName1 : conceptNames) {
                 textToSearch.append(conceptName1.getName());
                 textToSearch.append(" ");
@@ -154,7 +130,6 @@ public class ConceptTreePanel extends SearchableTreePanel {
         /*
          * Disable so that folks can't start multiple searches.
          */
-
         getSearchBtn().setEnabled(false);
         getSearchTextField().setEnabled(false);
         LabeledSpinningDialWaitIndicator waitIndicator = new LabeledSpinningDialWaitIndicator(this, "Searching for '" + text + "'");
@@ -263,70 +238,25 @@ public class ConceptTreePanel extends SearchableTreePanel {
             return;
         }
 
-
-        // Get the list of concepts up to root
-        final LinkedList conceptList = new LinkedList();
-        Concept c = concept;
-        while (c != null) {
-            conceptList.add(c);
-            c = (Concept) c.getParentConcept();
-        }
-
-        // Walk the tree from root on down opening nodes as we go
-        final ListIterator i = conceptList.listIterator(conceptList.size());
-
-        // Skip the root
-        i.previous();
         final JTree tree = getJTree();
-        final DefaultTreeModel treeModel = (DefaultTreeModel) tree.getModel();
-        final DefaultMutableTreeNode rootNode = (DefaultMutableTreeNode) treeModel.getRoot();
-        TreePath path = new TreePath(rootNode.getPath());
-        tree.setSelectionPath(path);
-        DefaultMutableTreeNode parentNode = rootNode;
-        DAO dao = knowledgebaseDAOFactory.newDAO();
-        dao.startTransaction();;
-        while (i.hasPrevious()) {
-            c = (Concept) i.previous();
-            final TreeConcept parentTreeConcept = (TreeConcept) parentNode.getUserObject();
-            parentTreeConcept.lazyExpand(parentNode, dao);
-
-            // treeModel.reload(parentNode);
-            final Enumeration enm = parentNode.children();
-            while (enm.hasMoreElements()) {
-                final DefaultMutableTreeNode node = (DefaultMutableTreeNode) enm.nextElement();
-                final TreeConcept tc = (TreeConcept) node.getUserObject();
-                if (tc.getName().equals(c.getPrimaryConceptName().getName())) {
-                    parentNode = node;
-
-                    break;
-                }
-            }
-        }
-        dao.endTransaction();
-
-        final DefaultMutableTreeNode fParentNode = parentNode;
-        SwingUtilities.invokeLater(new Runnable() {
-
-            public void run() {
-                treeModel.reload(fParentNode);
-                tree.scrollPathToVisible(new TreePath(fParentNode));
+        final ConceptTreeModel model = (ConceptTreeModel) tree.getModel();
+        final TreeNode node = (TreeNode) Worker.post(new Job() {
+            public Object run() {
+                return model.loadNode(concept.getPrimaryConceptName().getName());
             }
         });
+
+        final TreePath path = new TreePath(model.getPathToRoot(node));
+
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                model.reload(node);
+                tree.scrollPathToVisible(path);
+            }
+        });
+        validate();
     }
 
-    /**
-     * Override JTree to only accept instances of ConceptTree
-     *
-     * @param tree
-     */
-    @Override
-    public void setJTree(JTree tree) {
-        if (!(tree instanceof ConceptTree)) {
-            throw new IllegalArgumentException("JTree must be an instanceof ConceptTree");
-        }
-
-        super.setJTree(tree);
-    }
 
 }
 
