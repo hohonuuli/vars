@@ -1,17 +1,25 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * @(#)ConceptTreePanelDemo.java   2009.11.05 at 02:44:29 PST
+ *
+ * Copyright 2009 MBARI
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
-package vars.knowledgebase.ui;
+
+
+package vars.knowledgebase.demos;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.tree.TreeModel;
 import org.jdesktop.swingx.JXTree;
 import vars.knowledgebase.KnowledgebaseModule;
+import vars.knowledgebase.ui.ToolBelt;
 import vars.shared.ui.tree.ConceptTreeCellRenderer;
 import vars.shared.ui.tree.ConceptTreeModel;
 import vars.shared.ui.tree.ConceptTreePanel;
@@ -27,7 +35,7 @@ public class ConceptTreePanelDemo {
         ToolBelt toolBelt = injector.getInstance(ToolBelt.class);
         JFrame frame = new JFrame();
         ConceptTreePanel panel = new ConceptTreePanel(toolBelt.getKnowledgebaseDAOFactory());
-        TreeModel treeModel = new ConceptTreeModel(toolBelt.getKnowledgebaseDAOFactory());
+        final ConceptTreeModel treeModel = new ConceptTreeModel(toolBelt.getKnowledgebaseDAOFactory());
         JXTree tree = new JXTree(treeModel);
         tree.setCellRenderer(new ConceptTreeCellRenderer());
         panel.setJTree(tree);
@@ -36,5 +44,4 @@ public class ConceptTreePanelDemo {
         frame.pack();
         frame.setVisible(true);
     }
-
 }

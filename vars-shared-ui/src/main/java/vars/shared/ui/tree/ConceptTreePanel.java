@@ -1,17 +1,32 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * @(#)ConceptTreePanel.java   2009.11.05 at 02:05:54 PST
+ *
+ * Copyright 2009 MBARI
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
+
 
 package vars.shared.ui.tree;
 
 import com.google.inject.Inject;
 import foxtrot.Job;
 import foxtrot.Worker;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
+import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -22,12 +37,13 @@ import org.mbari.swing.LabeledSpinningDialWaitIndicator;
 import org.mbari.swing.SearchableTreePanel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.PersistenceCache;
 import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.ConceptNameDAO;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.shared.ui.GlobalLookup;
-
 
 /**
  *
@@ -36,6 +52,8 @@ import vars.shared.ui.GlobalLookup;
 public class ConceptTreePanel extends SearchableTreePanel {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
+    private final MouseListener popupListener = new PopupListener();
+    private final KeyListener enterListener = new EnterKeyListener();
 
     /**
          * Store previous searches so that we don't try to do database lookup on them again.
@@ -43,21 +61,17 @@ public class ConceptTreePanel extends SearchableTreePanel {
     private final Collection<String> cachedGlobSearches;
 
     /**
-         * Store previous searches so that we don't try to do database lookup on them again.
-         * @uml.property  name="cachedWordSearches"
-         * @uml.associationEnd  multiplicity="(0 -1)" elementType="java.lang.String"
-         */
+     * Store previous searches so that we don't try to do database lookup on them again.
+     */
     private final Collection<String> cachedWordSearches;
-
     private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
-
+    private JPopupMenu popupMenu;
 
     /**
      * Constructor
      *
-     * @param conceptDAO
-     * @param conceptNameDAO
-     * @param persistenceCache
+     *
+     * @param knowledgebaseDAOFactory
      */
     @Inject
     public ConceptTreePanel(KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
@@ -65,23 +79,6 @@ public class ConceptTreePanel extends SearchableTreePanel {
         this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
         cachedWordSearches = new HashSet<String>();
         cachedGlobSearches = new HashSet<String>();
-    }
-
-
-    public void refresh() {
-        cachedGlobSearches.clear();
-        cachedWordSearches.clear();
-        ConceptTreeModel model = (ConceptTreeModel) getJTree().getModel();
-        model.refresh();
-    }
-
-    public void refreshAndOpenNode(Concept concept) {
-        if (log.isDebugEnabled()) {
-            log.debug("Refreshing ConceptTree and opening it to '" +
-                    concept.getPrimaryConceptName().getName() + "', " + concept);
-        }
-        refresh();
-        openNode(concept);
     }
 
     /**
@@ -115,8 +112,15 @@ public class ConceptTreePanel extends SearchableTreePanel {
     }
 
     /**
+     * Returns the popupmenu that's been associated with this panel
+     */
+    public JPopupMenu getPopupMenu() {
+        return popupMenu;
+    }
+
+    /**
      * This overridden method does a database lookup for searches. This is a
-     * woorkaournd needed for lazy loading. This method will load the branches
+     * woorkaround needed for lazy loading. This method will load the branches
      * of all matches from the database.
      *
      * @param text
@@ -132,7 +136,8 @@ public class ConceptTreePanel extends SearchableTreePanel {
          */
         getSearchBtn().setEnabled(false);
         getSearchTextField().setEnabled(false);
-        LabeledSpinningDialWaitIndicator waitIndicator = new LabeledSpinningDialWaitIndicator(this, "Searching for '" + text + "'");
+        LabeledSpinningDialWaitIndicator waitIndicator = new LabeledSpinningDialWaitIndicator(this,
+            "Searching for '" + text + "'");
         loadNodes(text, useGlobSearch, waitIndicator);
         boolean ok = super.goToMatchingNode(text, useGlobSearch);
         waitIndicator.dispose();
@@ -144,16 +149,22 @@ public class ConceptTreePanel extends SearchableTreePanel {
     }
 
     /**
-     * Perfroms the database lookup of all matching Concepts.
+     * Perform the database lookup of all {@link Concepts} that match the criteria
+     *
      * @param text
      * @param useGlobSearch
      */
-    private void loadNodes(final String text, final boolean useGlobSearch, final LabeledSpinningDialWaitIndicator waitIndicator) {
-        Collection<ConceptName> matches = (Collection) Worker.post(new Job() {
+    private void loadNodes(final String text, final boolean useGlobSearch,
+                           final LabeledSpinningDialWaitIndicator waitIndicator) {
+        Worker.post(new Job() {
+
             public Object run() {
                 Collection<ConceptName> matches = null;
-                try {
 
+                /*
+                 *  Do a fast lookup of the matching concepts
+                 */
+                try {
                     if (useGlobSearch) {
                         if (!cachedGlobSearches.contains(text)) {
                             ConceptNameDAO dao = knowledgebaseDAOFactory.newConceptNameDAO();
@@ -180,38 +191,42 @@ public class ConceptTreePanel extends SearchableTreePanel {
                         EventBus.publish(GlobalLookup.TOPIC_NONFATAL_ERROR, e);
                     }
                 }
+
+                /*
+                 * Open each node
+                 */
+                try {
+                    if (matches != null) {
+                        ConceptDAO dao = knowledgebaseDAOFactory.newConceptDAO();
+                        dao.startTransaction();
+
+                        for (final ConceptName conceptName : matches) {
+                            SwingUtilities.invokeLater(new Runnable() {
+
+                                public void run() {
+                                    waitIndicator.setLabel("Loading '" + conceptName.getName() + "'");
+                                }
+
+                            });
+                            openNode(conceptName.getConcept(), dao);
+                        }
+
+                        dao.endTransaction();
+
+                    }
+                }
+                catch (Exception e) {
+                    log.error("A problem occurred with the database while loading concepts matching " + text, e);
+                    EventBus.publish(GlobalLookup.TOPIC_NONFATAL_ERROR, e);
+                }
+
                 return matches;
+
             }
+
         });
 
 
-        /*
-         * If we loaded the matched names from the database then we need
-         * to open the Concept such that it gets cached under the root
-         * concept.
-         */
-        if (matches != null) {
-            int n = 0;
-            for (Iterator i = matches.iterator(); i.hasNext(); ) {
-                n++;
-                final ConceptName cn = (ConceptName) i.next();
-                waitIndicator.setLabel("Loading '" + cn.getName() + "'");
-
-                /*
-                 * Have to open the node in a seperate thread for the
-                 * progress monitor to update. Here we're using foxtrot.
-                 */
-                Worker.post(new Job() {
-
-                    public Object run() {
-                        openNode(cn.getConcept());
-
-                        return null;
-                    }
-                });
-            }
-
-        }
     }
 
     /**
@@ -230,8 +245,36 @@ public class ConceptTreePanel extends SearchableTreePanel {
      */
     public synchronized void openNode(final Concept concept) {
         if (log.isDebugEnabled()) {
-            log.debug("Opening node containing '" + concept.getPrimaryConceptName().getName() +
-                    "', " + concept);
+            log.debug("Opening node containing '" + concept.getPrimaryConceptName().getName() + "', " + concept);
+        }
+
+        if (concept == null) {
+            return;
+        }
+
+        Worker.post(new Job() {
+
+            @Override
+            public Object run() {
+                ConceptDAO dao = knowledgebaseDAOFactory.newConceptDAO();
+                dao.startTransaction();
+                openNode(concept, dao);
+                dao.endTransaction();
+
+                return null;
+            }
+        });
+
+    }
+
+    /**
+     * Internal method for opening multiple nodes in a single transaction
+     * @param concept
+     * @param dao
+     */
+    private void openNode(final Concept concept, ConceptDAO dao) {
+        if (log.isDebugEnabled()) {
+            log.debug("Opening node containing '" + concept.getPrimaryConceptName().getName() + "', " + concept);
         }
 
         if (concept == null) {
@@ -240,23 +283,125 @@ public class ConceptTreePanel extends SearchableTreePanel {
 
         final JTree tree = getJTree();
         final ConceptTreeModel model = (ConceptTreeModel) tree.getModel();
-        final TreeNode node = (TreeNode) Worker.post(new Job() {
-            public Object run() {
-                return model.loadNode(concept.getPrimaryConceptName().getName());
-            }
-        });
+        final TreeNode node = model.loadNode(concept.getPrimaryConceptName().getName(), dao);
 
         final TreePath path = new TreePath(model.getPathToRoot(node));
-
         SwingUtilities.invokeLater(new Runnable() {
+
             public void run() {
                 model.reload(node);
                 tree.scrollPathToVisible(path);
             }
+
         });
         validate();
     }
 
+    /**
+     * Refreshes the tree from data in the database (beawre you made need to
+     * purge the {@link PersistenceCache} first. This methods will open the root
+     * node.
+     */
+    public void refresh() {
+        cachedGlobSearches.clear();
+        cachedWordSearches.clear();
+        ConceptTreeModel model = (ConceptTreeModel) getJTree().getModel();
+        model.refresh();
+    }
 
+    /**
+     * Refreshes the tree from data in the database (beawre you made need to
+     * purge the {@link PersistenceCache} first. This methods will open the node
+     * containing the specified {@link Concept}.
+     * 
+     * @param concept The concept to open in the tree
+     */
+    public void refreshAndOpenNode(Concept concept) {
+        if (log.isDebugEnabled()) {
+            log.debug("Refreshing ConceptTree and opening it to '" + concept.getPrimaryConceptName().getName() +
+                      "', " + concept);
+        }
+
+        refresh();
+        openNode(concept);
+    }
+
+    /**
+     * This overriden method adds a few needed listeners to the concept tree
+     * 
+     * @param tree
+     */
+    @Override
+    public void setJTree(JTree tree) {
+        JTree oldTree = getJTree();
+        if (oldTree != null) {
+            oldTree.removeMouseListener(popupListener);
+            oldTree.removeKeyListener(enterListener);
+        }
+
+        if (tree != null) {
+            tree.addMouseListener(popupListener);
+            tree.addKeyListener(enterListener);
+        }
+
+        super.setJTree(tree);
+    }
+
+    /**
+     * Sets a popupmenu to use with the JTree
+     */
+    public void setPopupMenu(JPopupMenu popupMenu) {
+        this.popupMenu = popupMenu;
+    }
+
+    /**
+     * Listens for ENTER and toggles the selected node open or closed i
+     */
+    private class EnterKeyListener extends KeyAdapter {
+
+        @Override
+        public void keyReleased(KeyEvent event) {
+            if (event.getKeyCode() == KeyEvent.VK_ENTER) {
+                JTree tree = getJTree();
+                if (tree != null) {
+                    int row = tree.getSelectionRows()[0];
+
+                    if (tree.isCollapsed(row)) {
+                        tree.expandRow(row);
+                    }
+                    else {
+                        tree.collapseRow(row);
+                    }
+                }
+            }
+        }
+    }
+
+
+    /**
+     * Listens for mouse events that can popup the Popupmenu
+     */
+    private class PopupListener extends MouseAdapter {
+
+        private void evalutePopup(MouseEvent e) {
+
+            // Display popup menu next to selected item
+            if (e.isPopupTrigger() && (getJTree().getSelectionCount() != 0)) {
+                JPopupMenu p = getPopupMenu();
+                if (p != null) {
+                    getPopupMenu().show(e.getComponent(), e.getX(), e.getY());
+                }
+            }
+        }
+
+        @Override
+        public void mousePressed(MouseEvent event) {
+            evalutePopup(event);
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent event) {
+            evalutePopup(event);
+        }
+    }
 }
-

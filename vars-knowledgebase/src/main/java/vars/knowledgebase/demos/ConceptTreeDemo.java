@@ -3,8 +3,9 @@
  * and open the template in the editor.
  */
 
-package vars.knowledgebase.ui;
+package vars.knowledgebase.demos;
 
+import vars.knowledgebase.ui.*;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import javax.swing.JFrame;

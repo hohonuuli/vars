@@ -6,16 +6,18 @@
 package vars.shared.ui.tree;
 
 import java.util.Comparator;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreeNode;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptPrimaryNameComparator;
-import vars.shared.ui.kbtree.SortedTreeNode;
 
 /**
- *
+ * {@link  TreeNode} used to construct the {@link ConceptTreeModel}
+ * 
  * @author brian
  */
-public class ConceptTreeNode extends SortedTreeNode {
+public class ConceptTreeNode extends DefaultMutableTreeNode {
 
     private boolean loaded;
     private static final Comparator<Concept> COMPARATOR = new ConceptPrimaryNameComparator();
