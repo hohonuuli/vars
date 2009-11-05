@@ -20,7 +20,6 @@ import javax.swing.tree.TreeNode;
  */
 public class SortedTreeNode extends DefaultMutableTreeNode {
 
-    private static final long serialVersionUID = 9190234445771344521L;
 
     /**
      *

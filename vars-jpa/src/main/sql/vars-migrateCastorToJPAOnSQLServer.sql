@@ -198,3 +198,13 @@ ALTER TABLE VideoArchive
     ADD CONSTRAINT uc_VideoArchiveName UNIQUE (VideoArchiveName)
 GO
 
+-- Enforce the 1:1 relationship between VideoFrame and CameraData tables
+ALTER TABLE PhysicalData
+    ADD CONSTRAINT uc_VideoFrameID_FK UNIQUE (VideoFrameID_FK)
+GO
+
+-- Enforce the 1:1 relationship between VideoFrame and CameraData tables
+ALTER TABLE CameraData
+    ADD CONSTRAINT uc_VideoFrameID_FK UNIQUE (VideoFrameID_FK)
+GO
+

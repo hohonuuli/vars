@@ -8,6 +8,8 @@ package vars.knowledgebase.ui;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import javax.swing.JFrame;
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import org.jdesktop.swingx.JXTree;
 import vars.knowledgebase.KnowledgebaseModule;

@@ -155,7 +155,7 @@ public class TreeConcept implements Comparable {
         // remove the flag
         parent.removeAllChildren();
         concept = dao.merge(getConcept());
-        Collection<Concept> concepts = new ArrayList<Concept>(getConcept().getChildConcepts());
+        Collection<Concept> concepts = new ArrayList<Concept>(concept.getChildConcepts());
         for (Iterator iter = concepts.iterator(); iter.hasNext(); ) {
             Concept childConcept = (Concept) iter.next();
             DefaultMutableTreeNode node = new SortedTreeNode(new TreeConcept(childConcept));

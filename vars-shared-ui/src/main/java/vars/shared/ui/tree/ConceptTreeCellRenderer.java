@@ -89,7 +89,8 @@ public class ConceptTreeCellRenderer extends DefaultTreeCellRenderer {
         secondaryNames.clear();
 
         // Get the name from the Object contained in this node
-        Concept concept = (Concept) value;
+        ConceptTreeNode node = (ConceptTreeNode) value;
+        Concept concept = (Concept) node.getUserObject();
 
         /*
          * if the user object is a boolean value, then that means that
