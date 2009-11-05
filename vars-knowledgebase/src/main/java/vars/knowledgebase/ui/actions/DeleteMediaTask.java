@@ -6,22 +6,23 @@ import javax.swing.JOptionPane;
 import org.bushe.swing.event.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.DAO;
 import vars.knowledgebase.ConceptMetadata;
+import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.Media;
-import vars.knowledgebase.MediaDAO;
 import vars.knowledgebase.ui.Lookup;
 
 public class DeleteMediaTask {
 	
     private final Logger log = LoggerFactory.getLogger(getClass());
 
-    private final MediaDAO mediaDAO;
+    private final KnowledgebaseDAOFactory  knowledgebaseDAOFactory;
 
-    public DeleteMediaTask(MediaDAO mediaDAO) {
-        this.mediaDAO = mediaDAO;
+    public DeleteMediaTask(KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
+        this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
     }
     
-    public boolean delete(final Media media) {
+    public boolean delete(Media media) {
         boolean okToProceed = (media != null);
         
         /*
@@ -41,9 +42,13 @@ public class DeleteMediaTask {
          */
         final ConceptMetadata conceptMetadata = media.getConceptMetadata();
         if (okToProceed) {
-            conceptMetadata.removeMedia(media);
             try {
-                mediaDAO.makeTransient(media);
+                DAO dao = knowledgebaseDAOFactory.newDAO();
+                dao.startTransaction();
+                media = dao.merge(media);
+                media.getConceptMetadata().removeMedia(media);
+                dao.remove(media);
+                dao.endTransaction();
             }
             catch (Exception e) {
             	conceptMetadata.addMedia(media);

@@ -32,17 +32,17 @@ public class TransactionLogger {
 
     @PrePersist
     public void logPersist(Object object) {
-        logTransaction(object, DAO.TransactionType.INSERT);
+        logTransaction(object, DAO.TransactionType.PERSIST);
     }
 
     @PreRemove
     public void logRemove(Object object) {
-        logTransaction(object, DAO.TransactionType.DELETE);
+        logTransaction(object, DAO.TransactionType.REMOVE);
     }
 
     @PreUpdate
     public void logUpdate(Object object) {
-        logTransaction(object, DAO.TransactionType.UPDATE);
+        logTransaction(object, DAO.TransactionType.MERGE);
     }
 
     private void logTransaction(Object object, DAO.TransactionType transactionType) {

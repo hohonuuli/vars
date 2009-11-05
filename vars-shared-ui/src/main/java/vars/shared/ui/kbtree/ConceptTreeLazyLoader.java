@@ -19,12 +19,15 @@ import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import vars.DAO;
+import vars.knowledgebase.KnowledgebaseDAOFactory;
 
 /**
  *
  */
 public class ConceptTreeLazyLoader implements TreeExpansionListener {
 
+    private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
     private final DefaultTreeModel treeModel;
 
     /**
@@ -33,8 +36,9 @@ public class ConceptTreeLazyLoader implements TreeExpansionListener {
      *
      * @param model
      */
-    public ConceptTreeLazyLoader(DefaultTreeModel model) {
+    public ConceptTreeLazyLoader(DefaultTreeModel model, KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
         treeModel = model;
+        this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
     }
 
     /**
@@ -55,7 +59,10 @@ public class ConceptTreeLazyLoader implements TreeExpansionListener {
 
             @Override
             public void run() {
-                if ((treeConcept != null) && treeConcept.lazyExpand(node)) {
+
+                final DAO dao = knowledgebaseDAOFactory.newDAO();
+                dao.startTransaction();
+                if ((treeConcept != null) && treeConcept.lazyExpand(node, dao)) {
                     SwingUtilities.invokeLater(new Runnable() {
 
                         public void run() {
@@ -63,6 +70,7 @@ public class ConceptTreeLazyLoader implements TreeExpansionListener {
                         }
                     });
                 }
+                dao.endTransaction();
             }
         };
         lazyLoader.start();

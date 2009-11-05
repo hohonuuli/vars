@@ -14,6 +14,7 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import vars.jpa.EntityManagerFactoryAspect;
 
 /**
  * Created by IntelliJ IDEA.
@@ -22,17 +23,17 @@ import javax.persistence.Persistence;
  * Time: 9:37:10 AM
  * To change this template use File | Settings | File Templates.
  */
-    public class KnowledgebaseDAOFactoryImpl implements KnowledgebaseDAOFactory {
+    public class KnowledgebaseDAOFactoryImpl implements KnowledgebaseDAOFactory, EntityManagerFactoryAspect {
 
     private final EntityManagerFactory entityManagerFactory;
 
     @Inject
-    public KnowledgebaseDAOFactoryImpl(@Named("knowledgebaseEAO") String persistenceUnit) {
+    public KnowledgebaseDAOFactoryImpl(@Named("knowledgebasePersistenceUnit") String persistenceUnit) {
         this.entityManagerFactory = Persistence.createEntityManagerFactory(persistenceUnit);
     }
 
     public ConceptDAO newConceptDAO() {
-        return new ConceptDAOImpl(entityManagerFactory.createEntityManager(), newConceptNameDAO());
+        return new ConceptDAOImpl(entityManagerFactory.createEntityManager());
     }
 
     public ConceptMetadataDAO newConceptMetadataDAO() {
@@ -48,11 +49,11 @@ import javax.persistence.Persistence;
     }
 
     public LinkRealizationDAO newLinkRealizationDAO() {
-        return new LinkRealizationDAOImpl(entityManagerFactory.createEntityManager(), newConceptDAO());
+        return new LinkRealizationDAOImpl(entityManagerFactory.createEntityManager());
     }
 
     public LinkTemplateDAO newLinkTemplateDAO() {
-        return new LinkTemplateDAOImpl(entityManagerFactory.createEntityManager(), newConceptDAO());
+        return new LinkTemplateDAOImpl(entityManagerFactory.createEntityManager());
     }
 
     public MediaDAO newMediaDAO() {
@@ -65,5 +66,9 @@ import javax.persistence.Persistence;
 
     public DAO newDAO() {
         return new vars.jpa.DAO(entityManagerFactory.createEntityManager());
+    }
+
+    public EntityManagerFactory getEntityManagerFactory() {
+        return entityManagerFactory;
     }
 }

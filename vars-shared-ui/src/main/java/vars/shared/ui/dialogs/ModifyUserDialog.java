@@ -31,6 +31,7 @@ import org.bushe.swing.event.EventBus;
 import org.mbari.util.Dispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.MiscDAOFactory;
 import vars.UserAccount;
 import vars.UserAccountDAO;
 import vars.UserAccountRoles;
@@ -64,15 +65,15 @@ public class ModifyUserDialog extends JDialog implements ILockableEditor {
     private JPasswordField pwdField = null;
     private JComboBox roleComboBox = null;
     private JLabel userLabel = null;
-    private final UserAccountDAO userAccountDAO;
+    private final MiscDAOFactory miscDAOFactory;
 
     /**
      * @param owner
      * @param userAccountDAO
      */
-    public ModifyUserDialog(Frame owner, UserAccountDAO userAccountDAO) {
+    public ModifyUserDialog(Frame owner, MiscDAOFactory miscDAOFactory) {
         super(owner);
-        this.userAccountDAO = userAccountDAO;
+        this.miscDAOFactory = miscDAOFactory;
         initialize();
     }
 
@@ -140,7 +141,10 @@ public class ModifyUserDialog extends JDialog implements ILockableEditor {
 
         if ((selectedUserAccount != null) && !visible) {
             try {
-                userAccountDAO.update(selectedUserAccount);
+                UserAccountDAO userAccountDAO = miscDAOFactory.newUserAccountDAO();
+                userAccountDAO.startTransaction();
+                userAccountDAO.merge(selectedUserAccount);
+                userAccountDAO.endTransaction();
             }
             catch (Exception e) {
                 EventBus.publish(GlobalLookup.TOPIC_NONFATAL_ERROR,
@@ -270,7 +274,7 @@ public class ModifyUserDialog extends JDialog implements ILockableEditor {
 
     private UserAccountComboBox getNameComboBox() {
         if (nameComboBox == null) {
-            nameComboBox = new UserAccountComboBox(userAccountDAO);
+            nameComboBox = new UserAccountComboBox(miscDAOFactory);
             nameComboBox.addItemListener(new java.awt.event.ItemListener() {
 
                 public void itemStateChanged(java.awt.event.ItemEvent e) {

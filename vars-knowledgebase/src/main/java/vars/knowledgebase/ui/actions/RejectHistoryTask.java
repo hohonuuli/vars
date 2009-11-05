@@ -33,6 +33,7 @@ import foxtrot.Worker;
 import java.util.Collection;
 import java.util.HashSet;
 import org.bushe.swing.event.EventBus;
+import vars.DAO;
 import vars.LinkBean;
 import vars.LinkComparator;
 import vars.UserAccount;
@@ -72,6 +73,7 @@ public class RejectHistoryTask extends AbstractHistoryTask {
     private final Map actionMap = new HashMap();
 
     private final GenericRejectTask DEFAULT_TASK;
+    private final AnnotationDAOFactory annotationDAOFactory;
 
     @Inject
     public RejectHistoryTask(AnnotationDAOFactory annotationDAOFactory, 
@@ -79,6 +81,7 @@ public class RejectHistoryTask extends AbstractHistoryTask {
             KnowledgebaseDAOFactory knowledgebaseDAOFactory,
             KnowledgebaseFactory knowledgebaseFactory) {
         super(knowledgebaseDAOFactory);
+        this.annotationDAOFactory = annotationDAOFactory;
         DEFAULT_TASK = new GenericRejectTask(knowledgebaseDAOFactory);
 
 
@@ -151,18 +154,21 @@ public class RejectHistoryTask extends AbstractHistoryTask {
             super(knowledgebaseDAOFactory);
         }
 
-        public void doTask(final UserAccount userAccount, final History history) {
+        public void doTask(final UserAccount userAccount, History history) {
             reject(userAccount, history);
         }
 
-        public void reject(final UserAccount userAccount, final History history) {
+        public void reject(final UserAccount userAccount, History history) {
             if (canDo(userAccount, history)) {
-                history.setApprovalDate(new Date());
-                history.setRejected(true);
-                history.setApproverName(userAccount.getUserName());
+                
                 try {
-                    HistoryDAO historyDAO = knowledgebaseDAOFactory.newHistoryDAO();
-                    historyDAO.update(history);
+                    DAO dao = knowledgebaseDAOFactory.newDAO();
+                    dao.startTransaction();
+                    history = dao.merge(history);
+                    history.setApprovalDate(new Date());
+                    history.setRejected(true);
+                    history.setApproverName(userAccount.getUserName());
+                    dao.endTransaction();
                 }
                 catch (Exception e) {
                     throw new TaskException("Unable to update history in database", e);
@@ -211,7 +217,9 @@ public class RejectHistoryTask extends AbstractHistoryTask {
             progressBar.setValue(1);
             Concept thatConcept = null;
             try {
+                conceptDAO.startTransaction();
                 thatConcept = conceptDAO.findByName(name);
+                conceptDAO.endTransaction();
             }
             catch (Exception e1) {
                 EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e1);
@@ -268,7 +276,12 @@ public class RejectHistoryTask extends AbstractHistoryTask {
                                 Worker.post(new Task() {
 
                                     public Object run() throws Exception {
-                                        conceptNameDAO.makeTransient(conceptName);
+                                        conceptNameDAO.startTransaction();
+                                        Concept aConcept = conceptNameDAO.merge(thisConcept);
+                                        ConceptName conceptName = aConcept.getConceptName(name);
+                                        aConcept.removeConceptName(conceptName);
+                                        conceptNameDAO.remove(conceptName);
+                                        conceptNameDAO.endTransaction();
                                         return null;
                                     }
                                 });
@@ -291,7 +304,7 @@ public class RejectHistoryTask extends AbstractHistoryTask {
                                         public Object run() throws Exception {
                                             history.setApprovalDate(new Date());
                                             history.setRejected(true);
-                                            historyDAO.update(history);
+                                            historyDAO.merge(history);
                                             return null;
                                         }
                                     });
@@ -341,7 +354,7 @@ public class RejectHistoryTask extends AbstractHistoryTask {
 
         public AddConceptTask(KnowledgebaseDAOFactory knowledgebaseDAOFactory, ObservationDAO observationDAO) {
             super(knowledgebaseDAOFactory);
-            this.deleteConceptTask = new DeleteConceptTask(knowledgebaseDAOFactory.newConceptDAO(), observationDAO);
+            this.deleteConceptTask = new DeleteConceptTask(annotationDAOFactory, knowledgebaseDAOFactory);
         }
 
 
@@ -381,7 +394,9 @@ public class RejectHistoryTask extends AbstractHistoryTask {
             final String rejectedName = history.getNewValue();
             final Concept parentConcept = history.getConceptMetadata().getConcept();
             final ConceptDAO conceptDAO = getKnowledgebaseDAOFactory().newConceptDAO();
+            conceptDAO.startTransaction();
             Concept rejectedConcept = conceptDAO.findByName(rejectedName);
+            conceptDAO.endTransaction();
             if (rejectedConcept == null) {
                 dropHistory(history, "Unable to find a concept with the name '" +
                         rejectedName + "' in the knowledgebase. I'll drop the history reference");
@@ -405,7 +420,7 @@ public class RejectHistoryTask extends AbstractHistoryTask {
         public AddLinkTemplateTask(KnowledgebaseFactory knowledgebaseFactory, KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
             super(knowledgebaseDAOFactory);
             this.knowledgebaseFactory = knowledgebaseFactory;
-            this.deleteLinkTemplateTask = new DeleteLinkTemplateTask(knowledgebaseDAOFactory.newLinkTemplateDAO());
+            this.deleteLinkTemplateTask = new DeleteLinkTemplateTask(knowledgebaseDAOFactory);
         }
 
         @Override
@@ -453,7 +468,7 @@ public class RejectHistoryTask extends AbstractHistoryTask {
 
         public AddLinkRealizationTask(KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
             super(knowledgebaseDAOFactory);
-            this.deleteLinkRealizationTask = new DeleteLinkRealizationTask(knowledgebaseDAOFactory.newLinkRealizationDAO());
+            this.deleteLinkRealizationTask = new DeleteLinkRealizationTask(knowledgebaseDAOFactory);
         }
 
         @Override
@@ -498,9 +513,13 @@ public class RejectHistoryTask extends AbstractHistoryTask {
         }
 
         @Override
-        public void reject(UserAccount userAccount, final History history) {
-            if (canDo(userAccount, history)) {
-                final ConceptMetadata conceptMetadata = history.getConceptMetadata();
+        public void reject(UserAccount userAccount, History aHistory) {
+            if (canDo(userAccount, aHistory)) {
+
+                MediaDAO mediaDAO = getKnowledgebaseDAOFactory().newMediaDAO();
+                mediaDAO.startTransaction();
+                final History history = mediaDAO.merge(aHistory);
+                ConceptMetadata conceptMetadata = history.getConceptMetadata();
                 
                 // Iterate on copy to avoid threading issues
                 final Set<Media> mediaSet = new HashSet<Media>(conceptMetadata.getMedias());
@@ -512,11 +531,11 @@ public class RejectHistoryTask extends AbstractHistoryTask {
                     }
                 });
 
-                MediaDAO mediaDAO = getKnowledgebaseDAOFactory().newMediaDAO();
                 for (Media media : matches) {
                     conceptMetadata.removeMedia(media);
-                    mediaDAO.makeTransient(media);
+                    mediaDAO.remove(media);
                 }
+                mediaDAO.endTransaction();
 
                 try {
                     super.reject(userAccount, history);
@@ -536,30 +555,36 @@ public class RejectHistoryTask extends AbstractHistoryTask {
         }
 
         @Override
-        public void reject(UserAccount userAccount, final History history) {
+        public void reject(UserAccount userAccount, History history) {
             if (canDo(userAccount, history)) {
                 final ConceptDAO conceptDAO = getKnowledgebaseDAOFactory().newConceptDAO();
 
                 final Concept concept = history.getConceptMetadata().getConcept();
-                final Concept currentParent = concept.getParentConcept();
+                Concept currentParent = concept.getParentConcept();
 
                 /*
                  * Need to do a little database lookup.
                  */
                 Concept newParent = null;
                 Concept oldParent = null;
+                conceptDAO.startTransaction();
                 try {
+                    history = conceptDAO.merge(history);
                     newParent = conceptDAO.findByName(history.getNewValue());
                     oldParent = conceptDAO.findByName(history.getOldValue());
                 }
                 catch (Exception e) {
                     EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
                 }
+                conceptDAO.endTransaction();
 
                 if (currentParent.equals(newParent)) {
                     if (oldParent != null) {
 
+                        conceptDAO.startTransaction();
+                        oldParent = conceptDAO.merge(oldParent);
                         Collection<Concept> descendents = conceptDAO.findDescendents(oldParent);
+                        conceptDAO.endTransaction();
                         Collection<Concept> matches = Collections2.filter(descendents, new Predicate<Concept>(){
                             @Override
                             public boolean apply(Concept input) {
@@ -578,12 +603,16 @@ public class RejectHistoryTask extends AbstractHistoryTask {
                         /*
                          * Update the database.
                          */
-                        currentParent.removeChildConcept(concept);
+
+
                         super.reject(userAccount, history);
                         try {
-                            conceptDAO.update(currentParent);
-                            oldParent.addChildConcept(concept);
-                            conceptDAO.update(oldParent);
+                            conceptDAO.startTransaction();
+                            currentParent = conceptDAO.merge(currentParent);
+                            Concept aConcept = conceptDAO.merge(concept);
+                            currentParent.removeChildConcept(aConcept);
+                            oldParent.addChildConcept(aConcept);
+                            conceptDAO.endTransaction();
                         }
                         catch (Exception e) {
                             currentParent.addChildConcept(concept);
@@ -640,7 +669,9 @@ public class RejectHistoryTask extends AbstractHistoryTask {
                 if ((currentValue != null && currentValue.equals(newValue)) || (newValue != null && newValue.equals(currentValue))) {
                     concept.setNodcCode(history.getOldValue());
                     try {
-                        conceptDAO.update((Concept) concept);
+                        conceptDAO.startTransaction();
+                        conceptDAO.merge((Concept) concept);
+                        conceptDAO.endTransaction();
                         super.reject(userAccount, history);
                     }
                     catch (Exception e) {
@@ -672,7 +703,9 @@ public class RejectHistoryTask extends AbstractHistoryTask {
                 if ((currentValue != null && currentValue.equals(newValue)) || (newValue != null && newValue.equals(currentValue))) {
                     concept.setRankName(history.getOldValue());
                     try {
-                        conceptDAO.update((Concept) concept);
+                        conceptDAO.startTransaction();
+                        conceptDAO.merge((Concept) concept);
+                        conceptDAO.endTransaction();
                         super.reject(userAccount, history);
                     }
                     catch (Exception e) {
@@ -704,7 +737,9 @@ public class RejectHistoryTask extends AbstractHistoryTask {
                 if ((currentValue != null && currentValue.equals(newValue)) || (newValue != null && newValue.equals(currentValue))) {
                     concept.setRankLevel(history.getOldValue());
                     try {
-                        conceptDAO.update((Concept) concept);
+                        conceptDAO.startTransaction();
+                        conceptDAO.merge((Concept) concept);
+                        conceptDAO.endTransaction();
                         super.reject(userAccount, history);
                     }
                     catch (Exception e) {
@@ -736,7 +771,9 @@ public class RejectHistoryTask extends AbstractHistoryTask {
                 if ((currentValue != null && currentValue.equals(newValue)) || (newValue != null && newValue.equals(currentValue))) {
                     concept.setReference(history.getOldValue());
                     try {
-                        conceptDAO.update((Concept) concept);
+                        conceptDAO.startTransaction();
+                        conceptDAO.merge((Concept) concept);
+                        conceptDAO.endTransaction();
                         super.reject(userAccount, history);
                     }
                     catch (Exception e) {
@@ -778,7 +815,9 @@ public class RejectHistoryTask extends AbstractHistoryTask {
                     // Verify that the old name is not being used by another concept in the database. If it is return
                     Concept duplicate = null;
                     try {
+                        conceptDAO.startTransaction();
                         duplicate = conceptDAO.findByName(history.getOldValue());
+                        conceptDAO.endTransaction();
                     }
                     catch (Exception e1) {
                         EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e1);
@@ -789,7 +828,9 @@ public class RejectHistoryTask extends AbstractHistoryTask {
                             conceptName.setName(history.getOldValue());
                         try {
                             knowledgebaseDAO.updateConceptNameUsedByAnnotations(concept);
-                            conceptDAO.update(concept);
+                            conceptDAO.startTransaction();
+                            conceptDAO.merge(concept);
+                            conceptDAO.endTransaction();
                             super.reject(userAccount, history);
                         }
                         catch (Exception e) {

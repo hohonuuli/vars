@@ -25,7 +25,6 @@ import vars.ExternalDataDAO;
 import vars.ExternalDataDaoExpdImpl;
 import vars.MiscDAOFactory;
 import vars.MiscFactory;
-import vars.PersistenceCacheProvider;
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.AnnotationFactory;
 import vars.annotation.jpa.AnnotationDAOFactoryImpl;
@@ -84,17 +83,16 @@ public class VarsJpaModule implements Module {
         binder.bindConstant().annotatedWith(Names.named("miscPersistenceUnit")).to(miscPersistenceUnit);
 
         // Bind annotation object and DAO factories
-        binder.bind(AnnotationDAOFactory.class).to(AnnotationDAOFactoryImpl.class);
+        binder.bind(AnnotationDAOFactory.class).to(AnnotationDAOFactoryImpl.class).in(Scopes.SINGLETON);;
         binder.bind(AnnotationFactory.class).to(AnnotationFactoryImpl.class);
         binder.bind(ExternalDataDAO.class).to(ExternalDataDaoExpdImpl.class);
         binder.bind(KnowledgebaseDAO.class).to(KnowledgebaseDAOImpl.class);
-        binder.bind(KnowledgebaseDAOFactory.class).to(KnowledgebaseDAOFactoryImpl.class);
+        binder.bind(KnowledgebaseDAOFactory.class).to(KnowledgebaseDAOFactoryImpl.class).in(Scopes.SINGLETON);;
         binder.bind(KnowledgebaseFactory.class).to(KnowledgebaseFactoryImpl.class);
-        binder.bind(MiscDAOFactory.class).to(MiscDAOFactoryImpl.class);
+        binder.bind(MiscDAOFactory.class).to(MiscDAOFactoryImpl.class).in(Scopes.SINGLETON);;
         binder.bind(MiscFactory.class).to(MiscFactoryImpl.class);
         binder.bind(QueryDAO.class).to(QueryDAOImpl.class);
         binder.bind(VarsUserPreferencesFactory.class).to(VarsUserPreferencesFactoryImpl.class).in(Scopes.SINGLETON);
-        binder.bind(PersistenceCacheProvider.class).to(JPACacheProvider.class).in(Scopes.SINGLETON);
 
     }
 }

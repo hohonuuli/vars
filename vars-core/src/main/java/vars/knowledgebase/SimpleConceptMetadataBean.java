@@ -100,4 +100,8 @@ public class SimpleConceptMetadataBean implements ConceptMetadata {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    public boolean isPendingApproval() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
 }

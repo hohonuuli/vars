@@ -321,4 +321,15 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
         }
         return primaryMedia;
     }
+
+    public boolean isPendingApproval() {
+        boolean isPending = false;
+        for (History history : getHistories()) {
+            if (!history.isApproved()) {
+                isPending = true;
+                break;
+            }
+        }
+        return isPending;
+    }
 }

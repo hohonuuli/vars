@@ -9,8 +9,6 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import vars.PersistenceCacheProvider;
 import com.google.common.collect.ImmutableSet;
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
 import java.util.Set;
 import javax.persistence.EntityManagerFactory;
 import vars.annotation.jpa.GAssociation;
@@ -37,7 +35,7 @@ import vars.knowledgebase.jpa.GUsage;
  *
  * @author brian
  */
-public class JPACacheProvider implements PersistenceCacheProvider {
+public class HibernateCacheProvider implements PersistenceCacheProvider {
 
     private final EntityManagerFactory entityManagerFactory;
 
@@ -60,11 +58,10 @@ public class JPACacheProvider implements PersistenceCacheProvider {
             GMedia.class,
             GUsage.class);
 
-    @Inject
-    public JPACacheProvider(@Named("miscEAO") EntityManagerFactory entityManagerFactory) {
+    
+    public HibernateCacheProvider(EntityManagerFactory entityManagerFactory) {
         this.entityManagerFactory = entityManagerFactory;
     }
-
 
     /**
      * Clear the second level cache

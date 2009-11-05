@@ -21,7 +21,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Enumeration;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -32,7 +31,9 @@ import javax.swing.tree.TreeSelectionModel;
 import org.bushe.swing.event.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.DAO;
 import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.shared.ui.ConceptChangeListener;
@@ -57,12 +58,8 @@ public class ConceptTree extends JTree implements ConceptChangeListener {
     public final static Cursor WAIT_CURSOR = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
     public final static Cursor DEFAULT_CURSOR = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
     private final Logger log = LoggerFactory.getLogger(getClass());
-    private KnowledgebaseDAOFactory knowledgebaseDAOFactory;
+    private final ConceptTreeController controller;
 
-    /**
-         * @uml.property  name="popupMenu"
-         * @uml.associationEnd  inverse="this$0:org.mbari.vars.ui.ConceptTree$ConceptPopupMenu"
-         */
     protected ConceptTreePopupMenu popupMenu;
 
     /**
@@ -81,22 +78,16 @@ public class ConceptTree extends JTree implements ConceptChangeListener {
      * @param conceptDAO
      */
     public ConceptTree(Concept rootConcept, KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
-        this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
+        this.controller = new ConceptTreeController(this, knowledgebaseDAOFactory);
         loadModel(rootConcept);
         initialize();
-    }
-
-
-    protected ConceptTree() {
-        // Hack to get EditableConceptTree working correctly. Don't delete this.
     }
 
     /**
      * Refresh the tree from the database
      */
     public void refresh() {
-        // Reload from the root
-        loadModel(knowledgebaseDAOFactory.newConceptDAO().findRoot());
+        controller.refresh();
     }
 
     /**
@@ -115,7 +106,7 @@ public class ConceptTree extends JTree implements ConceptChangeListener {
      * @param  conceptName Description of the Parameter
      */
     public void addedConceptName(ConceptName conceptName) {
-        updateTreeNode(knowledgebaseDAOFactory.newConceptDAO().findByName(conceptName.getName()));
+        controller.addedConceptName(conceptName);
     }
 
     /**
@@ -174,7 +165,7 @@ public class ConceptTree extends JTree implements ConceptChangeListener {
         List list = null;
 
         try {
-            list = findConceptFamilyTree(name);
+            list = controller.findConceptFamilyTree(name);
         }
         catch (Exception e) {
             if (log.isErrorEnabled()) {
@@ -199,7 +190,10 @@ public class ConceptTree extends JTree implements ConceptChangeListener {
 
             // Need to ensure the tree node for the current family name is expanded.
             TreeConcept treeConcept = (TreeConcept) treeNode.getUserObject();
-            treeConcept.lazyExpand(treeNode);
+            DAO dao = controller.getKnowledgebaseDAOFactory().newDAO();
+            dao.startTransaction();
+            treeConcept.lazyExpand(treeNode, dao);
+            dao.endTransaction();
 
             // Find the child node for the next family member.
             boolean found = false;
@@ -224,30 +218,7 @@ public class ConceptTree extends JTree implements ConceptChangeListener {
         return treeNode;
     }
 
-    /**
-     * Gets the list of <code>Concept</code> objects from the root down to the
-     * <code>Concept</code> for the specified concept name.
-     *
-     * @param  name           The name of the concept for the tree.
-     * @return  The list of concepts from the root to the parameter concept.
-     */
-    List findConceptFamilyTree(final String name) {
-        final LinkedList conceptList = new LinkedList();
-        Concept concept = knowledgebaseDAOFactory.newConceptDAO().findByName(name);
-        conceptList.add(concept);
 
-        while (concept.hasParent()) {
-            concept = (Concept) concept.getParentConcept();
-            conceptList.addFirst(concept);
-        }
-
-        return conceptList;
-    }
-
-    /**
-         * Method description
-         * @return
-         */
     public ConceptTreePopupMenu getPopupMenu() {
         if (popupMenu == null) {
             log.debug(getClass().getName() + "getPopupMenu called");
@@ -356,6 +327,8 @@ public class ConceptTree extends JTree implements ConceptChangeListener {
             setModel(null);
         }
         else {
+            final DAO dao = controller.getKnowledgebaseDAOFactory().newDAO();
+            rootConcept = dao.merge(rootConcept);
             TreeConcept treeConcept = new TreeConcept(rootConcept);
             DefaultMutableTreeNode rootNode = new SortedTreeNode(treeConcept);
 
@@ -366,12 +339,13 @@ public class ConceptTree extends JTree implements ConceptChangeListener {
              * the ConceptTreeLazyLoader
              */
             rootNode.add(new DefaultMutableTreeNode(Boolean.TRUE));
-            treeConcept.lazyExpand(rootNode);
+            treeConcept.lazyExpand(rootNode, dao);
+            dao.endTransaction();
 
             DefaultTreeModel model = new DefaultTreeModel(rootNode);
 
             setModel(model);
-            addTreeExpansionListener(new ConceptTreeLazyLoader(model));
+            addTreeExpansionListener(new ConceptTreeLazyLoader(model, controller.getKnowledgebaseDAOFactory()));
         }
     }
 
@@ -397,12 +371,20 @@ public class ConceptTree extends JTree implements ConceptChangeListener {
         }
     }
 
+    private void makeChildrenVisible(DefaultMutableTreeNode node) {
+        DAO dao = controller.getKnowledgebaseDAOFactory().newDAO();
+        dao.startTransaction();
+        makeChildrenVisible(node, dao);
+        dao.endTransaction();
+
+    }
+
     /**
      * Makes the children nodes under the specified node visible.
      *
      * @param  node   The node on which to act.
      */
-    private void makeChildrenVisible(DefaultMutableTreeNode node) {
+    private void makeChildrenVisible(DefaultMutableTreeNode node, DAO dao) {
 
         // RxTBD wcpr The Java API interaction of using TreeNodes and TreePaths
         // doesn't seem to make sense. There should be a cleaner way to implement
@@ -414,7 +396,8 @@ public class ConceptTree extends JTree implements ConceptChangeListener {
         // Expand the node
         TreeConcept treeConcept = (TreeConcept) node.getUserObject();
 
-        treeConcept.lazyExpand(node);
+
+        treeConcept.lazyExpand(node, dao);
 
         boolean allChildrenAreLeaves = true;
         Enumeration children = node.children();
@@ -423,7 +406,7 @@ public class ConceptTree extends JTree implements ConceptChangeListener {
             DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) children.nextElement();
 
             if (!childNode.isLeaf()) {
-                makeChildrenVisible(childNode);
+                makeChildrenVisible(childNode, dao);
                 allChildrenAreLeaves = false;
             }
         }
@@ -590,7 +573,10 @@ public class ConceptTree extends JTree implements ConceptChangeListener {
         // Get the new parent node
         DefaultMutableTreeNode newParentNode = expandDownToNode(newParentName);
         TreeConcept treeConcept = (TreeConcept) newParentNode.getUserObject();
-        boolean parentNeededExpanding = treeConcept.lazyExpand(newParentNode);
+
+        ConceptDAO conceptDao = controller.getKnowledgebaseDAOFactory().newConceptDAO();
+        conceptDao.startTransaction();
+        boolean parentNeededExpanding = treeConcept.lazyExpand(newParentNode, conceptDao);
 
         // Branch on whether parent needed expanding:
         // - The parent node needed to be expanded. The call to lazyExpand()
@@ -633,5 +619,6 @@ public class ConceptTree extends JTree implements ConceptChangeListener {
             model.insertNodeInto(conceptNode, newParentNode, insertPosition);
             setSelectionPath(new TreePath(conceptNode.getPath()));
         }
+        conceptDao.endTransaction();
     }
 }

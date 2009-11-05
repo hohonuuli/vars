@@ -21,17 +21,17 @@ import org.slf4j.LoggerFactory;
  * dao.endTransaction();
  * </code>
  */
-public class DAO implements vars.DAO {
+public class DAO implements vars.DAO, EntityManagerAspect {
 
     private final EntityManager entityManager;
     protected final Logger log = LoggerFactory.getLogger(getClass());
 
     public enum TransactionType {
-        DELETE,
+        REMOVE,
         FIND,
-        INSERT,
+        PERSIST,
         LOAD_LAZY_RELATIONS, // <-- Load those lazy relationships
-        UPDATE
+        MERGE
     }
 
     @Inject
@@ -45,20 +45,20 @@ public class DAO implements vars.DAO {
         }
         try {
             switch (transactionType) {
-                case DELETE:
+                case REMOVE:
                     if (!entityManager.contains(entity)) {
                         entity = entityManager.merge(entity);
                     }
                     entityManager.remove(entity);
                     break;
-                case UPDATE:
+                case MERGE:
                     /*
                      * If this fails due to versioning (i.e. optimistic locking) a
                      * javax.persistence.OptimisticLockException will be thrown.
                      */
                     entity = entityManager.merge(entity);
                     break;
-                case INSERT:
+                case PERSIST:
                     entityManager.persist(entity);
                     break;
                 case LOAD_LAZY_RELATIONS:
@@ -93,16 +93,14 @@ public class DAO implements vars.DAO {
     }
 
     /**
-     * Update an object in the database
+     * Update an object in the database and bring it into the current transaction
      *
      * @param entity
      *            The entity object whos fields are being updated in the
      *            database.
-     * @param endTransaction if true the transaction wll be ended when the method exits. If
-     *     false then the transaction will be kept open and can be reused by the current thread.
      */
-    public <T> T update(T entity) {
-        return processTransaction(entity, TransactionType.UPDATE);
+    public <T> T merge(T entity) {
+        return processTransaction(entity, TransactionType.MERGE);
     }
 
     /**
@@ -111,14 +109,14 @@ public class DAO implements vars.DAO {
      * @param entity
      *            The entity object to persist in the database
      */
-    public <T> T makePersistent(T entity) {
-        return processTransaction(entity, TransactionType.INSERT);
+    public <T> T persist(T entity) {
+        return processTransaction(entity, TransactionType.PERSIST);
     }
 
 
 
-    public <T> T makeTransient(T object) {
-        return processTransaction(object, TransactionType.DELETE);
+    public <T> T remove(T object) {
+        return processTransaction(object, TransactionType.REMOVE);
     }
 
 
@@ -239,6 +237,17 @@ public class DAO implements vars.DAO {
             }
         }
    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        if (entityManager != null && entityManager.isOpen()) {
+            if (log.isDebugEnabled()) {
+                log.debug("Closing " + entityManager);
+            }
+            entityManager.close();
+        }
+        super.finalize();
+    }
 
 }
 

@@ -26,9 +26,9 @@ public class LinkTemplateDAOImpl extends DAO implements LinkTemplateDAO {
     private final ConceptDAO conceptDAO;
     
     @Inject
-    public LinkTemplateDAOImpl(EntityManager entityManager, ConceptDAO conceptDAO) {
+    public LinkTemplateDAOImpl(EntityManager entityManager) {
         super(entityManager);
-        this.conceptDAO = conceptDAO; 
+        this.conceptDAO = new ConceptDAOImpl(entityManager);
     }
 
     public Collection<LinkTemplate> findAllByLinkFields(String linkName, String toConcept, String linkValue) {

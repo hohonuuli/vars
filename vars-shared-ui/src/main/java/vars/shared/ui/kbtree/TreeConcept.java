@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import javax.swing.tree.DefaultMutableTreeNode;
+import vars.DAO;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.History;
@@ -31,7 +32,7 @@ import vars.knowledgebase.History;
  */
 public class TreeConcept implements Comparable {
 
-    private final Concept concept;
+    private Concept concept;
     private final String[] secondaryNames;
 
     /**
@@ -69,6 +70,7 @@ public class TreeConcept implements Comparable {
     public Concept getConcept() {
         return concept;
     }
+
 
     public String getName() {
         return concept.getPrimaryConceptName().getName();
@@ -127,10 +129,12 @@ public class TreeConcept implements Comparable {
      * </pre>
      *
      * @param parent
+     * @param A DAO Object for accessing the lazy loaded children. It should already
+     *      have an open transaction (i.e startTransaction() shoudl've been called
      * @return
      *
      */
-    public synchronized boolean lazyExpand(DefaultMutableTreeNode parent) {
+    public synchronized boolean lazyExpand(DefaultMutableTreeNode parent, DAO dao) {
 
         // Return false if attempt made to expand a node with no children.
         if (parent.isLeaf()) {
@@ -150,6 +154,7 @@ public class TreeConcept implements Comparable {
 
         // remove the flag
         parent.removeAllChildren();
+        concept = dao.merge(getConcept());
         Collection<Concept> concepts = new ArrayList<Concept>(getConcept().getChildConcepts());
         for (Iterator iter = concepts.iterator(); iter.hasNext(); ) {
             Concept childConcept = (Concept) iter.next();

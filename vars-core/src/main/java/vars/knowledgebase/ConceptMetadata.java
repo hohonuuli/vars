@@ -39,6 +39,12 @@ public interface ConceptMetadata extends KnowledgebaseObject {
      */
     boolean hasPrimaryImage();
 
+    /**
+     *
+     * @return true if it contains a history that has not been approved or reject
+     */
+    boolean isPendingApproval();
+
     Media getPrimaryMedia(MediaTypes mediaType);
 
 

@@ -21,11 +21,13 @@ import org.bushe.swing.event.EventBus;
 import org.mbari.util.Dispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.Observation;
 import vars.annotation.ObservationDAO;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptName;
+import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.ui.Lookup;
 
 /**
@@ -36,8 +38,8 @@ import vars.knowledgebase.ui.Lookup;
 public class DeleteConceptTask {
 
     private static final Logger log = LoggerFactory.getLogger(DeleteConceptTask.class);
-    private final ConceptDAO conceptDAO;
-    private final ObservationDAO observationDAO;
+    private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
+    private final AnnotationDAOFactory annotationDAOFactory;
 
     /**
      * Constructs ...
@@ -45,15 +47,16 @@ public class DeleteConceptTask {
      * @param conceptDAO
      * @param observationDAO
      */
-    public DeleteConceptTask(ConceptDAO conceptDAO, ObservationDAO observationDAO) {
-        this.conceptDAO = conceptDAO;
-        this.observationDAO = observationDAO;
+    public DeleteConceptTask(AnnotationDAOFactory annotationDAOFactory, KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
+        this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
+        this.annotationDAOFactory = annotationDAOFactory;
+
     }
 
-    public boolean delete(final Concept concept) {
+    public boolean delete(Concept concept) {
         boolean okToProceed = (concept != null);
         final String rejectedName = concept.getPrimaryConceptName().getName();
-        final Concept parentConcept = concept.getParentConcept();
+        ConceptDAO conceptDAO = knowledgebaseDAOFactory.newConceptDAO();
 
         /*
          * Look up the concept that we're deleting. Make sure it exists and it's not the root concept
@@ -68,7 +71,10 @@ public class DeleteConceptTask {
         if (okToProceed) {
             Collection<Concept> deletedConcepts;
             try {
+                
+                conceptDAO.startTransaction();
                 deletedConcepts = conceptDAO.findDescendents(concept);
+                conceptDAO.endTransaction();
                 Dispatcher dispatcher = Lookup.getApplicationFrameDispatcher();
                 Frame frame = (Frame) dispatcher.getValueObject();
                 final int option = JOptionPane .showConfirmDialog( frame,
@@ -94,7 +100,10 @@ public class DeleteConceptTask {
         Collection observations = null;
         if (okToProceed) {
             try {
+                ObservationDAO observationDAO = annotationDAOFactory.newObservationDAO();
+                observationDAO.startTransaction();
                 observations = observationDAO.findAllByConcept(concept, true);
+                observationDAO.endTransaction();
             }
             catch (Exception e) {
                 log.error("Failed to fetch observations from database", e);
@@ -116,8 +125,11 @@ public class DeleteConceptTask {
          */
         if (okToProceed) {
             try {
-                parentConcept.removeChildConcept(concept);
-                conceptDAO.makeTransient(concept);
+                conceptDAO.startTransaction();
+                concept = conceptDAO.merge(concept);
+                concept.getParentConcept().removeChildConcept(concept);
+                conceptDAO.remove(concept);
+                conceptDAO.endTransaction();
             }
             catch (Exception e) {
                 final String msg = "Failed to delete '" + rejectedName + "'";
@@ -170,12 +182,14 @@ public class DeleteConceptTask {
 
     private boolean update(final Collection<Observation> observations, final String newName) {
         boolean success = true;
+        ObservationDAO observationDAO = annotationDAOFactory.newObservationDAO();
+        observationDAO.startTransaction();
         for (Observation observation : observations) {
             final String oldName = observation.getConceptName();
             observation.setConceptName(newName);
 
             try {
-                observationDAO.update(observation);
+                observationDAO.merge(observation);
             }
             catch (Exception e) {
                 observation.setConceptName(oldName);
@@ -185,6 +199,7 @@ public class DeleteConceptTask {
                 break;
             }
         }
+        observationDAO.endTransaction();
 
         return success;
     }

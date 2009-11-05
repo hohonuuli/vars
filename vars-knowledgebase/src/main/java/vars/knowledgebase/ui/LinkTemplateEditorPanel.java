@@ -168,13 +168,13 @@ public class LinkTemplateEditorPanel extends EditorPanel {
 
                         DAO dao = getToolBelt().getKnowledgebaseDAOFactory().newDAO();
                         dao.startTransaction();
-                        linkTemplate = dao.update(linkTemplate);
+                        linkTemplate = dao.merge(linkTemplate);
                         ConceptMetadata conceptMetadata = linkTemplate.getConceptMetadata();
                         conceptMetadata.removeLinkTemplate(linkTemplate);
-                        dao.makeTransient(linkTemplate);
+                        dao.remove(linkTemplate);
                         final History history = getToolBelt().getHistoryFactory().delete(userAccount, linkTemplate);
                         conceptMetadata.addHistory(history);
-                        dao.makePersistent(history);
+                        dao.persist(history);
                         dao.endTransaction();
 
                     }
@@ -270,9 +270,9 @@ public class LinkTemplateEditorPanel extends EditorPanel {
                                 final Concept newFromConcept = conceptDAO.findByName(newFromConceptName);
                                 final ConceptMetadata conceptMetadata = linkTemplate.getConceptMetadata();
                                 conceptMetadata.removeLinkTemplate(linkTemplate);
-                                conceptDAO.update(conceptMetadata);
+                                conceptDAO.merge(conceptMetadata);
                                 newFromConcept.getConceptMetadata().addLinkTemplate(linkTemplate);
-                                conceptDAO.update(newFromConcept);
+                                conceptDAO.merge(newFromConcept);
                             }
                             catch (Exception e) {
                                 String message = "Failed to change parent of " + linkTemplate + " from " +
@@ -322,7 +322,7 @@ public class LinkTemplateEditorPanel extends EditorPanel {
                                 linkTemplate.setToConcept(newToConceptName);
 
                                 try {
-                                    linkTemplateDAO.update(linkTemplate);
+                                    linkTemplateDAO.merge(linkTemplate);
                                 }
                                 catch (Exception e) {
                                     log.error("Update to " + linkTemplate + " failed.", e);

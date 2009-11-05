@@ -41,12 +41,14 @@ public class PopulateDatabaseAction extends ActionAdapter {
     private final UserAccountDAO userAccountDAO;
     private final KnowledgebaseFactory knowledgebaseFactory;
     private final MiscFactory miscFactory;
+    private final ToolBelt toolBelt;
 
     public PopulateDatabaseAction(ToolBelt toolBelt) {
         this.conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
         this.knowledgebaseFactory = toolBelt.getKnowledgebaseFactory();
         this.miscFactory = toolBelt.getMiscFactory();
         this.userAccountDAO = toolBelt.getMiscDAOFactory().newUserAccountDAO();
+        this.toolBelt = toolBelt;
     }
     
 
@@ -97,7 +99,7 @@ public class PopulateDatabaseAction extends ActionAdapter {
                 Concept concept = knowledgebaseFactory.newConcept();
                 concept.addConceptName(conceptName);
                 concept.setOriginator("VARS");
-                conceptDAO.makePersistent(concept);
+                conceptDAO.persist(concept);
                 gotRoot = true;
 
             }
@@ -125,10 +127,10 @@ public class PopulateDatabaseAction extends ActionAdapter {
             
             if (ok == JOptionPane.YES_OPTION) {
                 UserAccount admin = NewUserDialog.showDialog(frame, true,
-                        "VARS - Create Administrator Account", userAccountDAO, miscFactory);
+                        "VARS - Create Administrator Account", toolBelt.getMiscDAOFactory(), miscFactory);
                 if (admin != null) {
                     admin.setRole(UserAccountRoles.ADMINISTRATOR.toString());
-                    userAccountDAO.update(admin);
+                    userAccountDAO.merge(admin);
                     gotAdmins = true;
                 }
 

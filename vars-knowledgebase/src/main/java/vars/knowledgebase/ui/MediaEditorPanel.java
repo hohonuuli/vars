@@ -257,7 +257,7 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
             History history = getToolBelt().getHistoryFactory().delete(userAccount, media);
             final Concept concept = media.getConceptMetadata().getConcept();
             concept.getConceptMetadata().addHistory(history);
-            history = getToolBelt().getKnowledgebaseDAOFactory().newHistoryDAO().makePersistent(history);
+            history = getToolBelt().getKnowledgebaseDAOFactory().newHistoryDAO().persist(history);
 
             if (userAccount.isAdministrator()) {
                 getToolBelt().getApproveHistoryTask().approve(userAccount, history);
@@ -360,8 +360,8 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
 
             try {
                 MediaDAO mediaDAO = getToolBelt().getKnowledgebaseDAOFactory().newMediaDAO();
-                mediaDAO.update(media);
-                mediaDAO.update(oldPrimaryMedia);
+                mediaDAO.merge(media);
+                mediaDAO.merge(oldPrimaryMedia);
 
                 // TODO 20070628 brian - verify that this redraws the media table
                 getMediaList().paintImmediately(getMediaList().getBounds());

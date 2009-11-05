@@ -7,7 +7,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ResourceBundle;
 
+import vars.PersistenceCacheProvider;
 import vars.jpa.VarsJpaModule;
+import vars.knowledgebase.jpa.KnowledgbaseCacheProvider;
 
 /**
  * Created by IntelliJ IDEA.
@@ -32,8 +34,8 @@ public class KnowledgebaseModule implements Module {
         miscPersistenceUnit = bundle.getString("misc.persistence.unit");
     }
 
-
     public void configure(Binder binder) {
         binder.install(new VarsJpaModule(annotationPersistenceUnit, knowledgebasePersistenceUnit, miscPersistenceUnit));
+        binder.bind(PersistenceCacheProvider.class).to(KnowledgbaseCacheProvider.class);
     }
 }

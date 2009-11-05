@@ -12,13 +12,12 @@
 
 
 
-package vars.knowledgebase.ui.persistence;
+package vars.knowledgebase.ui;
 
 import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.EventTopicSubscriber;
 import vars.UserAccount;
 import vars.knowledgebase.History;
-import vars.knowledgebase.ui.Lookup;
 import vars.knowledgebase.ui.actions.ApproveHistoryTask;
 
 /**
@@ -41,7 +40,7 @@ public class ApproveHistorySubscriber implements EventTopicSubscriber<History> {
     }
 
     public void onEvent(String topic, History history) {
-        if (Lookup.TOPIC_INSERT_CONCEPT_NAME.equals(topic)) {
+        if (Lookup.TOPIC_APPROVE_HISTORY.equals(topic)) {
             final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
             if ((userAccount != null) && userAccount.isAdministrator()) {
                 try {

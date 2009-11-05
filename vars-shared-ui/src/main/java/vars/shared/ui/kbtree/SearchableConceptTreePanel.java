@@ -31,7 +31,6 @@ import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import org.bushe.swing.event.EventBus;
 import org.mbari.swing.LabeledSpinningDialWaitIndicator;
@@ -39,10 +38,12 @@ import org.mbari.swing.SearchableTreePanel;
 import org.mbari.util.Dispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.DAO;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.ConceptNameDAO;
+import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.shared.ui.GlobalLookup;
 
 /**
@@ -78,8 +79,9 @@ public class SearchableConceptTreePanel extends SearchableTreePanel {
          * @uml.associationEnd  multiplicity="(0 -1)" elementType="java.lang.String"
          */
     private final Collection<String> cachedWordSearches;
-    private final ConceptNameDAO conceptNameDAO;
-    private final ConceptDAO conceptDAO;
+
+    private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
+
 
     /**
      * Constructor
@@ -89,10 +91,9 @@ public class SearchableConceptTreePanel extends SearchableTreePanel {
      * @param persistenceCache
      */
     @Inject
-    public SearchableConceptTreePanel(ConceptDAO conceptDAO, ConceptNameDAO conceptNameDAO) {
+    public SearchableConceptTreePanel(KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
         super();
-        this.conceptDAO = conceptDAO;
-        this.conceptNameDAO = conceptNameDAO;
+        this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
         cachedWordSearches = new HashSet<String>();
         cachedGlobSearches = new HashSet<String>();
         Dispatcher.getDispatcher(DISPATCHER_KEY).setValueObject(this);
@@ -100,7 +101,12 @@ public class SearchableConceptTreePanel extends SearchableTreePanel {
 
 
     public void refreshTree() {
-        refreshTreeAndOpenNode(conceptDAO.findRoot());
+        ConceptDAO dao = knowledgebaseDAOFactory.newConceptDAO();
+        dao.startTransaction();
+        Concept root = dao.findRoot();
+        dao.endTransaction();
+
+        refreshTreeAndOpenNode(root);
     }
 
     public void refreshTreeAndOpenNode(Concept concept) {
@@ -190,14 +196,20 @@ public class SearchableConceptTreePanel extends SearchableTreePanel {
 
                     if (useGlobSearch) {
                         if (!cachedGlobSearches.contains(text)) {
-                            matches = conceptNameDAO.findByNameContaining(text);
+                            ConceptNameDAO dao = knowledgebaseDAOFactory.newConceptNameDAO();
+                            dao.startTransaction();
+                            matches = dao.findByNameContaining(text);
+                            dao.endTransaction();
                             cachedGlobSearches.add(text);
                             cachedWordSearches.add(text);
                         }
                     }
                     else {
                         if (!cachedWordSearches.contains(text)) {
-                            matches = conceptNameDAO.findByNameStartingWith(text);
+                            ConceptNameDAO dao = knowledgebaseDAOFactory.newConceptNameDAO();
+                            dao.startTransaction();
+                            matches = dao.findByNameStartingWith(text);
+                            dao.endTransaction();
                             cachedWordSearches.add(text);
                         }
                     }
@@ -286,10 +298,12 @@ public class SearchableConceptTreePanel extends SearchableTreePanel {
         TreePath path = new TreePath(rootNode.getPath());
         tree.setSelectionPath(path);
         DefaultMutableTreeNode parentNode = rootNode;
+        DAO dao = knowledgebaseDAOFactory.newDAO();
+        dao.startTransaction();;
         while (i.hasPrevious()) {
             c = (Concept) i.previous();
             final TreeConcept parentTreeConcept = (TreeConcept) parentNode.getUserObject();
-            parentTreeConcept.lazyExpand(parentNode);
+            parentTreeConcept.lazyExpand(parentNode, dao);
 
             // treeModel.reload(parentNode);
             final Enumeration enm = parentNode.children();
@@ -303,6 +317,7 @@ public class SearchableConceptTreePanel extends SearchableTreePanel {
                 }
             }
         }
+        dao.endTransaction();
 
         final DefaultMutableTreeNode fParentNode = parentNode;
         SwingUtilities.invokeLater(new Runnable() {

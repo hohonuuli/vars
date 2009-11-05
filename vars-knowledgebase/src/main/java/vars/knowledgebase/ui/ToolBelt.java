@@ -94,10 +94,6 @@ public class ToolBelt {
         return miscFactory;
     }
 
-    public PersistenceCache getPersistenceCache() {
-        return persistenceCache;
-    }
-
     public QueryDAO getQueryDAO() {
         return queryDAO;
     }
@@ -106,6 +102,9 @@ public class ToolBelt {
         return rejectHistoryTask;
     }
 
+    public PersistenceCache getPersistenceCache() {
+        return persistenceCache;
+    }
 
 
 }

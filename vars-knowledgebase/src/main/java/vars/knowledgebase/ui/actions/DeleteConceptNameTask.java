@@ -123,7 +123,7 @@ public class DeleteConceptNameTask {
                         try {
                             ConceptNameDAO conceptNameDAO = knowledgebaseDAOFactory.newConceptNameDAO();
                             concept.removeConceptName(conceptName);
-                            conceptNameDAO.makeTransient(conceptName);
+                            conceptNameDAO.remove(conceptName);
                         }
                         catch (Exception e) {
                             if (log.isErrorEnabled()) {

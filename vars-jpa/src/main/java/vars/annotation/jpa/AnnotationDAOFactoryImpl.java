@@ -16,6 +16,7 @@ import vars.annotation.PhysicalDataDAO;
 import vars.annotation.VideoArchiveDAO;
 import vars.annotation.VideoArchiveSetDAO;
 import vars.annotation.VideoFrameDAO;
+import vars.jpa.EntityManagerFactoryAspect;
 
 /**
  * Created by IntelliJ IDEA.
@@ -24,7 +25,7 @@ import vars.annotation.VideoFrameDAO;
  * Time: 9:30:45 AM
  * To change this template use File | Settings | File Templates.
  */
-public class AnnotationDAOFactoryImpl implements AnnotationDAOFactory {
+public class AnnotationDAOFactoryImpl implements AnnotationDAOFactory, EntityManagerFactoryAspect {
 
     private final EntityManagerFactory entityManagerFactory;
     private final AnnotationFactory annotationFactory;
@@ -40,7 +41,7 @@ public class AnnotationDAOFactoryImpl implements AnnotationDAOFactory {
     }
 
     public AssociationDAO newAssociationDAO() {
-        return new AssociationDAOImpl(entityManagerFactory.createEntityManager(), kbFactory.newConceptDAO());
+        return new AssociationDAOImpl(entityManagerFactory.createEntityManager());
     }
 
     public CameraDataDAO newCameraDataDAO() {
@@ -52,7 +53,7 @@ public class AnnotationDAOFactoryImpl implements AnnotationDAOFactory {
     }
 
     public ObservationDAO newObservationDAO() {
-        return new ObservationDAOImpl(entityManagerFactory.createEntityManager(), kbFactory.newConceptDAO());
+        return new ObservationDAOImpl(entityManagerFactory.createEntityManager());
     }
 
     public PhysicalDataDAO newPhysicalDataDAO() {
@@ -64,7 +65,7 @@ public class AnnotationDAOFactoryImpl implements AnnotationDAOFactory {
     }
 
     public VideoArchiveSetDAO newVideoArchiveSetDAO() {
-        return new VideoArchiveSetDAOImpl(entityManagerFactory.createEntityManager(), newVideoArchiveDAO());
+        return new VideoArchiveSetDAOImpl(entityManagerFactory.createEntityManager(), annotationFactory);
     }
 
     public VideoFrameDAO newVideoFrameDAO() {
@@ -73,6 +74,10 @@ public class AnnotationDAOFactoryImpl implements AnnotationDAOFactory {
 
     public DAO newDAO() {
         return new vars.jpa.DAO(entityManagerFactory.createEntityManager());
+    }
+
+    public EntityManagerFactory getEntityManagerFactory() {
+        return entityManagerFactory;
     }
 
 }

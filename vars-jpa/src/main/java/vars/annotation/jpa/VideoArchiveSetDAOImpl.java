@@ -14,6 +14,7 @@ import java.util.List;
 
 import com.google.inject.Inject;
 import javax.persistence.EntityManager;
+import vars.annotation.AnnotationFactory;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveDAO;
 import vars.annotation.VideoArchiveSet;
@@ -25,9 +26,9 @@ public class VideoArchiveSetDAOImpl extends DAO implements VideoArchiveSetDAO {
     private final VideoArchiveDAO videoArchiveDAO;
 
     @Inject
-    public VideoArchiveSetDAOImpl(EntityManager entityManager, VideoArchiveDAO videoArchiveDAO) {
+    public VideoArchiveSetDAOImpl(EntityManager entityManager, AnnotationFactory annotationFactory) {
         super(entityManager);
-        this.videoArchiveDAO = videoArchiveDAO;
+        this.videoArchiveDAO = new VideoArchiveDAOImpl(entityManager, annotationFactory);
     }
 
     public Set<String> findAllLinkValues(VideoArchiveSet videoArchiveSet, String linkName) {

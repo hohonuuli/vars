@@ -7,9 +7,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-import vars.knowledgebase.ConceptMetadata;
+import vars.DAO;
+import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.LinkRealization;
-import vars.knowledgebase.LinkRealizationDAO;
 import vars.knowledgebase.ui.Lookup;
 
 /**
@@ -20,15 +20,14 @@ import vars.knowledgebase.ui.Lookup;
 public class DeleteLinkRealizationTask {
 
     private  final Logger log = LoggerFactory.getLogger(getClass());
-    private final LinkRealizationDAO linkRealizationDAO;
+    private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
 
-     public DeleteLinkRealizationTask(LinkRealizationDAO linkRealizationDAO) {
-         this.linkRealizationDAO = linkRealizationDAO;
+     public DeleteLinkRealizationTask(KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
+         this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
     }
 
-    public boolean delete(final LinkRealization linkRealization) {
+    public boolean delete(LinkRealization linkRealization) {
         boolean okToProceed = (linkRealization != null);
-        final ConceptMetadata conceptMetadata = linkRealization.getConceptMetadata();
 
         /*
          * Let the user know just how much damage their about to do to the database
@@ -46,8 +45,12 @@ public class DeleteLinkRealizationTask {
          */
         if (okToProceed) {
             try {
-            	conceptMetadata.removeLinkRealization(linkRealization);
-                linkRealizationDAO.makeTransient(linkRealization);
+                DAO dao = knowledgebaseDAOFactory.newDAO();
+                dao.startTransaction();
+                linkRealization = dao.merge(linkRealization);
+            	linkRealization.getConceptMetadata().removeLinkRealization(linkRealization);
+                dao.remove(linkRealization);
+                dao.endTransaction();
             }
             catch (Exception e) {
                 final String msg = "Failed to delete '" + linkRealization.stringValue() + "'";

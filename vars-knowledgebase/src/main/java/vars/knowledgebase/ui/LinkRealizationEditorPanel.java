@@ -567,7 +567,7 @@ public class LinkRealizationEditorPanel extends EditorPanel {
                 try {
                     LinkRealizationDAO linkRealizationDAO = getToolBelt().getKnowledgebaseDAOFactory()
                         .newLinkRealizationDAO();
-                    linkRealizationDAO.makePersistent(linkRealization);
+                    linkRealizationDAO.persist(linkRealization);
                 }
                 catch (Exception e) {
                     concept.getConceptMetadata().removeLinkRealization(linkRealization);
@@ -594,10 +594,10 @@ public class LinkRealizationEditorPanel extends EditorPanel {
 
                     DAO dao = getToolBelt().getKnowledgebaseDAOFactory().newDAO();
                     dao.startTransaction();
-                    linkRealization = dao.update(linkRealization);
+                    linkRealization = dao.merge(linkRealization);
                     ConceptMetadata conceptDelegate = linkRealization.getConceptMetadata();
                     conceptDelegate.addHistory(history);
-                    dao.makePersistent(history);
+                    dao.persist(history);
                     dao.endTransaction();
 
                     EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
@@ -665,7 +665,7 @@ public class LinkRealizationEditorPanel extends EditorPanel {
                 //. Update the current linkRealization
                 DAO dao = getToolBelt().getKnowledgebaseDAOFactory().newDAO();
                 dao.startTransaction();
-                linkRealization = dao.update(linkRealization);
+                linkRealization = dao.merge(linkRealization);
                 linkRealization.setLinkName(getLinkField().getText());
                 linkRealization.setToConcept(name);
                 linkRealization.setLinkValue(getLinkValueTextArea().getText());
@@ -674,7 +674,7 @@ public class LinkRealizationEditorPanel extends EditorPanel {
                 History history = getToolBelt().getHistoryFactory().replaceLinkRealization(userAccount, oldValue,
                     linkRealization);
                 linkRealization.getConceptMetadata().addHistory(history);
-                dao.makePersistent(history);
+                dao.persist(history);
                 dao.endTransaction();
 
                 EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);

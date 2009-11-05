@@ -27,9 +27,9 @@ public class LinkRealizationDAOImpl extends DAO implements LinkRealizationDAO {
     private final ConceptDAO conceptDAO;
 
     @Inject
-    public LinkRealizationDAOImpl(EntityManager entityManager, ConceptDAO conceptDao) {
+    public LinkRealizationDAOImpl(EntityManager entityManager) {
         super(entityManager);
-        this.conceptDAO = conceptDao;
+        this.conceptDAO = new ConceptDAOImpl(entityManager);
     }
 
     public Collection<LinkRealization> findAllByLinkName() {

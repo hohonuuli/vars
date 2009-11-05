@@ -459,9 +459,9 @@ public class AddConceptNameDialog extends JDialog {
 
                 try {
                     ConceptNameDAO conceptNameDAO = knowledgebaseDAOFactory.newConceptNameDAO();
-                    conceptNameDAO.makePersistent(conceptName);
+                    conceptNameDAO.persist(conceptName);
                     HistoryDAO historyDAO = knowledgebaseDAOFactory.newHistoryDAO();
-                    historyDAO.makePersistent(history);
+                    historyDAO.persist(history);
                 }
                 catch (Exception e) {
                     concept.removeConceptName(conceptName);

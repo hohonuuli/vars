@@ -7,6 +7,7 @@ import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.Concept;
 import com.google.inject.Inject;
 import javax.persistence.EntityManager;
+import vars.knowledgebase.jpa.ConceptDAOImpl;
 
 /**
  * Created by IntelliJ IDEA.
@@ -20,9 +21,9 @@ public class AssociationDAOImpl extends DAO implements AssociationDAO {
     private final ConceptDAO conceptDAO;
 
     @Inject
-    public AssociationDAOImpl(EntityManager entityManager, ConceptDAO conceptDao) {
+    public AssociationDAOImpl(EntityManager entityManager) {
         super(entityManager);
-        this.conceptDAO = conceptDao;
+        this.conceptDAO = new ConceptDAOImpl(entityManager);
     }
 
     public void validateName(Association ass) {

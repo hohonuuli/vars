@@ -139,7 +139,7 @@ public class VideoArchiveDAOImpl extends DAO implements VideoArchiveDAO {
             try {
                 startTransaction();
                 for (VideoFrame videoFrame : emptyFrames) {
-                    makeTransient(videoFrame);
+                    remove(videoFrame);
                 }
                 endTransaction();
                 log.debug("Deleted " + n + " empty VideoFrames from " + videoArchive);

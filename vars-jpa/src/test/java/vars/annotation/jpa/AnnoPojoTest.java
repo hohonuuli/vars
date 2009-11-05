@@ -29,7 +29,7 @@ public class AnnoPojoTest {
         AnnotationTestObjectFactory factory = new AnnotationTestObjectFactory(af);
         VideoArchiveSet vas = factory.makeObjectGraph("BIG-TEST", 2);
 
-        EntityUtilities eu = new EntityUtilities(null);
+        EntityUtilities eu = new EntityUtilities();
         log.info("ANNOTATION TREE FOR toString TEST:\n" + eu.buildTextTree(vas));
 
 

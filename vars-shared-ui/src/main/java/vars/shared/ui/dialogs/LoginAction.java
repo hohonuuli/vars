@@ -18,6 +18,7 @@ import java.awt.Frame;
 import org.mbari.awt.event.ActionAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.MiscDAOFactory;
 import vars.MiscFactory;
 import vars.UserAccount;
 import vars.UserAccountDAO;
@@ -45,9 +46,9 @@ public class LoginAction extends ActionAdapter {
      * @param miscFactory
      * @param userAccountDAO
      */
-    public LoginAction(MiscFactory miscFactory, UserAccountDAO userAccountDAO) {
+    public LoginAction(MiscDAOFactory miscDAOFactory, MiscFactory miscFactory) {
         final Frame frame = (Frame) GlobalLookup.getSelectedFrameDispatcher().getValueObject();
-        loginDialog = new LoginDialog(frame, true, userAccountDAO, miscFactory);
+        loginDialog = new LoginDialog(frame, true, miscDAOFactory, miscFactory);
     }
 
     /**

@@ -59,62 +59,10 @@ public class Lookup extends GlobalLookup {
     public static final String RESOURCE_BUNDLE = "knowlegebase-app";
     public static final Object KEY_DISPATCHER_GUICE_INJECTOR = Injector.class;
     
-    /** The data object should be a  Media  */
-    public static final String TOPIC_DELETE_MEDIA = "vars.knowledgebase.ui.Lookup-DeleteMedia";
-
-    /** The data object should be a  Concept  */
-    public static final String TOPIC_DELETE_CONCEPT = "vars.knowledgebase.ui.Lookup-DeleteConcept";
-
-    /** The data object should be a  ConceptName  */
-    public static final String TOPIC_DELETE_CONCEPT_NAME = "vars.knowledgebase.ui.Lookup-DeleteConceptName";
-
-    /** The data object should be a  History  */
-    public static final String TOPIC_DELETE_HISTORY = "vars.knowledgebase.ui.Lookup-DeleteHistory";
-
-    /** The data object should be a  LinkRealization  */
-    public static final String TOPIC_DELETE_LINK_REALIZATION = "vars.knowledgebase.ui.Lookup-DeleteLinkRealization";
-
-    /** The data object should be a  LinkTemplate  */
-    public static final String TOPIC_DELETE_LINK_TEMPLATE = "vars.knowledgebase.ui.Lookup-DeleteLinkTemplate";
     
     /** The data object should be a {@link Concept} */
     public static final String TOPIC_SELECTED_CONCEPT = "vars.knowledgebase.ui.Lookup-SelectedConcept";
 
-     /** The data object should be a  Media  */
-    public static final String TOPIC_UPDATE_MEDIA = "vars.knowledgebase.ui.Lookup-UpdateMedia";
-
-    /** The data object should be a  Concept  */
-    public static final String TOPIC_UPDATE_CONCEPT = "vars.knowledgebase.ui.Lookup-UpdateConcept";
-
-    /** The data object should be a  ConceptName  */
-    public static final String TOPIC_UPDATE_CONCEPT_NAME = "vars.knowledgebase.ui.Lookup-UpdateConceptName";
-
-    /** The data object should be a  History  */
-    public static final String TOPIC_UPDATE_HISTORY = "vars.knowledgebase.ui.Lookup-UpdateHistory";
-
-    /** The data object should be a  LinkRealization  */
-    public static final String TOPIC_UPDATE_LINK_REALIZATION = "vars.knowledgebase.ui.Lookup-UpdateLinkRealization";
-
-    /** The data object should be a  LinkTemplate  */
-    public static final String TOPIC_UPDATE_LINK_TEMPLATE = "vars.knowledgebase.ui.Lookup-UpdateLinkTemplate";
-
-     /** The data object should be a  Media  */
-    public static final String TOPIC_INSERT_MEDIA = "vars.knowledgebase.ui.Lookup-InsertMedia";
-
-    /** The data object should be a  Concept  */
-    public static final String TOPIC_INSERT_CONCEPT = "vars.knowledgebase.ui.Lookup-InsertConcept";
-
-    /** The data object should be a  ConceptName  */
-    public static final String TOPIC_INSERT_CONCEPT_NAME = "vars.knowledgebase.ui.Lookup-InsertConceptName";
-
-    /** The data object should be a  History  */
-    public static final String TOPIC_INSERT_HISTORY = "vars.knowledgebase.ui.Lookup-InsertHistory";
-
-    /** The data object should be a  LinkRealization  */
-    public static final String TOPIC_INSERT_LINK_REALIZATION = "vars.knowledgebase.ui.Lookup-InsertLinkRealization";
-
-    /** The data object should be a  LinkTemplate  */
-    public static final String TOPIC_INSERT_LINK_TEMPLATE = "vars.knowledgebase.ui.Lookup-InsertLinkTemplate";
 
     /** The data object should be a  History  */
     public static final String TOPIC_APPROVE_HISTORY = "vars.knowledgebase.ui.Lookup-ApproveHistory";
@@ -202,26 +150,9 @@ public class Lookup extends GlobalLookup {
 
 
         EventBus.subscribe(TOPIC_APPROVE_HISTORY, LOGGING_SUBSCRIBER);
-        EventBus.subscribe(TOPIC_DELETE_CONCEPT, LOGGING_SUBSCRIBER);
-        EventBus.subscribe(TOPIC_DELETE_CONCEPT_NAME, LOGGING_SUBSCRIBER);
-        EventBus.subscribe(TOPIC_DELETE_HISTORY, LOGGING_SUBSCRIBER);
-        EventBus.subscribe(TOPIC_DELETE_LINK_REALIZATION, LOGGING_SUBSCRIBER);
-        EventBus.subscribe(TOPIC_DELETE_LINK_TEMPLATE, LOGGING_SUBSCRIBER);
         EventBus.subscribe(TOPIC_EXIT, LOGGING_SUBSCRIBER);
         EventBus.subscribe(TOPIC_FATAL_ERROR, LOGGING_SUBSCRIBER);
-        EventBus.subscribe(TOPIC_INSERT_CONCEPT, LOGGING_SUBSCRIBER);
-        EventBus.subscribe(TOPIC_INSERT_CONCEPT_NAME, LOGGING_SUBSCRIBER);
-        EventBus.subscribe(TOPIC_INSERT_HISTORY, LOGGING_SUBSCRIBER);
-        EventBus.subscribe(TOPIC_INSERT_LINK_REALIZATION, LOGGING_SUBSCRIBER);
-        EventBus.subscribe(TOPIC_INSERT_LINK_TEMPLATE, LOGGING_SUBSCRIBER);
-        EventBus.subscribe(TOPIC_INSERT_MEDIA, LOGGING_SUBSCRIBER);
         EventBus.subscribe(TOPIC_SELECTED_CONCEPT, LOGGING_SUBSCRIBER);
-        EventBus.subscribe(TOPIC_UPDATE_CONCEPT, LOGGING_SUBSCRIBER);
-        EventBus.subscribe(TOPIC_UPDATE_CONCEPT_NAME, LOGGING_SUBSCRIBER);
-        EventBus.subscribe(TOPIC_UPDATE_HISTORY, LOGGING_SUBSCRIBER);
-        EventBus.subscribe(TOPIC_UPDATE_LINK_REALIZATION, LOGGING_SUBSCRIBER);
-        EventBus.subscribe(TOPIC_UPDATE_LINK_TEMPLATE, LOGGING_SUBSCRIBER);
-        EventBus.subscribe(TOPIC_UPDATE_MEDIA, LOGGING_SUBSCRIBER);
         EventBus.subscribe(TOPIC_UPDATE_OBSERVATIONS, LOGGING_SUBSCRIBER);
 
     }

@@ -196,16 +196,16 @@ public class AddLinkRealizationDialog extends JDialog {
 
                 DAO dao = knowledgebaseDAOFactory.newDAO();
                 dao.startTransaction();
-                c = dao.update(c);
+                c = dao.merge(c);
                 concept.getConceptMetadata().addLinkRealization(linkRealization);
-                dao.makePersistent(linkRealization);
+                dao.persist(linkRealization);
                 
                 /*
                  * Create a History
                  */
                 History history = historyFactory.add(userAccount, linkRealization);
                 c.getConceptMetadata().addHistory(history);
-                dao.makePersistent(history);
+                dao.persist(history);
                 dao.endTransaction();
 
                 EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);

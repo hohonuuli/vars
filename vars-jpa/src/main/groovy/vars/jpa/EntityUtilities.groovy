@@ -15,6 +15,8 @@ import vars.annotation.VideoArchiveSet
 
 class EntityUtilities {
 
+    def EntityUtilties() { /* Default Constructor */ }
+
     /**
      * Builds a text tree of the videoArchiveSet
      */

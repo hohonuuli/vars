@@ -6,21 +6,22 @@ import javax.swing.JOptionPane;
 import org.bushe.swing.event.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.DAO;
+import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.LinkTemplate;
-import vars.knowledgebase.LinkTemplateDAO;
 import vars.knowledgebase.ui.Lookup;
 
 public class DeleteLinkTemplateTask {
 	
     private final Logger log = LoggerFactory.getLogger(getClass());
 
-    private final LinkTemplateDAO linkTemplateDAO;
+    private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
     
-    public DeleteLinkTemplateTask(LinkTemplateDAO linkTemplateDAO) {
-        this.linkTemplateDAO = linkTemplateDAO;
+    public DeleteLinkTemplateTask(KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
+        this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
     }
     
-    public boolean delete(final LinkTemplate linkTemplate) {
+    public boolean delete(LinkTemplate linkTemplate) {
         boolean okToProceed = (linkTemplate != null);
 
         // TODO get count of associations and linkRealizations that use this template and notify user before delete
@@ -44,8 +45,12 @@ public class DeleteLinkTemplateTask {
          */
         if (okToProceed) {
             try {
+                DAO dao = knowledgebaseDAOFactory.newDAO();
+                dao.startTransaction();
+                linkTemplate = dao.merge(linkTemplate);
                 linkTemplate.getConceptMetadata().removeLinkTemplate(linkTemplate);
-                linkTemplateDAO.makeTransient(linkTemplate);
+                dao.remove(linkTemplate);
+                dao.endTransaction();
             }
             catch (Exception e) {
                 final String msg = "Failed to delete '" + linkTemplate.stringValue() + "'";

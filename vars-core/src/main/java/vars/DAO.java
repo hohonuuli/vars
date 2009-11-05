@@ -23,16 +23,16 @@ public interface DAO {
      *
      * @param object
      */
-    <T> T makePersistent(T object);
+    <T> T persist(T object);
 
     /**
      * TODO: Add JavaDoc
      *
      * @param object
      */
-    <T> T makeTransient(T object);
+    <T> T remove(T object);
 
-    <T> T update(T object);
+    <T> T merge(T object);
 
 
     <T> T findByPrimaryKey(Class<T> clazz, Object primaryKey);

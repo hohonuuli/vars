@@ -2,7 +2,6 @@ package vars.knowledgebase.ui.actions;
 
 import vars.knowledgebase.History;
 import vars.knowledgebase.ConceptMetadata;
-import vars.knowledgebase.ConceptMetadataDAO;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.ui.Lookup;
 import vars.UserAccount;
@@ -10,6 +9,7 @@ import org.bushe.swing.event.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.inject.Inject;
+import vars.DAO;
 
 public abstract class AbstractHistoryTask {
 
@@ -29,13 +29,16 @@ public abstract class AbstractHistoryTask {
      */
     public abstract void doTask(final UserAccount userAccount, final History history);
     
-    protected void dropHistory(final History h, final String msg) {
+    protected void dropHistory(History h, final String msg) {
         EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, msg);
 
+        DAO dao = knowledgebaseDAOFactory.newDAO();
+        dao.startTransaction();
+        h = dao.merge(h);
         final ConceptMetadata conceptMetadata = h.getConceptMetadata();
         conceptMetadata.removeHistory(h);
-        ConceptMetadataDAO conceptMetadataDAO = knowledgebaseDAOFactory.newConceptMetadataDAO();
-        conceptMetadataDAO.update(conceptMetadata);
+        h = dao.remove(h);
+        dao.endTransaction();
 
     }
     

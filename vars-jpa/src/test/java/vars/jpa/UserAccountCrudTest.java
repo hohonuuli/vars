@@ -3,14 +3,15 @@ package vars.jpa;
 import org.junit.Before;
 import org.junit.Assert;
 import org.junit.Test;
-import org.mbari.jpaxx.NonManagedEAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.inject.Injector;
 import com.google.inject.Guice;
-import vars.UserAccount;
-import vars.*;
 import vars.DAO;
+import vars.MiscDAOFactory;
+import vars.MiscFactory;
+import vars.UserAccount;
+import vars.UserAccountRoles;
 
 /**
  * Created by IntelliJ IDEA.
@@ -23,7 +24,6 @@ public class UserAccountCrudTest {
 
     MiscFactory miscFactory;
     MiscDAOFactory daoFactory;
-    NonManagedEAO eao;
 
     public final Logger log = LoggerFactory.getLogger(getClass());
 
@@ -33,7 +33,6 @@ public class UserAccountCrudTest {
 
         miscFactory = injector.getInstance(MiscFactory.class);
         daoFactory = injector.getInstance(MiscDAOFactory.class);
-        eao = injector.getInstance(MiscEAO.class);
     }
 
     @Test
@@ -46,7 +45,7 @@ public class UserAccountCrudTest {
         userAccount.setUserName(testString);
         userAccount.setRole(UserAccountRoles.ADMINISTRATOR.getRoleName());
         DAO dao = daoFactory.newUserAccountDAO();
-        dao.makePersistent(userAccount);
+        dao.persist(userAccount);
         Assert.assertNotNull(((JPAEntity) userAccount).getId());
 
         userAccount = dao.findByPrimaryKey(GUserAccount.class, ((JPAEntity) userAccount).getId());
@@ -56,7 +55,7 @@ public class UserAccountCrudTest {
                 userAccount.getRole());
         Assert.assertTrue("Couldn't authenticate", userAccount.authenticate(testString));
 
-        dao.makeTransient(userAccount);
+        dao.remove(userAccount);
 
         Assert.assertNull("Primary key wasn't reset on delete", ((JPAEntity) userAccount).getId());
     }

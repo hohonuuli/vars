@@ -15,12 +15,14 @@
 package vars.shared.ui;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import org.mbari.swing.FancyComboBox;
 import org.mbari.swing.SortedComboBoxModel;
 import org.mbari.text.IgnoreCaseToStringComparator;
+import vars.MiscDAOFactory;
 import vars.UserAccount;
 import vars.UserAccountDAO;
 
@@ -50,16 +52,16 @@ public class UserAccountComboBox extends FancyComboBox {
 
     };
     private final List<UserAccount> userAccounts = Collections.synchronizedList(new ArrayList<UserAccount>());
-    private final UserAccountDAO userAccountDAO;
+    private final MiscDAOFactory miscDAOFactory;
 
     /**
      * Constructs ...
      *
      * @param userAccountDAO
      */
-    public UserAccountComboBox(UserAccountDAO userAccountDAO) {
+    public UserAccountComboBox(MiscDAOFactory miscDAOFactory) {
         super();
-        this.userAccountDAO = userAccountDAO;
+        this.miscDAOFactory = miscDAOFactory;
         setComparator(comparator);
     }
 
@@ -104,7 +106,12 @@ public class UserAccountComboBox extends FancyComboBox {
         // Get potential user names and add them to the comboBox
         synchronized (userAccounts) {
             userAccounts.clear();
-            userAccounts.addAll(userAccountDAO.findAll());
+            UserAccountDAO userAccountDAO = miscDAOFactory.newUserAccountDAO();
+            userAccountDAO.startTransaction();
+            Collection<UserAccount> accounts = userAccountDAO.findAll();
+            userAccountDAO.endTransaction();
+
+            userAccounts.addAll(accounts);
             Collections.sort(userAccounts, userAccountComparator);
 
             /*

@@ -190,7 +190,7 @@ public class KnowledgebaseFrame extends JFrame {
      */
     private LoginAction getLoginAction() {
         if (loginAction == null) {
-            loginAction = new LoginAction(toolBelt.getMiscFactory(), toolBelt.getMiscDAOFactory().newUserAccountDAO()) {
+            loginAction = new LoginAction(toolBelt.getMiscDAOFactory(), toolBelt.getMiscFactory()) {
 
                 @Override
                 public void doAction() {
@@ -320,8 +320,7 @@ public class KnowledgebaseFrame extends JFrame {
     protected SearchableConceptTreePanel getTreePanel() {
         if (treePanel == null) {
             final ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
-            treePanel = new SearchableConceptTreePanel(conceptDAO,
-                    toolBelt.getKnowledgebaseDAOFactory().newConceptNameDAO());
+            treePanel = new SearchableConceptTreePanel(toolBelt.getKnowledgebaseDAOFactory());
 
             /*
              * Fetch the root concept. We need this to intialize the ConceptTree
@@ -518,7 +517,7 @@ public class KnowledgebaseFrame extends JFrame {
 
         private static final long serialVersionUID = 1L;
         private final ModifyUserDialog dialog = new ModifyUserDialog((Frame) Lookup.getApplicationFrameDispatcher().getValueObject(),
-                toolBelt.getMiscDAOFactory().newUserAccountDAO());
+                toolBelt.getMiscDAOFactory());
 
         public void doAction() {
 

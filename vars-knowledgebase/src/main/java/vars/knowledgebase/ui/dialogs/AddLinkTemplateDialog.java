@@ -167,14 +167,14 @@ public class AddLinkTemplateDialog extends JDialog {
                         }
                         else {
                             c.getConceptMetadata().addLinkTemplate(linkTemplate);
-                            linkTemplateDAO.makePersistent(linkTemplate);
+                            linkTemplateDAO.persist(linkTemplate);
                             UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
                             History history = historyFactory.add(userAccount, linkTemplate);
                             c.getConceptMetadata().addHistory(history);
 
                             try {
                                 HistoryDAO historyDAO = knowledgebaseDAOFactory.newHistoryDAO();
-                                historyDAO.makePersistent(history);
+                                historyDAO.persist(history);
                             }
                             catch (Exception e1) {
                                 c.getConceptMetadata().removeLinkTemplate(linkTemplate);

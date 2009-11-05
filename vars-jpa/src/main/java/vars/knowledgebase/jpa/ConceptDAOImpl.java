@@ -31,22 +31,22 @@ public class ConceptDAOImpl extends DAO implements ConceptDAO {
     private final PersistenceRule<Concept> thereCanBeOnlyOne = new ExactlyOnePrimaryNameRule();
 
     @Inject
-    public ConceptDAOImpl(EntityManager entityManager, ConceptNameDAO conceptNameDAO) {
+    public ConceptDAOImpl(EntityManager entityManager) {
         super(entityManager);
-        this.conceptNameDAO = conceptNameDAO;
+        this.conceptNameDAO = new ConceptNameDAOImpl(entityManager);
     }
 
-    @Override
-    public <T> T makePersistent(T object) {
-        thereCanBeOnlyOne.apply((Concept) object);
-        return super.makePersistent(object);
-    }
-
-    @Override
-    public <T> T update(T object) {
-        thereCanBeOnlyOne.apply((Concept) object);
-        return super.update(object);
-    }
+//    @Override
+//    public <T> T persist(T object) {
+//        thereCanBeOnlyOne.apply((Concept) object);
+//        return super.persist(object);
+//    }
+//
+//    @Override
+//    public <T> T merge(T object) {
+//        thereCanBeOnlyOne.apply((Concept) object);
+//        return super.merge(object);
+//    }
 
     public Concept findRoot() {
         List<Concept> roots = findByNamedQuery("Concept.findRoot", new HashMap<String, Object>());
@@ -119,7 +119,7 @@ public class ConceptDAOImpl extends DAO implements ConceptDAO {
     public Concept addConceptName(Concept concept, ConceptName conceptName) {
         startTransaction();
         concept.addConceptName(conceptName);
-        concept = makePersistent(concept);
+        concept = persist(concept);
         endTransaction();
         return concept;
     }

@@ -14,9 +14,11 @@ import javax.swing.event.DocumentListener;
 import org.mbari.swing.JFancyButton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.MiscDAOFactory;
 import vars.MiscFactory;
 import vars.UserAccount;
 import vars.UserAccountDAO;
+import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.shared.ui.GlobalLookup;
 
 /**
@@ -29,13 +31,13 @@ public class NewUserDialog extends javax.swing.JDialog {
     private final Logger log = LoggerFactory.getLogger(NewUserDialog.class);
     private static final long serialVersionUID = -4959276001824698570L;
     private UserAccount returnValue;
-    private final UserAccountDAO userAccountDAO;
+    private final MiscDAOFactory miscDAOFactory;
     private final MiscFactory miscFactory;
 
     /** Creates new form NewUserDialog */
-    public NewUserDialog(java.awt.Frame parent, boolean modal, UserAccountDAO userAccountDAO, MiscFactory miscFactory) {
+    public NewUserDialog(java.awt.Frame parent, boolean modal, MiscDAOFactory miscDAOFactory, MiscFactory miscFactory) {
         super(parent, modal);
-        this.userAccountDAO = userAccountDAO;
+        this.miscDAOFactory = miscDAOFactory;
         this.miscFactory = miscFactory;
         initComponents();
         initModel();
@@ -44,8 +46,8 @@ public class NewUserDialog extends javax.swing.JDialog {
         pack();
     }
     
-    public static UserAccount showDialog(Frame parent, boolean modal, String title, UserAccountDAO userAccountDAO, MiscFactory miscFactory) {
-        NewUserDialog dialog = new NewUserDialog(parent, modal, userAccountDAO, miscFactory);
+    public static UserAccount showDialog(Frame parent, boolean modal, String title, MiscDAOFactory miscDAOFactory, MiscFactory miscFactory) {
+        NewUserDialog dialog = new NewUserDialog(parent, modal, miscDAOFactory, miscFactory);
         dialog.setTitle(title);
         dialog.setVisible(true);
         return dialog.returnValue;
@@ -191,7 +193,10 @@ public class NewUserDialog extends javax.swing.JDialog {
         String pwd1 = new String(pwd1Field.getPassword());
         String pwd2 = new String(pwd2Field.getPassword());
         exit: {
+            
             if (pwd1.equals(pwd2)) {
+                UserAccountDAO userAccountDAO = miscDAOFactory.newUserAccountDAO();
+                userAccountDAO.startTransaction();
                 try {
 
                     userAccount = userAccountDAO.findByUserName(userName);
@@ -208,13 +213,16 @@ public class NewUserDialog extends javax.swing.JDialog {
                     userAccount.setUserName(userName);
                     userAccount.setPassword(pwd1);
                     try {
-                        userAccountDAO.makePersistent(userAccount);
+                        userAccountDAO.persist(userAccount);
                         setVisible(false);
                     } catch (Exception ex) {
                         msgLabel.setText("Unable to insert a new user into the database");
                         log.warn("An error occured while inserting " + userName + " into the database", ex);
 
                         break exit;
+                    }
+                    finally {
+                        userAccountDAO.endTransaction();
                     }
                 }
             }

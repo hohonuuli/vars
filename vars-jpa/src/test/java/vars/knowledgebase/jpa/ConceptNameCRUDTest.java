@@ -5,8 +5,6 @@ import org.junit.Before;
 import org.junit.After;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.mbari.jpaxx.NonManagedEAO;
-import vars.knowledgebase.*;
 import vars.testing.KnowledgebaseTestObjectFactory;
 import vars.jpa.EntityUtilities;
 import vars.jpa.VarsJpaTestModule;
@@ -14,6 +12,13 @@ import com.google.inject.Injector;
 import com.google.inject.Guice;
 
 import java.util.Collection;
+import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptDAO;
+import vars.knowledgebase.ConceptName;
+import vars.knowledgebase.ConceptNameDAO;
+import vars.knowledgebase.ConceptNameTypes;
+import vars.knowledgebase.KnowledgebaseDAOFactory;
+import vars.knowledgebase.KnowledgebaseFactory;
 
 /**
  * Created by IntelliJ IDEA.
@@ -26,7 +31,7 @@ public class ConceptNameCRUDTest {
 
     public final Logger log = LoggerFactory.getLogger(getClass());
     KnowledgebaseDAOFactory daoFactory;
-    NonManagedEAO eao;
+
     KnowledgebaseFactory kbFactory;
     KnowledgebaseTestObjectFactory testObjectFactory;
     EntityUtilities entityUtilities;
@@ -38,8 +43,7 @@ public class ConceptNameCRUDTest {
         kbFactory = injector.getInstance(KnowledgebaseFactory.class);
         testObjectFactory = new KnowledgebaseTestObjectFactory(kbFactory);
         daoFactory = injector.getInstance(KnowledgebaseDAOFactory.class);
-        eao = injector.getInstance(KnowledgebaseEAO.class);
-        entityUtilities = new EntityUtilities(eao);
+        entityUtilities = new EntityUtilities();
     }
 
     @After
@@ -61,9 +65,9 @@ public class ConceptNameCRUDTest {
 
          log.info("---------- TEST: conceptNameCRUD ----------");
          ConceptDAO dao = daoFactory.newConceptDAO();
-         ConceptNameDAO conceptNameDAO = daoFactory.newConceptNameDAO();
+         //ConceptNameDAO conceptNameDAO = daoFactory.newConceptNameDAO();
          Concept concept = testObjectFactory.makeObjectGraph("conceptNameCRUD", 2);
-         dao.makePersistent(concept);
+         dao.persist(concept);
          log.info("INITIAL KNOWLEDGEBASE TREE:\n" + entityUtilities.buildTextTree(concept));
 
          String name1 = "FOO";
@@ -72,56 +76,84 @@ public class ConceptNameCRUDTest {
          insert: {
 
              // Using correct JPA form
+             dao.startTransaction();
              concept = dao.findRoot();
              ConceptName conceptName = new GConceptName();
              conceptName.setName(name1);
              conceptName.setNameType(ConceptNameTypes.SYNONYM.toString());
              concept.addConceptName(conceptName);
-             conceptName = conceptNameDAO.makePersistent(conceptName);
+             conceptName = dao.persist(conceptName);
+             dao.endTransaction();
+
+             dao.startTransaction();
              concept = dao.findRoot();
+             conceptName = dao.merge(conceptName);
              log.info("INSERTED " + conceptName + " in KNOWLEDGEBASE TREE:\n" + entityUtilities.buildTextTree(concept));
              concept.removeConceptName(conceptName);
-             conceptNameDAO.makeTransient(conceptName);
+             dao.remove(conceptName);
              log.info("DELETED " + conceptName + " in KNOWLEDGEBASE TREE:\n" + entityUtilities.buildTextTree(concept));
+             dao.endTransaction();
+
 
              // Using old reference to conceptName
+             dao.startTransaction();
+             concept = dao.merge(concept);
              concept.addConceptName(conceptName);
-             conceptNameDAO.makePersistent(conceptName);
+             dao.persist(conceptName);
+             dao.endTransaction();
              log.info("INSERTED " + conceptName + " in KNOWLEDGEBASE TREE:\n" + entityUtilities.buildTextTree(concept));
+
+             dao.startTransaction();
+             dao.merge(concept);
              concept.removeConceptName(conceptName);
-             conceptName = conceptNameDAO.makeTransient(conceptName);
+             conceptName = dao.remove(conceptName);
+             dao.endTransaction();
              log.info("DELETED " + conceptName + " in KNOWLEDGEBASE TREE:\n" + entityUtilities.buildTextTree(concept));
 
              // Insert by inserting a new concept
+             dao.startTransaction();
              Concept childConcept = new ConceptImpl();
              conceptName.setNameType(ConceptNameTypes.PRIMARY.getName());
              childConcept.addConceptName(conceptName);
              concept.addChildConcept(childConcept);
-             dao.makePersistent(childConcept);
+             dao.persist(childConcept);
+             dao.endTransaction();
              log.info("UPDATED " + concept + " in KNOWLEDGEBASE TREE:\n" + entityUtilities.buildTextTree(concept));
 
          }
 
 
          update: {
+             dao.startTransaction();
              concept = dao.findByName(name1);
              ConceptName conceptName = concept.getConceptName(name1);
              conceptName.setName(name2);
-             conceptNameDAO.update(conceptName);
+             dao.merge(conceptName);
+             dao.endTransaction();
+
+             dao.startTransaction();
              Concept root = dao.findRoot();
+             concept  = dao.findByName(concept.getPrimaryConceptName().getName());
+             //concept = dao.merge(concept);
              log.info("UPDATED KNOWLEDGEBASE TREE:\n" + entityUtilities.buildTextTree(root));
              conceptName = new GConceptName();
              conceptName.setName(name1);
              conceptName.setNameType(ConceptNameTypes.SYNONYM.toString());
              concept.addConceptName(conceptName);
-             dao.update(concept);
+             dao.persist(conceptName);
+             dao.endTransaction();
+
+             dao.startTransaction();
              root = dao.findRoot();
+             dao.endTransaction();
              log.info("UPDATED KNOWLEDGEBASE TREE:\n" + entityUtilities.buildTextTree(root));
          }
 
          cleanup: {
+             dao.startTransaction();
              concept = dao.findRoot();
-             dao.makeTransient(concept);
+             dao.remove(concept);
+             dao.endTransaction();
              log.info("DELETED KNOWLEDGEBASE TREE:\n" + entityUtilities.buildTextTree(concept));
          }
 

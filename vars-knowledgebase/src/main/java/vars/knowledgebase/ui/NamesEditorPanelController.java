@@ -24,6 +24,7 @@ import org.mbari.swing.WaitIndicator;
 import org.mbari.util.Dispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.DAO;
 import vars.UserAccount;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
@@ -81,10 +82,16 @@ class NamesEditorPanelController {
             final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
             if (value == JOptionPane.YES_OPTION) {
                 WaitIndicator waitIndicator = new WaitIndicator(namesEditorPanel);
-                final History history = historyFactory.delete(userAccount, conceptName);
+                History history = historyFactory.delete(userAccount, conceptName);
+                DAO dao = toolBelt.getKnowledgebaseDAOFactory().newDAO();
+                dao.startTransaction();
+                conceptName = dao.merge(conceptName);
                 conceptName.getConcept().getConceptMetadata().addHistory(history);
-                EventBus.publish(Lookup.TOPIC_INSERT_HISTORY, history);
+                history = dao.persist(history);
+                dao.endTransaction();
                 waitIndicator.dispose();
+                EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
+                
             }
 
     }
@@ -112,9 +119,7 @@ class NamesEditorPanelController {
         log.error("Entering updateConceptName method");
         boolean okToProceed = true;
 
-        ApproveHistoryTask approveHistoryTask = toolBelt.getApproveHistoryTask();
         ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
-        ConceptNameDAO conceptNameDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptNameDAO();
         KnowledgebaseDAO knowledgebaseDAO = toolBelt.getKnowledgebaseDAO();
         KnowledgebaseFactory knowledgebaseFactory = toolBelt.getKnowledgebaseFactory();
 
@@ -167,11 +172,16 @@ class NamesEditorPanelController {
             newConceptName.setAuthor(author);
             newConceptName.setNameType(nameType);
 
+            DAO dao = toolBelt.getKnowledgebaseDAOFactory().newDAO();
+            dao.startTransaction();
+            concept = dao.merge(concept);
+
             /*
              * Add a History object to track the change.
              */
             History history = historyFactory.replaceConceptName(userAccount, oldConceptName, newConceptName);
-            conceptMetadata.addHistory(history);
+            concept.getConceptMetadata().addHistory(history);
+            history = dao.persist(history);
 
             /*
              * When updating a primary name we want to keep the older
@@ -190,6 +200,7 @@ class NamesEditorPanelController {
                  */
                 oldConceptName.setName(newName);
                 concept.addConceptName(copyCn);
+                dao.persist(copyCn);
             }
             else {
                 oldConceptName.setName(newName);
@@ -197,10 +208,10 @@ class NamesEditorPanelController {
 
             oldConceptName.setAuthor(author);
             oldConceptName.setNameType(nameType);
+            dao.endTransaction();
 
-            EventBus.publish(Lookup.TOPIC_UPDATE_CONCEPT, concept);
+
             try {
-                concept = conceptDAO.findInDatastore(concept);
                 knowledgebaseDAO.updateConceptNameUsedByAnnotations(concept);
             }
             catch (Exception e) {
@@ -231,14 +242,19 @@ class NamesEditorPanelController {
                     ConceptName oldPrimaryName = concept.getConceptName(history.getOldValue());
                     if ((oldPrimaryName != null) &&
                             !oldPrimaryName.getNameType().equalsIgnoreCase(ConceptNameTypes.PRIMARY.toString())) {
-                        concept.removeConceptName(oldPrimaryName);
+                        
 
                         try {
-                            conceptNameDAO.makeTransient(oldPrimaryName);
+                            dao.startTransaction();
+                            concept = dao.merge(concept);
+                            concept.removeConceptName(oldPrimaryName);
+                            dao.remove(oldPrimaryName);
+                            dao.endTransaction();
                         }
                         catch (Exception ex) {
                             log.error("Failed to remove " + oldPrimaryName +
                                       " from the database. This will need to be done manually!!");
+
                         }
                     }
                 }
@@ -249,14 +265,13 @@ class NamesEditorPanelController {
                  * or your database transaction will fail because of a timestamp mismatch. (ie. Cache does not
                  * match you instance)
                  */
-                if ((userAccount != null) && userAccount.isAdministrator()) {
-                    approveHistoryTask.approve(userAccount, history);
-                }
+                EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
 
 
             }
         }
 
+        EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, newName);
         log.debug("Exiting updateConceptName method");
 
         return okToProceed;

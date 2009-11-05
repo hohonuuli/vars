@@ -29,7 +29,7 @@ public class KBPojoTest {
         KnowledgebaseTestObjectFactory factory = new KnowledgebaseTestObjectFactory(af);
         Concept c = factory.makeObjectGraph("BIG-TEST", 3);
 
-        EntityUtilities eu = new EntityUtilities(null);
+        EntityUtilities eu = new EntityUtilities();
         log.info("KNOWLEDGEBASE TREE FOR toString TEST:\n" + eu.buildTextTree(c)); 
 
 

@@ -46,7 +46,6 @@ import org.slf4j.LoggerFactory;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.KnowledgebaseModule;
 import vars.knowledgebase.ui.actions.PopulateDatabaseAction;
-import vars.knowledgebase.ui.persistence.PersistenceSubscriptions;
 
 /**
  *
@@ -58,7 +57,7 @@ public class KnowledgebaseApp {
     private static Logger log;
     private KnowledgebaseFrame knowledgebaseFrame;
     private final ToolBelt toolBelt;
-    private final PersistenceSubscriptions persistenceController;
+    private final EventTopicSubscriber approveHistorySubscriber;
 
         /**
      * To loosely couple our components, I'm using an event bus to
@@ -172,11 +171,12 @@ public class KnowledgebaseApp {
         Injector injector = Guice.createInjector(new KnowledgebaseModule());
         Lookup.getGuiceInjectorDispatcher().setValueObject(injector);
         toolBelt = injector.getInstance(ToolBelt.class);
-        persistenceController = new PersistenceSubscriptions(toolBelt);
+        approveHistorySubscriber = new ApproveHistorySubscriber(toolBelt.getApproveHistoryTask());
 
         /*
          * Subscribe to all our favorite topics
          */
+        EventBus.subscribe(Lookup.TOPIC_APPROVE_HISTORY, approveHistorySubscriber);
         EventBus.subscribe(Lookup.TOPIC_EXIT, exitSubscriber);
         EventBus.subscribe(Lookup.TOPIC_FATAL_ERROR, fatalErrorSubscriber);
         EventBus.subscribe(Lookup.TOPIC_NONFATAL_ERROR, nonFatalErrorSubscriber);

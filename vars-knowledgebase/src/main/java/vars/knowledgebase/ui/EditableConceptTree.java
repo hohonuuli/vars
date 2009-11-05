@@ -23,10 +23,10 @@ import javax.swing.tree.TreePath;
 import org.bushe.swing.event.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.DAO;
 import vars.UserAccount;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.History;
-import vars.knowledgebase.HistoryDAO;
 import vars.shared.ui.GlobalLookup;
 import vars.shared.ui.ILockableEditor;
 import vars.shared.ui.kbtree.ConceptTree;
@@ -52,10 +52,9 @@ public class EditableConceptTree extends ConceptTree implements ILockableEditor 
      * @param toolBelt
      */
     public EditableConceptTree(Concept rootConcept, ToolBelt toolBelt) {
+        super(rootConcept, toolBelt.getKnowledgebaseDAOFactory());
         this.toolBelt = toolBelt;
-        popupMenu = new EditableConceptTreePopupMenu(this, toolBelt);
-        loadModel(rootConcept);
-        initialize();
+        this.popupMenu = new EditableConceptTreePopupMenu(this, toolBelt);
 
         /*
          * Don't let foks delete the root node!
@@ -76,12 +75,7 @@ public class EditableConceptTree extends ConceptTree implements ILockableEditor 
         });
     }
 
-    /**
- * Method description
- *
- *
- * @return
- */
+ 
     public boolean isLocked() {
         return locked;
     }
@@ -112,25 +106,18 @@ public class EditableConceptTree extends ConceptTree implements ILockableEditor 
                 if (optionNum == 0) {
 
                     final Concept concept = ((TreeConcept) node.getUserObject()).getConcept();
-                    final Concept parentConcept = concept.getParentConcept();
+                    Concept parentConcept = concept.getParentConcept();
                     if (parentConcept != null) {
-                        final History history = toolBelt.getHistoryFactory().delete(userAccount, concept);
+                        History history = toolBelt.getHistoryFactory().delete(userAccount, concept);
+
+                        DAO dao = toolBelt.getKnowledgebaseDAOFactory().newDAO();
+                        dao.startTransaction();
+                        parentConcept = dao.merge(parentConcept);
                         parentConcept.getConceptMetadata().addHistory(history);
+                        history = dao.persist(history);
+                        dao.endTransaction();
 
-                        try {
-                            HistoryDAO historyDAO = toolBelt.getKnowledgebaseDAOFactory().newHistoryDAO();
-                            historyDAO.makePersistent(history);
-
-                            if (userAccount.isAdministrator()) {
-                                toolBelt.getApproveHistoryTask().approve((UserAccount) userAccount, (History) history);
-                            }
-                        }
-                        catch (Exception e) {
-                            EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, "Failed to update database. Unable to mark '" +
-                                                               conceptName + "' for deletion");
-                            parentConcept.getConceptMetadata().removeHistory(history);
-                        }
-
+                        EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
                         EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, parentConcept.getPrimaryConceptName().getName());
 
                     }

@@ -90,7 +90,7 @@ public class ConceptImpl implements Serializable, Concept, JPAEntity {
 
     @OneToOne(
         mappedBy = "concept",
-        fetch = FetchType.LAZY,
+        fetch = FetchType.EAGER,
         cascade = { CascadeType.ALL },
         targetEntity = ConceptMetadataImpl.class
     )
@@ -370,4 +370,27 @@ public class ConceptImpl implements Serializable, Concept, JPAEntity {
     public String getTaxonomyType() {
         return taxonomyType;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Concept other = (Concept) obj;
+        if (this.hashCode() != other.hashCode()) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return toString().hashCode();
+    }
+
+
+
 }

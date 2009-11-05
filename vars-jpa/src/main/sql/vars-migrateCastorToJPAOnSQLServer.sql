@@ -77,8 +77,6 @@ ALTER TABLE VideoArchive
     ADD LAST_UPDATED_TIME DATETIME NULL
 GO
 
-
-
 ALTER TABLE VideoArchiveSet
     ADD LAST_UPDATED_TIME DATETIME NULL
 GO
@@ -90,10 +88,6 @@ GO
 UPDATE Concept
 SET ParentConceptID_FK = NULL
 WHERE ParentConceptID_FK = 0
-GO
-
-UPDATE CameraData
-    ADD LogDTG DATETIME NULL
 GO
 
 UPDATE Association
@@ -185,14 +179,22 @@ UPDATE VideoFrame
     WHERE LAST_UPDATED_TIME IS NULL
 GO
 
+-- Allow case sensitive comparison. This is needed for the uc_ConceptName constraint to work correctly. 
+-- May need to drop any indices on this column first
+ALTER TABLE ConceptName 
+    ALTER COLUMN ConceptName VARCHAR(50) COLLATE SQL_Latin1_General_CP1_CS_AS
+GO
 
 ALTER TABLE ConceptName
-    ADD CONSTRAINT uc_ConceptName
-    ADD UNIQUE (ConceptName)
+    ADD CONSTRAINT uc_ConceptName UNIQUE (ConceptName)
+GO
+
+-- Enforce the 1:1 relationship between Concept and ConceptDelegate tables
+ALTER TABLE ConceptDelegate
+    ADD CONSTRAINT uc_ConceptID_FK UNIQUE (ConceptID_FK)
 GO
 
 ALTER TABLE VideoArchive
-    ADD CONSTRAINT uc_VideoArchiveName
-    ADD UNIQUE (VideoArchiveName)
+    ADD CONSTRAINT uc_VideoArchiveName UNIQUE (VideoArchiveName)
 GO
 

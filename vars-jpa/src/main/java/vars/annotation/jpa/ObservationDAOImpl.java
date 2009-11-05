@@ -17,6 +17,7 @@ import com.google.inject.Inject;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import vars.knowledgebase.jpa.ConceptDAOImpl;
 
 /**
  * Created by IntelliJ IDEA.
@@ -30,9 +31,9 @@ public class ObservationDAOImpl extends DAO implements ObservationDAO {
     private final ConceptDAO conceptDAO;
 
     @Inject
-    public ObservationDAOImpl(EntityManager entityManager, ConceptDAO conceptDao) {
+    public ObservationDAOImpl(EntityManager entityManager) {
         super(entityManager);
-        this.conceptDAO = conceptDao;
+        this.conceptDAO = new ConceptDAOImpl(entityManager);
     }
 
     public List<Observation> findAllByConceptName(String conceptName) {

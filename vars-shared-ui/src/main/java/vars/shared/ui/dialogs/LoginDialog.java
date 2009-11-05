@@ -23,6 +23,7 @@ import org.bushe.swing.event.EventBus;
 import org.mbari.swing.JFancyButton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.MiscDAOFactory;
 import vars.MiscFactory;
 import vars.UserAccount;
 import vars.UserAccountDAO;
@@ -48,7 +49,7 @@ public class LoginDialog extends JDialog {
     private final JDialog newUserDialog;
     private javax.swing.JButton okButton;
     private javax.swing.JPasswordField passwordField;
-    private final UserAccountDAO userAccountDAO;
+    private final MiscDAOFactory miscDAOFactory;
 
     /**
      * Creates new form LoginDialog
@@ -58,10 +59,10 @@ public class LoginDialog extends JDialog {
      * @param userAccountDAO
      * @param miscFactory
      */
-    public LoginDialog(java.awt.Frame parent, boolean modal, UserAccountDAO userAccountDAO, MiscFactory miscFactory) {
+    public LoginDialog(java.awt.Frame parent, boolean modal, MiscDAOFactory miscDAOFactory, MiscFactory miscFactory) {
         super(parent, modal);
-        this.userAccountDAO = userAccountDAO;
-        newUserDialog = new NewUserDialog(parent, true, userAccountDAO, miscFactory);
+        this.miscDAOFactory = miscDAOFactory;
+        newUserDialog = new NewUserDialog(parent, true, miscDAOFactory, miscFactory);
         initComponents();
         setLocationRelativeTo(parent);
         pack();
@@ -90,7 +91,7 @@ public class LoginDialog extends JDialog {
          */
     UserAccountComboBox getNameComboBox() {
         if (nameComboBox == null) {
-            nameComboBox = new UserAccountComboBox(userAccountDAO);
+            nameComboBox = new UserAccountComboBox(miscDAOFactory);
         }
 
         return nameComboBox;
@@ -254,7 +255,10 @@ public class LoginDialog extends JDialog {
         String password = new String(passwordField.getPassword());
         boolean success = false;
         try {
+            UserAccountDAO userAccountDAO = miscDAOFactory.newUserAccountDAO();
+            userAccountDAO.startTransaction();
             userAccount = userAccountDAO.findByUserName(userName.trim());
+            userAccountDAO.endTransaction();
         }
         catch (Exception e) {
             msgLabel.setText("Database connection failed");

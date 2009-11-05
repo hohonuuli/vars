@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import org.bushe.swing.event.EventBus;
+import vars.DAO;
 import vars.ILink;
 import vars.LinkBean;
 import vars.UserAccount;
@@ -98,11 +99,11 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
          * concept. This allows us to track History better.
          * deleteMap.put(History.FIELD_CONCEPT, new RemoveConceptAction());
          */
-        deleteMap.put(History.FIELD_CONCEPT_CHILD, new DeleteChildConceptTask(knowledgebaseDAOFactory));
-        deleteMap.put(History.FIELD_CONCEPTNAME, new DeleteConceptNameAction(knowledgebaseDAOFactory));
-        deleteMap.put(History.FIELD_LINKREALIZATION, new DeleteLinkRealizationTask(knowledgebaseDAOFactory));
-        deleteMap.put(History.FIELD_LINKTEMPLATE, new DeleteLinkTemplateTask(knowledgebaseDAOFactory));
-        deleteMap.put(History.FIELD_MEDIA, new DeleteMediaTask(knowledgebaseDAOFactory));
+        deleteMap.put(History.FIELD_CONCEPT_CHILD, new ADeleteChildConceptTask(knowledgebaseDAOFactory));
+        deleteMap.put(History.FIELD_CONCEPTNAME, new ADeleteConceptNameAction(knowledgebaseDAOFactory));
+        deleteMap.put(History.FIELD_LINKREALIZATION, new ADeleteLinkRealizationTask(knowledgebaseDAOFactory));
+        deleteMap.put(History.FIELD_LINKTEMPLATE, new ADeleteLinkTemplateTask(knowledgebaseDAOFactory));
+        deleteMap.put(History.FIELD_MEDIA, new ADeleteMediaTask(knowledgebaseDAOFactory));
 
         final Map<String, AbstractHistoryTask> replaceMap = new HashMap<String, AbstractHistoryTask>();
         actionMap.put(History.ACTION_REPLACE, replaceMap);
@@ -129,9 +130,9 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
         approve(userAccount, history);
     }
 
-    private class DeleteChildConceptTask extends GenericApproveTask {
+    private class ADeleteChildConceptTask extends GenericApproveTask {
 
-        DeleteChildConceptTask(KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
+        ADeleteChildConceptTask(KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
             super(knowledgebaseDAOFactory);
         }
 
@@ -154,9 +155,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
             }
 
             if (concept != null) {
-                vars.knowledgebase.ui.actions.DeleteConceptTask dct = new vars.knowledgebase.ui.actions
-                    .DeleteConceptTask(knowledgebaseDAOFactory.newConceptDAO(),
-                                       toolBelt.getAnnotationDAOFactory().newObservationDAO());
+                DeleteConceptTask dct = new DeleteConceptTask(toolBelt.getAnnotationDAOFactory(), knowledgebaseDAOFactory);
                 if (dct.delete(concept)) {
                     super.approve(userAccount, history);
                 }
@@ -175,24 +174,30 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
     }
 
 
-    private class DeleteConceptNameAction extends GenericApproveTask {
+    private class ADeleteConceptNameAction extends GenericApproveTask {
 
-        DeleteConceptNameAction(KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
+        ADeleteConceptNameAction(KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
             super(knowledgebaseDAOFactory);
         }
 
         @Override
-        public void approve(final UserAccount userAccount, final History history) {
-            final Concept concept = history.getConceptMetadata().getConcept();
+        public void approve(final UserAccount userAccount, History history) {
+            DAO dao = knowledgebaseDAOFactory.newDAO();
+            dao.startTransaction();
+            history = dao.merge(history);
+            Concept concept = history.getConceptMetadata().getConcept();
             final ConceptName conceptName = concept.getConceptName(history.getOldValue());
+            dao.endTransaction();
             if (conceptName != null) {
 
                 // Make sure that the name you are deleting isn't used by any observations anymore
                 toolBelt.getKnowledgebaseDAO().updateConceptNameUsedByAnnotations(concept);
 
-                ConceptNameDAO conceptNameDAO = knowledgebaseDAOFactory.newConceptNameDAO();
+                dao.startTransaction();
+                concept = dao.merge(concept);
                 concept.removeConceptName(conceptName);
-                conceptNameDAO.makeTransient(conceptName);
+                dao.remove(conceptName);
+                dao.endTransaction();
             }
             else {
                 dropHistory(history, "'" + history.getOldValue() + "' was not found. I'll remove the obsolete history");
@@ -203,15 +208,14 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
     }
 
 
-    private class DeleteLinkRealizationTask extends GenericApproveTask {
+    private class ADeleteLinkRealizationTask extends GenericApproveTask {
 
         private final vars.knowledgebase.ui.actions.DeleteLinkRealizationTask deleteLinkRealizationTask;
 
         @Inject
-        DeleteLinkRealizationTask(KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
+        ADeleteLinkRealizationTask(KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
             super(knowledgebaseDAOFactory);
-            this.deleteLinkRealizationTask = new vars.knowledgebase.ui.actions.DeleteLinkRealizationTask(
-                knowledgebaseDAOFactory.newLinkRealizationDAO());
+            this.deleteLinkRealizationTask = new DeleteLinkRealizationTask(knowledgebaseDAOFactory);
         }
 
         @Override
@@ -265,14 +269,13 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
     }
 
 
-    private class DeleteLinkTemplateTask extends GenericApproveTask {
+    private class ADeleteLinkTemplateTask extends GenericApproveTask {
 
-        private final vars.knowledgebase.ui.actions.DeleteLinkTemplateTask deleteLinkTemplateTask;
+        private final DeleteLinkTemplateTask deleteLinkTemplateTask;
 
-        DeleteLinkTemplateTask(KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
+        ADeleteLinkTemplateTask(KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
             super(knowledgebaseDAOFactory);
-            this.deleteLinkTemplateTask = new vars.knowledgebase.ui.actions.DeleteLinkTemplateTask(
-                knowledgebaseDAOFactory.newLinkTemplateDAO());
+            this.deleteLinkTemplateTask = new DeleteLinkTemplateTask(knowledgebaseDAOFactory);
         }
 
         @Override
@@ -327,14 +330,13 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
     }
 
 
-    private class DeleteMediaTask extends GenericApproveTask {
+    private class ADeleteMediaTask extends GenericApproveTask {
 
-        private final vars.knowledgebase.ui.actions.DeleteMediaTask deleteMediaTask;
+        private final DeleteMediaTask deleteMediaTask;
 
-        DeleteMediaTask(KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
+        ADeleteMediaTask(KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
             super(knowledgebaseDAOFactory);
-            this.deleteMediaTask = new vars.knowledgebase.ui.actions.DeleteMediaTask(
-                knowledgebaseDAOFactory.newMediaDAO());
+            this.deleteMediaTask = new DeleteMediaTask(knowledgebaseDAOFactory);
         }
 
         @Override
@@ -390,12 +392,15 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
          *             This exception should be caught, logged and a dialog
          *             should be shown to the user.
          */
-        public void doTask(final UserAccount userAccount, final History history) {
+        public void doTask(final UserAccount userAccount, History history) {
             if (canDo(userAccount, history)) {
+                
+                ConceptDAO dao = knowledgebaseDAOFactory.newConceptDAO();
+                dao.startTransaction();
+                history = dao.merge(history);
                 history.setApprovalDate(new Date());
                 history.setApproverName(userAccount.getUserName());
-                ConceptDAO dao = knowledgebaseDAOFactory.newConceptDAO();
-                dao.update(history.getConceptMetadata().getConcept());
+                dao.endTransaction();
             }
             else {
                 final String msg = "Unable to approve the History [" + history + "]";

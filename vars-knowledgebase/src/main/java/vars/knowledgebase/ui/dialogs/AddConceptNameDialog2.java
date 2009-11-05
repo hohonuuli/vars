@@ -27,6 +27,7 @@ import org.mbari.swing.SpinningDialWaitIndicator;
 import org.mbari.swing.WaitIndicator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.DAO;
 import vars.UserAccount;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
@@ -314,19 +315,24 @@ private void initComponents() {
                 nameType = ConceptNameTypes.SYNONYM.toString();
             }
             conceptName.setNameType(nameType);
-            myConcept = conceptDAO.findInDatastore(myConcept);
+
+            DAO dao = knowledgebaseDAOFactory.newDAO();
+            dao.startTransaction();
+            myConcept = dao.merge(myConcept);
             myConcept.addConceptName(conceptName);
-            conceptNameDAO.makePersistent(conceptName);
-            //EventBus.publish(Lookup.TOPIC_INSERT_CONCEPT_NAME, myConcept);
+            dao.persist(conceptName);
+            
 
             /*
              * Add a History object to track the change.
              */
             final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
-            final History history = historyFactory.add(userAccount, conceptName);
+            History history = historyFactory.add(userAccount, conceptName);
             myConcept.getConceptMetadata().addHistory(history);
+            history = dao.persist(history);
+            dao.endTransaction();
             close();
-            EventBus.publish(Lookup.TOPIC_UPDATE_CONCEPT, myConcept);
+            EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
             waitIndicator.dispose();
         }
 
