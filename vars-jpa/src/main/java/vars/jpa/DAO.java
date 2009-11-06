@@ -39,6 +39,12 @@ public class DAO implements vars.DAO, EntityManagerAspect {
         this.entityManager = entityManager;
     }
 
+    public void commit() {
+        if (entityManager.getTransaction().isActive()) {
+            entityManager.getTransaction().commit();
+        }
+    }
+
     private <T> T processTransaction(T entity, TransactionType transactionType) {
         if (log.isDebugEnabled()) {
             log.debug("Executing " + transactionType + " on " + entity);

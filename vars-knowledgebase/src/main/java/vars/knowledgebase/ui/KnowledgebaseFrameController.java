@@ -16,6 +16,8 @@ package vars.knowledgebase.ui;
 
 import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.EventTopicSubscriber;
+import org.mbari.swing.LabeledSpinningDialWaitIndicator;
+import org.mbari.swing.WaitIndicator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.PersistenceCache;
@@ -23,7 +25,7 @@ import vars.jpa.HibernateCacheProvider;
 import vars.jpa.EntityManagerFactoryAspect;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
-import vars.shared.ui.kbtree.SearchableConceptTreePanel;
+import vars.shared.ui.tree.ConceptTreePanel;
 
 /**
  *
@@ -60,6 +62,8 @@ class KnowledgebaseFrameController {
     */
     public void refreshTreeAndOpenNode(String name) {
 
+        WaitIndicator waitIndicator = new LabeledSpinningDialWaitIndicator(knowledgebaseFrame.getTreePanel(), "Refreshing");
+
         /**
          * Refresh node
          */
@@ -72,13 +76,13 @@ class KnowledgebaseFrameController {
                              "Failed to clear" + " knowledgebase cache. Please close this " + "application");
         }
 
-        final SearchableConceptTreePanel treePanel = knowledgebaseFrame.getTreePanel();
+        final ConceptTreePanel treePanel = knowledgebaseFrame.getTreePanel();
         ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
         conceptDAO.startTransaction();
         Concept concept = conceptDAO.findByName(name);
         conceptDAO.endTransaction();
-        treePanel.refreshTreeAndOpenNode(concept);
-
+        treePanel.refreshAndOpenNode(concept);
+        waitIndicator.dispose();
     }
 
     /**

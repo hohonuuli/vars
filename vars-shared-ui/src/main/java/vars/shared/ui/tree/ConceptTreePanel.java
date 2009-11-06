@@ -79,6 +79,7 @@ public class ConceptTreePanel extends SearchableTreePanel {
         this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
         cachedWordSearches = new HashSet<String>();
         cachedGlobSearches = new HashSet<String>();
+        
     }
 
     /**
@@ -252,18 +253,21 @@ public class ConceptTreePanel extends SearchableTreePanel {
             return;
         }
 
-        Worker.post(new Job() {
+        TreePath treePath = (TreePath) Worker.post(new Job() {
 
             @Override
             public Object run() {
                 ConceptDAO dao = knowledgebaseDAOFactory.newConceptDAO();
                 dao.startTransaction();
-                openNode(concept, dao);
+                TreePath path = openNode(concept, dao);
                 dao.endTransaction();
 
-                return null;
+                return path;
             }
         });
+
+        getJTree().setSelectionPath(treePath);
+        getJTree().scrollPathToVisible(treePath);
 
     }
 
@@ -272,13 +276,13 @@ public class ConceptTreePanel extends SearchableTreePanel {
      * @param concept
      * @param dao
      */
-    private void openNode(final Concept concept, ConceptDAO dao) {
+    private TreePath openNode(final Concept concept, ConceptDAO dao) {
         if (log.isDebugEnabled()) {
             log.debug("Opening node containing '" + concept.getPrimaryConceptName().getName() + "', " + concept);
         }
 
         if (concept == null) {
-            return;
+            return null;
         }
 
         final JTree tree = getJTree();
@@ -295,6 +299,7 @@ public class ConceptTreePanel extends SearchableTreePanel {
 
         });
         validate();
+        return path;
     }
 
     /**
@@ -335,15 +340,14 @@ public class ConceptTreePanel extends SearchableTreePanel {
     public void setJTree(JTree tree) {
         JTree oldTree = getJTree();
         if (oldTree != null) {
-            oldTree.removeMouseListener(popupListener);
             oldTree.removeKeyListener(enterListener);
+            oldTree.removeMouseListener(popupListener);
         }
 
         if (tree != null) {
-            tree.addMouseListener(popupListener);
             tree.addKeyListener(enterListener);
+            tree.addMouseListener(popupListener);
         }
-
         super.setJTree(tree);
     }
 

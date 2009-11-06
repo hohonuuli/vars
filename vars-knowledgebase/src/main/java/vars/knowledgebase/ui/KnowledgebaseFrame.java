@@ -32,7 +32,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.event.TreeSelectionEvent;
@@ -40,7 +39,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import org.bushe.swing.event.EventBus;
-import org.bushe.swing.event.EventTopicSubscriber;
+import org.jdesktop.swingx.JXTree;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.util.Dispatcher;
 import org.slf4j.Logger;
@@ -49,16 +48,14 @@ import vars.CacheClearedEvent;
 import vars.CacheClearedListener;
 import vars.UserAccount;
 import vars.knowledgebase.Concept;
-import vars.knowledgebase.ConceptDAO;
-import vars.knowledgebase.ConceptNameTypes;
-import vars.knowledgebase.SimpleConceptBean;
-import vars.knowledgebase.SimpleConceptNameBean;
+
 import vars.shared.ui.ILockableEditor;
 import vars.shared.ui.dialogs.LoginAction;
 import vars.shared.ui.dialogs.ModifyUserDialog;
-import vars.shared.ui.kbtree.ConceptTree;
-import vars.shared.ui.kbtree.SearchableConceptTreePanel;
-import vars.shared.ui.kbtree.TreeConcept;
+import vars.shared.ui.tree.ConceptTreeCellRenderer;
+import vars.shared.ui.tree.ConceptTreeModel;
+import vars.shared.ui.tree.ConceptTreeNode;
+import vars.shared.ui.tree.ConceptTreePanel;
 
 /**
  *
@@ -78,7 +75,7 @@ public class KnowledgebaseFrame extends JFrame {
     private JPanel rightPanel = null;
     private JSplitPane splitPane = null;
     private JTabbedPane tabbedPane = null;
-    private SearchableConceptTreePanel treePanel = null;
+    private ConceptTreePanel treePanel = null;
     private final LockAction lockAction = new LockAction();
     private final KnowledgebaseFrameController controller;
     private LoginAction loginAction;
@@ -239,8 +236,7 @@ public class KnowledgebaseFrame extends JFrame {
                 private static final long serialVersionUID = 1L;
 
                 public void doAction() {
-                    final EditableConceptTreePopupMenu popupMenu = (EditableConceptTreePopupMenu) ((ConceptTree) getTreePanel()
-                        .getJTree()).getPopupMenu();
+                    EditConceptTreePopupMenu popupMenu = (EditConceptTreePopupMenu) getTreePanel().getPopupMenu();
                     popupMenu.triggerEditAction();
                 }
 
@@ -317,61 +313,40 @@ public class KnowledgebaseFrame extends JFrame {
     }
 
 
-    protected SearchableConceptTreePanel getTreePanel() {
+    protected ConceptTreePanel getTreePanel() {
         if (treePanel == null) {
-            final ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
-            treePanel = new SearchableConceptTreePanel(toolBelt.getKnowledgebaseDAOFactory());
 
-            /*
-             * Fetch the root concept. We need this to intialize the ConceptTree
-             */
-            Concept concept = null;
+            treePanel = new ConceptTreePanel(toolBelt.getKnowledgebaseDAOFactory());
 
-            try {
-                concept = conceptDAO.findRoot();
-            }
-            catch (Exception e) {
-                concept = new SimpleConceptBean(new SimpleConceptNameBean("ERROR!!",
-                        ConceptNameTypes.PRIMARY.toString()));
-                log.error("Failed to load knowledgebase", e);
-                EventBus.publish(Lookup.TOPIC_FATAL_ERROR, "Failed to load knowledgebase.");
-            }
+            final ConceptTreeModel treeModel = new ConceptTreeModel(toolBelt.getKnowledgebaseDAOFactory());
 
-            /*
-             * Build the conceptTree and add a listener. This listener should
-             * pass the concept to a Dispatcher so other objects will get
-             * notified when the concept changes.
-             */
-            final EditableConceptTree conceptTree = new EditableConceptTree(concept, toolBelt);
-            EventBus.subscribe(Lookup.TOPIC_SELECTED_CONCEPT, new EventTopicSubscriber<Concept>() {
+            final JXTree tree = new JXTree(treeModel);
+            tree.setCellRenderer(new ConceptTreeCellRenderer());
+            tree.addTreeSelectionListener(getTreeSelectionListener());
+            treePanel.setJTree(tree);
 
-                public void onEvent(String topic, Concept data) {
-                    String value = data != null ? data.getPrimaryConceptName().getName() : conceptDAO.findRoot().getPrimaryConceptName().getName();
-                    conceptTree.setSelectedConcept(value);
-                }
-
-
-            });
-            conceptTree.addTreeSelectionListener(getTreeSelectionListener());
-            lockAction.addEditor(conceptTree);
-            treePanel.setJTree(conceptTree);
-            JPopupMenu popupMenu = conceptTree.getPopupMenu();
+            // ---- Build popup menu
+            EditConceptTreePopupMenu popupMenu = new EditConceptTreePopupMenu(tree, toolBelt);
+            lockAction.addEditor(popupMenu);
             popupMenu.addSeparator();
             JMenuItem menuIteum = new JMenuItem("Refresh", 'r');
             menuIteum.addActionListener(new ActionListener() {
-
                 public void actionPerformed(ActionEvent e) {
-                    refreshTreeAndOpenNode(conceptTree.getSelectedConcept().getPrimaryConceptName().getName());
+                    int row = tree.getSelectionRows()[0];
+                    TreePath path = tree.getPathForRow(row);
+                    ConceptTreeNode node = (ConceptTreeNode) path.getLastPathComponent();
+                    String name = ((Concept) node.getUserObject()).getPrimaryConceptName().getName();
+                    refreshTreeAndOpenNode(name);
                 }
-
             });
             popupMenu.add(menuIteum);
+            treePanel.setPopupMenu(popupMenu);
 
             /*
              * Register the tree with a dispatcher so that other components can
              * attempt to fetch it.
              */
-            Lookup.getConceptTreeDispatcher().setValueObject(conceptTree);
+            Lookup.getConceptTreeDispatcher().setValueObject(tree);
         }
 
         return treePanel;
@@ -494,9 +469,8 @@ public class KnowledgebaseFrame extends JFrame {
             if (selectionPath != null) {
                 DefaultMutableTreeNode node = (DefaultMutableTreeNode) selectionPath.getLastPathComponent();
                 Object userObject = node.getUserObject();
-                if (userObject instanceof TreeConcept) {
-                    TreeConcept treeConcept = (TreeConcept) userObject;
-                    concept = treeConcept.getConcept();
+                if (userObject instanceof Concept) {
+                    concept = (Concept) userObject;
                 }
             }
 

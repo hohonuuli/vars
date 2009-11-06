@@ -18,15 +18,20 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JDialog;
 import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.JTree;
+import javax.swing.tree.TreePath;
+import vars.knowledgebase.Concept;
 import vars.knowledgebase.ui.dialogs.AddConceptDialog;
 import vars.shared.ui.ILockableEditor;
-import vars.shared.ui.kbtree.ConceptTreePopupMenu;
+import vars.shared.ui.tree.ConceptTreeModel;
+import vars.shared.ui.tree.ConceptTreeNode;
 
 /**
  *
  * @author brian
  */
-public class EditableConceptTreePopupMenu extends ConceptTreePopupMenu implements ILockableEditor {
+public class EditConceptTreePopupMenu extends JPopupMenu implements ILockableEditor {
 
     private final JMenuItem addConceptMenuItem;
     private JDialog dialog;
@@ -34,6 +39,7 @@ public class EditableConceptTreePopupMenu extends ConceptTreePopupMenu implement
     private final JMenuItem moveConceptItem;
     private final JMenuItem removeConceptMenuItem;
     private final ToolBelt toolBelt;
+    private final JTree tree;
 
     /**
      * Constructs ...
@@ -41,16 +47,16 @@ public class EditableConceptTreePopupMenu extends ConceptTreePopupMenu implement
      * @param conceptTree
      * @param toolBelt
      */
-    public EditableConceptTreePopupMenu(final EditableConceptTree conceptTree, ToolBelt toolBelt) {
-        super(conceptTree);
+    public EditConceptTreePopupMenu(JTree tree, ToolBelt toolBelt) {
         if (toolBelt == null) {
             throw new IllegalArgumentException("ToolBelt argument can not be null");
         }
+        this.tree = tree;
         this.toolBelt = toolBelt;
 
-        addConceptMenuItem = new JMenuItem(EditableConceptTree.ADD_CONCEPT, 'A');
-        removeConceptMenuItem = new JMenuItem(EditableConceptTree.REMOVE_CONCEPT, 'R');
-        moveConceptItem = new JMenuItem(EditableConceptTree.EDIT_CONCEPT, 'M');
+        addConceptMenuItem = new JMenuItem("Add Concept", 'A');
+        removeConceptMenuItem = new JMenuItem("Remove Concept", 'R');
+        moveConceptItem = new JMenuItem("Edit Concept", 'M');
 
 
         addConceptMenuItem.addActionListener(new ActionListener() {
@@ -117,14 +123,23 @@ public class EditableConceptTreePopupMenu extends ConceptTreePopupMenu implement
 
     public void triggerEditAction() {
         if (!isLocked()) {
-            ((AddConceptDialog) getDialog()).setConcept(getConceptTree().getSelectedConcept());
+            int row = tree.getSelectionRows()[0];
+            TreePath path = tree.getPathForRow(row);
+            ConceptTreeNode node = (ConceptTreeNode) path.getLastPathComponent();
+
+            ((AddConceptDialog) getDialog()).setConcept((Concept) node.getUserObject());
             getDialog().setVisible(true);
         }
     }
 
     public void triggerRemoveAction() {
         if (!isLocked()) {
-            getConceptTree().removedConcept(null);
+            ConceptTreeModel model = (ConceptTreeModel) tree.getModel();
+            int row = tree.getSelectionRows()[0];
+            TreePath path = tree.getPathForRow(row);
+            ConceptTreeNode node = (ConceptTreeNode) path.getLastPathComponent();
+            node.setLoaded(false);
+            model.reload(node);
         }
     }
 }

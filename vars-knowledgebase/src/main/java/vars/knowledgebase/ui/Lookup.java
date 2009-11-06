@@ -19,6 +19,7 @@ import com.google.inject.Injector;
 import java.awt.Frame;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import javax.swing.JTree;
 import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.EventTopicSubscriber;
 import org.mbari.swing.ProgressDialog;
@@ -29,7 +30,6 @@ import vars.UserAccount;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.KnowledgebaseModule;
 import vars.shared.ui.GlobalLookup;
-import vars.shared.ui.kbtree.ConceptTree;
 
 /**
  * Lookup contains globally available resources for the Knowledgbebase application.
@@ -54,7 +54,7 @@ public class Lookup extends GlobalLookup {
     private static final EventTopicSubscriber LOGGING_SUBSCRIBER = new LoggingSubscriber();
     protected static final Object KEY_DISPATCHER_APPLICATION_FRAME = KnowledgebaseFrame.class;
     protected static final Object KEY_DISPATCHER_APPLICATION = KnowledgebaseApp.class;
-    protected static final Object KEY_DISPATCHER_CONCEPT_TREE = ConceptTree.class;
+    protected static final Object KEY_DISPATCHER_CONCEPT_TREE = JTree.class;
     protected static final Object KEY_DISPATCHER_SELECTED_CONCEPT = Concept.class;
     public static final String RESOURCE_BUNDLE = "knowlegebase-app";
     public static final Object KEY_DISPATCHER_GUICE_INJECTOR = Injector.class;
@@ -119,9 +119,9 @@ public class Lookup extends GlobalLookup {
         getConceptTreeDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
-                if (!(evt.getNewValue() instanceof ConceptTree)) {
+                if (!(evt.getNewValue() instanceof JTree)) {
                     throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
-                            ", EXPECTED: " + ConceptTree.class.getName());
+                            ", EXPECTED: " + JTree.class.getName());
                 }
             }
         });

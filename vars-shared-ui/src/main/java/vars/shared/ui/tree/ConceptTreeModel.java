@@ -108,7 +108,6 @@ public class ConceptTreeModel extends DefaultTreeModel {
             node.removeAllChildren();
             Concept concept = (Concept) node.getUserObject();
 
-            // ---- Load and cache
             concept = dao.merge(concept);
             List<Concept> childConcepts = new ArrayList<Concept>(concept.getChildConcepts());
 
@@ -218,7 +217,7 @@ public class ConceptTreeModel extends DefaultTreeModel {
          * refresh we need to toss the old one
          */
         conceptLoaderThread = new Thread(new ConceptLoaderRunnable(),
-                                         "Concept Loader Thread for " + getClass().getName());
+                "Concept Loader Thread for " + getClass().getName());
         conceptLoaderThread.setDaemon(true);
         conceptLoaderThread.start();
         ConceptDAO conceptDAO = knowledgebaseDAOFactory.newConceptDAO();
@@ -244,6 +243,7 @@ public class ConceptTreeModel extends DefaultTreeModel {
         super.setRoot(rootNode);
         super.reload();
     }
+
 
     /**
      * Sets the root node of the TreeModel
