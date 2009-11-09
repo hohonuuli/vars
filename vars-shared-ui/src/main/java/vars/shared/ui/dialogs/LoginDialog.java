@@ -269,7 +269,7 @@ public class LoginDialog extends JDialog {
             msgLabel.setText("Unable to find '" + userName + "' in the database");
         }
         else {
-            if (!userAccount.getPassword().equals(password.trim())) {
+            if (!userAccount.authenticate(password)) {
                 msgLabel.setText("Invalid password");
             }
             else {

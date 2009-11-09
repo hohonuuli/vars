@@ -91,6 +91,11 @@ public class VideoArchiveSetDAOImpl extends DAO implements VideoArchiveSetDAO {
         return sequenceNumbers;
     }
 
+    /**
+     * This should be alled within a JPA/DAO transaction
+     * @param primaryKey
+     * @return
+     */
     public Integer findVideoFrameCountByPrimaryKey(Object primaryKey) {
 
         Integer count = 0;
@@ -99,10 +104,7 @@ public class VideoArchiveSetDAOImpl extends DAO implements VideoArchiveSetDAO {
         if (videoArchiveSet != null) {
 
             // Do inside of a transaction to account for lazy loading
-            startTransaction();
             count = videoArchiveSet.getVideoFrames().size();
-            endTransaction();
-            
         }
         else {
             log.info("No VideoArchiveSet with id = " + primaryKey + " was found in the database");

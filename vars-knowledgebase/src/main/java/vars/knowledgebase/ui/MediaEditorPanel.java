@@ -257,7 +257,7 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
             History history = getToolBelt().getHistoryFactory().delete(userAccount, media);
             final Concept concept = media.getConceptMetadata().getConcept();
             concept.getConceptMetadata().addHistory(history);
-            history = getToolBelt().getKnowledgebaseDAOFactory().newHistoryDAO().persist(history);
+            getToolBelt().getKnowledgebaseDAOFactory().newHistoryDAO().persist(history);
 
             if (userAccount.isAdministrator()) {
                 getToolBelt().getApproveHistoryTask().approve(userAccount, history);

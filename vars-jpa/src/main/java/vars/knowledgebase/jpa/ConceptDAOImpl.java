@@ -15,8 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.persistence.EntityManager;
-import vars.PersistenceRule;
-import vars.knowledgebase.rules.ExactlyOnePrimaryNameRule;
 
 /**
  * Created by IntelliJ IDEA.
@@ -28,25 +26,12 @@ import vars.knowledgebase.rules.ExactlyOnePrimaryNameRule;
 public class ConceptDAOImpl extends DAO implements ConceptDAO {
 
     private final ConceptNameDAO conceptNameDAO;
-    private final PersistenceRule<Concept> thereCanBeOnlyOne = new ExactlyOnePrimaryNameRule();
 
     @Inject
     public ConceptDAOImpl(EntityManager entityManager) {
         super(entityManager);
         this.conceptNameDAO = new ConceptNameDAOImpl(entityManager);
     }
-
-//    @Override
-//    public <T> T persist(T object) {
-//        thereCanBeOnlyOne.apply((Concept) object);
-//        return super.persist(object);
-//    }
-//
-//    @Override
-//    public <T> T merge(T object) {
-//        thereCanBeOnlyOne.apply((Concept) object);
-//        return super.merge(object);
-//    }
 
     public Concept findRoot() {
         List<Concept> roots = findByNamedQuery("Concept.findRoot", new HashMap<String, Object>());
@@ -59,20 +44,28 @@ public class ConceptDAOImpl extends DAO implements ConceptDAO {
         return roots.get(0);
     }
 
+    /**
+     * This find method should be called inside of a transaction
+     * @param name
+     * @return
+     */
     public Concept findByName(String name) {
         ConceptName conceptName = conceptNameDAO.findByName(name);
-        return conceptName == null ? null : conceptName.getConcept();
+        return conceptName == null ? null : merge(conceptName.getConcept());
     }
 
+    /**
+     * This should be called within a JPA tranaction
+     * @param concept
+     * @return
+     */
     public Collection<ConceptName> findDescendentNames(Concept concept) {
 
         Collection<ConceptName> conceptNames = new ArrayList<ConceptName>();
 
-        startTransaction();
         Concept mergedConcept = findByPrimaryKey(ConceptImpl.class, ((JPAEntity) concept).getId());
         conceptNames.addAll(mergedConcept.getConceptNames());
         findDescendentNames(mergedConcept.getChildConcepts(), conceptNames);
-        endTransaction();
 
         return conceptNames;
 
@@ -95,16 +88,18 @@ public class ConceptDAOImpl extends DAO implements ConceptDAO {
 
     public Collection<Concept> findAll() {
         Map<String, Object> params = new HashMap<String, Object>();
-        // TODO this may not be memory efficient (may return lots of disconnected objet graphs
         return findByNamedQuery("Concept.findAll", params);
     }
 
+    /**
+     * Should be called within a JPA transaction
+     * @param concept
+     * @return
+     */
     public Collection<Concept> findDescendents(Concept concept) {
         Collection<Concept> concepts = new ArrayList<Concept>();
-        startTransaction();
         Concept mergedConcept = findByPrimaryKey(ConceptImpl.class, ((JPAEntity) concept).getId());
         findDescendents(mergedConcept, concepts);
-        endTransaction();
 
         return concepts;
     }
@@ -116,12 +111,6 @@ public class ConceptDAOImpl extends DAO implements ConceptDAO {
         }
     }
 
-    public Concept addConceptName(Concept concept, ConceptName conceptName) {
-        startTransaction();
-        concept.addConceptName(conceptName);
-        concept = persist(concept);
-        endTransaction();
-        return concept;
-    }
+
 
 }

@@ -66,14 +66,17 @@ public class GUserAccount implements Serializable, UserAccount, JPAEntity {
     @Column(name = "UserName", nullable = false, unique = true, length = 50)
     String userName
 
-    @Column(name = "firstName", length = 50)
+    @Column(name = "FirstName", length = 50)
     String firstName
 
-    @Column(name = "lastName", length = 50)
+    @Column(name = "LastName", length = 50)
     String lastName
 
     @Column(name = "Affiliation", length = 512)
     String affiliation
+
+    @Column(name = "Email", length = 50)
+    String email
 
     public boolean isAdministrator() {
         return UserAccountRoles.ADMINISTRATOR.getRoleName().equals(role);

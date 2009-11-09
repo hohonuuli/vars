@@ -42,9 +42,13 @@ public class ObservationDAOImpl extends DAO implements ObservationDAO {
         return findByNamedQuery("Observation.findByConceptName", map);
     }
 
+    /**
+     * This should be called within a JPA transaction
+     * @param concept
+     * @param cascade
+     * @return
+     */
     public List<Observation> findAllByConcept(final Concept concept, final boolean cascade) {
-
-        startTransaction();
 
         Collection<ConceptName> conceptNames = null;
         if (cascade) {
@@ -65,18 +69,19 @@ public class ObservationDAOImpl extends DAO implements ObservationDAO {
         }
         jpql += ")";
 
-        startTransaction();
         Query query = getEntityManager().createQuery(jpql);
         List<Observation> observations = query.getResultList();
-        endTransaction();
 
         return observations;
     }
 
+    /**
+     * This should be called within a JPA transaction
+     * @return
+     */
     public List<String> findAllConceptNamesUsedInAnnotations() {
 
         final EntityManager entityManager = getEntityManager();
-        startTransaction();
 
         // ---- Step 1: Fetch from Observation
         String sql = "SELECT DISTINCT conceptName FROM Observation";
@@ -88,7 +93,6 @@ public class ObservationDAOImpl extends DAO implements ObservationDAO {
         query = entityManager.createNativeQuery(sql);
         conceptNames.addAll(query.getResultList());
 
-        endTransaction();
 
         return conceptNames; 
     }

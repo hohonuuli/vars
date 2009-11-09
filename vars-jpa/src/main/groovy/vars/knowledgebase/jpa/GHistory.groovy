@@ -56,13 +56,11 @@ import vars.UserAccount
     @NamedQuery(name = "History.findById",
                 query = "SELECT v FROM History v WHERE v.id = :id"),
     @NamedQuery(name = "History.findByApprovalDate",
-                query = "SELECT h FROM History h WHERE h.approvalDate = :approvalDate") ,
+                query = "SELECT h FROM History h WHERE h.approvalDate = :approvalDate"),
     @NamedQuery(name = "History.findByCreationDate",
-                query = "SELECT h FROM History h WHERE h.creationDate = :creationDate") ,
-    @NamedQuery(name = "History.findByDescription",
-                query = "SELECT h FROM History h WHERE h.description = :description") ,
+                query = "SELECT h FROM History h WHERE h.creationDate = :creationDate"),
     @NamedQuery(name = "History.findByCreatorName",
-                query = "SELECT h FROM History h WHERE h.creatorName = :creatorName") ,
+                query = "SELECT h FROM History h WHERE h.creatorName = :creatorName"),
     @NamedQuery(name = "History.findByApproverName",
                 query = "SELECT h FROM History h WHERE h.approverName = :approverName") ,
     @NamedQuery(name = "History.findByField", query = "SELECT h FROM History h WHERE h.field = :field") ,
@@ -101,8 +99,8 @@ class GHistory implements Serializable, History, JPAEntity {
     @Temporal(value = TemporalType.TIMESTAMP)
     Date creationDate
 
-    @Column(name = "Description", length = 1000, nullable = true)
-    String description
+    //@Column(name = "Description", length = 1000, nullable = true)
+    //String description
 
     @Column(name = "CreatorName", nullable = false, length = 50)
     String creatorName

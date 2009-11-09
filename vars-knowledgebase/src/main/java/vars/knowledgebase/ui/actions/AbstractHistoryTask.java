@@ -37,7 +37,7 @@ public abstract class AbstractHistoryTask {
         h = dao.merge(h);
         final ConceptMetadata conceptMetadata = h.getConceptMetadata();
         conceptMetadata.removeHistory(h);
-        h = dao.remove(h);
+        dao.remove(h);
         dao.endTransaction();
 
     }

@@ -26,7 +26,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.font.LayoutPathImpl.EndType;
 import vars.jpa.DAO;
 import vars.jpa.EntityUtilities;
 import vars.jpa.JPAEntity;
@@ -91,7 +90,7 @@ public class KBCrudTest {
 
         log.info("KNOWLEDGEBASE TREE BEFORE TEST:\n" + entityUtilities.buildTextTree(c));
         dao.startTransaction();
-        c = dao.persist(c);
+        dao.persist(c);
         dao.endTransaction();
 
         Long cId = ((JPAEntity) c).getId();
@@ -117,7 +116,7 @@ public class KBCrudTest {
 //        log.info("Descendent names from root:" + names);
 
         dao.startTransaction();
-        c = dao.remove(c);
+        dao.remove(c);
         dao.endTransaction();
         log.info("KNOWLEDGEBASE TREE AFTER DELETE:\n" + entityUtilities.buildTextTree(c));
         dao.startTransaction();
@@ -139,7 +138,7 @@ public class KBCrudTest {
             Concept root = testObjectFactory.makeConcept("__ROOT__");
             root.getPrimaryConceptName().setName("__ROOT__");
             dao.startTransaction();
-            root = dao.persist(root);
+            dao.persist(root);
             dao.endTransaction();
             log.info("BUILDING KNOWLEDGEBASE TREE:\n" + entityUtilities.buildTextTree(root));
 
@@ -150,7 +149,7 @@ public class KBCrudTest {
             dao.startTransaction();
             root = dao.findRoot();
             root.addChildConcept(concept2A);
-            concept2A = dao.persist(concept2A);
+            dao.persist(concept2A);
             dao.endTransaction();
             log.info("BUILDING KNOWLEDGEBASE TREE:\n" + entityUtilities.buildTextTree(root));
 
@@ -160,10 +159,12 @@ public class KBCrudTest {
             dao.startTransaction();
             concept2A = dao.findByName(concept2A.getPrimaryConceptName().getName());
             concept2A.addChildConcept(concept3AA);
+            dao.persist(concept3AA);
             Concept concept3AB = testObjectFactory.makeConcept("LEVEL 3 A B");
             concept3AB.getPrimaryConceptName().setName("3AB");
             concept2A.addChildConcept(concept3AB);
-            concept2A = dao.merge(concept2A);
+            dao.persist(concept3AB);
+            //concept2A = dao.merge(concept2A);
             dao.endTransaction();
             log.info("BUILDING KNOWLEDGEBASE TREE:\n" + entityUtilities.buildTextTree(root));
 
@@ -173,7 +174,7 @@ public class KBCrudTest {
             dao.startTransaction();
             concept3AA = dao.findByName("3AA");
             concept3AA.addChildConcept(concept4A);
-            concept4A = dao.persist(concept4A);
+            dao.persist(concept4A);
             dao.endTransaction();
             log.info("BUILDING KNOWLEDGEBASE TREE:\n" + entityUtilities.buildTextTree(root));
 
@@ -183,7 +184,7 @@ public class KBCrudTest {
             root = dao.findRoot();
             concept2B.getPrimaryConceptName().setName("2B");
             root.addChildConcept(concept2B);
-            concept2B = dao.persist(concept2B);
+            dao.persist(concept2B);
             dao.endTransaction();
             log.info("BUILDING KNOWLEDGEBASE TREE:\n" + entityUtilities.buildTextTree(root));
         }
@@ -197,18 +198,19 @@ public class KBCrudTest {
             Concept concept2B = dao.findByName("2B");
             Concept concept3AB = dao.findByName("3AB");
             Concept concept3AA = dao.findByName("3AA");
-            Concept concept2A = dao.findByName("2A");
 
             // Tear down each node in the database
             log.info("---------- Remove 2B ----------");
             concept2B.getParentConcept().removeChildConcept(concept2B);
             dao.remove(concept2B);
-
-            log.info("---------- Remove 3AB ----------");
+            //log.info("---------- Remove 3AB ----------");
             concept3AB.getParentConcept().removeChildConcept(concept3AB);
             dao.remove(concept3AB);
+            dao.endTransaction();
 
             log.info("---------- Remove 3AA ----------");
+            dao.startTransaction();
+            dao.merge(concept3AA);
             concept3AA.getParentConcept().removeChildConcept(concept3AA);
             dao.remove(concept3AA);
             dao.endTransaction();
@@ -234,7 +236,7 @@ public class KBCrudTest {
         Concept concept = testObjectFactory.makeObjectGraph("BIG-TEST", 1);
         ConceptDAO dao = daoFactory.newConceptDAO();
         dao.startTransaction();
-        concept = dao.persist(concept);
+        dao.persist(concept);
         dao.endTransaction();
 
         final Collection<History> histories = new ArrayList<History>();

@@ -3,10 +3,12 @@ package vars.knowledgebase.jpa
 import javax.persistence.Version
 import javax.persistence.Column
 import java.sql.Timestamp
+import javax.persistence.CascadeType
 import javax.persistence.Id
 import javax.persistence.GeneratedValue
 import javax.persistence.TableGenerator
 import javax.persistence.Entity
+import javax.persistence.FetchType
 import javax.persistence.Table
 import javax.persistence.NamedQueries
 import javax.persistence.NamedQuery
@@ -20,7 +22,6 @@ import vars.jpa.JPAEntity
 import vars.EntitySupportCategory
 import javax.persistence.EntityListeners
 import vars.jpa.TransactionLogger
-import vars.jpa.KeyNullifier
 import vars.jpa.KeyNullifier
 import javax.persistence.Transient
 import javax.persistence.UniqueConstraint
@@ -90,7 +91,7 @@ public class GConceptName implements Serializable, ConceptName, JPAEntity {
     @Bindable
     String author
 
-    @ManyToOne(optional = false, targetEntity = ConceptImpl.class)
+    @ManyToOne(optional = false, targetEntity = ConceptImpl.class, fetch = FetchType.EAGER, cascade = [ CascadeType.MERGE ])
     @JoinColumn(name = "ConceptID_FK")
     Concept concept
 

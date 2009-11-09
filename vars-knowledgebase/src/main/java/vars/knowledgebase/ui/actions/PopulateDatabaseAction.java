@@ -37,17 +37,13 @@ import vars.shared.ui.dialogs.NewUserDialog;
  */
 public class PopulateDatabaseAction extends ActionAdapter {
 
-    private final ConceptDAO conceptDAO;
-    private final UserAccountDAO userAccountDAO;
     private final KnowledgebaseFactory knowledgebaseFactory;
     private final MiscFactory miscFactory;
     private final ToolBelt toolBelt;
 
     public PopulateDatabaseAction(ToolBelt toolBelt) {
-        this.conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
         this.knowledgebaseFactory = toolBelt.getKnowledgebaseFactory();
         this.miscFactory = toolBelt.getMiscFactory();
-        this.userAccountDAO = toolBelt.getMiscDAOFactory().newUserAccountDAO();
         this.toolBelt = toolBelt;
     }
     
@@ -80,6 +76,8 @@ public class PopulateDatabaseAction extends ActionAdapter {
         /*
          * The Knowledgebase needs to have a root concept
          */
+        ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
+        conceptDAO.startTransaction();
         Concept root = conceptDAO.findRoot();
         boolean gotRoot = (root != null);
         
@@ -104,6 +102,7 @@ public class PopulateDatabaseAction extends ActionAdapter {
 
             }
         }
+        conceptDAO.endTransaction();
         return gotRoot;
     }
     
@@ -112,8 +111,11 @@ public class PopulateDatabaseAction extends ActionAdapter {
      * @throws RuntimeException if unable to find or create an Administrator
      */
     private boolean checkAdmin() {
-        
+
+        UserAccountDAO userAccountDAO = toolBelt.getMiscDAOFactory().newUserAccountDAO();
+        userAccountDAO.startTransaction();
         Collection<UserAccount> admins = userAccountDAO.findAllByRole(UserAccountRoles.ADMINISTRATOR.toString());
+        userAccountDAO.endTransaction();
         boolean gotAdmins = (admins.size() != 0);
         
         if (!gotAdmins) {
@@ -129,8 +131,10 @@ public class PopulateDatabaseAction extends ActionAdapter {
                 UserAccount admin = NewUserDialog.showDialog(frame, true,
                         "VARS - Create Administrator Account", toolBelt.getMiscDAOFactory(), miscFactory);
                 if (admin != null) {
+                    userAccountDAO.startTransaction();
                     admin.setRole(UserAccountRoles.ADMINISTRATOR.toString());
                     userAccountDAO.merge(admin);
+                    userAccountDAO.endTransaction();
                     gotAdmins = true;
                 }
 

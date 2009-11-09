@@ -128,6 +128,7 @@ public class ConceptImpl implements Serializable, Concept, JPAEntity {
     private String originator;
 
     @ManyToOne(
+        fetch = FetchType.EAGER,
         optional = true,
         targetEntity = ConceptImpl.class,
         cascade = { CascadeType.MERGE }

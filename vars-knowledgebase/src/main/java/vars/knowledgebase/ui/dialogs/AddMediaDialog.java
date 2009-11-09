@@ -280,7 +280,7 @@ public class AddMediaDialog extends JDialog {
                 History history = null;
                 try {
                     concept.getConceptMetadata().addMedia(media);
-                    media = (Media) knowledgebaseDAOFactory.newMediaDAO().persist(concept);
+                    knowledgebaseDAOFactory.newMediaDAO().persist(concept);
 
                     // Build the History
                     final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();

@@ -45,9 +45,12 @@ public class UserAccountCrudTest {
         userAccount.setUserName(testString);
         userAccount.setRole(UserAccountRoles.ADMINISTRATOR.getRoleName());
         DAO dao = daoFactory.newUserAccountDAO();
+        dao.startTransaction();
         dao.persist(userAccount);
+        dao.endTransaction();
         Assert.assertNotNull(((JPAEntity) userAccount).getId());
 
+        dao.startTransaction();
         userAccount = dao.findByPrimaryKey(GUserAccount.class, ((JPAEntity) userAccount).getId());
         log.info("Password stored in database as '" + userAccount.getPassword() + "'");
         Assert.assertEquals("UserName wasn't stored correctly", testString, userAccount.getUserName());
@@ -56,6 +59,7 @@ public class UserAccountCrudTest {
         Assert.assertTrue("Couldn't authenticate", userAccount.authenticate(testString));
 
         dao.remove(userAccount);
+        dao.endTransaction();
 
         Assert.assertNull("Primary key wasn't reset on delete", ((JPAEntity) userAccount).getId());
     }

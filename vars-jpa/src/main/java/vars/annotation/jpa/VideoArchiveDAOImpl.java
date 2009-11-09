@@ -45,10 +45,16 @@ public class VideoArchiveDAOImpl extends DAO implements VideoArchiveDAO {
         return findAllLinkValues(videoArchive, linkName, null);
     }
 
+    /**
+     * This should only be called withint JPA/DAO transaction
+     * @param videoArchive
+     * @param linkName
+     * @param concept
+     * @return
+     */
     public Set<String> findAllLinkValues(VideoArchive videoArchive, String linkName, Concept concept) {
 
         // Due to lazy loading we want to iterate through all objects in a collection
-        startTransaction();
 
         videoArchive = findByPrimaryKey(VideoArchive.class, ((JPAEntity) videoArchive).getId()); // merge
         Collection<? extends VideoFrame> videoFrames = videoArchive.getVideoArchiveSet().getVideoFrames();
@@ -64,9 +70,6 @@ public class VideoArchiveDAOImpl extends DAO implements VideoArchiveDAO {
                 }
             }
         }
-
-        endTransaction();
-
 
         return linkValues;
     }
@@ -104,12 +107,9 @@ public class VideoArchiveDAOImpl extends DAO implements VideoArchiveDAO {
 
     public VideoArchive findByName(final String name) {
         VideoArchive videoArchive = null;
-        Map<String, Object> params = new HashMap<String, Object>() {
-
-            {
-                put("name", name);
-            }
-        };
+        Map<String, Object> params = new HashMap<String, Object>() {{
+            put("name", name);
+        }};
 
         List<VideoArchive> videoArchives = findByNamedQuery("VideoArchive.findByName", params);
         if (videoArchives.size() == 1) {
@@ -122,6 +122,11 @@ public class VideoArchiveDAOImpl extends DAO implements VideoArchiveDAO {
         return videoArchive;
     }
 
+    /**
+     * This should be called within a DAO transaction
+     * @param videoArchive
+     * @return
+     */
     public VideoArchive deleteEmptyVideoFrames(VideoArchive videoArchive) {
 
         Collection<VideoFrame> emptyFrames = (Collection<VideoFrame>) videoArchive.getEmptyVideoFrames();
@@ -137,11 +142,9 @@ public class VideoArchiveDAOImpl extends DAO implements VideoArchiveDAO {
          */
         if (doFetch) {
             try {
-                startTransaction();
                 for (VideoFrame videoFrame : emptyFrames) {
                     remove(videoFrame);
                 }
-                endTransaction();
                 log.debug("Deleted " + n + " empty VideoFrames from " + videoArchive);
             } finally {
                 videoArchive = findByPrimaryKey(videoArchive.getClass(), ((JPAEntity) videoArchive).getId());

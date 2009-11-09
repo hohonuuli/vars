@@ -18,7 +18,7 @@ import vars.MiscDAOFactory;
 import vars.MiscFactory;
 import vars.UserAccount;
 import vars.UserAccountDAO;
-import vars.knowledgebase.KnowledgebaseDAOFactory;
+import vars.UserAccountRoles;
 import vars.shared.ui.GlobalLookup;
 
 /**
@@ -212,6 +212,7 @@ public class NewUserDialog extends javax.swing.JDialog {
                     userAccount = miscFactory.newUserAccount();
                     userAccount.setUserName(userName);
                     userAccount.setPassword(pwd1);
+                    userAccount.setRole(UserAccountRoles.MAINTENANCE.toString());
                     try {
                         userAccountDAO.persist(userAccount);
                         setVisible(false);

@@ -87,7 +87,7 @@ class NamesEditorPanelController {
                 dao.startTransaction();
                 conceptName = dao.merge(conceptName);
                 conceptName.getConcept().getConceptMetadata().addHistory(history);
-                history = dao.persist(history);
+                dao.persist(history);
                 dao.endTransaction();
                 waitIndicator.dispose();
                 EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
@@ -181,7 +181,7 @@ class NamesEditorPanelController {
              */
             History history = historyFactory.replaceConceptName(userAccount, oldConceptName, newConceptName);
             concept.getConceptMetadata().addHistory(history);
-            history = dao.persist(history);
+            dao.persist(history);
 
             /*
              * When updating a primary name we want to keep the older

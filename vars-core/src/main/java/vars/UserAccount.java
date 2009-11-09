@@ -67,6 +67,8 @@ public interface UserAccount extends VARSObject {
 
     String getAffiliation();
 
+    String getEmail();
+
     boolean isAdministrator();
 
 
@@ -98,6 +100,8 @@ public interface UserAccount extends VARSObject {
     void setFirstName(String firstName);
     void setLastName(String lastName);
     void setAffiliation(String affiliation);
+
+    void setEmail(String email);
 
     boolean authenticate(String unencryptedPassword);
 }

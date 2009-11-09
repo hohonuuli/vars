@@ -590,7 +590,7 @@ public class AddConceptDialog extends javax.swing.JDialog {
                 History history = historyFactory.replaceParentConcept(userAccount, oldParentConcept,
                     newParentConcept);
                 concept.getConceptMetadata().addHistory(history);
-                history = conceptDAO.persist(history);
+                conceptDAO.persist(history);
                 conceptDAO.endTransaction();
 
                 /*
@@ -609,7 +609,7 @@ public class AddConceptDialog extends javax.swing.JDialog {
                 conceptDAO.startTransaction();
                 concept = conceptDAO.merge(concept);
                 concept.getConceptMetadata().addHistory(history);
-                history = conceptDAO.persist(history);
+                conceptDAO.persist(history);
                 concept.setNodcCode(nodcCode);
                 conceptDAO.endTransaction();
 

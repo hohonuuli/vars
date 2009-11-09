@@ -40,5 +40,4 @@ public interface ConceptDAO extends DAO {
      */
     Collection<Concept> findDescendents(Concept concept);
 
-    Concept addConceptName(Concept concept, ConceptName conceptName);
 }

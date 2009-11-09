@@ -82,7 +82,7 @@ public class ConceptNameCRUDTest {
              conceptName.setName(name1);
              conceptName.setNameType(ConceptNameTypes.SYNONYM.toString());
              concept.addConceptName(conceptName);
-             conceptName = dao.persist(conceptName);
+             dao.persist(conceptName);
              dao.endTransaction();
 
              dao.startTransaction();
@@ -106,7 +106,7 @@ public class ConceptNameCRUDTest {
              dao.startTransaction();
              dao.merge(concept);
              concept.removeConceptName(conceptName);
-             conceptName = dao.remove(conceptName);
+             dao.remove(conceptName);
              dao.endTransaction();
              log.info("DELETED " + conceptName + " in KNOWLEDGEBASE TREE:\n" + entityUtilities.buildTextTree(concept));
 

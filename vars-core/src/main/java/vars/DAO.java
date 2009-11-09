@@ -1,7 +1,16 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * @(#)DAO.java   2009.11.06 at 07:58:58 PST
+ *
+ * Copyright 2009 MBARI
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
+
 
 package vars;
 
@@ -12,60 +21,23 @@ import java.util.Map;
  *
  * @author brian
  */
+
 /**
  *
  * @author brian
  */
 public interface DAO {
 
-    /**
-     * TODO: Add JavaDoc
-     *
-     * @param object
-     */
-    <T> T persist(T object);
+    void commit();
+
+    void endTransaction();
 
     /**
-     * TODO: Add JavaDoc
-     *
-     * @param object
-     */
-    <T> T remove(T object);
-
-    <T> T merge(T object);
-
-
-    <T> T findByPrimaryKey(Class<T> clazz, Object primaryKey);
-
-    /**
-     * Compares 2 object tho see if they represent the same entity in the database.
-     * Normally, this would return true if both objects have the same primary key.
-     * 
-     * @param obj1
-     * @param obj2
+     * True if the to bojects represnt the same object in the datastore. (e.g.
+     * It basically compares the primary key)
      * @return
      */
-    boolean equalInDatastore(Object obj1, Object obj2);
-
-    /**
-     * Looks up the object in the data store and retrieves the latest and greatest
-     * copy of it.
-     *
-     * @param object The object to lookup
-     * @return The object retrived from the datastore
-     */
-    <T> T findInDatastore(T object);
-
-    /**
-     * Many one-to-many relations are lazy loaded in JPA. For convience, this
-     * method will load all lazy relations of an IEntity object. This method has
-     * no effect on objects that are not persistant
-     *
-     * @param entity
-     *            The persistent object whos children will be loaded from the
-     *            database.
-     */
-    <T> T loadLazyRelations(T entity);
+    boolean equalInDatastore(Object thisObj, Object thatObj);
 
     /**
      * Executes a named query using a map of named parameters
@@ -81,9 +53,34 @@ public interface DAO {
      */
     List findByNamedQuery(String name, Map<String, Object> namedParameters);
 
+    <T> T findByPrimaryKey(Class<T> clazz, Object primaryKey);
+
+    /**
+     * Many one-to-many relations are lazy loaded in JPA. For convience, this
+     * method will load all lazy relations of an IEntity object. This method has
+     * no effect on objects that are not persistant
+     *
+     * @param entity
+     *            The persistent object whos children will be loaded from the
+     *            database.
+     */
+    void loadLazyRelations(Object entity);
+
+    <T> T merge(T object);
+
+    /**
+     * TODO: Add JavaDoc
+     *
+     * @param object
+     */
+    void persist(Object object);
+
+    /**
+     * TODO: Add JavaDoc
+     *
+     * @param object
+     */
+    void remove(Object object);
 
     void startTransaction();
-    void endTransaction();
-
-
 }

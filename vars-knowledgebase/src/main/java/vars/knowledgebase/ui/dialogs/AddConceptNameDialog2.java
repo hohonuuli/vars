@@ -329,7 +329,7 @@ private void initComponents() {
             final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
             History history = historyFactory.add(userAccount, conceptName);
             myConcept.getConceptMetadata().addHistory(history);
-            history = dao.persist(history);
+            dao.persist(history);
             dao.endTransaction();
             close();
             EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
