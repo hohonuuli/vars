@@ -1,5 +1,5 @@
 /*
- * @(#)LinkTemplateEditorPanel.java   2009.10.24 at 08:17:15 PDT
+ * @(#)LinkTemplateEditorPanel.java   2009.11.09 at 03:42:15 PST
  *
  * Copyright 2009 MBARI
  *
@@ -35,7 +35,6 @@ import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptMetadata;
 import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.History;
-import vars.knowledgebase.HistoryDAO;
 import vars.knowledgebase.LinkTemplate;
 import vars.knowledgebase.LinkTemplateDAO;
 import vars.knowledgebase.ui.dialogs.AddLinkTemplateDialog;
@@ -161,8 +160,17 @@ public class LinkTemplateEditorPanel extends EditorPanel {
                 if (link == null) {
                     EventBus.publish(Lookup.TOPIC_WARNING, "No LinkTemplate has been selected");
                 }
+                else if (!(link instanceof LinkTemplate)) {
+
+                    // This happens when you try to delete 'nil | nil | nil'
+                    EventBus.publish(Lookup.TOPIC_WARNING,
+                                     "You are not allowed to delete '" + link.stringValue() + "'");
+
+                }
                 else {
+
                     LinkTemplate linkTemplate = (LinkTemplate) link;
+
                     String name = linkTemplate.getConceptMetadata().getConcept().getPrimaryConceptName().getName();
                     try {
 
@@ -176,17 +184,14 @@ public class LinkTemplateEditorPanel extends EditorPanel {
                         conceptMetadata.addHistory(history);
                         dao.persist(history);
                         dao.endTransaction();
+                        EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);    // Will refresh everything
 
                     }
                     catch (Exception e) {
-                        log.error("Failed to delete " + linkTemplate + " in database");
-                        EventBus.publish(
-                            Lookup.TOPIC_NONFATAL_ERROR,
-                            "An error occured when trying to save History information " +
-                            " to the database. The change was made but no History record for it will be available");
+                        log.error("Failed to delete " + linkTemplate + " in database", e);
+                        EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+                        EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, name);
                     }
-
-                    EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, name);
                 }
             }
         }
@@ -227,114 +232,127 @@ public class LinkTemplateEditorPanel extends EditorPanel {
 
         public void doAction() {
 
-            final LinkEditorPanel panel = getLinkEditorPanel();
-            final LinkTemplate linkTemplate = (LinkTemplate) panel.getLink();
-            if (linkTemplate == null) {
-                EventBus.publish(Lookup.TOPIC_WARNING, "No link has been selected");
-            }
-            else {
+            final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+            if ((userAccount != null) && !userAccount.isReadOnly()) {
+                final LinkEditorPanel panel = getLinkEditorPanel();
+                ILink link = panel.getLink();
+                if (link == null) {
+                    EventBus.publish(Lookup.TOPIC_WARNING, "No LinkTemplate has been selected");
+                }
+                else if (!(link instanceof LinkTemplate)) {
+                    // This happens when you try to delete 'nil | nil | nil'
+                    EventBus.publish(Lookup.TOPIC_WARNING, "You are not allowed to delete '" + link.stringValue() + "'");
+                }
+                else {
 
-                // Get new values
-                WaitIndicator waitIndicator = new SpinningDialWaitIndicator(LinkTemplateEditorPanel.this);
-                final String newToConceptName = panel.getToConcept();
-                final String newFromConceptName = panel.getFromConcept();
-                final String newLinkName = panel.getLinkName();
-                final String newLinkValue = panel.getLinkValue();
+                    final LinkTemplate linkTemplate = (LinkTemplate) link;
 
-                Worker.post(new Job() {
+                    // Get new values
+                    WaitIndicator waitIndicator = new SpinningDialWaitIndicator(LinkTemplateEditorPanel.this);
+                    final String newToConceptName = panel.getToConcept();
+                    final String newFromConceptName = panel.getFromConcept();
+                    final String newLinkName = panel.getLinkName();
+                    final String newLinkValue = panel.getLinkValue();
 
-                    public Object run() {
+                    Worker.post(new Job() {
 
-                        // Get old values
-                        String oldToConceptName = panel.getToConcept();
-                        String oldFromConceptName = null;
-                        try {
-                            oldFromConceptName = linkTemplate.getFromConcept();
-                        }
-                        catch (Exception e) {
-                            oldFromConceptName = ConceptName.NAME_DEFAULT;
-                        }
+                        public Object run() {
 
-                        String oldLinkName = linkTemplate.getLinkName();
-                        String oldLinkValue = linkTemplate.getLinkValue();
-
-                        // Did we actually make changes
-                        boolean updateLink = !newToConceptName.equals(oldToConceptName) ||
-                                             !newFromConceptName.equals(oldFromConceptName) ||
-                                             !newLinkName.equals(oldLinkName) || !newLinkValue.equals(oldLinkValue);
-
-                        // Change the parent concept
-                        if (!newFromConceptName.equals(oldFromConceptName)) {
+                            // Get old values
+                            String oldToConceptName = panel.getToConcept();
+                            String oldFromConceptName = null;
                             try {
-                                final ConceptDAO conceptDAO = getToolBelt().getKnowledgebaseDAOFactory().newConceptDAO();
-                                final Concept newFromConcept = conceptDAO.findByName(newFromConceptName);
-                                final ConceptMetadata conceptMetadata = linkTemplate.getConceptMetadata();
-                                conceptMetadata.removeLinkTemplate(linkTemplate);
-                                conceptDAO.merge(conceptMetadata);
-                                newFromConcept.getConceptMetadata().addLinkTemplate(linkTemplate);
-                                conceptDAO.merge(newFromConcept);
+                                oldFromConceptName = linkTemplate.getFromConcept();
                             }
                             catch (Exception e) {
-                                String message = "Failed to change parent of " + linkTemplate + " from " +
-                                                 oldFromConceptName + " to " + newFromConceptName;
-                                log.error(message, e);
-                                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, message);
+                                oldFromConceptName = ConceptName.NAME_DEFAULT;
                             }
-                        }
 
-                        if (updateLink) {
+                            String oldLinkName = linkTemplate.getLinkName();
+                            String oldLinkValue = linkTemplate.getLinkValue();
 
-                            // Verify that the link name/ link value combo is unique
-                            LinkTemplateDAO linkTemplateDAO = getToolBelt().getKnowledgebaseDAOFactory()
-                                .newLinkTemplateDAO();
-                            Collection<LinkTemplate> links = new ArrayList<LinkTemplate>();
-                            boolean okToProceed = true;
-                            try {
+                            // Did we actually make changes
+                            boolean updateLink = !newToConceptName.equals(oldToConceptName) ||
+                                                 !newFromConceptName.equals(oldFromConceptName) ||
+                                                 !newLinkName.equals(oldLinkName) || !newLinkValue.equals(oldLinkValue);
 
-                                links.addAll(linkTemplateDAO.findAllByLinkName(linkTemplate.getLinkName()));
+                            // Change the parent concept
+                            if (!newFromConceptName.equals(oldFromConceptName)) {
+                                try {
+                                    final ConceptDAO conceptDAO = getToolBelt().getKnowledgebaseDAOFactory().newConceptDAO();
+                                    conceptDAO.startTransaction();
+                                    final Concept newFromConcept = conceptDAO.findByName(newFromConceptName);
+                                    final LinkTemplate lt = conceptDAO.merge(linkTemplate);
+                                    final ConceptMetadata conceptMetadata = lt.getConceptMetadata();
+                                    conceptMetadata.removeLinkTemplate(lt);
+                                    newFromConcept.getConceptMetadata().addLinkTemplate(linkTemplate);
+                                    conceptDAO.endTransaction();
+                                }
+                                catch (Exception e) {
+                                    String message = "Failed to change parent of " + linkTemplate + " from " +
+                                                     oldFromConceptName + " to " + newFromConceptName;
+                                    log.error(message, e);
+                                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+                                }
+                            }
 
-                                for (LinkTemplate link : links) {
-                                    if (!linkTemplateDAO.equalInDatastore(link, linkTemplate) &&
-                                            link.getLinkValue().equalsIgnoreCase(newLinkValue)) {
-                                        okToProceed = false;
+                            if (updateLink) {
 
-                                        break;
+                                // Verify that the link name/ link value combo is unique
+                                LinkTemplateDAO linkTemplateDAO = getToolBelt().getKnowledgebaseDAOFactory().newLinkTemplateDAO();
+                                Collection<LinkTemplate> links = new ArrayList<LinkTemplate>();
+                                boolean okToProceed = true;
+                                try {
+
+                                    links.addAll(linkTemplateDAO.findAllByLinkName(linkTemplate.getLinkName()));
+
+                                    for (LinkTemplate link : links) {
+                                        if (!linkTemplateDAO.equalInDatastore(link, linkTemplate) &&
+                                                link.getLinkValue().equalsIgnoreCase(newLinkValue)) {
+                                            okToProceed = false;
+
+                                            break;
+                                        }
+                                    }
+                                }
+                                catch (Exception e1) {
+                                    log.error("Failed to look up linkname", e1);
+                                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e1);
+                                }
+
+                                if (!okToProceed) {
+
+                                    // Don't allow duplicate link names
+                                    EventBus.publish(Lookup.TOPIC_WARNING,
+                                                     "A LinkTemplate with a LinkName of '" +
+                                                     linkTemplate.getLinkName() + "' and a LinkValue of '" +
+                                                     newLinkValue +
+                                                     "' already exist. Unable to change the LinkTemplate.");
+                                    panel.setLink(linkTemplate);
+                                }
+                                else {
+                                    
+                                    try {
+                                        linkTemplateDAO.startTransaction();
+                                        linkTemplateDAO.merge(linkTemplate);
+                                        linkTemplate.setLinkName(newLinkName);
+                                        linkTemplate.setLinkValue(newLinkValue);
+                                        linkTemplate.setToConcept(newToConceptName);
+                                        linkTemplateDAO.endTransaction();
+                                    }
+                                    catch (Exception e) {
+                                        log.error("Update to " + linkTemplate + " failed.", e);
+                                        EventBus.publish(Lookup.TOPIC_WARNING, e);
                                     }
                                 }
                             }
-                            catch (Exception e1) {
-                                log.error("Failed to look up linkname", e1);
-                                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e1);
-                            }
 
-                            if (!okToProceed) {
-
-                                // Don't allow duplicate link names
-                                EventBus.publish(Lookup.TOPIC_WARNING,
-                                                 "A LinkTemplate with a LinkName of '" + linkTemplate.getLinkName() +
-                                                 "' and a LinkValue of '" + newLinkValue +
-                                                 "' already exist. Unable to change the LinkTemplate.");
-                                panel.setLink(linkTemplate);
-                            }
-                            else {
-                                linkTemplate.setLinkName(newLinkName);
-                                linkTemplate.setLinkValue(newLinkValue);
-                                linkTemplate.setToConcept(newToConceptName);
-
-                                try {
-                                    linkTemplateDAO.merge(linkTemplate);
-                                }
-                                catch (Exception e) {
-                                    log.error("Update to " + linkTemplate + " failed.", e);
-                                    EventBus.publish(Lookup.TOPIC_WARNING, "Failed to save changes to database");
-                                }
-                            }
+                            return null;
                         }
+                    });
+                    waitIndicator.dispose();
 
-                        return null;
-                    }
-                });
-                waitIndicator.dispose();
+                }
             }
         }
     }

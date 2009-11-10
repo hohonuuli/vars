@@ -288,8 +288,8 @@ public class HistoryViewPanel extends JPanel {
                 }
             }
 
-            approver = history.getApproverName();
-            Date approval = history.getApprovalDate();
+            approver = history.getProcessorName();
+            Date approval = history.getProcessedDate();
             if (approval != null) {
                 synchronized (DATEFORMAT) {
                     approvalDate = DATEFORMAT.format(approval);

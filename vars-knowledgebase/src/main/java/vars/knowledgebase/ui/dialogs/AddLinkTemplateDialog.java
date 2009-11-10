@@ -166,27 +166,26 @@ public class AddLinkTemplateDialog extends JDialog {
                                              "' already exist. Unable to complete your request");
                         }
                         else {
-                            c.getConceptMetadata().addLinkTemplate(linkTemplate);
-                            linkTemplateDAO.persist(linkTemplate);
+
                             UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
                             History history = historyFactory.add(userAccount, linkTemplate);
-                            c.getConceptMetadata().addHistory(history);
-
                             try {
-                                HistoryDAO historyDAO = knowledgebaseDAOFactory.newHistoryDAO();
-                                historyDAO.persist(history);
+                                linkTemplateDAO.startTransaction();
+                                linkTemplateDAO.merge(c);
+                                c.getConceptMetadata().addLinkTemplate(linkTemplate);
+                                linkTemplateDAO.persist(linkTemplate);
+                                c.getConceptMetadata().addHistory(history);
+                                linkTemplateDAO.persist(history);
+                                linkTemplateDAO.endTransaction();
+                            
                             }
                             catch (Exception e1) {
                                 c.getConceptMetadata().removeLinkTemplate(linkTemplate);
-                                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR,
-                                                 "Failed to update '" + c.getPrimaryConceptName().getName() +
-                                                 "' in the database. Rolling back your changes.");
+                                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e1);
 
                             }
 
-                            if ((userAccount != null) && userAccount.isAdministrator()) {
-                                approveHistoryTask.approve(userAccount, history);
-                            }
+                            EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
 
                             // Clear the database cache
                             EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, c.getPrimaryConceptName().getName());

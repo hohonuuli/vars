@@ -294,7 +294,30 @@ public class ConceptImpl implements Serializable, Concept, JPAEntity {
      * @return
      */
     public boolean hasDescendent(String child) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        return hasDescendent(child, this);
+    }
+
+    private boolean hasDescendent(String childName, Concept concept) {
+        boolean match = false;
+
+        // ---- Check the immediate children for a match
+        Collection<Concept> children = new ArrayList<Concept>(concept.getChildConcepts());
+        for (Concept child : children) {
+            match = child.getConceptName(childName) != null;
+            if (match) {
+                break;
+            }
+        }
+
+        // ---- Iterate down to the grandchildren (and so on
+        for (Concept child : children) {
+            match = hasDescendent(childName, child);
+            if (match) {
+                break;
+            }
+        }
+
+        return match;
     }
 
     public boolean hasDetails() {

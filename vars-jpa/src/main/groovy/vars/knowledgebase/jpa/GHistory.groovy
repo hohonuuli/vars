@@ -55,22 +55,22 @@ import vars.UserAccount
 @NamedQueries( value = [
     @NamedQuery(name = "History.findById",
                 query = "SELECT v FROM History v WHERE v.id = :id"),
-    @NamedQuery(name = "History.findByApprovalDate",
-                query = "SELECT h FROM History h WHERE h.approvalDate = :approvalDate"),
+    @NamedQuery(name = "History.findByProcessedDate",
+                query = "SELECT h FROM History h WHERE h.processedDate = :processedDate"),
     @NamedQuery(name = "History.findByCreationDate",
                 query = "SELECT h FROM History h WHERE h.creationDate = :creationDate"),
     @NamedQuery(name = "History.findByCreatorName",
                 query = "SELECT h FROM History h WHERE h.creatorName = :creatorName"),
-    @NamedQuery(name = "History.findByApproverName",
-                query = "SELECT h FROM History h WHERE h.approverName = :approverName") ,
+    @NamedQuery(name = "History.findByProcessorName",
+                query = "SELECT h FROM History h WHERE h.processorName = :processorName") ,
     @NamedQuery(name = "History.findByField", query = "SELECT h FROM History h WHERE h.field = :field") ,
     @NamedQuery(name = "History.findByOldValue", query = "SELECT h FROM History h WHERE h.oldValue = :oldValue") ,
     @NamedQuery(name = "History.findByNewValue", query = "SELECT h FROM History h WHERE h.newValue = :newValue") ,
     @NamedQuery(name = "History.findByAction", query = "SELECT h FROM History h WHERE h.action = :action") ,
     @NamedQuery(name = "History.findByComment", query = "SELECT h FROM History h WHERE h.comment = :comment") ,
-    @NamedQuery(name = "History.findByRejected", query = "SELECT h FROM History h WHERE h.rejected = :rejected"),
-    @NamedQuery(name = "History.findPendingApproval", query = "SELECT h FROM History h WHERE h.approvalDate IS NULL"),
-    @NamedQuery(name = "History.findApproved", query = "SELECT h FROM History h WHERE h.approvalDate IS NOT NULL")
+    @NamedQuery(name = "History.findByApproved", query = "SELECT h FROM History h WHERE h.approved = :approved"),
+    @NamedQuery(name = "History.findPendingApproval", query = "SELECT h FROM History h WHERE h.processedDate IS NULL"),
+    @NamedQuery(name = "History.findApproved", query = "SELECT h FROM History h WHERE h.processedDate IS NOT NULL")
 ])
 class GHistory implements Serializable, History, JPAEntity {
 
@@ -91,22 +91,19 @@ class GHistory implements Serializable, History, JPAEntity {
     @Column(name = "LAST_UPDATED_TIME")
     private Timestamp updatedTime
 
-    @Column(name = "ApprovalDTG")
+    @Column(name = "ProcessedDTG")
     @Temporal(value = TemporalType.TIMESTAMP)
-    Date approvalDate
+    Date processedDate
 
     @Column(name = "CreationDTG", nullable = false)
     @Temporal(value = TemporalType.TIMESTAMP)
     Date creationDate
 
-    //@Column(name = "Description", length = 1000, nullable = true)
-    //String description
-
     @Column(name = "CreatorName", nullable = false, length = 50)
     String creatorName
 
-    @Column(name = "ApproverName", length = 50)
-    String approverName
+    @Column(name = "ProcessorName", length = 50)
+    String processorName
 
     @Column(name = "Field", length = 2048)
     String field
@@ -123,8 +120,8 @@ class GHistory implements Serializable, History, JPAEntity {
     @Column(name = "Comment", length = 2048)
     String comment
 
-    @Column(name = "Rejected")
-    private Short rejected = 0
+    @Column(name = "Approved")
+    private Short approved = 0
 
     @ManyToOne(optional = false, targetEntity = ConceptMetadataImpl.class)
     @JoinColumn(name = "ConceptDelegateID_FK")
@@ -141,8 +138,8 @@ class GHistory implements Serializable, History, JPAEntity {
         return ACTION_ADD.equalsIgnoreCase(action)
     }
 
-    boolean isApproved() {
-        return approvalDate != null
+    Boolean isApproved() {
+        return approved == 1
     }
 
     boolean isDelete() {
@@ -153,12 +150,16 @@ class GHistory implements Serializable, History, JPAEntity {
         return ACTION_REPLACE.equalsIgnoreCase(action)
     }
 
-    Boolean isRejected() {
-        return rejected == 0
+    boolean isRejected() {
+        return !isApproved()
     }
 
-    void setRejected(Boolean rejected) {
-        this.rejected = rejected ? 1 : 0
+    boolean isProcessed() {
+        return processedDate != null;
+    }
+
+    void setApproved(Boolean approved) {
+        this.approved = approved ? 1 : 0
     }
 
     String stringValue() {

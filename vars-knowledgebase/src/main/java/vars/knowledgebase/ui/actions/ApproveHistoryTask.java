@@ -31,7 +31,6 @@ import vars.UserAccount;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptName;
-import vars.knowledgebase.ConceptNameDAO;
 import vars.knowledgebase.History;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.LinkRealization;
@@ -111,7 +110,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
     }
 
     public void approve(final UserAccount userAccount, final History history) {
-        if ((history != null) && !history.isApproved() && !history.isRejected()) {
+        if ((history != null) && !history.isProcessed()) {
             if (log.isDebugEnabled()) {
                 log.debug("Approving " + history);
             }
@@ -398,8 +397,9 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
                 ConceptDAO dao = knowledgebaseDAOFactory.newConceptDAO();
                 dao.startTransaction();
                 history = dao.merge(history);
-                history.setApprovalDate(new Date());
-                history.setApproverName(userAccount.getUserName());
+                history.setProcessedDate(new Date());
+                history.setProcessorName(userAccount.getUserName());
+                history.setApproved(Boolean.TRUE);
                 dao.endTransaction();
             }
             else {

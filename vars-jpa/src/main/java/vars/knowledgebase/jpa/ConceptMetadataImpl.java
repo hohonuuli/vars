@@ -1,5 +1,5 @@
 /*
- * @(#)ConceptMetadataImpl.java   2009.09.28 at 09:18:07 PDT
+ * @(#)ConceptMetadataImpl.java   2009.11.09 at 11:37:21 PST
  *
  * Copyright 2009 MBARI
  *
@@ -31,9 +31,9 @@ import vars.knowledgebase.*;
 /**
  * <pre>
  * CREATE TABLE CONCEPTDELEGATE (
- *   ID          	BIGINT NOT NULL,
- *   CONCEPTID_FK	BIGINT,
- *   USAGEID_FK  	BIGINT,
+ *   ID                 BIGINT NOT NULL,
+ *   CONCEPTID_FK       BIGINT,
+ *   USAGEID_FK         BIGINT,
  *   CONSTRAINT PK_CONCEPTDELEGATE PRIMARY KEY(ID)
  * )
  * GO
@@ -55,7 +55,6 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
     @OneToOne(optional = false, targetEntity = ConceptImpl.class)
     @JoinColumn(name = "ConceptID_FK", nullable = false)
     private Concept concept;
-
     @OneToMany(
         targetEntity = GHistory.class,
         mappedBy = "conceptMetadata",
@@ -106,11 +105,12 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
     )
     private Set<Media> medias;
 
+
     /** Optimistic lock to prevent concurrent overwrites */
     @Version
     @Column(name = "LAST_UPDATED_TIME")
     private Timestamp updatedTime;
-    
+
     @OneToOne(
         mappedBy = "conceptMetadata",
         fetch = FetchType.EAGER,
@@ -235,6 +235,18 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
         return media;
     }
 
+    public Media getPrimaryMedia(MediaTypes mediaType) {
+        Media primaryMedia = null;
+        Set<Media> ms = new HashSet<Media>(getMedias());
+        for (Media media : ms) {
+            if (media.isPrimary() && media.getType().equals(mediaType.toString())) {
+                primaryMedia = media;
+            }
+        }
+
+        return primaryMedia;
+    }
+
     public Usage getUsage() {
         return usage;
     }
@@ -261,6 +273,19 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
 
     }
 
+    public boolean isPendingApproval() {
+        boolean isPending = false;
+        for (History history : getHistories()) {
+            if (!history.isApproved() && !history.isRejected()) {
+                isPending = true;
+
+                break;
+            }
+        }
+
+        return isPending;
+    }
+
     public void removeHistory(History history) {
         if (getHistories().remove(history)) {
             ((GHistory) history).setConceptMetadata(null);
@@ -275,7 +300,7 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
 
     public void removeLinkTemplate(LinkTemplate linkTemplate) {
         if (getLinkTemplates().remove(linkTemplate)) {
-            ((GLinkTemplate) linkTemplate).setConceptMetadata(this);
+            ((GLinkTemplate) linkTemplate).setConceptMetadata(null);
         }
     }
 
@@ -309,27 +334,5 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
     @Override
     public String toString() {
         return EntitySupportCategory.basicToString(this, new ArrayList());
-    }
-
-    public Media getPrimaryMedia(MediaTypes mediaType) {
-        Media primaryMedia = null;
-        Set<Media> ms = new HashSet<Media>(getMedias());
-        for (Media media : ms) {
-            if (media.isPrimary() && media.getType().equals(mediaType.toString())) {
-                primaryMedia = media;
-            }
-        }
-        return primaryMedia;
-    }
-
-    public boolean isPendingApproval() {
-        boolean isPending = false;
-        for (History history : getHistories()) {
-            if (!history.isApproved()) {
-                isPending = true;
-                break;
-            }
-        }
-        return isPending;
     }
 }

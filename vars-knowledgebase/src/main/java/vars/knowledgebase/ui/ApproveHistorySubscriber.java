@@ -1,5 +1,5 @@
 /*
- * @(#)ApproveHistorySubscriber.java   2009.10.29 at 12:49:38 PDT
+ * @(#)ApproveHistorySubscriber.java   2009.11.09 at 03:36:36 PST
  *
  * Copyright 2009 MBARI
  *
@@ -42,15 +42,17 @@ public class ApproveHistorySubscriber implements EventTopicSubscriber<History> {
     public void onEvent(String topic, History history) {
         if (Lookup.TOPIC_APPROVE_HISTORY.equals(topic)) {
             final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
-            if ((userAccount != null) && userAccount.isAdministrator()) {
-                try {
+            try {
+                if ((userAccount != null) && (userAccount.isAdministrator()) && (!history.isProcessed())) {
                     approveHistoryTask.approve(userAccount, history);
                 }
-                catch (Exception e) {
-                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
-                    EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE,
-                                     history.getConceptMetadata().getConcept().getPrimaryConceptName().getName());
-                }
+            }
+            catch (Exception e) {
+                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+            }
+            finally {
+                EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE,
+                                 history.getConceptMetadata().getConcept().getPrimaryConceptName().getName());
             }
         }
     }

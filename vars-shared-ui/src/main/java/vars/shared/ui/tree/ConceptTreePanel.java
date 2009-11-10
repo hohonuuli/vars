@@ -323,10 +323,10 @@ public class ConceptTreePanel extends SearchableTreePanel {
      */
     public void refreshAndOpenNode(Concept concept) {
         if (log.isDebugEnabled()) {
-            log.debug("Refreshing ConceptTree and opening it to '" + concept.getPrimaryConceptName().getName() +
-                      "', " + concept);
+            String name = concept == null ? "the root node" : concept.getPrimaryConceptName().getName();
+            log.debug("Refreshing ConceptTree and opening it to '" + name +
+                      "' -> " + concept);
         }
-
         refresh();
         openNode(concept);
     }

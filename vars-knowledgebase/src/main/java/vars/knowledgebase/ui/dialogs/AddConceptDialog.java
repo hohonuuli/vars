@@ -348,7 +348,7 @@ public class AddConceptDialog extends javax.swing.JDialog {
         }
 
         final Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
-        if ((frame != null) && (frame instanceof KnowledgebaseFrame)) {
+        if ((frame != null) && (frame instanceof KnowledgebaseFrame) && (concept != null)) {
             final String name = concept.getPrimaryConceptName().getName();
             Worker.post(new Job() {
 

@@ -15,7 +15,6 @@ import java.util.Collection;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptName;
-import vars.knowledgebase.ConceptNameDAO;
 import vars.knowledgebase.ConceptNameTypes;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.KnowledgebaseFactory;
@@ -67,7 +66,9 @@ public class ConceptNameCRUDTest {
          ConceptDAO dao = daoFactory.newConceptDAO();
          //ConceptNameDAO conceptNameDAO = daoFactory.newConceptNameDAO();
          Concept concept = testObjectFactory.makeObjectGraph("conceptNameCRUD", 2);
+         dao.startTransaction();
          dao.persist(concept);
+         dao.endTransaction();
          log.info("INITIAL KNOWLEDGEBASE TREE:\n" + entityUtilities.buildTextTree(concept));
 
          String name1 = "FOO";

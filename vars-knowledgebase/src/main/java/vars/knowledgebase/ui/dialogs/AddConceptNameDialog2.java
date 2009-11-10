@@ -316,23 +316,28 @@ private void initComponents() {
             }
             conceptName.setNameType(nameType);
 
-            DAO dao = knowledgebaseDAOFactory.newDAO();
-            dao.startTransaction();
-            myConcept = dao.merge(myConcept);
-            myConcept.addConceptName(conceptName);
-            dao.persist(conceptName);
-            
+            try {
+                DAO dao = knowledgebaseDAOFactory.newDAO();
+                dao.startTransaction();
+                myConcept = dao.merge(myConcept);
+                myConcept.addConceptName(conceptName);
+                dao.persist(conceptName);
 
-            /*
-             * Add a History object to track the change.
-             */
-            final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
-            History history = historyFactory.add(userAccount, conceptName);
-            myConcept.getConceptMetadata().addHistory(history);
-            dao.persist(history);
-            dao.endTransaction();
+
+                /*
+                 * Add a History object to track the change.
+                 */
+                final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+                History history = historyFactory.add(userAccount, conceptName);
+                myConcept.getConceptMetadata().addHistory(history);
+                dao.persist(history);
+                dao.endTransaction();
+                EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
+            }
+            catch (Exception e) {
+                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+            }
             close();
-            EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
             waitIndicator.dispose();
         }
 

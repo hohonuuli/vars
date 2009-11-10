@@ -91,15 +91,17 @@ public interface History extends KnowledgebaseObject {
     String getAction();
 
     /**
-     * Gets the approval date of this <code>History</code>.
+     * Gets the date that this <code>History</code> was processed (i.e. approved
+     * or rejected.
+     * 
      * @return  The approval date of this <code>History</code>.
      */
-    Date getApprovalDate();
+    Date getProcessedDate();
 
     /**
-     * @return  the approverName
+     * @return  the Username of whoever processed this history
      */
-    String getApproverName();
+    String getProcessorName();
 
     /**
      * Method description
@@ -154,13 +156,10 @@ public interface History extends KnowledgebaseObject {
     /**
      * Gets whether this <code>History</code> has been approved.
      *
-     * NOTE: Changes that are not approved are stored in the database with an
-     * approvalDtg == 0 (ie 1/1/1970)
-     *
      * @return <code>true</code> if this <code>History</code> has been
      * approved.
      */
-    boolean isApproved();
+    Boolean isApproved();
 
     /**
      * Determines whether the action of this <code>History</code> is a delete.
@@ -175,7 +174,7 @@ public interface History extends KnowledgebaseObject {
      *
      * @return <code>true</code> if this <code>History</code> was rejected.
      */
-    Boolean isRejected();
+    boolean isRejected();
 
     /**
      * Determines whether the action of this <code>History</code> is a
@@ -185,6 +184,12 @@ public interface History extends KnowledgebaseObject {
      * is an replace.
      */
     boolean isReplace();
+
+    /**
+     * @return true if this History has already been process (i.e. approved or
+     *      rejected
+     */
+    boolean isProcessed();
 
 
     /**
@@ -198,12 +203,12 @@ public interface History extends KnowledgebaseObject {
      * @param approvalDate  The approval Data of this <code>History</code>.
      * @thows  IllegalArgumentException If the approval Date is <code>null</code>.
      */
-    void setApprovalDate(Date approvalDate);
+    void setProcessedDate(Date approvalDate);
 
     /**
      * @param approverName  the approverName to set
      */
-    void setApproverName(String approverName);
+    void setProcessorName(String approverName);
 
     /**
      * Method description
@@ -247,7 +252,8 @@ public interface History extends KnowledgebaseObject {
      * Method description
      * @param  rejected
      */
-    void setRejected(Boolean rejected);
+    void setApproved(Boolean approved);
+
 
     String stringValue();
 }

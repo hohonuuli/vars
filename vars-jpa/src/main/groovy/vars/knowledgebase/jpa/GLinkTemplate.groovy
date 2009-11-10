@@ -80,7 +80,7 @@ class GLinkTemplate implements Serializable, LinkTemplate, JPAEntity {
 
 
    public String getFromConcept() {
-        return conceptMetadata.concept.primaryConceptName.name
+        return conceptMetadata?.concept?.primaryConceptName.name
     }
 
     String stringValue() {

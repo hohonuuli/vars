@@ -11,11 +11,11 @@ package vars
 class LinkCategory {
 
     static String formatLinkAsString(ILink link) {
-        return "${link.linkName}${ILink.DELIMITER}${link.linkValue}${ILink.DELIMITER}${link.toConcept}"
+        return "${link.linkName}${ILink.DELIMITER}${link.toConcept}${ILink.DELIMITER}${link.linkValue}"
     }
 
     static String formatLinkAsLongString(ILink link) {
-        return "${link.fromConcept}${ILink.DELIMITER}${link.linkName}${ILink.DELIMITER}${link.linkValue}${ILink.DELIMITER}${link.toConcept}"
+        return "${link.fromConcept}${ILink.DELIMITER}${link.linkName}${ILink.DELIMITER}${link.toConcept}${ILink.DELIMITER}${link.linkValue}"
     }
 
 }

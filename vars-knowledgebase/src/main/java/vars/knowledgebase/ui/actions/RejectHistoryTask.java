@@ -20,19 +20,20 @@ package vars.knowledgebase.ui.actions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.inject.Inject;
+import foxtrot.Job;
+import foxtrot.Worker;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import javax.swing.JProgressBar;
-import org.mbari.swing.ProgressDialog;
-import foxtrot.Task;
-import foxtrot.Worker;
 
 import java.util.Collection;
 import java.util.HashSet;
+import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
 import org.bushe.swing.event.EventBus;
+import org.mbari.swing.LabeledSpinningDialWaitIndicator;
 import vars.DAO;
 import vars.LinkBean;
 import vars.LinkComparator;
@@ -54,7 +55,6 @@ import vars.knowledgebase.LinkRealization;
 import vars.knowledgebase.LinkTemplate;
 import vars.knowledgebase.Media;
 import vars.knowledgebase.MediaDAO;
-import vars.knowledgebase.ui.KnowledgebaseApp;
 import vars.knowledgebase.ui.Lookup; 
 
 //~--- classes ----------------------------------------------------------------
@@ -147,6 +147,23 @@ public class RejectHistoryTask extends AbstractHistoryTask {
         }
     }
 
+    private LabeledSpinningDialWaitIndicator newWaitIndicator() {
+        return (LabeledSpinningDialWaitIndicator) Worker.post(new Job() {
+            @Override
+            public Object run() {
+                JComponent frame = (JComponent) Lookup.getApplicationFrameDispatcher().getValueObject();
+                 return new LabeledSpinningDialWaitIndicator(frame);
+            }
+        });
+    }
+
+    private void updateWaitIndicator(final LabeledSpinningDialWaitIndicator waitIndicator, final String msg) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                waitIndicator.setLabel(msg);
+            }
+        });
+    }
 
     private class GenericRejectTask extends AbstractHistoryTask {
 
@@ -165,9 +182,9 @@ public class RejectHistoryTask extends AbstractHistoryTask {
                     DAO dao = knowledgebaseDAOFactory.newDAO();
                     dao.startTransaction();
                     history = dao.merge(history);
-                    history.setApprovalDate(new Date());
-                    history.setRejected(true);
-                    history.setApproverName(userAccount.getUserName());
+                    history.setProcessedDate(new Date());
+                    history.setApproved(Boolean.FALSE);
+                    history.setProcessorName(userAccount.getUserName());
                     dao.endTransaction();
                 }
                 catch (Exception e) {
@@ -194,152 +211,82 @@ public class RejectHistoryTask extends AbstractHistoryTask {
                 return;
             }
 
-            final ProgressDialog dialog = Lookup.getProgressDialog();
-            final JProgressBar progressBar = dialog.getProgressBar();
-            progressBar.setIndeterminate(false);
-            progressBar.setMinimum(0);
-            progressBar.setMaximum(6);
-            progressBar.setStringPainted(true);
-            progressBar.setValue(0);
-            progressBar.setString("Initializing...");
-            dialog.setSize(350, 40);
-            dialog.setVisible(true);
+            Worker.post(new Job() {
 
-            final ConceptDAO conceptDAO = getKnowledgebaseDAOFactory().newConceptDAO();
-            final ConceptNameDAO conceptNameDAO = getKnowledgebaseDAOFactory().newConceptNameDAO();
-            final HistoryDAO historyDAO = getKnowledgebaseDAOFactory().newHistoryDAO();
+                @Override
+                public Object run() {
 
-            /*
-             * Verify that the concept name still exists in the knowledgebase
-             */
-            final String name = history.getNewValue();
-            progressBar.setString("Fetching '" + name + "' from database");
-            progressBar.setValue(1);
-            Concept thatConcept = null;
-            try {
-                conceptDAO.startTransaction();
-                thatConcept = conceptDAO.findByName(name);
-                conceptDAO.endTransaction();
-            }
-            catch (Exception e1) {
-                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e1);
-            }
-
-            if (thatConcept == null) {
-                dropHistory(history, "The concept-name, '" + name + "' no longer exists in the knowledgebase. I'll remove this history from the database");
-                return;
-            }
+                    final LabeledSpinningDialWaitIndicator waitIndicator = newWaitIndicator();
+                    updateWaitIndicator(waitIndicator, "Initializing...");
 
 
-            /*
-             * We need to check that the concept-name that we're dropping is still associated with the correct
-             * concept.
-             */
-            final Concept thisConcept = history.getConceptMetadata().getConcept();
-            if (thisConcept.equals(thatConcept)) {
-                /*
-                 * A primary conceptname can not be dropped. If it's a primary name we remove the history.
-                 */
-                if (!thisConcept.getPrimaryConceptName().getName().equals(name)) {
+
+                    final ConceptDAO conceptDAO = getKnowledgebaseDAOFactory().newConceptDAO();
+                    final ConceptNameDAO conceptNameDAO = getKnowledgebaseDAOFactory().newConceptNameDAO();
+                    final HistoryDAO historyDAO = getKnowledgebaseDAOFactory().newHistoryDAO();
 
                     /*
-                     * When dropping a concept-name we first want to make sure that no annotations are
-                     * using it.
+                     * Verify that the concept name still exists in the knowledgebase
                      */
-                    boolean ok = true;
-                    progressBar.setString("Removing uses of '" + name + "' from database");
-                    progressBar.setValue(2);
+                    final String name = history.getNewValue();
+                    updateWaitIndicator(waitIndicator, "Fetching '" + name + "' from database");
+                    
+                    Concept thatConcept = null;
                     try {
-                        Worker.post(new Task() {
+                        thatConcept = conceptDAO.findByName(name);
+                        if (thatConcept == null) {
+                            dropHistory(history, "The concept-name, '" + name + "' no longer exists in the knowledgebase. I'll remove this history from the database");
+                            return null;
+                        }
 
-                            public Object run() throws Exception {
+
+                         /*
+                         * We need to check that the concept-name that we're dropping is still associated with the correct
+                         * concept.
+                         */
+                        Concept thisConcept = history.getConceptMetadata().getConcept();
+                        if (thisConcept.equals(thatConcept)) {
+                            /*
+                             * A primary conceptname can not be dropped. If it's a primary name we remove the history.
+                             */
+                            if (!thisConcept.getPrimaryConceptName().getName().equals(name)) {
+
+                                updateWaitIndicator(waitIndicator, "Removing uses of '" + name + "' from database");
                                 knowledgebaseDAO.updateConceptNameUsedByAnnotations(thisConcept);
-                                return null;
-                            }
-                        });
-                    }
-                    catch (Exception e) {
-                        ok = false;
-                        progressBar.setIndeterminate(false);
-                        dialog.setVisible(false);
-                        EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, "Failed to remove uses of '" + name + "' from the database. Reason: " + e.getMessage());
-                    }
-
-                    if (ok) {
-                        final ConceptName conceptName = thisConcept.getConceptName(name);
-                        if (conceptName != null) {
-
-                            // Delete the name
-                            progressBar.setString("Deleting '" + name + "' from the knowledgebase");
-                            progressBar.setValue(3);
-                            try {
-                                Worker.post(new Task() {
-
-                                    public Object run() throws Exception {
-                                        conceptNameDAO.startTransaction();
-                                        Concept aConcept = conceptNameDAO.merge(thisConcept);
-                                        ConceptName conceptName = aConcept.getConceptName(name);
-                                        aConcept.removeConceptName(conceptName);
-                                        conceptNameDAO.remove(conceptName);
-                                        conceptNameDAO.endTransaction();
-                                        return null;
-                                    }
-                                });
-                            }
-                            catch (Exception e) {
-                                ok = false;
-                                progressBar.setIndeterminate(false);
-                                dialog.setVisible(false);
-                                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, "Unable to delete '" +
-                                        name + "' from the database. Reason: " + e.getMessage());
                             }
 
-                            if (ok) {
+                            ConceptName conceptName = thisConcept.getConceptName(name);
+                            if (conceptName != null) {
+                                updateWaitIndicator(waitIndicator, "Updating database values");
+                                conceptNameDAO.startTransaction();
+                                thisConcept = conceptNameDAO.merge(thisConcept);
+                                conceptName = thisConcept.getConceptName(name);
                                 thisConcept.removeConceptName(conceptName);
-                                progressBar.setString("Deleting '" + name + "' from the knowledgebase");
-                                progressBar.setValue(4);
-                                try {
-                                    Worker.post(new Task() {
+                                conceptNameDAO.remove(conceptName);
+                                conceptNameDAO.endTransaction();
 
-                                        public Object run() throws Exception {
-                                            history.setApprovalDate(new Date());
-                                            history.setRejected(true);
-                                            historyDAO.merge(history);
-                                            return null;
-                                        }
-                                    });
-                                }
-                                catch (Exception e) {
-                                    progressBar.setIndeterminate(false);
-                                    dialog.setVisible(false);
-                                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR,
-                                            "Failed to update '" +
-                                            thisConcept.getPrimaryConceptName().getName() +
-                                            "'. Reason: " + e.getMessage() +
-                                            ". I'll refresh the knowledgebase to resynchronize it.");
-                                }
+                                historyDAO.startTransaction();
+                                historyDAO.merge(history);
+                                history.setProcessedDate(new Date());
+                                history.setProcessorName(userAccount.getUserName());
+                                history.setApproved(true);
+                                historyDAO.endTransaction();
                             }
+
                         }
                     }
+                    catch (Exception e) {
+                        EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+                        EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, name);
+                    }
+                    finally {
+                        waitIndicator.dispose();
+                    }
 
-                    progressBar.setString("Refreshing");
-                    progressBar.setValue(5);
-                    KnowledgebaseApp app = (KnowledgebaseApp) Lookup.getApplicationDispatcher().getValueObject();
-                    app.getKnowledgebaseFrame().refreshTreeAndOpenNode(thisConcept.getPrimaryConceptName().getName());
+                    return null;
                 }
-                else {
-                    dropHistory(history, "Unable to delete a primary concept name! I'll remove this history from the database.");
-                }
-            }
-            else {
-                dropHistory(history, "This History refers to a concept name that has been moved to '" + 
-                        thatConcept.getPrimaryConceptName().getName() + "'. I'll remove this history from the database.");
-            }
+            });
 
-            // Get count of usages in the Annotation database. Collection<Observation>
-            progressBar.setValue(6);
-            progressBar.setIndeterminate(false);
-            dialog.setVisible(false);
         }
     }
 
