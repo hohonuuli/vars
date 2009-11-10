@@ -24,9 +24,9 @@ import vars.knowledgebase.jpa.ConceptMetadataImpl;
 import vars.knowledgebase.jpa.GConceptName;
 import vars.knowledgebase.jpa.GHistory;
 import vars.knowledgebase.jpa.GLinkRealization;
-import vars.knowledgebase.jpa.GLinkTemplate;
 import vars.knowledgebase.jpa.GMedia;
 import vars.knowledgebase.jpa.GUsage;
+import vars.knowledgebase.jpa.LinkTemplateImpl;
 
 /**
  * Provides a method to clear the 2nd level cache used by Hibernate JPA. This
@@ -54,7 +54,7 @@ public class HibernateCacheProvider implements PersistenceCacheProvider {
             GConceptName.class,
             GHistory.class,
             GLinkRealization.class,
-            GLinkTemplate.class,
+            LinkTemplateImpl.class,
             GMedia.class,
             GUsage.class);
 

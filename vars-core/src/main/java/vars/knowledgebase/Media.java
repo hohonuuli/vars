@@ -71,7 +71,7 @@ public interface Media extends KnowledgebaseObject {
      *
      * @return    The boolean primary of the <code>Media</code>
      */
-    boolean isPrimary();
+    Boolean isPrimary();
 
     /**
      * Sets the <code>Media</code> 'caption' attribute.
@@ -91,7 +91,7 @@ public interface Media extends KnowledgebaseObject {
      * Sets the <code>Media</code> 'primary' attribute.
      * @param primary    boolean primary of the <code>Media</code>
      */
-    void setPrimary(boolean primary);
+    void setPrimary(Boolean primary);
 
     /**
      * Sets the <code>Media</code> 'type' attribute.

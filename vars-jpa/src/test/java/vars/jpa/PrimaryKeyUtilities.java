@@ -28,7 +28,7 @@ import vars.knowledgebase.jpa.ConceptMetadataImpl;
 import vars.knowledgebase.jpa.GConceptName;
 import vars.knowledgebase.jpa.GHistory;
 import vars.knowledgebase.jpa.GLinkRealization;
-import vars.knowledgebase.jpa.GLinkTemplate;
+import vars.knowledgebase.jpa.LinkTemplateImpl;
 import vars.knowledgebase.jpa.GMedia;
 import vars.knowledgebase.jpa.GUsage;
 import vars.annotation.VideoArchiveSet;
@@ -120,7 +120,7 @@ public class PrimaryKeyUtilities {
                 put(ConceptMetadataImpl.class, new ArrayList());
                 put(GHistory.class, new ArrayList());
                 put(GLinkRealization.class, new ArrayList());
-                put(GLinkTemplate.class, new ArrayList());
+                put(LinkTemplateImpl.class, new ArrayList());
                 put(GMedia.class, new ArrayList());
                 put(GUsage.class, new ArrayList());
             }
@@ -173,7 +173,7 @@ public class PrimaryKeyUtilities {
         map.get(ConceptMetadataImpl.class).add(cm.getId());
         map.get(GHistory.class).addAll(primaryKeys(metadata.getHistories()));
         map.get(GLinkRealization.class).addAll(primaryKeys(metadata.getLinkRealizations()));
-        map.get(GLinkTemplate.class).addAll(primaryKeys(metadata.getLinkTemplates()));
+        map.get(LinkTemplateImpl.class).addAll(primaryKeys(metadata.getLinkTemplates()));
         map.get(GMedia.class).addAll(primaryKeys(metadata.getMedias()));
         map.get(GUsage.class).add(((JPAEntity) metadata.getUsage()).getId());
 

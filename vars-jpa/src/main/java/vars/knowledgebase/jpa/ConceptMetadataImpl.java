@@ -1,5 +1,5 @@
 /*
- * @(#)ConceptMetadataImpl.java   2009.11.09 at 11:37:21 PST
+ * @(#)ConceptMetadataImpl.java   2009.11.10 at 10:06:20 PST
  *
  * Copyright 2009 MBARI
  *
@@ -15,18 +15,47 @@
 package vars.knowledgebase.jpa;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+import javax.persistence.TableGenerator;
+import javax.persistence.Transient;
+import javax.persistence.Version;
+import org.hibernate.collection.PersistentSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import vars.EntitySupportCategory;
 import vars.jpa.JPAEntity;
 import vars.jpa.KeyNullifier;
 import vars.jpa.TransactionLogger;
-import vars.knowledgebase.*;
+import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptMetadata;
+import vars.knowledgebase.History;
+import vars.knowledgebase.HistoryCreationDateComparator;
+import vars.knowledgebase.LinkRealization;
+import vars.knowledgebase.LinkTemplate;
+import vars.knowledgebase.Media;
+import vars.knowledgebase.MediaTypes;
+import vars.knowledgebase.Usage;
 
 /**
  * <pre>
@@ -52,9 +81,13 @@ import vars.knowledgebase.*;
                             query = "SELECT v FROM ConceptMetadata v WHERE v.id = :id") })
 public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEntity {
 
+    @Transient
+    private final Logger log = LoggerFactory.getLogger(getClass());
+
     @OneToOne(optional = false, targetEntity = ConceptImpl.class)
     @JoinColumn(name = "ConceptID_FK", nullable = false)
     private Concept concept;
+
     @OneToMany(
         targetEntity = GHistory.class,
         mappedBy = "conceptMetadata",
@@ -90,12 +123,13 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
     private Set<LinkRealization> linkRealizations;
 
     @OneToMany(
-        targetEntity = GLinkTemplate.class,
+        targetEntity = LinkTemplateImpl.class,
         mappedBy = "conceptMetadata",
         fetch = FetchType.EAGER,
         cascade = CascadeType.ALL
     )
     private Set<LinkTemplate> linkTemplates;
+
 
     @OneToMany(
         targetEntity = GMedia.class,
@@ -105,12 +139,10 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
     )
     private Set<Media> medias;
 
-
     /** Optimistic lock to prevent concurrent overwrites */
     @Version
     @Column(name = "LAST_UPDATED_TIME")
     private Timestamp updatedTime;
-
     @OneToOne(
         mappedBy = "conceptMetadata",
         fetch = FetchType.EAGER,
@@ -133,7 +165,7 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
 
     public void addLinkTemplate(LinkTemplate linkTemplate) {
         if (getLinkTemplates().add(linkTemplate)) {
-            ((GLinkTemplate) linkTemplate).setConceptMetadata(this);
+            ((LinkTemplateImpl) linkTemplate).setConceptMetadata(this);
         }
     }
 
@@ -189,6 +221,9 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
         if (histories == null) {
             histories = new TreeSet<History>(new HistoryCreationDateComparator());
         }
+        else {
+            histories = rebuildPersistentSet(histories);
+        }
 
         return histories;
     }
@@ -201,6 +236,9 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
         if (linkRealizations == null) {
             linkRealizations = new HashSet<LinkRealization>();
         }
+        else {
+            linkRealizations = rebuildPersistentSet(linkRealizations);
+        }
 
         return linkRealizations;
     }
@@ -209,6 +247,9 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
         if (linkTemplates == null) {
             linkTemplates = new HashSet<LinkTemplate>();
         }
+        else {
+            linkTemplates = rebuildPersistentSet(linkTemplates);
+        }
 
         return linkTemplates;
     }
@@ -216,6 +257,9 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
     public Set<Media> getMedias() {
         if (medias == null) {
             medias = new HashSet<Media>();
+        }
+        else {
+            medias = rebuildPersistentSet(medias);
         }
 
         return medias;
@@ -286,6 +330,22 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
         return isPending;
     }
 
+    /**
+     * Workaround for Hibernate bug: http://opensource.atlassian.com/projects/hibernate/browse/HHH-3799
+     * @param urls
+     */
+    private <T> Set<T> rebuildPersistentSet(Set<T> urls) {
+        if (!(urls instanceof HashSet)) {
+            for (Object object : urls) {
+                object.hashCode();
+            }
+            urls = new HashSet<T>(urls);
+            log.debug("Rebuilding persistentset");
+
+        }
+        return urls;
+    }
+
     public void removeHistory(History history) {
         if (getHistories().remove(history)) {
             ((GHistory) history).setConceptMetadata(null);
@@ -300,7 +360,7 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
 
     public void removeLinkTemplate(LinkTemplate linkTemplate) {
         if (getLinkTemplates().remove(linkTemplate)) {
-            ((GLinkTemplate) linkTemplate).setConceptMetadata(null);
+            ((LinkTemplateImpl) linkTemplate).setConceptMetadata(null);
         }
     }
 

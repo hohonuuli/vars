@@ -28,7 +28,7 @@ public class KnowledgebaseFactoryImpl implements KnowledgebaseFactory {
     }
 
     public LinkTemplate newLinkTemplate() {
-        return new GLinkTemplate();
+        return new LinkTemplateImpl();
     }
 
     public Media newMedia() {

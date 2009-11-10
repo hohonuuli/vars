@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableList;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Collection;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -32,7 +33,7 @@ import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 import javax.persistence.Transient;
 import javax.persistence.Version;
-import vars.LinkUtilites;
+import vars.LinkUtilities;
 import vars.jpa.JPAEntity;
 import vars.jpa.KeyNullifier;
 import vars.jpa.TransactionLogger;
@@ -68,7 +69,7 @@ public class LinkTemplateImpl implements Serializable, LinkTemplate, JPAEntity {
     private static final Collection<String> PROPS = ImmutableList.of(LinkTemplate.PROP_LINKNAME,
         LinkTemplate.PROP_TOCONCEPT, LinkTemplate.PROP_LINKVALUE);
 
-    @ManyToOne(optional = false, targetEntity = ConceptMetadataImpl.class)
+    @ManyToOne(optional = false, targetEntity = ConceptMetadataImpl.class, cascade= {CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "ConceptDelegateID_FK")
     ConceptMetadata conceptMetadata;
 
@@ -107,6 +108,10 @@ public class LinkTemplateImpl implements Serializable, LinkTemplate, JPAEntity {
         return conceptMetadata;
     }
 
+    public void setConceptMetadata(ConceptMetadata conceptMetadata) {
+        this.conceptMetadata = conceptMetadata;
+    }
+    
     public String getFromConcept() {
         return (conceptMetadata == null) ? null : conceptMetadata.getConcept().getPrimaryConceptName().getName();
     }
@@ -127,6 +132,10 @@ public class LinkTemplateImpl implements Serializable, LinkTemplate, JPAEntity {
         return toConcept;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public void setLinkName(String linkName) {
         this.linkName = linkName;
     }
@@ -140,7 +149,7 @@ public class LinkTemplateImpl implements Serializable, LinkTemplate, JPAEntity {
     }
 
     public String stringValue() {
-        return LinkUtilites.formatAsString(this);
+        return LinkUtilities.formatAsString(this);
     }
 
     @Override
@@ -151,27 +160,14 @@ public class LinkTemplateImpl implements Serializable, LinkTemplate, JPAEntity {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final LinkTemplateImpl other = (LinkTemplateImpl) obj;
-        if ((this.linkName == null) ? (other.linkName != null) : !this.linkName.equals(other.linkName)) {
-            return false;
-        }
-        if ((this.linkValue == null) ? (other.linkValue != null) : !this.linkValue.equals(other.linkValue)) {
-            return false;
-        }
-        if ((this.toConcept == null) ? (other.toConcept != null) : !this.toConcept.equals(other.toConcept)) {
-            return false;
-        }
-        return true;
+        final LinkTemplateImpl that = (LinkTemplateImpl) obj;
+        return this.stringValue().equals(that.stringValue());
     }
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 79 * hash + (this.linkName != null ? this.linkName.hashCode() : 0);
-        hash = 79 * hash + (this.linkValue != null ? this.linkValue.hashCode() : 0);
-        return hash;
+        return 47 * stringValue().hashCode();
     }
-
     
 
 }

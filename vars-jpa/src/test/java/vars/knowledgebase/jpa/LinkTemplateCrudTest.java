@@ -26,6 +26,7 @@ import vars.jpa.EntityUtilities;
 import vars.jpa.VarsJpaTestModule;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
+import vars.knowledgebase.ConceptMetadata;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.LinkTemplate;
@@ -57,8 +58,8 @@ public class LinkTemplateCrudTest {
         // Insert
         LinkTemplate linkTemplate = testObjectFactory.makeLinkTemplate();
         dao.startTransaction();
-        concept = dao.merge(concept);
-        concept.getConceptMetadata().addLinkTemplate(linkTemplate);
+        ConceptMetadata conceptMetadata = dao.merge(concept.getConceptMetadata());
+        conceptMetadata.addLinkTemplate(linkTemplate);
         dao.persist(linkTemplate);
         dao.endTransaction();
         log.info("INSERTED " + linkTemplate + " in KNOWLEDGEBASE TREE:\n" + entityUtilities.buildTextTree(concept));
