@@ -6,7 +6,11 @@
 package vars.jpa;
 
 import vars.PersistenceCacheProvider;
+
+import javax.persistence.Cache;
 import javax.persistence.EntityManagerFactory;
+
+import org.eclipse.persistence.internal.jpa.EntityManagerFactoryImpl;
 
 /**
  * Provides a method to clear the 2nd level cache used by Hibernate JPA. This
@@ -15,7 +19,7 @@ import javax.persistence.EntityManagerFactory;
  *
  * @author brian
  */
-public class HibernateCacheProvider implements PersistenceCacheProvider {
+public class JPACacheProvider implements PersistenceCacheProvider {
 
     private final EntityManagerFactory entityManagerFactory;
 
@@ -39,7 +43,7 @@ public class HibernateCacheProvider implements PersistenceCacheProvider {
 //            GUsage.class);
 
     
-    public HibernateCacheProvider(EntityManagerFactory entityManagerFactory) {
+    public JPACacheProvider(EntityManagerFactory entityManagerFactory) {
         this.entityManagerFactory = entityManagerFactory;
     }
 
@@ -47,20 +51,11 @@ public class HibernateCacheProvider implements PersistenceCacheProvider {
      * Clear the second level cache
      */
     public void clear() {
-        /*
-         * http://wiki.eclipse.org/EclipseLink/Development/JPA_2.0/cache_api
-         * http://weblogs.java.net/blog/archive/2009/08/21/jpa-caching
-         * http://jcp.org/en/jsr/detail?id=317
-         * https://forums.hibernate.org/viewtopic.php?f=1&t=958289&view=next
-         * https://www.hibernate.org/hib_docs/v3/api/org/hibernate/cache/EhCache.html
-         * http://bill.burkecentral.com/2007/07/06/co-existence-with-hibernate-jpa-and-ejb3/
-         */
-
-//        Session session = (Session) entityManagerFactory.createEntityManager().getDelegate();
-//        SessionFactory sessionFactory = session.getSessionFactory();
-//        for (Object clazz : persistentClasses) {
-//            sessionFactory.evict((Class) clazz);
-//        }
+        
+        // TODO Hack until JPA 2.0 is finalized
+        EntityManagerFactoryImpl emf = (EntityManagerFactoryImpl) entityManagerFactory;
+        Cache cache = emf.getCache();
+        cache.evictAll();
         
     }
 
