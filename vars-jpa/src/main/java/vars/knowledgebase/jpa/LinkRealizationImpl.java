@@ -91,7 +91,7 @@ public class LinkRealizationImpl implements Serializable, LinkRealization, JPAEn
     @Column(name = "LinkValue", length = 255)
     String linkValue;
 
-    @ManyToOne(optional = false, targetEntity = ConceptMetadataImpl.class, cascade = CascadeType.ALL)
+    @ManyToOne(optional = false, targetEntity = ConceptMetadataImpl.class, cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "ConceptDelegateID_FK")
     ConceptMetadata conceptMetadata;
 
@@ -111,9 +111,12 @@ public class LinkRealizationImpl implements Serializable, LinkRealization, JPAEn
         return LinkUtilities.formatAsString(this);
     }
 
+    
+
     @Override
     public String toString() {
-        return stringValue();
+        return "LinkRealizationImpl ([id=" + id + "] linkName=" + linkName
+                + ", toConcept=" + toConcept + ", linkValue=" + linkValue + ")";
     }
 
     @Override

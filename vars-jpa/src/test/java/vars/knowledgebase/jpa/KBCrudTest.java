@@ -109,16 +109,9 @@ public class KBCrudTest {
         dao.endTransaction();
         Assert.assertNotNull("Whoops, couldn't get root", root);
 
-        //Collection<IConcept> allConcepts = dao.findAll();
-        //log.info("All concepts: " + allConcepts);
 
-//        Collection<ConceptName> names = dao.findDescendentNames(c);
-//        log.info("Descendent names from root:" + names);
 
-        dao.startTransaction();
-        dao.remove(c);
-        dao.endTransaction();
-        log.info("KNOWLEDGEBASE TREE AFTER DELETE:\n" + entityUtilities.buildTextTree(c));
+        dao.cascadeRemove(root);
         dao.startTransaction();
         c = dao.findByPrimaryKey(c.getClass(), cId);
         dao.endTransaction();
@@ -212,16 +205,18 @@ public class KBCrudTest {
             dao.startTransaction();
             dao.merge(concept3AA);
             concept3AA.getParentConcept().removeChildConcept(concept3AA);
-            dao.remove(concept3AA);
             dao.endTransaction();
+            dao.cascadeRemove(concept3AA);
+            
 
             dao.startTransaction();
             root = dao.findByPrimaryKey(root.getClass(), ((JPAEntity) root).getId());
+            dao.endTransaction();
             log.info("KNOWLEDGEBASE TREE:\n" + entityUtilities.buildTextTree(root));
 
             log.info("---------- Remove __ROOT__ ----------");
-            dao.remove(root);
-            dao.endTransaction();
+            dao.cascadeRemove(root);
+            
         }
 
     }
@@ -301,9 +296,7 @@ public class KBCrudTest {
         dao.endTransaction();
         log.info("KNOWLEDGEBASE TREE AFTER HISTORY DELETE:\n" + entityUtilities.buildTextTree(concept));
 
-        dao.startTransaction();
-        dao.remove(concept);
-        dao.endTransaction();
+        dao.cascadeRemove(concept);
 
     }
 

@@ -12,8 +12,11 @@ import com.google.inject.Inject;
 import java.util.Collection;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+
 import javax.persistence.EntityManager;
 
 /**
@@ -98,8 +101,7 @@ public class ConceptDAOImpl extends DAO implements ConceptDAO {
      */
     public Collection<Concept> findDescendents(Concept concept) {
         Collection<Concept> concepts = new ArrayList<Concept>();
-        Concept mergedConcept = findByPrimaryKey(ConceptImpl.class, ((JPAEntity) concept).getId());
-        findDescendents(mergedConcept, concepts);
+        findDescendents(concept, concepts);
 
         return concepts;
     }
@@ -111,6 +113,34 @@ public class ConceptDAOImpl extends DAO implements ConceptDAO {
         }
     }
 
-
+    /**
+     * This method will start and stop the transaction on it's own.
+     */
+    public void cascadeRemove(Concept concept) {
+        // Bring ALL child concepts into the transaction first
+        startTransaction();
+        concept = merge(concept);
+        Queue<Concept> queue = new LinkedList<Concept>(findDescendents(concept));
+        endTransaction();
+        while(queue.size() > 0) {
+            Concept c = queue.poll();
+            if (c.getChildConcepts().size() == 0) {
+                // If it doesn't have any children delete the concept
+                startTransaction();
+                c = merge(c);
+                Concept parent = c.getParentConcept();
+                if (parent != null) {
+                    parent.removeChildConcept(c);
+                }
+                remove(c);
+                endTransaction();
+            }
+            else {
+                // If it has children put it at the end of the queue
+                queue.offer(c);
+            }
+        }
+        
+    }
 
 }

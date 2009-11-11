@@ -294,10 +294,9 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
                 /*
                  * Find the matching linkTemplate
                  */
-                Set linkTemplates = concept.getConceptMetadata().getLinkTemplates();
+                Collection<LinkTemplate> linkTemplates = concept.getConceptMetadata().getLinkTemplates();
                 LinkTemplate linkTemplate = null;
-                for (Iterator i = linkTemplates.iterator(); i.hasNext(); ) {
-                    LinkTemplate t = (LinkTemplate) i.next();
+                for (LinkTemplate t : linkTemplates) {
                     if (t.getLinkName().equals(exampleTemplate.getLinkName()) &&
                             t.getToConcept().equals(exampleTemplate.getToConcept()) &&
                             t.getLinkValue().equals(exampleTemplate.getLinkValue())) {
@@ -344,7 +343,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
             /*
              * Find the correct media object to delete
              */
-            final Set<Media> mediaSet = history.getConceptMetadata().getMedias();
+            final Collection<Media> mediaSet = history.getConceptMetadata().getMedias();
             Media media = null;
             for (Iterator i = mediaSet.iterator(); i.hasNext(); ) {
                 final Media m = (Media) i.next();

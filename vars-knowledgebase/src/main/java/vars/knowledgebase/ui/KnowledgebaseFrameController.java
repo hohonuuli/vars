@@ -21,7 +21,7 @@ import org.mbari.swing.WaitIndicator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.PersistenceCache;
-import vars.jpa.HibernateCacheProvider;
+import vars.jpa.JPACacheProvider;
 import vars.jpa.EntityManagerFactoryAspect;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
@@ -48,10 +48,9 @@ class KnowledgebaseFrameController {
     public KnowledgebaseFrameController(KnowledgebaseFrame knowledgebaseFrame, ToolBelt toolBelt) {
         this.knowledgebaseFrame = knowledgebaseFrame;
         this.toolBelt = toolBelt;
-        final EntityManagerFactoryAspect jpaAspect = (EntityManagerFactoryAspect) toolBelt.getKnowledgebaseDAOFactory();
-        this.persistenceCache = new PersistenceCache(new HibernateCacheProvider(jpaAspect.getEntityManagerFactory()));
+        this.persistenceCache = toolBelt.getPersistenceCache();
 
-        // When a Refresh event is published refresh the knowledgbase
+        // When a Refresh event is published refresh the knowledgebase
         EventBus.subscribe(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, refreshTreeSubscriber);
     }
 

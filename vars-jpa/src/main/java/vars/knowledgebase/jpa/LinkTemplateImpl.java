@@ -22,6 +22,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -65,11 +66,8 @@ import vars.knowledgebase.LinkTemplate;
 })
 public class LinkTemplateImpl implements Serializable, LinkTemplate, JPAEntity {
 
-    @Transient
-    private static final Collection<String> PROPS = ImmutableList.of(LinkTemplate.PROP_LINKNAME,
-        LinkTemplate.PROP_TOCONCEPT, LinkTemplate.PROP_LINKVALUE);
 
-    @ManyToOne(optional = false, targetEntity = ConceptMetadataImpl.class, cascade= {CascadeType.MERGE, CascadeType.REFRESH})
+    @ManyToOne(optional = false, targetEntity = ConceptMetadataImpl.class, fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "ConceptDelegateID_FK")
     ConceptMetadata conceptMetadata;
 
@@ -100,6 +98,7 @@ public class LinkTemplateImpl implements Serializable, LinkTemplate, JPAEntity {
     String toConcept;
 
     /** Optimistic lock to prevent concurrent overwrites */
+    @SuppressWarnings("unused")
     @Version
     @Column(name = "LAST_UPDATED_TIME")
     private Timestamp updatedTime;
@@ -152,22 +151,58 @@ public class LinkTemplateImpl implements Serializable, LinkTemplate, JPAEntity {
         return LinkUtilities.formatAsString(this);
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final LinkTemplateImpl that = (LinkTemplateImpl) obj;
-        return this.stringValue().equals(that.stringValue());
+    
+
+	@Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result
+                + ((linkName == null) ? 0 : linkName.hashCode());
+        result = prime * result
+                + ((linkValue == null) ? 0 : linkValue.hashCode());
+        result = prime * result
+                + ((toConcept == null) ? 0 : toConcept.hashCode());
+        return result;
     }
 
     @Override
-    public int hashCode() {
-        return 47 * stringValue().hashCode();
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        LinkTemplateImpl other = (LinkTemplateImpl) obj;
+        if (linkName == null) {
+            if (other.linkName != null)
+                return false;
+        }
+        else if (!linkName.equals(other.linkName))
+            return false;
+        if (linkValue == null) {
+            if (other.linkValue != null)
+                return false;
+        }
+        else if (!linkValue.equals(other.linkValue))
+            return false;
+        if (toConcept == null) {
+            if (other.toConcept != null)
+                return false;
+        }
+        else if (!toConcept.equals(other.toConcept))
+            return false;
+        return true;
     }
+
+    @Override
+	public String toString() {
+		return "LinkTemplateImpl ([id=" + id + "] linkName=" + linkName
+				+ ", toConcept=" + toConcept + ", linkValue=" + linkValue + ")";
+	}
+    
+    
     
 
 }

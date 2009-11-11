@@ -39,5 +39,12 @@ public interface ConceptDAO extends DAO {
      * @throws DAOException
      */
     Collection<Concept> findDescendents(Concept concept);
+    
+    /**
+     * May need to bring all lazy loaded children into the transaction in order to delete them. If you need
+     * to remove a concept use this method (unless you've put a casacade delete trigger on your database)
+     * @param concept
+     */
+    void cascadeRemove(Concept concept);
 
 }

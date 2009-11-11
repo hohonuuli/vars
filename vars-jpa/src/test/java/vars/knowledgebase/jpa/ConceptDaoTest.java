@@ -18,12 +18,12 @@ import org.junit.Ignore;
 /**
  * Integration testing. You need to use this against a development database that actually contains data
  */
-public class ConceptDAOTest {
+public class ConceptDaoTest {
 
     public final Logger log = LoggerFactory.getLogger(getClass());
     private final ConceptDAO conceptDAO;
 
-    public ConceptDAOTest() {
+    public ConceptDaoTest() {
         Injector injector = Guice.createInjector(new VarsJpaDevelopmentModule());
         KnowledgebaseDAOFactory knowledgebaseDAOFactory = injector.getInstance(KnowledgebaseDAOFactory.class);
         conceptDAO = knowledgebaseDAOFactory.newConceptDAO();

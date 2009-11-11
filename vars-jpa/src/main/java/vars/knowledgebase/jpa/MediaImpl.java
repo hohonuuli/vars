@@ -16,6 +16,8 @@ package vars.knowledgebase.jpa;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -59,7 +61,7 @@ public class MediaImpl implements Serializable, Media, JPAEntity {
     @Column(name = "Caption", length = 1000)
     String caption;
 
-    @ManyToOne(optional = false, targetEntity = ConceptMetadataImpl.class)
+    @ManyToOne(optional = false, targetEntity = ConceptMetadataImpl.class, cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "ConceptDelegateID_FK")
     ConceptMetadata conceptMetadata;
 
@@ -186,8 +188,8 @@ public class MediaImpl implements Serializable, Media, JPAEntity {
     public String toString() {
         StringBuilder sb = new StringBuilder(getClass().getSimpleName());
         sb.append(" ([id=").append(getId()).append("] ");
-        sb.append("url=").append(url).append(sb).append(")");
+        sb.append("url=").append(url).append(")");
 
-        return super.toString();
+        return sb.toString();
     }
 }

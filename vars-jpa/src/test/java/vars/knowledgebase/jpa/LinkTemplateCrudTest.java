@@ -78,9 +78,7 @@ public class LinkTemplateCrudTest {
         dao.endTransaction();
         log.info("DELETED " + linkTemplate + " in KNOWLEDGEBASE TREE:\n" + entityUtilities.buildTextTree(concept));
 
-        dao.startTransaction();
-        dao.remove(dao.merge(concept));
-        dao.endTransaction();
+        dao.cascadeRemove(concept);
 
     }
 

@@ -26,7 +26,7 @@ import vars.knowledgebase.KnowledgebaseFactory;
  * Time: 2:02:12 PM
  * To change this template use File | Settings | File Templates.
  */
-public class ConceptNameCRUDTest {
+public class ConceptNameCrudTest {
 
     public final Logger log = LoggerFactory.getLogger(getClass());
     KnowledgebaseDAOFactory daoFactory;
@@ -153,8 +153,8 @@ public class ConceptNameCRUDTest {
          cleanup: {
              dao.startTransaction();
              concept = dao.findRoot();
-             dao.remove(concept);
              dao.endTransaction();
+             dao.cascadeRemove(concept);
              log.info("DELETED KNOWLEDGEBASE TREE:\n" + entityUtilities.buildTextTree(concept));
          }
 

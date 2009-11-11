@@ -13,6 +13,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -84,10 +86,6 @@ import vars.knowledgebase.History;
 })
 public class HistoryImpl implements Serializable, History, JPAEntity {
 
-    @Transient
-    private static final List<String> PROPS = ImmutableList.of(History.PROP_ACTION, History.PROP_FIELD,
-            History.PROP_NEW_VALUE, History.PROP_OLD_VALUE, History.PROP_CREATOR_NAME, History.PROP_CREATION_DATE);
-
     @Id
     @Column(name = "id", nullable = false, updatable=false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "History_Gen")
@@ -97,6 +95,7 @@ public class HistoryImpl implements Serializable, History, JPAEntity {
     Long id;
 
     /** Optimistic lock to prevent concurrent overwrites */
+    @SuppressWarnings("unused")
     @Version
     @Column(name = "LAST_UPDATED_TIME")
     private Timestamp updatedTime;
@@ -133,7 +132,7 @@ public class HistoryImpl implements Serializable, History, JPAEntity {
     @Column(name = "Approved")
     private Short approved = 0;
 
-    @ManyToOne(optional = false, targetEntity = ConceptMetadataImpl.class)
+    @ManyToOne(optional = false, targetEntity = ConceptMetadataImpl.class, cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "ConceptDelegateID_FK")
     ConceptMetadata conceptMetadata;
 
@@ -192,21 +191,71 @@ public class HistoryImpl implements Serializable, History, JPAEntity {
 
 
 
-    @Override
-    public boolean equals(Object that) {
-        if (that == null) {
-            return false;
-        }
-        if (getClass() != that.getClass()) {
-            return false;
-        }
-
-        return stringValue().equals(((History) that).stringValue());
-    }
+    
 
     @Override
     public int hashCode() {
-        return stringValue().hashCode() * 5;
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((action == null) ? 0 : action.hashCode());
+        result = prime * result
+                + ((creationDate == null) ? 0 : creationDate.hashCode());
+        result = prime * result
+                + ((creatorName == null) ? 0 : creatorName.hashCode());
+        result = prime * result + ((field == null) ? 0 : field.hashCode());
+        result = prime * result
+                + ((newValue == null) ? 0 : newValue.hashCode());
+        result = prime * result
+                + ((oldValue == null) ? 0 : oldValue.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        HistoryImpl other = (HistoryImpl) obj;
+        if (action == null) {
+            if (other.action != null)
+                return false;
+        }
+        else if (!action.equals(other.action))
+            return false;
+        if (creationDate == null) {
+            if (other.creationDate != null)
+                return false;
+        }
+        else if (!creationDate.equals(other.creationDate))
+            return false;
+        if (creatorName == null) {
+            if (other.creatorName != null)
+                return false;
+        }
+        else if (!creatorName.equals(other.creatorName))
+            return false;
+        if (field == null) {
+            if (other.field != null)
+                return false;
+        }
+        else if (!field.equals(other.field))
+            return false;
+        if (newValue == null) {
+            if (other.newValue != null)
+                return false;
+        }
+        else if (!newValue.equals(other.newValue))
+            return false;
+        if (oldValue == null) {
+            if (other.oldValue != null)
+                return false;
+        }
+        else if (!oldValue.equals(other.oldValue))
+            return false;
+        return true;
     }
 
     public String getAction() {
@@ -299,10 +348,22 @@ public class HistoryImpl implements Serializable, History, JPAEntity {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(getClass().getSimpleName());
-        sb.append(" ([id=").append(id).append("])");
-        return sb.toString();
+        StringBuilder builder = new StringBuilder();
+        builder.append("HistoryImpl ([id=").append(id).append("] creatorName=")
+                .append(creatorName).append(", creationDate=").append(
+                        creationDate).append(", action=").append(action)
+                .append(", field=").append(field).append(", oldValue=").append(
+                        oldValue).append(", newValue=").append(newValue)
+                .append(", approved=").append(approved).append(")");
+        return builder.toString();
     }
+
+  
+    
+    
+    
+
+    
 
 
 

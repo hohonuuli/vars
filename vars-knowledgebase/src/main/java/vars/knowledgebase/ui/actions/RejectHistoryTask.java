@@ -90,7 +90,7 @@ public class RejectHistoryTask extends AbstractHistoryTask {
          * IAction> String defines which field was added. See History.FIELD_* 
          * for acceptabe values. The Map holds that process the approval
          */
-        final Map addMap = new HashMap();
+        final Map<String, GenericRejectTask> addMap = new HashMap<String, GenericRejectTask>();
         actionMap.put(History.ACTION_ADD, addMap);
         addMap.put(History.FIELD_CONCEPT, DEFAULT_TASK);
         addMap.put(History.FIELD_CONCEPT_CHILD, new AddConceptTask(knowledgebaseDAOFactory, annotationDAOFactory.newObservationDAO()));
@@ -104,7 +104,7 @@ public class RejectHistoryTask extends AbstractHistoryTask {
          * This map holds actions that process the approval of remove actions
          * deleteMap<String, IAction> String defines which field was Added
          */
-        final Map deleteMap = new HashMap();
+        final Map<String, GenericRejectTask> deleteMap = new HashMap<String, GenericRejectTask>();
         actionMap.put(History.ACTION_DELETE, deleteMap);
         /*
          * A concept is never deleted directly. It's deleted from the parent
@@ -118,7 +118,7 @@ public class RejectHistoryTask extends AbstractHistoryTask {
         deleteMap.put(History.FIELD_MEDIA, DEFAULT_TASK);
         deleteMap.put(History.FIELD_SECTIONINFO, DEFAULT_TASK);
 
-        final Map replaceMap = new HashMap();
+        final Map<String, GenericRejectTask> replaceMap = new HashMap<String, GenericRejectTask>();
         actionMap.put(History.ACTION_REPLACE, replaceMap);
         replaceMap.put(History.FIELD_CONCEPT_PARENT, new ReplaceParentConceptTask(knowledgebaseDAOFactory));
         replaceMap.put(History.FIELD_CONCEPT_NODCCODE, new ReplaceNodcCodeTask(knowledgebaseDAOFactory));
@@ -386,7 +386,7 @@ public class RejectHistoryTask extends AbstractHistoryTask {
                 /*
                  * Find the matching linkTemplate
                  */
-                Set<LinkTemplate> linkTemplates = conceptMetadata.getLinkTemplates();
+                Collection<LinkTemplate> linkTemplates = conceptMetadata.getLinkTemplates();
                 LinkTemplate linkTemplate = null;
                 for (Iterator i = linkTemplates.iterator(); i.hasNext();) {
                     LinkTemplate t = (LinkTemplate) i.next();
@@ -472,7 +472,6 @@ public class RejectHistoryTask extends AbstractHistoryTask {
                 final Set<Media> mediaSet = new HashSet<Media>(conceptMetadata.getMedias());
 
                 final Collection<Media> matches = Collections2.filter(mediaSet, new Predicate<Media>() {
-                    @Override
                     public boolean apply(Media input) {
                         return input.getUrl().equals(history.getNewValue());
                     }
@@ -533,7 +532,6 @@ public class RejectHistoryTask extends AbstractHistoryTask {
                         Collection<Concept> descendents = conceptDAO.findDescendents(oldParent);
                         conceptDAO.endTransaction();
                         Collection<Concept> matches = Collections2.filter(descendents, new Predicate<Concept>(){
-                            @Override
                             public boolean apply(Concept input) {
                                 return input.getPrimaryConceptName().getName().equals(concept.getPrimaryConceptName().getName());
                             }

@@ -57,10 +57,11 @@ public class EntityUtilities {
 
 
     public String buildTextTree(Concept concept) {
-        return buildTextTree(concept, 0, new StringBuilder());
+        return buildTextTree(concept, 0);
     }
 
-    private String buildTextTree(Concept concept, int depth, StringBuilder sb) {
+    private String buildTextTree(Concept concept, int depth) {
+        final StringBuilder sb = new StringBuilder();
         String a = "";
         for (int i = 0; i < depth; i++) {
             a += "    ";
@@ -68,11 +69,11 @@ public class EntityUtilities {
 
         sb.append(a).append(">-- ").append(concept).append("\n");
         for (ConceptName conceptName : concept.getConceptNames()) {
-            sb.append(a).append("    |-- ").append(concept).append("\n");
+            sb.append(a).append("    |-- ").append(conceptName).append("\n");
         }
 
         final ConceptMetadata conceptMetadata = concept.getConceptMetadata();
-        sb.append(a).append("    |-- ").append(conceptMetadata).append("\n");
+        sb.append(a).append("    `-- ").append(conceptMetadata).append("\n");
 
         for (Media media : conceptMetadata.getMedias()) {
             sb.append(a).append("        |-- ").append(media).append("\n");
@@ -92,7 +93,7 @@ public class EntityUtilities {
 
         depth++;
         for (Concept child : concept.getChildConcepts()) {
-            sb.append(buildTextTree(child, depth, sb));
+            sb.append(buildTextTree(child, depth));
         }
 
         return sb.toString();

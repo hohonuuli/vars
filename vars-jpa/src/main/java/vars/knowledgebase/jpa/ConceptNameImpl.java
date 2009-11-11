@@ -81,7 +81,7 @@ public class ConceptNameImpl implements Serializable, ConceptName, JPAEntity {
         optional = false,
         targetEntity = ConceptImpl.class,
         fetch = FetchType.EAGER,
-        cascade = { CascadeType.MERGE }
+        cascade = {CascadeType.MERGE, CascadeType.REFRESH}
     )
     @JoinColumn(name = "ConceptID_FK")
     Concept concept;
@@ -198,6 +198,6 @@ public class ConceptNameImpl implements Serializable, ConceptName, JPAEntity {
         StringBuilder sb = new StringBuilder(getClass().getSimpleName());
         sb.append(" ([id=").append(id).append("] name=").append(name).append(")");
 
-        return super.toString();
+        return sb.toString();
     }
 }

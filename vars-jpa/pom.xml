@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>vars-redux</artifactId>
@@ -10,23 +9,23 @@
     <artifactId>vars-jpa</artifactId>
     <name>vars-jpa [Library]</name>
     <properties>
-    	<derbyVersion>10.5.3.0_1</derbyVersion>
+        <derbyVersion>10.5.3.0_1</derbyVersion>
     </properties>
-<!--
+    <!--
     Build settings
 -->
     <build>
         <filters>
             <filter>src/main/filters/${environment}.properties</filter>
         </filters>
-        <resources> 
+        <resources>
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
             </resource>
         </resources>
     </build>
-<!--
+    <!--
     Dependencies
 -->
     <dependencies>
@@ -50,68 +49,14 @@
         <dependency>
             <groupId>javax.persistence</groupId>
             <artifactId>persistence-api</artifactId>
-            <version>[1.0,)</version>
-            <scope>provided</scope>
+            <version>1.0.2</version>
         </dependency>
-	<dependency>
-        <groupId>org.eclipse.persistence</groupId>
-        <artifactId>eclipselink</artifactId>
-        <version>1.2.0</version>
-        <scope>test</scope>
-    </dependency>
-	<!-- <dependency>
-        <groupId>org.apache.openjpa</groupId>
-        <artifactId>openjpa</artifactId>
-        <version>1.2.1</version>
-        <scope>test</scope>
-    </dependency> -->
-
-      <!-- Eclipselink bombs on the datamodel (bug!!). OpenJPA works but the enhancer build step needed to
-        create lazy-loading proxies bombs on the groovy classes. Hibernate works fine though.
-         Correction. Hibernate has a show stopper bug in Eagerloaded sets. Hashcode of objects in sets is
-         calculated before the objects values are set. Makes the objects unreachable.-->
-        <!-- <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-entitymanager</artifactId>
-            <version>3.4.0.GA</version>
-            <scope>compile</scope>
-            <exclusions>
-                <exclusion>
-                    <artifactId>jta</artifactId>
-                    <groupId>javax.transaction</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency> -->
-        <!-- <dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-jta</artifactId>
-            <version>1.0.1B-rc4</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>hsqldb</groupId>
-            <artifactId>hsqldb</artifactId>
-            <version>1.8.0.7</version>
-            <scope>test</scope>
-        </dependency> -->
-        <dependency>
-            <groupId>com.microsoft</groupId>
-            <artifactId>sqljdbc4</artifactId>
-            <version>2.0</version>
-            <scope>test</scope>
-        </dependency>
-      <!-- For password encryption -->
+        <!-- For password encryption -->
         <dependency>
             <groupId>org.jasypt</groupId>
             <artifactId>jasypt</artifactId>
             <version>1.5</version>
             <scope>compile</scope>
-        </dependency>
-      <!-- jasypt needs ICU4J for Java 5, it's not required for Java 6 -->
-        <dependency>
-            <groupId>com.ibm.icu</groupId>
-            <artifactId>icu4j</artifactId>
-            <version>4.0.1</version>
         </dependency>
         <!-- Used by ExternalDataDaoExpdImpl! Needed for database testing -->
         <dependency>
@@ -127,17 +72,39 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>net.sf.ehcache</groupId>
-            <artifactId>ehcache</artifactId>
-            <version>1.6.2</version>
+            <groupId>org.eclipse.persistence</groupId>
+            <artifactId>eclipselink</artifactId>
+            <version>1.2.0</version>
             <scope>compile</scope>
+            <optional>false</optional>
+        </dependency>
+        <!-- JDBC Driver -->
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derbyclient</artifactId>
+            <version>${derbyVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Database engine -->
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derby</artifactId>
+            <version>${derbyVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Network server control -->
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derbynet</artifactId>
+            <version>${derbyVersion}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
-<!--
+    <!--
     PROFILES
 
     Correct JDBC drivers for each profile NEED to be included here
--->
+    -->
     <profiles>
         <profile>
             <id>dev</id>
@@ -194,7 +161,7 @@
                 </dependency>
             </dependencies>
         </profile>
-		<profile>
+        <profile>
             <id>simpa</id>
             <properties>
                 <environment>simpa</environment>
@@ -247,10 +214,4 @@
             </dependencies>
         </profile>
     </profiles>
-
 </project>
-
-
-
-
-

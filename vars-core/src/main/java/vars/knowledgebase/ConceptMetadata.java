@@ -20,6 +20,7 @@
 
 package vars.knowledgebase;
 
+import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -105,23 +106,23 @@ public interface ConceptMetadata extends KnowledgebaseObject {
     /**
      * @return
      */
-    Set<History> getHistories();
+    Collection<History> getHistories();
 
 
     /**
      * @return
      */
-    Set<LinkRealization> getLinkRealizations();
+    Collection<LinkRealization> getLinkRealizations();
 
     /**
      * @return
      */
-    Set<LinkTemplate> getLinkTemplates();
+    Collection<LinkTemplate> getLinkTemplates();
 
     /**
      * @return
      */
-    Set<Media> getMedias();
+    Collection<Media> getMedias();
 
 
     /**

@@ -24,6 +24,7 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Set;
@@ -311,7 +312,7 @@ public class HistoryEditorPanel extends EditorPanel implements ILockableEditor {
     public void setConcept(final Concept concept) {
         super.setConcept(concept);
         histories.clear();
-        Set<History> historySet = getConcept().getConceptMetadata().getHistories();
+        Collection<History> historySet = getConcept().getConceptMetadata().getHistories();
         histories.addAll(historySet);
         final ListListModel listModel = (ListListModel) getHistoryList().getModel();
         listModel.clear();
@@ -335,7 +336,6 @@ public class HistoryEditorPanel extends EditorPanel implements ILockableEditor {
     /**
 	 * <p><!-- Method description --></p>
 	 * @param  userAccount
-	 * @uml.property  name="userAccount"
 	 */
     public void setUserAccount(final UserAccount userAccount) {
         this.userAccount = userAccount;
@@ -356,7 +356,6 @@ public class HistoryEditorPanel extends EditorPanel implements ILockableEditor {
     
     /**
 	 * @return  the userAccount
-	 * @uml.property  name="userAccount"
 	 */
     public UserAccount getUserAccount() {
         return userAccount;

@@ -19,6 +19,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.persistence.CascadeType;
@@ -78,10 +79,7 @@ import vars.knowledgebase.Usage;
                             query = "SELECT v FROM ConceptMetadata v WHERE v.id = :id") })
 public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEntity {
 
-    @Transient
-    private final Logger log = LoggerFactory.getLogger(getClass());
-
-    @OneToOne(optional = false, targetEntity = ConceptImpl.class)
+    @OneToOne(optional = false, targetEntity = ConceptImpl.class, cascade = {CascadeType.MERGE, CascadeType.REFRESH} )
     @JoinColumn(name = "ConceptID_FK", nullable = false)
     private Concept concept;
 
@@ -89,10 +87,10 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
         targetEntity = HistoryImpl.class,
         mappedBy = "conceptMetadata",
         fetch = FetchType.EAGER,
-        cascade = CascadeType.ALL
+        cascade = {CascadeType.ALL}
     )
     @OrderBy(value = "creationDate")
-    private Set<History> histories;
+    private List<History> histories;
 
     @Id
     @Column(
@@ -117,7 +115,7 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
         fetch = FetchType.EAGER,
         cascade = CascadeType.ALL
     )
-    private Set<LinkRealization> linkRealizations;
+    private List<LinkRealization> linkRealizations;
 
     @OneToMany(
         targetEntity = LinkTemplateImpl.class,
@@ -125,7 +123,7 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
         fetch = FetchType.EAGER,
         cascade = CascadeType.ALL
     )
-    private Set<LinkTemplate> linkTemplates;
+    private List<LinkTemplate> linkTemplates;
 
 
     @OneToMany(
@@ -134,12 +132,14 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
         fetch = FetchType.EAGER,
         cascade = CascadeType.ALL
     )
-    private Set<Media> medias;
+    private List<Media> medias;
 
     /** Optimistic lock to prevent concurrent overwrites */
-    @Version
+    @SuppressWarnings("unused")
+	@Version
     @Column(name = "LAST_UPDATED_TIME")
     private Timestamp updatedTime;
+    
     @OneToOne(
         mappedBy = "conceptMetadata",
         fetch = FetchType.EAGER,
@@ -177,9 +177,9 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
         return concept;
     }
 
-    public Set<History> getHistories() {
+    public Collection<History> getHistories() {
         if (histories == null) {
-            histories = new TreeSet<History>(new HistoryCreationDateComparator());
+            histories = new ArrayList<History>();
         }
  
 
@@ -190,26 +190,26 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
         return id;
     }
 
-    public Set<LinkRealization> getLinkRealizations() {
+    public Collection<LinkRealization> getLinkRealizations() {
         if (linkRealizations == null) {
-            linkRealizations = new HashSet<LinkRealization>();
+            linkRealizations = new ArrayList<LinkRealization>();
         }
 
 
         return linkRealizations;
     }
 
-    public Set<LinkTemplate> getLinkTemplates() {
+    public Collection<LinkTemplate> getLinkTemplates() {
         if (linkTemplates == null) {
-            linkTemplates = new HashSet<LinkTemplate>();
+            linkTemplates = new ArrayList<LinkTemplate>();
         }
 
         return linkTemplates;
     }
 
-    public Set<Media> getMedias() {
+    public Collection<Media> getMedias() {
         if (medias == null) {
-            medias = new HashSet<Media>();
+            medias = new ArrayList<Media>();
         }
 
 
@@ -332,6 +332,14 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
         hash = 41 * hash + (this.id != null ? this.id.hashCode() : 0);
         return hash;
     }
+
+	@Override
+	public String toString() {
+		return "ConceptMetadataImpl ([id=" + id + "] updatedTime=" + updatedTime
+				+ ")";
+	}
+    
+    
 
     
 

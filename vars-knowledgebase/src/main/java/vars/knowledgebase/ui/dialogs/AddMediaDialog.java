@@ -20,6 +20,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 import javax.swing.JDialog;
@@ -228,7 +229,7 @@ public class AddMediaDialog extends JDialog {
             if (isUrlValid) {
 
                 // Make sure that this concept does not already contain a media with the same URL
-                Set mediaSet = concept.getConceptMetadata().getMedias();
+                Collection<Media> mediaSet = concept.getConceptMetadata().getMedias();
                 for (Iterator i = mediaSet.iterator(); i.hasNext(); ) {
                     Media m = (Media) i.next();
                     if (m.getUrl().equalsIgnoreCase(url.toExternalForm())) {

@@ -17,6 +17,8 @@ package vars.knowledgebase.jpa;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Date;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -61,7 +63,7 @@ import vars.knowledgebase.Usage;
                             query = "SELECT u FROM Usage u WHERE u.specification = :specification") })
 public class UsageImpl implements Serializable, Usage, JPAEntity {
 
-    @OneToOne(targetEntity = ConceptMetadataImpl.class, optional = false)
+    @OneToOne(targetEntity = ConceptMetadataImpl.class, optional = false, cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "ConceptDelegateID_FK")
     ConceptMetadata conceptMetadata;
 
