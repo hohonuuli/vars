@@ -77,7 +77,7 @@ public interface VideoFrame extends AnnotationObject, VideoMoment {
      * Indeicates if an annotation has an associated framegrab.
      * @return
      */
-    boolean hasFrameGrab();
+    boolean hasImageReference();
 
 
     /**

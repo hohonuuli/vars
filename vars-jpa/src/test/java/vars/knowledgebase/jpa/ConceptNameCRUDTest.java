@@ -79,7 +79,7 @@ public class ConceptNameCRUDTest {
              // Using correct JPA form
              dao.startTransaction();
              concept = dao.findRoot();
-             ConceptName conceptName = new GConceptName();
+             ConceptName conceptName = kbFactory.newConceptName();
              conceptName.setName(name1);
              conceptName.setNameType(ConceptNameTypes.SYNONYM.toString());
              concept.addConceptName(conceptName);
@@ -113,7 +113,7 @@ public class ConceptNameCRUDTest {
 
              // Insert by inserting a new concept
              dao.startTransaction();
-             Concept childConcept = new ConceptImpl();
+             Concept childConcept = kbFactory.newConcept();
              conceptName.setNameType(ConceptNameTypes.PRIMARY.getName());
              childConcept.addConceptName(conceptName);
              concept.addChildConcept(childConcept);
@@ -137,7 +137,7 @@ public class ConceptNameCRUDTest {
              concept  = dao.findByName(concept.getPrimaryConceptName().getName());
              //concept = dao.merge(concept);
              log.info("UPDATED KNOWLEDGEBASE TREE:\n" + entityUtilities.buildTextTree(root));
-             conceptName = new GConceptName();
+             conceptName = kbFactory.newConceptName();
              conceptName.setName(name1);
              conceptName.setNameType(ConceptNameTypes.SYNONYM.toString());
              concept.addConceptName(conceptName);

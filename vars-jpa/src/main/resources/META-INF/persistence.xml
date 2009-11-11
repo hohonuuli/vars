@@ -3,65 +3,145 @@
              xmlns="http://java.sun.com/xml/ns/persistence"
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd">
-    <persistence-unit name="vars-hibernate-production" transaction-type="RESOURCE_LOCAL">
+    <persistence-unit name="vars-jpa-production" transaction-type="RESOURCE_LOCAL">
         <description>VARS Data Model</description>
-        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+        <class>vars.annotation.jpa.VideoArchiveSetImpl</class>
+        <class>vars.annotation.jpa.CameraDeploymentImpl</class>
+        <class>vars.annotation.jpa.VideoArchiveImpl</class>
+        <class>vars.annotation.jpa.VideoFrameImpl</class>
+        <class>vars.annotation.jpa.PhysicalDataImpl</class>
+        <class>vars.annotation.jpa.CameraDataImpl</class>
+        <class>vars.annotation.jpa.ObservationImpl</class>
+        <class>vars.annotation.jpa.AssociationImpl</class>
+        <class>vars.knowledgebase.jpa.ConceptImpl</class>
+        <class>vars.knowledgebase.jpa.ConceptMetadataImpl</class>
+        <class>vars.knowledgebase.jpa.ConceptNameImpl</class>
+        <class>vars.knowledgebase.jpa.HistoryImpl</class>
+        <class>vars.knowledgebase.jpa.LinkRealizationImpl</class>
+        <class>vars.knowledgebase.jpa.LinkTemplateImpl</class>
+        <class>vars.knowledgebase.jpa.MediaImpl</class>
+        <class>vars.knowledgebase.jpa.UsageImpl</class>
+        <class>vars.jpa.UserAccountImpl</class>
+        <class>vars.jpa.PreferenceNode</class>
         <properties>
-            <property name="hibernate.archive.autodetection" value="class"/>
-            <property name="hibernate.c3p0.idle_test_period" value="3000"/>
-            <property name="hibernate.c3p0.max_size" value="20"/>
-            <property name="hibernate.c3p0.max_statements" value="50"/>
-            <property name="hibernate.c3p0.min_size" value="5"/>
-            <property name="hibernate.c3p0.timeout" value="300"/>
-            <property name="hibernate.cache.provider_class" value="net.sf.ehcache.hibernate.SingletonEhCacheProvider"/>
-            <property name="hibernate.cache.use_query_cache" value="true"/>
-            <property name="hibernate.cache.use_second_level_cache" value="true"/>
-            <property name="hibernate.generate_statistics" value="true"/>
-            <property name="hibernate.connection.driver_class" value="${PRODUCTION_JDBC_DRIVER}"/>
-            <property name="hibernate.connection.password" value="${PRODUCTION_JDBC_PASSWORD}"/>
-            <property name="hibernate.connection.url" value="${PRODUCTION_JDBC_URL}"/>
-            <property name="hibernate.connection.username" value="${PRODUCTION_JDBC_USERNAME}"/>
-            <property name="hibernate.dialect" value="${PRODUCTION_HIBERNATE_DIALECT}"/>
-            <!-- <property name="hibernate.hbm2ddl.auto" value="validate"/> -->
-            <property name="hibernate.show_sql" value="false"/>
+            <property name="javax.persistence.jdbc.url" value="${PRODUCTION_JDBC_URL}"/>
+            <property name="javax.persistence.jdbc.user" value="${PRODUCTION_JDBC_USERNAME}"/>
+            <property name="javax.persistence.jdbc.driver" value="${PRODUCTION_JDBC_DRIVER}"/>
+            <property name="javax.persistence.jdbc.password" value="${PRODUCTION_JDBC_PASSWORD}"/>
+            <property name="eclipselink.logging.level" value="CONFIG"/>
+            <property name="eclipselink.ddl-generation" value="create-tables"/>
         </properties>
     </persistence-unit>
-    <persistence-unit name="vars-hibernate-development" transaction-type="RESOURCE_LOCAL">
+
+     <persistence-unit name="vars-jpa-development" transaction-type="RESOURCE_LOCAL">
         <description>VARS Data Model</description>
-        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+         <class>vars.annotation.jpa.VideoArchiveSetImpl</class>
+        <class>vars.annotation.jpa.CameraDeploymentImpl</class>
+        <class>vars.annotation.jpa.VideoArchiveImpl</class>
+        <class>vars.annotation.jpa.VideoFrameImpl</class>
+        <class>vars.annotation.jpa.PhysicalDataImpl</class>
+        <class>vars.annotation.jpa.CameraDataImpl</class>
+        <class>vars.annotation.jpa.ObservationImpl</class>
+        <class>vars.annotation.jpa.AssociationImpl</class>
+        <class>vars.knowledgebase.jpa.ConceptImpl</class>
+        <class>vars.knowledgebase.jpa.ConceptMetadataImpl</class>
+        <class>vars.knowledgebase.jpa.ConceptNameImpl</class>
+        <class>vars.knowledgebase.jpa.HistoryImpl</class>
+        <class>vars.knowledgebase.jpa.LinkRealizationImpl</class>
+        <class>vars.knowledgebase.jpa.LinkTemplateImpl</class>
+        <class>vars.knowledgebase.jpa.MediaImpl</class>
+        <class>vars.knowledgebase.jpa.UsageImpl</class>
+        <class>vars.jpa.UserAccountImpl</class>
+        <class>vars.jpa.PreferenceNode</class>
         <properties>
-            <!--<property name="hibernate.ejb.cfgfile" value="/hibernate.cfg.xml"/>-->
-            <property name="hibernate.archive.autodetection" value="class"/>
-            <property name="hibernate.c3p0.idle_test_period" value="3000"/>
-            <property name="hibernate.c3p0.max_size" value="20"/>
-            <property name="hibernate.c3p0.max_statements" value="50"/>
-            <property name="hibernate.c3p0.min_size" value="5"/>
-            <property name="hibernate.c3p0.timeout" value="300"/>
-            <property name="hibernate.cache.provider_class" value="net.sf.ehcache.hibernate.SingletonEhCacheProvider"/>
-            <property name="hibernate.cache.use_query_cache" value="true"/>
-            <property name="hibernate.cache.use_second_level_cache" value="true"/>
-            <property name="hibernate.generate_statistics" value="true"/>
-            <property name="hibernate.connection.driver_class" value="${DEVELOPMENT_JDBC_DRIVER}"/>
-            <property name="hibernate.connection.password" value="${DEVELOPMENT_JDBC_PASSWORD}"/>
-            <property name="hibernate.connection.url" value="${DEVELOPMENT_JDBC_URL}"/>
-            <property name="hibernate.connection.username" value="${DEVELOPMENT_JDBC_USERNAME}"/>
-            <property name="hibernate.dialect" value="${DEVELOPMENT_HIBERNATE_DIALECT}"/>
-            <!-- <property name="hibernate.hbm2ddl.auto" value="validate"/> bombs on derby-->
-            <!-- <property name="hibernate.hbm2ddl.auto" value="create"/> -->
-            <property name="hibernate.show_sql" value="false"/>
+            <property name="javax.persistence.jdbc.url" value="${DEVELOPMENT_JDBC_URL}"/>
+            <property name="javax.persistence.jdbc.user" value="${DEVELOPMENT_JDBC_USERNAME}"/>
+            <property name="javax.persistence.jdbc.driver" value="${DEVELOPMENT_JDBC_DRIVER}"/>
+            <property name="javax.persistence.jdbc.password" value="${DEVELOPMENT_JDBC_PASSWORD}"/>
+            <property name="eclipselink.logging.level" value="FINE"/>
+           <!--  <property name="eclipselink.ddl-generation" value="create-tables"/> -->
         </properties>
     </persistence-unit>
-    <persistence-unit name="vars-hibernate-test" transaction-type="RESOURCE_LOCAL">
-        <!-- <class>vars.User</class> -->
+
+    <persistence-unit name="vars-jpa-test" transaction-type="RESOURCE_LOCAL">
+        <description>VARS Data Model</description>
+        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+        <class>vars.annotation.jpa.VideoArchiveSetImpl</class>
+        <class>vars.annotation.jpa.CameraDeploymentImpl</class>
+        <class>vars.annotation.jpa.VideoArchiveImpl</class>
+        <class>vars.annotation.jpa.VideoFrameImpl</class>
+        <class>vars.annotation.jpa.PhysicalDataImpl</class>
+        <class>vars.annotation.jpa.CameraDataImpl</class>
+        <class>vars.annotation.jpa.ObservationImpl</class>
+        <class>vars.annotation.jpa.AssociationImpl</class>
+        <class>vars.knowledgebase.jpa.ConceptImpl</class>
+        <class>vars.knowledgebase.jpa.ConceptMetadataImpl</class>
+        <class>vars.knowledgebase.jpa.ConceptNameImpl</class>
+        <class>vars.knowledgebase.jpa.HistoryImpl</class>
+        <class>vars.knowledgebase.jpa.LinkRealizationImpl</class>
+        <class>vars.knowledgebase.jpa.LinkTemplateImpl</class>
+        <class>vars.knowledgebase.jpa.MediaImpl</class>
+        <class>vars.knowledgebase.jpa.UsageImpl</class>
+        <class>vars.jpa.UserAccountImpl</class>
+        <class>vars.jpa.PreferenceNode</class>
         <properties>
-            <property name="hibernate.archive.autodetection" value="class"/>
-            <property name="hibernate.dialect" value="org.hibernate.dialect.HSQLDialect" />
-            <property name="hibernate.cache.provider_class" value="net.sf.ehcache.hibernate.SingletonEhCacheProvider" />
-            <property name="hibernate.connection.driver_class" value="org.hsqldb.jdbcDriver" />
-            <property name="hibernate.connection.username" value="sa" />
-            <property name="hibernate.connection.password" value="" />
-            <property name="hibernate.connection.url" value="jdbc:hsqldb:mem:my-project-test" />
-            <property name="hibernate.hbm2ddl.auto" value="create-drop" />
+            <property name="javax.persistence.jdbc.url" value="jdbc:derby:memory:VARS;create=true"/>
+            <property name="javax.persistence.jdbc.user" value="sa"/>
+            <property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.ClientDriver"/>
+            <property name="javax.persistence.jdbc.password" value=""/>
+            <property name="eclipselink.logging.level" value="FINE"/>
+
+            <!-- Logging -->
+			<property name="eclipselink.logging.level" value="FINE" />
+			<property name="eclipselink.logging.timestamp" value="false" />
+			<property name="eclipselink.logging.session" value="false" />
+			<property name="eclipselink.logging.thread" value="false" />
+
+            <!-- Database Table generation -->
+            <property name="eclipselink.ddl-generation" value="create-tables"/>
+            <property name="eclipselink.ddl-generation.output-mode" value="database"/>
         </properties>
     </persistence-unit>
+
+    <!-- <persistence-unit name="vars-jpa-test" transaction-type="RESOURCE_LOCAL">
+        <description>VARS Data Model</description>
+        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+        <class>vars.annotation.jpa.VideoArchiveSetImpl</class>
+        <class>vars.annotation.jpa.CameraDeploymentImpl</class>
+        <class>vars.annotation.jpa.VideoArchiveImpl</class>
+        <class>vars.annotation.jpa.VideoFrameImpl</class>
+        <class>vars.annotation.jpa.PhysicalDataImpl</class>
+        <class>vars.annotation.jpa.CameraDataImpl</class>
+        <class>vars.annotation.jpa.ObservationImpl</class>
+        <class>vars.annotation.jpa.AssociationImpl</class>
+        <class>vars.knowledgebase.jpa.ConceptImpl</class>
+        <class>vars.knowledgebase.jpa.ConceptMetadataImpl</class>
+        <class>vars.knowledgebase.jpa.ConceptNameImpl</class>
+        <class>vars.knowledgebase.jpa.HistoryImpl</class>
+        <class>vars.knowledgebase.jpa.LinkRealizationImpl</class>
+        <class>vars.knowledgebase.jpa.LinkTemplateImpl</class>
+        <class>vars.knowledgebase.jpa.MediaImpl</class>
+        <class>vars.knowledgebase.jpa.UsageImpl</class>
+        <class>vars.jpa.UserAccountImpl</class>
+        <class>vars.jpa.PreferenceNode</class>
+        <properties>
+            <property name="javax.persistence.jdbc.url" value="jdbc:hsqldb:mem:my-project-test"/>
+            <property name="javax.persistence.jdbc.user" value="sa"/>
+            <property name="javax.persistence.jdbc.driver" value="org.hsqldb.jdbcDriver"/>
+            <property name="javax.persistence.jdbc.password" value=""/>
+            <property name="eclipselink.logging.level" value="FINE"/>
+            <property name="eclipselink.target-database" value="org.eclipse.persistence.platform.database.HSQLPlatform" /> 
+
+			<property name="eclipselink.logging.level" value="FINE" />
+			<property name="eclipselink.logging.timestamp" value="false" />
+			<property name="eclipselink.logging.session" value="false" />
+			<property name="eclipselink.logging.thread" value="false" />
+
+            <property name="eclipselink.ddl-generation" value="create-tables"/>
+            <property name="eclipselink.ddl-generation.output-mode" value="database"/>
+        </properties>
+    </persistence-unit> -->
+
 </persistence>

@@ -86,7 +86,7 @@ public interface CameraData extends AnnotationObject {
      * Get the <code>String</code> of the Still Image captured by this <code>CameraData</code>.
      * @return  The <code>String</code> of the Still Image URL captured by  this <code>CameraData</code>.
      */
-    String getFrameGrabURL();
+    String getImageReference();
 
     /**
      * @return
@@ -139,7 +139,7 @@ public interface CameraData extends AnnotationObject {
      * Set <code>String</code> of the Still Image URL captured by this <code>CameraData</code>.
      * @param  stillImage
      */
-    void setFrameGrabURL(String stillImage);
+    void setImageReference(String stillImage);
 
 
     /**

@@ -21,5 +21,9 @@ public interface PropertyChange {
 
     void removePropertyChangeListener(PropertyChangeListener listener);
 
+    PropertyChangeListener[] getPropertyChangeListeners();
+
+    PropertyChangeListener[] getPropertyChangeListeners(String string);
+
 
 }

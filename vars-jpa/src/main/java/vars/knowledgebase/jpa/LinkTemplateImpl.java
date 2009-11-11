@@ -108,7 +108,7 @@ public class LinkTemplateImpl implements Serializable, LinkTemplate, JPAEntity {
         return conceptMetadata;
     }
 
-    public void setConceptMetadata(ConceptMetadata conceptMetadata) {
+    void setConceptMetadata(ConceptMetadata conceptMetadata) {
         this.conceptMetadata = conceptMetadata;
     }
     

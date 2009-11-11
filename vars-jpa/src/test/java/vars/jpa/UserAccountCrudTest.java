@@ -51,7 +51,7 @@ public class UserAccountCrudTest {
         Assert.assertNotNull(((JPAEntity) userAccount).getId());
 
         dao.startTransaction();
-        userAccount = dao.findByPrimaryKey(GUserAccount.class, ((JPAEntity) userAccount).getId());
+        userAccount = dao.findByPrimaryKey(UserAccountImpl.class, ((JPAEntity) userAccount).getId());
         log.info("Password stored in database as '" + userAccount.getPassword() + "'");
         Assert.assertEquals("UserName wasn't stored correctly", testString, userAccount.getUserName());
         Assert.assertEquals("Role wasn't stored correctly", UserAccountRoles.ADMINISTRATOR.getRoleName(),

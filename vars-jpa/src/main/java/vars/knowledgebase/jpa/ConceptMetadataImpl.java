@@ -15,7 +15,6 @@
 package vars.knowledgebase.jpa;
 
 import java.io.Serializable;
-import java.lang.reflect.Field;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,10 +39,8 @@ import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 import javax.persistence.Transient;
 import javax.persistence.Version;
-import org.hibernate.collection.PersistentSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.EntitySupportCategory;
 import vars.jpa.JPAEntity;
 import vars.jpa.KeyNullifier;
 import vars.jpa.TransactionLogger;
@@ -89,7 +86,7 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
     private Concept concept;
 
     @OneToMany(
-        targetEntity = GHistory.class,
+        targetEntity = HistoryImpl.class,
         mappedBy = "conceptMetadata",
         fetch = FetchType.EAGER,
         cascade = CascadeType.ALL
@@ -115,7 +112,7 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
     private Long id;
 
     @OneToMany(
-        targetEntity = GLinkRealization.class,
+        targetEntity = LinkRealizationImpl.class,
         mappedBy = "conceptMetadata",
         fetch = FetchType.EAGER,
         cascade = CascadeType.ALL
@@ -132,7 +129,7 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
 
 
     @OneToMany(
-        targetEntity = GMedia.class,
+        targetEntity = MediaImpl.class,
         mappedBy = "conceptMetadata",
         fetch = FetchType.EAGER,
         cascade = CascadeType.ALL
@@ -147,19 +144,19 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
         mappedBy = "conceptMetadata",
         fetch = FetchType.EAGER,
         cascade = CascadeType.ALL,
-        targetEntity = GUsage.class
+        targetEntity = UsageImpl.class
     )
     private Usage usage;
 
     public void addHistory(History history) {
         if (getHistories().add(history)) {
-            ((GHistory) history).setConceptMetadata(this);
+            ((HistoryImpl) history).setConceptMetadata(this);
         }
     }
 
     public void addLinkRealization(LinkRealization linkRealization) {
         if (getLinkRealizations().add(linkRealization)) {
-            ((GLinkRealization) linkRealization).setConceptMetadata(this);
+            ((LinkRealizationImpl) linkRealization).setConceptMetadata(this);
         }
     }
 
@@ -171,47 +168,10 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
 
     public void addMedia(Media media) {
         if (getMedias().add(media)) {
-            ((GMedia) media).setConceptMetadata(this);
+            ((MediaImpl) media).setConceptMetadata(this);
         }
     }
 
-    @Override
-    public boolean equals(Object that) {
-
-        boolean isEqual = true;
-
-        if (this == that) {
-
-            // Do nothing isEqual is already true
-            //isEqual = true
-        }
-        else if ((that == null) || (this.getClass() != that.getClass())) {
-            isEqual = false;
-        }
-        else {
-
-            /*
-             * Check ID. If they are both null use concept id
-             */
-            JPAEntity thatCm = (JPAEntity) that;
-            if ((this.id != null) && (thatCm.getId() != null)) {
-                isEqual = this.id.equals(thatCm.getId());
-            }
-            else {
-                Concept thisConcept = getConcept();
-                Concept thatConcept = ((ConceptMetadata) that).getConcept();
-                if ((thisConcept == null) || (thatConcept == null)) {
-                    isEqual = false;
-                }
-                else {
-                    isEqual = thisConcept.hashCode() == thatConcept.hashCode();
-                }
-            }
-        }
-
-        return isEqual;
-
-    }
 
     public Concept getConcept() {
         return concept;
@@ -221,9 +181,7 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
         if (histories == null) {
             histories = new TreeSet<History>(new HistoryCreationDateComparator());
         }
-        else {
-            histories = rebuildPersistentSet(histories);
-        }
+ 
 
         return histories;
     }
@@ -236,9 +194,7 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
         if (linkRealizations == null) {
             linkRealizations = new HashSet<LinkRealization>();
         }
-        else {
-            linkRealizations = rebuildPersistentSet(linkRealizations);
-        }
+
 
         return linkRealizations;
     }
@@ -246,9 +202,6 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
     public Set<LinkTemplate> getLinkTemplates() {
         if (linkTemplates == null) {
             linkTemplates = new HashSet<LinkTemplate>();
-        }
-        else {
-            linkTemplates = rebuildPersistentSet(linkTemplates);
         }
 
         return linkTemplates;
@@ -258,9 +211,7 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
         if (medias == null) {
             medias = new HashSet<Media>();
         }
-        else {
-            medias = rebuildPersistentSet(medias);
-        }
+
 
         return medias;
     }
@@ -299,23 +250,7 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
         return (getPrimaryImage() != null);
     }
 
-    @Override
-    public int hashCode() {
-        int result = 0;
 
-        /*
-         * Use id has hash. If it's null use the concept id hash instead
-         */
-        if (id != null) {
-            result = 3 * id.intValue();
-        }
-        else {
-            result = (concept == null) ? 0 : concept.hashCode();
-        }
-
-        return result;
-
-    }
 
     public boolean isPendingApproval() {
         boolean isPending = false;
@@ -330,31 +265,16 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
         return isPending;
     }
 
-    /**
-     * Workaround for Hibernate bug: http://opensource.atlassian.com/projects/hibernate/browse/HHH-3799
-     * @param urls
-     */
-    private <T> Set<T> rebuildPersistentSet(Set<T> urls) {
-        if (!(urls instanceof HashSet)) {
-            for (Object object : urls) {
-                object.hashCode();
-            }
-            urls = new HashSet<T>(urls);
-            log.debug("Rebuilding persistentset");
-
-        }
-        return urls;
-    }
 
     public void removeHistory(History history) {
         if (getHistories().remove(history)) {
-            ((GHistory) history).setConceptMetadata(null);
+            ((HistoryImpl) history).setConceptMetadata(null);
         }
     }
 
     public void removeLinkRealization(LinkRealization linkRealization) {
         if (getLinkRealizations().remove(linkRealization)) {
-            ((GLinkRealization) linkRealization).setConceptMetadata(null);
+            ((LinkRealizationImpl) linkRealization).setConceptMetadata(null);
         }
     }
 
@@ -366,7 +286,7 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
 
     public void removeMedia(Media media) {
         if (getMedias().remove(media)) {
-            ((GMedia) media).setConceptMetadata(null);
+            ((MediaImpl) media).setConceptMetadata(null);
         }
     }
 
@@ -380,19 +300,39 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
 
     public void setUsage(Usage usage) {
         if (this.usage != null) {
-            GUsage thisUsage = (GUsage) this.usage;
+            UsageImpl thisUsage = (UsageImpl) this.usage;
             thisUsage.setConceptMetadata(null);
         }
 
         this.usage = usage;
 
         if (usage != null) {
-            ((GUsage) usage).setConceptMetadata(this);
+            ((UsageImpl) usage).setConceptMetadata(this);
         }
     }
 
     @Override
-    public String toString() {
-        return EntitySupportCategory.basicToString(this, new ArrayList());
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final ConceptMetadataImpl other = (ConceptMetadataImpl) obj;
+        if (this.id != other.id && (this.id == null || !this.id.equals(other.id))) {
+            return false;
+        }
+        return true;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 41 * hash + (this.id != null ? this.id.hashCode() : 0);
+        return hash;
+    }
+
+    
+
 }

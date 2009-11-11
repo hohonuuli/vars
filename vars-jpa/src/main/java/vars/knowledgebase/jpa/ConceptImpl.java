@@ -39,7 +39,6 @@ import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 import javax.persistence.Transient;
 import javax.persistence.Version;
-import vars.EntitySupportCategory;
 import vars.jpa.JPAEntity;
 import vars.jpa.KeyNullifier;
 import vars.jpa.TransactionLogger;
@@ -97,7 +96,7 @@ public class ConceptImpl implements Serializable, Concept, JPAEntity {
     private ConceptMetadata conceptMetadata;
 
     @OneToMany(
-        targetEntity = GConceptName.class,
+        targetEntity = ConceptNameImpl.class,
         mappedBy = "concept",
         fetch = FetchType.EAGER,
         cascade = { CascadeType.ALL }
@@ -384,7 +383,9 @@ public class ConceptImpl implements Serializable, Concept, JPAEntity {
 
     @Override
     public String toString() {
-        return EntitySupportCategory.basicToString(this, PROP_NAMES);
+        StringBuilder sb = new StringBuilder(getClass().getSimpleName());
+        sb.append(" ([id=").append(id).append("])");
+        return sb.toString();
     }
 
     public void setTaxonomyType(String taxonomyType) {

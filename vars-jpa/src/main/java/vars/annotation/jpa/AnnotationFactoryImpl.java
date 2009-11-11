@@ -13,31 +13,31 @@ import vars.annotation.*;
 public class AnnotationFactoryImpl implements AnnotationFactory {
 
     public Association newAssociation() {
-        return new GAssociation();
+        return new AssociationImpl();
     }
 
     public Association newAssociation(String linkName, String toConcept, String linkValue) {
-        return new GAssociation(linkName, toConcept, linkValue);
+        return new AssociationImpl(linkName, toConcept, linkValue);
     }
 
     public Observation newObservation() {
-        return new GObservation();
+        return new ObservationImpl();
     }
 
     public VideoFrame newVideoFrame() {
-        return new GVideoFrame();
+        return new VideoFrameImpl();
     }
 
     public VideoArchive newVideoArchive() {
-        return new GVideoArchive();
+        return new VideoArchiveImpl();
     }
 
     public VideoArchiveSet newVideoArchiveSet() {
-        return new GVideoArchiveSet();
+        return new VideoArchiveSetImpl();
     }
 
     public CameraDeployment newCameraDeployment() {
-        return new GCameraDeployment();
+        return new CameraDeploymentImpl();
     }
 
 }

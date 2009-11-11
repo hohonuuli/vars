@@ -161,6 +161,10 @@ public class MediaImpl implements Serializable, Media, JPAEntity {
     public void setCredit(String credit) {
         this.credit = credit;
     }
+    
+    public void setId(Long id) {
+    	this.id = id;
+    }
 
     public void setPrimary(Boolean primary) {
         this.primaryMedia = primary;

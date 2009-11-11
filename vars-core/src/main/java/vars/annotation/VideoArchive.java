@@ -57,7 +57,7 @@ public interface VideoArchive extends AnnotationObject, ILazy {
      * collection will be empty if no empty VideoFrames were found.
      *
      */
-    Collection<? extends VideoFrame> getEmptyVideoFrames();
+    Collection<VideoFrame> getEmptyVideoFrames();
 
 
     /**

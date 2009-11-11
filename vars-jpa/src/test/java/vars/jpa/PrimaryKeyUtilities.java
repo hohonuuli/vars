@@ -25,17 +25,26 @@ import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptMetadata;
 import vars.knowledgebase.jpa.ConceptImpl;
 import vars.knowledgebase.jpa.ConceptMetadataImpl;
-import vars.knowledgebase.jpa.GConceptName;
-import vars.knowledgebase.jpa.GHistory;
-import vars.knowledgebase.jpa.GLinkRealization;
 import vars.knowledgebase.jpa.LinkTemplateImpl;
-import vars.knowledgebase.jpa.GMedia;
-import vars.knowledgebase.jpa.GUsage;
+
 import vars.annotation.VideoArchiveSet;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoFrame;
 import vars.annotation.Observation;
-import vars.annotation.jpa.*;
+import vars.annotation.jpa.AssociationImpl;
+import vars.annotation.jpa.CameraDataImpl;
+import vars.annotation.jpa.CameraDeploymentImpl;
+
+import vars.annotation.jpa.ObservationImpl;
+import vars.annotation.jpa.PhysicalDataImpl;
+import vars.annotation.jpa.VideoArchiveImpl;
+import vars.annotation.jpa.VideoArchiveSetImpl;
+import vars.annotation.jpa.VideoFrameImpl;
+import vars.knowledgebase.jpa.ConceptNameImpl;
+import vars.knowledgebase.jpa.HistoryImpl;
+import vars.knowledgebase.jpa.LinkRealizationImpl;
+import vars.knowledgebase.jpa.MediaImpl;
+import vars.knowledgebase.jpa.UsageImpl;
 
 /**
  * Created by IntelliJ IDEA.
@@ -116,13 +125,13 @@ public class PrimaryKeyUtilities {
 
             {
                 put(ConceptImpl.class, new ArrayList());
-                put(GConceptName.class, new ArrayList());
+                put(ConceptNameImpl.class, new ArrayList());
                 put(ConceptMetadataImpl.class, new ArrayList());
-                put(GHistory.class, new ArrayList());
-                put(GLinkRealization.class, new ArrayList());
+                put(HistoryImpl.class, new ArrayList());
+                put(LinkRealizationImpl.class, new ArrayList());
                 put(LinkTemplateImpl.class, new ArrayList());
-                put(GMedia.class, new ArrayList());
-                put(GUsage.class, new ArrayList());
+                put(MediaImpl.class, new ArrayList());
+                put(UsageImpl.class, new ArrayList());
             }
         };
 
@@ -135,23 +144,23 @@ public class PrimaryKeyUtilities {
         Map<Class, Collection> map = new HashMap<Class, Collection>() {
 
             {
-                put(GVideoArchiveSet.class, new ArrayList());
-                put(GCameraDeployment.class, new ArrayList());
-                put(GVideoArchive.class, new ArrayList());
-                put(GVideoFrame.class, new ArrayList());
-                put(GPhysicalData.class, new ArrayList());
-                put(GCameraData.class, new ArrayList());
-                put(GObservation.class, new ArrayList());
-                put(GAssociation.class, new ArrayList());
+                put(VideoArchiveSetImpl.class, new ArrayList());
+                put(CameraDeploymentImpl.class, new ArrayList());
+                put(VideoArchiveImpl.class, new ArrayList());
+                put(VideoFrameImpl.class, new ArrayList());
+                put(PhysicalDataImpl.class, new ArrayList());
+                put(CameraDataImpl.class, new ArrayList());
+                put(ObservationImpl.class, new ArrayList());
+                put(AssociationImpl.class, new ArrayList());
             }
         };
 
-        map.get(GVideoArchiveSet.class).add(((JPAEntity) videoArchiveSet).getId());
-        map.get(GCameraDeployment.class).addAll(primaryKeys(videoArchiveSet.getCameraDeployments()));
+        map.get(VideoArchiveSetImpl.class).add(((JPAEntity) videoArchiveSet).getId());
+        map.get(CameraDeploymentImpl.class).addAll(primaryKeys(videoArchiveSet.getCameraDeployments()));
 
         Collection<VideoArchive> videoArchives = videoArchiveSet.getVideoArchives();
 
-        map.get(GVideoArchive.class).addAll(primaryKeys(videoArchives));
+        map.get(VideoArchiveImpl.class).addAll(primaryKeys(videoArchives));
 
         for (VideoArchive va : videoArchives) {
             for (VideoFrame videoFrame : va.getVideoFrames()) {
@@ -166,16 +175,16 @@ public class PrimaryKeyUtilities {
     private static void primaryKeyMap(Concept concept, Map<Class, Collection> map) {
         JPAEntity c = (JPAEntity) concept;
         map.get(ConceptImpl.class).add(new Long(c.getId()));
-        map.get(GConceptName.class).addAll(primaryKeys(concept.getConceptNames()));
+        map.get(ConceptNameImpl.class).addAll(primaryKeys(concept.getConceptNames()));
 
         ConceptMetadata metadata = (ConceptMetadataImpl) concept.getConceptMetadata();
         JPAEntity cm = (JPAEntity) metadata;
         map.get(ConceptMetadataImpl.class).add(cm.getId());
-        map.get(GHistory.class).addAll(primaryKeys(metadata.getHistories()));
-        map.get(GLinkRealization.class).addAll(primaryKeys(metadata.getLinkRealizations()));
+        map.get(HistoryImpl.class).addAll(primaryKeys(metadata.getHistories()));
+        map.get(LinkRealizationImpl.class).addAll(primaryKeys(metadata.getLinkRealizations()));
         map.get(LinkTemplateImpl.class).addAll(primaryKeys(metadata.getLinkTemplates()));
-        map.get(GMedia.class).addAll(primaryKeys(metadata.getMedias()));
-        map.get(GUsage.class).add(((JPAEntity) metadata.getUsage()).getId());
+        map.get(MediaImpl.class).addAll(primaryKeys(metadata.getMedias()));
+        map.get(UsageImpl.class).add(((JPAEntity) metadata.getUsage()).getId());
 
         // Process the child conceptNames
         for (Object child : concept.getChildConcepts()) {
@@ -185,15 +194,15 @@ public class PrimaryKeyUtilities {
     }
 
     private static void primaryKeyMap(VideoFrame videoFrame, Map<Class, Collection> map) {
-        map.get(GVideoFrame.class).add(((JPAEntity) videoFrame).getId());
-        map.get(GPhysicalData.class).add(((JPAEntity) videoFrame.getPhysicalData()).getId());
-        map.get(GPhysicalData.class).add(((JPAEntity) videoFrame.getPhysicalData()).getId());
+        map.get(VideoFrameImpl.class).add(((JPAEntity) videoFrame).getId());
+        map.get(PhysicalDataImpl.class).add(((JPAEntity) videoFrame.getPhysicalData()).getId());
+        map.get(PhysicalDataImpl.class).add(((JPAEntity) videoFrame.getPhysicalData()).getId());
 
         Collection obs = videoFrame.getObservations();
 
-        map.get(GObservation.class).add(primaryKeys(obs));
+        map.get(ObservationImpl.class).add(primaryKeys(obs));
 
-        Collection ass = map.get(GAssociation.class);
+        Collection ass = map.get(AssociationImpl.class);
 
         for (Object o : obs) {
             Observation observation = (Observation) o;

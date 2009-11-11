@@ -8,7 +8,6 @@ package vars.knowledgebase.jpa;
 import com.google.common.collect.ImmutableList;
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.util.Collections;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -25,8 +24,6 @@ import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 import javax.persistence.Transient;
 import javax.persistence.Version;
-import vars.EntitySupportCategory;
-import vars.LinkCategory;
 import vars.LinkUtilities;
 import vars.jpa.JPAEntity;
 import vars.jpa.KeyNullifier;
@@ -152,6 +149,10 @@ public class LinkRealizationImpl implements Serializable, LinkRealization, JPAEn
         return toConcept;
     }
 
+    public void setId(Long id) {
+    	this.id = id;
+    }
+    
     public void setToConcept(String toConcept) {
         this.toConcept = toConcept;
     }

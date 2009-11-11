@@ -60,7 +60,6 @@ public class ExternalDataDaoExpdImpl implements ExternalDataDAO {
      * null timecodes
      */
     private final Predicate<VideoMoment> nonNullTimecodePredicate = new Predicate<VideoMoment>() {
-        @Override
         public boolean apply(VideoMoment arg0) {
             return arg0.getTimecode() != null;
         }
@@ -71,7 +70,6 @@ public class ExternalDataDaoExpdImpl implements ExternalDataDAO {
      * null alternateTimecodes
      */
     private final Predicate<VideoMoment> nonNullAlternateTimecodePredicate = new Predicate<VideoMoment>() {
-        @Override
         public boolean apply(VideoMoment arg0) {
             return arg0.getAlternateTimecode() != null;
         }

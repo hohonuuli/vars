@@ -16,15 +16,15 @@ public class KnowledgebaseFactoryImpl implements KnowledgebaseFactory {
     }
 
     public ConceptName newConceptName() {
-        return new GConceptName();
+        return new ConceptNameImpl();
     }
 
     public History newHistory() {
-        return new GHistory();
+        return new HistoryImpl();
     }
 
     public LinkRealization newLinkRealization() {
-        return new GLinkRealization();
+        return new LinkRealizationImpl();
     }
 
     public LinkTemplate newLinkTemplate() {
@@ -32,11 +32,11 @@ public class KnowledgebaseFactoryImpl implements KnowledgebaseFactory {
     }
 
     public Media newMedia() {
-        return new GMedia();
+        return new MediaImpl();
     }
 
     public Usage newUsage() {
-        return new GUsage();
+        return new UsageImpl();
     }
 
 }

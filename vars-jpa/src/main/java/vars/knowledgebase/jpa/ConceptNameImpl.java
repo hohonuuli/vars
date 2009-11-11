@@ -1,16 +1,21 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * @(#)ConceptNameImpl.java   2009.11.10 at 03:26:40 PST
+ *
+ * Copyright 2009 MBARI
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
+
 
 package vars.knowledgebase.jpa;
 
-import com.google.common.collect.ImmutableList;
-import groovy.beans.Bindable;
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.util.Collections;
-import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -25,27 +30,22 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
-import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
-import vars.EntitySupportCategory;
 import vars.jpa.JPAEntity;
 import vars.jpa.KeyNullifier;
 import vars.jpa.TransactionLogger;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptName;
 
-
-
-
 /**
  * <pre>
  * CREATE TABLE CONCEPTNAME (
- *   CONCEPTNAME 	VARCHAR(50) NOT NULL,
- *   CONCEPTID_FK	BIGINT,
- *   AUTHOR      	VARCHAR(255),
- *   NAMETYPE    	VARCHAR(10),
- *   ID          	BIGINT NOT NULL,
+ *   CONCEPTNAME        VARCHAR(50) NOT NULL,
+ *   CONCEPTID_FK       BIGINT,
+ *   AUTHOR             VARCHAR(255),
+ *   NAMETYPE           VARCHAR(10),
+ *   ID                 BIGINT NOT NULL,
  *   CONSTRAINT PK_CONCEPTNAME PRIMARY KEY(ID)
  * )
  * GO
@@ -58,72 +58,87 @@ import vars.knowledgebase.ConceptName;
  * </pre>
  */
 @Entity(name = "ConceptName")
-@Table(name = "ConceptName", uniqueConstraints = {@UniqueConstraint(columnNames = {"ConceptName"})})
-@EntityListeners({TransactionLogger.class, KeyNullifier.class})
+@Table(name = "ConceptName", uniqueConstraints = { @UniqueConstraint(columnNames = { "ConceptName" }) })
+@EntityListeners({ TransactionLogger.class, KeyNullifier.class })
 @NamedQueries( {
-    @NamedQuery(name = "ConceptName.findById",
-                query = "SELECT v FROM ConceptName v WHERE v.id = :id"),
-    @NamedQuery(name = "ConceptName.findByName",
-                query = "SELECT c FROM ConceptName c WHERE c.name = :name"),
-    @NamedQuery(name = "ConceptName.findByAuthor", query = "SELECT c FROM ConceptName c WHERE c.author = :author"),
+
+    @NamedQuery(name = "ConceptName.findById", query = "SELECT v FROM ConceptName v WHERE v.id = :id") ,
+    @NamedQuery(name = "ConceptName.findByName", query = "SELECT c FROM ConceptName c WHERE c.name = :name") ,
+    @NamedQuery(name = "ConceptName.findByAuthor", query = "SELECT c FROM ConceptName c WHERE c.author = :author") ,
     @NamedQuery(name = "ConceptName.findByNameType",
-                query = "SELECT c FROM ConceptName c WHERE c.nameType = :nameType"),
-    @NamedQuery(name = "ConceptName.findAll",
-                query = "SELECT c FROM ConceptName c"),
-    @NamedQuery(name = "ConceptName.findByNameLike",
-                query = "SELECT c FROM ConceptName c WHERE c.name LIKE :name")
+                query = "SELECT c FROM ConceptName c WHERE c.nameType = :nameType") ,
+    @NamedQuery(name = "ConceptName.findAll", query = "SELECT c FROM ConceptName c") ,
+    @NamedQuery(name = "ConceptName.findByNameLike", query = "SELECT c FROM ConceptName c WHERE c.name LIKE :name")
+
 })
 public class ConceptNameImpl implements Serializable, ConceptName, JPAEntity {
 
-    @Transient
-    private static final List<String> PROPS = ImmutableList.of(ConceptName.PROP_NAME);
+
+    @Column(name = "Author", length = 255)
+    String author;
+
+    @ManyToOne(
+        optional = false,
+        targetEntity = ConceptImpl.class,
+        fetch = FetchType.EAGER,
+        cascade = { CascadeType.MERGE }
+    )
+    @JoinColumn(name = "ConceptID_FK")
+    Concept concept;
 
     @Id
-    @Column(name = "id", nullable = false, updatable=false)
+    @Column(
+        name = "id",
+        nullable = false,
+        updatable = false
+    )
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "ConceptName_Gen")
-    @TableGenerator(name = "ConceptName_Gen", table = "UniqueID",
-            pkColumnName = "TableName", valueColumnName = "NextID",
-            pkColumnValue = "ConceptName", allocationSize = 1)
+    @TableGenerator(
+        name = "ConceptName_Gen",
+        table = "UniqueID",
+        pkColumnName = "TableName",
+        valueColumnName = "NextID",
+        pkColumnValue = "ConceptName",
+        allocationSize = 1
+    )
     Long id;
+
+    @Column(
+        name = "ConceptName",
+        nullable = false,
+        length = 64,
+        unique = true
+    )
+    String name;
+    
+    @Column(
+        name = "NameType",
+        nullable = false,
+        length = 10
+    )
+    String nameType;
 
     /** Optimistic lock to prevent concurrent overwrites */
     @Version
     @Column(name = "LAST_UPDATED_TIME")
     private Timestamp updatedTime;
 
-    @Column(name = "ConceptName", nullable = false, length = 64, unique = true)
-    @Bindable
-    String name;
-
-    @Column(name = "NameType", nullable = false, length = 10)
-    @Bindable
-    String nameType;
-
-    @Column(name = "Author", length = 255)
-    @Bindable
-    String author;
-
-    @ManyToOne(optional = false, targetEntity = ConceptImpl.class, fetch = FetchType.EAGER, cascade = { CascadeType.MERGE })
-    @JoinColumn(name = "ConceptID_FK")
-    Concept concept;
-
-    public String stringValue() {
-        return name;
-    }
-
     @Override
-    public String toString() {
-        return EntitySupportCategory.basicToString(this, ImmutableList.of(PROP_NAME, PROP_NAME_TYPE));
-    }
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
 
-    @Override
-    public boolean equals(Object that) {
-        return EntitySupportCategory.equals(this, (JPAEntity) that, PROPS);
-    }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
 
-    @Override
-    public int hashCode() {
-        return EntitySupportCategory.hashCode(this, PROPS);
+        final ConceptNameImpl other = (ConceptNameImpl) obj;
+        if ((this.name == null) ? (other.name != null) : !this.name.equals(other.name)) {
+            return false;
+        }
+
+        return true;
     }
 
     public String getAuthor() {
@@ -134,6 +149,10 @@ public class ConceptNameImpl implements Serializable, ConceptName, JPAEntity {
         return concept;
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public String getName() {
         return name;
     }
@@ -142,12 +161,24 @@ public class ConceptNameImpl implements Serializable, ConceptName, JPAEntity {
         return nameType;
     }
 
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 79 * hash + ((this.name != null) ? this.name.hashCode() : 0);
+
+        return hash;
+    }
+
     public void setAuthor(String author) {
         this.author = author;
     }
 
     public void setConcept(Concept concept) {
         this.concept = concept;
+    }
+    
+    public void setId(Long id) {
+    	this.id = id;
     }
 
     public void setName(String name) {
@@ -158,9 +189,15 @@ public class ConceptNameImpl implements Serializable, ConceptName, JPAEntity {
         this.nameType = nameType;
     }
 
-    public Long getId() {
-        return id;
+    public String stringValue() {
+        return name;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(getClass().getSimpleName());
+        sb.append(" ([id=").append(id).append("] name=").append(name).append(")");
 
+        return super.toString();
+    }
 }

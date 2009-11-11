@@ -16,7 +16,6 @@ public class ExactlyOnePrimaryNameRule implements PersistenceRule<Concept> {
 
     // Filter used by before method
     Predicate<ConceptName> filter = new Predicate<ConceptName>() {
-        @Override
         public boolean apply(ConceptName input) {
             return  ConceptNameTypes.PRIMARY.toString().equalsIgnoreCase(input.getNameType());
         }

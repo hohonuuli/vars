@@ -150,6 +150,10 @@ public class UsageImpl implements Serializable, Usage, JPAEntity {
     public void setEmbargoExpirationDate(Date embargoExpirationDTG) {
         this.embargoExpirationDate = embargoExpirationDTG;
     }
+    
+    public void setId(Long id) {
+    	this.id = id;
+    }
 
     public void setSpecification(String specification) {
         this.specification = specification;

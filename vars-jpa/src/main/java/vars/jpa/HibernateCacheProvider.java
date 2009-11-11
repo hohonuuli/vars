@@ -5,28 +5,8 @@
 
 package vars.jpa;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import vars.PersistenceCacheProvider;
-import com.google.common.collect.ImmutableSet;
-import java.util.Set;
 import javax.persistence.EntityManagerFactory;
-import vars.annotation.jpa.GAssociation;
-import vars.annotation.jpa.GCameraData;
-import vars.annotation.jpa.GCameraDeployment;
-import vars.annotation.jpa.GObservation;
-import vars.annotation.jpa.GPhysicalData;
-import vars.annotation.jpa.GVideoArchive;
-import vars.annotation.jpa.GVideoArchiveSet;
-import vars.annotation.jpa.GVideoFrame;
-import vars.knowledgebase.jpa.ConceptImpl;
-import vars.knowledgebase.jpa.ConceptMetadataImpl;
-import vars.knowledgebase.jpa.GConceptName;
-import vars.knowledgebase.jpa.GHistory;
-import vars.knowledgebase.jpa.GLinkRealization;
-import vars.knowledgebase.jpa.GMedia;
-import vars.knowledgebase.jpa.GUsage;
-import vars.knowledgebase.jpa.LinkTemplateImpl;
 
 /**
  * Provides a method to clear the 2nd level cache used by Hibernate JPA. This
@@ -39,24 +19,24 @@ public class HibernateCacheProvider implements PersistenceCacheProvider {
 
     private final EntityManagerFactory entityManagerFactory;
 
-    private final Set<?> persistentClasses = ImmutableSet.of(
-            GUserAccount.class,
-            GAssociation.class,
-            GCameraData.class,
-            GCameraDeployment.class,
-            GObservation.class,
-            GPhysicalData.class,
-            GVideoArchive.class,
-            GVideoArchiveSet.class,
-            GVideoFrame.class,
-            ConceptImpl.class,
-            ConceptMetadataImpl.class,
-            GConceptName.class,
-            GHistory.class,
-            GLinkRealization.class,
-            LinkTemplateImpl.class,
-            GMedia.class,
-            GUsage.class);
+//    private final Set<?> persistentClasses = ImmutableSet.of(
+//            GUserAccount.class,
+//            GAssociation.class,
+//            GCameraData.class,
+//            GCameraDeployment.class,
+//            GObservation.class,
+//            GPhysicalData.class,
+//            GVideoArchive.class,
+//            GVideoArchiveSet.class,
+//            GVideoFrame.class,
+//            ConceptImpl.class,
+//            ConceptMetadataImpl.class,
+//            GConceptName.class,
+//            GHistory.class,
+//            GLinkRealization.class,
+//            LinkTemplateImpl.class,
+//            GMedia.class,
+//            GUsage.class);
 
     
     public HibernateCacheProvider(EntityManagerFactory entityManagerFactory) {
@@ -76,11 +56,11 @@ public class HibernateCacheProvider implements PersistenceCacheProvider {
          * http://bill.burkecentral.com/2007/07/06/co-existence-with-hibernate-jpa-and-ejb3/
          */
 
-        Session session = (Session) entityManagerFactory.createEntityManager().getDelegate();
-        SessionFactory sessionFactory = session.getSessionFactory();
-        for (Object clazz : persistentClasses) {
-            sessionFactory.evict((Class) clazz);
-        }
+//        Session session = (Session) entityManagerFactory.createEntityManager().getDelegate();
+//        SessionFactory sessionFactory = session.getSessionFactory();
+//        for (Object clazz : persistentClasses) {
+//            sessionFactory.evict((Class) clazz);
+//        }
         
     }
 

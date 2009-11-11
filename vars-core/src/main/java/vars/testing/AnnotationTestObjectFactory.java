@@ -114,7 +114,7 @@ public class AnnotationTestObjectFactory {
         camera.setFieldWidth(new Double(randomNumber(0, 100)));
         camera.setFocus(Integer.valueOf((int) randomNumber(0, 10)));
         camera.setIris(Integer.valueOf((int) randomNumber(0, 5)));
-        camera.setFrameGrabURL("http://www.mbari.org/IMG" + randomNumber(0, 10000) + ".jpg");
+        camera.setImageReference("http://www.mbari.org/IMG" + randomNumber(0, 10000) + ".jpg");
         camera.setZoom(Integer.valueOf((int) randomNumber(0, 10)));
 
         return videoFrame;

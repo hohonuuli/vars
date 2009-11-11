@@ -29,7 +29,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import javax.persistence.Version;
-import vars.EntitySupportCategory;
 import vars.jpa.JPAEntity;
 import vars.jpa.KeyNullifier;
 import vars.jpa.TransactionLogger;
@@ -191,10 +190,7 @@ public class HistoryImpl implements Serializable, History, JPAEntity {
         return sb.toString();
     }
 
-    @Override
-    public String toString() {
-        return EntitySupportCategory.basicToString(this, PROPS);
-    }
+
 
     @Override
     public boolean equals(Object that) {
@@ -243,6 +239,10 @@ public class HistoryImpl implements Serializable, History, JPAEntity {
 
     public String getField() {
         return field;
+    }
+    
+    public void setId(Long id) {
+    	this.id = id;
     }
 
     public String getNewValue() {
@@ -297,6 +297,12 @@ public class HistoryImpl implements Serializable, History, JPAEntity {
         this.conceptMetadata = conceptMetadata;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(getClass().getSimpleName());
+        sb.append(" ([id=").append(id).append("])");
+        return sb.toString();
+    }
 
 
 

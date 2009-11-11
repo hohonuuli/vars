@@ -16,23 +16,6 @@
     Build settings
 -->
     <build>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.groovy.maven</groupId>
-                <artifactId>gmaven-plugin</artifactId>
-                <version>1.0</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>generateStubs</goal>
-                            <goal>compile</goal>
-                            <goal>generateTestStubs</goal>
-                            <goal>testCompile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
         <filters>
             <filter>src/main/filters/${environment}.properties</filter>
         </filters>
@@ -65,29 +48,18 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy</artifactId>
-            <version>1.6.5</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>ant</artifactId>
-                    <groupId>org.apache.ant</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
             <groupId>javax.persistence</groupId>
             <artifactId>persistence-api</artifactId>
             <version>[1.0,)</version>
             <scope>provided</scope>
         </dependency>
-	<!-- <dependency>
+	<dependency>
         <groupId>org.eclipse.persistence</groupId>
         <artifactId>eclipselink</artifactId>
-        <version>[1.1.1,)</version>
+        <version>1.2.0</version>
         <scope>test</scope>
     </dependency>
-	<dependency>
+	<!-- <dependency>
         <groupId>org.apache.openjpa</groupId>
         <artifactId>openjpa</artifactId>
         <version>1.2.1</version>
@@ -95,11 +67,12 @@
     </dependency> -->
 
       <!-- Eclipselink bombs on the datamodel (bug!!). OpenJPA works but the enhancer build step needed to
-        create lazy-loading proxies bombs on the groovy classes. Hibernate works fine though -->
-        <dependency>
+        create lazy-loading proxies bombs on the groovy classes. Hibernate works fine though.
+         Correction. Hibernate has a show stopper bug in Eagerloaded sets. Hashcode of objects in sets is
+         calculated before the objects values are set. Makes the objects unreachable.-->
+        <!-- <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
-            <!-- <version>3.5.0.Beta-1</version> -->
             <version>3.4.0.GA</version>
             <scope>compile</scope>
             <exclusions>
@@ -108,8 +81,8 @@
                     <groupId>javax.transaction</groupId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
+        </dependency> -->
+        <!-- <dependency>
             <groupId>geronimo-spec</groupId>
             <artifactId>geronimo-spec-jta</artifactId>
             <version>1.0.1B-rc4</version>
@@ -120,7 +93,7 @@
             <artifactId>hsqldb</artifactId>
             <version>1.8.0.7</version>
             <scope>test</scope>
-        </dependency>
+        </dependency> -->
         <dependency>
             <groupId>com.microsoft</groupId>
             <artifactId>sqljdbc4</artifactId>
