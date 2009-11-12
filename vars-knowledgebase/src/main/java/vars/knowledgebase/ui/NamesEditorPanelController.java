@@ -113,10 +113,6 @@ class NamesEditorPanelController {
             final String nameType, final String oldName, final UserAccount userAccount) {
 
 
-//            )final Concept concept, final String newName, final String author,
-//                                     final String nameType, final String oldName, final UserAccount userAccount) {
-
-        log.error("Entering updateConceptName method");
         boolean okToProceed = true;
 
         ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
@@ -155,7 +151,6 @@ class NamesEditorPanelController {
             }
         }
 
-        ConceptName oldConceptName = concept.getConceptName(oldName);
         if (okToProceed) {
 
             log.debug("Updating the conceptName");
@@ -175,6 +170,7 @@ class NamesEditorPanelController {
             DAO dao = toolBelt.getKnowledgebaseDAOFactory().newDAO();
             dao.startTransaction();
             concept = dao.merge(concept);
+            ConceptName oldConceptName = concept.getConceptName(oldName);
 
             /*
              * Add a History object to track the change.
@@ -187,6 +183,7 @@ class NamesEditorPanelController {
              * When updating a primary name we want to keep the older
              * name, so we add a new Concept with the old values.
              */
+            
             if (nameType.equals(ConceptNameTypes.PRIMARY.toString())) {
                 ConceptName copyCn = knowledgebaseFactory.newConceptName();
                 copyCn.setName(oldConceptName.getName());
@@ -212,6 +209,13 @@ class NamesEditorPanelController {
 
 
             try {
+                /*
+               * Update the annotations that might use the name. Ideally, the database would only contain
+               * primary names. But just in case we'll update common names and synonyms.
+               */
+              if (log.isDebugEnabled()) {
+                  log.debug("Changing all Observations that use '" + oldName + "' to use '" + newName + "'");
+              }
                 knowledgebaseDAO.updateConceptNameUsedByAnnotations(concept);
             }
             catch (Exception e) {
@@ -221,58 +225,15 @@ class NamesEditorPanelController {
                 EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, msg);
             }
 
+            /*
+             * If the user is an admin go ahead and approve the change. Do this BEFORE you refresh the tree
+             * or your database transaction will fail because of a timestamp mismatch. (ie. Cache does not
+             * match you instance)
+             */
             EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
 
-            if (okToProceed) {
-
-                /*
-                 * Update the annotations that might use the name. Ideally, the database would only contain
-                 * primary names. But just in case we'll update common names and synonyms.
-                 */
-                if (log.isDebugEnabled()) {
-                    log.debug("Changing all Observations that use '" + oldName + "' to use '" + newName + "'");
-                }
-
-
-                /*
-                 * If the annotation update was successful we can drop the old conceptname that we
-                 * might have created if changing a primary name
-                 */
-                if (okToProceed) {
-                    ConceptName oldPrimaryName = concept.getConceptName(history.getOldValue());
-                    if ((oldPrimaryName != null) &&
-                            !oldPrimaryName.getNameType().equalsIgnoreCase(ConceptNameTypes.PRIMARY.toString())) {
-                        
-
-                        try {
-                            dao.startTransaction();
-                            concept = dao.merge(concept);
-                            concept.removeConceptName(oldPrimaryName);
-                            dao.remove(oldPrimaryName);
-                            dao.endTransaction();
-                        }
-                        catch (Exception ex) {
-                            log.error("Failed to remove " + oldPrimaryName +
-                                      " from the database. This will need to be done manually!!");
-
-                        }
-                    }
-                }
-
-
-                /*
-                 * If the user is an admin go ahead and approve the change. Do this BEFORE you refresh the tree
-                 * or your database transaction will fail because of a timestamp mismatch. (ie. Cache does not
-                 * match you instance)
-                 */
-                EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
-
-
-            }
         }
 
-        EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, newName);
-        log.debug("Exiting updateConceptName method");
 
         return okToProceed;
     }

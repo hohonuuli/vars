@@ -136,7 +136,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
         }
 
         @Override
-        public void approve(final UserAccount userAccount, final History history) {
+        public void approve(final UserAccount userAccount, History history) {
 
             /*
              * Find the child concept to be deleted.
@@ -153,9 +153,12 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
                 }
             }
 
+            
             if (concept != null) {
                 DeleteConceptTask dct = new DeleteConceptTask(toolBelt.getAnnotationDAOFactory(), knowledgebaseDAOFactory);
                 if (dct.delete(concept)) {
+                    DAO dao = toolBelt.getKnowledgebaseDAOFactory().newDAO();
+                    history = dao.findInDatastore(history);
                     super.approve(userAccount, history);
                 }
                 else {
@@ -394,12 +397,17 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
             if (canDo(userAccount, history)) {
                 
                 ConceptDAO dao = knowledgebaseDAOFactory.newConceptDAO();
-                dao.startTransaction();
-                history = dao.merge(history);
-                history.setProcessedDate(new Date());
-                history.setProcessorName(userAccount.getUserName());
-                history.setApproved(Boolean.TRUE);
-                dao.endTransaction();
+                try {
+                    dao.startTransaction();
+                    history = dao.merge(history);
+                    history.setProcessedDate(new Date());
+                    history.setProcessorName(userAccount.getUserName());
+                    history.setApproved(Boolean.TRUE);
+                    dao.endTransaction();
+                }
+                catch (Exception e) {
+                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+                }
             }
             else {
                 final String msg = "Unable to approve the History [" + history + "]";

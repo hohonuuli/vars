@@ -92,7 +92,6 @@ public class KnowledgebaseApp {
                 details = error.toString();
             }
 
-
             /*
              * Create an error pane to display the error stuff
              */
@@ -107,7 +106,7 @@ public class KnowledgebaseApp {
 
     /**
      * This subscriber should display a warning message on a fatal error. When
-     * the OK button is clicked a notificaiton to the EXIT_TOPIC should be sent
+     * the OK button is clicked a notification to the EXIT_TOPIC should be sent
      */
     private final EventTopicSubscriber fatalErrorSubscriber = new EventTopicSubscriber() {
 

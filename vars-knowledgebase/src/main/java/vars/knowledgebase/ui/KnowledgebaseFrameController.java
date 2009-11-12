@@ -34,7 +34,7 @@ import vars.shared.ui.tree.ConceptTreePanel;
 class KnowledgebaseFrameController {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
-    private final EventTopicSubscriber refreshTreeSubscriber = new RefreshTreeAndOpenNodeSubscriber();
+    private final EventTopicSubscriber<String> refreshTreeSubscriber = new RefreshTreeAndOpenNodeSubscriber();
     private final KnowledgebaseFrame knowledgebaseFrame;
     private final ToolBelt toolBelt;
     private final PersistenceCache persistenceCache;

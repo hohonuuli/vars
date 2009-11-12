@@ -245,12 +245,13 @@ public class ConceptTreePanel extends SearchableTreePanel {
      * @param concept
      */
     public synchronized void openNode(final Concept concept) {
-        if (log.isDebugEnabled()) {
-            log.debug("Opening node containing '" + concept.getPrimaryConceptName().getName() + "', " + concept);
-        }
 
         if (concept == null) {
             return;
+        }
+        
+        if (log.isDebugEnabled()) {
+            log.debug("Opening node containing '" + concept.getPrimaryConceptName().getName() + "', " + concept);
         }
 
         TreePath treePath = (TreePath) Worker.post(new Job() {

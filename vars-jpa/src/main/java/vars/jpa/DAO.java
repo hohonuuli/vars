@@ -245,4 +245,9 @@ public class DAO implements vars.DAO, EntityManagerAspect {
             log.debug("JPA Transaction Started");
         }
     }
+
+    public <T> T findInDatastore(T object) {
+        JPAEntity jpaEntity = (JPAEntity) object;
+        return (T) findByPrimaryKey(object.getClass(), jpaEntity.getId());
+    }
 }

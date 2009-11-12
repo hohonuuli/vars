@@ -97,7 +97,7 @@ public class DeleteConceptTask {
          * Get all concept-names that will be deleted. Use those to find all the Observations that
          * will be affected.
          */
-        Collection observations = null;
+        Collection<Observation> observations = null;
         if (okToProceed) {
             try {
                 ObservationDAO observationDAO = annotationDAOFactory.newObservationDAO();
@@ -125,11 +125,7 @@ public class DeleteConceptTask {
          */
         if (okToProceed) {
             try {
-                conceptDAO.startTransaction();
-                concept = conceptDAO.merge(concept);
-                concept.getParentConcept().removeChildConcept(concept);
-                conceptDAO.remove(concept);
-                conceptDAO.endTransaction();
+                conceptDAO.cascadeRemove(concept);
             }
             catch (Exception e) {
                 final String msg = "Failed to delete '" + rejectedName + "'";
@@ -142,7 +138,7 @@ public class DeleteConceptTask {
         return okToProceed;
     }
 
-    private boolean handleObservations(final Collection observations, final Concept concept) {
+    private boolean handleObservations(final Collection<Observation> observations, final Concept concept) {
         boolean okToProceed = true;
         final String deletedName = concept.getPrimaryConceptName().getName();
         final Concept parentConcept = concept.getParentConcept();

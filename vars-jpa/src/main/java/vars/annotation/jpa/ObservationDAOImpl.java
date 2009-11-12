@@ -17,6 +17,10 @@ import com.google.inject.Inject;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import vars.knowledgebase.jpa.ConceptDAOImpl;
 
 /**
@@ -29,6 +33,8 @@ import vars.knowledgebase.jpa.ConceptDAOImpl;
 public class ObservationDAOImpl extends DAO implements ObservationDAO {
 
     private final ConceptDAO conceptDAO;
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    
 
     @Inject
     public ObservationDAOImpl(EntityManager entityManager) {
@@ -59,17 +65,18 @@ public class ObservationDAOImpl extends DAO implements ObservationDAO {
             conceptNames.addAll(concept.getConceptNames());
         }
 
-        String jpql = "SELECT o FROM Observation o WHERE o.conceptName IN (";
+        StringBuilder sb = new StringBuilder("SELECT o FROM Observation o WHERE o.conceptName IN (");
         int n = 0;
         for (ConceptName cn : conceptNames) {
-            jpql += cn.getName();
+            sb.append("'").append(cn.getName()).append("'");
             if (n < conceptNames.size() - 1) {
-                jpql += ", ";
+                sb.append(", ");
             }
+            n++;
         }
-        jpql += ")";
+        sb.append(")");
 
-        Query query = getEntityManager().createQuery(jpql);
+        Query query = getEntityManager().createQuery(sb.toString());
         List<Observation> observations = query.getResultList();
 
         return observations;

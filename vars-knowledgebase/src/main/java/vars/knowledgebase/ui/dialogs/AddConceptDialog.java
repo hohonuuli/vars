@@ -21,6 +21,9 @@ import java.awt.Frame;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.ImageIcon;
 import org.bushe.swing.event.EventBus;
 import org.mbari.swing.JFancyButton;
@@ -554,6 +557,7 @@ public class AddConceptDialog extends javax.swing.JDialog {
             final UserAccount userAccount = (UserAccount) GlobalLookup.getUserAccountDispatcher().getValueObject();
             final HistoryFactory historyFactory = toolBelt.getHistoryFactory();
             final ApproveHistoryTask approveHistoryTask = toolBelt.getApproveHistoryTask();
+            final List<History> histories = new ArrayList<History>();
 
             /*
             * Modify the parent concept
@@ -587,16 +591,13 @@ public class AddConceptDialog extends javax.swing.JDialog {
                 }
 
                 newParentConcept.addChildConcept(concept);
-                History history = historyFactory.replaceParentConcept(userAccount, oldParentConcept,
+                History history1 = historyFactory.replaceParentConcept(userAccount, oldParentConcept,
                     newParentConcept);
-                concept.getConceptMetadata().addHistory(history);
-                conceptDAO.persist(history);
+                concept.getConceptMetadata().addHistory(history1);
+                conceptDAO.persist(history1);
                 conceptDAO.endTransaction();
 
-                /*
-                 * If the user is an admin then you can approve
-                 */
-                EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
+                histories.add(history1);
             }
 
             // Set optional fields
@@ -604,16 +605,16 @@ public class AddConceptDialog extends javax.swing.JDialog {
             final String nodcCode = isValidString(nodcField.getText()) ? nodcField.getText() : null;
             if (((nodcCode != null) && !nodcCode.equals(oldNodcCode)) ||
                     ((nodcCode == null) && (oldNodcCode != null))) {
-                History history = historyFactory.replaceNodcCode(userAccount, oldNodcCode, nodcCode);
+                History history2 = historyFactory.replaceNodcCode(userAccount, oldNodcCode, nodcCode);
 
                 conceptDAO.startTransaction();
                 concept = conceptDAO.merge(concept);
-                concept.getConceptMetadata().addHistory(history);
-                conceptDAO.persist(history);
+                concept.getConceptMetadata().addHistory(history2);
+                conceptDAO.persist(history2);
                 concept.setNodcCode(nodcCode);
                 conceptDAO.endTransaction();
 
-                EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
+                //histories.add(history2);
             }
 
             final String oldRankName = concept.getRankName();
@@ -621,16 +622,16 @@ public class AddConceptDialog extends javax.swing.JDialog {
                                     ? (String) rankNameComboBox.getSelectedItem() : null;
             if (((rankName != null) && !rankName.equals(oldRankName)) ||
                     ((rankName == null) && (oldRankName != null))) {
-                final History history = historyFactory.replaceRankName(userAccount, oldRankName, rankName);
+                History history3 = historyFactory.replaceRankName(userAccount, oldRankName, rankName);
 
                 conceptDAO.startTransaction();
                 concept = conceptDAO.merge(concept);
-                concept.getConceptMetadata().addHistory(history);
+                concept.getConceptMetadata().addHistory(history3);
                 concept.setRankName(rankName);
-                conceptDAO.persist(history);
+                conceptDAO.persist(history3);
                 conceptDAO.endTransaction();
 
-                EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
+                //histories.add(history3);
             }
 
             final String oldRankLevel = concept.getRankLevel();
@@ -638,32 +639,32 @@ public class AddConceptDialog extends javax.swing.JDialog {
                                      ? (String) rankLevelComboBox.getSelectedItem() : null;
             if (((rankLevel != null) && !rankLevel.equals(oldRankLevel)) ||
                     ((rankLevel == null) && (oldRankLevel != null))) {
-                final History history = historyFactory.replaceRankLevel(userAccount, oldRankLevel, rankLevel);
+                History history4 = historyFactory.replaceRankLevel(userAccount, oldRankLevel, rankLevel);
 
                 conceptDAO.startTransaction();
                 concept = conceptDAO.merge(concept);
-                concept.getConceptMetadata().addHistory(history);
+                concept.getConceptMetadata().addHistory(history4);
                 concept.setRankLevel(rankLevel);
-                conceptDAO.persist(history);
+                conceptDAO.persist(history4);
                 conceptDAO.endTransaction();
 
-                EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
+                //histories.add(history4);
             }
 
             final String oldReference = concept.getReference();
             final String reference = isValidString(referenceText.getText()) ? referenceText.getText() : null;
             if (((reference != null) && !reference.equals(oldReference)) ||
                     ((reference == null) && (oldReference != null))) {
-                final History history = historyFactory.replaceReference(userAccount, oldReference, reference);
+                History history5 = historyFactory.replaceReference(userAccount, oldReference, reference);
 
                 conceptDAO.startTransaction();
                 concept = conceptDAO.merge(concept);
-                concept.getConceptMetadata().addHistory(history);
+                concept.getConceptMetadata().addHistory(history5);
                 concept.setReference(reference);
-                conceptDAO.persist(history);
+                conceptDAO.persist(history5);
                 conceptDAO.endTransaction();
 
-                EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
+                //histories.add(history5);
             }
 
             conceptDAO.startTransaction();
@@ -677,6 +678,15 @@ public class AddConceptDialog extends javax.swing.JDialog {
                 primaryName.setAuthor(null);
             }
             conceptDAO.endTransaction();
+            
+            /*
+             *  TODO We aren't automatically approving all histories. This sometimes causes a 
+             *  concurrent modification exception in the knowledbase. So we add all the histories
+             *  but only approve any change in parents.
+             */
+            for (History history : histories) {
+                EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
+            }
 
         }
     }
