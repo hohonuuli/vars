@@ -27,7 +27,7 @@ import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.ConceptNameTypes;
 import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.ui.Lookup;
-import vars.knowledgebase.ui.ToolBelt;
+import vars.knowledgebase.ui.Toolbelt;
 import vars.shared.ui.dialogs.NewUserDialog;
 
 
@@ -39,9 +39,9 @@ public class PopulateDatabaseAction extends ActionAdapter {
 
     private final KnowledgebaseFactory knowledgebaseFactory;
     private final MiscFactory miscFactory;
-    private final ToolBelt toolBelt;
+    private final Toolbelt toolBelt;
 
-    public PopulateDatabaseAction(ToolBelt toolBelt) {
+    public PopulateDatabaseAction(Toolbelt toolBelt) {
         this.knowledgebaseFactory = toolBelt.getKnowledgebaseFactory();
         this.miscFactory = toolBelt.getMiscFactory();
         this.toolBelt = toolBelt;

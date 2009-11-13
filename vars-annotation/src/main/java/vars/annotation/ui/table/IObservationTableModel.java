@@ -3,6 +3,17 @@ package vars.annotation.ui.table;
 import vars.annotation.Observation;
 
 public interface IObservationTableModel {
+    
+    
+    Integer SAMPLE = Integer.valueOf(3);
+
+    Integer NONE = Integer.valueOf(0);
+
+    /**  */
+    Integer FRAMEGRAB_AND_SAMPLE = Integer.valueOf(2);
+
+    /**  */
+    Integer FRAMEGRAB = Integer.valueOf(1);
 
     /**
      *  Adds an observation to the table model.

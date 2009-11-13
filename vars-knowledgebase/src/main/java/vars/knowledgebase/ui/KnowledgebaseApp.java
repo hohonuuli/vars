@@ -44,7 +44,6 @@ import org.mbari.util.SystemUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.knowledgebase.Concept;
-import vars.knowledgebase.KnowledgebaseModule;
 import vars.knowledgebase.ui.actions.PopulateDatabaseAction;
 
 /**
@@ -56,7 +55,7 @@ public class KnowledgebaseApp {
 
     private static Logger log;
     private KnowledgebaseFrame knowledgebaseFrame;
-    private final ToolBelt toolBelt;
+    private final Toolbelt toolBelt;
     private final EventTopicSubscriber approveHistorySubscriber;
 
         /**
@@ -167,9 +166,9 @@ public class KnowledgebaseApp {
     public KnowledgebaseApp() {
         super();
 
-        Injector injector = Guice.createInjector(new KnowledgebaseModule());
+        Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
         Lookup.getGuiceInjectorDispatcher().setValueObject(injector);
-        toolBelt = injector.getInstance(ToolBelt.class);
+        toolBelt = injector.getInstance(Toolbelt.class);
         approveHistorySubscriber = new ApproveHistorySubscriber(toolBelt.getApproveHistoryTask());
 
         /*

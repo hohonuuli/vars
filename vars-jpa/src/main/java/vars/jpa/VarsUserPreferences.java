@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  * Time: 9:49:54 AM
  * To change this template use File | Settings | File Templates. 
  */
-class VarsUserPreferences extends AbstractPreferences {
+public class VarsUserPreferences extends AbstractPreferences {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
     private final EntityManagerFactory entityManagerFactory;

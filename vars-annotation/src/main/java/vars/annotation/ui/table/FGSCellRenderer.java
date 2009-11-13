@@ -28,27 +28,13 @@ import javax.swing.table.TableCellRenderer;
 /**
  * <p>A cell renderer that displays if the current observation has a frame-grab
  * or sample associated with it.</p>
- *
- * @author  <a href="http://www.mbari.org">MBARI</a>
- * @version  $Id: FGSCellRenderer.java 332 2006-08-01 18:38:46Z hohonuuli $
  */
 public class FGSCellRenderer extends JPanel implements TableCellRenderer {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 5186538638116123072L;
 
-    /**
-     *     @uml.property  name="lblFrameGrab"
-     *     @uml.associationEnd
-     */
+
     private javax.swing.JLabel lblFrameGrab = null;
 
-    /**
-     *     @uml.property  name="lblSample"
-     *     @uml.associationEnd
-     */
     private javax.swing.JLabel lblSample = null;
 
     /**
@@ -59,11 +45,7 @@ public class FGSCellRenderer extends JPanel implements TableCellRenderer {
         initialize();
     }
 
-    /**
-     *     This method initializes lblFrameGrab
-     *     @return   javax.swing.JLabel
-     *     @uml.property  name="lblFrameGrab"
-     */
+
     private javax.swing.JLabel getLblFrameGrab() {
         if (lblFrameGrab == null) {
             lblFrameGrab = new javax.swing.JLabel();
@@ -79,11 +61,7 @@ public class FGSCellRenderer extends JPanel implements TableCellRenderer {
         return lblFrameGrab;
     }
 
-    /**
-     *     This method initializes lblSample
-     *     @return   javax.swing.JLabel
-     *     @uml.property  name="lblSample"
-     */
+
     private javax.swing.JLabel getLblSample() {
         if (lblSample == null) {
             lblSample = new javax.swing.JLabel();
@@ -123,15 +101,15 @@ public class FGSCellRenderer extends JPanel implements TableCellRenderer {
         boolean hasSample = false;
 
         // Set the framegrab icon
-        if (ObservationColumnModel.FRAMEGRAB.equals(obs)) {
+        if (IObservationTableModel.FRAMEGRAB.equals(obs)) {
             hasFramegrab = true;
             hasSample = false;
         }
-        else if (ObservationColumnModel.SAMPLE.equals(obs)) {
+        else if (IObservationTableModel.SAMPLE.equals(obs)) {
             hasFramegrab = false;
             hasSample = true;
         }
-        else if (ObservationColumnModel.FRAMEGRAB_AND_SAMPLE.equals(obs)) {
+        else if (IObservationTableModel.FRAMEGRAB_AND_SAMPLE.equals(obs)) {
             hasFramegrab = true;
             hasSample = true;
         }
@@ -142,10 +120,6 @@ public class FGSCellRenderer extends JPanel implements TableCellRenderer {
         return this;
     }
 
-    /**
-     * This method initializes this
-     *
-     */
     private void initialize() {
         this.setLayout(new java.awt.BorderLayout());
         this.add(getLblFrameGrab(), java.awt.BorderLayout.WEST);
@@ -154,4 +128,3 @@ public class FGSCellRenderer extends JPanel implements TableCellRenderer {
     }
 }
 
-//@jve:visual-info  decl-index=0 visual-constraint="10,10"

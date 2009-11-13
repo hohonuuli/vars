@@ -58,7 +58,7 @@ public class LinkTemplateEditorPanel extends EditorPanel {
      *
      * @param toolBelt
      */
-    public LinkTemplateEditorPanel(final ToolBelt toolBelt) {
+    public LinkTemplateEditorPanel(final Toolbelt toolBelt) {
         super(toolBelt);
         initialize();
         setLocked(isLocked());
@@ -334,10 +334,10 @@ public class LinkTemplateEditorPanel extends EditorPanel {
                                     
                                     try {
                                         linkTemplateDAO.startTransaction();
-                                        linkTemplateDAO.merge(linkTemplate);
-                                        linkTemplate.setLinkName(newLinkName);
-                                        linkTemplate.setLinkValue(newLinkValue);
-                                        linkTemplate.setToConcept(newToConceptName);
+                                        final LinkTemplate lt = linkTemplateDAO.merge(linkTemplate);
+                                        lt.setLinkName(newLinkName);
+                                        lt.setLinkValue(newLinkValue);
+                                        lt.setToConcept(newToConceptName);
                                         linkTemplateDAO.endTransaction();
                                     }
                                     catch (Exception e) {

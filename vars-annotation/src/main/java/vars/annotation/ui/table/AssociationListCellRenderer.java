@@ -23,7 +23,7 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 import vars.annotation.Association;
-
+ 
 /**
  * <p>Allows a list of <code>Associations</code> to be displayed in a
  * a single cell of a JTable</p>
@@ -34,20 +34,10 @@ import vars.annotation.Association;
  *      [AssociationListCellRenderer]<--[TableCellRenderer4AssociationList]
  * </pre>
  *
- * @author  <a href="mailto:brian@mbari.org">Brian Schlining</a>
- * @version  $Id: AssociationListCellRenderer.java 332 2006-08-01 18:38:46Z hohonuuli $
- * @stereotype  thing
  */
 public class AssociationListCellRenderer extends DefaultListCellRenderer implements ListCellRenderer {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = -8979640203584622884L;
-
-    /**
-     *     @uml.property  name="assoString"
-     */
+ 
     String assoString;
 
     /**
@@ -92,7 +82,6 @@ public class AssociationListCellRenderer extends DefaultListCellRenderer impleme
         return component;
     }
 
-    // Override the default to give us a bit of horizontal padding
 
     /**
      *  Gets the preferredSize attribute of the AssociationListCellRenderer object

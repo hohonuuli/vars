@@ -87,7 +87,7 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
      * @param toolBelt
      */
     @Inject
-    public NamesEditorPanel(ToolBelt toolBelt) {
+    public NamesEditorPanel(Toolbelt toolBelt) {
         super(toolBelt);
         controller = new NamesEditorPanelController(this);
         initialize();

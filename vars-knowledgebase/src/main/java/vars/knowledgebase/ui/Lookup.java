@@ -24,11 +24,8 @@ import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.EventTopicSubscriber;
 import org.mbari.swing.ProgressDialog;
 import org.mbari.util.Dispatcher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import vars.UserAccount;
 import vars.knowledgebase.Concept;
-import vars.knowledgebase.KnowledgebaseModule;
+import vars.shared.InjectorModule;
 import vars.shared.ui.GlobalLookup;
 
 /**
@@ -51,12 +48,11 @@ import vars.shared.ui.GlobalLookup;
  */
 public class Lookup extends GlobalLookup {
 
-    private static final EventTopicSubscriber LOGGING_SUBSCRIBER = new LoggingSubscriber();
     protected static final Object KEY_DISPATCHER_APPLICATION_FRAME = KnowledgebaseFrame.class;
     protected static final Object KEY_DISPATCHER_APPLICATION = KnowledgebaseApp.class;
     protected static final Object KEY_DISPATCHER_CONCEPT_TREE = JTree.class;
     protected static final Object KEY_DISPATCHER_SELECTED_CONCEPT = Concept.class;
-    public static final String RESOURCE_BUNDLE = "knowlegebase-app";
+    public static final String RESOURCE_BUNDLE = "knowledgebase-app";
     public static final Object KEY_DISPATCHER_GUICE_INJECTOR = Injector.class;
     
     
@@ -67,7 +63,6 @@ public class Lookup extends GlobalLookup {
     /** The data object should be a  History  */
     public static final String TOPIC_APPROVE_HISTORY = "vars.knowledgebase.ui.Lookup-ApproveHistory";
 
-    public static final String TOPIC_EXIT = "vars.knowledgebase.ui.Lookup-Exit";
 
     /** The data object should be a Concept */
     public static final String TOPIC_UPDATE_OBSERVATIONS = "vars.knowledgebase.ui.Lookup-UpateObservations";
@@ -138,20 +133,7 @@ public class Lookup extends GlobalLookup {
         });
 
 
-        /*
-         * When a UserAccount is sent to this topic make sure it gets relayed
-         * to the correct dispatcher
-         */
-        EventBus.subscribe(TOPIC_USERACCOUNT, new EventTopicSubscriber<UserAccount>() {
-            public void onEvent(String topic, UserAccount data) {
-                getUserAccountDispatcher().setValueObject(data);
-            }
-        });
-
-
         EventBus.subscribe(TOPIC_APPROVE_HISTORY, LOGGING_SUBSCRIBER);
-        EventBus.subscribe(TOPIC_EXIT, LOGGING_SUBSCRIBER);
-        EventBus.subscribe(TOPIC_FATAL_ERROR, LOGGING_SUBSCRIBER);
         EventBus.subscribe(TOPIC_SELECTED_CONCEPT, LOGGING_SUBSCRIBER);
         EventBus.subscribe(TOPIC_UPDATE_OBSERVATIONS, LOGGING_SUBSCRIBER);
 
@@ -171,7 +153,7 @@ public class Lookup extends GlobalLookup {
         final Dispatcher dispatcher = Dispatcher.getDispatcher(KEY_DISPATCHER_GUICE_INJECTOR);
         Injector injector = (Injector) dispatcher.getValueObject();
         if (injector == null) {
-            injector = Guice.createInjector(new KnowledgebaseModule());
+            injector = Guice.createInjector(new InjectorModule(RESOURCE_BUNDLE));
             dispatcher.setValueObject(injector);
         }
 
@@ -209,19 +191,6 @@ public class Lookup extends GlobalLookup {
         return Dispatcher.getDispatcher(KEY_DISPATCHER_CONCEPT_TREE);
     }
 
-    /**
-     * Log events in debug mode
-     */
-    private static class LoggingSubscriber implements EventTopicSubscriber {
-
-        private final Logger log = LoggerFactory.getLogger(getClass());
-
-        public void onEvent(String topic, Object data) {
-            if (log.isDebugEnabled()) {
-                log.debug("Event Published:\n\tTOPIC: " + topic +  "\n\tDATA: " + data);
-            }
-        }
-
-    }
+ 
 
 }

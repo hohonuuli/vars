@@ -81,14 +81,14 @@ public class LinkEditorPanel extends javax.swing.JPanel implements ILockableEdit
     private javax.swing.JComboBox toConceptComboBox;
 
 
-    private final ToolBelt toolBelt;
+    private final Toolbelt toolBelt;
 
     /**
      * Creates new form LinkEditorPanel
      *
      * @param toolBelt
      */
-    public LinkEditorPanel(ToolBelt toolBelt) {
+    public LinkEditorPanel(Toolbelt toolBelt) {
         this.toolBelt = toolBelt;
         initialize();
     }

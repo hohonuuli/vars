@@ -36,7 +36,7 @@ import vars.knowledgebase.LinkRealization;
 import vars.knowledgebase.LinkRealizationDAO;
 import vars.knowledgebase.ui.LinkEditorPanel;
 import vars.knowledgebase.ui.Lookup;
-import vars.knowledgebase.ui.ToolBelt;
+import vars.knowledgebase.ui.Toolbelt;
 import vars.knowledgebase.ui.actions.ApproveHistoryTask;
 import vars.shared.ui.OkCancelButtonPanel;
 
@@ -51,7 +51,7 @@ public class AddLinkRealizationDialog extends JDialog {
     private JPanel jContentPane = null;
     private LinkEditorPanel linkEditorPanel = null;
     private Concept concept;
-    private final ToolBelt toolBelt;
+    private final Toolbelt toolBelt;
 
     /**
      * Constructs ...
@@ -60,7 +60,7 @@ public class AddLinkRealizationDialog extends JDialog {
      * @param knowledgebaseDAOFactory
      * @param knowledgebaseFactory
      */
-    public AddLinkRealizationDialog(ToolBelt toolBelt) {
+    public AddLinkRealizationDialog(Toolbelt toolBelt) {
         this(null, toolBelt);
     }
 
@@ -70,7 +70,7 @@ public class AddLinkRealizationDialog extends JDialog {
      * @param knowledgebaseDAOFactory
      * @param knowledgebaseFactory
      */
-    public AddLinkRealizationDialog(Frame owner, ToolBelt toolBelt) {
+    public AddLinkRealizationDialog(Frame owner, Toolbelt toolBelt) {
         super(owner);
         setTitle("VARS - Add Description");
         this.toolBelt = toolBelt;

@@ -43,7 +43,7 @@ import vars.knowledgebase.MediaTypes;
 import vars.knowledgebase.ui.KnowledgebaseApp;
 import vars.knowledgebase.ui.Lookup;
 import vars.knowledgebase.ui.MediaViewPanel;
-import vars.knowledgebase.ui.ToolBelt;
+import vars.knowledgebase.ui.Toolbelt;
 import vars.knowledgebase.ui.actions.ApproveHistoryTask;
 import vars.shared.ui.OkCancelButtonPanel;
 
@@ -72,7 +72,7 @@ public class AddMediaDialog extends JDialog {
      * @param knowledgebaseDAOFactory
      * @param knowledgebaseFactory
      */
-    public AddMediaDialog(Frame owner, ToolBelt toolBelt) {
+    public AddMediaDialog(Frame owner, Toolbelt toolBelt) {
         super(owner);
         this.knowledgebaseDAOFactory = toolBelt.getKnowledgebaseDAOFactory();
         this.knowledgebaseFactory = toolBelt.getKnowledgebaseFactory();

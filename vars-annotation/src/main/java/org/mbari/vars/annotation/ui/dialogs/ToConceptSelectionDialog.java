@@ -1,0 +1,184 @@
+package org.mbari.vars.annotation.ui.dialogs;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+
+import javax.swing.JDialog;
+import org.jdesktop.layout.GroupLayout;
+import org.jdesktop.layout.LayoutStyle;
+import org.mbari.swing.JFancyButton;
+import org.mbari.vars.dao.DAOException;
+import org.mbari.vars.knowledgebase.model.Concept;
+import org.mbari.vars.knowledgebase.model.dao.KnowledgeBaseCache;
+import org.mbari.vars.ui.ConceptNameComboBox;
+import org.mbari.vars.ui.HierachicalConceptNameComboBox;
+import org.mbari.vars.util.AppFrameDispatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class ToConceptSelectionDialog extends JDialog {
+
+    private JButton okButton;
+    private JButton cancelButton;
+    private ConceptNameComboBox comboBox;
+    
+    private final Logger log = LoggerFactory.getLogger(ToConceptSelectionDialog.class);
+
+    /**
+     * Launch the application
+     * @param args
+     */
+    public static void main(String args[]) {
+        try {
+            ToConceptSelectionDialog dialog = new ToConceptSelectionDialog();
+            dialog.addWindowListener(new WindowAdapter() {
+
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    System.exit(0);
+                }
+            });
+            dialog.setVisible(true);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Create the dialog
+     */
+    public ToConceptSelectionDialog() {
+        super(AppFrameDispatcher.getFrame());
+        try {
+            initialize();
+        }
+        catch (Throwable e) {
+            e.printStackTrace();
+        }
+    //
+    }
+
+    private void initialize() throws Exception {
+		final GroupLayout groupLayout = new GroupLayout((JComponent) getContentPane());
+		groupLayout.setHorizontalGroup(
+			groupLayout.createParallelGroup(GroupLayout.LEADING)
+				.add(groupLayout.createSequentialGroup()
+					.addContainerGap()
+					.add(groupLayout.createParallelGroup(GroupLayout.TRAILING)
+						.add(getComboBox(), 0, 476, Short.MAX_VALUE)
+						.add(groupLayout.createSequentialGroup()
+							.add(getOkButton())
+							.addPreferredGap(LayoutStyle.RELATED)
+							.add(getCancelButton())))
+					.addContainerGap())
+		);
+		groupLayout.setVerticalGroup(
+			groupLayout.createParallelGroup(GroupLayout.LEADING)
+				.add(groupLayout.createSequentialGroup()
+					.addContainerGap()
+					.add(getComboBox(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(LayoutStyle.RELATED)
+					.add(groupLayout.createParallelGroup(GroupLayout.BASELINE)
+						.add(getCancelButton())
+						.add(getOkButton()))
+					.addContainerGap(16, Short.MAX_VALUE))
+		);
+		getContentPane().setLayout(groupLayout);
+                setModal(true);
+		setTitle("VARS - Select Concept");
+		pack();
+    }
+
+    /**
+     * @return
+     */
+    protected ConceptNameComboBox getComboBox() {
+        if (comboBox == null) {
+            Concept concept = null;
+            try {
+                concept = KnowledgeBaseCache.getInstance().findConceptByName("physical-object");
+                if (concept == null) {
+                    concept = KnowledgeBaseCache.getInstance().findRootConcept();
+                }
+            }
+            catch (DAOException ex) {
+                log.error("Failed to lookup 'physical-object'", ex);
+            }
+            
+            if (concept != null) {
+                comboBox = new HierachicalConceptNameComboBox(concept);
+            }
+            else {
+                comboBox = new HierachicalConceptNameComboBox();
+            }
+        }
+        return comboBox;
+    }
+
+    /**
+     * @return
+     */
+    protected JButton getCancelButton() {
+        if (cancelButton == null) {
+            cancelButton = new JFancyButton();
+            cancelButton.setIcon(new ImageIcon(getClass().getResource("/images/vars/knowledgebase/delete2.png")));
+            cancelButton.setText("");
+            cancelButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    ToConceptSelectionDialog.this.setVisible(false);
+                }
+            });
+        }
+        return cancelButton;
+    }
+
+    /**
+     * @return
+     */
+    public JButton getOkButton() {
+        if (okButton == null) {
+            okButton = new JFancyButton();
+            okButton.setIcon(new ImageIcon(getClass().getResource("/images/vars/knowledgebase/check2.png")));
+            okButton.setText("");
+            getRootPane().setDefaultButton(okButton);
+            addHierarchyListener(new HierarchyListener() {
+                public void hierarchyChanged(final HierarchyEvent e) {
+                    if (HierarchyEvent.SHOWING_CHANGED == (HierarchyEvent.SHOWING_CHANGED & e.getChangeFlags())) {
+                        ToConceptSelectionDialog.this.getRootPane().setDefaultButton(okButton);
+                    }
+                }
+            });
+        }
+        return okButton;
+    }
+    
+    public Concept getSelectedConcept() {
+        String conceptName = (String) getComboBox().getSelectedItem();
+        Concept concept = null;
+        try {
+            concept = KnowledgeBaseCache.getInstance().findConceptByName(conceptName);
+        }
+        catch (DAOException e) {
+            log.error("Failed to lookup '" + conceptName + "' from the knowledgebase", e);
+        }
+        return concept;
+    }
+
+    @Override
+    public void setVisible(boolean b) {
+        super.setVisible(b);
+        if (b) {
+            getComboBox().requestFocusInWindow();
+        }
+    }
+    
+    
+}

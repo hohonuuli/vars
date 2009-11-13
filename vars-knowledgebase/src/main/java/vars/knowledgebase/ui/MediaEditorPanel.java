@@ -70,7 +70,7 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
     /**
      * @param toolBelt
      */
-    public MediaEditorPanel(ToolBelt toolBelt) {
+    public MediaEditorPanel(Toolbelt toolBelt) {
         super(toolBelt);
         initialize();
         setLocked(isLocked());

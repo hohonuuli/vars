@@ -14,12 +14,11 @@
 
 package vars.knowledgebase.demos;
 
-import com.google.inject.Guice;
 import com.google.inject.Injector;
 import javax.swing.JFrame;
 import org.jdesktop.swingx.JXTree;
-import vars.knowledgebase.KnowledgebaseModule;
-import vars.knowledgebase.ui.ToolBelt;
+import vars.knowledgebase.ui.Lookup;
+import vars.knowledgebase.ui.Toolbelt;
 import vars.shared.ui.tree.ConceptTreeCellRenderer;
 import vars.shared.ui.tree.ConceptTreeModel;
 import vars.shared.ui.tree.ConceptTreePanel;
@@ -31,8 +30,8 @@ import vars.shared.ui.tree.ConceptTreePanel;
 public class ConceptTreePanelDemo {
 
     public static void main(String[] args) {
-        Injector injector = Guice.createInjector(new KnowledgebaseModule());
-        ToolBelt toolBelt = injector.getInstance(ToolBelt.class);
+        Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
+        Toolbelt toolBelt = injector.getInstance(Toolbelt.class);
         JFrame frame = new JFrame();
         ConceptTreePanel panel = new ConceptTreePanel(toolBelt.getKnowledgebaseDAOFactory());
         final ConceptTreeModel treeModel = new ConceptTreeModel(toolBelt.getKnowledgebaseDAOFactory());

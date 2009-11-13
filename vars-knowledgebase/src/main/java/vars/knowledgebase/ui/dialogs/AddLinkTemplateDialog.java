@@ -39,7 +39,7 @@ import vars.knowledgebase.LinkTemplate;
 import vars.knowledgebase.LinkTemplateDAO;
 import vars.knowledgebase.ui.LinkEditorPanel;
 import vars.knowledgebase.ui.Lookup;
-import vars.knowledgebase.ui.ToolBelt;
+import vars.knowledgebase.ui.Toolbelt;
 import vars.knowledgebase.ui.actions.ApproveHistoryTask;
 import vars.shared.ui.OkCancelButtonPanel;
 
@@ -66,14 +66,14 @@ public class AddLinkTemplateDialog extends JDialog {
     private final HistoryFactory historyFactory;
     private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
     private final KnowledgebaseFactory knowledgebaseFactory;
-    private final ToolBelt toolBelt;
+    private final Toolbelt toolBelt;
 
     /**
      * Constructs ...
      *
      * @param toolBelt
      */
-    public AddLinkTemplateDialog(ToolBelt toolBelt) {
+    public AddLinkTemplateDialog(Toolbelt toolBelt) {
         this(null, toolBelt);
     }
 
@@ -81,7 +81,7 @@ public class AddLinkTemplateDialog extends JDialog {
      * @param owner
      * @param toolBelt
      */
-    public AddLinkTemplateDialog(Frame owner, ToolBelt toolBelt) {
+    public AddLinkTemplateDialog(Frame owner, Toolbelt toolBelt) {
         super(owner);
         this.toolBelt = toolBelt;
         this.knowledgebaseDAOFactory = toolBelt.getKnowledgebaseDAOFactory();

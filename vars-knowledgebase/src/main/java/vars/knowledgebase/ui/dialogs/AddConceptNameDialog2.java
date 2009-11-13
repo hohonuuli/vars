@@ -39,7 +39,7 @@ import vars.knowledgebase.HistoryFactory;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.ui.Lookup;
-import vars.knowledgebase.ui.ToolBelt;
+import vars.knowledgebase.ui.Toolbelt;
 import vars.knowledgebase.ui.actions.ApproveHistoryTask;
 
 /**
@@ -75,7 +75,7 @@ public class AddConceptNameDialog2 extends javax.swing.JDialog {
      * @param modal
      * @param toolBelt
      */
-    public AddConceptNameDialog2(java.awt.Frame parent, boolean modal, ToolBelt toolBelt) {
+    public AddConceptNameDialog2(java.awt.Frame parent, boolean modal, Toolbelt toolBelt) {
         super(parent, modal);
         this.knowledgebaseDAOFactory = toolBelt.getKnowledgebaseDAOFactory();
         this.knowledgebaseFactory = toolBelt.getKnowledgebaseFactory();

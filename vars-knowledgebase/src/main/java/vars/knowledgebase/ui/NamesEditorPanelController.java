@@ -48,7 +48,7 @@ import vars.knowledgebase.ui.dialogs.AddConceptNameDialog2;
 class NamesEditorPanelController {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
-    private final ToolBelt toolBelt;
+    private final Toolbelt toolBelt;
     private final NamesEditorPanel namesEditorPanel;
     private NewAction newAction;
 

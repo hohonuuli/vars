@@ -1,41 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <artifactId>vars-redux</artifactId>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>vars-redux</artifactId>
+        <groupId>vars-redux</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
     <groupId>vars-redux</groupId>
+    <artifactId>vars-annotation</artifactId>
     <version>1.0-SNAPSHOT</version>
-  </parent>
-  <groupId>vars-redux</groupId>
-  <artifactId>vars-annotation</artifactId>
-  <version>1.0-SNAPSHOT</version>
-  <name>vars-annotation</name>
-  <url>http://maven.apache.org</url>
-  <dependencies>
-    <dependency>
-      <groupId>org.swinglabs</groupId>
-      <artifactId>swingx</artifactId>
-      <version>1.0</version>
-    </dependency>
-    <dependency>
-      <groupId>vars-redux</groupId>
-      <artifactId>vars-core</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>vars-redux</groupId>
-      <artifactId>vars-shared-ui</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.mbari</groupId>
-      <artifactId>mbarix4j</artifactId>
-      <version>1.8-SNAPSHOT</version>
-    </dependency>
-  </dependencies>
+    <name>vars-annotation</name>
+    <url>http://maven.apache.org</url>
+    <dependencies>
+        <dependency>
+            <groupId>org.swinglabs</groupId>
+            <artifactId>swingx</artifactId>
+            <version>1.6</version>
+        </dependency>
+        <dependency>
+            <groupId>vars-redux</groupId>
+            <artifactId>vars-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>vars-redux</groupId>
+            <artifactId>vars-jpa</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>vars-redux</groupId>
+            <artifactId>vars-shared-ui</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mbari</groupId>
+            <artifactId>mbarix4j</artifactId>
+            <version>1.8-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mbari</groupId>
+            <artifactId>vcr4j</artifactId>
+            <version>1.5</version>
+        </dependency>
+        <dependency>
+              <groupId>com.google.inject</groupId>
+              <artifactId>guice</artifactId>
+              <version>2.0</version>
+            </dependency>
+    </dependencies>
 </project>
-
-
-
-

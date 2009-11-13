@@ -47,7 +47,7 @@ public class EditConceptTreePopupMenu extends JPopupMenu implements ILockableEdi
     private boolean locked;
     private final JMenuItem moveConceptItem;
     private final JMenuItem removeConceptMenuItem;
-    private final ToolBelt toolBelt;
+    private final Toolbelt toolBelt;
     private final JTree tree;
 
     /**
@@ -57,7 +57,7 @@ public class EditConceptTreePopupMenu extends JPopupMenu implements ILockableEdi
      * @param tree
      * @param toolBelt
      */
-    public EditConceptTreePopupMenu(JTree tree, ToolBelt toolBelt) {
+    public EditConceptTreePopupMenu(JTree tree, Toolbelt toolBelt) {
         if (toolBelt == null) {
             throw new IllegalArgumentException("ToolBelt argument can not be null");
         }

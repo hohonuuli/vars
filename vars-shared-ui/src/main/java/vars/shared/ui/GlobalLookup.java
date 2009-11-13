@@ -11,6 +11,8 @@ import java.beans.PropertyChangeListener;
 import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.EventTopicSubscriber;
 import org.mbari.util.Dispatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import vars.UserAccount;
 
 /**
@@ -28,6 +30,8 @@ public class GlobalLookup {
      */
     public static final String TOPIC_NONFATAL_ERROR = "vars.shared.ui.GlobalLookup-TopicNonfatalError";
 
+    public static final String TOPIC_EXIT = "vars.shared.ui.GlobalLookup-Exit";
+
     /**
      * Subscribers to this topic will get and {@link Exception} as the data
      */
@@ -36,6 +40,8 @@ public class GlobalLookup {
     public static final String TOPIC_WARNING = "vars.shared.ui.GlobalLookup-TopicWarning";
 
     public static final String TOPIC_USERACCOUNT = "vars.shared.ui.GlobalLookup-UserAccount";
+
+    public static final EventTopicSubscriber<Object> LOGGING_SUBSCRIBER = new LoggingSubscriber();
 
     /*
      * Throw an exception if the wrong parameter type is set
@@ -70,6 +76,14 @@ public class GlobalLookup {
                 getUserAccountDispatcher().setValueObject(data);
             }
         });
+        
+
+
+        EventBus.subscribe(TOPIC_EXIT, LOGGING_SUBSCRIBER);
+        EventBus.subscribe(TOPIC_USERACCOUNT, LOGGING_SUBSCRIBER);
+        EventBus.subscribe(TOPIC_FATAL_ERROR, LOGGING_SUBSCRIBER);
+        EventBus.subscribe(TOPIC_WARNING, LOGGING_SUBSCRIBER);
+        EventBus.subscribe(TOPIC_NONFATAL_ERROR, LOGGING_SUBSCRIBER);
     }
 
     /**
@@ -87,6 +101,21 @@ public class GlobalLookup {
      */
     public static Dispatcher getUserAccountDispatcher() {
         return Dispatcher.getDispatcher(KEY_DISPATCHER_USERACCOUNT);
+    }
+
+    /**
+     * Log events in debug mode
+     */
+    static class LoggingSubscriber implements EventTopicSubscriber {
+
+        private final Logger log = LoggerFactory.getLogger(getClass());
+
+        public void onEvent(String topic, Object data) {
+            if (log.isDebugEnabled()) {
+                log.debug("Event Published:\n\tTOPIC: " + topic +  "\n\tDATA: " + data);
+            }
+        }
+
     }
 
 }

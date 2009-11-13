@@ -41,7 +41,7 @@ import vars.knowledgebase.HistoryFactory;
 import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.ui.KnowledgebaseFrame;
 import vars.knowledgebase.ui.Lookup;
-import vars.knowledgebase.ui.ToolBelt;
+import vars.knowledgebase.ui.Toolbelt;
 import vars.knowledgebase.ui.actions.ApproveHistoryTask;
 import vars.shared.ui.AllConceptNamesComboBox;
 import vars.shared.ui.GlobalLookup;
@@ -54,7 +54,7 @@ public class AddConceptDialog extends javax.swing.JDialog {
     private static final long serialVersionUID = 6993327643414741677L;
     private static final Logger log = LoggerFactory.getLogger(AddConceptDialog.class);
     private final AddConceptDialogController controller;
-    final ToolBelt toolBelt;
+    final Toolbelt toolBelt;
  
     private javax.swing.JTextField authorField;
     private javax.swing.JLabel authorLabel;
@@ -87,7 +87,7 @@ public class AddConceptDialog extends javax.swing.JDialog {
      * @param queryDAO
      */
     @Inject
-    public AddConceptDialog(ToolBelt toolBelt) {
+    public AddConceptDialog(Toolbelt toolBelt) {
         super((Frame) Lookup.getApplicationFrameDispatcher().getValueObject(), true);
         if (toolBelt == null) {
             throw new IllegalArgumentException("ToolBelt argument can not be null");
@@ -413,12 +413,12 @@ public class AddConceptDialog extends javax.swing.JDialog {
 
     private class AddConceptDialogController {
 
-        private final ToolBelt toolBelt;
+        private final Toolbelt toolBelt;
 
         /**
          * Constructs ...
          */
-        public AddConceptDialogController(ToolBelt toolBelt) {
+        public AddConceptDialogController(Toolbelt toolBelt) {
             this.toolBelt = toolBelt;
 
         }

@@ -18,11 +18,13 @@ package vars.annotation;
 import java.util.Date;
 import java.util.Set;
 
+import vars.PropertyChange;
+
 /**
  *
  * @author brian
  */
-public interface Observation extends AnnotationObject {
+public interface Observation extends AnnotationObject, PropertyChange {
 
     String PROP_ASSOCIATIONS = "associations";
     String PROP_CONCEPT_NAME = "conceptName";
@@ -30,6 +32,8 @@ public interface Observation extends AnnotationObject {
     String PROP_OBSERVATION_DATE = "observationDate";
     String PROP_OBSERVER = "observer";
     String PROP_VIDEO_FRAME = "videoFrame";
+    String PROP_X = "x";
+    String PROP_Y = "y";
 
     /**
      * Add to the <code>Association</code> collection.

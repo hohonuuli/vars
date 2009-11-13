@@ -1,4 +1,4 @@
-package org.mbari.vars.annotation.ui;
+package vars.annotation.ui.table;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -10,18 +10,15 @@ import javax.swing.table.AbstractTableModel;
 
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
-import org.mbari.vars.annotation.ui.table.IObservationTableModel;
-import org.mbari.vars.annotation.ui.table.ValueColumn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import vars.annotation.IAssociation;
-import vars.annotation.IObservation;
+import vars.annotation.Observation;
 
 public class JXObservationTableModel extends AbstractTableModel implements IObservationTableModel {
     
-    private final List<IObservation> observations = Collections.synchronizedList(new ArrayList<IObservation>());
-    private final Logger log = LoggerFactory.getLogger(JXObservationTableModel.class);
+    private final List<Observation> observations = Collections.synchronizedList(new ArrayList<Observation>());
+    private final Logger log = LoggerFactory.getLogger(getClass());
     private final TableColumnModel tableColumnModel;
 
     public JXObservationTableModel(TableColumnModel tableColumnModel) {
@@ -29,7 +26,7 @@ public class JXObservationTableModel extends AbstractTableModel implements IObse
     }
 
 
-    public void addObservation(final IObservation obs) {
+    public void addObservation(final Observation obs) {
         if ((obs != null) && (obs.getVideoFrame() != null)) {
 
             /**
@@ -45,13 +42,13 @@ public class JXObservationTableModel extends AbstractTableModel implements IObse
              * This property change listener redraws the row of the table when
              * an association is added or removed from an observation.
              */
-            obs.addPropertyChangeListener(IAssociation.PROP_ASSOCIATIONS, new AssociationListListener(obs));
+            obs.addPropertyChangeListener(Observation.PROP_ASSOCIATIONS, new AssociationListListener(obs));
 
             /*
              * This property change listener redraws the row of the table if the
              * conceptName of the observation changes.
              */
-            obs.addPropertyChangeListener(IObservation.PROP_CONCEPTNAME, new ConceptNameListener(obs));
+            obs.addPropertyChangeListener(Observation.PROP_CONCEPT_NAME, new ConceptNameListener(obs));
 
             final int index = observations.indexOf(obs);
             fireTableRowsInserted(index, index);
@@ -73,15 +70,15 @@ public class JXObservationTableModel extends AbstractTableModel implements IObse
         return observations.size();
     }
 
-    public IObservation getObservationAt(int rowIndex) {
-        IObservation out = null;
+    public Observation getObservationAt(int rowIndex) {
+        Observation out = null;
         if (rowIndex < observations.size()) {
-            out = (IObservation) observations.get(rowIndex);
+            out = (Observation) observations.get(rowIndex);
         }
         return out;
     }
 
-    public int getObservationRow(IObservation observation) {
+    public int getObservationRow(Observation observation) {
         int row = -1;
         if (observation != null) {
             row = observations.indexOf(observation);
@@ -108,30 +105,24 @@ public class JXObservationTableModel extends AbstractTableModel implements IObse
         
     }
 
-    public void removeObservation(IObservation obs) {
+    public void removeObservation(Observation obs) {
 
         final int index = observations.indexOf(obs);
         if (index >= 0) {
+            // Don't need to remove propertychangelisteners, they'll be garbage collected
             observations.remove(index);
-
-            // TODO remove property change listeners
-            //IObservation observation = observations.get(index);
-            //obser
-
             fireTableRowsDeleted(index, index);
-
-
         }
     }
 
     public Object getValueAt(int rowIndex, int columnIndex) {
         Object out = null;
         if (rowIndex < observations.size()) {
-            final IObservation obs = (IObservation) observations.get(rowIndex);
+            final Observation obs = (Observation) observations.get(rowIndex);
 
             /*
              *  Since the columns can be reordered we can't rely on the columnIndex
-             *  to retrieve the correctcolumn. So we use the name of the column
+             *  to retrieve the correct column. So we use the name of the column
              *  instead.
              */
             final TableColumn tc = tableColumnModel.getColumn(columnIndex);
@@ -160,9 +151,9 @@ public class JXObservationTableModel extends AbstractTableModel implements IObse
      */
     private class AssociationListListener implements PropertyChangeListener {
 
-        private final IObservation observation;
+        private final Observation observation;
 
-        AssociationListListener(final IObservation observation) {
+        AssociationListListener(final Observation observation) {
             this.observation = observation;
         }
 
@@ -204,9 +195,9 @@ public class JXObservationTableModel extends AbstractTableModel implements IObse
      */
     private class ConceptNameListener implements PropertyChangeListener {
         
-        private final IObservation observation;
+        private final Observation observation;
 
-        ConceptNameListener(final IObservation observation) {
+        ConceptNameListener(final Observation observation) {
             this.observation = observation;
         }
 
