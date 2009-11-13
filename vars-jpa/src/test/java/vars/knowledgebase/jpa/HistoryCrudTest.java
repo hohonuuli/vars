@@ -15,7 +15,6 @@ import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.History;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.KnowledgebaseFactory;
-import vars.knowledgebase.Media;
 import vars.testing.KnowledgebaseTestObjectFactory;
 
 import com.google.inject.Guice;

@@ -73,6 +73,7 @@ public class ObservationImpl implements Serializable, Observation, JPAEntity, Pr
     Long id;
 
     /** Optimistic lock to prevent concurrent overwrites */
+    @SuppressWarnings("unused")
     @Version
     @Column(name = "LAST_UPDATED_TIME")
     private Timestamp updatedTime;
@@ -93,6 +94,10 @@ public class ObservationImpl implements Serializable, Observation, JPAEntity, Pr
 
     @Column(name = "Notes", length = 200)
     String notes;
+    
+    Double x;
+    
+    Double y;
 
     @OneToMany(targetEntity = AssociationImpl.class,
             mappedBy = "observation",
@@ -235,6 +240,24 @@ public class ObservationImpl implements Serializable, Observation, JPAEntity, Pr
         sb.append(conceptName).append(", observer=").append(observer);
         sb.append(", observationDate=").append(observationDate).append(")");
         return sb.toString();
+    }
+
+    public Double getX() {
+        return x;
+    }
+
+    public Double getY() {
+        return y;
+    }
+
+    public void setX(Double x) {
+        this.x = x;
+        
+    }
+
+    public void setY(Double y) {
+       this.y = y;
+        
     }
 
 

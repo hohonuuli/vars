@@ -14,16 +14,26 @@ package vars;
 
 import java.util.Comparator;
 
+import org.mbari.text.IgnoreCaseToStringComparator;
+
 /**
  * For comparing links using linkName, toConcept and linkValue fields.
  * @author brian
  */
 public class LinkComparator implements Comparator<ILink> {
+    
+    private final Comparator comparator = new IgnoreCaseToStringComparator();
 
     public int compare(ILink o1, ILink o2) {
-        final String s1 = o1.getLinkName() + ILink.DELIMITER + o1.getToConcept() + ILink.DELIMITER + o1.getLinkValue();
-        final String s2 = o2.getLinkName() + ILink.DELIMITER + o2.getToConcept() + ILink.DELIMITER + o2.getLinkValue();
-
-        return s1.compareTo(s2);
+        int c = comparator.compare(o1.getLinkName(), o2.getLinkName());
+        if (c == 0) {
+            c = comparator.compare(o1.getToConcept(), o2.getToConcept());
+        }
+        
+        if (c == 0) {
+            c = comparator.compare(o1.getLinkValue(), o2.getLinkValue());
+        }
+        
+        return c;
     }
 }

@@ -52,6 +52,8 @@ public interface DAO {
      * @return A list of objects returned by the query.
      */
     List findByNamedQuery(String name, Map<String, Object> namedParameters);
+    
+    <T> T findInDatastore(T object);
 
     <T> T findByPrimaryKey(Class<T> clazz, Object primaryKey);
 

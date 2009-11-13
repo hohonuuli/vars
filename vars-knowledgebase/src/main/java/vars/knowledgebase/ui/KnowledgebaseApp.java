@@ -242,14 +242,10 @@ public class KnowledgebaseApp {
             getClass().getResource("/images/vars/knowledgebase/knowledgebase-splash.png"));
         SplashFrame splashFrame = new SplashFrame(mbariLogo);
 
-        // TODO 20050415 brian: Need to load a configuration
-        splashFrame.setMessage(" Loading configuration...");
-        splashFrame.setVisible(true);
-        splashFrame.repaint();
-
         /*
          * Load knowledgebase
          */
+        splashFrame.setVisible(true);
         splashFrame.setMessage(" Loading knowledgebase...");
         splashFrame.repaint();
 
@@ -277,9 +273,6 @@ public class KnowledgebaseApp {
 
         /*
          * Initialize GUI
-         *
-         * TODO 20050415 brian: Need to use the loaded configuration to
-         * initiaize the GUI settings.
          */
         splashFrame.setMessage(" Initializing the GUI...");
         splashFrame.repaint();

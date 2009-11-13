@@ -1,13 +1,8 @@
 /*
- * @(#)Observation.java   2008.12.30 at 01:50:54 PST
+ * @(#)Observation.java   2009.11.12 at 03:28:18 PST
  *
- * Copyright 2007 MBARI
+ * Copyright 2009 MBARI
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
- * (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
- *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -28,14 +23,13 @@ import java.util.Set;
  * @author brian
  */
 public interface Observation extends AnnotationObject {
-    
+
+    String PROP_ASSOCIATIONS = "associations";
     String PROP_CONCEPT_NAME = "conceptName";
-    String PROP_OBSERVATION_DATE = "observationDate";
     String PROP_NOTES = "notes";
+    String PROP_OBSERVATION_DATE = "observationDate";
     String PROP_OBSERVER = "observer";
     String PROP_VIDEO_FRAME = "videoFrame";
-    String PROP_ASSOCIATIONS = "associations";
-        
 
     /**
      * Add to the <code>Association</code> collection.
@@ -48,7 +42,6 @@ public interface Observation extends AnnotationObject {
      */
     void addAssociation(Association association);
 
-
     /**
      * WARNING! Do not add or remove directly from this collection.
      * @return  A synchronized collection
@@ -59,7 +52,6 @@ public interface Observation extends AnnotationObject {
      * @return  The fromConcept of this observation.
      */
     String getConceptName();
-
 
     /**
      * @return
@@ -82,7 +74,19 @@ public interface Observation extends AnnotationObject {
     VideoFrame getVideoFrame();
 
     /**
-     * Indecates if this observation has a sample associated with it. It does
+     * 
+     * @return The x location of the observation within the videoFrame in pixels
+     */
+    Double getX();
+
+    /**
+     * 
+     * @return The y location of the observation within the videoFrame in pixels
+     */
+    Double getY();
+
+    /**
+     * Indicates if this observation has a sample associated with it. It does
      * this by looking at each association for the linkName starting with
      * sampled.
      *
@@ -97,7 +101,6 @@ public interface Observation extends AnnotationObject {
      * The <code>Association</code> object to remove.
      */
     void removeAssociation(final Association association);
-
 
     /**
      * <p><!-- Method description --></p>
@@ -121,4 +124,15 @@ public interface Observation extends AnnotationObject {
      */
     void setObserver(String observer);
 
+    /**
+     * 
+     * @param x  The x location of the observation within the videoFrame in pixels
+     */
+    void setX(Double x);
+
+    /**
+     * 
+     * @param y  The y location of the observation within the videoFrame in pixels
+     */
+    void setY(Double y);
 }

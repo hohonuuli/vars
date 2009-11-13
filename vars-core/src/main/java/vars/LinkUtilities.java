@@ -19,7 +19,9 @@ public class LinkUtilities {
 
     public static String formatAsLongString(ILink link) {
         StringBuilder sb = new StringBuilder();
-        sb.append(link.getFromConcept()).append(ILink.DELIMITER);
+        String fromConcept = link.getFromConcept();
+        fromConcept = (fromConcept == null) ? ILink.VALUE_NIL : fromConcept;
+        sb.append(fromConcept).append(ILink.DELIMITER);
         sb.append(link.getLinkName()).append(ILink.DELIMITER);
         sb.append(link.getToConcept()).append(ILink.DELIMITER);
         sb.append(link.getLinkValue());

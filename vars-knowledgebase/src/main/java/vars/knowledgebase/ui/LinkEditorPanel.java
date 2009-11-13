@@ -14,6 +14,7 @@
 
 package vars.knowledgebase.ui;
 
+import vars.shared.ui.FullLinkListCellRender;
 import vars.shared.ui.ILockableEditor;
 import foxtrot.Job;
 import foxtrot.Worker;
@@ -23,7 +24,11 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Vector;
+
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
 import org.mbari.swing.SearchableComboBoxModel;
@@ -31,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.ILink;
 import vars.LinkBean;
+import vars.LinkComparator;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptName;
@@ -179,7 +185,8 @@ public class LinkEditorPanel extends javax.swing.JPanel implements ILockableEdit
 
         jLabel4.setText("Search:");
 
-        linkComboBox.setModel(new SearchableComboBoxModel());
+        linkComboBox.setModel(new SearchableComboBoxModel(new LinkComparator()));
+        linkComboBox.setRenderer(new FullLinkListCellRender());
 
         jLabel1.setText("Link:");
 
@@ -387,6 +394,9 @@ public class LinkEditorPanel extends javax.swing.JPanel implements ILockableEdit
                  */
                 int startIndex = linkComboBox.getSelectedIndex() + 1;
                 SearchableComboBoxModel linksModel = (SearchableComboBoxModel) linkComboBox.getModel();
+                
+                startIndex = startIndex >= linksModel.getSize() ? 0 : startIndex;
+                
                 int index = linksModel.searchForItemContaining(searchField.getText(), startIndex);
                 if (index > -1) {
 
@@ -460,8 +470,7 @@ public class LinkEditorPanel extends javax.swing.JPanel implements ILockableEdit
 
             public Object run() {
                 LinkTemplateDAO linkTemplateDAO = toolBelt.getKnowledgebaseDAOFactory().newLinkTemplateDAO();
-
-                return linkTemplateDAO.findAllApplicableToConcept(fConcept);
+                return new Vector<ILink>(linkTemplateDAO.findAllApplicableToConcept(fConcept));
             }
 
         });
@@ -473,16 +482,15 @@ public class LinkEditorPanel extends javax.swing.JPanel implements ILockableEdit
         linkTemplates.add(nilLinkTemplate);
         SearchableComboBoxModel model = (SearchableComboBoxModel) linkComboBox.getModel();
         model.clear();
-        model.addAll(new ArrayList<ILink>(linkTemplates));
+        model.addAll(linkTemplates);
         model.setSelectedItem(nilLinkTemplate);
 
         this.concept = concept;
     }
 
     /**
-         * @param link  the link to set
-         * @uml.property  name="link"
-         */
+     * @param link  the link to set
+     */
     public void setLink(ILink link) {
 
         ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
