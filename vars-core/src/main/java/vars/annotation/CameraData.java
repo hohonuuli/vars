@@ -1,13 +1,8 @@
 /*
- * @(#)CameraData.java   2008.12.30 at 01:50:54 PST
+ * @(#)CameraData.java   2009.11.15 at 02:33:32 PST
  *
- * Copyright 2007 MBARI
+ * Copyright 2009 MBARI
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
- * (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
- *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -31,12 +26,19 @@ public interface CameraData extends AnnotationObject {
     String PROP_DIRECTION = "direction";
     String PROP_FIELD_WIDTH = "fieldWidth";
     String PROP_FOCUS = "focus";
+    String PROP_IMAGE_REFERENCE = "imageReference";
     String PROP_IRIS = "iris";
     String PROP_NAME = "name";
-    String PROP_FRAME_GRAB_URL = "frameGrabURL";
     String PROP_VIDEO_FRAME = "videoFrame";
     String PROP_ZOOM = "zoom";
-
+    String PROP_X = "x";
+    String PROP_Y = "y";
+    String PROP_X_Y_UNITS = "xyUnits";
+    String PROP_Z = "z";
+    String PROP_Z_UNITS = "zUnits";
+    String PROP_PITCH = "pitch";
+    String PROP_ROLL = "roll";
+    String PROP_HEADING = "heading";
 
     /**
      * Check to verfiy that a cameradata object contains data.
@@ -64,6 +66,14 @@ public interface CameraData extends AnnotationObject {
      */
     Integer getFocus();
 
+    Float getHeading();
+
+    /**
+     * Get the <code>String</code> of the Still Image captured by this <code>CameraData</code>.
+     * @return  The <code>String</code> of the Still Image URL captured by  this <code>CameraData</code>.
+     */
+    String getImageReference();
+
     /**
      * Get the <code>CameraData</code> iris.
      * @return  The integer value of <code>CameraData</code> iris.
@@ -71,7 +81,7 @@ public interface CameraData extends AnnotationObject {
     Integer getIris();
 
     /**
-     * 
+     *
      * @return The date that the cameradata was recorded
      */
     Date getLogDate();
@@ -82,16 +92,24 @@ public interface CameraData extends AnnotationObject {
      */
     String getName();
 
-    /**
-     * Get the <code>String</code> of the Still Image captured by this <code>CameraData</code>.
-     * @return  The <code>String</code> of the Still Image URL captured by  this <code>CameraData</code>.
-     */
-    String getImageReference();
+    Float getPitch();
+
+    Float getRoll();
 
     /**
      * @return
      */
     VideoFrame getVideoFrame();
+
+    Float getX();
+
+    String getXYUnits();
+
+    Float getY();
+
+    Float getZ();
+
+    String getZUnits();
 
     /**
      * Get the <code>CameraData</code> zoom.
@@ -117,6 +135,13 @@ public interface CameraData extends AnnotationObject {
      */
     void setFocus(Integer focus);
 
+    void setHeading(Float tilt);
+
+    /**
+     * Set <code>String</code> of the Still Image URL captured by this <code>CameraData</code>.
+     * @param  stillImage
+     */
+    void setImageReference(String stillImage);
 
     /**
      * Set <code>CameraData</code> iris.
@@ -135,12 +160,19 @@ public interface CameraData extends AnnotationObject {
      */
     void setName(String name);
 
-    /**
-     * Set <code>String</code> of the Still Image URL captured by this <code>CameraData</code>.
-     * @param  stillImage
-     */
-    void setImageReference(String stillImage);
+    void setPitch(Float pitch);
 
+    void setRoll(Float roll);
+
+    void setX(Float x);
+
+    void setXYUnits(String units);
+
+    void setY(Float y);
+
+    void setZ(Float z);
+
+    void setZUnits(String units);
 
     /**
      * Set <code>CameraData</code> zoom.

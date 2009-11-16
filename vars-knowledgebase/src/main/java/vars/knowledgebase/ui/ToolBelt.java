@@ -13,23 +13,23 @@ import vars.PersistenceCacheProvider;
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.AnnotationFactory;
 import vars.knowledgebase.HistoryFactory;
-import vars.knowledgebase.KnowledgebaseDAO;
+import vars.knowledgebase.SpecialKnowledgebaseDAO;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.ui.actions.ApproveHistoryTask;
 import vars.knowledgebase.ui.actions.RejectHistoryTask;
-import vars.query.QueryDAO;
+import vars.query.SpecialQueryDAO;
 
 /**
  * Container that holds on to a ton of shared objects that need to be widely
  * used across this application
  */
-public class Toolbelt {
+public class ToolBelt {
 
     private final ApproveHistoryTask approveHistoryTask;
     private final AnnotationDAOFactory annotationDAOFactory;
     private final AnnotationFactory annotationFactory;
-    private final KnowledgebaseDAO knowledgebaseDAO;
+    private final SpecialKnowledgebaseDAO knowledgebaseDAO;
     private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
     private final KnowledgebaseFactory knowledgebaseFactory;
     private final HistoryFactory historyFactory;
@@ -37,13 +37,13 @@ public class Toolbelt {
     private final MiscFactory miscFactory;
     private final PersistenceCache persistenceCache;
     private final RejectHistoryTask rejectHistoryTask;
-    private final QueryDAO queryDAO;
+    private final SpecialQueryDAO queryDAO;
 
     @Inject
-    public Toolbelt(AnnotationDAOFactory annotationDAOFactory, AnnotationFactory annotationFactory,
-            KnowledgebaseDAO knowledgebaseDAO, KnowledgebaseDAOFactory knowledgebaseDAOFactory,
+    public ToolBelt(AnnotationDAOFactory annotationDAOFactory, AnnotationFactory annotationFactory,
+            SpecialKnowledgebaseDAO knowledgebaseDAO, KnowledgebaseDAOFactory knowledgebaseDAOFactory,
             KnowledgebaseFactory knowledgebaseFactory, MiscDAOFactory miscDAOFactory,
-            MiscFactory miscFactory, PersistenceCacheProvider persistenceCacheProvider, QueryDAO queryDAO) {
+            MiscFactory miscFactory, PersistenceCacheProvider persistenceCacheProvider, SpecialQueryDAO queryDAO) {
         this.annotationDAOFactory = annotationDAOFactory;
         this.annotationFactory = annotationFactory;
         this.knowledgebaseDAO = knowledgebaseDAO;
@@ -74,7 +74,7 @@ public class Toolbelt {
         return historyFactory;
     }
 
-    public KnowledgebaseDAO getKnowledgebaseDAO() {
+    public SpecialKnowledgebaseDAO getKnowledgebaseDAO() {
         return knowledgebaseDAO;
     }
 
@@ -94,7 +94,7 @@ public class Toolbelt {
         return miscFactory;
     }
 
-    public QueryDAO getQueryDAO() {
+    public SpecialQueryDAO getQueryDAO() {
         return queryDAO;
     }
 

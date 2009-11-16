@@ -37,7 +37,7 @@ import vars.knowledgebase.LinkRealization;
 import vars.knowledgebase.LinkTemplate;
 import vars.knowledgebase.Media;
 import vars.knowledgebase.ui.Lookup;
-import vars.knowledgebase.ui.Toolbelt;
+import vars.knowledgebase.ui.ToolBelt;
 
 
 /**
@@ -55,7 +55,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
     private final Map<String, Map<String, AbstractHistoryTask>> actionMap = new HashMap<String,
         Map<String, AbstractHistoryTask>>();
     private final GenericApproveTask DEFAULT_TASK;
-    private final Toolbelt toolBelt;
+    private final ToolBelt toolBelt;
 
     /**
      * Constructs ...
@@ -66,7 +66,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
      * @param knowledgebaseFactory
      */
     @Inject
-    public ApproveHistoryTask(Toolbelt toolBelt) {
+    public ApproveHistoryTask(ToolBelt toolBelt) {
         super(toolBelt.getKnowledgebaseDAOFactory());
         this.toolBelt = toolBelt;
 

@@ -26,8 +26,6 @@ import org.mbari.vars.annotation.ui.actions.AddOldRefNumPropWithDialogAction;
  * </p>
  *
  * @author  <a href="http://www.mbari.org">MBARI</a>
- * @version  $Id: OldRefNumPropButton.java 314 2006-07-10 02:38:46Z hohonuuli $
- * @see org.mbari.vars.annotation.ui.actions.AddOldRefNumPropWithDialogAction
  */
 public class OldRefNumPropButton extends PropButton {
 

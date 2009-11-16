@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)NewVideoFrameButton.java   2009.11.15 at 08:33:19 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
- * (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,6 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 
 
 package org.mbari.vars.annotation.ui;
@@ -32,35 +30,12 @@ import org.mbari.vars.annotation.ui.dispatchers.VideoArchiveDispatcher;
  * <p>A button that calls the <code>NewVideoFrameAction</code> </p>
  *
  * @author  <a href="http://www.mbari.org">MBARI</a>
- * @version  $Id: NewVideoFrameButton.java 332 2006-08-01 18:38:46Z hohonuuli $
- * @see org.mbari.vars.annotation.ui.actions.NewVideoFrameAction
  */
 public class NewVideoFrameButton extends JFancyButton {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 371940906038361907L;
-
-    /**
-     *     @uml.property  name="action"
-     *     @uml.associationEnd  multiplicity="(1 1)"
-     */
     private final Action action = new NewVideoFrameAction();
-
-    /**
-     *     @uml.property  name="hasPerson"
-     */
     private boolean hasPerson;
-
-    /**
-     *     @uml.property  name="hasVcr"
-     */
     private boolean hasVcr;
-
-    /**
-     *     @uml.property  name="hasVideoArchive"
-     */
     private boolean hasVideoArchive;
 
     /**

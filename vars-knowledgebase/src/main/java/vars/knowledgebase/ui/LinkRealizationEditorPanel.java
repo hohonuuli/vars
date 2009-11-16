@@ -103,7 +103,7 @@ public class LinkRealizationEditorPanel extends EditorPanel {
      *
      * @param toolBelt
      */
-    public LinkRealizationEditorPanel(Toolbelt toolBelt) {
+    public LinkRealizationEditorPanel(ToolBelt toolBelt) {
         super(toolBelt);
         initialize();
         setLocked(isLocked());

@@ -12,7 +12,7 @@ import org.jdesktop.swingx.JXTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.knowledgebase.ui.Lookup;
-import vars.knowledgebase.ui.Toolbelt;
+import vars.knowledgebase.ui.ToolBelt;
 import vars.shared.ui.tree.ConceptTreeCellRenderer;
 import vars.shared.ui.tree.ConceptTreeModel;
 
@@ -29,7 +29,7 @@ public class ConceptTreeDemo {
 
     public static void main(String[] args) {
         Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
-        Toolbelt toolBelt = injector.getInstance(Toolbelt.class);
+        ToolBelt toolBelt = injector.getInstance(ToolBelt.class);
         JFrame frame = new JFrame();
         TreeModel treeModel = new ConceptTreeModel(toolBelt.getKnowledgebaseDAOFactory());
         JXTree tree = new JXTree(treeModel);

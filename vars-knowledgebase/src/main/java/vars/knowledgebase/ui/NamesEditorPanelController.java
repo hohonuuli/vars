@@ -35,7 +35,7 @@ import vars.knowledgebase.ConceptNameTypes;
 import vars.knowledgebase.History;
 import vars.knowledgebase.HistoryDAO;
 import vars.knowledgebase.HistoryFactory;
-import vars.knowledgebase.KnowledgebaseDAO;
+import vars.knowledgebase.SpecialKnowledgebaseDAO;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.ui.actions.ApproveHistoryTask;
@@ -48,7 +48,7 @@ import vars.knowledgebase.ui.dialogs.AddConceptNameDialog2;
 class NamesEditorPanelController {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
-    private final Toolbelt toolBelt;
+    private final ToolBelt toolBelt;
     private final NamesEditorPanel namesEditorPanel;
     private NewAction newAction;
 
@@ -116,7 +116,7 @@ class NamesEditorPanelController {
         boolean okToProceed = true;
 
         ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
-        KnowledgebaseDAO knowledgebaseDAO = toolBelt.getKnowledgebaseDAO();
+        SpecialKnowledgebaseDAO knowledgebaseDAO = toolBelt.getKnowledgebaseDAO();
         KnowledgebaseFactory knowledgebaseFactory = toolBelt.getKnowledgebaseFactory();
 
 

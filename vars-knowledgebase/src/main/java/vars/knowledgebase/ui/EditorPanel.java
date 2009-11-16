@@ -46,18 +46,18 @@ public abstract class EditorPanel extends JPanel implements ILockableEditor {
 
     private Concept concept;
     private boolean locked = true;
-    private final Toolbelt toolBelt;
+    private final ToolBelt toolBelt;
 
     /**
      * This is the default constructor
      */
-    public EditorPanel(Toolbelt toolBelt) {
+    public EditorPanel(ToolBelt toolBelt) {
         super();
         this.toolBelt = toolBelt;
         initialize();
     }
 
-    Toolbelt getToolBelt() {
+    ToolBelt getToolBelt() {
         return toolBelt;
     }
 

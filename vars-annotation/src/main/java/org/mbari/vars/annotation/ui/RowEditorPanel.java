@@ -50,38 +50,25 @@ import javax.swing.KeyStroke;
 import javax.swing.LayoutFocusTraversalPolicy;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import org.mbari.vars.annotation.model.Observation;
 import org.mbari.vars.annotation.ui.dispatchers.ObservationTableDispatcher;
 import org.mbari.vars.annotation.ui.dispatchers.PersonDispatcher;
 import org.mbari.vars.annotation.ui.dispatchers.PredefinedDispatcher;
 import org.mbari.vars.annotation.ui.table.AssociationListEditorPanel;
-import org.mbari.vars.annotation.ui.table.ObservationTable;
-import org.mbari.vars.dao.DAOException;
-import vars.knowledgebase.IConceptName;
-import org.mbari.vars.knowledgebase.model.dao.CacheClearedEvent;
-import org.mbari.vars.knowledgebase.model.dao.CacheClearedListener;
-import org.mbari.vars.knowledgebase.model.dao.KnowledgeBaseCache;
-import org.mbari.vars.ui.AllConceptNamesComboBox;
-import org.mbari.vars.util.AppFrameDispatcher;
+import vars.knowledgebase.ConceptName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.knowledgebase.IConcept;
+import vars.knowledgebase.Concept;
 
 /**
  * <p>THis panel is explcitly desinged for editing Observations in the
  * ObservationTable.</p>
  *
  * @author  <a href="http://www.mbari.org">MBARI</a>
- * @version  $Id: RowEditorPanel.java 376 2006-10-26 18:21:43Z hohonuuli $
  * @created  May 3, 2004
  */
 public class RowEditorPanel extends JPanel {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 2374475010769392908L;
-    private static final Logger log = LoggerFactory.getLogger(RowEditorPanel.class);
+    private final Logger log = LoggerFactory.getLogger(getClass());
     private static final Set shifttab = new HashSet(1);
 
     // The keys which will be listened for in the JTextArea for a change in
@@ -102,11 +89,6 @@ public class RowEditorPanel extends JPanel {
      */
     protected Action nextFocusAction = new AbstractAction("Move Focus Forwards") {
 
-        /**
-         *
-         */
-        private static final long serialVersionUID = -8571470635303948649L;
-
         public void actionPerformed(ActionEvent evt) {
             ((Component) evt.getSource()).transferFocus();
         }
@@ -118,57 +100,29 @@ public class RowEditorPanel extends JPanel {
      */
     protected Action prevFocusAction = new AbstractAction("Move Focus Backwards") {
 
-        /**
-         *
-         */
-        private static final long serialVersionUID = -4445290002450595260L;
 
         public void actionPerformed(ActionEvent evt) {
             ((Component) evt.getSource()).transferFocusBackward();
         }
     };
 
-    /**
-     *     @uml.property  name="conceptComboBox"
-     *     @uml.associationEnd
-     */
     private JComboBox conceptComboBox;
 
-    /**
-     *     @uml.property  name="jPanel"
-     *     @uml.associationEnd
-     */
     private JPanel jPanel;
 
-    /**
-     *     @uml.property  name="listPanel"
-     *     @uml.associationEnd
-     */
+
     private AssociationListEditorPanel listPanel;
 
     /**
      *     A collection of names that we should not allow notes to be added to.
-     *     @uml.property  name="notableConceptNames"
-     *     @uml.associationEnd  multiplicity="(0 -1)" elementType="java.lang.String"
      */
     private Collection notableConceptNames;
 
-    /**
-     *     @uml.property  name="notesArea"
-     *     @uml.associationEnd
-     */
+
     private JTextArea notesArea;
 
-    /**
-     *     @uml.property  name="observationTable"
-     *     @uml.associationEnd  multiplicity="(1 1)"
-     */
     private final ObservationTable observationTable;
 
-    /**
-     *     @uml.property  name="selectedObservation"
-     *     @uml.associationEnd
-     */
     private Observation selectedObservation;
 
     /**
@@ -527,6 +481,7 @@ public class RowEditorPanel extends JPanel {
      *
      * @param  shouldEnable The new enabled value
      */
+    @Override
     public void setEnabled(final boolean shouldEnable) {
         super.setEnabled(shouldEnable);
         getNotesArea().setEnabled(shouldEnable);

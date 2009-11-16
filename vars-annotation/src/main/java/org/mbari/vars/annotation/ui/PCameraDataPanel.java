@@ -25,14 +25,12 @@ import org.mbari.swing.PropertyPanel;
 import org.mbari.vars.annotation.ui.dispatchers.ObservationDispatcher;
 import org.mbari.vars.annotation.ui.dispatchers.ObservationTableDispatcher;
 import org.mbari.vars.annotation.ui.dispatchers.VideoArchiveDispatcher;
-import org.mbari.vars.dao.DAOEventQueue;
-import org.mbari.vars.dao.IDataObject;
-import org.mbari.vars.util.AppFrameDispatcher;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.annotation.ICameraData;
-import vars.annotation.IVideoFrame;
-import vars.annotation.IObservation;
+import vars.annotation.CameraData;
+import vars.annotation.VideoFrame;
+import vars.annotation.Observation;
 
 /**
  * <p>
@@ -40,20 +38,12 @@ import vars.annotation.IObservation;
  * </p>
  *
  * @author <a href="http://www.mbari.org">MBARI</a>
- * @version $Id: PCameraDataPanel.java 332 2006-08-01 18:38:46Z hohonuuli $
  */
 public class PCameraDataPanel extends PropertiesPanel {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = -3537457109453647935L;
-    private static final Logger log = LoggerFactory.getLogger(PCameraDataPanel.class);
 
-    /**
-     * @uml.property name="directionAction"
-     * @uml.associationEnd
-     */
+    private final Logger log = LoggerFactory.getLogger(getClass());
+
     private ActionAdapter directionAction;
 
     /**
@@ -68,29 +58,17 @@ public class PCameraDataPanel extends PropertiesPanel {
         addToolTip("StillImage");
     }
 
-    /**
-     * <p><!-- Method description --></p>
-     */
     private void addListeners() {
         final PropertyPanel p = getPropertyPanel("Direction");
         p.getEditButton();
         p.setEditAction(getDirectionAction());
     }
 
-    /**
-     * <p><!-- Method description --></p>
-     *
-     * @return
-     * @uml.property name="directionAction"
-     */
     private ActionAdapter getDirectionAction() {
         if (directionAction == null) {
             directionAction = new ActionAdapter() {
 
-                /**
-                 *
-                 */
-                private static final long serialVersionUID = -6355620271863236350L;
+
 
                 public void doAction() {
                     final PropertyPanel p = getPropertyPanel("Direction");
@@ -101,9 +79,9 @@ public class PCameraDataPanel extends PropertiesPanel {
                             JOptionPane.QUESTION_MESSAGE, null, ICameraData.DIRECTIONS,
                             initialValue);
                     if (selectedValue != null) {
-                        final IObservation obs = ObservationDispatcher.getInstance().getObservation();
-                        final IVideoFrame vf = obs.getVideoFrame();
-                        final ICameraData cd = vf.getCameraData();
+                        final Observation obs = ObservationDispatcher.getInstance().getObservation();
+                        final VideoFrame vf = obs.getVideoFrame();
+                        final CameraData cd = vf.getCameraData();
                         cd.setDirection(selectedValue);
 
                         try {
@@ -139,19 +117,19 @@ public class PCameraDataPanel extends PropertiesPanel {
      * @see org.mbari.util.IObserver#update(java.lang.Object, java.lang.Object)
      */
     public void update(final Object obj, final Object changeCode) {
-        final IObservation obs = (IObservation) obj;
+        final Observation obs = (Observation) obj;
         if (obs == null) {
             clearValues();
 
             return;
         }
 
-        final IVideoFrame vf = obs.getVideoFrame();
+        final VideoFrame vf = obs.getVideoFrame();
         if (vf == null) {
             clearValues();
         }
         else {
-            final ICameraData c = vf.getCameraData();
+            final CameraData c = vf.getCameraData();
             if (c == null) {
                 clearValues();
             }

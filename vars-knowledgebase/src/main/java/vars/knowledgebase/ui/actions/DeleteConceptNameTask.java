@@ -31,7 +31,7 @@ import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.ConceptNameDAO;
 import vars.knowledgebase.History;
-import vars.knowledgebase.KnowledgebaseDAO;
+import vars.knowledgebase.SpecialKnowledgebaseDAO;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.ui.Lookup;
@@ -48,11 +48,11 @@ public class DeleteConceptNameTask {
     private static final Logger log = LoggerFactory.getLogger(DeleteConceptNameTask.class);
 
     private final HistoryFactory historyFactory;
-    private final KnowledgebaseDAO knowledgebaseDAO;
+    private final SpecialKnowledgebaseDAO knowledgebaseDAO;
     private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
 
     public DeleteConceptNameTask(KnowledgebaseDAOFactory knowledgebaseDAOFactory, 
-            KnowledgebaseFactory knowledgebaseFactory, KnowledgebaseDAO knowledgebaseDAO) {
+            KnowledgebaseFactory knowledgebaseFactory, SpecialKnowledgebaseDAO knowledgebaseDAO) {
         this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
         this.historyFactory = new HistoryFactory(knowledgebaseFactory);
         this.knowledgebaseDAO = knowledgebaseDAO;

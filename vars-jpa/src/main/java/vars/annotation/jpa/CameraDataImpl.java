@@ -1,7 +1,8 @@
 /*
- * @(#)CameraDataImpl.java   2009.11.10 at 12:58:38 PST
+ * @(#)CameraDataImpl.java   2009.11.15 at 02:23:43 PST
  *
  * Copyright 2009 MBARI
+ *
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -56,7 +57,6 @@ import vars.jpa.TransactionLogger;
                 query = "SELECT c FROM CameraData c WHERE c.imageReference = :imageReference") ,
     @NamedQuery(name = "CameraData.findByImageReferenceLike",
                 query = "SELECT c FROM CameraData c WHERE c.imageReference LIKE :imageReference")
-
 })
 public class CameraDataImpl implements Serializable, CameraData, JPAEntity {
 
@@ -66,6 +66,8 @@ public class CameraDataImpl implements Serializable, CameraData, JPAEntity {
     Double fieldWidth;
 
     Integer focus;
+
+    Float heading;
 
     @Id
     @Column(
@@ -92,9 +94,13 @@ public class CameraDataImpl implements Serializable, CameraData, JPAEntity {
     @Column(name = "LogDTG")
     @Temporal(value = TemporalType.TIMESTAMP)
     Date logDate;
-    
+
     @Column(name = "Name", length = 50)
     String name;
+
+    Float pitch;
+
+    Float roll;
 
     /** Optimistic lock to prevent concurrent overwrites */
     @Version
@@ -104,90 +110,289 @@ public class CameraDataImpl implements Serializable, CameraData, JPAEntity {
     @OneToOne(targetEntity = VideoFrameImpl.class, optional = false)
     @JoinColumn(name = "VideoFrameID_FK", nullable = false)
     VideoFrame videoFrame;
-    
+
+    Float x;
+
+    String xyUnits;
+
+    Float y;
+
+    Float z;
+
+    String zUnits;
+
     Integer zoom;
 
+    /**
+     * @return
+     */
     public boolean containsData() {
         return ((name != null) || (direction != null) || (zoom != null) || (focus != null) || (iris != null) ||
                 (fieldWidth != null) || (imageReference != null));
     }
 
+    /**
+     * @return
+     */
     public String getDirection() {
         return direction;
     }
 
+    /**
+     * @return
+     */
     public Double getFieldWidth() {
         return fieldWidth;
     }
 
+    /**
+     * @return
+     */
     public Integer getFocus() {
         return focus;
     }
 
+    /**
+     * @return
+     */
+    public Float getHeading() {
+        return heading;
+    }
+
+    /**
+     * @return
+     */
     public Long getId() {
         return id;
     }
 
+    /**
+     * @return
+     */
     public String getImageReference() {
         return imageReference;
     }
 
+    /**
+     * @return
+     */
     public Integer getIris() {
         return iris;
     }
 
+    /**
+     * @return
+     */
     public Date getLogDate() {
         return logDate;
     }
 
+    /**
+     * @return
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * @return
+     */
+    public Float getPitch() {
+        return pitch;
+    }
+
+    /**
+     * @return
+     */
+    public Float getRoll() {
+        return roll;
+    }
+
+    /**
+     * @return
+     */
     public VideoFrame getVideoFrame() {
         return videoFrame;
     }
 
+    /**
+     * @return
+     */
+    public Float getX() {
+        return x;
+    }
+
+    /**
+     * @return
+     */
+    public String getXYUnits() {
+        return xyUnits;
+    }
+
+    /**
+     * @return
+     */
+    public Float getY() {
+        return y;
+    }
+
+    /**
+     * @return
+     */
+    public Float getZ() {
+        return z;
+    }
+
+    /**
+     * @return
+     */
+    public String getZUnits() {
+        return zUnits;
+    }
+
+    /**
+     * @return
+     */
     public Integer getZoom() {
         return zoom;
     }
 
+    /**
+     *
+     * @param direction
+     */
     public void setDirection(String direction) {
         this.direction = direction;
     }
 
+    /**
+     *
+     * @param fieldWidth
+     */
     public void setFieldWidth(Double fieldWidth) {
         this.fieldWidth = fieldWidth;
     }
 
+    /**
+     *
+     * @param focus
+     */
     public void setFocus(Integer focus) {
         this.focus = focus;
     }
 
+    /**
+     *
+     * @param heading
+     */
+    public void setHeading(Float heading) {
+        this.heading = heading;
+    }
+
+    /**
+     *
+     * @param id
+     */
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    /**
+     *
+     * @param stillImage
+     */
     public void setImageReference(String stillImage) {
         this.imageReference = stillImage;
     }
-    
-    public void setId(Long id) {
-    	this.id = id;
-    }
 
+    /**
+     *
+     * @param iris
+     */
     public void setIris(Integer iris) {
         this.iris = iris;
     }
 
+    /**
+     *
+     * @param logDate
+     */
     public void setLogDate(Date logDate) {
         this.logDate = logDate;
     }
 
+    /**
+     *
+     * @param name
+     */
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+     *
+     * @param pitch
+     */
+    public void setPitch(Float pitch) {
+        this.pitch = pitch;
+    }
+
+    /**
+     *
+     * @param roll
+     */
+    public void setRoll(Float roll) {
+        this.roll = roll;
     }
 
     void setVideoFrame(VideoFrame videoFrame) {
         this.videoFrame = videoFrame;
     }
 
+    /**
+     *
+     * @param x
+     */
+    public void setX(Float x) {
+        this.x = x;
+    }
+
+    /**
+     *
+     * @param units
+     */
+    public void setXYUnits(String units) {
+        this.xyUnits = units;
+    }
+
+    /**
+     *
+     * @param y
+     */
+    public void setY(Float y) {
+        this.y = y;
+    }
+
+    /**
+     *
+     * @param z
+     */
+    public void setZ(Float z) {
+        this.z = z;
+    }
+
+    /**
+     *
+     * @param units
+     */
+    public void setZUnits(String units) {
+        this.zUnits = units;
+    }
+
+    /**
+     *
+     * @param zoom
+     */
     public void setZoom(Integer zoom) {
         this.zoom = zoom;
     }

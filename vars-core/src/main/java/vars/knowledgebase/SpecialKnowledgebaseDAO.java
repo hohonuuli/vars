@@ -5,7 +5,7 @@ import vars.query.IQueryable;
 /**
  * DAO used by the Knowledgebase Application for special operations
  */
-public interface KnowledgebaseDAO extends IQueryable {
+public interface SpecialKnowledgebaseDAO extends IQueryable {
 
     void updateConceptNameUsedByAnnotations(Concept concept);
 

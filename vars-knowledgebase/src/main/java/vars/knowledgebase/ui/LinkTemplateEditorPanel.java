@@ -58,7 +58,7 @@ public class LinkTemplateEditorPanel extends EditorPanel {
      *
      * @param toolBelt
      */
-    public LinkTemplateEditorPanel(final Toolbelt toolBelt) {
+    public LinkTemplateEditorPanel(final ToolBelt toolBelt) {
         super(toolBelt);
         initialize();
         setLocked(isLocked());

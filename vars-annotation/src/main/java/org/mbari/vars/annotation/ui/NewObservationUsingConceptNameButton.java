@@ -39,9 +39,9 @@ import javax.swing.BorderFactory;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.border.Border;
+import org.bushe.swing.event.EventBus;
 import org.mbari.swing.IPopup;
 import org.mbari.swing.JFancyButton;
-import org.mbari.swing.SearchableTreePanel;
 import org.mbari.util.Dispatcher;
 import org.mbari.util.IObserver;
 import org.mbari.vars.annotation.ui.actions.NewObservationUsingConceptNameAction;
@@ -50,9 +50,11 @@ import org.mbari.vars.annotation.ui.dispatchers.VcrDispatcher;
 import org.mbari.vars.annotation.ui.dispatchers.VideoArchiveDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.CacheClearedEvent;
 import vars.CacheClearedListener;
-import vars.annotation.ui.Toolbelt;
-import vars.knowledgebase.Concept;
+import vars.annotation.SpecialAnnotationDAO;
+import vars.annotation.ui.Lookup;
+import vars.annotation.ui.ToolBelt;
 
 /**
  * <p>Creates a new Observation and changes its fromConcept to one specified
@@ -87,7 +89,7 @@ public class NewObservationUsingConceptNameButton extends JFancyButton
     private boolean isInitialized;
 
     private JPopupMenu popupMenu;
-    private final Toolbelt toolbelt;
+    private final ToolBelt toolbelt;
 
     /**
      * Constructor for the NewObservationUsingConceptNameButton object
@@ -95,7 +97,7 @@ public class NewObservationUsingConceptNameButton extends JFancyButton
      * @param  conceptName New <code>Observation</code>s will be created using
      * this conceptName.
      */
-    public NewObservationUsingConceptNameButton(final String conceptName, final Toolbelt toolbelt) {
+    public NewObservationUsingConceptNameButton(final String conceptName, final ToolBelt toolbelt) {
         super();
         this.toolbelt = toolbelt;
         this.conceptName = conceptName;
@@ -170,22 +172,20 @@ public class NewObservationUsingConceptNameButton extends JFancyButton
      *
      */
     private void checkEnable() {
+        boolean enable = false;
         if (hasVcr && hasPerson && hasVideoArchive) {
 
             // Check that the name is in the knowledgebase
-            Concept concept = null;
             try {
-                concept = KnowledgeBaseCache.getInstance().findConceptByName(conceptName);
+                SpecialAnnotationDAO annotationDAO = toolbelt.getSpecialAnnotationDAO();
+                enable = annotationDAO.doesConceptNameExist(conceptName);
             }
-            catch (final DAOException e) {
+            catch (final Exception e) {
                 log.error("Failed to lookup '" + conceptName + "' from the database", e);
             }
+        }
 
-            setEnabled(concept != null);
-        }
-        else {
-            setEnabled(false);
-        }
+        setEnabled(enable);
     }
 
     /**
@@ -297,13 +297,9 @@ public class NewObservationUsingConceptNameButton extends JFancyButton
             popupMenu = new JPopupMenu();
             final JMenuItem find = new JMenuItem("Find in Knowledgebase tree");
             find.addActionListener(new ActionListener() {
-
                 public void actionPerformed(final ActionEvent ae) {
-                    final Dispatcher dispatcher = Dispatcher.getDispatcher(SearchableConceptTreePanel.DISPATCHER_KEY);
-                    final SearchableTreePanel panel = (SearchableTreePanel) dispatcher.getValueObject();
-                    if (panel != null) {
-                        panel.goToMatchingNode(getConceptName(), false);
-                    }
+                    // Send a message to select a concept in the tree 
+                    EventBus.publish(Lookup.TOPIC_SELECT_CONCEPT, getConceptName());
                 }
 
             });

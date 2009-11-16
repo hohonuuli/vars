@@ -17,10 +17,14 @@
 
 package org.mbari.vars.annotation.ui;
 
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import javax.swing.ImageIcon;
@@ -29,14 +33,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.swing.IPopup;
-import org.mbari.util.IObserver;
-import org.mbari.vars.annotation.model.VideoArchive;
-import org.mbari.vars.annotation.model.dao.VideoArchiveDAO;
 import org.mbari.vars.annotation.ui.actions.AddNewRefNumPropAction;
 import org.mbari.vars.annotation.ui.actions.UpdateNewRefNumAction;
-import org.mbari.vars.annotation.ui.dispatchers.VideoArchiveDispatcher;
-import org.mbari.vars.util.AppFrameDispatcher;
-import vars.annotation.IVideoArchive;
+import vars.annotation.VideoArchive;
+import vars.annotation.VideoArchiveDAO;
+import vars.annotation.ui.Lookup;
+import vars.annotation.ui.ToolBelt;
 
 /**
  * <p>
@@ -47,28 +49,19 @@ import vars.annotation.IVideoArchive;
  */
 public class NewRefNumPropButton extends PropButton implements IPopup {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = -5140299372657701376L;
 
-    /**
-     *     @uml.property  name="jPopupMenu"
-     *     @uml.associationEnd
-     */
     private JPopupMenu jPopupMenu;
 
-    /**
-     *     @uml.property  name="refNumAction"
-     *     @uml.associationEnd  multiplicity="(1 1)"
-     */
     private ActionAdapter refNumAction;
+
+    private final ToolBelt toolBelt;
 
     /**
      *  Constructor
      */
-    public NewRefNumPropButton() {
+    public NewRefNumPropButton(final ToolBelt toolBelt) {
         super();
+        this.toolBelt = toolBelt;
         setAction(getRefNumAction());
         initialize();
     }
@@ -104,14 +97,24 @@ public class NewRefNumPropButton extends PropButton implements IPopup {
             set.addActionListener(new ActionListener() {
 
                 public void actionPerformed(final ActionEvent ae) {
+                    VideoArchiveDAO videoArchiveDAO = toolBelt.getAnnotationDAOFactory().newVideoArchiveDAO();
+                    VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+
+                    // TODO 'identity-reference' should be pulled out and put into a properties file
+                    final Collection<String> refNums = videoArchiveDAO.findAllLinkValues(videoArchive, "identity-reference");
+                    // REturned as string convert to integers:
+                    final Collection<Integer> refInts = new ArrayList<Integer>(refNums.size());
+                    for (String object : refNums) {
+                        refInts.add(Integer.valueOf(object));
+                    }
 
                     // TO help the user out let's put the max used number in the dialog
-                    final Collection refNums = VideoArchiveDAO.getInstance().findAllReferenceNumbers(
-                                (VideoArchive) VideoArchiveDispatcher.getInstance().getVideoArchive());
-                    final Integer maxNum = (Integer) Collections.max(refNums);
-                    final String s = (String) JOptionPane.showInputDialog(AppFrameDispatcher.getFrame(),
-                                         "Enter a reference number", "VARS - Input", JOptionPane.PLAIN_MESSAGE, null,
-                                         null, maxNum.toString());
+                    final Integer maxNum = (Integer) Collections.max(refInts);
+                    Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
+                    final String s = (String) JOptionPane.showInputDialog(frame,
+                            "Enter a reference number", "VARS - Input",
+                            JOptionPane.PLAIN_MESSAGE, null,
+                            null, maxNum.toString());
                     if (s == null) {
 
                         // do nothing
@@ -169,9 +172,11 @@ public class NewRefNumPropButton extends PropButton implements IPopup {
         setEnabled(false);
         addMouseListener(new MouseAdapter() {
 
+            @Override
             public void mousePressed(final MouseEvent e) {
                 maybeShowPopup(e);
             }
+            @Override
             public void mouseReleased(final MouseEvent e) {
                 maybeShowPopup(e);
             }
@@ -217,12 +222,13 @@ public class NewRefNumPropButton extends PropButton implements IPopup {
              * Listen to changes in the videoArchive. When the archive is changed
              * the new reference number initial value will be set.
              */
-            VideoArchiveDispatcher.getInstance().addObserver(new IObserver() {
+            Lookup.getVideoArchiveDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
 
-                public void update(final Object obj, final Object changeCode) {
-                    updateAction.setVideoArchive((IVideoArchive) obj);
+                public void propertyChange(PropertyChangeEvent evt) {
+                    updateAction.setVideoArchive((VideoArchive) evt.getNewValue());
                 }
             });
+ 
         }
 
         /**

@@ -14,6 +14,7 @@ import org.bushe.swing.event.EventBus;
 import org.mbari.util.Dispatcher;
 import org.mbari.vars.annotation.ui.AnnotationApp;
 import org.mbari.vars.annotation.ui.AnnotationFrame;
+import org.mbari.vars.annotation.ui.MiscTabsPanel;
 import vars.UserAccount;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
@@ -43,7 +44,25 @@ public class Lookup extends GlobalLookup {
      * Refresh the persisted objects (akak clear 2nd level cache).
      */
     public static final String TOPIC_REFRESH = "vars.annotation.ui.Lookup-Refresh";
+
+    /**
+     * Change the videoarchive being annotated. The data object will be an
+     * instance of {@link VideoArchive}
+     */
     public static final String TOPIC_SELECTED_VIDEOARCHIVE = "vars.annotation.ui.Lookup-VideoArchive";
+
+    /**
+     * Specifies the Observations that are selected in the Observation table. the
+     * data object will be a Collection&lt;Observation&gt;
+     */
+    public static final String TOPIC_SELECTED_OBSERVATIONS = "vars-annotation.ui.Lookup-SelectedObservations";
+
+    /**
+     * Message is sent when a concept should be selected in the concept tree. The
+     * data object is a {@link String} representing the concept name to select. The
+     * subscriber for the tree is in {@link MiscTabsPanel}
+     */
+    public static final String TOPIC_SELECT_CONCEPT = "vars-annotation.ui.Lookup-SelectedConcept";
     public static final String RESOURCE_BUNDLE = "annotation-app";
 
 

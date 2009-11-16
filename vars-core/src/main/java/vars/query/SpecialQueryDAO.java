@@ -13,7 +13,7 @@ import vars.ILink;
 /**
  * DAO used by the Query Application for special operations
  */
-public interface QueryDAO extends IQueryable {
+public interface SpecialQueryDAO extends IQueryable {
 
     Integer getCountOfUniqueValuesByColumn(String columnName);
 

@@ -34,7 +34,7 @@ import vars.QueryableImpl;
  * SQL internally for speed reasons.
  * @author brian
  */
-public class QueryDAOImpl extends QueryableImpl implements QueryDAO {
+public class SpecialQueryDAOImpl extends QueryableImpl implements SpecialQueryDAO {
 
     private static final String jdbcPassword;
     private static final String jdbcUrl;
@@ -42,7 +42,7 @@ public class QueryDAOImpl extends QueryableImpl implements QueryDAO {
     private static final String jdbcDriver;
 
     static {
-        ResourceBundle bundle = ResourceBundle.getBundle("query-dao");
+        ResourceBundle bundle = ResourceBundle.getBundle("query-jdbc");
         jdbcUrl = bundle.getString("jdbc.url");
         jdbcUsername = bundle.getString("jdbc.username");
         jdbcPassword = bundle.getString("jdbc.password");
@@ -52,7 +52,7 @@ public class QueryDAOImpl extends QueryableImpl implements QueryDAO {
     /**
      * Constructs ...
      */
-    public QueryDAOImpl() {
+    public SpecialQueryDAOImpl() {
         super(jdbcUrl, jdbcUsername, jdbcPassword, jdbcDriver);
     }
 

@@ -25,7 +25,7 @@ import java.awt.Dimension;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
-import vars.annotation.ui.Toolbelt;
+import vars.annotation.ui.ToolBelt;
 
 /**
  * <p>This panel contains all the components of the annotation appliation.</p>
@@ -51,12 +51,12 @@ public class AnnotationPanel extends JPanel {
 
     private javax.swing.JSplitPane topSplitPane = null;
 
-    private final Toolbelt toolbelt;
+    private final ToolBelt toolbelt;
 
     /**
      * This is the default constructor
      */
-    public AnnotationPanel(Toolbelt toolbelt) {
+    public AnnotationPanel(ToolBelt toolbelt) {
         super();
         this.toolbelt = toolbelt;
         initialize();

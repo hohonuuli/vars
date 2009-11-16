@@ -27,7 +27,7 @@ import org.mbari.util.SystemUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.ui.Lookup;
-import vars.annotation.ui.Toolbelt;
+import vars.annotation.ui.ToolBelt;
 
 /**
  * <p>This is the main class for the Annotation Application.</p>
@@ -52,7 +52,7 @@ public class AnnotationApp {
     private JFrame getAnnotationAppFrame() {
         if (annotationAppFrame == null) {
             final Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
-            annotationAppFrame = new AnnotationFrame(injector.getInstance(Toolbelt.class));
+            annotationAppFrame = new AnnotationFrame(injector.getInstance(ToolBelt.class));
             annotationAppFrame.pack();
 
             // Center the frame on screen

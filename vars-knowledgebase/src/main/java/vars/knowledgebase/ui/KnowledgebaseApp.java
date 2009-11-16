@@ -55,7 +55,7 @@ public class KnowledgebaseApp {
 
     private static Logger log;
     private KnowledgebaseFrame knowledgebaseFrame;
-    private final Toolbelt toolBelt;
+    private final ToolBelt toolBelt;
     private final EventTopicSubscriber approveHistorySubscriber;
 
         /**
@@ -168,7 +168,7 @@ public class KnowledgebaseApp {
 
         Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
         Lookup.getGuiceInjectorDispatcher().setValueObject(injector);
-        toolBelt = injector.getInstance(Toolbelt.class);
+        toolBelt = injector.getInstance(ToolBelt.class);
         approveHistorySubscriber = new ApproveHistorySubscriber(toolBelt.getApproveHistoryTask());
 
         /*

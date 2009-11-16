@@ -24,11 +24,14 @@ import java.awt.Component;
 import javax.swing.JTabbedPane;
 import javax.swing.JTree;
 import javax.swing.tree.TreeModel;
+import org.bushe.swing.event.EventBus;
+import org.bushe.swing.event.EventTopicSubscriber;
 import org.jdesktop.swingx.JXTree;
 import org.mbari.swing.SearchableTreePanel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.annotation.ui.Toolbelt;
+import vars.annotation.ui.Lookup;
+import vars.annotation.ui.ToolBelt;
 import vars.shared.ui.UIDecorator;
 import vars.shared.ui.tree.ConceptTreeCellRenderer;
 import vars.shared.ui.tree.ConceptTreeModel;
@@ -51,7 +54,7 @@ public class MiscTabsPanel extends javax.swing.JPanel {
 
     private SearchableTreePanel treePanel;
 
-    private final Toolbelt toolbelt;
+    private final ToolBelt toolbelt;
 
     /** We don't read this but we hang on to a reference to prevent garbage collection */
     private UIDecorator treeDecorator;
@@ -59,7 +62,7 @@ public class MiscTabsPanel extends javax.swing.JPanel {
     /**
      * Creates new form MiscTabsPanel
      */
-    public MiscTabsPanel(Toolbelt toolbelt) {
+    public MiscTabsPanel(ToolBelt toolbelt) {
         this.toolbelt = toolbelt;
         initComponents();
         initTabs();
@@ -76,6 +79,16 @@ public class MiscTabsPanel extends javax.swing.JPanel {
             final JTree tree = new JXTree(treeModel);
             tree.setCellRenderer(new ConceptTreeCellRenderer());
             treeDecorator = new JTreeDragAndDropDecorator(tree);
+
+            /*
+             * Listen to messages to select a concept in the tree
+             */
+            EventBus.subscribe(Lookup.TOPIC_SELECT_CONCEPT, new EventTopicSubscriber<String>() {
+                public void onEvent(String topic, String data) {
+                    treePanel.goToMatchingNode(data, false);
+                }
+            });
+
         }
 
         return treePanel;

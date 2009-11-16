@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.ArrayList;
 
 import vars.QueryableImpl;
+import vars.annotation.Association;
+import vars.annotation.Observation;
 
 /**
  * Created by IntelliJ IDEA.
@@ -14,7 +16,7 @@ import vars.QueryableImpl;
  * Time: 12:58:56 PM
  * To change this template use File | Settings | File Templates.
  */
-public class KnowledgebaseDAOImpl extends QueryableImpl implements KnowledgebaseDAO {
+public class SpecialKnowledgebaseDAOImpl extends QueryableImpl implements SpecialKnowledgebaseDAO {
 
     private static final String jdbcPassword;
     private static final String jdbcUrl;
@@ -22,7 +24,7 @@ public class KnowledgebaseDAOImpl extends QueryableImpl implements Knowledgebase
     private static final String jdbcDriver;
 
     static {
-        ResourceBundle bundle = ResourceBundle.getBundle("knowledgebase-dao");
+        ResourceBundle bundle = ResourceBundle.getBundle("knowledgebase-jdbc");
         jdbcUrl = bundle.getString("jdbc.url");
         jdbcUsername = bundle.getString("jdbc.username");
         jdbcPassword = bundle.getString("jdbc.password");
@@ -32,10 +34,17 @@ public class KnowledgebaseDAOImpl extends QueryableImpl implements Knowledgebase
     /**
      * Constructs ...
      */
-    public KnowledgebaseDAOImpl() {
+    public SpecialKnowledgebaseDAOImpl() {
         super(jdbcUrl, jdbcUsername, jdbcPassword, jdbcDriver);
     }
 
+    /**
+     * Updates all {@link Observation}s, {@link Association}s, and {@link LinkTemplate}s
+     * in the database so that any that use a non-primary name for the given
+     * concept are changed so that they use the primary name.
+     *
+     * @param concept
+     */
     public void updateConceptNameUsedByAnnotations(Concept concept) {
 
         String primaryName = concept.getPrimaryConceptName().getName();

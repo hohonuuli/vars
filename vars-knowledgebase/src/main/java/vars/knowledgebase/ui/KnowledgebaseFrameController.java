@@ -36,7 +36,7 @@ class KnowledgebaseFrameController {
     private final Logger log = LoggerFactory.getLogger(getClass());
     private final EventTopicSubscriber<String> refreshTreeSubscriber = new RefreshTreeAndOpenNodeSubscriber();
     private final KnowledgebaseFrame knowledgebaseFrame;
-    private final Toolbelt toolBelt;
+    private final ToolBelt toolBelt;
     private final PersistenceCache persistenceCache;
 
     /**
@@ -45,7 +45,7 @@ class KnowledgebaseFrameController {
      * @param knowledgebaseFrame
      * @param toolBelt
      */
-    public KnowledgebaseFrameController(KnowledgebaseFrame knowledgebaseFrame, Toolbelt toolBelt) {
+    public KnowledgebaseFrameController(KnowledgebaseFrame knowledgebaseFrame, ToolBelt toolBelt) {
         this.knowledgebaseFrame = knowledgebaseFrame;
         this.toolBelt = toolBelt;
         this.persistenceCache = toolBelt.getPersistenceCache();

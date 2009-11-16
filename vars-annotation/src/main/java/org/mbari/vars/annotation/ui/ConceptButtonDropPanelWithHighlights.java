@@ -13,6 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.prefs.Preferences;
 import javax.swing.JButton;
+import vars.annotation.ui.ToolBelt;
 
 /**
  *
@@ -48,8 +49,8 @@ public class ConceptButtonDropPanelWithHighlights extends ConceptButtonDropPanel
         }
     };
     
-    public ConceptButtonDropPanelWithHighlights(final Preferences tabPreferences) {
-        super(tabPreferences);
+    public ConceptButtonDropPanelWithHighlights(final Preferences tabPreferences, ToolBelt toolBelt) {
+        super(tabPreferences, toolBelt);
         checkForActionListener();
     }
     

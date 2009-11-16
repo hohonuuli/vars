@@ -50,6 +50,7 @@ import org.mbari.vars.annotation.ui.dispatchers.PersonDispatcher;
 import org.mbari.vars.annotation.ui.dispatchers.PreferencesDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.annotation.ui.ToolBelt;
 import vars.jpa.VarsUserPreferences;
 
 /**
@@ -63,22 +64,11 @@ public class ConceptButtonPanel extends JPanel {
     private static final long serialVersionUID = -8103461282255784621L;
     private static final Logger log = LoggerFactory.getLogger(ConceptButtonPanel.class);
 
-    /**
-     *     @uml.property  name="dragLockCb"
-     *     @uml.associationEnd
-     */
     private JCheckBox dragLockCb;
 
-    /**
-     *     @uml.property  name="lockButton"
-     *     @uml.associationEnd
-     */
+
     private JButton lockButton = null;
 
-    /**
-     *     @uml.property  name="lockedIcon"
-     *     @uml.associationEnd  multiplicity="(1 1)"
-     */
     private final ImageIcon lockedIcon;
     
     private final ImageIcon showIndexIcon;
@@ -86,72 +76,41 @@ public class ConceptButtonPanel extends JPanel {
 
     /**
      *     The button to move a new tab
-     *     @uml.property  name="moveTabButton"
-     *     @uml.associationEnd
      */
     private final JButton moveTabButton = null;
 
-    /**
-     *     @uml.property  name="newTabAction"
-     *     @uml.associationEnd
-     */
+
     private ActionAdapter newTabAction;
 
     /**
      *     The button to create a new tab
-     *     @uml.property  name="newTabButton"
-     *     @uml.associationEnd
      */
     private JButton newTabButton = null;
 
-    /**
-     *     @uml.property  name="removeTabAction"
-     *     @uml.associationEnd
-     */
     private ActionAdapter removeTabAction;
 
     /**
      *     The button to remove a new tab
-     *     @uml.property  name="removeTabButton"
-     *     @uml.associationEnd
      */
     private JButton removeTabButton = null;
 
-    /**
-     *     @uml.property  name="renameTabAction"
-     *     @uml.associationEnd
-     */
     private ActionAdapter renameTabAction;
 
     /**
      *     The button to rename a new tab
-     *     @uml.property  name="renameTabButton"
-     *     @uml.associationEnd
      */
     private JButton renameTabButton = null;
 
-    /**
-     *     @uml.property  name="locked"
-     */
+
     private boolean locked = false;
 
     /**
      *     The JTabbedPane to hold the ConceptButtons
-     *     @uml.property  name="tabbedPane"
-     *     @uml.associationEnd
      */
     private JTabbedPane tabbedPane;
 
-    /**
-     *     @uml.property  name="unlockedIcon"
-     *     @uml.associationEnd  multiplicity="(1 1)"
-     */
     private final ImageIcon unlockedIcon;
 
-    /**
-     *     The appropriate user preferences object
-     *     @uml.property  name="userPreferences"
-     */
     private Preferences userPreferences = null;
 
     private JPanel buttonPanel = null;
@@ -161,12 +120,15 @@ public class ConceptButtonPanel extends JPanel {
     private boolean showOverview = false;
     
     private ConceptButtonOverviewPanel overviewPanel = null;
+
+    private final ToolBelt toolBelt;
     
     /**
      *
      */
-    public ConceptButtonPanel() {
+    public ConceptButtonPanel(final ToolBelt toolBelt) {
         super();
+        this.toolBelt = toolBelt;
         lockedIcon = new ImageIcon(getClass().getResource("/images/vars/annotation/lock-16.png"));
         unlockedIcon = new ImageIcon(getClass().getResource("/images/vars/annotation/lock_open-16.png"));
         showIndexIcon = new ImageIcon(getClass().getResource("/images/vars/annotation/16px/index_up.png"));
@@ -465,7 +427,7 @@ public class ConceptButtonPanel extends JPanel {
             for (int i = 0; i < tabNames.length; i++) {
                 final Preferences tabPrefs = cpPrefs.node(tabNames[i]);
                 final String tabName = tabPrefs.get("tabName", "dummy");
-                final ConceptButtonDropPanel panel = new ConceptButtonDropPanel(cpPrefs.node(tabNames[i]));
+                final ConceptButtonDropPanel panel = new ConceptButtonDropPanel(cpPrefs.node(tabNames[i]), toolBelt);
                 getTabbedPane().add(tabName, panel);
             }
         }
@@ -526,7 +488,7 @@ public class ConceptButtonPanel extends JPanel {
                     if (!alreadyThere) {
                         final Preferences newTabPrefs = cpPrefs.node("tab" + cpTabs.length);
                         newTabPrefs.put("tabName", tabName);
-                        final ConceptButtonDropPanel dropPanel = new ConceptButtonDropPanel(newTabPrefs);
+                        final ConceptButtonDropPanel dropPanel = new ConceptButtonDropPanel(newTabPrefs, toolBelt);
                         getTabbedPane().add(tabName, dropPanel);
                     }
                     else {

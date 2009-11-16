@@ -29,14 +29,14 @@ import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.AnnotationFactory;
 import vars.annotation.jpa.AnnotationDAOFactoryImpl;
 import vars.annotation.jpa.AnnotationFactoryImpl;
-import vars.knowledgebase.KnowledgebaseDAO;
+import vars.knowledgebase.SpecialKnowledgebaseDAO;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
-import vars.knowledgebase.KnowledgebaseDAOImpl;
+import vars.knowledgebase.SpecialKnowledgebaseDAOImpl;
 import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.jpa.KnowledgebaseDAOFactoryImpl;
 import vars.knowledgebase.jpa.KnowledgebaseFactoryImpl;
-import vars.query.QueryDAO;
-import vars.query.QueryDAOImpl;
+import vars.query.SpecialQueryDAO;
+import vars.query.SpecialQueryDAOImpl;
 
 /**
  * Created by IntelliJ IDEA.
@@ -86,12 +86,12 @@ public class VarsJpaModule implements Module {
         binder.bind(AnnotationDAOFactory.class).to(AnnotationDAOFactoryImpl.class).in(Scopes.SINGLETON);;
         binder.bind(AnnotationFactory.class).to(AnnotationFactoryImpl.class);
         binder.bind(ExternalDataDAO.class).to(ExternalDataDaoExpdImpl.class);
-        binder.bind(KnowledgebaseDAO.class).to(KnowledgebaseDAOImpl.class);
+        binder.bind(SpecialKnowledgebaseDAO.class).to(SpecialKnowledgebaseDAOImpl.class);
         binder.bind(KnowledgebaseDAOFactory.class).to(KnowledgebaseDAOFactoryImpl.class).in(Scopes.SINGLETON);;
         binder.bind(KnowledgebaseFactory.class).to(KnowledgebaseFactoryImpl.class);
         binder.bind(MiscDAOFactory.class).to(MiscDAOFactoryImpl.class).in(Scopes.SINGLETON);;
         binder.bind(MiscFactory.class).to(MiscFactoryImpl.class);
-        binder.bind(QueryDAO.class).to(QueryDAOImpl.class);
+        binder.bind(SpecialQueryDAO.class).to(SpecialQueryDAOImpl.class);
         binder.bind(VarsUserPreferencesFactory.class).to(VarsUserPreferencesFactoryImpl.class).in(Scopes.SINGLETON);
 
     }

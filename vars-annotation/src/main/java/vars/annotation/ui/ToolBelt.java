@@ -1,5 +1,5 @@
 /*
- * @(#)Toolbelt.java   2009.11.13 at 09:32:51 PST
+ * @(#)Toolbelt.java   2009.11.15 at 07:47:13 PST
  *
  * Copyright 2009 MBARI
  *
@@ -22,33 +22,36 @@ import vars.PersistenceCache;
 import vars.PersistenceCacheProvider;
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.AnnotationFactory;
+import vars.annotation.SpecialAnnotationDAO;
 import vars.knowledgebase.HistoryFactory;
-import vars.knowledgebase.KnowledgebaseDAO;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.KnowledgebaseFactory;
-import vars.query.QueryDAO;
+import vars.knowledgebase.SpecialKnowledgebaseDAO;
+import vars.query.SpecialQueryDAO;
 
 /**
  *
  */
-public class Toolbelt {
+public class ToolBelt {
 
     private final AnnotationDAOFactory annotationDAOFactory;
     private final AnnotationFactory annotationFactory;
     private final HistoryFactory historyFactory;
-    private final KnowledgebaseDAO knowledgebaseDAO;
     private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
     private final KnowledgebaseFactory knowledgebaseFactory;
     private final MiscDAOFactory miscDAOFactory;
     private final MiscFactory miscFactory;
     private final PersistenceCache persistenceCache;
-    private final QueryDAO queryDAO;
+    private final SpecialAnnotationDAO specialAnnotationDAO;
+    private final SpecialKnowledgebaseDAO specialKnowledgebaseDAO;
+    private final SpecialQueryDAO specialQueryDAO;
 
     /**
      * Constructs ...
      *
      * @param annotationDAOFactory
      * @param annotationFactory
+     * @param annotationDAO
      * @param knowledgebaseDAO
      * @param knowledgebaseDAOFactory
      * @param knowledgebaseFactory
@@ -58,19 +61,21 @@ public class Toolbelt {
      * @param queryDAO
      */
     @Inject
-    public Toolbelt(AnnotationDAOFactory annotationDAOFactory, AnnotationFactory annotationFactory,
-                    KnowledgebaseDAO knowledgebaseDAO, KnowledgebaseDAOFactory knowledgebaseDAOFactory,
-                    KnowledgebaseFactory knowledgebaseFactory, MiscDAOFactory miscDAOFactory, MiscFactory miscFactory,
-                    PersistenceCacheProvider persistenceCacheProvider, QueryDAO queryDAO) {
+    public ToolBelt(AnnotationDAOFactory annotationDAOFactory, AnnotationFactory annotationFactory,
+                    KnowledgebaseDAOFactory knowledgebaseDAOFactory, KnowledgebaseFactory knowledgebaseFactory,
+                    MiscDAOFactory miscDAOFactory, MiscFactory miscFactory,
+                    PersistenceCacheProvider persistenceCacheProvider, SpecialAnnotationDAO annotationDAO,
+                    SpecialKnowledgebaseDAO knowledgebaseDAO, SpecialQueryDAO queryDAO) {
         this.annotationDAOFactory = annotationDAOFactory;
+        this.specialAnnotationDAO = annotationDAO;
         this.annotationFactory = annotationFactory;
-        this.knowledgebaseDAO = knowledgebaseDAO;
+        this.specialKnowledgebaseDAO = knowledgebaseDAO;
         this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
         this.knowledgebaseFactory = knowledgebaseFactory;
         this.miscDAOFactory = miscDAOFactory;
         this.miscFactory = miscFactory;
         this.persistenceCache = new PersistenceCache(persistenceCacheProvider);
-        this.queryDAO = queryDAO;
+        this.specialQueryDAO = queryDAO;
         historyFactory = new HistoryFactory(knowledgebaseFactory);
     }
 
@@ -93,13 +98,6 @@ public class Toolbelt {
      */
     public HistoryFactory getHistoryFactory() {
         return historyFactory;
-    }
-
-    /**
-     * @return
-     */
-    public KnowledgebaseDAO getKnowledgebaseDAO() {
-        return knowledgebaseDAO;
     }
 
     /**
@@ -140,8 +138,21 @@ public class Toolbelt {
     /**
      * @return
      */
-    public QueryDAO getQueryDAO() {
-        return queryDAO;
+    public SpecialAnnotationDAO getSpecialAnnotationDAO() {
+        return specialAnnotationDAO;
     }
 
+    /**
+     * @return
+     */
+    public SpecialKnowledgebaseDAO getSpecialKnowledgebaseDAO() {
+        return specialKnowledgebaseDAO;
+    }
+
+    /**
+     * @return
+     */
+    public SpecialQueryDAO getSpecialQueryDAO() {
+        return specialQueryDAO;
+    }
 }

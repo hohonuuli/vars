@@ -43,7 +43,7 @@ import org.mbari.vars.annotation.ui.actions.ShowOpenVideoArchiveDialogAction;
 import org.mbari.vars.annotation.ui.dialogs.AboutDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.annotation.ui.Toolbelt;
+import vars.annotation.ui.ToolBelt;
 
 /**
  * <p>This frame is the parent frame of all UI components in the annotation
@@ -61,12 +61,12 @@ public class AnnotationFrame extends JFrame {
     private JMenuBar myMenuBar;
     private JPanel quickControlsPanel;
     private JPanel statusPanel;
-    private final Toolbelt toolbelt;
+    private final ToolBelt toolbelt;
 
     /**
      * Creates new form JFrame
      */
-    public AnnotationFrame(Toolbelt toolbelt) {
+    public AnnotationFrame(ToolBelt toolbelt) {
         super();
         this.toolbelt = toolbelt;
         initialize();

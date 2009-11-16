@@ -42,6 +42,7 @@ import org.mbari.swing.IPopup;
 import org.mbari.swing.SwingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.annotation.ui.ToolBelt;
 
 /**
  * <p>
@@ -51,46 +52,24 @@ import org.slf4j.LoggerFactory;
  * </p>
  * <hr>
  *
- * @author : $Author: hohonuuli $
- * @version : $Revision: 332 $
- * @see ConceptButtonTransferable
- * @see ConcepTreeReadOnly
  */
 public class ConceptButtonDropPanel extends JPanel {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 2530068922739002858L;
-    private static final Logger log = LoggerFactory.getLogger(ConceptButtonDropPanel.class);
 
-    // This is just the preference for the tab this panel exists on
-
-    /**
-     *     @uml.property  name="tabPreferences"
-     */
+    private final Logger log = LoggerFactory.getLogger(getClass());
     protected Preferences tabPreferences = null;
 
     /**
      *     the actions supported by this drop target
-     *     @uml.property  name="acceptableActions"
      */
     private final int acceptableActions = DnDConstants.ACTION_COPY_OR_MOVE;
 
-    // The local DropTarget and DropTargetListener
-
-    /**
-     *     @uml.property  name="dropTarget"
-     */
     private DropTarget dropTarget;
 
-    /**
-     *     @uml.property  name="dtListener"
-     */
     DropTargetListener dtListener;
 
-    // These are objects from the encompassing GUI so this class can call some
-    // methods on them
+    private final ToolBelt toolbelt;
+
 
     /**
      * This is the constructor
@@ -99,10 +78,10 @@ public class ConceptButtonDropPanel extends JPanel {
      *            is the Preferences object that hold the configuration of the
      *            buttons on this ConceptButtonDropPanel
      */
-    public ConceptButtonDropPanel(final Preferences tabPreferences) {
+    public ConceptButtonDropPanel(final Preferences tabPreferences, final ToolBelt toolbelt) {
 
-        // Set all the member variables
         this.tabPreferences = tabPreferences;
+        this.toolbelt = toolbelt;
 
         // Set the layout of the buttons to flow
         final FlowLayout cbFlow = new WrappingFlowLayout(FlowLayout.LEFT);
@@ -205,7 +184,7 @@ public class ConceptButtonDropPanel extends JPanel {
             }
 
             final JButton tempJButton = new NewObservationUsingConceptNameButton(buttonPrefs[i].get("buttonName",
-                                            "unknown"));
+                                            "unknown"), toolbelt);
             makeButtonDeletable(tempJButton);
 
             // in case the buttonOrder preference was not stored properly, make
@@ -457,7 +436,7 @@ public class ConceptButtonDropPanel extends JPanel {
                 }
 
                 // Now create a new button
-                buttonToDrop = new NewObservationUsingConceptNameButton(s);
+                buttonToDrop = new NewObservationUsingConceptNameButton(s, toolbelt);
                 makeButtonDeletable(buttonToDrop);
             }
             else if (data instanceof NewObservationUsingConceptNameButton) {

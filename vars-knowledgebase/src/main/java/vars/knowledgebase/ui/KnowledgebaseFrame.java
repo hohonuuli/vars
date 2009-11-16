@@ -80,7 +80,7 @@ public class KnowledgebaseFrame extends JFrame {
     private final KnowledgebaseFrameController controller;
     private LoginAction loginAction;
     private MediaEditorPanel mediaEditorPanel;
-    private final Toolbelt toolBelt;
+    private final ToolBelt toolBelt;
     private TreeSelectionListener treeSelectionListener;
 
     /**
@@ -90,7 +90,7 @@ public class KnowledgebaseFrame extends JFrame {
      * @param toolBelt
      */
     @Inject
-    public KnowledgebaseFrame(Toolbelt toolBelt) {
+    public KnowledgebaseFrame(ToolBelt toolBelt) {
         if (toolBelt == null) {
             throw new IllegalArgumentException("ToolBelt argument can not be null");
         }
