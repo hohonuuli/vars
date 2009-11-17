@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)StatusLabelForVideoArchive.java   2009.11.17 at 09:35:07 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
- * (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,9 +12,7 @@
  */
 
 
-/*
-Created on Dec 1, 2003
- */
+
 package org.mbari.vars.annotation.ui;
 
 import java.awt.event.MouseAdapter;
@@ -28,28 +23,18 @@ import javax.swing.JDialog;
 import org.mbari.swing.SwingUtils;
 import org.mbari.util.Dispatcher;
 import org.mbari.vars.annotation.ui.actions.ShowOpenVideoArchiveDialogAction;
-import org.mbari.vars.annotation.ui.dispatchers.PredefinedDispatcher;
-import vars.annotation.IVideoArchive;
+import vars.annotation.VideoArchive;
+import vars.annotation.ui.Lookup;
 
 /**
- * <p>Indicates which videoarchive the annotator is editing. Clicking on the
- * label opens a dialog allowing the user to change the videoarchive being
+ * <p>Indicates which {@link VideoArchive} the annotator is editing. Clicking on the
+ * label opens a dialog allowing the user to change the {@link VideoArchive} being
  * edited.</p>
  *
  * @author  <a href="http://www.mbari.org">MBARI</a>
- * @version  $Id: StatusLabelForVideoArchive.java 332 2006-08-01 18:38:46Z hohonuuli $
  */
 public class StatusLabelForVideoArchive extends StatusLabel {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = -3645686292355814856L;
-
-    /**
-     *     @uml.property  name="action"
-     *     @uml.associationEnd
-     */
     private ShowOpenVideoArchiveDialogAction action;
 
     /**
@@ -57,15 +42,15 @@ public class StatusLabelForVideoArchive extends StatusLabel {
      */
     public StatusLabelForVideoArchive() {
         super();
-        Dispatcher dispatcher = PredefinedDispatcher.VIDEOARCHIVE.getDispatcher();
+        Dispatcher dispatcher = Lookup.getVideoArchiveDispatcher();
         dispatcher.addPropertyChangeListener(new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
-                updateVideoArchiveSet((IVideoArchive) evt.getNewValue());
+                update((VideoArchive) evt.getNewValue());
             }
 
         });
-        updateVideoArchiveSet((IVideoArchive) dispatcher.getValueObject());
+        update((VideoArchive) dispatcher.getValueObject());
 
         /*
          * On click show a dialog allowing a user to open a VideoArchive
@@ -86,17 +71,20 @@ public class StatusLabelForVideoArchive extends StatusLabel {
         });
     }
 
-    /**
-     *     <p><!-- Method description --></p>
-     *     @return
-     *     @uml.property  name="action"
-     */
     private ShowOpenVideoArchiveDialogAction getAction() {
         if (action == null) {
             action = new ShowOpenVideoArchiveDialogAction();
         }
 
         return action;
+    }
+
+    /**
+     *
+     * @param evt
+     */
+    public void propertyChange(PropertyChangeEvent evt) {
+        update((VideoArchive) evt.getNewValue());
     }
 
     /**
@@ -107,39 +95,28 @@ public class StatusLabelForVideoArchive extends StatusLabel {
      *
      * @param videoArchive Sets the videoArchive to be registered with the label
      */
-    public void update(final IVideoArchive videoArchive) {
+    public void update(final VideoArchive videoArchive) {
         boolean ok = false;
         String text = "NONE";
         String toolTip = text;
         if (videoArchive != null) {
-            text = videoArchive.getVideoArchiveName() + "";
+            text = videoArchive.getName() + "";
             toolTip = text;
-            
-            if (text.length() > 20 && 
-                    (text.toLowerCase().startsWith("http:") || 
-                    text.toLowerCase().startsWith("file:"))) {
+
+            if ((text.length() > 20) &&
+                    (text.toLowerCase().startsWith("http:") || text.toLowerCase().startsWith("file:"))) {
                 String[] parts = text.split("/");
                 if (parts.length > 0) {
                     text = ".../" + parts[parts.length - 1];
                 }
-                
+
             }
+
             ok = true;
         }
 
         setText("Video: " + text);
         setToolTipText(toolTip);
         setOk(ok);
-    }
-
-    /**
-     * Method description
-     *
-     *
-     * @param arg0
-     * @param arg1
-     */
-    public void update(Object arg0, Object arg1) {
-        updateVideoArchiveSet((IVideoArchive) arg0);
     }
 }

@@ -14,6 +14,8 @@
 
 package vars.annotation.jpa;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import javax.persistence.Column;
@@ -28,6 +30,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
+import javax.persistence.Transient;
 import javax.persistence.Version;
 import vars.LinkUtilities;
 import vars.annotation.Association;
@@ -58,6 +61,9 @@ import vars.jpa.TransactionLogger;
 
 })
 public class AssociationImpl implements Serializable, Association, JPAEntity {
+    
+    @Transient
+    private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
     @Id
     @Column(
@@ -214,5 +220,29 @@ public class AssociationImpl implements Serializable, Association, JPAEntity {
     @Override
     public String toString() {
         return stringValue();
+    }
+
+    public void addPropertyChangeListener(String string, PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(string, listener);
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(listener);
+    }
+
+    public PropertyChangeListener[] getPropertyChangeListeners() {
+        return propertyChangeSupport.getPropertyChangeListeners();
+    }
+
+    public PropertyChangeListener[] getPropertyChangeListeners(String string) {
+        return propertyChangeSupport.getPropertyChangeListeners(string);
+    }
+
+    public void removePropertyChangeListener(String string, PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(string, listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(listener);
     }
 }

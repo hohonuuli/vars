@@ -1,5 +1,6 @@
 package org.mbari.vars.annotation.ui.dialogs;
 
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.HierarchyEvent;
@@ -11,52 +12,36 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 
 import javax.swing.JDialog;
+
+import org.bushe.swing.event.EventBus;
 import org.jdesktop.layout.GroupLayout;
 import org.jdesktop.layout.LayoutStyle;
 import org.mbari.swing.JFancyButton;
-import org.mbari.vars.dao.DAOException;
-import org.mbari.vars.knowledgebase.model.Concept;
-import org.mbari.vars.knowledgebase.model.dao.KnowledgeBaseCache;
-import org.mbari.vars.ui.ConceptNameComboBox;
-import org.mbari.vars.ui.HierachicalConceptNameComboBox;
-import org.mbari.vars.util.AppFrameDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import vars.annotation.SpecialAnnotationDAO;
+import vars.annotation.ui.Lookup;
+import vars.knowledgebase.Concept;
+import vars.shared.ui.ConceptNameComboBox;
+import vars.shared.ui.HierachicalConceptNameComboBox;
 
 public class ToConceptSelectionDialog extends JDialog {
 
     private JButton okButton;
     private JButton cancelButton;
     private ConceptNameComboBox comboBox;
+    private final SpecialAnnotationDAO specialAnnotationDAO;
     
-    private final Logger log = LoggerFactory.getLogger(ToConceptSelectionDialog.class);
-
-    /**
-     * Launch the application
-     * @param args
-     */
-    public static void main(String args[]) {
-        try {
-            ToConceptSelectionDialog dialog = new ToConceptSelectionDialog();
-            dialog.addWindowListener(new WindowAdapter() {
-
-                @Override
-                public void windowClosing(WindowEvent e) {
-                    System.exit(0);
-                }
-            });
-            dialog.setVisible(true);
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    
 
     /**
      * Create the dialog
      */
-    public ToConceptSelectionDialog() {
-        super(AppFrameDispatcher.getFrame());
+    public ToConceptSelectionDialog(SpecialAnnotationDAO specialAnnotationDAO) {
+        super((Frame) Lookup.getApplicationFrameDispatcher().getValueObject());
+        this.specialAnnotationDAO = specialAnnotationDAO;
         try {
             initialize();
         }
@@ -104,20 +89,21 @@ public class ToConceptSelectionDialog extends JDialog {
         if (comboBox == null) {
             Concept concept = null;
             try {
-                concept = KnowledgeBaseCache.getInstance().findConceptByName("physical-object");
+                concept = specialAnnotationDAO.findConceptByName("physical-object");
                 if (concept == null) {
-                    concept = KnowledgeBaseCache.getInstance().findRootConcept();
+                    concept = specialAnnotationDAO.findRootConcept();
                 }
             }
-            catch (DAOException ex) {
-                log.error("Failed to lookup 'physical-object'", ex);
+            catch (Exception ex) {
+                log.error("Failed to lookup concepts from knowledgebase", ex);
+                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, ex);
             }
             
             if (concept != null) {
-                comboBox = new HierachicalConceptNameComboBox(concept);
+                comboBox = new HierachicalConceptNameComboBox(concept, specialAnnotationDAO.getConceptDAO());
             }
             else {
-                comboBox = new HierachicalConceptNameComboBox();
+                comboBox = new HierachicalConceptNameComboBox(specialAnnotationDAO.getConceptDAO());
             }
         }
         return comboBox;
@@ -164,10 +150,11 @@ public class ToConceptSelectionDialog extends JDialog {
         String conceptName = (String) getComboBox().getSelectedItem();
         Concept concept = null;
         try {
-            concept = KnowledgeBaseCache.getInstance().findConceptByName(conceptName);
+            concept = specialAnnotationDAO.findConceptByName(conceptName);
         }
-        catch (DAOException e) {
+        catch (Exception e) {
             log.error("Failed to lookup '" + conceptName + "' from the knowledgebase", e);
+            EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
         }
         return concept;
     }

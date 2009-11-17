@@ -66,7 +66,7 @@ public class AnnotationPanel extends JPanel {
         if (buttonEditorSplitPane == null) {
             buttonEditorSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
             buttonEditorSplitPane.setRightComponent(getButtonPanel());
-            buttonEditorSplitPane.setLeftComponent(new RowEditorPanel());
+            buttonEditorSplitPane.setLeftComponent(new RowEditorPanel(toolBelt));
         }
 
         return buttonEditorSplitPane;

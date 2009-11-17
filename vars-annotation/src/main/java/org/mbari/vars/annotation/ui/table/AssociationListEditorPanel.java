@@ -27,6 +27,8 @@ import java.awt.event.FocusEvent;
 import java.awt.image.ImageObserver;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -40,18 +42,19 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.ToolTipManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
+import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.awt.layout.VerticalFlowLayout;
 import org.mbari.swing.JFancyButton;
 import org.mbari.swing.ListListModel;
-import org.mbari.vars.annotation.model.Association;
-import vars.annotation.AssociationList;
-import vars.annotation.ISimpleConcept;
-import org.mbari.vars.annotation.model.Observation;
-import org.mbari.vars.annotation.model.dao.AssociationDAO;
-import org.mbari.vars.dao.DAOEventQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import vars.annotation.Association;
+import vars.annotation.Observation;
+import vars.annotation.ui.Lookup;
+import vars.annotation.ui.PersistenceService;
 
 /**
  * <p>
@@ -73,133 +76,64 @@ import org.slf4j.LoggerFactory;
  *  [AssociationListCellRenderer]
  * </pre>
  *
- * @author  <a href="mailto:brian@mbari.org">Brian Schlining </a>
- * @version  $Id: AssociationListEditorPanel.java,v 1.12 2004/02/27 19:25:56
- *          brian Exp $
- * @stereotype  thing
  */
 public class AssociationListEditorPanel extends JPanel {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 4495657018990703758L;
-    private static final Logger log = LoggerFactory.getLogger(AssociationListEditorPanel.class);
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    
 
-    /**
-     *     Description of the Field
-     *     @uml.property  name="hEIGHT"
-     */
     public final int HEIGHT = ImageObserver.HEIGHT;
 
-    /**
-     *     Description of the Field
-     *     @uml.property  name="wIDTH"
-     */
     public final int WIDTH = ImageObserver.WIDTH;
 
-    /**
-     *     @uml.property  name="jList"
-     *     @uml.associationEnd
-     */
     JList jList;
 
-    /**
-     *     @uml.property  name="jScrollPane"
-     *     @uml.associationEnd
-     */
+ 
     JScrollPane jScrollPane;
 
-    /**
-     *     @uml.property  name="associationEditorPanel"
-     *     @uml.associationEnd
-     */
+ 
     protected AssociationEditorPanel associationEditorPanel = null;
 
-    /**
-     *     @uml.property  name="verticalFlowLayout1"
-     *     @uml.associationEnd  multiplicity="(1 1)"
-     */
+ 
     VerticalFlowLayout verticalFlowLayout1 = new VerticalFlowLayout();
 
-    /**
-     *     @uml.property  name="listEditorPanel"
-     *     @uml.associationEnd  multiplicity="(1 1)"
-     */
     JPanel listEditorPanel = new JPanel();
 
-    /**
-     *     @uml.property  name="addAction"
-     *     @uml.associationEnd
-     */
     private ActionAdapter addAction;
 
-    /**
-     *     @uml.property  name="buttonAdd"
-     *     @uml.associationEnd
-     */
     private JButton buttonAdd = null;
 
-    /**
-     *     @uml.property  name="buttonEdit"
-     *     @uml.associationEnd
-     */
     private JButton buttonEdit = null;
 
-    /**
-     *     @uml.property  name="buttonPanel"
-     *     @uml.associationEnd
-     */
+ 
     private JPanel buttonPanel;
 
-    /**
-     *     @uml.property  name="buttonRemove"
-     *     @uml.associationEnd
-     */
+
     private JButton buttonRemove = null;
 
-    /**
-     *     @uml.property  name="changeListener"
-     */
     private PropertyChangeListener changeListener;
 
-    /**
-     *     @uml.property  name="editAction"
-     *     @uml.associationEnd
-     */
     private ActionAdapter editAction;
 
-    /**
-     *     @uml.property  name="editingAssociation"
-     */
     private boolean editingAssociation;
 
-    /**
-     *     @uml.property  name="observation"
-     *     @uml.associationEnd
-     */
+
     private Observation observation;
 
-    /**
-     *     @uml.property  name="removeAction"
-     *     @uml.associationEnd
-     */
+
     private ActionAdapter removeAction;
+    
+    private final PersistenceService persistenceService;
 
     /**
      * Constructor for the AssociationListEditorPanel object
      */
-    public AssociationListEditorPanel() {
+    public AssociationListEditorPanel(PersistenceService persistenceService) {
+        this.persistenceService = persistenceService;
         initialize();
     }
 
-    // Enable the buttons if it is appropriate to do so, based on the state of
-    // the jList
 
-    /**
-     * <p><!-- Method description --></p>
-     *
-     */
     private void enableButtons() {
         getButtonAdd().setEnabled(true);
 
@@ -213,19 +147,11 @@ public class AssociationListEditorPanel extends JPanel {
         }
     }
 
-    /**
-     *     <p><!-- Method description --></p>
-     *     @return
-     *     @uml.property  name="addAction"
-     */
+
     ActionAdapter getAddAction() {
         if (addAction == null) {
             addAction = new ActionAdapter() {
 
-                /**
-                 *
-                 */
-                private static final long serialVersionUID = 4167992105629488599L;
 
                 public void doAction() {
 
@@ -248,7 +174,6 @@ public class AssociationListEditorPanel extends JPanel {
     /**
      *     Gets the associationEditorPanel attribute of the AssociationListEditorPanel object
      *     @return   The associationEditorPanel value
-     *     @uml.property  name="associationEditorPanel"
      */
     public AssociationEditorPanel getAssociationEditorPanel() {
         if (associationEditorPanel == null) {
@@ -265,11 +190,6 @@ public class AssociationListEditorPanel extends JPanel {
         return associationEditorPanel;
     }
 
-    /**
-     *     <p><!-- Method description --></p>
-     *     @return
-     *     @uml.property  name="buttonAdd"
-     */
     private JButton getButtonAdd() {
         if (buttonAdd == null) {
             buttonAdd = new JFancyButton();
@@ -283,11 +203,6 @@ public class AssociationListEditorPanel extends JPanel {
         return buttonAdd;
     }
 
-    /**
-     *     <p><!-- Method description --></p>
-     *     @return
-     *     @uml.property  name="buttonEdit"
-     */
     private JButton getButtonEdit() {
         if (buttonEdit == null) {
             buttonEdit = new JFancyButton();
@@ -302,11 +217,6 @@ public class AssociationListEditorPanel extends JPanel {
         return buttonEdit;
     }
 
-    /**
-     *     <p><!-- Method description --></p>
-     *     @return
-     *     @uml.property  name="buttonPanel"
-     */
     private JPanel getButtonPanel() {
         if (buttonPanel == null) {
             buttonPanel = new JPanel();
@@ -320,11 +230,7 @@ public class AssociationListEditorPanel extends JPanel {
         return buttonPanel;
     }
 
-    /**
-     *     <p><!-- Method description --></p>
-     *     @return
-     *     @uml.property  name="buttonRemove"
-     */
+
     private JButton getButtonRemove() {
         if (buttonRemove == null) {
             buttonRemove = new JFancyButton();
@@ -342,7 +248,6 @@ public class AssociationListEditorPanel extends JPanel {
     /**
      *     This change listener can be added to any object whose state change requires the JList to repaint.
      *     @return
-     *     @uml.property  name="changeListener"
      */
     PropertyChangeListener getChangeListener() {
         if (changeListener == null) {
@@ -358,19 +263,11 @@ public class AssociationListEditorPanel extends JPanel {
         return changeListener;
     }
 
-    /**
-     *     <p><!-- Method description --></p>
-     *     @return
-     *     @uml.property  name="editAction"
-     */
+ 
     ActionAdapter getEditAction() {
         if (editAction == null) {
             editAction = new ActionAdapter() {
 
-                /**
-                 *
-                 */
-                private static final long serialVersionUID = 4634422451695299506L;
 
                 public void doAction() {
                     try {
@@ -388,11 +285,7 @@ public class AssociationListEditorPanel extends JPanel {
         return editAction;
     }
 
-    /**
-     *     <p><!-- Method description --></p>
-     *     @return
-     *     @uml.property  name="jList"
-     */
+
     private JList getJList() {
         if (jList == null) {
             jList = new JList();
@@ -440,11 +333,6 @@ public class AssociationListEditorPanel extends JPanel {
         return jList;
     }
 
-    /**
-     *     <p><!-- Method description --></p>
-     *     @return
-     *     @uml.property  name="jScrollPane"
-     */
     private JScrollPane getJScrollPane() {
         if (jScrollPane == null) {
             jScrollPane = new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -460,9 +348,8 @@ public class AssociationListEditorPanel extends JPanel {
     }
 
     /**
-     *     Retrieve the observation whose assocations are being edited.
+     *     Retrieve the observation whose associations are being edited.
      *     @return
-     *     @uml.property  name="observation"
      */
     public Observation getObservation() {
         return observation;
@@ -471,16 +358,11 @@ public class AssociationListEditorPanel extends JPanel {
     /**
      *     The removeAction removes the association selected in the list from the database, the view, and the datamodel.
      *     @return
-     *     @uml.property  name="removeAction"
      */
     ActionAdapter getRemoveAction() {
         if (removeAction == null) {
             removeAction = new ActionAdapter() {
 
-                /**
-                 *
-                 */
-                private static final long serialVersionUID = 5987519694176839512L;
 
                 public void doAction() {
 
@@ -496,31 +378,20 @@ public class AssociationListEditorPanel extends JPanel {
                         // just remove it.
                         if (association == null) {
                             listModel.remove(j.getSelectedIndex());
-
                             return;
                         }
 
-                        // Get the parent of the selected association
-
-                        final ISimpleConcept parent = association.getParent();
 
                         // Remove references to the selected association from
-                        // the parent
-                        // and the listModel
+                        // the parent and the listModel
                         listModel.remove(j.getSelectedIndex());
 
-                        // Delete the new Association into the database.
-                        DAOEventQueue.flush();
-
+ 
                         try {
-                            AssociationDAO.getInstance().delete(association);
-                            parent.removeAssociation(association);
+                            persistenceService.deleteAssociations(new ArrayList<Association>() {{ add(association); }} );
                         }
                         catch (final Exception ex) {
-                            if (log.isErrorEnabled()) {
-                                log.error("Unable to delete an Association (" + association +
-                                          ") record from the VARS database.", ex);
-                            }
+                            EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, ex);
                         }
 
                     }
@@ -531,10 +402,6 @@ public class AssociationListEditorPanel extends JPanel {
         return removeAction;
     }
 
-    /**
-     * <p><!-- Method description --></p>
-     *
-     */
     void initialize() {
         listEditorPanel.setOpaque(false);
         layoutPanel();
@@ -562,8 +429,8 @@ public class AssociationListEditorPanel extends JPanel {
     }
 
     /**
-     * This method is requried for focus management. All components are remove
-     * from the vewi at certain times so taht they can't be focused on. but they
+     * This method is required for focus management. All components are remove
+     * from the view at certain times so that they can't be focused on. but they
      * bet added back later
      *
      */

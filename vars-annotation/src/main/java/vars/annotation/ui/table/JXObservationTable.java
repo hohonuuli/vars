@@ -20,6 +20,8 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.Collection;
 import java.util.HashSet;
+
+import javax.swing.JTable;
 import javax.swing.JViewport;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
@@ -213,5 +215,9 @@ public class JXObservationTable extends JXTable implements IObservationTable {
 
         getSelectionModel().setSelectionInterval(row, row);
         scrollCellToVisible(row, 0);
+    }
+
+    public JTable getJTable() {
+        return this;
     }
 }

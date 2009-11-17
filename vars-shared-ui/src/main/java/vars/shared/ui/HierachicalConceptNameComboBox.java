@@ -40,11 +40,6 @@ import vars.knowledgebase.ConceptName;
  */
 public class HierachicalConceptNameComboBox extends ConceptNameComboBox {
 
-    private static final long serialVersionUID = -3394497521010481199L;
-    /**
-	 * @uml.property  name="concept"
-	 * @uml.associationEnd  
-	 */
     private Concept concept;
     private final ConceptDAO conceptDAO;
 
@@ -74,22 +69,11 @@ public class HierachicalConceptNameComboBox extends ConceptNameComboBox {
         initialize();
     }
 
-    //~--- get methods --------------------------------------------------------
-
-    /**
-	 * @return
-	 * @uml.property  name="concept"
-	 */
+ 
     public Concept getConcept() {
         return concept;
     }
 
-    //~--- methods ------------------------------------------------------------
-
-    /**
-     * <p><!-- Method description --></p>
-     *
-     */
     protected void initialize() {
         setEditable(true);
         addKeyListener(new KeyAdapter() {
@@ -116,12 +100,6 @@ public class HierachicalConceptNameComboBox extends ConceptNameComboBox {
         });
     }
 
-    //~--- set methods --------------------------------------------------------
-
-    /**
-	 * @param  concept
-	 * @uml.property  name="concept"
-	 */
     public void setConcept(Concept concept) {
         this.concept = concept;
 

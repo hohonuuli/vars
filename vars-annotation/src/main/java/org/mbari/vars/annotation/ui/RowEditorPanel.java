@@ -51,16 +51,25 @@ import javax.swing.KeyStroke;
 import javax.swing.LayoutFocusTraversalPolicy;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+
+import org.bushe.swing.event.EventBus;
 import org.mbari.vars.annotation.ui.table.AssociationListEditorPanel;
 import org.mbari.vars.annotation.ui.table.ObservationTablePanel;
 
+import vars.CacheClearedEvent;
+import vars.CacheClearedListener;
+import vars.UserAccount;
 import vars.annotation.Observation;
+import vars.annotation.SpecialAnnotationDAO;
 import vars.annotation.ui.Lookup;
+import vars.annotation.ui.PersistenceService;
+import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.table.IObservationTable;
 import vars.knowledgebase.ConceptName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.knowledgebase.Concept;
+import vars.shared.ui.AllConceptNamesComboBox;
 
 /**
  * <p>THis panel is explcitly desinged for editing Observations in the
@@ -113,7 +122,7 @@ public class RowEditorPanel extends JPanel {
     /**
      *     A collection of names that we should not allow notes to be added to.
      */
-    private Collection notableConceptNames;
+    private Collection<String> notableConceptNames;
 
 
     private JTextArea notesArea;
@@ -121,12 +130,14 @@ public class RowEditorPanel extends JPanel {
     private final IObservationTable observationTable;
 
     private Observation selectedObservation;
+    
+    private final ToolBelt toolBelt;
 
     /**
      * Constructor for the RowEditorPanel object
      */
-    public RowEditorPanel() {
-        this((IObservationTable) Lookup.getObservationTableDispatcher().getValueObject());
+    public RowEditorPanel(ToolBelt toolBelt) {
+        this((IObservationTable) Lookup.getObservationTableDispatcher().getValueObject(), toolBelt);
     }
 
     /**
@@ -134,20 +145,22 @@ public class RowEditorPanel extends JPanel {
      *
      * @param  observationTable Description of the Parameter
      */
-    public RowEditorPanel(final IObservationTable observationTable) {
+    public RowEditorPanel(final IObservationTable observationTable, ToolBelt toolBelt) {
         super();
         this.observationTable = observationTable;
+        this.toolBelt = toolBelt;
         ((JTable) observationTable).setFocusable(false);
         initialize();
 
         /**
          * Listen for changes in the observation
          */
-        PredefinedDispatcher.OBSERVATION.getDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
+        Lookup.getSelectedObservationsDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
 
             public void propertyChange(final PropertyChangeEvent evt) {
-                final Observation newObs = (Observation) evt.getNewValue();
-                setObservation(newObs);
+                final Collection<Observation> observations = (Collection<Observation>) evt.getNewValue();
+                Observation obs = (observations.size() == 1) ? observations.iterator().next() : null;
+                setObservation(obs);
             }
 
         });
@@ -156,10 +169,9 @@ public class RowEditorPanel extends JPanel {
          * This allows the notable concept names to be refreshed is the
          * KnowledgebaseCache is cleared
          */
-        KnowledgeBaseCache.getInstance().addCacheClearedListener(new CacheClearedListener() {
+        toolBelt.getPersistenceCache().addCacheClearedListener(new CacheClearedListener() {
 
             public void afterClear(final CacheClearedEvent evt) {
-
                 // DO nothing
             }
 
@@ -172,14 +184,10 @@ public class RowEditorPanel extends JPanel {
 
     }
 
-    /**
-     *     <p><!-- Method description --></p>
-     *     @return
-     *     @uml.property  name="conceptComboBox"
-     */
+
     private JComboBox getConceptComboBox() {
         if (conceptComboBox == null) {
-            conceptComboBox = new AllConceptNamesComboBox();
+            conceptComboBox = new AllConceptNamesComboBox(toolBelt.getSpecialQueryDAO());
             conceptComboBox.setPreferredSize(new Dimension(250, 23));
 
             conceptComboBox.addItemListener(new ItemListener() {
@@ -196,12 +204,12 @@ public class RowEditorPanel extends JPanel {
 
                         if ((selectedObservation != null) && !selectedObservation.getConceptName().equals(conceptName)) {
                             selectedObservation.setConceptName(conceptName);
-                            final String person = PersonDispatcher.getInstance().getPerson();
-                            selectedObservation.setObserver(person);
+                            final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+                            selectedObservation.setObserver(userAccount.getUserName());
                             selectedObservation.setObservationDate(new Date());
 
                             if (log.isDebugEnabled()) {
-                                log.debug("Observation changed to " + conceptName + " by " + person);
+                                log.debug("Observation changed to " + conceptName + " by " + userAccount.getUserName());
                             }
                         }
                     }
@@ -249,14 +257,14 @@ public class RowEditorPanel extends JPanel {
                         conceptComboBox.setEnabled(false);
 
                         try {
-                            concept = KnowledgeBaseCache.getInstance().findConceptByName(selectedName);
-                            primaryName = concept.getPrimaryConceptNameAsString();
+                            final SpecialAnnotationDAO specialAnnotationDAO = toolBelt.getSpecialAnnotationDAO();
+                            concept = specialAnnotationDAO.findConceptByName(selectedName);
+                            primaryName = concept.getPrimaryConceptName().getName();
                         }
-                        catch (final DAOException e1) {
+                        catch (final Exception e1) {
                             log.error("Failed to lookup '" + conceptComboBox.getSelectedItem() + "' from database", e1);
-                            AppFrameDispatcher.showErrorDialog(
-                                "Failed to validate the concept-name. There may be a problem with the database connection");
-                            primaryName = IConceptName.NAME_DEFAULT;
+                            EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e1);
+                            primaryName = ConceptName.NAME_DEFAULT;
                         }
 
                         if (!selectedName.equals(primaryName)) {
@@ -281,8 +289,6 @@ public class RowEditorPanel extends JPanel {
             jPanel.setLayout(new BorderLayout(4, 4));
             jPanel.add(getConceptComboBox(), BorderLayout.WEST);
             final JScrollPane scrollPane = new JScrollPane(getNotesArea());
-
-            // scrollPane.setPreferredSize(new Dimension(5, 20));
             jPanel.add(scrollPane, BorderLayout.CENTER);
         }
 
@@ -303,22 +309,22 @@ public class RowEditorPanel extends JPanel {
      *     <p>The video lab has requested that top level concepts should not be able to have notes added to them. This is because annotators on the ship frequently use 'object' or 'physical-object' as the concept name but then but the detail of what the object is in the notes. They would like to stop this practice and force users to choose a concept.</p> <p>This method gets the root concept name and the names of its child concepts (and only the root concepts child concepts) and adds them to a collection. </p>
      *     @return   A collection of strings representing the root conceptname and it's  child names.
      */
-    private Collection getNotableConceptNames() {
+    private Collection<String> getNotableConceptNames() {
         if (notableConceptNames == null) {
 
 
-            notableConceptNames = new HashSet();
+            notableConceptNames = new HashSet<String>();
 
             try {
-                final Concept rootConcept = KnowledgeBaseCache.getInstance().findRootConcept();
-                notableConceptNames.add(rootConcept.getPrimaryConceptNameAsString());
-                final Collection chillin = rootConcept.getChildConceptColl();
-                for (final Iterator i = chillin.iterator(); i.hasNext(); ) {
-                    final Concept child = (IConcept) i.next();
-                    notableConceptNames.add(child.getPrimaryConceptNameAsString());
+                final Concept rootConcept = toolBelt.getSpecialAnnotationDAO().findRootConcept();
+                notableConceptNames.add(rootConcept.getPrimaryConceptName().getName());
+                final Collection<Concept> chillin = rootConcept.getChildConcepts();
+                for (final Iterator<Concept> i = chillin.iterator(); i.hasNext(); ) {
+                    final Concept child = i.next();
+                    notableConceptNames.add(child.getPrimaryConceptName().getName());
                 }
             }
-            catch (final DAOException e) {
+            catch (final Exception e) {
                 if (log.isErrorEnabled()) {
                     log.error("Failed to get root concept from database", e);
                 }
@@ -416,17 +422,21 @@ public class RowEditorPanel extends JPanel {
      * and down wraps at the top and bottom of the table.
      */
     private void mapKeys() {
+        
+        final JTable jTable = observationTable.getJTable();
         this.getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.CTRL_DOWN_MASK),
                          "up-table");
         this.getActionMap().put("down-table", new AbstractAction() {
 
 
             public void actionPerformed(final ActionEvent e) {
+                
+                
 
-                final int numRows = observationTable.getRowCount();
-                final int currentRow = observationTable.getSelectionModel().getLeadSelectionIndex();
+                final int numRows = jTable.getRowCount();
+                final int currentRow = jTable.getSelectionModel().getLeadSelectionIndex();
                 final int nextRow = (currentRow + 1 >= numRows) ? 0 : currentRow + 1;
-                observationTable.getSelectionModel().setSelectionInterval(nextRow, nextRow);
+                jTable.getSelectionModel().setSelectionInterval(nextRow, nextRow);
                 observationTable.scrollToVisible(nextRow, 0);
             }
 
@@ -439,10 +449,10 @@ public class RowEditorPanel extends JPanel {
 
             public void actionPerformed(final ActionEvent e) {
 
-                final int numRows = observationTable.getRowCount();
-                final int currentRow = observationTable.getSelectionModel().getLeadSelectionIndex();
+                final int numRows = jTable.getRowCount();
+                final int currentRow = jTable.getSelectionModel().getLeadSelectionIndex();
                 final int nextRow = (currentRow - 1 < 0) ? numRows - 1 : currentRow - 1;
-                observationTable.getSelectionModel().setSelectionInterval(nextRow, nextRow);
+                jTable.getSelectionModel().setSelectionInterval(nextRow, nextRow);
                 observationTable.scrollToVisible(nextRow, 0);
             }
 
@@ -471,10 +481,11 @@ public class RowEditorPanel extends JPanel {
 
         if (isNull) {
             try {
-                getConceptComboBox().setSelectedItem(
-                    KnowledgeBaseCache.getInstance().findRootConcept().getPrimaryConceptNameAsString());
+                Concept rootConcept = toolBelt.getSpecialAnnotationDAO().findRootConcept();
+                
+                getConceptComboBox().setSelectedItem(rootConcept.getPrimaryConceptName().getName());
             }
-            catch (final DAOException e) {
+            catch (final Exception e) {
                 getConceptComboBox().setSelectedIndex(0);
 
                 if (log.isErrorEnabled()) {

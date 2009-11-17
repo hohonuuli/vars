@@ -42,6 +42,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
+import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
@@ -51,155 +52,74 @@ import javax.swing.event.ListSelectionListener;
 import org.mbari.swing.SortedComboBoxModel;
 import org.mbari.swing.SwingWorker;
 import org.mbari.text.IgnoreCaseToStringComparator;
-import org.mbari.vars.annotation.model.Association;
-import org.mbari.vars.annotation.model.Observation;
-import org.mbari.vars.annotation.model.dao.ObservationDAO;
+
 import org.mbari.vars.annotation.ui.VideoSetViewer;
 import org.mbari.vars.annotation.ui.actions.DeleteObservationAction;
-import org.mbari.vars.dao.DAOEventQueue;
-import org.mbari.vars.dao.DAOException;
-import org.mbari.vars.dao.IDataObject;
-import org.mbari.vars.knowledgebase.model.Concept;
-import org.mbari.vars.knowledgebase.model.dao.KnowledgeBaseCache;
-import org.mbari.vars.ui.AllConceptNamesComboBox;
-import org.mbari.vars.ui.ConceptNameComboBox;
-import org.mbari.vars.util.AppFrameDispatcher;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.annotation.IObservation;
-import vars.annotation.IAssociation;
+import vars.annotation.Observation;
+import vars.annotation.Association;
+import vars.annotation.ui.table.IObservationTable;
+import vars.annotation.ui.table.IObservationTableModel;
+import vars.shared.ui.AllConceptNamesComboBox;
+import vars.shared.ui.ConceptNameComboBox;
 
 /**
  * <p>A UI component that provides access to search and replace functions for
  * an ObservationTable</p>
  *
  * @author  <a href="http://www.mbari.org">MBARI</a>
- * @version  $Id: SearchAndReplaceWidget.java 332 2006-08-01 18:38:46Z hohonuuli $
  */
 public class SearchAndReplaceWidget extends JPanel {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 4864271460726368174L;
-    private static final Logger log = LoggerFactory.getLogger(SearchAndReplaceWidget.class);
-
-    /**
-     *     @uml.property  name="addAssociationButton"
-     *     @uml.associationEnd
-     */
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    
     private JButton addAssociationButton = null;
 
-    /**
-     *     @uml.property  name="associationLabel"
-     *     @uml.associationEnd
-     */
     private JLabel associationLabel = null;
 
-    /**
-     *     @uml.property  name="conceptLabel"
-     *     @uml.associationEnd
-     */
     private JLabel conceptLabel = null;
 
-    /**
-     *     @uml.property  name="isBeingUpdated"
-     */
     private transient volatile boolean isBeingUpdated = false;
 
-    /**
-     *     @uml.property  name="removeAssociationsButton"
-     *     @uml.associationEnd
-     */
     private JButton removeAssociationsButton = null;
 
-    /**
-     *     @uml.property  name="removeObservationButton"
-     *     @uml.associationEnd
-     */
     private JButton removeObservationButton = null;
 
-    /**
-     *     @uml.property  name="renameConceptButton"
-     *     @uml.associationEnd
-     */
+
     private JButton renameConceptButton = null;
 
-    /**
-     *     @uml.property  name="renameConceptComboBox"
-     *     @uml.associationEnd
-     */
+ 
     private AllConceptNamesComboBox renameConceptComboBox = null;
 
-    /**
-     *     @uml.property  name="replaceAssociationButton"
-     *     @uml.associationEnd
-     */
+ 
     private JButton replaceAssociationButton = null;
 
-    /**
-     *     @uml.property  name="searchAssociationCheckBox"
-     *     @uml.associationEnd
-     */
+ 
     private JCheckBox searchAssociationCheckBox = null;
 
-    /**
-     *     @uml.property  name="searchAssociationComboBox"
-     *     @uml.associationEnd
-     */
     private JComboBox searchAssociationComboBox = null;
 
-    /**
-     *     @uml.property  name="searchButton"
-     *     @uml.associationEnd
-     */
+ 
     private JButton searchButton = null;
 
-    /**
-     *     @uml.property  name="searchConceptCheckBox"
-     *     @uml.associationEnd
-     */
     private JCheckBox searchConceptCheckBox = null;
 
-    /**
-     *     @uml.property  name="searchConceptComboBox"
-     *     @uml.associationEnd
-     */
     private ConceptNameComboBox searchConceptComboBox = null;
 
-    /**
-     *     @uml.property  name="searchLabel"
-     *     @uml.associationEnd
-     */
+
     private JLabel searchLabel = null;
 
-    /**
-     *     @uml.property  name="searchPanel"
-     *     @uml.associationEnd
-     */
     private JPanel searchPanel = null;
 
-    /**
-     *     @uml.property  name="searchStatusLabel"
-     *     @uml.associationEnd
-     */
     private JLabel searchStatusLabel = null;
 
-    /**
-     *     @uml.property  name="table"
-     *     @uml.associationEnd  multiplicity="(1 1)"
-     */
-    private final ObservationTable table;
+    private final IObservationTable table;
 
-    /**
-     *     @uml.property  name="videoSetViewer"
-     *     @uml.associationEnd  multiplicity="(1 1)" inverse="searchAndReplaceWidget:org.mbari.vars.annotation.ui.VideoSetViewer"
-     */
     private final VideoSetViewer videoSetViewer;
 
-    /**
-     *     @uml.property  name="waitMessage" multiplicity="(0 -1)" dimension="1"
-     */
+
     private final String[] waitMessage = { "Retrieving Concept Names ..." };
 
     /**
@@ -208,18 +128,13 @@ public class SearchAndReplaceWidget extends JPanel {
      * @param  videoSetViewer Description of the Parameter
      * @param  table Description of the Parameter
      */
-    public SearchAndReplaceWidget(final VideoSetViewer videoSetViewer, final ObservationTable table) {
+    public SearchAndReplaceWidget(final VideoSetViewer videoSetViewer, final IObservationTable table) {
         this.videoSetViewer = videoSetViewer;
         this.table = table;
         listenForTableChanges();
         initialize();
     }
 
-    /**
-     *     <p><!-- Method description --></p>
-     *     @return
-     *     @uml.property  name="addAssociationButton"
-     */
     private JButton getAddAssociationButton() {
         if (addAssociationButton == null) {
             addAssociationButton = new JButton("Add Association");
@@ -235,7 +150,7 @@ public class SearchAndReplaceWidget extends JPanel {
                     }
 
                     final Association association = editorPanel.getUserGeneratedAssociation();
-                    final IObservation[] observations = SearchAndReplace.getSelectedObservations(table);
+                    final Observation[] observations = SearchAndReplace.getSelectedObservations(table);
 
                     /*
                      * Flush pending database transactions in order to simplify
@@ -272,11 +187,7 @@ public class SearchAndReplaceWidget extends JPanel {
         return addAssociationButton;
     }
 
-    /**
-     *     <p><!-- Method description --></p>
-     *     @return
-     *     @uml.property  name="associationLabel"
-     */
+
     private JLabel getAssociationLabel() {
         if (associationLabel == null) {
             associationLabel = new JLabel("Association");
@@ -285,11 +196,7 @@ public class SearchAndReplaceWidget extends JPanel {
         return associationLabel;
     }
 
-    /**
-     *     <p><!-- Method description --></p>
-     *     @return
-     *     @uml.property  name="conceptLabel"
-     */
+ 
     private JLabel getConceptLabel() {
         if (conceptLabel == null) {
             conceptLabel = new JLabel("Concept Name");
@@ -298,11 +205,7 @@ public class SearchAndReplaceWidget extends JPanel {
         return conceptLabel;
     }
 
-    /**
-     *     <p><!-- Method description --></p>
-     *     @return
-     *     @uml.property  name="removeAssociationsButton"
-     */
+
     private JButton getRemoveAssociationsButton() {
         if (removeAssociationsButton == null) {
             removeAssociationsButton = new JButton("Remove Associations");
@@ -316,9 +219,9 @@ public class SearchAndReplaceWidget extends JPanel {
                         return;
                     }
 
-                    final IObservation[] selectedObs = SearchAndReplace.getSelectedObservations(table);
+                    final Observation[] selectedObs = SearchAndReplace.getSelectedObservations(table);
                     for (int i = 0; i < selectedObs.length; i++) {
-                        final IObservation obs = selectedObs[i];
+                        final Observation obs = selectedObs[i];
                         final Collection dead = obs.removeDescendantAssociation(deadAssoc);
                         DAOEventQueue.updateVideoArchiveSet((IDataObject) obs);
 
@@ -338,11 +241,6 @@ public class SearchAndReplaceWidget extends JPanel {
         return removeAssociationsButton;
     }
 
-    /**
-     *     <p><!-- Method description --></p>
-     *     @return
-     *     @uml.property  name="removeObservationButton"
-     */
     private JButton getRemoveObservationButton() {
         if (removeObservationButton == null) {
             removeObservationButton = new JButton("Remove Selected Observations");
@@ -363,9 +261,9 @@ public class SearchAndReplaceWidget extends JPanel {
                     }
 
                     // Remove the association from the table and the database
-                    final IObservation[] observationsToBeRemoved = SearchAndReplace.getSelectedObservations(table);
+                    final Observation[] observationsToBeRemoved = SearchAndReplace.getSelectedObservations(table);
                     for (int i = 0; i < observationsToBeRemoved.length; i++) {
-                        final IObservation deadObs = observationsToBeRemoved[i];
+                        final Observation deadObs = observationsToBeRemoved[i];
                         ((IObservationTableModel) table.getModel()).removeObservation(deadObs);
                         action.setObservation(deadObs);
                         action.doAction();
@@ -381,11 +279,6 @@ public class SearchAndReplaceWidget extends JPanel {
         return removeObservationButton;
     }
 
-    /**
-     *     <p><!-- Method description --></p>
-     *     @return
-     *     @uml.property  name="renameConceptButton"
-     */
     private JButton getRenameConceptButton() {
         if (renameConceptButton == null) {
             renameConceptButton = new JButton("Rename Selected");
@@ -397,12 +290,7 @@ public class SearchAndReplaceWidget extends JPanel {
         return renameConceptButton;
     }
 
-    /**
-     * <p><!-- Method description --></p>
-     *
-     *
-     * @return
-     */
+
     private ConceptNameComboBox getRenameConceptComboBox() {
         if (renameConceptComboBox == null) {
             renameConceptComboBox = new AllConceptNamesComboBox();
@@ -412,11 +300,6 @@ public class SearchAndReplaceWidget extends JPanel {
         return renameConceptComboBox;
     }
 
-    /**
-     *     <p><!-- Method description --></p>
-     *     @return
-     *     @uml.property  name="replaceAssociationButton"
-     */
     private JButton getReplaceAssociationButton() {
         if (replaceAssociationButton == null) {
             replaceAssociationButton = new JButton("Replace Matching Associations");
@@ -429,11 +312,6 @@ public class SearchAndReplaceWidget extends JPanel {
         return replaceAssociationButton;
     }
 
-    /**
-     *     <p><!-- Method description --></p>
-     *     @return
-     *     @uml.property  name="searchAssociationCheckBox"
-     */
     private JCheckBox getSearchAssociationCheckBox() {
         if (searchAssociationCheckBox == null) {
             searchAssociationCheckBox = new JCheckBox();
@@ -456,11 +334,6 @@ public class SearchAndReplaceWidget extends JPanel {
         return searchAssociationCheckBox;
     }
 
-    /**
-     *     <p><!-- Method description --></p>
-     *     @return
-     *     @uml.property  name="searchAssociationComboBox"
-     */
     private JComboBox getSearchAssociationComboBox() {
         if (searchAssociationComboBox == null) {
             searchAssociationComboBox = new JComboBox();
@@ -473,11 +346,6 @@ public class SearchAndReplaceWidget extends JPanel {
         return searchAssociationComboBox;
     }
 
-    /**
-     *     <p><!-- Method description --></p>
-     *     @return
-     *     @uml.property  name="searchButton"
-     */
     private JButton getSearchButton() {
         if (searchButton == null) {
             searchButton = new JButton("Search");
@@ -523,11 +391,7 @@ public class SearchAndReplaceWidget extends JPanel {
         return searchButton;
     }
 
-    /**
-     *     <p><!-- Method description --></p>
-     *     @return
-     *     @uml.property  name="searchConceptCheckBox"
-     */
+
     private JCheckBox getSearchConceptCheckBox() {
         if (searchConceptCheckBox == null) {
             searchConceptCheckBox = new JCheckBox();
@@ -557,11 +421,7 @@ public class SearchAndReplaceWidget extends JPanel {
         return searchConceptCheckBox;
     }
 
-    /**
-     *     <p><!-- Method description --></p>
-     *     @return
-     *     @uml.property  name="searchConceptComboBox"
-     */
+
     private ConceptNameComboBox getSearchConceptComboBox() {
         if (searchConceptComboBox == null) {
             searchConceptComboBox = new ConceptNameComboBox();
@@ -581,11 +441,7 @@ public class SearchAndReplaceWidget extends JPanel {
         return searchConceptComboBox;
     }
 
-    /**
-     *     <p><!-- Method description --></p>
-     *     @return
-     *     @uml.property  name="searchLabel"
-     */
+
     private JLabel getSearchLabel() {
         if (searchLabel == null) {
             searchLabel = new JLabel("Search By");
@@ -594,11 +450,6 @@ public class SearchAndReplaceWidget extends JPanel {
         return searchLabel;
     }
 
-    /**
-     *     <p><!-- Method description --></p>
-     *     @return
-     *     @uml.property  name="searchPanel"
-     */
     private JPanel getSearchPanel() {
         if (searchPanel == null) {
             searchPanel = new JPanel(new BorderLayout());
@@ -609,11 +460,6 @@ public class SearchAndReplaceWidget extends JPanel {
         return searchPanel;
     }
 
-    /**
-     *     <p><!-- Method description --></p>
-     *     @return
-     *     @uml.property  name="searchStatusLabel"
-     */
     private JLabel getSearchStatusLabel() {
         if (searchStatusLabel == null) {
             searchStatusLabel = new JLabel("Search Status");
@@ -623,10 +469,6 @@ public class SearchAndReplaceWidget extends JPanel {
         return searchStatusLabel;
     }
 
-    /**
-     * <p><!-- Method description --></p>
-     *
-     */
     private void initialize() {
         final String border = "6dlu";
         final String padding = "4dlu";
@@ -670,12 +512,9 @@ public class SearchAndReplaceWidget extends JPanel {
         this.add(separator, cc.xywh(8, 2, 1, 8));
     }
 
-    /**
-     * <p><!-- Method description --></p>
-     *
-     */
     private void listenForTableChanges() {
-        table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+        final JTable jTable = table.getJTable();
+        jTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
             public void valueChanged(final ListSelectionEvent e) {
                 updateEnabledStatusForAllAssociationComponents();
@@ -691,23 +530,15 @@ public class SearchAndReplaceWidget extends JPanel {
         });
     }
 
-    /**
-     *  Description of the Method
-     */
     public void redrawSelectedRows() {
-        final IObservationTableModel model = (IObservationTableModel) table.getModel();
-        final int[] selectedRows = table.getSelectedRows();
+        final JTable jTable = table.getJTable();
+        final IObservationTableModel model = (IObservationTableModel) jTable.getModel();
+        final int[] selectedRows = jTable.getSelectedRows();
         for (int i = 0; i < selectedRows.length; i++) {
             model.redrawRow(selectedRows[i]);
-
-            // System.out.println("redrawing row: " + i);
         }
     }
 
-    /**
-     * <p><!-- Method description --></p>
-     *
-     */
     private void updateContentsOfAssociationComboBox() {
         final SwingWorker worker = new SwingWorker() {
 
@@ -883,7 +714,7 @@ public class SearchAndReplaceWidget extends JPanel {
      * @param component
      */
     private void updateEnabledStatusForAssociationComponent(final JComponent component) {
-        if (getSearchAssociationCheckBox().isSelected() && (table.getSelectedRowCount() > 0)) {
+        if (getSearchAssociationCheckBox().isSelected() && (table.getJTable().getSelectedRowCount() > 0)) {
             component.setEnabled(true);
         }
         else {
@@ -898,7 +729,7 @@ public class SearchAndReplaceWidget extends JPanel {
      * @param component
      */
     private void updateEnabledStatusForObservationComponent(final JComponent component) {
-        if (getSearchConceptCheckBox().isSelected() && (table.getSelectedRowCount() > 0)) {
+        if (getSearchConceptCheckBox().isSelected() && (table.getJTable().getSelectedRowCount() > 0)) {
             component.setEnabled(true);
         }
         else {
@@ -984,9 +815,9 @@ public class SearchAndReplaceWidget extends JPanel {
                 // the association will get changed
                 // in one of the replace operations
                 final int[] selectedRows = table.getSelectedRows();
-                final IAssociation[] possibleAssociations = SearchAndReplace.getAssociationsAtRows(table, selectedRows);
+                final Association[] possibleAssociations = SearchAndReplace.getAssociationsAtRows(table, selectedRows);
                 for (int i = 0; i < possibleAssociations.length; i++) {
-                    final IAssociation currentAssoc = possibleAssociations[i];
+                    final Association currentAssoc = possibleAssociations[i];
                     if (currentAssoc.equals(associationSearchedFor)) {
                         currentAssoc.setLinkName(association.getLinkName());
                         currentAssoc.setToConcept(association.getToConcept());

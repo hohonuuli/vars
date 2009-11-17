@@ -65,7 +65,7 @@ public class ConceptTreeModel extends DefaultTreeModel {
     */
     private List<Concept> findFamilyTree(final String name, ConceptDAO dao) {
 
-        final LinkedList conceptList = new LinkedList();
+        final LinkedList<Concept> conceptList = new LinkedList<Concept>();
         Concept concept = dao.findByName(name);
         conceptList.add(concept);
 
@@ -175,7 +175,7 @@ public class ConceptTreeModel extends DefaultTreeModel {
          * used to travel down the tree to the desired concept node.
          */
         List<Concept> list = findFamilyTree(name, dao);
-        Iterator familyTree = list.iterator();
+        Iterator<Concept> familyTree = list.iterator();
 
         // Pop the root Concept off the stack since it is the degenerative case.
         familyTree.next();
@@ -184,16 +184,16 @@ public class ConceptTreeModel extends DefaultTreeModel {
         ConceptTreeNode treeNode = (ConceptTreeNode) getRoot();
 
         while (familyTree.hasNext()) {
-            String nextConceptName = ((Concept) familyTree.next()).getPrimaryConceptName().getName();
+            String nextConceptName = (familyTree.next()).getPrimaryConceptName().getName();
 
             // Need to ensure the tree node for the current family name is expanded.
             loadChildConcepts(treeNode, dao);
 
             // Find the child node for the next family member.
             boolean found = false;
-            Enumeration childrenNodes = treeNode.children();
+            Enumeration<ConceptTreeNode> childrenNodes = treeNode.children();
             while (!found && childrenNodes.hasMoreElements()) {
-                treeNode = (ConceptTreeNode) childrenNodes.nextElement();
+                treeNode = childrenNodes.nextElement();
                 Concept concept = (Concept) treeNode.getUserObject();
 
                 if (nextConceptName.equals(concept.getPrimaryConceptName().getName())) {

@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)AssociationListCellRenderer.java   2009.11.17 at 11:18:54 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
- * (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,6 +12,7 @@
  */
 
 
+
 package org.mbari.vars.annotation.ui.table;
 
 import java.awt.Component;
@@ -22,7 +20,8 @@ import java.awt.Dimension;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
-import org.mbari.vars.annotation.model.Association;
+import vars.LinkUtilities;
+import vars.annotation.Association;
 
 /**
  * <p>Allows a list of <code>Associations</code> to be displayed in a
@@ -34,20 +33,9 @@ import org.mbari.vars.annotation.model.Association;
  *      [AssociationListCellRenderer]<--[TableCellRenderer4AssociationList]
  * </pre>
  *
- * @author  <a href="mailto:brian@mbari.org">Brian Schlining</a>
- * @version  $Id: AssociationListCellRenderer.java 332 2006-08-01 18:38:46Z hohonuuli $
- * @stereotype  thing
  */
 public class AssociationListCellRenderer extends DefaultListCellRenderer implements ListCellRenderer {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = -8979640203584622884L;
-
-    /**
-     *     @uml.property  name="assoString"
-     */
     String assoString;
 
     /**
@@ -80,7 +68,7 @@ public class AssociationListCellRenderer extends DefaultListCellRenderer impleme
             association = (Association) value;
 
             if (association != null) {
-                assoString = association.toLongString();
+                assoString = LinkUtilities.formatAsLongString(association);
                 this.setText(assoString);
             }
             else {
@@ -92,11 +80,7 @@ public class AssociationListCellRenderer extends DefaultListCellRenderer impleme
         return component;
     }
 
-    // Override the default to give us a bit of horizontal padding
-
     /**
-     *  Gets the preferredSize attribute of the AssociationListCellRenderer object
-     *
      * @return  The preferredSize value
      */
     @Override
@@ -109,10 +93,7 @@ public class AssociationListCellRenderer extends DefaultListCellRenderer impleme
         return dim;
     }
 
-    // Override the default to send back the ConceptName string
-
     /**
-     *  Gets the toolTipText attribute of the AssociationListCellRenderer object
      *
      * @return  The toolTipText value
      */

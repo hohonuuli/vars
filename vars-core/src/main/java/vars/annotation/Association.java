@@ -21,12 +21,13 @@
 package vars.annotation;
 
 import vars.ILink;
+import vars.PropertyChange;
 
 /**
  *
  * @author brian
  */
-public interface Association extends AnnotationObject, ILink {
+public interface Association extends AnnotationObject, ILink, PropertyChange {
 
     String PROP_OBSERVATION = "observation";
 

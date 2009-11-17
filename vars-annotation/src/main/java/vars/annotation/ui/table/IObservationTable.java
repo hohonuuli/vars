@@ -1,5 +1,7 @@
 package vars.annotation.ui.table;
 
+import javax.swing.JTable;
+
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
 
@@ -65,5 +67,7 @@ public interface IObservationTable {
     int getPreferredRowHeight(final int rowIndex, final int margin);
 
     void scrollToVisible(final int rowIndex, final int vColIndex);
+    
+    JTable getJTable();
 
 }

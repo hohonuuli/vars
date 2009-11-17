@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
  * status of a particular connection or setting. Green = good, red = bad</p>
  *
  * @author  <a href="http://www.mbari.org">MBARI</a>
- * @version  $Id: StatusLabel.java 332 2006-08-01 18:38:46Z hohonuuli $
  */
 public abstract class StatusLabel extends JLabel implements PropertyChangeListener {
 

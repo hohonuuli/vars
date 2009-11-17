@@ -35,31 +35,27 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.WindowConstants;
 import javax.swing.table.JTableHeader;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.swing.SwingUtils;
-import org.mbari.vars.annotation.model.CameraData;
-import org.mbari.vars.annotation.model.dao.VideoArchiveDAO;
+import org.mbari.util.Dispatcher;
 import org.mbari.vars.annotation.ui.actions.MoveVideoFrameWithDialogAction;
-import org.mbari.vars.annotation.ui.dispatchers.ObservationDispatcher;
-import org.mbari.vars.annotation.ui.dispatchers.VideoArchiveDispatcher;
-import org.mbari.vars.annotation.ui.table.ObservationColumnModel;
-import org.mbari.vars.annotation.ui.table.ObservationTable;
-import org.mbari.vars.annotation.ui.table.ObservationTableModel;
+
 import org.mbari.vars.annotation.ui.table.SearchAndReplaceWidget;
-import org.mbari.vars.annotation.ui.table.TableSorter;
-import org.mbari.vars.dao.DAOEventQueue;
-import org.mbari.vars.dao.DAOException;
-import org.mbari.vars.dao.IDataObject;
-import org.mbari.vars.util.AppFrameDispatcher;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.annotation.ICameraData;
-import vars.annotation.IVideoFrame;
-import vars.annotation.IObservation;
-import vars.annotation.IVideoArchive;
-import vars.annotation.IVideoArchiveSet;
+import vars.annotation.CameraData;
+import vars.annotation.CameraDirections;
+import vars.annotation.VideoFrame;
+import vars.annotation.Observation;
+import vars.annotation.VideoArchive;
+import vars.annotation.VideoArchiveSet;
+import vars.annotation.ui.Lookup;
+import vars.annotation.ui.table.IObservationTable;
+import vars.annotation.ui.table.IObservationTableModel;
 
 /**
  * <p>
@@ -69,72 +65,46 @@ import vars.annotation.IVideoArchiveSet;
  * </p>
  *
  * @author <a href="http://www.mbari.org">MBARI </a>
- * @version $Id: VideoSetViewer.java 332 2006-08-01 18:38:46Z hohonuuli $
  */
 public class VideoSetViewer extends JFrame {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = -4001020589826092183L;
-    private static final Logger log = LoggerFactory.getLogger(VideoSetViewer.class);
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    
 
-    /**
-     *     @uml.property  name="changes"
-     */
     private final PropertyChangeSupport changes;
 
-    /**
-     *     @uml.property  name="moveVideoFramesButton"
-     *     @uml.associationEnd
-     */
+
     private JButton moveVideoFramesButton;
 
-    /**
-     *     @uml.property  name="myMenuBar"
-     *     @uml.associationEnd  multiplicity="(1 1)"
-     */
     private JMenuBar myMenuBar;
 
-    /**
-     *     @uml.property  name="searchAndReplaceWidget"
-     *     @uml.associationEnd  inverse="videoSetViewer:org.mbari.vars.annotation.ui.table.SearchAndReplaceWidget"
-     */
     private SearchAndReplaceWidget searchAndReplaceWidget = null;
 
-    /**
-     *     @uml.property  name="table"
-     *     @uml.associationEnd  multiplicity="(1 1)"
-     */
-    private ObservationTable table;
 
-    /**
-     *     @uml.property  name="toolPanel"
-     *     @uml.associationEnd  multiplicity="(1 1)"
-     */
+    private IObservationTable table;
+
+
     private JPanel toolPanel;
 
-    /**
-     *     @uml.property  name="videoArchiveSet"
-     *     @uml.associationEnd  multiplicity="(1 1)"
-     */
-    private IVideoArchiveSet videoArchiveSet;
+
+    private VideoArchiveSet videoArchiveSet;
 
     /**
      * Constructor for the VideoSetViewer object
      */
     public VideoSetViewer() {
         changes = new PropertyChangeSupport(this);
-        final VideoArchiveDispatcher vad = VideoArchiveDispatcher.getInstance();
-        vad.addPropertyChangeListener(new PropertyChangeListener() {
+        final Dispatcher dispatcher = Lookup.getVideoArchiveDispatcher();
+        dispatcher.addPropertyChangeListener(new PropertyChangeListener() {
 
             public void propertyChange(final PropertyChangeEvent evt) {
-                setVideoArchive((IVideoArchive) evt.getNewValue());
+                setVideoArchive((VideoArchive) evt.getNewValue());
             }
         });
 
         // Need to grab the dispatcher when constructing a new instance
-        setVideoArchive(VideoArchiveDispatcher.getInstance().getVideoArchive());
+        VideoArchive videoArchive = (VideoArchive) dispatcher.getValueObject();
+        setVideoArchive(videoArchive);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         SwingUtils.smartSetBounds(this);
         getContentPane().setLayout(new BorderLayout());
@@ -174,27 +144,7 @@ public class VideoSetViewer extends JFrame {
         changes.addPropertyChangeListener(l);
     }
 
-    /**
-     * <p><!-- Method description --></p>
-     *
-     *
-     * @return
-     */
 
-//  private JButton getMergeCameraLogButton() {
-//      if (mergeCameraLogButton != null) {
-//          return mergeCameraLogButton;
-//      }
-//
-//      mergeCameraLogButton = new JButton(new MergeCameraLogAction());
-//      return mergeCameraLogButton;
-//  }
-
-    /**
-     *     <p><!-- Method description --></p>
-     *     @return
-     *     @uml.property  name="moveVideoFramesButton"
-     */
     private JButton getMoveVideoFramesButton() {
         if (moveVideoFramesButton == null) {
             moveVideoFramesButton = new JButton(new MoveAction());
@@ -203,11 +153,7 @@ public class VideoSetViewer extends JFrame {
         return moveVideoFramesButton;
     }
 
-    /**
-     *     <p><!-- Method description --></p>
-     *     @return
-     *     @uml.property  name="myMenuBar"
-     */
+ 
     private JMenuBar getMyMenuBar() {
         if (myMenuBar == null) {
             myMenuBar = new JMenuBar();
@@ -220,24 +166,16 @@ public class VideoSetViewer extends JFrame {
         return myMenuBar;
     }
 
-    /**
-     *     @return
-     *     @uml.property  name="searchAndReplaceWidget"
-     */
+
     private SearchAndReplaceWidget getSearchAndReplaceWidget() {
         if (searchAndReplaceWidget == null) {
-            searchAndReplaceWidget = new SearchAndReplaceWidget(this, getTable());
+            searchAndReplaceWidget = new SearchAndReplaceWidget(this, (IObservationTable) getTable());
         }
 
         return searchAndReplaceWidget;
     }
 
-    /**
-     *     <p><!-- Method description --></p>
-     *     @return
-     *     @uml.property  name="table"
-     */
-    public ObservationTable getTable() {
+    public JTable getTable() {
         if (table == null) {
             final TableSorter sorter = new TableSorter();
             table = new ObservationTable(sorter, (ObservationColumnModel) ObservationColumnModel.getInstance());
@@ -252,12 +190,7 @@ public class VideoSetViewer extends JFrame {
         return table;
     }
 
-    /**
-     * <p><!-- Method description --></p>
-     *
-     *
-     * @return
-     */
+
     private JPanel getToolBar() {
         if (toolPanel == null) {
             toolPanel = new JPanel(new BorderLayout());
@@ -287,10 +220,7 @@ public class VideoSetViewer extends JFrame {
         return toolPanel;
     }
 
-    /**
-     * <p><!-- Method description --></p>
-     *
-     */
+ 
     private void populateTable() {
 
         /*
@@ -302,8 +232,8 @@ public class VideoSetViewer extends JFrame {
          * observationsStillInTable set. (this is the most efficient thing I
          * could think of).
          */
-        final ObservationTable obsTable = getTable();
-        ((ObservationTableModel) obsTable.getModel()).clear();
+        final IObservationTable obsTable = getTable();
+        ((IObservationTableModel) obsTable.getModel()).clear();
 
         if (videoArchiveSet != null) {
             if (log.isDebugEnabled()) {
@@ -312,11 +242,11 @@ public class VideoSetViewer extends JFrame {
 
             final Collection videoFrames = videoArchiveSet.getVideoFrames();
             for (final Iterator i = videoFrames.iterator(); i.hasNext(); ) {
-                final IVideoFrame videoFrame = (IVideoFrame) i.next();
+                final VideoFrame videoFrame = (VideoFrame) i.next();
                 final Collection observations = videoFrame.getObservations();
                 synchronized (observations) {
                     for (final Iterator j = observations.iterator(); j.hasNext(); ) {
-                        final IObservation observation = (IObservation) j.next();
+                        final Observation observation = (Observation) j.next();
                         obsTable.addObservation(observation);
                     }
                 }
@@ -344,7 +274,7 @@ public class VideoSetViewer extends JFrame {
      *
      * @param va
      */
-    private void setVideoArchive(final IVideoArchive va) {
+    private void setVideoArchive(final VideoArchive va) {
         if (va == null) {
 
             // TODO what to do?
@@ -372,10 +302,6 @@ public class VideoSetViewer extends JFrame {
 
     class ChangeCameraDirectionAction extends ActionAdapter {
 
-        /**
-         *
-         */
-        private static final long serialVersionUID = -8381419005332235806L;
 
         /**
          */
@@ -387,18 +313,18 @@ public class VideoSetViewer extends JFrame {
          * Description of the Method
          */
         public void doAction() {
-            final String[] directions = ICameraData.DIRECTIONS;
+            final CameraDirections[] directions = CameraDirections.values();
             final String selectedValue = (String) JOptionPane.showInputDialog(VideoSetViewer.this,
                                              "Select a camera direction.", "VARS - Change Camera Direction",
                                              JOptionPane.QUESTION_MESSAGE, null, directions, directions[0]);
             if (selectedValue != null) {
-                final ObservationTable obsTable = getTable();
+                final IObservationTable obsTable = getTable();
                 final int[] rows = obsTable.getSelectedRows();
                 for (int i = 0; i < rows.length; i++) {
-                    final IObservation obs = obsTable.getObservationAt(rows[i]);
-                    final IVideoFrame vf = obs.getVideoFrame();
+                    final Observation obs = obsTable.getObservationAt(rows[i]);
+                    final VideoFrame vf = obs.getVideoFrame();
                     if (vf != null) {
-                        ICameraData cd = vf.getCameraData();
+                        CameraData cd = vf.getCameraData();
                         if (cd == null) {
                             cd = new CameraData();
                             vf.setCameraData(cd);
@@ -433,10 +359,6 @@ public class VideoSetViewer extends JFrame {
      */
     private class MoveAction extends MoveVideoFrameWithDialogAction {
 
-        /**
-         *
-         */
-        private static final long serialVersionUID = 5100323856709680084L;
 
         /**
          * Constructs ...
@@ -446,21 +368,18 @@ public class VideoSetViewer extends JFrame {
             super(VideoSetViewer.this);
         }
 
-        /**
-         * <p><!-- Method description --></p>
-         *
-         */
+
         @Override
         public void doAction() {
 
             /*
              * Get the selected VideoFrames and set them.
              */
-            final ObservationTable obsTable = getTable();
+            final IObservationTable obsTable = getTable();
             final Collection frames = new ArrayList();
             final int[] rows = obsTable.getSelectedRows();
             for (int i = 0; i < rows.length; i++) {
-                final IObservation obs = obsTable.getObservationAt(rows[i]);
+                final Observation obs = obsTable.getObservationAt(rows[i]);
                 if (obs != null) {
                     frames.add(obs.getVideoFrame());
                 }
@@ -479,7 +398,7 @@ public class VideoSetViewer extends JFrame {
              * need to reopen the VideoArchive so that anychanges to it are
              * propagated to the table model. (i.e so the view matches the data)
              */
-            final IObservation observation = ObservationDispatcher.getInstance().getObservation();
+            final Observation observation = ObservationDispatcher.getInstance().getObservation();
             if (observation != null) {
                 try {
                     DAOEventQueue.updateVideoArchiveSet((IDataObject) observation);
@@ -494,13 +413,13 @@ public class VideoSetViewer extends JFrame {
              * Setting the VideoArchive in the VideoARchiveDispatcher will cause both
              * the VideoSetViewer and annotaiton app to redraw thier tables
              */
-            final IVideoArchive videoArchive = VideoArchiveDispatcher.getInstance().getVideoArchive();
-            IVideoArchive va = null;
+            final VideoArchive videoArchive = VideoArchiveDispatcher.getInstance().getVideoArchive();
+            VideoArchive va = null;
             try {
                 va = VideoArchiveDAO.getInstance().findByVideoArchiveName(videoArchive.getVideoArchiveName());
                 VideoArchiveDispatcher.getInstance().setVideoArchive(va);
             }
-            catch (final DAOException e) {
+            catch (final Exception e) {
                 final String msg = "Problem with database. Reopen the VideoArchive!";
                 AppFrameDispatcher.showErrorDialog(msg);
             }

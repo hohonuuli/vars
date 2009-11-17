@@ -1,7 +1,17 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * @(#)Lookup.java   2009.11.17 at 09:19:06 PST
+ *
+ * Copyright 2009 MBARI
+ *
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
+
 
 package vars.annotation.ui;
 
@@ -29,17 +39,24 @@ import vars.shared.ui.GlobalLookup;
  */
 public class Lookup extends GlobalLookup {
 
+    protected static final Object KEY_DISPATCHER_CAMERA_DIRECTION = "vars.annotation.ui.Lookup-CameraDirection";
+    protected static final Object KEY_DISPATCHER_GUICE_INJECTOR = "vars.annotation.ui.Lookup-Injector";
     protected static final Object KEY_DISPATCHER_OBSERVATION_TABLE = "vars.annotation.ui.Lookup-ObservationTable";
+    protected static final Object KEY_DISPATCHER_PREFERENCES = "vars.annotation.ui.Lookup-Preferences";
     protected static final Object KEY_DISPATCHER_VIDEOARCHIVE = VideoArchive.class;
+    protected static final Object KEY_DISPATCHER_SELECTED_OBSERVATIONS = Observation.class;
     protected static final Object KEY_DISPATCHER_APPLICATION_FRAME = AnnotationFrame.class;
     protected static final Object KEY_DISPATCHER_APPLICATION = AnnotationApp.class;
-    protected static final Object KEY_DISPATCHER_SELECTED_OBSERVATIONS = Observation.class;
-    protected static final Object KEY_DISPATCHER_PREFERENCES = "vars.annotation.ui.Lookup-Preferences";
-    protected static final Object KEY_DISPATCHER_GUICE_INJECTOR = "vars.annotation.ui.Lookup-Injector";
     protected static final Object KEY_DISPATCHER_VIDEO_SERVICE = "vars.annotation.ui.Lookup-VideoService";
-    protected static final Object KEY_DISPATCHER_CAMERA_DIRECTION = "vars.annotation.ui.Lookup-CameraDirection";
 
-    /** Subscribers to this topic will receive Boolean objects */
+    /**  */
+    public static final String RESOURCE_BUNDLE = "annotation-app";
+
+    /** 
+     * Subscribers to this topic will receive Boolean objects. 
+     * True = status is OK, 
+     * false = database problems
+     */
     public static final String TOPIC_DATABASE_STATUS = "vars.annotation.ui.Lookup-DatabaseStatus";
 
     /**
@@ -48,16 +65,16 @@ public class Lookup extends GlobalLookup {
     public static final String TOPIC_REFRESH = "vars.annotation.ui.Lookup-Refresh";
 
     /**
-     * Change the videoarchive being annotated. The data object will be an
-     * instance of {@link VideoArchive}
-     */
-    public static final String TOPIC_SELECTED_VIDEOARCHIVE = "vars.annotation.ui.Lookup-VideoArchive";
-
-    /**
      * Specifies the Observations that are selected in the Observation table. the
      * data object will be a Collection&lt;Observation&gt;
      */
     public static final String TOPIC_SELECTED_OBSERVATIONS = "vars-annotation.ui.Lookup-SelectedObservations";
+
+    /**
+     * Change the {@link VideoArchive} being annotated. The data object will be an
+     * instance of {@link VideoArchive}
+     */
+    public static final String TOPIC_SELECTED_VIDEOARCHIVE = "vars.annotation.ui.Lookup-VideoArchive";
 
     /**
      * Message is sent when a concept should be selected in the concept tree. The
@@ -65,54 +82,62 @@ public class Lookup extends GlobalLookup {
      * subscriber for the tree is in {@link MiscTabsPanel}
      */
     public static final String TOPIC_SELECT_CONCEPT = "vars-annotation.ui.Lookup-SelectedConcept";
-    public static final String RESOURCE_BUNDLE = "annotation-app";
-
 
     static {
         getApplicationDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
+
             public void propertyChange(PropertyChangeEvent evt) {
-                if (evt.getNewValue() != null && !(evt.getNewValue() instanceof AnnotationApp)) {
+                if ((evt.getNewValue() != null) && !(evt.getNewValue() instanceof AnnotationApp)) {
                     throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
-                            ", EXPECTED: " + AnnotationApp.class.getName());
+                                                       ", EXPECTED: " + AnnotationApp.class.getName());
                 }
             }
+
         });
 
         getApplicationFrameDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
+
             public void propertyChange(PropertyChangeEvent evt) {
-                if (evt.getNewValue() != null && !(evt.getNewValue() instanceof AnnotationFrame)) {
+                if ((evt.getNewValue() != null) && !(evt.getNewValue() instanceof AnnotationFrame)) {
                     throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
-                            ", EXPECTED: " + AnnotationFrame.class.getName());
+                                                       ", EXPECTED: " + AnnotationFrame.class.getName());
                 }
             }
+
         });
 
         getGuiceInjectorDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
+
             public void propertyChange(PropertyChangeEvent evt) {
-                if (evt.getNewValue() != null && !(evt.getNewValue() instanceof Injector)) {
+                if ((evt.getNewValue() != null) && !(evt.getNewValue() instanceof Injector)) {
                     throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
-                            ", EXPECTED: " + Injector.class.getName());
+                                                       ", EXPECTED: " + Injector.class.getName());
                 }
             }
+
         });
 
         getPreferencesDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
+
             public void propertyChange(PropertyChangeEvent evt) {
-                if (evt.getNewValue() != null && !(evt.getNewValue() instanceof Preferences)) {
+                if ((evt.getNewValue() != null) && !(evt.getNewValue() instanceof Preferences)) {
                     throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
-                            ", EXPECTED: " + Preferences.class.getName());
+                                                       ", EXPECTED: " + Preferences.class.getName());
                 }
             }
+
         });
 
 
         getVideoArchiveDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
+
             public void propertyChange(PropertyChangeEvent evt) {
-                if (evt.getNewValue() != null && !(evt.getNewValue() instanceof VideoArchive)) {
+                if ((evt.getNewValue() != null) && !(evt.getNewValue() instanceof VideoArchive)) {
                     throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
-                            ", EXPECTED: " + VideoArchive.class.getName());
+                                                       ", EXPECTED: " + VideoArchive.class.getName());
                 }
             }
+
         });
 
 
@@ -142,18 +167,31 @@ public class Lookup extends GlobalLookup {
 
     }
 
-    public static Dispatcher getVideoArchiveDispatcher() {
-        return Dispatcher.getDispatcher(KEY_DISPATCHER_VIDEOARCHIVE);
+    /**
+     * @return
+     */
+    public static Dispatcher getApplicationDispatcher() {
+        return Dispatcher.getDispatcher(KEY_DISPATCHER_APPLICATION);
     }
 
     /**
-     * Stores a reference to the {@link ConceptTree} so that other componenets
-     * can reference it as needed.
+     * @return
      */
-    public static Dispatcher getObservationTableDispatcher() {
-        return Dispatcher.getDispatcher(KEY_DISPATCHER_OBSERVATION_TABLE);
+    public static Dispatcher getApplicationFrameDispatcher() {
+        return Dispatcher.getDispatcher(KEY_DISPATCHER_APPLICATION_FRAME);
     }
 
+    /**
+     *
+     * @return A Dispatcher referencing a {@link CameraDirections} enumeration
+     */
+    public static Dispatcher getCameraDirectionDispatcher() {
+        return Dispatcher.getDispatcher(KEY_DISPATCHER_CAMERA_DIRECTION);
+    }
+
+    /**
+     * @return
+     */
     public static Dispatcher getGuiceInjectorDispatcher() {
         final Dispatcher dispatcher = Dispatcher.getDispatcher(KEY_DISPATCHER_GUICE_INJECTOR);
         Injector injector = (Injector) dispatcher.getValueObject();
@@ -165,12 +203,13 @@ public class Lookup extends GlobalLookup {
         return Dispatcher.getDispatcher(KEY_DISPATCHER_GUICE_INJECTOR);
     }
 
-    public static Dispatcher getApplicationDispatcher() {
-        return Dispatcher.getDispatcher(KEY_DISPATCHER_APPLICATION);
-    }
-
-    public static Dispatcher getApplicationFrameDispatcher() {
-        return Dispatcher.getDispatcher(KEY_DISPATCHER_APPLICATION_FRAME);
+    /**
+     * Stores a reference to the {@link ConceptTree} so that other componenets
+     * can reference it as needed.
+     * @return
+     */
+    public static Dispatcher getObservationTableDispatcher() {
+        return Dispatcher.getDispatcher(KEY_DISPATCHER_OBSERVATION_TABLE);
     }
 
     /**
@@ -179,7 +218,7 @@ public class Lookup extends GlobalLookup {
      * for the current UserAccount. This may be null
      */
     public static Dispatcher getPreferencesDispatcher() {
-        return  Dispatcher.getDispatcher(KEY_DISPATCHER_PREFERENCES);
+        return Dispatcher.getDispatcher(KEY_DISPATCHER_PREFERENCES);
     }
 
     /**
@@ -191,17 +230,18 @@ public class Lookup extends GlobalLookup {
     public static Dispatcher getSelectedObservationsDispatcher() {
         return Dispatcher.getDispatcher(KEY_DISPATCHER_SELECTED_OBSERVATIONS);
     }
-    
+
+    /**
+     * @return
+     */
+    public static Dispatcher getVideoArchiveDispatcher() {
+        return Dispatcher.getDispatcher(KEY_DISPATCHER_VIDEOARCHIVE);
+    }
+
+    /**
+     * @return
+     */
     public static Dispatcher getVideoServiceDispatcher() {
         return Dispatcher.getDispatcher(KEY_DISPATCHER_VIDEO_SERVICE);
     }
-    
-    /**
-     * 
-     * @return A Dispatcher referencing a {@link CameraDirections} enumeration
-     */
-    public static Dispatcher getCameraDirectionDispatcher() {
-        return Dispatcher.getDispatcher(KEY_DISPATCHER_CAMERA_DIRECTION);
-    }
-
 }

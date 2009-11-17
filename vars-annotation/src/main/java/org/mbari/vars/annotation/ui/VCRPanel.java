@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)VCRPanel.java   2009.11.17 at 10:20:54 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
- * (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,44 +12,42 @@
  */
 
 
+
 package org.mbari.vars.annotation.ui;
 
-import org.mbari.util.IObserver;
-import org.mbari.vars.annotation.ui.dispatchers.VcrDispatcher;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import org.mbari.util.Dispatcher;
 import org.mbari.vcr.IVCR;
+import vars.annotation.ui.Lookup;
+import vars.annotation.ui.VideoService;
 
 /**
  * <p>A VCR panel that monitors for changes of VCRs</p>
  *
  * @author  <a href="http://www.mbari.org">MBARI</a>
- * @version  $Id: VCRPanel.java 314 2006-07-10 02:38:46Z hohonuuli $
  */
-public class VCRPanel extends org.mbari.vcr.ui.VCRPanel implements IObserver {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = 4917967545974139337L;
+public class VCRPanel extends org.mbari.vcr.ui.VCRPanel implements PropertyChangeListener {
 
     /**
      * Constructor
      */
     public VCRPanel() {
         super();
-        final VcrDispatcher dispatcher = VcrDispatcher.getInstance();
-        dispatcher.addObserver(this);
-        setVcr(dispatcher.getVcr());
+        final Dispatcher dispatcher = Lookup.getVideoServiceDispatcher();
+        dispatcher.addPropertyChangeListener(this);
+        final VideoService videoService = (VideoService) dispatcher.getValueObject();
+        final IVCR vcr = (videoService == null) ? null : videoService.getVCR();
+        setVcr(vcr);
     }
 
     /**
-     *  Recieves updates from the VcrDispatcher. This method should not be called
-     * by a developer.
      *
-     * @param  newVcr The new IVCR object
-     * @param  changeCode This parameter is not used.
-     * @see org.mbari.util.IObserver#update(java.lang.Object, java.lang.Object)
+     * @param evt
      */
-    public void update(final Object newVcr, final Object changeCode) {
-        setVcr((IVCR) newVcr);
+    public void propertyChange(PropertyChangeEvent evt) {
+        final VideoService videoService = (VideoService) evt.getNewValue();
+        final IVCR vcr = (videoService == null) ? null : videoService.getVCR();
+        setVcr(vcr);
     }
 }

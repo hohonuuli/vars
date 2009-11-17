@@ -12,6 +12,8 @@ import org.mbari.awt.event.ActionAdapter;
 import org.mbari.vars.annotation.ui.actions.AddPropertyAction;
 import org.mbari.vars.annotation.ui.dialogs.ToConceptSelectionDialog;
 
+import vars.annotation.SpecialAnnotationDAO;
+
 /**
  *
  * @author brian
@@ -20,9 +22,11 @@ public class SurfacePropButton extends PropButton {
 
     private ActionAdapter showDialogAction;
     private AddPropertyAction addPropertyAction;
+    private final SpecialAnnotationDAO specialAnnotationDAO;
 
-    public SurfacePropButton() {
+    public SurfacePropButton(SpecialAnnotationDAO specialAnnotationDAO) {
         super();
+        this.specialAnnotationDAO = specialAnnotationDAO;
         setAction(getShowDialogAction());
         setToolTipText("upon");
         setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/surfacebutton.png")));
@@ -60,11 +64,11 @@ public class SurfacePropButton extends PropButton {
 
         protected ToConceptSelectionDialog getDialog() {
             if (dialog == null) {
-                dialog = new ToConceptSelectionDialog();
+                dialog = new ToConceptSelectionDialog(specialAnnotationDAO);
                 dialog.setLocationRelativeTo(SurfacePropButton.this);
                 dialog.getOkButton().addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        getAddPropertyAction().setLinkValue(dialog.getSelectedConcept().getPrimaryConceptNameAsString());
+                        getAddPropertyAction().setLinkValue(dialog.getSelectedConcept().getPrimaryConceptName().getName());
                         dialog.setVisible(false);
                         getAddPropertyAction().doAction();
                     }

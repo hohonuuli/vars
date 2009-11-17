@@ -37,6 +37,7 @@ public class PersistenceService {
 
     private final AnnotationDAOFactory annotationDAOFactory;
     private final AnnotationFactory annotationFactory;
+    
 
     /**
      * Constructs ...
@@ -165,6 +166,41 @@ public class PersistenceService {
         return updatedAssociations;
     }
     
+    public void deleteAssociations(Collection<Association> associations) {
+        final DAO dao = annotationDAOFactory.newDAO();
+        Collection<Observation> modifiedObservations = new ArrayList<Observation>();
+        dao.startTransaction();
+        for (Association association : associations) {
+            association = dao.merge(association);
+            final Observation observation = association.getObservation();
+            observation.removeAssociation(association);
+            dao.remove(association);
+            if (!modifiedObservations.contains(observation)) {
+                modifiedObservations.add(observation);
+            }
+        }
+        dao.endTransaction();
+        updateUI(modifiedObservations);
+    }
+    
+    public void deleteObservations(Collection<Observation> observations) {
+        final DAO dao = annotationDAOFactory.newDAO();
+        dao.startTransaction();
+        for (Observation observation : observations) {
+            VideoFrame videoFrame = observation.getVideoFrame();
+            videoFrame.removeObservation(observation);
+            dao.remove(observation);
+            if (videoFrame.getObservations().size() == 0) {
+                VideoArchive videoArchive = videoFrame.getVideoArchive();
+                videoArchive.removeVideoFrame(videoFrame);
+                dao.remove(videoFrame);
+            }
+            
+        }
+        dao.endTransaction();
+        updateUI();
+    }
+    
     private void updateUI(Collection<Observation> observations) {
         // TODO implement this.
         
@@ -177,7 +213,14 @@ public class PersistenceService {
     }
     
     private void updateUI(VideoArchiveSet videoArchiveSet) {
+     // TODO implement me
+    }
+    
+    private void updateUI() {
         
     }
+    
+
+
     
 }
