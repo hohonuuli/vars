@@ -23,12 +23,16 @@ Preferences - Java - Code Generation - Code and Comments
  */
 package org.mbari.vars.annotation.ui;
 
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.Collection;
+
 import org.mbari.swing.JFancyButton;
-import org.mbari.vars.annotation.ui.dispatchers.ObservationTableDispatcher;
-import org.mbari.vars.annotation.ui.dispatchers.PersonDispatcher;
-import org.mbari.vars.annotation.ui.table.ObservationTable;
+
+import vars.UserAccount;
+import vars.annotation.Observation;
+import vars.annotation.ui.Lookup;
+
 
 /**
  * <p>This button toggles its enabled state based on if Person is logged in
@@ -36,14 +40,10 @@ import org.mbari.vars.annotation.ui.table.ObservationTable;
  * ObservationTable has rows selected = enabled; otherwise not enabled.</p>
  *
  * @author <a href="http://www.mbari.org">MBARI</a>
- * @version $Id: PropButton.java 314 2006-07-10 02:38:46Z hohonuuli $
  */
 public class PropButton extends JFancyButton {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = -7442195802758439190L;
+
 
     /**
      * Constructs ...
@@ -54,25 +54,20 @@ public class PropButton extends JFancyButton {
 
         // Enable the button if a user is logged in and one ro more rows are
         // selected in the table.
-        ObservationTableDispatcher.getInstance().getObservationTable().getSelectionModel().addListSelectionListener(
-            new ListSelectionListener() {
-
-            public void valueChanged(final ListSelectionEvent e) {
-                final String p = PersonDispatcher.getInstance().getPerson();
-                if (p != null) {
-                    final ObservationTable t = ObservationTableDispatcher.getInstance().getObservationTable();
-                    if (t.getSelectedRows().length > 0) {
-                        setEnabled(true);
-                    }
-                    else {
-                        setEnabled(false);
-                    }
+        Lookup.getSelectedObservationsDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
+            
+            public void propertyChange(PropertyChangeEvent evt) {
+                boolean enable = false;
+                
+                Collection<Observation> observations = (Collection<Observation>) evt.getNewValue();
+                if (observations.size() > 0) {
+                    UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+                    enable = userAccount != null;
                 }
-                else {
-                    setEnabled(false);
-                }
+                
+                setEnabled(enable);
             }
-
         });
+        
     }
 }

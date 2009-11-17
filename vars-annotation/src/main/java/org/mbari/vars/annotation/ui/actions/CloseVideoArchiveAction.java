@@ -105,7 +105,7 @@ public class CloseVideoArchiveAction extends ActionAdapter implements IVideoArch
         if ((observation != null) && (observation.getVideoFrame() != null)) {
             progressBar.setString("Saving " + observation.getVideoFrame().getTimeCode());
             progressBar.setValue(1);
-            DAOEventQueue.update((IDataObject) observation);
+            DAOEventQueue.updateVideoArchiveSet((IDataObject) observation);
         }
 
         /*

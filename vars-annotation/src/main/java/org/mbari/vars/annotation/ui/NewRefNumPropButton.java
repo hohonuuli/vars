@@ -45,7 +45,6 @@ import vars.annotation.ui.ToolBelt;
  * Adds a 'new reference number' assotiation to the currently selected observations.
  * </p>
  * @author  <a href="http://www.mbari.org">MBARI</a>
- * @version  $Id: NewRefNumPropButton.java 332 2006-08-01 18:38:46Z hohonuuli $
  */
 public class NewRefNumPropButton extends PropButton implements IPopup {
 
@@ -66,11 +65,6 @@ public class NewRefNumPropButton extends PropButton implements IPopup {
         initialize();
     }
 
-    /**
-     *     <p><!-- Method description --></p>
-     *     @return
-     *     @uml.property  name="jPopupMenu"
-     */
     private JPopupMenu getJPopupMenu() {
         if (jPopupMenu == null) {
 
@@ -141,17 +135,12 @@ public class NewRefNumPropButton extends PropButton implements IPopup {
      *  Gets the popupMenu used by this button
      *
      * @return  The popupMenu value
-     *  @see org.mbari.swing.IPopup#getPopupMenu()
      */
     public JPopupMenu getPopupMenu() {
         return getJPopupMenu();
     }
 
-    /**
-     *     <p><!-- Method description --></p>
-     *     @return
-     *     @uml.property  name="refNumAction"
-     */
+
     private ActionAdapter getRefNumAction() {
         if (refNumAction == null) {
             refNumAction = new RefNumAction();
@@ -160,10 +149,6 @@ public class NewRefNumPropButton extends PropButton implements IPopup {
         return refNumAction;
     }
 
-    /**
-     * <p><!-- Method description --></p>
-     *
-     */
     private void initialize() {
 
         // Set some properties
@@ -190,21 +175,18 @@ public class NewRefNumPropButton extends PropButton implements IPopup {
     }
 
     /**
-     *     This class combines 2 actions together and also sets up one of the actions to listen to changes in the VideoArchive.
+     *     This class combines 2 actions together and also sets up one of the actions to listen to 
+     *     changes in the VideoArchive.
      *     @author  brian
      */
     private class RefNumAction extends ActionAdapter {
 
-        /**
-         *
-         */
-        private static final long serialVersionUID = 1870783910768380309L;
 
         /**
          * This keeps the reference number incremented to one more than the largest
          * value found in the database when a VideoArchive is opened.
          */
-        private final UpdateNewRefNumAction updateAction = new UpdateNewRefNumAction();
+        private final UpdateNewRefNumAction updateAction = new UpdateNewRefNumAction(toolBelt.getAnnotationDAOFactory());
 
         /**
          * This action adds the association to the selected observation
@@ -231,10 +213,6 @@ public class NewRefNumPropButton extends PropButton implements IPopup {
  
         }
 
-        /**
-         * <p><!-- Method description --></p>
-         *
-         */
         public void doAction() {
 
             /*

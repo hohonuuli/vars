@@ -237,7 +237,7 @@ public class SearchAndReplace {
                 for (final Iterator iter = associations.iterator(); iter.hasNext(); ) {
                     final IAssociation association = (IAssociation) iter.next();
                     observation.removeAssociation(association);
-                    DAOEventQueue.update((IDataObject) observation);
+                    DAOEventQueue.updateVideoArchiveSet((IDataObject) observation);
                     DAOEventQueue.delete((IDataObject) association);
                 }
             }
@@ -273,7 +273,7 @@ public class SearchAndReplace {
                 if (a.equals(association)) {
                     final ISimpleConcept parent = a.getParent();
                     parent.removeAssociation(a);
-                    DAOEventQueue.update((IDataObject) parent);
+                    DAOEventQueue.updateVideoArchiveSet((IDataObject) parent);
                     DAOEventQueue.delete((IDataObject) a);
                 }
             }
@@ -372,7 +372,7 @@ public class SearchAndReplace {
         oldAssociation.setParent(newAssociation.getParent());
         oldAssociation.setToConcept(newAssociation.getToConcept());
 
-        DAOEventQueue.update((IDataObject) oldAssociation);
+        DAOEventQueue.updateVideoArchiveSet((IDataObject) oldAssociation);
     }
 
     private static final class ObsUpdateErrorHandler extends DAOExceptionHandler {

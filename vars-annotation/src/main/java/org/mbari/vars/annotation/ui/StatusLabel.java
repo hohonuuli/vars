@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)StatusLabel.java   2009.11.16 at 04:21:30 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
- * (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,18 +10,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
-/*
-Created on Dec 1, 2003
- */
 package org.mbari.vars.annotation.ui;
 
 import java.awt.Color;
+import java.beans.PropertyChangeListener;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
-import org.mbari.util.IObserver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,25 +27,11 @@ import org.slf4j.LoggerFactory;
  * @author  <a href="http://www.mbari.org">MBARI</a>
  * @version  $Id: StatusLabel.java 332 2006-08-01 18:38:46Z hohonuuli $
  */
-public abstract class StatusLabel extends JLabel implements IObserver {
+public abstract class StatusLabel extends JLabel implements PropertyChangeListener {
 
-    private static final Logger log = LoggerFactory.getLogger(StatusLabel.class);
-
-    /**
-     *     @uml.property  name="offIcon"
-     *     @uml.associationEnd  multiplicity="(1 1)"
-     */
+    protected final Logger log = LoggerFactory.getLogger(getClass());
     private ImageIcon offIcon;
-
-    /**
-     *     @uml.property  name="ok"
-     */
     private boolean ok;
-
-    /**
-     *     @uml.property  name="onIcon"
-     *     @uml.associationEnd  multiplicity="(1 1)"
-     */
     private ImageIcon onIcon;
 
     /**
@@ -67,14 +45,6 @@ public abstract class StatusLabel extends JLabel implements IObserver {
                 BorderFactory.createEmptyBorder(1, 2, 1, 2)));
     }
 
-    /**
-     * <p><!-- Method description --></p>
-     *
-     *
-     * @param relativePath
-     *
-     * @return
-     */
     private ImageIcon getImageIcon(final String relativePath) {
         return new ImageIcon(getClass().getResource(relativePath));
     }
@@ -87,8 +57,8 @@ public abstract class StatusLabel extends JLabel implements IObserver {
     }
 
     /**
-     *     @param  b
-     *     @uml.property  name="ok"
+     *
+     * @param b
      */
     public void setOk(final boolean b) {
         ok = b;

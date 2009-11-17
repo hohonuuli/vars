@@ -15,16 +15,19 @@
 
 package org.mbari.vars.annotation.ui;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
 import org.mbari.swing.JFancyButton;
 import org.mbari.swing.SwingUtils;
-import org.mbari.util.IObserver;
+import org.mbari.util.Dispatcher;
 import org.mbari.vars.annotation.ui.actions.NewVideoFrameAction;
-import org.mbari.vars.annotation.ui.dispatchers.PersonDispatcher;
-import org.mbari.vars.annotation.ui.dispatchers.VcrDispatcher;
-import org.mbari.vars.annotation.ui.dispatchers.VideoArchiveDispatcher;
+
+import vars.annotation.ui.Lookup;
+
 
 /**
  * <p>A button that calls the <code>NewVideoFrameAction</code> </p>
@@ -49,32 +52,36 @@ public class NewVideoFrameButton extends JFancyButton {
         setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/obs_new.png")));
         action.setEnabled(false);
 
-        hasVideoArchive = VideoArchiveDispatcher.getInstance().getVideoArchive() != null;
-        VideoArchiveDispatcher.getInstance().addObserver(new IObserver() {
-
-            public void update(final Object obj, final Object changeCode) {
-                hasVideoArchive = (obj != null);
+        final Dispatcher videoArchiveDispatcher = Lookup.getVideoArchiveDispatcher();
+        hasVideoArchive = videoArchiveDispatcher.getValueObject()!= null;
+        videoArchiveDispatcher.addPropertyChangeListener(new PropertyChangeListener() {
+            
+            public void propertyChange(PropertyChangeEvent evt) {
+                hasVideoArchive = (evt.getNewValue() != null);
+                checkEnable();
+            }
+        });
+        
+        final Dispatcher userAccountDispatcher = Lookup.getUserAccountDispatcher();
+        hasPerson = userAccountDispatcher.getValueObject() != null;
+        userAccountDispatcher.addPropertyChangeListener(new PropertyChangeListener() {
+            
+            public void propertyChange(PropertyChangeEvent evt) {
+                hasPerson = (evt.getNewValue() != null);
                 checkEnable();
             }
         });
 
-        hasPerson = PersonDispatcher.DISPATCHER.getValueObject() != null;
-        PersonDispatcher.getInstance().addObserver(new IObserver() {
-
-            public void update(final Object obj, final Object changeCode) {
-                hasPerson = (obj != null);
+        final Dispatcher videoServiceDispatcher = Lookup.getVideoServiceDispatcher();
+        hasVcr = videoArchiveDispatcher.getValueObject() != null;
+        videoArchiveDispatcher.addPropertyChangeListener(new PropertyChangeListener() {
+            
+            public void propertyChange(PropertyChangeEvent evt) {
+                hasVcr = (evt.getNewValue() != null);
                 checkEnable();
             }
         });
 
-        hasVcr = VcrDispatcher.DISPATCHER.getValueObject() != null;
-        VcrDispatcher.getInstance().addObserver(new IObserver() {
-
-            public void update(final Object obj, final Object changeCode) {
-                hasVcr = (obj != null);
-                checkEnable();
-            }
-        });
         setText("");
 
     }

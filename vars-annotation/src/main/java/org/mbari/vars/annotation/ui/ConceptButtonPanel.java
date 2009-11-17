@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)ConceptButtonPanel.java   2009.11.16 at 09:10:47 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
- * (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,12 +12,7 @@
  */
 
 
-/*
-Created on Jan 10, 2005
- *
-TODO To change the template for this generated file go to
-Window - Preferences - Java - Code Style - Code Templates
- */
+
 package org.mbari.vars.annotation.ui;
 
 import java.awt.BorderLayout;
@@ -46,10 +38,11 @@ import org.mbari.swing.JFancyButton;
 import org.mbari.util.Dispatcher;
 import org.mbari.util.IObserver;
 import org.mbari.vars.annotation.ui.dialogs.NewConceptButtonTabDialog;
-import org.mbari.vars.annotation.ui.dispatchers.PersonDispatcher;
-import org.mbari.vars.annotation.ui.dispatchers.PreferencesDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import vars.UserAccount;
+import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
 import vars.jpa.VarsUserPreferences;
 
@@ -58,73 +51,53 @@ import vars.jpa.VarsUserPreferences;
  */
 public class ConceptButtonPanel extends JPanel {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = -8103461282255784621L;
-    private static final Logger log = LoggerFactory.getLogger(ConceptButtonPanel.class);
-
-    private JCheckBox dragLockCb;
-
-
+    private JPanel buttonPanel = null;
     private JButton lockButton = null;
-
-    private final ImageIcon lockedIcon;
-    
-    private final ImageIcon showIndexIcon;
-    private final ImageIcon hideIndexIcon;
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     /**
      *     The button to move a new tab
      */
     private final JButton moveTabButton = null;
 
-
-    private ActionAdapter newTabAction;
-
     /**
      *     The button to create a new tab
      */
     private JButton newTabButton = null;
-
-    private ActionAdapter removeTabAction;
+    private ConceptButtonOverviewPanel overviewPanel = null;
 
     /**
      *     The button to remove a new tab
      */
     private JButton removeTabButton = null;
 
-    private ActionAdapter renameTabAction;
-
     /**
      *     The button to rename a new tab
      */
     private JButton renameTabButton = null;
-
-
     private boolean locked = false;
+    private JButton showOverviewButton = null;
+    private Preferences userPreferences = null;
+    private boolean showOverview = false;
+    private JCheckBox dragLockCb;
+    private final ImageIcon hideIndexIcon;
+    private final ImageIcon lockedIcon;
+    private ActionAdapter newTabAction;
+    private ActionAdapter removeTabAction;
+    private ActionAdapter renameTabAction;
+    private final ImageIcon showIndexIcon;
 
     /**
      *     The JTabbedPane to hold the ConceptButtons
      */
     private JTabbedPane tabbedPane;
-
+    private final ToolBelt toolBelt;
     private final ImageIcon unlockedIcon;
 
-    private Preferences userPreferences = null;
-
-    private JPanel buttonPanel = null;
-    
-    private JButton showOverviewButton = null;
-    
-    private boolean showOverview = false;
-    
-    private ConceptButtonOverviewPanel overviewPanel = null;
-
-    private final ToolBelt toolBelt;
-    
     /**
+     * Constructs ...
      *
+     * @param toolBelt
      */
     public ConceptButtonPanel(final ToolBelt toolBelt) {
         super();
@@ -137,11 +110,10 @@ public class ConceptButtonPanel extends JPanel {
     }
 
     /**
-     * <p><!-- Method description --></p>
-     *
      */
     public void changeUserPreferences() {
-        userPreferences = PreferencesDispatcher.getInstance().getPreferences();
+        
+        userPreferences = (Preferences) Lookup.getPreferencesDispatcher().getValueObject();
 
         if (userPreferences != null) {
             loadTabsFromPreferences();
@@ -152,10 +124,21 @@ public class ConceptButtonPanel extends JPanel {
         }
     }
 
-    /**
-     *     @return  the lockButton
-     *     @uml.property  name="lockButton"
-     */
+    private JPanel getButtonPanel() {
+        if (buttonPanel == null) {
+            buttonPanel = new JPanel();
+            buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+            buttonPanel.add(getNewTabButton());
+            buttonPanel.add(getRenameTabButton());
+            buttonPanel.add(getRemoveTabButton());
+            buttonPanel.add(getLockButton());
+            buttonPanel.add(getShowOverviewButton());
+            buttonPanel.add(Box.createVerticalGlue());
+        }
+
+        return buttonPanel;
+    }
+
     protected JButton getLockButton() {
         if (lockButton == null) {
             lockButton = new JFancyButton();
@@ -163,8 +146,8 @@ public class ConceptButtonPanel extends JPanel {
             lockButton.setToolTipText("Buttons on the tabs can not be reordered when locked");
             lockButton.setIcon(unlockedIcon);
 
-            final Dispatcher dispatcher =
-                Dispatcher.getDispatcher(NewObservationUsingConceptNameButton.DISPATCHER_KEY_DRAG_LOCK);
+            final Dispatcher dispatcher = Dispatcher.getDispatcher(
+                NewObservationUsingConceptNameButton.DISPATCHER_KEY_DRAG_LOCK);
 
             /*
              * If the button is locked then we want to prevent the
@@ -176,7 +159,9 @@ public class ConceptButtonPanel extends JPanel {
 
                 public void actionPerformed(final ActionEvent e) {
                     locked = !locked;
+
                     final Boolean isDragLocked = Boolean.valueOf(locked);
+
                     dispatcher.setValueObject(isDragLocked);
                 }
 
@@ -189,6 +174,7 @@ public class ConceptButtonPanel extends JPanel {
 
                 public void propertyChange(final PropertyChangeEvent evt) {
                     final boolean locked = ((Boolean) evt.getNewValue()).booleanValue();
+
                     if (locked) {
                         lockButton.setIcon(lockedIcon);
                     }
@@ -203,63 +189,13 @@ public class ConceptButtonPanel extends JPanel {
 
         return lockButton;
     }
-    
-    
-    protected JButton getShowOverviewButton() {
-        if (showOverviewButton == null) {
-            showOverviewButton = new JFancyButton();
-            showOverviewButton.setText("");
-            showOverviewButton.setIcon(showIndexIcon);
-            showOverviewButton.setToolTipText("Show overview tab");
-            showOverviewButton.addActionListener(new ActionListener() {
 
-                public void actionPerformed(ActionEvent e) {
-                    showOverview = !showOverview;
-                    
-                    if (showOverview) {
-                        final ConceptButtonOverviewPanel panel = getOverviewPanel();
-                        showOverviewButton.setIcon(hideIndexIcon);
-                        panel.loadPreferences(); // refreshes the panel
-                        getTabbedPane().add("  OVERVIEW  ", panel);
-                        showOverviewButton.setToolTipText("Hide overview tab");
-                        getTabbedPane().setSelectedComponent(panel);
-                        
-                    }
-                    else {
-                        showOverviewButton.setIcon(showIndexIcon);
-                        getTabbedPane().remove(getOverviewPanel());
-                        showOverviewButton.setToolTipText("Show overview tab");
-                    }
-                    
-                }
-            });
-            
-        }
-        return showOverviewButton;
-    }
-    
-    
-    protected ConceptButtonOverviewPanel getOverviewPanel() {
-        if (overviewPanel == null) {
-            overviewPanel = new ConceptButtonOverviewPanel();
-        }
-        return overviewPanel;
-    }
-
-    /**
-     *     @return  Returns the moveTabButton.
-     *     @uml.property  name="moveTabButton"
-     */
     protected JButton getMoveTabButton() {
         if (moveTabButton == null) {}
 
         return moveTabButton;
     }
 
-    /**
-     *     @return  Returns the newTabAction.
-     *     @uml.property  name="newTabAction"
-     */
     protected ActionAdapter getNewTabAction() {
         if (newTabAction == null) {
             newTabAction = new NewTabAction();
@@ -269,10 +205,6 @@ public class ConceptButtonPanel extends JPanel {
         return newTabAction;
     }
 
-    /**
-     *     @return  Returns the newTabButton.
-     *     @uml.property  name="newTabButton"
-     */
     protected JButton getNewTabButton() {
         if (newTabButton == null) {
             newTabButton = new JFancyButton(getNewTabAction());
@@ -285,25 +217,23 @@ public class ConceptButtonPanel extends JPanel {
         return newTabButton;
     }
 
-    /**
-     *     @return  Returns the removeTabAction.
-     *     @uml.property  name="removeTabAction"
-     */
+    protected ConceptButtonOverviewPanel getOverviewPanel() {
+        if (overviewPanel == null) {
+            overviewPanel = new ConceptButtonOverviewPanel(toolBelt);
+        }
+
+        return overviewPanel;
+    }
+
     protected ActionAdapter getRemoveTabAction() {
         if (removeTabAction == null) {
             removeTabAction = new RemoveTabAction();
             removeTabAction.setEnabled(false);
-
-            //removeTabAction.setIcon(new ImageIcon(getClass().getResource("/images/vars/knowledgebase/delete2.png")));
         }
 
         return removeTabAction;
     }
 
-    /**
-     *     @return  Returns the removeTabButton.
-     *     @uml.property  name="removeTabButton"
-     */
     protected JButton getRemoveTabButton() {
         if (removeTabButton == null) {
             removeTabButton = new JFancyButton(getRemoveTabAction());
@@ -315,18 +245,9 @@ public class ConceptButtonPanel extends JPanel {
         return removeTabButton;
     }
 
-    /**
-     *     @return  Returns the renameTabAction.
-     *     @uml.property  name="renameTabAction"
-     */
     protected ActionAdapter getRenameTabAction() {
         if (renameTabAction == null) {
             renameTabAction = new ActionAdapter() {
-
-                /**
-                 *
-                 */
-                private static final long serialVersionUID = -2690503024126090264L;
 
                 public void doAction() {}
             };
@@ -335,10 +256,6 @@ public class ConceptButtonPanel extends JPanel {
         return renameTabAction;
     }
 
-    /**
-     *     @return  Returns the renameTabButton.
-     *     @uml.property  name="renameTabButton"
-     */
     protected JButton getRenameTabButton() {
         if (renameTabButton == null) {
             renameTabButton = new JFancyButton(getRenameTabAction());
@@ -351,10 +268,41 @@ public class ConceptButtonPanel extends JPanel {
         return renameTabButton;
     }
 
-    /**
-     *     @return  Returns the tabbedPane.
-     *     @uml.property  name="tabbedPane"
-     */
+    protected JButton getShowOverviewButton() {
+        if (showOverviewButton == null) {
+            showOverviewButton = new JFancyButton();
+            showOverviewButton.setText("");
+            showOverviewButton.setIcon(showIndexIcon);
+            showOverviewButton.setToolTipText("Show overview tab");
+            showOverviewButton.addActionListener(new ActionListener() {
+
+                public void actionPerformed(ActionEvent e) {
+                    showOverview = !showOverview;
+
+                    if (showOverview) {
+                        final ConceptButtonOverviewPanel panel = getOverviewPanel();
+
+                        showOverviewButton.setIcon(hideIndexIcon);
+                        panel.loadPreferences();    // refreshes the panel
+                        getTabbedPane().add("  OVERVIEW  ", panel);
+                        showOverviewButton.setToolTipText("Hide overview tab");
+                        getTabbedPane().setSelectedComponent(panel);
+
+                    }
+                    else {
+                        showOverviewButton.setIcon(showIndexIcon);
+                        getTabbedPane().remove(getOverviewPanel());
+                        showOverviewButton.setToolTipText("Show overview tab");
+                    }
+
+                }
+            });
+
+        }
+
+        return showOverviewButton;
+    }
+
     protected JTabbedPane getTabbedPane() {
         if (tabbedPane == null) {
             tabbedPane = new JTabbedPane(SwingConstants.BOTTOM);
@@ -363,60 +311,45 @@ public class ConceptButtonPanel extends JPanel {
         return tabbedPane;
     }
 
-    /**
-     * <p><!-- Method description --></p>
-     *
-     */
     private void initialize() {
 
-        
+
         setOpaque(true);
         setBackground(UIManager.getColor("control"));
         setLayout(new BorderLayout());
         add(getTabbedPane(), BorderLayout.CENTER);
         add(getButtonPanel(), BorderLayout.EAST);
         
-        PersonDispatcher.getInstance().addObserver(new IObserver() {
+        Lookup.getUserAccountDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
+            
+            public void propertyChange(PropertyChangeEvent evt) {
+                final boolean enabled = (evt.getNewValue() == null) ? false : true;
 
-            public void update(final Object obj, final Object changeCode) {
-                final boolean enabled = (obj == null) ? false : true;
                 getNewTabAction().setEnabled(enabled);
                 getRenameTabAction().setEnabled(enabled);
                 getRemoveTabAction().setEnabled(enabled);
+                
             }
-
         });
-        PreferencesDispatcher.getInstance().addObserver(new IObserver() {
-
-            public void update(final Object theObervered, final Object changeCode) {
+        
+        
+        Lookup.getPreferencesDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
+            
+            public void propertyChange(PropertyChangeEvent evt) {
                 changeUserPreferences();
             }
         });
-    }
-    
-    private JPanel getButtonPanel() {
-        if (buttonPanel == null) {
-            buttonPanel = new JPanel();
-            buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
-            buttonPanel.add(getNewTabButton());
-            buttonPanel.add(getRenameTabButton());
-            buttonPanel.add(getRemoveTabButton());
-            buttonPanel.add(getLockButton());
-            buttonPanel.add(getShowOverviewButton());
-            buttonPanel.add(Box.createVerticalGlue());
-        }
-        return buttonPanel;
+
     }
 
-    /**
-     * <p><!-- Method description --></p>
-     *
-     */
     private void loadTabsFromPreferences() {
         getTabbedPane().removeAll();
+
         final Preferences cpPrefs = userPreferences.node("CP");
+
         if (cpPrefs != null) {
             String[] tabNames = null;
+
             try {
                 tabNames = cpPrefs.childrenNames();
             }
@@ -428,38 +361,33 @@ public class ConceptButtonPanel extends JPanel {
                 final Preferences tabPrefs = cpPrefs.node(tabNames[i]);
                 final String tabName = tabPrefs.get("tabName", "dummy");
                 final ConceptButtonDropPanel panel = new ConceptButtonDropPanel(cpPrefs.node(tabNames[i]), toolBelt);
+
                 getTabbedPane().add(tabName, panel);
             }
         }
 
         setVisible(true);
     }
-    
-    
-    
 
     private class NewTabAction extends ActionAdapter {
 
-        /**
-         *
-         */
-        private static final long serialVersionUID = 2099427178247690538L;
 
         /**
-         * <p><!-- Method description --></p>
-         *
          */
         public void doAction() {
-            final String currentUser = PersonDispatcher.getInstance().getPerson();
-            if (currentUser == null) {
+            
+            final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher();
+
+            if (userAccount == null) {
                 JOptionPane.showMessageDialog(ConceptButtonPanel.this, "You must be logged in to create a new tab");
 
                 return;
             }
 
-            final NewConceptButtonTabDialog newConceptButtonTabDialog =
-                new NewConceptButtonTabDialog("Enter New Tab Name");
+            final NewConceptButtonTabDialog newConceptButtonTabDialog = new NewConceptButtonTabDialog(
+                "Enter New Tab Name");
             String tabName = null;
+
             if (newConceptButtonTabDialog != null) {
                 tabName = newConceptButtonTabDialog.getReturnValue();
             }
@@ -470,6 +398,7 @@ public class ConceptButtonPanel extends JPanel {
                 if ((userPreferences != null) && (userPreferences.node("CP") != null)) {
                     final Preferences cpPrefs = userPreferences.node("CP");
                     String[] cpTabs = null;
+
                     try {
                         cpTabs = cpPrefs.childrenNames();
                     }
@@ -478,8 +407,10 @@ public class ConceptButtonPanel extends JPanel {
                     }
 
                     boolean alreadyThere = false;
+
                     for (int j = 0; j < cpTabs.length; j++) {
                         final Preferences tabPrefs = cpPrefs.node("tab" + j);
+
                         if (tabPrefs.get("tabName", "").compareTo(tabName) == 0) {
                             alreadyThere = true;
                         }
@@ -487,8 +418,11 @@ public class ConceptButtonPanel extends JPanel {
 
                     if (!alreadyThere) {
                         final Preferences newTabPrefs = cpPrefs.node("tab" + cpTabs.length);
+
                         newTabPrefs.put("tabName", tabName);
+
                         final ConceptButtonDropPanel dropPanel = new ConceptButtonDropPanel(newTabPrefs, toolBelt);
+
                         getTabbedPane().add(tabName, dropPanel);
                     }
                     else {
@@ -501,78 +435,73 @@ public class ConceptButtonPanel extends JPanel {
         }
     }
 
+
     private class RemoveTabAction extends ActionAdapter {
 
-        /**
-         *
-         */
-        private static final long serialVersionUID = -6358272395282466591L;
 
         /**
          * <p><!-- Method description --></p>
          *
          */
         public void doAction() {
-            final String currentUser = PersonDispatcher.getInstance().getPerson();
-            if (currentUser != null) {
+            
+            final UserAccount userAccount = (UserAccount)  Lookup.getUserAccountDispatcher();
+
+            if (userAccount != null) {
                 final int response = JOptionPane.showConfirmDialog(ConceptButtonPanel.this,
-                                         "This action will remove the currently selected tab.  Are you sure?");
+                    "This action will remove the currently selected tab.  Are you sure?");
+
                 switch (response) {
-                    case JOptionPane.YES_OPTION :
+                case JOptionPane.YES_OPTION:
 
-                        // Grab the CP node from user prefs
-                        final Preferences cpPrefs = userPreferences.node("CP");
+                    // Grab the CP node from user prefs
+                    final Preferences cpPrefs = userPreferences.node("CP");
 
-                        // Get the current tab number
-                        final int currentTabNumber = getTabbedPane().getSelectedIndex();
+                    // Get the current tab number
+                    final int currentTabNumber = getTabbedPane().getSelectedIndex();
 
-                        // Remove the node at the current tab number
+                    // Remove the node at the current tab number
+                    try {
+                        cpPrefs.node("tab" + currentTabNumber).removeNode();
+                    }
+                    catch (final BackingStoreException bse) {
+                        log.error("Problem removing a tab.", bse);
+                    }
+
+                    // Now I have to rename all the rest of the tabs to move them up
+                    for (int i = (currentTabNumber + 1); i < getTabbedPane().getTabCount(); i++) {
+                        VarsUserPreferences.copyPrefs(cpPrefs.node("tab" + i), cpPrefs.node("tab" + (i - 1)));
+
                         try {
-                            cpPrefs.node("tab" + currentTabNumber).removeNode();
+                            cpPrefs.node("tab" + i).removeNode();
                         }
                         catch (final BackingStoreException bse) {
-                            log.error("Problem removing a tab.", bse);
+                            log.error("Problem removing a tab from preferences.", bse);
                         }
+                    }
 
-                        // Now I have to rename all the rest of the tabs to move them up
-                        for (int i = (currentTabNumber + 1); i < getTabbedPane().getTabCount(); i++) {
-                            VarsUserPreferences.copyPrefs(cpPrefs.node("tab" + i), cpPrefs.node("tab" + (i - 1)));
-                            try {
-                                cpPrefs.node("tab" + i).removeNode();
-                            }
-                            catch (final BackingStoreException bse) {
-                                log.error("Problem removing a tab from preferences.", bse);
-                            }
-                        }
+                    loadTabsFromPreferences();
 
-                        loadTabsFromPreferences();
+                    break;
 
-                        break;
+                case JOptionPane.NO_OPTION:
+                    break;
 
-                    case JOptionPane.NO_OPTION :
-                        break;
-
-                    case JOptionPane.CANCEL_OPTION :
-                        break;
+                case JOptionPane.CANCEL_OPTION:
+                    break;
                 }
             }
         }
     }
 
+
     private class RenameTabAction extends ActionAdapter {
 
-        /**
-         *
-         */
-        private static final long serialVersionUID = 8853058093763546773L;
-
-        /**
-         * <p><!-- Method description --></p>
-         *
-         */
         public void doAction() {
-            final String currentUser = PersonDispatcher.getInstance().getPerson();
-            if (currentUser == null) {
+            
+            final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher();
+
+            if (userAccount == null) {
                 return;
             }
         }

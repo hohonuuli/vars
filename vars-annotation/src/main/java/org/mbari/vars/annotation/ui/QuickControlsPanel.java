@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)QuickControlsPanel.java   2009.11.16 at 03:58:14 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
- * (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,9 +12,7 @@
  */
 
 
-/*
-Created on Dec 3, 2003
- */
+
 package org.mbari.vars.annotation.ui;
 
 import java.awt.event.ItemEvent;
@@ -28,47 +23,33 @@ import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import org.mbari.vars.annotation.model.VideoArchiveSet;
 import org.mbari.vars.annotation.ui.actions.ChangeAnnotationModeAction;
-import org.mbari.vars.annotation.ui.dispatchers.PredefinedDispatcher;
-import org.mbari.vars.annotation.ui.dispatchers.VideoArchiveDispatcher;
-import vars.annotation.ICameraData;
-import vars.annotation.IVideoArchive;
-import vars.annotation.IVideoArchiveSet;
+import vars.annotation.CameraDirections;
+import vars.annotation.FormatCodes;
+import vars.annotation.VideoArchive;
+import vars.annotation.ui.Lookup;
 
 /**
- * <p><!--Insert summary here--></p>
  *
  * @author  <a href="http://www.mbari.org">MBARI</a>
- * @version  $Id: QuickControlsPanel.java 332 2006-08-01 18:38:46Z hohonuuli $
  */
 public class QuickControlsPanel extends JPanel {
 
- 
     private final ChangeAnnotationModeAction action = new ChangeAnnotationModeAction();
-
-
     private JLabel cameraLabel;
-
     private JComboBox cbCameraDirection;
-
-
     private javax.swing.JComboBox modeChoiceBox;
-
     private javax.swing.JLabel modeLabel;
-
     private ModeObject[] modeObjects;
 
+    /**
+     * Constructs ...
+     */
     public QuickControlsPanel() {
         super();
         initialize();
     }
 
-    /**
-     *     <p><!-- Method description --></p>
-     *     @return
-     *     @uml.property  name="cameraLabel"
-     */
     private JLabel getCameraLabel() {
         if (cameraLabel == null) {
             cameraLabel = new JLabel();
@@ -78,10 +59,6 @@ public class QuickControlsPanel extends JPanel {
         return cameraLabel;
     }
 
-    /**
-     *     <p><!-- Method description --></p>
-     *     @return
-     */
     private JComboBox getCbCameraDirection() {
         if (cbCameraDirection == null) {
             cbCameraDirection = new CameraDirectionComboBox();
@@ -91,25 +68,18 @@ public class QuickControlsPanel extends JPanel {
 
                 public void itemStateChanged(final ItemEvent e) {
                     if (e.getStateChange() == ItemEvent.SELECTED) {
-                        PredefinedDispatcher.CAMERA_DIRECTION.getDispatcher().setValueObject(
-                            (String) cbCameraDirection.getSelectedItem());
-
+                        Lookup.getCameraDirectionDispatcher().setValueObject(cbCameraDirection.getSelectedItem());
                     }
                 }
 
             });
-            cbCameraDirection.setSelectedItem(ICameraData.DIR_DESCEND);
-            final String dir = (String) cbCameraDirection.getSelectedItem();
-            PredefinedDispatcher.CAMERA_DIRECTION.getDispatcher().setValueObject(dir);
+            cbCameraDirection.setSelectedItem(CameraDirections.DESCEND);
+            Lookup.getCameraDirectionDispatcher().setValueObject(cbCameraDirection.getSelectedItem());
         }
 
         return cbCameraDirection;
     }
 
-    /**
-     *     This method initializes modeChoiceBox
-     *     @return   javax.swing.JComboBox
-     */
     private javax.swing.JComboBox getModeChoiceBox() {
         if (modeChoiceBox == null) {
             modeChoiceBox = new ModeComboBox();
@@ -118,10 +88,6 @@ public class QuickControlsPanel extends JPanel {
         return modeChoiceBox;
     }
 
-    /**
-     *     This method initializes modeLabel
-     *     @return   javax.swing.JLabel
-     */
     private javax.swing.JLabel getModeLabel() {
         if (modeLabel == null) {
             modeLabel = new javax.swing.JLabel();
@@ -132,23 +98,17 @@ public class QuickControlsPanel extends JPanel {
     }
 
     /**
-     *     Gets the modeObjects attribute of the QuickControls object
-     *     @return   The modeObjects value
+     * @return
      */
     public ModeObject[] getModeObjects() {
         if (modeObjects == null) {
-            modeObjects = new ModeObject[] { new ModeObject(IVideoArchiveSet.FORMAT_CODE_OUTLINE),
-                                             new ModeObject(IVideoArchiveSet.FORMAT_CODE_DETAILED) };
+            modeObjects = new ModeObject[] { new ModeObject(FormatCodes.OUTLINE.getCode()),
+                                             new ModeObject(FormatCodes.DETAILED.getCode()) };
         }
 
         return modeObjects;
     }
 
-    /**
-     * This method initializes this
-     *
-     *
-     */
     private void initialize() {
         this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         this.add(getModeLabel(), null);
@@ -160,24 +120,11 @@ public class QuickControlsPanel extends JPanel {
 
     class ModeComboBox extends JComboBox implements PropertyChangeListener {
 
-        /**
-         *
-         */
-        private static final long serialVersionUID = 5554180629594135416L;
-
-        /**
-         * Constructs ...
-         *
-         */
         ModeComboBox() {
             super();
             initialize();
         }
 
-        /**
-         * <p><!-- Method description --></p>
-         *
-         */
         void initialize() {
             setEditable(false);
             setComponentOrientation(java.awt.ComponentOrientation.UNKNOWN);
@@ -203,17 +150,15 @@ public class QuickControlsPanel extends JPanel {
                 }
 
             });
-            VideoArchiveDispatcher.getInstance().addPropertyChangeListener(this);
+            Lookup.getVideoArchiveDispatcher().addPropertyChangeListener(this);
         }
 
         /**
-         * Registered to the VideoArchiveDispatcher
          *
-         * @param  evt Description of the Parameter
-         * @see  java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+         * @param evt
          */
         public void propertyChange(final PropertyChangeEvent evt) {
-            final IVideoArchive va = (IVideoArchive) evt.getNewValue();
+            final VideoArchive va = (VideoArchive) evt.getNewValue();
             if (va != null) {
                 final char formatCode = va.getVideoArchiveSet().getFormatCode();
                 final ModeObject[] modes = getModeObjects();
@@ -221,7 +166,7 @@ public class QuickControlsPanel extends JPanel {
                     if (modes[i].code == formatCode) {
                         final JComboBox cb = getModeChoiceBox();
                         final ModeObject mo = (ModeObject) cb.getSelectedItem();
-                        if ((mo != null) &&!mo.equals(modes[i])) {
+                        if ((mo != null) && !mo.equals(modes[i])) {
                             cb.setSelectedItem(modes[i]);
                         }
 
@@ -232,38 +177,21 @@ public class QuickControlsPanel extends JPanel {
         }
     }
 
-    /**
-     * Get the character codes allowed for setting the mode
-     *
-     * @author  brian
-     * @version
-     * @return  An array of the character codes allowed for
-     */
+
     class ModeObject {
 
         private final char code;
         private final String codeString;
 
-        /**
-         * Constructs ...
-         *
-         *
-         * @param c
-         */
         ModeObject(final char c) {
             code = c;
-            codeString = VideoArchiveSet.getFormatCodeDescriptiveName(c);
+            codeString = FormatCodes.getDescriptiveName(c + "");
         }
 
-        /**
-         *  Description of the Method
-         *
-         * @param  obj Description of the Parameter
-         * @return  Description of the Return Value
-         */
+
         public boolean equals(final Object obj) {
             boolean ok = false;
-            if ((obj == null) ||!obj.getClass().equals(getClass())) {
+            if ((obj == null) || !obj.getClass().equals(getClass())) {
                 ok = false;
             }
             else if (obj == this) {
@@ -279,11 +207,6 @@ public class QuickControlsPanel extends JPanel {
             return ok;
         }
 
-        /**
-         *  Description of the Method
-         *
-         * @return  Description of the Return Value
-         */
         public String toString() {
             return codeString;
         }

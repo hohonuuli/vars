@@ -45,39 +45,24 @@ import vars.annotation.IVideoFrame;
  */
 public class ChangeTimeCodeAction extends ActionAdapter {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
-    private static final Logger log = LoggerFactory.getLogger(ChangeTimeCodeAction.class);
 
-    /*
+    private final Logger log = LoggerFactory.getLogger(getClass());
+
+    /**
      * This is the timecode we want to change to
-     */
-
-    /**
-     *     @uml.property  name="timeCode"
-     *     @uml.associationEnd  multiplicity="(1 1)"
      */
     private final Timecode timeCode = new Timecode();
 
-    /*
+    /**
      * This is the videoframe whose timecode we want to change
      */
-
-    /**
-     *     @uml.property  name="videoFrame"
-     *     @uml.associationEnd
-     */
-    private IVideoFrame videoFrame;
+    private VideoFrame videoFrame;
 
     /**
      *
      */
     public ChangeTimeCodeAction() {
         super();
-
-        // TODO Auto-generated constructor stub
     }
 
     /**
@@ -85,8 +70,6 @@ public class ChangeTimeCodeAction extends ActionAdapter {
      */
     public ChangeTimeCodeAction(final String name) {
         super(name);
-
-        // TODO Auto-generated constructor stub
     }
 
     /**
@@ -95,8 +78,6 @@ public class ChangeTimeCodeAction extends ActionAdapter {
      */
     public ChangeTimeCodeAction(final String name, final Icon icon) {
         super(name, icon);
-
-        // TODO Auto-generated constructor stub
     }
 
     /**
@@ -104,9 +85,9 @@ public class ChangeTimeCodeAction extends ActionAdapter {
      *
      */
     public void doAction() {
-        final IObservation obs = ObservationDispatcher.getInstance().getObservation();
+        final Observation obs = ObservationDispatcher.getInstance().getObservation();
         if (obs != null) {
-            IVideoFrame vf =  obs.getVideoFrame();
+            VideoFrame vf =  obs.getVideoFrame();
             synchronized (vf) {
                 final String oldTimeCode = vf.getTimeCode();
                 final IVideoArchive va = vf.getVideoArchive();
@@ -171,9 +152,8 @@ public class ChangeTimeCodeAction extends ActionAdapter {
 
     /**
      *     @return  Returns the videoFrame.
-     *     @uml.property  name="videoFrame"
      */
-    public IVideoFrame getVideoFrame() {
+    public VideoFrame getVideoFrame() {
         return videoFrame;
     }
 
@@ -187,9 +167,8 @@ public class ChangeTimeCodeAction extends ActionAdapter {
 
     /**
      *     @param videoFrame  The videoFrame to set.
-     *     @uml.property  name="videoFrame"
      */
-    public void setVideoFrame(final IVideoFrame videoFrame) {
+    public void setVideoFrame(final VideoFrame videoFrame) {
         this.videoFrame = videoFrame;
     }
 

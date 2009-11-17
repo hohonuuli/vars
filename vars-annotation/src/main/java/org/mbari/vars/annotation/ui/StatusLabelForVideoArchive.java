@@ -61,11 +61,11 @@ public class StatusLabelForVideoArchive extends StatusLabel {
         dispatcher.addPropertyChangeListener(new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
-                update((IVideoArchive) evt.getNewValue());
+                updateVideoArchiveSet((IVideoArchive) evt.getNewValue());
             }
 
         });
-        update((IVideoArchive) dispatcher.getValueObject());
+        updateVideoArchiveSet((IVideoArchive) dispatcher.getValueObject());
 
         /*
          * On click show a dialog allowing a user to open a VideoArchive
@@ -140,6 +140,6 @@ public class StatusLabelForVideoArchive extends StatusLabel {
      * @param arg1
      */
     public void update(Object arg0, Object arg1) {
-        update((IVideoArchive) arg0);
+        updateVideoArchiveSet((IVideoArchive) arg0);
     }
 }

@@ -408,7 +408,7 @@ public class VideoSetViewer extends JFrame {
                         cd.setDirection(selectedValue);
 
                         try {
-                            DAOEventQueue.update((IDataObject) vf);
+                            DAOEventQueue.updateVideoArchiveSet((IDataObject) vf);
                         }
                         catch (final Exception e1) {
                             if (log.isErrorEnabled()) {
@@ -482,7 +482,7 @@ public class VideoSetViewer extends JFrame {
             final IObservation observation = ObservationDispatcher.getInstance().getObservation();
             if (observation != null) {
                 try {
-                    DAOEventQueue.update((IDataObject) observation);
+                    DAOEventQueue.updateVideoArchiveSet((IDataObject) observation);
                 }
                 catch (final Exception e) {
                     final String msg = "Failed to update the last modified observation:\n '" + observation + "'";

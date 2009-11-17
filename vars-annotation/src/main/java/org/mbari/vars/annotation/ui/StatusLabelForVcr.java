@@ -20,6 +20,7 @@ Created on Dec 1, 2003
  */
 package org.mbari.vars.annotation.ui;
 
+import java.awt.Frame;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -30,14 +31,15 @@ import javax.swing.SwingUtilities;
 import org.mbari.swing.SwingUtils;
 import org.mbari.util.Dispatcher;
 import org.mbari.util.IObserver;
-import org.mbari.vars.annotation.ui.dispatchers.PredefinedDispatcher;
-import org.mbari.vars.util.AppFrameDispatcher;
 import org.mbari.vcr.IVCR;
 import org.mbari.vcr.IVCRState;
 import org.mbari.vcr.ui.VCRSelectionDialog;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import vars.annotation.ui.Lookup;
+import vars.annotation.ui.VideoService;
 
 /**
  * <p>Indicates connection state of the VCR. Clicking on this label will bring up
@@ -50,14 +52,9 @@ public class StatusLabelForVcr extends StatusLabel {
     
     private static final String NO_CONNECTION = "VCR: Not connected";
     
-    /**
-     *
-     */
-    private static final long serialVersionUID = -1873722722432809410L;
-    private static final Logger log = LoggerFactory.getLogger(StatusLabelForVcr.class);
+    private final Logger log = LoggerFactory.getLogger(getClass());
     
-    /**
-     */
+
     private final StatusMonitor statusMonitor = new StatusMonitor();
     
     /**
@@ -84,7 +81,8 @@ public class StatusLabelForVcr extends StatusLabel {
                 videoDialog.setVisible(true);
             }
             
-            private final JDialog videoDialog = new VCRSelectionDialog(AppFrameDispatcher.getFrame());
+            Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
+            private final JDialog videoDialog = new VCRSelectionDialog(frame);
             
         });
         
@@ -95,9 +93,11 @@ public class StatusLabelForVcr extends StatusLabel {
          * old obj are equal, so we have to set it to null and then back to
          * it's value to trigger a notification.
          */
-        final Dispatcher dispatcher = PredefinedDispatcher.VCR.getDispatcher();
+        final Dispatcher dispatcher = Lookup.getVideoServiceDispatcher();
+        final VideoService videoService = (VideoService) dispatcher.getValueObject();
+        final IVCR vcr = videoService == null ? null : videoService.getVCR();
         dispatcher.addPropertyChangeListener(new VcrListener());
-        setVcr((IVCR) dispatcher.getValueObject());
+        setVcr(vcr);
         
     }
     
@@ -112,17 +112,7 @@ public class StatusLabelForVcr extends StatusLabel {
         setText(label);
     }
     
-    /**
-     * Method description
-     *
-     *
-     * @param obj
-     * @param changeCode
-     */
-    public void update(final Object obj, final Object changeCode) {
-        
-        // Do nothing. We're using VcrListener instead
-    }
+
     
     /**
      *  Monitors the VCR status. When the VCR is connected it toggles the
@@ -152,8 +142,10 @@ public class StatusLabelForVcr extends StatusLabel {
          * @param evt
          */
         public void propertyChange(final PropertyChangeEvent evt) {
-            final IVCR newVcr = (IVCR) evt.getNewValue();
-            final IVCR oldVcr = (IVCR) evt.getOldValue();
+            final VideoService newVideoService = (VideoService) evt.getNewValue();
+            final VideoService oldVideoService = (VideoService) evt.getOldValue();
+            final IVCR newVcr = newVideoService == null ? null : newVideoService.getVCR();
+            final IVCR oldVcr = oldVideoService == null ? null : oldVideoService.getVCR();
             
             if (log.isDebugEnabled()) {
                 final String label = (newVcr == null) ? NO_CONNECTION : "VCR: " + newVcr.getConnectionName();
@@ -166,5 +158,10 @@ public class StatusLabelForVcr extends StatusLabel {
             
             setVcr(newVcr);
         }
+    }
+
+    public void propertyChange(PropertyChangeEvent evt) {
+        // TODO Auto-generated method stub
+        
     }
 }

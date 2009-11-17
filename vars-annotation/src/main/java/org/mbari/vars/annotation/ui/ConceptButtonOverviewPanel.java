@@ -17,9 +17,11 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import org.mbari.vars.annotation.ui.dispatchers.PreferencesDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import vars.annotation.ui.Lookup;
+import vars.annotation.ui.ToolBelt;
 
 /**
  *
@@ -31,17 +33,20 @@ public class ConceptButtonOverviewPanel extends JPanel {
     
     private JScrollPane scrollPane = null;
     private JPanel overviewPanel = null;
+    private final ToolBelt toolBelt;
     
 
-    public ConceptButtonOverviewPanel() {
+    public ConceptButtonOverviewPanel(ToolBelt toolBelt) {
+        this.toolBelt = toolBelt;
         initialize();
         
         // Update the overview tab when the users are switched.
-        PreferencesDispatcher.DISPATCHER.addPropertyChangeListener(new PropertyChangeListener() {
+        Lookup.getPreferencesDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 loadPreferences();
             }
         });
+  
         loadPreferences();
     }
 
@@ -53,7 +58,7 @@ public class ConceptButtonOverviewPanel extends JPanel {
     
     public void loadPreferences() {
         getOverviewPanel().removeAll();
-        Preferences userPreferences = PreferencesDispatcher.getInstance().getPreferences();
+        Preferences userPreferences = (Preferences) Lookup.getPreferencesDispatcher().getValueObject();
         final Preferences cpPreferences = userPreferences.node("CP");
         if (cpPreferences != null) {
             String[] tabNames = null;
@@ -67,8 +72,7 @@ public class ConceptButtonOverviewPanel extends JPanel {
                 
                 for (int i = 0; i < tabNames.length; i++) {
                     String tabName = tabNames[i];
-                    JPanel panel = new ConceptButtonDropPanelWithHighlights(cpPreferences.node(tabName));
-                    //panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+                    JPanel panel = new ConceptButtonDropPanelWithHighlights(cpPreferences.node(tabName), toolBelt);
                     panel.setBorder(javax.swing.BorderFactory.createTitledBorder(cpPreferences.node(tabName).get("tabName","")));
                     getOverviewPanel().add(panel);
                 }
@@ -81,7 +85,6 @@ public class ConceptButtonOverviewPanel extends JPanel {
         if (overviewPanel == null) {
             overviewPanel = new JPanel();
             overviewPanel.setLayout(new FlowLayout(FlowLayout.LEADING));
-            //overviewPanel.setLayout(new BoxLayout(scrollPane, BoxLayout.X_AXIS));
         }
         return overviewPanel;
         

@@ -50,7 +50,7 @@ import org.mbari.awt.event.ActionAdapter;
 import org.mbari.util.Dispatcher;
 import org.mbari.text.IgnoreCaseToStringComparator;
 import org.mbari.util.ImmutableCollection;
-import vars.query.QueryDAO;
+import vars.query.SpecialQueryDAO;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -60,9 +60,9 @@ import vars.query.QueryDAO;
  */
 public class RefineSearchPanel extends JPanel {
 
-    private static final long serialVersionUID = 7354901590684719921L;
-    private static final Logger log = LoggerFactory.getLogger(RefineSearchPanel.class);
-    private static final Comparator COMPARATOR = new IgnoreCaseToStringComparator();
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    
+    private static final Comparator<Object> COMPARATOR = new IgnoreCaseToStringComparator();
     /**
      * This is a list of Colunn names who's return boxes should be checked by default
      * if found in the database.
@@ -80,7 +80,6 @@ public class RefineSearchPanel extends JPanel {
      * "Other" group.
      */
     private static final Map<String, Set<String>> COLUMN_GROUPS = new TreeMap<String, Set<String>>(COMPARATOR);
-    //~--- static initializers ------------------------------------------------
     static {
         DEFAULT_RETURNS.add("Associations");
         DEFAULT_RETURNS.add("ConceptName");
@@ -156,48 +155,29 @@ public class RefineSearchPanel extends JPanel {
         set.add("Salinity");
         set.add("Temperature");
     }
-    //~--- fields -------------------------------------------------------------
-    /**
-     * @uml.property  name="constraintNames"
-     * @uml.associationEnd  multiplicity="(0 -1)" elementType="java.lang.String"
-     */
+ 
     private Collection constraintNames;
-    // private Collection
     /**
      * Metadata representing information about the Annotations view in the database.
-     * @uml.property  name="metadata"
-     * @uml.associationEnd  qualifier="columnName:java.lang.String java.lang.String"
      */
     private Map metadata;
-    /**
-     * @uml.property  name="panel"
-     * @uml.associationEnd
-     */
+
     private JPanel panel;
-    /**
-     * @uml.property  name="scrollPane"
-     * @uml.associationEnd
-     */
+
     private JScrollPane scrollPane;
-    /**
-     * These are Columns that could be handled in a special manner.
-     * @uml.property  name="stringConstraints" multiplicity="(0 -1)" dimension="1"
-     */
+  
     private String[] stringConstraints = new String[]{"Observer", "ShipName", "PlatformName", "ChiefScientist", "Direction"};
-    /**
-     * @uml.property  name="valuePanels"
-     * @uml.associationEnd  multiplicity="(0 -1)" elementType="org.mbari.vars.query.ui.ValuePanel"
-     */
+
     private Collection valuePanels;
     //~--- constructors -------------------------------------------------------
 
-    private final QueryDAO queryDAO;
+    private final SpecialQueryDAO queryDAO;
 
     /**
      * This is the default constructor
      */
     @Inject
-    public RefineSearchPanel(QueryDAO queryDAO) {
+    public RefineSearchPanel(SpecialQueryDAO queryDAO) {
         super();
         constraintNames = Arrays.asList(stringConstraints);
         this.queryDAO = queryDAO;

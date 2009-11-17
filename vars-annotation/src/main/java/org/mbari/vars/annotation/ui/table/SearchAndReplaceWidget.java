@@ -249,7 +249,7 @@ public class SearchAndReplaceWidget extends JPanel {
                         observation.addAssociation(newAssociation);
 
                         try {
-                            ObservationDAO.getInstance().update((IDataObject) observation);
+                            ObservationDAO.getInstance().updateVideoArchiveSet((IDataObject) observation);
                         }
                         catch (final DAOException e1) {
                             if (log.isErrorEnabled()) {
@@ -320,7 +320,7 @@ public class SearchAndReplaceWidget extends JPanel {
                     for (int i = 0; i < selectedObs.length; i++) {
                         final IObservation obs = selectedObs[i];
                         final Collection dead = obs.removeDescendantAssociation(deadAssoc);
-                        DAOEventQueue.update((IDataObject) obs);
+                        DAOEventQueue.updateVideoArchiveSet((IDataObject) obs);
 
                         for (final Iterator j = dead.iterator(); j.hasNext(); ) {
                             final Association a = (Association) j.next();
@@ -991,7 +991,7 @@ public class SearchAndReplaceWidget extends JPanel {
                         currentAssoc.setLinkName(association.getLinkName());
                         currentAssoc.setToConcept(association.getToConcept());
                         currentAssoc.setLinkValue(association.getLinkValue());
-                        DAOEventQueue.update((IDataObject) currentAssoc);
+                        DAOEventQueue.updateVideoArchiveSet((IDataObject) currentAssoc);
                     }
                 }
             }

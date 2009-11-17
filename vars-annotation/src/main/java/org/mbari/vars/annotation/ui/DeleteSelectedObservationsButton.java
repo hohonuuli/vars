@@ -15,6 +15,9 @@
 
 package org.mbari.vars.annotation.ui;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JTable;
@@ -24,7 +27,6 @@ import javax.swing.event.ListSelectionListener;
 import org.mbari.swing.JFancyButton;
 import org.mbari.swing.SwingUtils;
 import org.mbari.vars.annotation.ui.actions.DeleteSelectedObservationsWithConfirmAction;
-import org.mbari.vars.annotation.ui.dispatchers.ObservationTableDispatcher;
 import vars.UserAccount;
 import vars.annotation.ui.Lookup;
 
@@ -33,7 +35,6 @@ import vars.annotation.ui.Lookup;
  * up a dialog prompting the user to confirm the delete.</p>
  *
  * @author  <a href="http://www.mbari.org">MBARI</a>
- * @version  $Id: DeleteSelectedObservationsButton.java 338 2006-08-03 23:59:08Z hohonuuli $
  */
 public class DeleteSelectedObservationsButton extends JFancyButton {
 
@@ -49,9 +50,8 @@ public class DeleteSelectedObservationsButton extends JFancyButton {
         setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/obs_delete.png")));
         setEnabled(false);
         setText("");
-
-        // Enable if 1 or more lines are selected in the table
-        ObservationTableDispatcher.getInstance().getObservationTable().getSelectionModel().addListSelectionListener(
+        
+        ((JTable) Lookup.getObservationTableDispatcher().getValueObject()).getSelectionModel().addListSelectionListener(
             new ListSelectionListener() {
 
             public void valueChanged(final ListSelectionEvent e) {

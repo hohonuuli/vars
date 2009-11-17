@@ -33,7 +33,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.List;
-import vars.query.QueryDAO;
+import vars.query.SpecialQueryDAO;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -43,33 +43,21 @@ import vars.query.QueryDAO;
  */
 public class NumberValuePanel extends ValuePanel {
 
-    private static final long serialVersionUID = -6246141989512191267L;
-    /**
-	 * @uml.property  name="minLabel"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
+
     private JLabel minLabel = null;
-    /**
-	 * @uml.property  name="minTextField"
-	 * @uml.associationEnd  
-	 */
+
     private JTextField minTextField = null;
-    /**
-	 * @uml.property  name="maxTextField"
-	 * @uml.associationEnd  
-	 */
+
     private JTextField maxTextField = null;
-    /**
-	 * @uml.property  name="maxLabel"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
+ 
     private JLabel maxLabel = null;
 
     private JButton scanButton = null;
 
-    private static final Logger log = LoggerFactory.getLogger(NumberValuePanel.class);
 
-    private final QueryDAO queryDAO;
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    
+    private final SpecialQueryDAO queryDAO;
 
     
     //~--- constructors -------------------------------------------------------
@@ -80,7 +68,7 @@ public class NumberValuePanel extends ValuePanel {
      * @param name
      */
     @Inject
-    public NumberValuePanel(String name, QueryDAO queryDAO) {
+    public NumberValuePanel(String name, SpecialQueryDAO queryDAO) {
         super(name);
         this.queryDAO = queryDAO;
         initialize();

@@ -42,4 +42,15 @@ public enum FormatCodes {
     public String toString() {
         return String.valueOf(code);
     }
+    
+    public static String getDescriptiveName(String code) {
+        FormatCodes formatCode = UNKNOWN;
+        for (FormatCodes c : values()) {
+            if (c.toString().equals(code)) {
+                formatCode = c;
+                break;
+            }
+        }
+        return formatCode.name();
+    }
 }

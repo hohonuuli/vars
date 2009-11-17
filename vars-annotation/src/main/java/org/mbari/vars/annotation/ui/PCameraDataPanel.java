@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)PCameraDataPanel.java   2009.11.16 at 02:02:09 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
- * (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,22 +12,25 @@
  */
 
 
+
 package org.mbari.vars.annotation.ui;
 
+import java.awt.Frame;
+import java.util.Collection;
+import java.util.HashSet;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
-
+import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.swing.PropertyPanel;
-import org.mbari.vars.annotation.ui.dispatchers.ObservationDispatcher;
-import org.mbari.vars.annotation.ui.dispatchers.ObservationTableDispatcher;
-import org.mbari.vars.annotation.ui.dispatchers.VideoArchiveDispatcher;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.CameraData;
-import vars.annotation.VideoFrame;
+import vars.annotation.CameraDirections;
 import vars.annotation.Observation;
+import vars.annotation.VideoFrame;
+import vars.annotation.ui.Lookup;
+import vars.annotation.ui.PersistenceService;
 
 /**
  * <p>
@@ -41,18 +41,17 @@ import vars.annotation.Observation;
  */
 public class PCameraDataPanel extends PropertiesPanel {
 
-
-    private final Logger log = LoggerFactory.getLogger(getClass());
-
     private ActionAdapter directionAction;
+    private final PersistenceService persistenceService;
 
     /**
      * Constructs ...
      */
-    PCameraDataPanel() {
+    PCameraDataPanel(PersistenceService persistenceService) {
         super();
-        setPropertyNames(new String[]{
-                "Direction", "Name", "Zoom", "Focus", "Iris", "FieldWidth", "StillImage"
+        this.persistenceService = persistenceService;
+        setPropertyNames(new String[] {
+            "Direction", "Name", "Zoom", "Focus", "Iris", "FieldWidth", "StillImage"
         });
         addListeners();
         addToolTip("StillImage");
@@ -68,39 +67,39 @@ public class PCameraDataPanel extends PropertiesPanel {
         if (directionAction == null) {
             directionAction = new ActionAdapter() {
 
-
-
                 public void doAction() {
                     final PropertyPanel p = getPropertyPanel("Direction");
                     final JTextField f1 = p.getValueField();
                     final String initialValue = f1.getText();
-                    final String selectedValue = (String) JOptionPane.showInputDialog(AppFrameDispatcher.getFrame(),
-                            "Select a camera direction.", "VARS - Camera Direction",
-                            JOptionPane.QUESTION_MESSAGE, null, ICameraData.DIRECTIONS,
-                            initialValue);
+                    Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
+                    final String selectedValue = (String) JOptionPane.showInputDialog(frame,
+                        "Select a camera direction.", "VARS - Camera Direction", JOptionPane.QUESTION_MESSAGE, null,
+                        CameraDirections.values(), initialValue);
                     if (selectedValue != null) {
-                        final Observation obs = ObservationDispatcher.getInstance().getObservation();
-                        final VideoFrame vf = obs.getVideoFrame();
-                        final CameraData cd = vf.getCameraData();
-                        cd.setDirection(selectedValue);
+                        final Collection<Observation> observations = (Collection<Observation>) Lookup
+                            .getSelectedObservationsDispatcher();
+                        if (observations.size() == 1) {
+                            final Observation obs = observations.iterator().next();
+                            final VideoFrame vf = obs.getVideoFrame();
+                            final CameraData cd = vf.getCameraData();
+                            cd.setDirection(selectedValue);
 
-                        try {
-                            DAOEventQueue.update((IDataObject) vf);
-                        }
-                        catch (final Exception e1) {
-                            if (log.isErrorEnabled()) {
-                                log.error("Failed to update a videoframe", e1);
+                            try {
+                                persistenceService.updateObservations(new HashSet<Observation>() {
+
+                                    {
+                                        add(obs);
+                                    }
+
+                                });
                             }
+                            catch (final Exception e1) {
+                                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e1);
+                            }
+
+                            f1.setText(selectedValue);
+
                         }
-
-                        f1.setText(selectedValue);
-
-                        // Redraw the table
-                        ObservationTableDispatcher.getInstance().getObservationTable().redrawAll();
-
-                        // Update everything that's listening to the videoarchive.
-                        final VideoArchiveDispatcher vad = VideoArchiveDispatcher.getInstance();
-                        vad.setVideoArchive(vad.getVideoArchive());
                     }
                 }
             };

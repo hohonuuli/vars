@@ -24,14 +24,8 @@ import vars.annotation.CameraDirections;
  * <p>A combobox that sets the Camera direction. A convience class.</p>
  *
  * @author  <a href="http://www.mbari.org">MBARI</a>
- * @version  $Id: CameraDirectionComboBox.java 314 2006-07-10 02:38:46Z hohonuuli $
  */
 public class CameraDirectionComboBox extends JComboBox {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = -7274559624357856862L;
 
     /**
      * Constructs ...

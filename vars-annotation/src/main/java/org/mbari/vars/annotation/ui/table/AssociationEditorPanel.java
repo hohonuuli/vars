@@ -254,7 +254,7 @@ public class AssociationEditorPanel extends JPanel {
 
             // Insert the new Association into the database.
             association.validateToConceptName();
-            DAOEventQueue.update(association);
+            DAOEventQueue.updateVideoArchiveSet(association);
         }
 
         // here a new Association is being created

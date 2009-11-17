@@ -22,7 +22,10 @@ Created on October 31, 2003, 9:16 AM
  */
 package org.mbari.vars.annotation.ui;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -32,9 +35,11 @@ import javax.swing.event.DocumentListener;
 import org.mbari.awt.layout.VerticalFlowLayout;
 import org.mbari.swing.PropertyPanel;
 import org.mbari.util.IObserver;
-import org.mbari.vars.annotation.ui.dispatchers.ObservationDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import vars.annotation.Observation;
+import vars.annotation.ui.Lookup;
 
 /**
  * <p>A JPanel the displays a group of related properties that can be obtained
@@ -43,34 +48,34 @@ import org.slf4j.LoggerFactory;
  *
  *
  * @author  <a href="http://www.mbari.org">MBARI</a>
- * @version  $Id: PropertiesPanel.java 332 2006-08-01 18:38:46Z hohonuuli $
  */
 public abstract class PropertiesPanel extends javax.swing.JPanel implements IObserver {
 
-    /**
-     *  The Logger
-     */
-    private static final Logger log = LoggerFactory.getLogger(PropertiesPanel.class);
-
-    /**
-     *     Any parameters that are not found using reflection are set to this value.
-     *     @uml.property  name="missingValue"
-     */
+    private final Logger log = LoggerFactory.getLogger(getClass());
     String missingValue = " ";
 
-    /**
-     *     Map of the <code>PropertyPanel</code>s. <br> key = String propertey name. <br> value = PropertyPanel that displays the property with name matching 'key'
-     *     @uml.property  name="propertyMap"
-     *     @uml.associationEnd  qualifier="key:java.lang.String org.mbari.swing.PropertyPanel"
-     */
-    Map propertyMap = new HashMap();
+    Map<String, PropertyPanel> propertyMap = new HashMap<String, PropertyPanel>();
 
     /**
      * Creates new PPhysicalDataPanel
      */
     public PropertiesPanel() {
         initialize();
-        ObservationDispatcher.getInstance().addObserver(this);
+        Lookup.getSelectedObservationsDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
+            
+            public void propertyChange(PropertyChangeEvent evt) {
+                
+                /*
+                 * Child classes expect a single observation. If more than one has been selected then 
+                 * post a null value
+                 */
+                Collection<Observation> observations = (Collection<Observation>) evt.getNewValue();
+                Observation obs = observations.size() == 1 ? observations.iterator().next() : null;
+                update(obs, "");
+                
+            }
+        });
+
     }
 
     /**
@@ -105,7 +110,7 @@ public abstract class PropertiesPanel extends javax.swing.JPanel implements IObs
      *  Clears the values of all the value fields
      */
     void clearValues() {
-        for (final Iterator i = propertyMap.keySet().iterator(); i.hasNext(); ) {
+        for (final Iterator<String> i = propertyMap.keySet().iterator(); i.hasNext(); ) {
             final String key = (String) i.next();
             final PropertyPanel p = (PropertyPanel) propertyMap.get(key);
             p.setProperty(key, missingValue);
@@ -163,7 +168,7 @@ public abstract class PropertiesPanel extends javax.swing.JPanel implements IObs
             final Class[] paramClass = new Class[] {};
             final Object[] args = new Object[] {};
             Object value = missingValue;
-            for (final Iterator i = propertyMap.keySet().iterator(); i.hasNext(); ) {
+            for (final Iterator<String> i = propertyMap.keySet().iterator(); i.hasNext(); ) {
                 final String key = (String) i.next();
                 final String firstLetter = key.substring(0, 1).toUpperCase();
                 final String name = "get" + firstLetter + key.substring(1, key.length());

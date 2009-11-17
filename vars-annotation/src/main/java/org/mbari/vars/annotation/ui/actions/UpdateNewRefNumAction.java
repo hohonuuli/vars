@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)UpdateNewRefNumAction.java   2009.11.16 at 09:42:47 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
- * (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,6 +12,7 @@
  */
 
 
+
 package org.mbari.vars.annotation.ui.actions;
 
 import java.util.Collections;
@@ -22,11 +20,10 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import org.mbari.awt.event.ActionAdapter;
-import org.mbari.vars.annotation.model.VideoArchive;
-import org.mbari.vars.annotation.model.VideoArchiveSet;
-import org.mbari.vars.annotation.model.dao.VideoArchiveSetDAO;
-import vars.annotation.IVideoArchiveSet;
-import vars.annotation.IVideoArchive;
+import vars.annotation.AnnotationDAOFactory;
+import vars.annotation.VideoArchive;
+import vars.annotation.VideoArchiveDAO;
+import vars.annotation.VideoArchiveSet;
 
 /**
  * <p>
@@ -40,32 +37,22 @@ import vars.annotation.IVideoArchive;
  *
  *
  * @author  <a href="http://www.mbari.org">MBARI</a>
- * @version  $Id: UpdateNewRefNumAction.java 332 2006-08-01 18:38:46Z hohonuuli $
  */
 public class UpdateNewRefNumAction extends ActionAdapter implements IVideoArchiveProperty {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
-
-    /**
-     *     @uml.property  name="needsUpdating"
-     */
     private boolean needsUpdating = true;
-
-    /**
-     *     @uml.property  name="videoArchive"
-     *     @uml.associationEnd
-     */
-    private IVideoArchive videoArchive;
+    private final AnnotationDAOFactory annotationDAOFactory;
+    private VideoArchive videoArchive;
 
     /**
      * Constructs ...
      *
+     *
+     * @param annotationDAOFactory
      */
-    public UpdateNewRefNumAction() {
+    public UpdateNewRefNumAction(AnnotationDAOFactory annotationDAOFactory) {
         super();
+        this.annotationDAOFactory = annotationDAOFactory;
         doAction();
     }
 
@@ -86,17 +73,22 @@ public class UpdateNewRefNumAction extends ActionAdapter implements IVideoArchiv
              * found + 1.
              */
             if (videoArchive != null) {
-                final IVideoArchiveSet vas = videoArchive.getVideoArchiveSet();
-                final Set refNums = VideoArchiveSetDAO.getInstance().findAllReferenceNumbers((VideoArchiveSet) vas);
+                VideoArchiveDAO dao = annotationDAOFactory.newVideoArchiveDAO();
+                dao.startTransaction();
+
+                // TODO identity-reference is hard coded. It needs to be put in a property file
+                Set<String> refNums = dao.findAllLinkValues(videoArchive, "identity-reference");
+
                 if (refNums.size() != 0) {
-                    final Set intValues = new HashSet();
-                    for (final Iterator i = refNums.iterator(); i.hasNext(); ) {
+                    final Set<Integer> intValues = new HashSet<Integer>();
+
+                    for (final Iterator<String> i = refNums.iterator(); i.hasNext(); ) {
                         final String s = (String) i.next();
+
                         try {
                             intValues.add(Integer.valueOf(s));
                         }
                         catch (final Exception e) {
-
                             // Do nothing. It's not an int value
                         }
                     }
@@ -111,31 +103,24 @@ public class UpdateNewRefNumAction extends ActionAdapter implements IVideoArchiv
         }
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see org.mbari.vars.annotation.ui.actions.IVideoArchiveProperty#getVideoArchive()
-     */
-
     /**
-     *     <p><!-- Method description --></p>
-     *     @return
-     *     @uml.property  name="videoArchive"
+     * @return
      */
-    public IVideoArchive getVideoArchive() {
+    public VideoArchive getVideoArchive() {
         return videoArchive;
     }
 
     /**
-     *     <p><!-- Method description --></p>
-     *     @param  newVideoArchive
-     *     @uml.property  name="videoArchive"
+     *
+     * @param newVideoArchive
      */
-    public void setVideoArchive(final IVideoArchive newVideoArchive) {
+    public void setVideoArchive(final VideoArchive newVideoArchive) {
         needsUpdating = true;
 
         if ((videoArchive != null) && (newVideoArchive != null)) {
-            final IVideoArchiveSet oldVas = videoArchive.getVideoArchiveSet();
-            final IVideoArchiveSet newVas = newVideoArchive.getVideoArchiveSet();
+            final VideoArchiveSet oldVas = videoArchive.getVideoArchiveSet();
+            final VideoArchiveSet newVas = newVideoArchive.getVideoArchiveSet();
+
             if (oldVas.equals(newVas)) {
                 needsUpdating = false;
             }

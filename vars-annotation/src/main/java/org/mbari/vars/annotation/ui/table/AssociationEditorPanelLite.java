@@ -278,7 +278,7 @@ public class AssociationEditorPanelLite extends JPanel {
                          * or insert the association as needed.
                          */
                         ((Association) association).validateToConceptName();
-                        DAOEventQueue.update((IDataObject) parent);
+                        DAOEventQueue.updateVideoArchiveSet((IDataObject) parent);
                     }
                 }
 

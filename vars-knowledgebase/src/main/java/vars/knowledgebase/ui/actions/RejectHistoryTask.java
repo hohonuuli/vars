@@ -56,13 +56,11 @@ import vars.knowledgebase.LinkTemplate;
 import vars.knowledgebase.Media;
 import vars.knowledgebase.MediaDAO;
 import vars.knowledgebase.ui.Lookup; 
-
-//~--- classes ----------------------------------------------------------------
+ 
 /**
  * <p>Handles the steps need to reject a History. NOTE: For some operations it's important to 
  * clear the knowledgebase after rejecting a History (Such as rejecting the addition of a concept name or concept</p>
  *
- * @version    $Id: RejectHistoryTask.java 3 2005-10-27 16:20:12Z hohonuuli $
  * @author     <a href="http://www.mbari.org">Monterey Bay Aquarium Research Institute</a>
  */
 public class RejectHistoryTask extends AbstractHistoryTask {

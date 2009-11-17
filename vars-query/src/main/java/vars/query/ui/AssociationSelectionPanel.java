@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)AssociationSelectionPanel.java   2009.11.16 at 08:52:51 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1 
- * (the "License"); you may not use this file except in compliance 
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,10 +12,10 @@
  */
 
 
+
 package vars.query.ui;
 
 import com.google.inject.Inject;
-import vars.LinkBean;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -28,119 +25,65 @@ import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.util.ArrayList;
 import java.util.Collection;
-import javax.swing.*;
-
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import org.bushe.swing.event.EventBus;
+import org.mbari.swing.SearchableComboBoxModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.mbari.swing.SearchableComboBoxModel;
 import vars.ILink;
-import vars.knowledgebase.*;
-import vars.query.QueryDAO;
+import vars.LinkBean;
+import vars.knowledgebase.ConceptName;
+import vars.knowledgebase.ConceptNameTypes;
+import vars.knowledgebase.KnowledgebaseDAOFactory;
+import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.SimpleConceptNameBean;
+import vars.query.SpecialQueryDAO;
 import vars.shared.ui.AllConceptNamesComboBox;
-
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * @author Brian Schlining
- * @version $Id: AssociationSelectionPanel.java 429 2006-11-20 22:51:32Z hohonuuli $
  */
 public class AssociationSelectionPanel extends JPanel {
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 1823103250255605396L;
-    private final Logger log = LoggerFactory.getLogger(AssociationSelectionPanel.class);
-    private final LinkBean nilAssociationBean = new LinkBean(
-        ILink.VALUE_NIL, ILink.VALUE_NIL, ILink.VALUE_NIL);
-    private final ConceptName nilConceptName = new SimpleConceptNameBean(
-        ILink.VALUE_NIL.toUpperCase(), ConceptNameTypes.PRIMARY.getName());
+    private JPanel bottomPanel = null;
+    private JComboBox cbAssociations = null;
+    private AllConceptNamesComboBox cbToConcept = null;
+    private JLabel lblLinkName = null;
+    private JLabel lblLinkValue = null;
+    private JLabel lblSearch = null;
+    private JLabel lblToConcept = null;
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    private JPanel middlePanel = null;
+    private final LinkBean nilAssociationBean = new LinkBean(ILink.VALUE_NIL, ILink.VALUE_NIL, ILink.VALUE_NIL);
+    private final ConceptName nilConceptName = new SimpleConceptNameBean(ILink.VALUE_NIL.toUpperCase(),
+        ConceptNameTypes.PRIMARY.getName());
     private final ConceptName selfConceptName = new SimpleConceptNameBean(ILink.VALUE_SELF,
         ConceptNameTypes.PRIMARY.getName());
-
-    //~--- fields -------------------------------------------------------------
-
-    /**
-	 * @uml.property  name="topPanel"
-	 * @uml.associationEnd  
-	 */
-    private JPanel topPanel = null;
-    /**
-	 * @uml.property  name="tfSearch"
-	 * @uml.associationEnd  
-	 */
-    private JTextField tfSearch = null;
-    /**
-	 * @uml.property  name="tfLinkValue"
-	 * @uml.associationEnd  
-	 */
-    private JTextField tfLinkValue = null;
-    /**
-	 * @uml.property  name="tfLinkName"
-	 * @uml.associationEnd  
-	 */
     private JTextField tfLinkName = null;
-    /**
-	 * @uml.property  name="middlePanel"
-	 * @uml.associationEnd  
-	 */
-    private JPanel middlePanel = null;
-    /**
-	 * @uml.property  name="lblToConcept"
-	 * @uml.associationEnd  
-	 */
-    private JLabel lblToConcept = null;
-    /**
-	 * @uml.property  name="lblSearch"
-	 * @uml.associationEnd  
-	 */
-    private JLabel lblSearch = null;
-    /**
-	 * @uml.property  name="lblLinkValue"
-	 * @uml.associationEnd  
-	 */
-    private JLabel lblLinkValue = null;
-    /**
-	 * @uml.property  name="lblLinkName"
-	 * @uml.associationEnd  
-	 */
-    private JLabel lblLinkName = null;
-    /**
-	 * @uml.property  name="conceptNames"
-	 * @uml.associationEnd  multiplicity="(0 -1)" elementType="java.lang.String"
-	 */
+    private JTextField tfLinkValue = null;
+    private JTextField tfSearch = null;
+    private JPanel topPanel = null;
     private Collection conceptNames = new ArrayList();
-    /**
-	 * @uml.property  name="cbToConcept"
-	 * @uml.associationEnd  
-	 */
-    private AllConceptNamesComboBox cbToConcept = null;
-    /**
-	 * @uml.property  name="cbAssociations"
-	 * @uml.associationEnd  
-	 */
-    private JComboBox cbAssociations = null;
-    /**
-	 * @uml.property  name="bottomPanel"
-	 * @uml.associationEnd  
-	 */
-    private JPanel bottomPanel = null;
-
-    private final KnowledgebaseFactory knowledgebaseFactory;
     private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
-    private final QueryDAO queryDAO;
-
-    //~--- constructors -------------------------------------------------------
+    private final KnowledgebaseFactory knowledgebaseFactory;
+    private final SpecialQueryDAO queryDAO;
 
     /**
      *
+     *
+     * @param knowledgebaseDAOFactory
+     * @param knowledgebaseFactory
+     * @param queryDAO
      */
     @Inject
     public AssociationSelectionPanel(KnowledgebaseDAOFactory knowledgebaseDAOFactory,
-            KnowledgebaseFactory knowledgebaseFactory, QueryDAO queryDAO) {
+                                     KnowledgebaseFactory knowledgebaseFactory, SpecialQueryDAO queryDAO) {
         super();
         this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
         this.knowledgebaseFactory = knowledgebaseFactory;
@@ -148,33 +91,24 @@ public class AssociationSelectionPanel extends JPanel {
         initialize();
     }
 
-    //~--- get methods --------------------------------------------------------
-
     /**
-     * <p><!-- Method description --></p>
-     *
-     *
      * @return
      */
     public LinkBean getAssociationBean() {
         LinkBean bean = new LinkBean();
+
         bean.setLinkName(getTfLinkName().getText());
         bean.setToConcept((String) getCbToConcept().getSelectedItem());
         bean.setLinkValue(getTfLinkValue().getText());
+
         return bean;
     }
 
-    /**
-	 * This method initializes jPanel
-	 * @return  javax.swing.JPanel
-	 * @uml.property  name="bottomPanel"
-	 */
     private JPanel getBottomPanel() {
         if (bottomPanel == null) {
             bottomPanel = new JPanel();
             lblLinkValue = new JLabel();
-            bottomPanel.setLayout(
-                    new BoxLayout(bottomPanel, BoxLayout.X_AXIS));
+            bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.X_AXIS));
             lblToConcept = new JLabel();
             lblLinkName = new JLabel();
             lblLinkName.setText("link");
@@ -196,11 +130,6 @@ public class AssociationSelectionPanel extends JPanel {
         return bottomPanel;
     }
 
-    /**
-	 * This method initializes jComboBox
-	 * @return  javax.swing.JComboBox
-	 * @uml.property  name="cbAssociations"
-	 */
     private JComboBox getCbAssociations() {
         if (cbAssociations == null) {
             cbAssociations = new JComboBox();
@@ -220,11 +149,6 @@ public class AssociationSelectionPanel extends JPanel {
         return cbAssociations;
     }
 
-    /**
-	 * This method initializes jComboBox1
-	 * @return  javax.swing.JComboBox
-	 * @uml.property  name="cbToConcept"
-	 */
     private AllConceptNamesComboBox getCbToConcept() {
         if (cbToConcept == null) {
             cbToConcept = new AllConceptNamesComboBox(queryDAO);
@@ -235,27 +159,16 @@ public class AssociationSelectionPanel extends JPanel {
         return cbToConcept;
     }
 
-    /**
-	 * This method initializes jPanel
-	 * @return  javax.swing.JPanel
-	 * @uml.property  name="middlePanel"
-	 */
     private JPanel getMiddlePanel() {
         if (middlePanel == null) {
             middlePanel = new JPanel();
-            middlePanel.setLayout(
-                    new BoxLayout(middlePanel, BoxLayout.X_AXIS));
+            middlePanel.setLayout(new BoxLayout(middlePanel, BoxLayout.X_AXIS));
             middlePanel.add(getCbAssociations(), null);
         }
 
         return middlePanel;
     }
 
-    /**
-	 * This method initializes jTextField
-	 * @return  javax.swing.JTextField
-	 * @uml.property  name="tfLinkName"
-	 */
     private JTextField getTfLinkName() {
         if (tfLinkName == null) {
             tfLinkName = new JTextField();
@@ -266,11 +179,6 @@ public class AssociationSelectionPanel extends JPanel {
         return tfLinkName;
     }
 
-    /**
-	 * This method initializes jTextField1
-	 * @return  javax.swing.JTextField
-	 * @uml.property  name="tfLinkValue"
-	 */
     private JTextField getTfLinkValue() {
         if (tfLinkValue == null) {
             tfLinkValue = new JTextField();
@@ -280,11 +188,6 @@ public class AssociationSelectionPanel extends JPanel {
         return tfLinkValue;
     }
 
-    /**
-	 * This method initializes jTextField
-	 * @return  javax.swing.JTextField
-	 * @uml.property  name="tfSearch"
-	 */
     private JTextField getTfSearch() {
         if (tfSearch == null) {
             tfSearch = new JTextField();
@@ -300,6 +203,7 @@ public class AssociationSelectionPanel extends JPanel {
             tfSearch.addActionListener(new ActionListener() {
 
                 public void actionPerformed(final ActionEvent e) {
+
                     /*
                      *  FIXME 20040907 brian: There is a known bug here that occurs
                      *  when enter is pressed repeatedly when tfSearch has focus. This
@@ -308,19 +212,23 @@ public class AssociationSelectionPanel extends JPanel {
                     final JComboBox cb = getCbAssociations();
                     int startIndex = cb.getSelectedIndex() + 1;
                     SearchableComboBoxModel linksModel = (SearchableComboBoxModel) cb.getModel();
-                    int index = linksModel.searchForItemContaining(tfSearch.getText(),
-                        startIndex);
+                    int index = linksModel.searchForItemContaining(tfSearch.getText(), startIndex);
+
                     if (index > -1) {
+
                         // Handle if match was found
                         cb.setSelectedIndex(index);
                         cb.hidePopup();
-                    } else {
+                    }
+                    else {
+
                         // If no match was found search from the start of the
                         // list.
                         if (startIndex > 0) {
                             index = linksModel.searchForItemContaining(tfSearch.getText());
 
                             if (index > -1) {
+
                                 // Handle if match was found
                                 cb.setSelectedIndex(index);
                                 cb.hidePopup();
@@ -335,11 +243,6 @@ public class AssociationSelectionPanel extends JPanel {
         return tfSearch;
     }
 
-    /**
-	 * This method initializes jPanel
-	 * @return  javax.swing.JPanel
-	 * @uml.property  name="topPanel"
-	 */
     private JPanel getTopPanel() {
         if (topPanel == null) {
             lblSearch = new JLabel();
@@ -353,32 +256,18 @@ public class AssociationSelectionPanel extends JPanel {
         return topPanel;
     }
 
-    //~--- methods ------------------------------------------------------------
-
-    /**
-     * This method initializes this
-     *
-     */
     private void initialize() {
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.setSize(384, 110);
-        this.setBorder(
-                javax.swing.BorderFactory.createTitledBorder(null,
-                "with association", javax.swing.border.TitledBorder.LEFT,
-                    javax.swing.border.TitledBorder.TOP,
-                        new java.awt.Font("Dialog", java.awt.Font.BOLD, 12),
-                            Color.RED));
+        this.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "with association",
+                javax.swing.border.TitledBorder.LEFT, javax.swing.border.TitledBorder.TOP,
+                new java.awt.Font("Dialog", java.awt.Font.BOLD, 12), Color.RED));
         this.add(getTopPanel(), null);
         this.add(getMiddlePanel(), null);
         this.add(getBottomPanel(), null);
     }
 
-    //~--- set methods --------------------------------------------------------
-
     /**
-     * <p><!-- Method description --></p>
-     *
-     *
      * @param associationBean
      */
     public void setAssociationBean(LinkBean associationBean) {
@@ -392,10 +281,9 @@ public class AssociationSelectionPanel extends JPanel {
     }
 
     /**
-	 * This method populates the available Associations that a user can select from in the cbAssociations.
-	 * @param  conceptNames_
-	 * @uml.property  name="conceptNames"
-	 */
+         * This method populates the available Associations that a user can select from in the cbAssociations.
+         * @param  conceptNames_
+         */
     public void setConceptNames(Collection conceptNames_) {
 
         /*
@@ -405,7 +293,8 @@ public class AssociationSelectionPanel extends JPanel {
          */
         if (conceptNames.equals(conceptNames_)) {
             return;
-        } else {
+        }
+        else {
             conceptNames = conceptNames_;
         }
 
@@ -432,14 +321,17 @@ public class AssociationSelectionPanel extends JPanel {
          * associations we use LinkTemplates.
          */
         Collection<ILink> associationBeans = null;
+
         try {
             if (conceptNames.contains(ILink.VALUE_NIL.toLowerCase()) ||
                     conceptNames.contains(ILink.VALUE_NIL.toUpperCase())) {
                 associationBeans = queryDAO.findAllLinkTemplates();
-            } else {
+            }
+            else {
                 associationBeans = queryDAO.findByConceptNames(conceptNames);
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
             log.error("Failed to look up associations", e);
         }
@@ -459,20 +351,21 @@ public class AssociationSelectionPanel extends JPanel {
 
         /*
          * The method setConceptNames may be invoked on a Thread other than the
-         * EventDispatchThread. We need to ensure that the redraw actions occur 
+         * EventDispatchThread. We need to ensure that the redraw actions occur
          * on the swing thread.
          */
         final SearchableComboBoxModel model = (SearchableComboBoxModel) getCbAssociations().getModel();
         final Collection aBeans = associationBeans;
+
         SwingUtilities.invokeLater(new Runnable() {
+
             public void run() {
                 model.clear();
                 model.addAll(aBeans);
                 model.setSelectedItem(nilAssociationBean);
             }
+
         });
 
     }
-
-}    // @jve:decl-index=0:visual-constraint="10,10"
-
+}

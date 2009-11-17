@@ -16,6 +16,7 @@ import org.mbari.vars.annotation.ui.AnnotationApp;
 import org.mbari.vars.annotation.ui.AnnotationFrame;
 import org.mbari.vars.annotation.ui.MiscTabsPanel;
 import vars.UserAccount;
+import vars.annotation.CameraDirections;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
 import vars.jpa.VarsUserPreferencesFactory;
@@ -29,19 +30,20 @@ import vars.shared.ui.GlobalLookup;
 public class Lookup extends GlobalLookup {
 
     protected static final Object KEY_DISPATCHER_OBSERVATION_TABLE = "vars.annotation.ui.Lookup-ObservationTable";
-    protected static final Object KEY_DISPATCHER_VIDEO_ARCHIVE = VideoArchive.class;
     protected static final Object KEY_DISPATCHER_VIDEOARCHIVE = VideoArchive.class;
     protected static final Object KEY_DISPATCHER_APPLICATION_FRAME = AnnotationFrame.class;
     protected static final Object KEY_DISPATCHER_APPLICATION = AnnotationApp.class;
     protected static final Object KEY_DISPATCHER_SELECTED_OBSERVATIONS = Observation.class;
     protected static final Object KEY_DISPATCHER_PREFERENCES = "vars.annotation.ui.Lookup-Preferences";
-    public static final Object KEY_DISPATCHER_GUICE_INJECTOR = "vars.annotation.ui.Lookup-Injector";
+    protected static final Object KEY_DISPATCHER_GUICE_INJECTOR = "vars.annotation.ui.Lookup-Injector";
+    protected static final Object KEY_DISPATCHER_VIDEO_SERVICE = "vars.annotation.ui.Lookup-VideoService";
+    protected static final Object KEY_DISPATCHER_CAMERA_DIRECTION = "vars.annotation.ui.Lookup-CameraDirection";
 
-    /** Subscribers to this topic will recieve Boolean objects */
+    /** Subscribers to this topic will receive Boolean objects */
     public static final String TOPIC_DATABASE_STATUS = "vars.annotation.ui.Lookup-DatabaseStatus";
 
     /**
-     * Refresh the persisted objects (akak clear 2nd level cache).
+     * Refresh the persisted objects (aka clear 2nd level cache).
      */
     public static final String TOPIC_REFRESH = "vars.annotation.ui.Lookup-Refresh";
 
@@ -141,7 +143,7 @@ public class Lookup extends GlobalLookup {
     }
 
     public static Dispatcher getVideoArchiveDispatcher() {
-        return Dispatcher.getDispatcher(KEY_DISPATCHER_VIDEO_ARCHIVE);
+        return Dispatcher.getDispatcher(KEY_DISPATCHER_VIDEOARCHIVE);
     }
 
     /**
@@ -188,6 +190,18 @@ public class Lookup extends GlobalLookup {
      */
     public static Dispatcher getSelectedObservationsDispatcher() {
         return Dispatcher.getDispatcher(KEY_DISPATCHER_SELECTED_OBSERVATIONS);
+    }
+    
+    public static Dispatcher getVideoServiceDispatcher() {
+        return Dispatcher.getDispatcher(KEY_DISPATCHER_VIDEO_SERVICE);
+    }
+    
+    /**
+     * 
+     * @return A Dispatcher referencing a {@link CameraDirections} enumeration
+     */
+    public static Dispatcher getCameraDirectionDispatcher() {
+        return Dispatcher.getDispatcher(KEY_DISPATCHER_CAMERA_DIRECTION);
     }
 
 }

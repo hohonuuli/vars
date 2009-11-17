@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)DateValuePanel.java   2009.11.16 at 08:48:35 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1 
- * (the "License"); you may not use this file except in compliance 
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,93 +12,65 @@
  */
 
 
+
 package vars.query.ui;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.TimeZone;
 import java.util.List;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import javax.swing.*;
-
+import java.util.TimeZone;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
 import mseries.Calendar.MDateChanger;
 import mseries.Calendar.MDefaultPullDownConstraints;
 import mseries.ui.MChangeEvent;
 import mseries.ui.MChangeListener;
 import mseries.ui.MDateEntryField;
 import org.bushe.swing.event.EventBus;
+import org.mbari.sql.QueryResults;
 import org.mbari.swing.JSimpleButton;
 import org.mbari.swing.SpinningDial;
-import org.mbari.sql.QueryResults;
 import org.mbari.swingworker.SwingWorker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.query.QueryDAO;
-
-//~--- classes ----------------------------------------------------------------
+import vars.query.SpecialQueryDAO;
 
 /**
  * @author Brian Schlining
- * @version $Id: DateValuePanel.java 332 2006-08-01 18:38:46Z hohonuuli $
  */
 public class DateValuePanel extends ValuePanel {
 
-    private static final long serialVersionUID = -1310670548066237966L;
-    private static final DateFormat dateFormat = new SimpleDateFormat(
-        "yyyy-MM-dd HH:mm:ss");
-    
-    private static final Logger log = LoggerFactory.getLogger(DateValuePanel.class);
-
-    //~--- static initializers ------------------------------------------------
+    private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     static {
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
 
-    //~--- fields -------------------------------------------------------------
-
-    /**
-	 * @uml.property  name="maxEntryField"
-	 * @uml.associationEnd  
-	 */
-    private MDateEntryField maxEntryField;
-    /**
-	 * @uml.property  name="minEntryField"
-	 * @uml.associationEnd  
-	 */
-    private MDateEntryField minEntryField;
-    /**
-	 * @uml.property  name="minLabel"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
-    private JLabel minLabel = null;
-    /**
-	 * @uml.property  name="maxLabel"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
+    private final Logger log = LoggerFactory.getLogger(getClass());
     private JLabel maxLabel = null;
-
+    private JLabel minLabel = null;
+    private MDateEntryField maxEntryField;
+    private MDateEntryField minEntryField;
+    private final SpecialQueryDAO queryDAO;
     private JButton scanButton;
-
-    private final QueryDAO queryDAO;
-    //~--- constructors -------------------------------------------------------
 
     /**
      * This is the default constructor
      *
      * @param name
+     * @param queryDAO
      */
-    public DateValuePanel(String name, QueryDAO queryDAO) {
+    public DateValuePanel(String name, SpecialQueryDAO queryDAO) {
         super(name);
         this.queryDAO = queryDAO;
         initialize();
     }
-
-    //~--- get methods --------------------------------------------------------
 
     /**
      * <p><!-- Method description --></p>
@@ -112,7 +81,9 @@ public class DateValuePanel extends ValuePanel {
     MDateEntryField getMaxDateField() {
         if (maxEntryField == null) {
             maxEntryField = new MDateEntryField(dateFormat);
+
             MDefaultPullDownConstraints c = new MDefaultPullDownConstraints();
+
             c.firstDay = Calendar.MONDAY;
             c.changerStyle = MDateChanger.SPINNER;
             c.selectionClickCount = 1;
@@ -143,7 +114,9 @@ public class DateValuePanel extends ValuePanel {
     MDateEntryField getMinDateField() {
         if (minEntryField == null) {
             minEntryField = new MDateEntryField(dateFormat);
+
             MDefaultPullDownConstraints c = new MDefaultPullDownConstraints();
+
             c.firstDay = Calendar.MONDAY;
             c.changerStyle = MDateChanger.SPINNER;
             c.selectionClickCount = 1;
@@ -165,40 +138,40 @@ public class DateValuePanel extends ValuePanel {
         return minEntryField;
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see query.ui.ValuePanel#getSQL()
-     */
+
 
     /**
-     * <p><!-- Method description --></p>
-     *
      *
      * @return
      */
     public String getSQL() {
         StringBuffer sb = new StringBuffer();
+
         try {
             if (getConstrainCheckBox().isSelected()) {
                 String minDate = dateFormat.format(getMinDateField().getValue());
                 String maxDate = dateFormat.format(getMaxDateField().getValue());
+
                 sb.append(" ").append(getValueName()).append(" BETWEEN '");
                 sb.append(minDate).append("' AND '").append(maxDate).append("'");
             }
-        } catch (ParseException e) {
+        }
+        catch (ParseException e) {
+
             // NEED TO LOG
         }
 
         return sb.toString();
     }
 
-      /**
-     * The scan button scans for min and max values and sets them in the text fields.
-     * @return The scanButton
-     */
+    /**
+   * The scan button scans for min and max values and sets them in the text fields.
+   * @return The scanButton
+   */
     private JButton getScanButton() {
         if (scanButton == null) {
             final ImageIcon icon = new ImageIcon(getClass().getResource("/images/vars/query/16px/refresh.png"));
+
             scanButton = new JSimpleButton(icon);
             scanButton.setToolTipText("Retrieve minimum and maximum " + getValueName() + " values from database");
 
@@ -207,10 +180,11 @@ public class DateValuePanel extends ValuePanel {
              * returned it sets them in the UI.
              */
             scanButton.addActionListener(new ActionListener() {
+
                 public void actionPerformed(ActionEvent e) {
 
                     final String sql = "SELECT MIN(" + getValueName() + ") AS minValue, MAX(" + getValueName() +
-                            ") AS maxValue FROM Annotations WHERE " + getValueName() + " IS NOT NULL";
+                                       ") AS maxValue FROM Annotations WHERE " + getValueName() + " IS NOT NULL";
 
                     /*
                      * Execute the queries asynchronously so that the UI doesn't block. WHile executing display a
@@ -220,6 +194,7 @@ public class DateValuePanel extends ValuePanel {
                     getMinDateField().setEnabled(false);
                     getMaxDateField().setEnabled(false);
                     scanButton.setEnabled(false);
+
                     SwingWorker swingWorker = new SwingWorker() {
 
                         QueryResults queryResults = null;
@@ -228,10 +203,13 @@ public class DateValuePanel extends ValuePanel {
                         protected Object doInBackground() throws Exception {
                             try {
                                 queryResults = queryDAO.executeQuery(sql);
-                            } catch (Exception e1) {
-                                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, "An error occurred while executing the SQL statement: '" + sql + "'");
+                            }
+                            catch (Exception e1) {
+                                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR,
+                                                 "An error occurred while executing the SQL statement: '" + sql + "'");
                                 log.error("An error occurred while executing the SQL statement: '" + sql + "'", e1);
                             }
+
                             return queryResults;
                         }
 
@@ -240,8 +218,10 @@ public class DateValuePanel extends ValuePanel {
 
                             Date min = null;
                             Date max = null;
-                            if (queryResults != null && queryResults.rowCount() == 1) {
+
+                            if ((queryResults != null) && (queryResults.rowCount() == 1)) {
                                 List values = queryResults.getResults("minValue");
+
                                 min = (Date) values.get(0);
                                 values = queryResults.getResults("maxValue");
                                 max = (Date) values.get(0);
@@ -259,14 +239,13 @@ public class DateValuePanel extends ValuePanel {
                     swingWorker.execute();
 
 
-
                 }
+
             });
         }
+
         return scanButton;
     }
-
-    //~--- methods ------------------------------------------------------------
 
     /**
      * This method initializes this

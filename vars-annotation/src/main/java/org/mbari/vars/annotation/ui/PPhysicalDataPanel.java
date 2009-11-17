@@ -21,9 +21,9 @@ Created on October 31, 2003, 9:16 AM
 package org.mbari.vars.annotation.ui;
 
 import org.mbari.util.IObserver;
-import vars.annotation.IObservation;
-import vars.annotation.IPhysicalData;
-import vars.annotation.IVideoFrame;
+import vars.annotation.Observation;
+import vars.annotation.PhysicalData;
+import vars.annotation.VideoFrame;
 
 /**
  * <p>Displays the properties of a PhysicalData object.</p>
@@ -33,10 +33,7 @@ import vars.annotation.IVideoFrame;
  */
 public class PPhysicalDataPanel extends PropertiesPanel implements IObserver {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 4679317552284109641L;
+
 
     /**
      * Creates new form PPhysicalDataPanel
@@ -54,19 +51,19 @@ public class PPhysicalDataPanel extends PropertiesPanel implements IObserver {
      * @see  org.mbari.util.IObserver#update(java.lang.Object, java.lang.Object)
      */
     public void update(final Object obj, final Object changeCode) {
-        final IObservation obs = (IObservation) obj;
+        final Observation obs = (Observation) obj;
         if (obs == null) {
             clearValues();
 
             return;
         }
 
-        final IVideoFrame vf = obs.getVideoFrame();
+        final VideoFrame vf = obs.getVideoFrame();
         if (vf == null) {
             clearValues();
         }
         else {
-            final IPhysicalData ad = vf.getPhysicalData();
+            final PhysicalData ad = vf.getPhysicalData();
             if (ad == null) {
                 clearValues();
             }

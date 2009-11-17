@@ -19,26 +19,28 @@ package org.mbari.vars.annotation.ui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import javax.swing.JDialog;
 import javax.swing.JTextField;
+
+import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.swing.PropertyPanel;
 import org.mbari.vars.annotation.locale.OpenVideoArchiveSetUsingParamsDialog;
 import org.mbari.vars.annotation.ui.actions.ChangeVideoArchiveNameAction;
-import org.mbari.vars.annotation.ui.dispatchers.ObservationDispatcher;
-import org.mbari.vars.annotation.ui.dispatchers.ObservationTableDispatcher;
-import org.mbari.vars.dao.DAOEventQueue;
-import org.mbari.vars.dao.IDataObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.annotation.IVideoArchive;
-import vars.annotation.IVideoArchiveSet;
-import vars.annotation.IVideoFrame;
-import vars.annotation.IObservation;
-import vars.annotation.ICameraPlatformDeployment;
+import vars.annotation.VideoArchive;
+import vars.annotation.VideoArchiveSet;
+import vars.annotation.VideoFrame;
+import vars.annotation.Observation;
+import vars.annotation.CameraDeployment;
+import vars.annotation.Observation;
+import vars.annotation.ui.Lookup;
+import vars.annotation.ui.PersistenceService;
 
 /**
  * <p>
@@ -47,34 +49,26 @@ import vars.annotation.ICameraPlatformDeployment;
  *
  *
  * @author  <a href="http://www.mbari.org">MBARI</a>
- * @version  $Id: PVideoArchivePanel.java 332 2006-08-01 18:38:46Z hohonuuli $
  */
 public class PVideoArchivePanel extends PropertiesPanel {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = -2335603516275582204L;
-    private static final Logger log = LoggerFactory.getLogger(PVideoArchivePanel.class);
 
-    /**
-     *     @uml.property  name="changeNameAction"
-     *     @uml.associationEnd
-     */
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    
     private ActionAdapter changeNameAction;
 
-    /**
-     *     @uml.property  name="changeNameDialog"
-     *     @uml.associationEnd
-     */
+
     private JDialog changeNameDialog;
+    
+    private final PersistenceService persistenceService;
 
     /**
      * Constructs ...
      *
      */
-    PVideoArchivePanel() {
+    PVideoArchivePanel(PersistenceService persistenceService) {
         super();
+        this.persistenceService = persistenceService;
         setPropertyNames(new String[] {
             "recordedDate", "videoArchiveName", "shipName", "platformName", "formatCode", "startDate", "endDate",
             "chiefScientist", "diveNumber", "trackingNumber"
@@ -82,10 +76,6 @@ public class PVideoArchivePanel extends PropertiesPanel {
         addListeners();
     }
 
-    /**
-     * <p><!-- Method description --></p>
-     *
-     */
     private void addListeners() {
 
         // //////////////////////////////////////////////////////////////////////
@@ -100,20 +90,24 @@ public class PVideoArchivePanel extends PropertiesPanel {
         f2.addActionListener(new ActionListener() {
 
             public void actionPerformed(final ActionEvent e) {
-                final IObservation obs = ObservationDispatcher.getInstance().getObservation();
-                final IVideoFrame vf = obs.getVideoFrame();
-                if (vf != null) {
-                    final IVideoArchive va = vf.getVideoArchive();
-                    if (va != null) {
-                        final IVideoArchiveSet vas = va.getVideoArchiveSet();
-                        vas.setShipName(f2.getText());
-
-                        try {
-                            DAOEventQueue.update((IDataObject) vas);
-                        }
-                        catch (final Exception e1) {
-                            if (log.isErrorEnabled()) {
-                                log.error("Failed to update a videoarchiveset", e1);
+                
+                Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+                observations = new ArrayList<Observation>(observations); // Make a copy to avoid sync issues.
+                if (observations.size() == 1) {
+                    
+                    final Observation obs = observations.iterator().next();
+                    final VideoFrame vf = obs.getVideoFrame();
+                    if (vf != null) {
+                        final VideoArchive va = vf.getVideoArchive();
+                        if (va != null) {
+                            final VideoArchiveSet vas = va.getVideoArchiveSet();
+                            vas.setShipName(f2.getText());
+    
+                            try {
+                                persistenceService.updateVideoArchiveSet(vas);
+                            }
+                            catch (final Exception e1) {
+                                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e1);
                             }
                         }
                     }
@@ -130,20 +124,22 @@ public class PVideoArchivePanel extends PropertiesPanel {
         f3.addActionListener(new ActionListener() {
 
             public void actionPerformed(final ActionEvent e) {
-                final IObservation obs = ObservationDispatcher.getInstance().getObservation();
-                final IVideoFrame vf = obs.getVideoFrame();
-                if (vf != null) {
-                    final IVideoArchive va = vf.getVideoArchive();
-                    if (va != null) {
-                        final IVideoArchiveSet vas = va.getVideoArchiveSet();
-                        vas.setPlatformName(f3.getText());
-
-                        try {
-                            DAOEventQueue.update((IDataObject) vas);
-                        }
-                        catch (final Exception e1) {
-                            if (log.isErrorEnabled()) {
-                                log.error("Failed to updated " + vas, e1);
+                Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+                observations = new ArrayList<Observation>(observations); // Make a copy to avoid sync issues.
+                if (observations.size() == 1) {
+                    final Observation obs = observations.iterator().next();
+                    final VideoFrame vf = obs.getVideoFrame();
+                    if (vf != null) {
+                        final VideoArchive va = vf.getVideoArchive();
+                        if (va != null) {
+                            final VideoArchiveSet vas = va.getVideoArchiveSet();
+                            vas.setPlatformName(f3.getText());
+    
+                            try {
+                                persistenceService.updateVideoArchiveSet(vas);
+                            }
+                            catch (final Exception e1) {
+                                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e1);
                             }
                         }
                     }
@@ -154,19 +150,9 @@ public class PVideoArchivePanel extends PropertiesPanel {
         p.setEditable(true);
     }
 
-    /**
-     *     <p><!-- Method description --></p>
-     *     @return
-     *     @uml.property  name="changeNameAction"
-     */
     private ActionAdapter getChangeNameAction() {
         if (changeNameAction == null) {
             changeNameAction = new ActionAdapter() {
-
-                /**
-                 *
-                 */
-                private static final long serialVersionUID = -7518619879734127810L;
 
                 public void doAction() {
                     getChangeNameDialog().setVisible(true);
@@ -177,32 +163,17 @@ public class PVideoArchivePanel extends PropertiesPanel {
         return changeNameAction;
     }
 
-    /**
-     *     <p><!-- Method description --></p>
-     *     @return
-     *     @uml.property  name="changeNameDialog"
-     */
+
     private JDialog getChangeNameDialog() {
         if (changeNameDialog == null) {
             changeNameDialog = new OpenVideoArchiveSetUsingParamsDialog() {
 
                 /**
-                 *
-                 */
-                private static final long serialVersionUID = -6624844651924209285L;
-
-                /*
-                 *  (non-Javadoc)
                  *  @see org.mbari.vars.annotation.ui.dialogs.OpenVideoArchiveSetUsingParamsDialog#getOkButtonAction()
                  */
                 public ActionAdapter getOkButtonAction() {
                     if (okButtonAction == null) {
                         okButtonAction = new ActionAdapter() {
-
-                            /**
-                             *
-                             */
-                            private static final long serialVersionUID = 3065036036641458323L;
                             public void doAction() {
                                 final int seqNumber = Integer.parseInt(getTfDiveNumber().getText());
                                 final String platform = (String) getCbCameraPlatform().getSelectedItem();
@@ -212,7 +183,6 @@ public class PVideoArchivePanel extends PropertiesPanel {
                                 action.setTapeNumber(tapeNumber);
                                 action.doAction();
                                 dispose();
-                                ObservationTableDispatcher.getInstance().getObservationTable().redrawAll();
                             }
                             private final ChangeVideoArchiveNameAction action = new ChangeVideoArchiveNameAction();
                         };
@@ -234,13 +204,13 @@ public class PVideoArchivePanel extends PropertiesPanel {
      */
     public void update(final Object obj, final Object changeCode) {
         
-        final IObservation obs = (IObservation) obj;
+        final Observation obs = (Observation) obj;
         if (obs == null) {
             clearValues();
             return;
         }
 
-        final IVideoFrame vf = obs.getVideoFrame();
+        final VideoFrame vf = obs.getVideoFrame();
         if (vf == null) {
             clearValues();
         }
@@ -272,12 +242,12 @@ public class PVideoArchivePanel extends PropertiesPanel {
          *
          * @param videoFrame
          */
-        PVideoArchive(final IVideoFrame videoFrame) {
+        PVideoArchive(final VideoFrame videoFrame) {
             recordedDate = videoFrame.getRecordedDate();
-            final IVideoArchive va = videoFrame.getVideoArchive();
+            final VideoArchive va = videoFrame.getVideoArchive();
             if (va != null) {
-                videoArchiveName = va.getVideoArchiveName();
-                final IVideoArchiveSet vas = va.getVideoArchiveSet();
+                videoArchiveName = va.getName();
+                final VideoArchiveSet vas = va.getVideoArchiveSet();
                 if (vas != null) {
                     formatCode = vas.getFormatCode() + "";
                     shipName = vas.getShipName();
@@ -285,7 +255,7 @@ public class PVideoArchivePanel extends PropertiesPanel {
                     startDate = vas.getStartDate();
                     endDate = vas.getEndDate();
                     trackingNumber = vas.getTrackingNumber();
-                    final Collection cpd = vas.getCameraPlatformDeployments();
+                    final Collection<CameraDeployment> cpd = new ArrayList<CameraDeployment>(vas.getCameraDeployments());
                     if ((cpd != null) && (cpd.size() > 0)) {
                         String sep = "";
                         if (cpd.size() > 1) {
@@ -295,8 +265,8 @@ public class PVideoArchivePanel extends PropertiesPanel {
                         final StringBuffer d = new StringBuffer();
                         final StringBuffer s = new StringBuffer();
                         for (final Iterator i = cpd.iterator(); i.hasNext(); ) {
-                            final ICameraPlatformDeployment pd = (ICameraPlatformDeployment) i.next();
-                            d.append(pd.getSeqNumber()).append(sep);
+                            final CameraDeployment pd = (CameraDeployment) i.next();
+                            d.append(pd.getSequenceNumber()).append(sep);
                             s.append(pd.getChiefScientistName()).append(sep);
                         }
 
@@ -307,65 +277,36 @@ public class PVideoArchivePanel extends PropertiesPanel {
             }
         }
 
-        /**
-         *         @return   Returns the chiefScientist.
-         *         @uml.property  name="chiefScientist"
-         */
         public String getChiefScientist() {
             return chiefScientist;
         }
 
-        /**
-         *         @return   Returns the diveNumber.
-         *         @uml.property  name="diveNumber"
-         */
         public String getDiveNumber() {
             return diveNumber;
         }
 
-        /**
-         *         @return   Returns the endDate.
-         *         @uml.property  name="endDate"
-         */
         public Date getEndDate() {
             return endDate;
         }
 
-        /**
-         *         @return   Returns the formatCode.
-         *         @uml.property  name="formatCode"
-         */
         public String getFormatCode() {
             return formatCode;
         }
 
-        /**
-         *         @return   Returns the platformName.
-         *         @uml.property  name="platformName"
-         */
         public String getPlatformName() {
             return platformName;
         }
 
-        /**
-         *         @return   Returns the recordedDate.
-         *         @uml.property  name="recordedDate"
-         */
         public Date getRecordedDate() {
             return recordedDate;
         }
 
-        /**
-         *         @return   Returns the shipName.
-         *         @uml.property  name="shipName"
-         */
         public String getShipName() {
             return shipName;
         }
 
         /**
          *         @return   Returns the startDate.
-         *         @uml.property  name="startDate"
          */
         public Date getStartDate() {
             return startDate;
@@ -374,7 +315,6 @@ public class PVideoArchivePanel extends PropertiesPanel {
         /**
          *         Gets the trackingNumber attribute of the PVideoArchive object
          *         @return   The trackingNumber value
-         *         @uml.property  name="trackingNumber"
          */
         public String getTrackingNumber() {
             return trackingNumber;
@@ -382,7 +322,6 @@ public class PVideoArchivePanel extends PropertiesPanel {
 
         /**
          *         @return   Returns the videoArchiveName
-         *         @uml.property  name="videoArchiveName"
          */
         public String getVideoArchiveName() {
             return videoArchiveName;

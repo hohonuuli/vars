@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)AnnotationPanel.java   2009.11.16 at 09:00:31 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
- * (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,9 +12,7 @@
  */
 
 
-/*
-Created on Dec 12, 2003
- */
+
 package org.mbari.vars.annotation.ui;
 
 import java.awt.BorderLayout;
@@ -31,34 +26,27 @@ import vars.annotation.ui.ToolBelt;
  * <p>This panel contains all the components of the annotation appliation.</p>
  *
  * @author  <a href="http://www.mbari.org">MBARI</a>
- * @version  $Id: AnnotationAppPanel.java 265 2006-06-20 05:30:09Z hohonuuli $
  */
 public class AnnotationPanel extends JPanel {
 
     private javax.swing.JSplitPane bottomSplitPane = null;
-
     private JSplitPane buttonEditorSplitPane = null;
-
     private javax.swing.JPanel buttonPanel = null;
-
     private javax.swing.JPanel conceptButtonPanel = null;
-
     private javax.swing.JPanel editorPanel = null;
-
     private javax.swing.JPanel miscTabsPanel = null;
-
     private javax.swing.JSplitPane outerSplitPane = null;
-
     private javax.swing.JSplitPane topSplitPane = null;
-
-    private final ToolBelt toolbelt;
+    private final ToolBelt toolBelt;
 
     /**
      * This is the default constructor
+     *
+     * @param toolbelt
      */
     public AnnotationPanel(ToolBelt toolbelt) {
         super();
-        this.toolbelt = toolbelt;
+        this.toolBelt = toolbelt;
         initialize();
         PreferenceSetter.getInstance().setResizePreference(this, "MainPanel");
     }
@@ -86,8 +74,8 @@ public class AnnotationPanel extends JPanel {
 
     private javax.swing.JComponent getButtonPanel() {
         if (buttonPanel == null) {
-            buttonPanel = new JPanel(new BorderLayout());       
-            buttonPanel.add(new VCRPanel(), BorderLayout.EAST);  // TODO comment this line for OPENHOUSE
+            buttonPanel = new JPanel(new BorderLayout());
+            buttonPanel.add(new VCRPanel(), BorderLayout.EAST);    // TODO comment this line for OPENHOUSE
             final ActionPanel ap = new ActionPanel();
             buttonPanel.add(ap, BorderLayout.CENTER);
             ap.registerHotKeys();
@@ -98,7 +86,7 @@ public class AnnotationPanel extends JPanel {
 
     private javax.swing.JPanel getConceptButtonPanel() {
         if (conceptButtonPanel == null) {
-            conceptButtonPanel = new ConceptButtonPanel();
+            conceptButtonPanel = new ConceptButtonPanel(toolBelt);
         }
 
         return conceptButtonPanel;
@@ -115,7 +103,7 @@ public class AnnotationPanel extends JPanel {
 
     private javax.swing.JPanel getMiscTabsPanel() {
         if (miscTabsPanel == null) {
-            miscTabsPanel = new MiscTabsPanel(toolbelt);
+            miscTabsPanel = new MiscTabsPanel(toolBelt);
         }
 
         return miscTabsPanel;
@@ -125,8 +113,9 @@ public class AnnotationPanel extends JPanel {
         if (outerSplitPane == null) {
             outerSplitPane = new javax.swing.JSplitPane();
             outerSplitPane.setTopComponent(getTopSplitPane());
+
             //outerSplitPane.setBottomComponent(getButtonAndEditorPanel());  // TODO uncommented this line for OPENHOUSE
-            outerSplitPane.setBottomComponent(getBottomSplitPane()); // TODO commented this line for OPENHOUSE
+            outerSplitPane.setBottomComponent(getBottomSplitPane());    // TODO commented this line for OPENHOUSE
             outerSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
             outerSplitPane.setOneTouchExpandable(true);
             outerSplitPane.setResizeWeight(1);

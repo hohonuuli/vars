@@ -42,6 +42,7 @@ public class ToolBelt {
     private final MiscDAOFactory miscDAOFactory;
     private final MiscFactory miscFactory;
     private final PersistenceCache persistenceCache;
+    private final PersistenceService persistenceService;
     private final SpecialAnnotationDAO specialAnnotationDAO;
     private final SpecialKnowledgebaseDAO specialKnowledgebaseDAO;
     private final SpecialQueryDAO specialQueryDAO;
@@ -61,11 +62,15 @@ public class ToolBelt {
      * @param queryDAO
      */
     @Inject
-    public ToolBelt(AnnotationDAOFactory annotationDAOFactory, AnnotationFactory annotationFactory,
-                    KnowledgebaseDAOFactory knowledgebaseDAOFactory, KnowledgebaseFactory knowledgebaseFactory,
-                    MiscDAOFactory miscDAOFactory, MiscFactory miscFactory,
-                    PersistenceCacheProvider persistenceCacheProvider, SpecialAnnotationDAO annotationDAO,
-                    SpecialKnowledgebaseDAO knowledgebaseDAO, SpecialQueryDAO queryDAO) {
+    public ToolBelt(AnnotationDAOFactory annotationDAOFactory, 
+            AnnotationFactory annotationFactory,
+            KnowledgebaseDAOFactory knowledgebaseDAOFactory, 
+            KnowledgebaseFactory knowledgebaseFactory,
+            MiscDAOFactory miscDAOFactory, MiscFactory miscFactory,
+            PersistenceCacheProvider persistenceCacheProvider, 
+            PersistenceService persistenceService, 
+            SpecialAnnotationDAO annotationDAO,
+            SpecialKnowledgebaseDAO knowledgebaseDAO, SpecialQueryDAO queryDAO) {
         this.annotationDAOFactory = annotationDAOFactory;
         this.specialAnnotationDAO = annotationDAO;
         this.annotationFactory = annotationFactory;
@@ -74,6 +79,7 @@ public class ToolBelt {
         this.knowledgebaseFactory = knowledgebaseFactory;
         this.miscDAOFactory = miscDAOFactory;
         this.miscFactory = miscFactory;
+        this.persistenceService = new PersistenceService(annotationDAOFactory, annotationFactory);
         this.persistenceCache = new PersistenceCache(persistenceCacheProvider);
         this.specialQueryDAO = queryDAO;
         historyFactory = new HistoryFactory(knowledgebaseFactory);
@@ -155,4 +161,9 @@ public class ToolBelt {
     public SpecialQueryDAO getSpecialQueryDAO() {
         return specialQueryDAO;
     }
+
+    public PersistenceService getPersistenceService() {
+        return persistenceService;
+    }
+    
 }

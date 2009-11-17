@@ -21,53 +21,42 @@ Created on Oct 8, 2004
 package org.mbari.vars.annotation.ui;
 
 import java.util.Date;
+
+import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.swing.PropertyPanel;
-import org.mbari.vars.annotation.model.Observation;
-import org.mbari.vars.annotation.model.VideoFrame;
 import org.mbari.vars.annotation.ui.actions.ChangeTimeCodeActionWithDialog;
-import org.mbari.vars.knowledgebase.model.Concept;
-import org.mbari.vars.knowledgebase.model.ConceptName;
-import vars.knowledgebase.IConceptName;
-import org.mbari.vars.knowledgebase.model.dao.CacheClearedEvent;
-import org.mbari.vars.knowledgebase.model.dao.CacheClearedListener;
-import org.mbari.vars.knowledgebase.model.dao.KnowledgeBaseCache;
-import vars.annotation.IObservation;
-import vars.annotation.IVideoFrame;
-import vars.knowledgebase.IConcept;
+
+import vars.CacheClearedEvent;
+import vars.CacheClearedListener;
+import vars.annotation.AnnotationFactory;
+import vars.annotation.Observation;
+import vars.annotation.VideoFrame;
+import vars.annotation.ui.Lookup;
+import vars.annotation.ui.ToolBelt;
+import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptDAO;
 
 /**
  * <p>Displays the properties of an observation</p>
  *
  * @author <a href="http://www.mbari.org">MBARI</a>
- * @version $Id: PObservationPanel.java 376 2006-10-26 18:21:43Z hohonuuli $
  */
 public class PObservationPanel extends PropertiesPanel {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = -2722676487288783983L;
 
-    /**
-     *     @uml.property  name="annotation"
-     *     @uml.associationEnd  multiplicity="(1 1)" inverse="this$0:org.mbari.vars.annotation.ui.PObservationPanel$Annotation"
-     */
     private final Annotation annotation;
 
-    /**
-     *     Allows the annotator to change the timecode
-     *     @uml.property  name="timeCodeAction"
-     *     @uml.associationEnd
-     */
     private ActionAdapter timeCodeAction;
+    private final ToolBelt toolBelt;
 
     /**
      * Constructs ...
      *
      */
-    public PObservationPanel() {
+    public PObservationPanel(ToolBelt toolBelt) {
         super();
+        this.toolBelt = toolBelt;
         annotation = new Annotation();
         setPropertyNames(new String[] { "TimeCode", "Concept", "RecordedDate", "ObservationDate", "Observer" });
         addListeners();
@@ -77,7 +66,7 @@ public class PObservationPanel extends PropertiesPanel {
          * If the KnowledgebaseCache is cleared we need to update the
          * displayed concept name.
          */
-        KnowledgeBaseCache.getInstance().addCacheClearedListener(new CacheClearedListener() {
+        toolBelt.getPersistenceCache().addCacheClearedListener(new CacheClearedListener() {
 
             public void afterClear(CacheClearedEvent evt) {
                 update(annotation.getObservation(), null);
@@ -85,15 +74,12 @@ public class PObservationPanel extends PropertiesPanel {
 
             public void beforeClear(CacheClearedEvent evt) {
 
-                // TODO Verify this default implementation is correct
+                // Do nada
             }
         });
     }
 
-    /**
-     * <p><!-- Method description --></p>
-     *
-     */
+
     private void addListeners() {
 
         // Allow the TimeCode to be edited
@@ -102,18 +88,10 @@ public class PObservationPanel extends PropertiesPanel {
         p.setEditAction(getTimeCodeAction());
     }
 
-    /**
-     *     @return  The ChangeTimeCodeAction. We override the doAction method in order to  redraw the panel properly.
-     *     @uml.property  name="timeCodeAction"
-     */
+
     private ActionAdapter getTimeCodeAction() {
         if (timeCodeAction == null) {
             timeCodeAction = new ChangeTimeCodeActionWithDialog() {
-
-                /**
-                 *
-                 */
-                private static final long serialVersionUID = -8801974108216091602L;
 
                 public void doAction() {
                     super.doAction();
@@ -138,7 +116,6 @@ public class PObservationPanel extends PropertiesPanel {
         final Observation obs = (Observation) obj;
         if (obs == null) {
             clearValues();
-
             return;
         }
 
@@ -151,94 +128,62 @@ public class PObservationPanel extends PropertiesPanel {
      */
     private class Annotation {
 
-        private final IObservation nullObs;
-        private IObservation observation;
+        private final Observation nullObs;
+        private Observation observation;
 
         /**
          * Constructs ...
          *
          */
         Annotation() {
-            final IVideoFrame nullVf = new VideoFrame();
-            nullObs = new Observation();
+            AnnotationFactory factory = toolBelt.getAnnotationFactory();
+            final VideoFrame nullVf = factory.newVideoFrame();
+            nullObs = factory.newObservation();
             nullVf.addObservation(nullObs);
             setObservation(nullObs);
         }
 
-        /**
-         * <p><!-- Method description --></p>
-         *
-         *
-         * @return
-         */
-        public IConcept getConcept() {
+        public Concept getConcept() {
             final String conceptName = observation.getConceptName();
-            IConcept out = null;
+            Concept out = null;
             try {
-                out = KnowledgeBaseCache.getInstance().findConceptByName(conceptName);
+                ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
+                conceptDAO.startTransaction();
+                out = conceptDAO.findByName(conceptName);
+                conceptDAO.endTransaction();
             }
             catch (final Exception e) {
-                out = new Concept(new ConceptName(conceptName, IConceptName.NAMETYPE_PRIMARY), null);
+                EventBus.publish(Lookup.TOPIC_FATAL_ERROR, e);
             }
 
             return out;
         }
 
-        /**
-         *         <p><!-- Method description --></p>
-         *         @return
-         *         @uml.property  name="observation"
-         */
-        IObservation getObservation() {
+
+        Observation getObservation() {
             return observation;
         }
 
-        /**
-         * <p><!-- Method description --></p>
-         *
-         *
-         * @return
-         */
+
         public Date getObservationDate() {
             return observation.getObservationDate();
         }
 
-        /**
-         * <p><!-- Method description --></p>
-         *
-         *
-         * @return
-         */
         public String getObserver() {
             return observation.getObserver();
         }
 
-        /**
-         * <p><!-- Method description --></p>
-         *
-         *
-         * @return
-         */
+
         public Date getRecordedDate() {
             return observation.getVideoFrame().getRecordedDate();
         }
 
-        /**
-         * <p><!-- Method description --></p>
-         *
-         *
-         * @return
-         */
+ 
         public String getTimeCode() {
-            return observation.getVideoFrame().getTimeCode();
+            return observation.getVideoFrame().getTimecode();
         }
 
-        /**
-         *         <p><!-- Method description --></p>
-         *         @param  obs
-         *         @uml.property  name="observation"
-         */
-        void setObservation(final IObservation obs) {
+        void setObservation(final Observation obs) {
             if (obs == null) {
                 observation = nullObs;
             }

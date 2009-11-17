@@ -44,16 +44,19 @@ import javax.swing.JComboBox;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.LayoutFocusTraversalPolicy;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import org.mbari.vars.annotation.ui.dispatchers.ObservationTableDispatcher;
-import org.mbari.vars.annotation.ui.dispatchers.PersonDispatcher;
-import org.mbari.vars.annotation.ui.dispatchers.PredefinedDispatcher;
 import org.mbari.vars.annotation.ui.table.AssociationListEditorPanel;
+import org.mbari.vars.annotation.ui.table.ObservationTablePanel;
+
+import vars.annotation.Observation;
+import vars.annotation.ui.Lookup;
+import vars.annotation.ui.table.IObservationTable;
 import vars.knowledgebase.ConceptName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,8 +87,6 @@ public class RowEditorPanel extends JPanel {
 
     /**
      *     The actions for changing the focus behavior of a JTextArea
-     *     @uml.property  name="nextFocusAction"
-     *     @uml.associationEnd  multiplicity="(1 1)"
      */
     protected Action nextFocusAction = new AbstractAction("Move Focus Forwards") {
 
@@ -94,10 +95,6 @@ public class RowEditorPanel extends JPanel {
         }
     };
 
-    /**
-     *     @uml.property  name="prevFocusAction"
-     *     @uml.associationEnd  multiplicity="(1 1)"
-     */
     protected Action prevFocusAction = new AbstractAction("Move Focus Backwards") {
 
 
@@ -121,7 +118,7 @@ public class RowEditorPanel extends JPanel {
 
     private JTextArea notesArea;
 
-    private final ObservationTable observationTable;
+    private final IObservationTable observationTable;
 
     private Observation selectedObservation;
 
@@ -129,7 +126,7 @@ public class RowEditorPanel extends JPanel {
      * Constructor for the RowEditorPanel object
      */
     public RowEditorPanel() {
-        this(ObservationTableDispatcher.getInstance().getObservationTable());
+        this((IObservationTable) Lookup.getObservationTableDispatcher().getValueObject());
     }
 
     /**
@@ -137,10 +134,10 @@ public class RowEditorPanel extends JPanel {
      *
      * @param  observationTable Description of the Parameter
      */
-    public RowEditorPanel(final ObservationTable observationTable) {
+    public RowEditorPanel(final IObservationTable observationTable) {
         super();
         this.observationTable = observationTable;
-        observationTable.setFocusable(false);
+        ((JTable) observationTable).setFocusable(false);
         initialize();
 
         /**
@@ -245,7 +242,7 @@ public class RowEditorPanel extends JPanel {
                          * it triggers an ItemEvent which in turn updates the Observation's concept name.
                          */
                         log.debug("ENTER Pressed in Editor");
-                        IConcept concept;
+                        Concept concept;
                         String primaryName;
                         final String selectedName = (String) conceptComboBox.getSelectedItem();
                         conceptComboBox.setPopupVisible(false);
@@ -277,11 +274,7 @@ public class RowEditorPanel extends JPanel {
         return conceptComboBox;
     }
 
-    /**
-     *     <p><!-- Method description --></p>
-     *     @return
-     *     @uml.property  name="jPanel"
-     */
+
     private JPanel getJPanel() {
         if (jPanel == null) {
             jPanel = new JPanel();
@@ -296,11 +289,7 @@ public class RowEditorPanel extends JPanel {
         return jPanel;
     }
 
-    /**
-     *     <p><!-- Method description --></p>
-     *     @return
-     *     @uml.property  name="listPanel"
-     */
+
     private AssociationListEditorPanel getListPanel() {
         if (listPanel == null) {
             listPanel = new AssociationListEditorPanel();
@@ -313,7 +302,6 @@ public class RowEditorPanel extends JPanel {
     /**
      *     <p>The video lab has requested that top level concepts should not be able to have notes added to them. This is because annotators on the ship frequently use 'object' or 'physical-object' as the concept name but then but the detail of what the object is in the notes. They would like to stop this practice and force users to choose a concept.</p> <p>This method gets the root concept name and the names of its child concepts (and only the root concepts child concepts) and adds them to a collection. </p>
      *     @return   A collection of strings representing the root conceptname and it's  child names.
-     *     @uml.property  name="notableConceptNames"
      */
     private Collection getNotableConceptNames() {
         if (notableConceptNames == null) {
@@ -322,11 +310,11 @@ public class RowEditorPanel extends JPanel {
             notableConceptNames = new HashSet();
 
             try {
-                final IConcept rootConcept = KnowledgeBaseCache.getInstance().findRootConcept();
+                final Concept rootConcept = KnowledgeBaseCache.getInstance().findRootConcept();
                 notableConceptNames.add(rootConcept.getPrimaryConceptNameAsString());
                 final Collection chillin = rootConcept.getChildConceptColl();
                 for (final Iterator i = chillin.iterator(); i.hasNext(); ) {
-                    final IConcept child = (IConcept) i.next();
+                    final Concept child = (IConcept) i.next();
                     notableConceptNames.add(child.getPrimaryConceptNameAsString());
                 }
             }
@@ -340,11 +328,7 @@ public class RowEditorPanel extends JPanel {
         return notableConceptNames;
     }
 
-    /**
-     *     <p><!-- Method description --></p>
-     *     @return
-     *     @uml.property  name="notesArea"
-     */
+
     private JTextArea getNotesArea() {
         if (notesArea == null) {
             notesArea = new JTextArea(1, 1);
@@ -402,10 +386,6 @@ public class RowEditorPanel extends JPanel {
         //FocusTraversalPolicy policy = getFocusTraversalPolicy();
         setFocusTraversalPolicy(new LayoutFocusTraversalPolicy() {
 
-            /**
-             *
-             */
-            private static final long serialVersionUID = -3923850138071244157L;
 
             // TODO Warning, when a component should not be focused, I
             // recursively
@@ -440,10 +420,6 @@ public class RowEditorPanel extends JPanel {
                          "up-table");
         this.getActionMap().put("down-table", new AbstractAction() {
 
-            /**
-             *
-             */
-            private static final long serialVersionUID = 1081157310975958639L;
 
             public void actionPerformed(final ActionEvent e) {
 
@@ -459,10 +435,7 @@ public class RowEditorPanel extends JPanel {
                 InputEvent.CTRL_DOWN_MASK), "down-table");
         this.getActionMap().put("up-table", new AbstractAction() {
 
-            /**
-             *
-             */
-            private static final long serialVersionUID = -5121776240964061423L;
+
 
             public void actionPerformed(final ActionEvent e) {
 

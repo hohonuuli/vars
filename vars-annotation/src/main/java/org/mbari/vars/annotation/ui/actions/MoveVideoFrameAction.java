@@ -111,7 +111,7 @@ public class MoveVideoFrameAction extends ActionAdapter implements IVideoArchive
 
                             try {
                                 vfDao.delete((IDataObject) sourceFrame);
-                                vfDao.update((IDataObject) targetFrame);
+                                vfDao.updateVideoArchiveSet((IDataObject) targetFrame);
                             }
                             catch (final DAOException e) {
                                 final String msg = "Unable to update " + sourceFrame + ". Aborting actions.";
@@ -126,7 +126,7 @@ public class MoveVideoFrameAction extends ActionAdapter implements IVideoArchive
                             videoArchive.addVideoFrame(sourceFrame);
 
                             try {
-                                VideoFrameDAO.getInstance().update((IDataObject) sourceFrame);
+                                VideoFrameDAO.getInstance().updateVideoArchiveSet((IDataObject) sourceFrame);
                             }
                             catch (final DAOException e) {
                                 final String msg = "Unable to update " + sourceFrame + ". Aborting actions.";

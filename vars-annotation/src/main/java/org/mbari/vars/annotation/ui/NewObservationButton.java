@@ -19,26 +19,27 @@ package org.mbari.vars.annotation.ui;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Collection;
+
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
 import org.mbari.swing.JFancyButton;
 import org.mbari.swing.SwingUtils;
 import org.mbari.vars.annotation.ui.actions.NewObservationAction;
-import org.mbari.vars.annotation.ui.dispatchers.PredefinedDispatcher;
+
+import vars.UserAccount;
+import vars.annotation.Observation;
+import vars.annotation.ui.Lookup;
 
 /**
  * <p>Create a new observation using the current time-code from the VCR</p>
  *
  * @author  <a href="http://www.mbari.org">MBARI</a>
- * @version  $Id: NewObservationButton.java 314 2006-07-10 02:38:46Z hohonuuli $
  */
 public class NewObservationButton extends JFancyButton {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 53820555698832688L;
+
 
     /**
      * Constructor for the NewObservationButton object
@@ -52,12 +53,17 @@ public class NewObservationButton extends JFancyButton {
         setEnabled(false);
         setText("");
 
-        // Enable this button if someone is logged in AND the Observation
-        // in the ObservationDispather is not null and the VCR is enabled.
-        PredefinedDispatcher.OBSERVATION.getDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
+        /* 
+         * Enable this button if someone is logged in AND the Observation
+         * in the ObservationDispather is not null and the VCR is enabled.
+         */
+        Lookup.getSelectedObservationsDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
+            
             public void propertyChange(PropertyChangeEvent evt) {
-                final String p = (String) PredefinedDispatcher.PERSON.getDispatcher().getValueObject();
-                setEnabled ((p != null) && (evt.getNewValue() != null));
+                final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+                final Collection<Observation> observations = (Collection<Observation>) evt.getNewValue();
+                setEnabled ((userAccount != null) && (observations.size() > 0));
+                
             }
         });
 

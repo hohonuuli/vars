@@ -23,25 +23,14 @@ Window - Preferences - Java - Code Style - Code Templates
  */
 package org.mbari.vars.annotation.ui.actions;
 
-import vars.annotation.IVideoArchive;
+import vars.annotation.VideoArchive;
 
 /**
  * @author  brian
  */
 public interface IVideoArchiveProperty {
 
-    /**
-     *     <p><!-- Method description --></p>
-     *     @return
-     *     @uml.property  name="videoArchive"
-     *     @uml.associationEnd
-     */
-    IVideoArchive getVideoArchive();
+    VideoArchive getVideoArchive();
 
-    /**
-     *     <p><!-- Method description --></p>
-     *     @param  videoArchive
-     *     @uml.property  name="videoArchive"
-     */
-    void setVideoArchive(IVideoArchive videoArchive);
+    void setVideoArchive(VideoArchive videoArchive);
 }

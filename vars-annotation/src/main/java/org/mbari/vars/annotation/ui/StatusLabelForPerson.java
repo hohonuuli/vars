@@ -23,11 +23,16 @@ package org.mbari.vars.annotation.ui;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+
 import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
 import org.mbari.swing.SwingUtils;
+import org.mbari.util.Dispatcher;
 import org.mbari.vars.annotation.ui.actions.OpenUserAccountAction;
-import org.mbari.vars.annotation.ui.dispatchers.PersonDispatcher;
+
+import vars.UserAccount;
+import vars.annotation.ui.Lookup;
 
 /**
  * <p>Indicates the status of the annotator. green means an annotator is logged
@@ -39,15 +44,8 @@ import org.mbari.vars.annotation.ui.dispatchers.PersonDispatcher;
  */
 public class StatusLabelForPerson extends StatusLabel {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = -1585624751599862740L;
 
-    /**
-     *     @uml.property  name="action"
-     *     @uml.associationEnd  multiplicity="(1 1)"
-     */
+  
     private final OpenUserAccountAction action = new OpenUserAccountAction();
 
     /**
@@ -55,9 +53,10 @@ public class StatusLabelForPerson extends StatusLabel {
      */
     public StatusLabelForPerson() {
         super();
-        final PersonDispatcher pd = PersonDispatcher.getInstance();
-        update(pd.getPerson(), null);
-        pd.addObserver(this);
+        final Dispatcher pd = Lookup.getUserAccountDispatcher();
+        final UserAccount userAccount = (UserAccount) pd.getValueObject();
+        update(userAccount);
+        pd.addPropertyChangeListener(this);
         addMouseListener(new MouseAdapter() {
 
             public void mouseClicked(final MouseEvent me) {
@@ -83,21 +82,21 @@ public class StatusLabelForPerson extends StatusLabel {
      * @param  changeCode Description of the Parameter
      * @see  org.mbari.util.IObserver#update(java.lang.Object, java.lang.Object)
      */
-    public void update(final Object personString, final Object changeCode) {
+    public void update(final UserAccount userAccount) {
         boolean ok = true;
         String msg = "User: Not logged in";
-        if ((personString == null) ||!(personString instanceof String)) {
+        if (userAccount == null) {
             ok = false;
         }
         else {
-            msg = "User: " + (String) personString;
-
-            if (msg.equalsIgnoreCase(PersonDispatcher.DEFAULT_USER)) {
-                ok = false;
-            }
+            msg = "User: " + userAccount.getUserName();
         }
 
         setText(msg);
         setOk(ok);
+    }
+
+    public void propertyChange(PropertyChangeEvent evt) {
+        update((UserAccount) evt.getNewValue());
     }
 }

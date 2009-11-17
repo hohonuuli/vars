@@ -61,7 +61,7 @@ public class ChangeAnnotationModeAction extends ActionAdapter {
             final IVideoArchiveSet vas = va.getVideoArchiveSet();
             if (vas != null) {
                 vas.setFormatCode(formatCode);
-                DAOEventQueue.update((IDataObject) vas);
+                DAOEventQueue.updateVideoArchiveSet((IDataObject) vas);
             }
         }
     }

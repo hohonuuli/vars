@@ -48,7 +48,7 @@ import foxtrot.Worker;
 import foxtrot.Job;
 import org.bushe.swing.event.EventBus;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
-import vars.query.QueryDAO;
+import vars.query.SpecialQueryDAO;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -60,21 +60,12 @@ import vars.query.QueryDAO;
  */
 public class SearchPanel extends JPanel {
 
-    private static final long serialVersionUID = 4506941047207763908L;
-    private static final Logger log = LoggerFactory.getLogger(SearchPanel.class);
     private static final int RESPONSE_DELAY = 750;
-
-    //~--- fields -------------------------------------------------------------
-
-    /**
-	 * @uml.property  name="cbAllAssociations"
-	 * @uml.associationEnd  
-	 */
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    
+ 
     private JCheckBox cbAllAssociations;
-    /**
-	 * @uml.property  name="cbAllInterpretations"
-	 * @uml.associationEnd  
-	 */
+ 
     private JCheckBox cbAllInterpretations;
     
     private JCheckBox cbHierarchy;
@@ -82,84 +73,38 @@ public class SearchPanel extends JPanel {
     private JCheckBox cbPhylogeny;
     
     private JCheckBox cbFullPhylogeny;
-    /**
-	 * @uml.property  name="clearAction"
-	 * @uml.associationEnd  
-	 */
+ 
     private ActionAdapter clearAction;
-    /**
-	 * @uml.property  name="delayTimer"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
+
     private final Timer delayTimer;
-    /**
-	 * @uml.property  name="topPanel"
-	 * @uml.associationEnd  
-	 */
+ 
     private JPanel topPanel = null;
-    /**
-	 * @uml.property  name="scrollPane"
-	 * @uml.associationEnd  
-	 */
+ 
     private JScrollPane scrollPane = null;
-    /**
-	 * @uml.property  name="removeButton"
-	 * @uml.associationEnd  
-	 */
+ 
     private JButton removeButton = null;
-    /**
-	 * @uml.property  name="middlePanel"
-	 * @uml.associationEnd  
-	 */
+ 
     private JPanel middlePanel = null;
-    /**
-	 * @uml.property  name="mainPanel"
-	 * @uml.associationEnd  
-	 */
-    private JPanel mainPanel = null;    // @jve:decl-index=0:visual-constraint="637,128"
-    /**
-	 * @uml.property  name="conceptNameSelectionPanel"
-	 * @uml.associationEnd  
-	 */
+ 
+    private JPanel mainPanel = null;    
+
     private ConceptNameSelectionPanel conceptNameSelectionPanel = null;
-    /**
-	 * @uml.property  name="conceptConstraintsList"
-	 * @uml.associationEnd  
-	 */
+
     private JList conceptConstraintsList = null;
-    /**
-	 * @uml.property  name="clearButton"
-	 * @uml.associationEnd  
-	 */
+
     private JButton clearButton = null;
-    /**
-	 * @uml.property  name="bottomPanel"
-	 * @uml.associationEnd  
-	 */
+
     private JPanel bottomPanel = null;
-    /**
-	 * @uml.property  name="associationSelectionPanel"
-	 * @uml.associationEnd  
-	 */
+
     private AssociationSelectionPanel associationSelectionPanel = null;
-    /**
-	 * @uml.property  name="allPanel"
-	 * @uml.associationEnd  
-	 */
+
     private JPanel allPanel = null;
-    /**
-	 * @uml.property  name="addButton"
-	 * @uml.associationEnd  
-	 */
+  
     private JButton addButton = null;
 
     private final Injector injector;
 
-    //~--- constructors -------------------------------------------------------
 
-    /**
-     *
-     */
     public SearchPanel(Injector injector) {
         super();
         this.injector = injector;
@@ -182,13 +127,7 @@ public class SearchPanel extends JPanel {
         initialize();
     }
 
-    //~--- get methods --------------------------------------------------------
 
-    /**
-	 * This method initializes jButton1
-	 * @return  javax.swing.JButton
-	 * @uml.property  name="addButton"
-	 */
     private JButton getAddButton() {
         if (addButton == null) {
             addButton = new JButton();
@@ -249,7 +188,6 @@ public class SearchPanel extends JPanel {
     /**
 	 * The all panel contains checkboxes for 'all interpretations' and 'all associations
 	 * @return
-	 * @uml.property  name="allPanel"
 	 */
     private JPanel getAllPanel() {
         if (allPanel == null) {
@@ -265,11 +203,6 @@ public class SearchPanel extends JPanel {
         return allPanel;
     }
 
-    /**
-	 * This method initializes jPanel2
-	 * @return  javax.swing.JPanel
-	 * @uml.property  name="associationSelectionPanel"
-	 */
     private AssociationSelectionPanel getAssociationSelectionPanel() {
         if (associationSelectionPanel == null) {
             associationSelectionPanel = injector.getInstance(AssociationSelectionPanel.class);
@@ -278,11 +211,7 @@ public class SearchPanel extends JPanel {
         return associationSelectionPanel;
     }
 
-    /**
-	 * This method initializes jPanel3
-	 * @return  javax.swing.JPanel
-	 * @uml.property  name="bottomPanel"
-	 */
+
     private JPanel getBottomPanel() {
         if (bottomPanel == null) {
             bottomPanel = new JPanel();
@@ -294,11 +223,7 @@ public class SearchPanel extends JPanel {
         return bottomPanel;
     }
 
-    /**
-	 * <p><!-- Method description --></p>
-	 * @return
-	 * @uml.property  name="cbAllAssociations"
-	 */
+
     protected JCheckBox getCbAllAssociations() {
         if (cbAllAssociations == null) {
             cbAllAssociations = new JCheckBox();
@@ -310,11 +235,6 @@ public class SearchPanel extends JPanel {
         return cbAllAssociations;
     }
 
-    /**
-	 * <p><!-- Method description --></p>
-	 * @return
-	 * @uml.property  name="cbAllInterpretations"
-	 */
     protected JCheckBox getCbAllInterpretations() {
         if (cbAllInterpretations == null) {
             cbAllInterpretations = new JCheckBox();
@@ -356,11 +276,7 @@ public class SearchPanel extends JPanel {
     	return cbFullPhylogeny;
     }
 
-    /**
-	 * <p><!-- Method description --></p>
-	 * @return
-	 * @uml.property  name="clearAction"
-	 */
+ 
     private ActionAdapter getClearAction() {
         if (clearAction == null) {
             clearAction = new ActionAdapter() {
@@ -377,11 +293,7 @@ public class SearchPanel extends JPanel {
         return clearAction;
     }
 
-    /**
-	 * <p><!-- Method description --></p>
-	 * @return
-	 * @uml.property  name="clearButton"
-	 */
+ 
     private JButton getClearButton() {
         if (clearButton == null) {
             clearButton = new JButton();
@@ -440,7 +352,6 @@ public class SearchPanel extends JPanel {
     /**
 	 * This method initializes a JList that contains the ConceptConstraints that are to be used for querying. The Model used is a ListListModel
 	 * @return  javax.swing.JList
-	 * @uml.property  name="conceptConstraintsList"
 	 */
     protected JList getConceptConstraintsList() {
         if (conceptConstraintsList == null) {
@@ -451,14 +362,10 @@ public class SearchPanel extends JPanel {
         return conceptConstraintsList;
     }
 
-    /**
-	 * This method initializes jPanel1
-	 * @return  javax.swing.JPanel
-	 * @uml.property  name="conceptNameSelectionPanel"
-	 */
+ 
     private ConceptNameSelectionPanel getConceptNameSelectionPanel() {
         if (conceptNameSelectionPanel == null) {
-            final QueryDAO queryDAO = injector.getInstance(QueryDAO.class);
+            final SpecialQueryDAO queryDAO = injector.getInstance(SpecialQueryDAO.class);
             final KnowledgebaseDAOFactory daoFactory = injector.getInstance(KnowledgebaseDAOFactory.class);
             conceptNameSelectionPanel = new ConceptNameSelectionPanel(queryDAO, daoFactory.newConceptDAO());
             final FancyComboBox cbConceptName = (FancyComboBox) conceptNameSelectionPanel.getCbConceptName();

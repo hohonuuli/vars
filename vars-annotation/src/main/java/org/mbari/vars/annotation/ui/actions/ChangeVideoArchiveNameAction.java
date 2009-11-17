@@ -75,7 +75,7 @@ public class ChangeVideoArchiveNameAction extends OpenVideoArchiveUsingParamsAct
             final DAOEventQueue eventQueue = DAOEventQueue.getInstance();
             synchronized (eventQueue) {
                 DAOEventQueue.flush();
-                VideoArchiveSetDAO.getInstance().update((VideoArchiveSet) orgVas);
+                VideoArchiveSetDAO.getInstance().updateVideoArchiveSet((VideoArchiveSet) orgVas);
             }
         }
         catch (final Exception e1) {
