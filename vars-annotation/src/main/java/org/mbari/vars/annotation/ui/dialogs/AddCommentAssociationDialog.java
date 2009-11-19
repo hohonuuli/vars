@@ -1,5 +1,6 @@
 package org.mbari.vars.annotation.ui.dialogs;
 
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.HierarchyEvent;
@@ -17,7 +18,8 @@ import javax.swing.ScrollPaneConstants;
 import org.jdesktop.layout.GroupLayout;
 import org.jdesktop.layout.LayoutStyle;
 import org.mbari.swing.JFancyButton;
-import org.mbari.vars.util.AppFrameDispatcher;
+
+import vars.annotation.ui.Lookup;
 
 public class AddCommentAssociationDialog extends JDialog {
 
@@ -59,7 +61,7 @@ public class AddCommentAssociationDialog extends JDialog {
      * Create the dialog
      */
     public AddCommentAssociationDialog() {
-        super(AppFrameDispatcher.getFrame());
+        super((Frame) Lookup.getApplicationFrameDispatcher().getValueObject());
         try {
             initialize();
         }

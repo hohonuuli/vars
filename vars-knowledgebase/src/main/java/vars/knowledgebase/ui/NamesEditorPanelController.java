@@ -35,7 +35,7 @@ import vars.knowledgebase.ConceptNameTypes;
 import vars.knowledgebase.History;
 import vars.knowledgebase.HistoryDAO;
 import vars.knowledgebase.HistoryFactory;
-import vars.knowledgebase.SpecialKnowledgebaseDAO;
+import vars.knowledgebase.KnowledgebasePersistenceService;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.ui.actions.ApproveHistoryTask;
@@ -116,7 +116,7 @@ class NamesEditorPanelController {
         boolean okToProceed = true;
 
         ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
-        SpecialKnowledgebaseDAO knowledgebaseDAO = toolBelt.getKnowledgebaseDAO();
+        KnowledgebasePersistenceService knowledgebaseDAO = toolBelt.getKnowledgebaseDAO();
         KnowledgebaseFactory knowledgebaseFactory = toolBelt.getKnowledgebaseFactory();
 
 

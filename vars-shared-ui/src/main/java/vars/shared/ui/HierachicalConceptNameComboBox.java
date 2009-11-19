@@ -26,6 +26,8 @@ import java.util.Collection;
 import java.util.List;
 
 import org.mbari.swing.SortedComboBoxModel;
+
+import vars.annotation.AnnotationPersistenceService;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptName;
@@ -41,7 +43,7 @@ import vars.knowledgebase.ConceptName;
 public class HierachicalConceptNameComboBox extends ConceptNameComboBox {
 
     private Concept concept;
-    private final ConceptDAO conceptDAO;
+    private final AnnotationPersistenceService annotationPersistenceService;
 
     //~--- constructors -------------------------------------------------------
 
@@ -49,9 +51,9 @@ public class HierachicalConceptNameComboBox extends ConceptNameComboBox {
      * Constructs ...
      *
      */
-    public HierachicalConceptNameComboBox(ConceptDAO conceptDAO) {
+    public HierachicalConceptNameComboBox(AnnotationPersistenceService annotationPersistenceService) {
         super();
-        this.conceptDAO = conceptDAO;
+        this.annotationPersistenceService = annotationPersistenceService;
         initialize();
     }
 
@@ -60,12 +62,11 @@ public class HierachicalConceptNameComboBox extends ConceptNameComboBox {
      *
      * @param concept
      */
-    public HierachicalConceptNameComboBox(Concept concept, ConceptDAO conceptDAO) {
+    public HierachicalConceptNameComboBox(Concept concept, AnnotationPersistenceService annotationPersistenceService) {
         // WARNING!! getDescendentNames can be very slow the first time it is called.
         super();
-        this.conceptDAO = conceptDAO;
+        this.annotationPersistenceService = annotationPersistenceService;
         setConcept(concept);
-
         initialize();
     }
 
@@ -104,7 +105,7 @@ public class HierachicalConceptNameComboBox extends ConceptNameComboBox {
         this.concept = concept;
 
         if (concept != null) {
-            Collection<ConceptName> conceptNames = conceptDAO.findDescendentNames(concept);
+            Collection<ConceptName> conceptNames = annotationPersistenceService.getReadOnlyConceptDAO().findDescendentNames(concept);
             List<String> namesAsStrings = new ArrayList<String>(conceptNames.size());
             for (ConceptName cn : conceptNames) {
                 namesAsStrings.add(cn.getName());

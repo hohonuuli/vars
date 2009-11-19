@@ -27,18 +27,18 @@ import vars.MiscDAOFactory;
 import vars.MiscFactory;
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.AnnotationFactory;
-import vars.annotation.SpecialAnnotationDAO;
-import vars.annotation.SpecialAnnotationDAOImpl;
+import vars.annotation.AnnotationPersistenceService;
+import vars.annotation.AnnotationPersistenceServiceImpl;
 import vars.annotation.jpa.AnnotationDAOFactoryImpl;
 import vars.annotation.jpa.AnnotationFactoryImpl;
-import vars.knowledgebase.SpecialKnowledgebaseDAO;
+import vars.knowledgebase.KnowledgebasePersistenceService;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
-import vars.knowledgebase.SpecialKnowledgebaseDAOImpl;
+import vars.knowledgebase.KnowledgebasePersistenceServiceImpl;
 import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.jpa.KnowledgebaseDAOFactoryImpl;
 import vars.knowledgebase.jpa.KnowledgebaseFactoryImpl;
-import vars.query.SpecialQueryDAO;
-import vars.query.SpecialQueryDAOImpl;
+import vars.query.QueryPersistenceService;
+import vars.query.QueryPersistenceServiceImpl;
 
 /**
  * Created by IntelliJ IDEA.
@@ -92,9 +92,9 @@ public class VarsJpaModule implements Module {
         binder.bind(KnowledgebaseFactory.class).to(KnowledgebaseFactoryImpl.class);
         binder.bind(MiscDAOFactory.class).to(MiscDAOFactoryImpl.class).in(Scopes.SINGLETON);;
         binder.bind(MiscFactory.class).to(MiscFactoryImpl.class);
-        binder.bind(SpecialAnnotationDAO.class).to(SpecialAnnotationDAOImpl.class).in(Scopes.SINGLETON);
-        binder.bind(SpecialKnowledgebaseDAO.class).to(SpecialKnowledgebaseDAOImpl.class);
-        binder.bind(SpecialQueryDAO.class).to(SpecialQueryDAOImpl.class);
+        binder.bind(AnnotationPersistenceService.class).to(AnnotationPersistenceServiceImpl.class).in(Scopes.SINGLETON);
+        binder.bind(KnowledgebasePersistenceService.class).to(KnowledgebasePersistenceServiceImpl.class);
+        binder.bind(QueryPersistenceService.class).to(QueryPersistenceServiceImpl.class);
         binder.bind(VarsUserPreferencesFactory.class).to(VarsUserPreferencesFactoryImpl.class).in(Scopes.SINGLETON);
 
     }

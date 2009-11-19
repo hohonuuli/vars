@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)AddSamplePropDialog.java   2009.11.18 at 04:32:38 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
- * (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,22 +12,24 @@
  */
 
 
-/*
-Created on Apr 19, 2004
- */
+
 package org.mbari.vars.annotation.ui.dialogs;
 
+import java.awt.Frame;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import org.mbari.vars.annotation.ui.actions.AddPropertyAction;
 import org.mbari.vars.annotation.ui.actions.AddSamplePropAction;
-import org.mbari.vars.dao.DAOException;
-import org.mbari.vars.knowledgebase.model.Concept;
-import org.mbari.vars.knowledgebase.model.ConceptName;
-import vars.knowledgebase.IConceptName;
-import org.mbari.vars.knowledgebase.model.dao.KnowledgeBaseCache;
-import org.mbari.vars.ui.HierachicalConceptNameComboBox;
-import org.mbari.vars.util.AppFrameDispatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import vars.annotation.ui.Lookup;
+import vars.annotation.ui.ToolBelt;
+import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptName;
+import vars.knowledgebase.ConceptNameTypes;
+import vars.knowledgebase.SimpleConceptBean;
+import vars.knowledgebase.SimpleConceptNameBean;
+import vars.shared.ui.HierachicalConceptNameComboBox;
 
 /**
  * <p>A dialog that prompts the user for the sampler device and sample number.
@@ -39,90 +38,35 @@ import org.mbari.vars.util.AppFrameDispatcher;
  * 'sample-reference'</p>
  *
  * @author  <a href="http://www.mbari.org">MBARI</a>
- * @version  $Id: AddSamplePropDialog.java 332 2006-08-01 18:38:46Z hohonuuli $
  * @see org.mbari.vars.annotation.ui.actions.AddSamplePropAction
  * @see org.mbari.vars.annotation.ui.actions.AddPropertyAction
  */
 public class AddSamplePropDialog extends JDialog {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 5646565565894821951L;
-
-    /**
-     *     @uml.property  name="btnCancel"
-     *     @uml.associationEnd
-     */
     private javax.swing.JButton btnCancel = null;
-
-    /**
-     *     @uml.property  name="btnOk"
-     *     @uml.associationEnd
-     */
     private javax.swing.JButton btnOk = null;
-
-    /**
-     *     @uml.property  name="cbSampler"
-     *     @uml.associationEnd
-     */
     private javax.swing.JComboBox cbSampler = null;
-
-    /**
-     *     @uml.property  name="jContentPane"
-     *     @uml.associationEnd
-     */
     private javax.swing.JPanel jContentPane = null;
-
-    /**
-     *     @uml.property  name="jLabel"
-     *     @uml.associationEnd
-     */
     private javax.swing.JLabel jLabel = null;
-
-    /**
-     *     @uml.property  name="jLabel1"
-     *     @uml.associationEnd
-     */
     private javax.swing.JLabel jLabel1 = null;
-
-    /**
-     *     @uml.property  name="jPanel"
-     *     @uml.associationEnd
-     */
     private javax.swing.JPanel jPanel = null;
-
-    /**
-     *     @uml.property  name="jPanel1"
-     *     @uml.associationEnd
-     */
     private javax.swing.JPanel jPanel1 = null;
-
-    /**
-     *     @uml.property  name="jPanel2"
-     *     @uml.associationEnd
-     */
     private javax.swing.JPanel jPanel2 = null;
-
-    /**
-     *     @uml.property  name="tfSampleRefNum"
-     *     @uml.associationEnd
-     */
+    private final Logger log = LoggerFactory.getLogger(getClass());
     private javax.swing.JTextField tfSampleRefNum = null;
+    private final ToolBelt toolBelt;
 
     /**
      * This is the default constructor
+     *
+     * @param toolBelt
      */
-    public AddSamplePropDialog() {
-        super(AppFrameDispatcher.getFrame(), true);
+    public AddSamplePropDialog(ToolBelt toolBelt) {
+        super((Frame) Lookup.getApplicationFrameDispatcher().getValueObject(), true);
+        this.toolBelt = toolBelt;
         initialize();
     }
 
-    /**
-     *     This method initializes btnCancel
-     *     @return   javax.swing.JButton
-     *     @uml.property  name="btnCancel"
-     */
     private javax.swing.JButton getBtnCancel() {
         if (btnCancel == null) {
             btnCancel = new javax.swing.JButton();
@@ -140,11 +84,6 @@ public class AddSamplePropDialog extends JDialog {
         return btnCancel;
     }
 
-    /**
-     *     This method initializes btnOk
-     *     @return   javax.swing.JButton
-     *     @uml.property  name="btnOk"
-     */
     private javax.swing.JButton getBtnOk() {
         if (btnOk == null) {
             btnOk = new javax.swing.JButton();
@@ -180,29 +119,25 @@ public class AddSamplePropDialog extends JDialog {
         return btnOk;
     }
 
-    /**
-     *     This method initializes cbSampler
-     *     @return   javax.swing.JComboBox
-     *     @uml.property  name="cbSampler"
-     */
     private javax.swing.JComboBox getCbSampler() {
         if (cbSampler == null) {
             Concept c;
             try {
-                c = KnowledgeBaseCache.getInstance().findConceptByName("equipment");
+
+                // TODO This is hard coded. It should be moved out to a properties file
+                c = toolBelt.getAnnotationPersistenceService().findConceptByName("equipment");
 
                 if (c == null) {
-                    c = KnowledgeBaseCache.getInstance().findRootConcept();
-
+                    c = toolBelt.getAnnotationPersistenceService().findRootConcept();
                 }
             }
-            catch (final DAOException e) {
-                final ConceptName cn = new ConceptName(IConceptName.NAME_DEFAULT, IConceptName.NAMETYPE_PRIMARY);
-                c = new Concept();
-                c.addConceptName(cn);
+            catch (final Exception e) {
+                final ConceptName cn = new SimpleConceptNameBean(ConceptName.NAME_DEFAULT,
+                    ConceptNameTypes.PRIMARY.getName());
+                c = new SimpleConceptBean(cn);
             }
 
-            cbSampler = new HierachicalConceptNameComboBox(c);
+            cbSampler = new HierachicalConceptNameComboBox(c, toolBelt.getAnnotationPersistenceService());
             cbSampler.setFocusable(true);
             cbSampler.setRequestFocusEnabled(true);
         }
@@ -210,11 +145,6 @@ public class AddSamplePropDialog extends JDialog {
         return cbSampler;
     }
 
-    /**
-     *     This method initializes jContentPane
-     *     @return   javax.swing.JPanel
-     *     @uml.property  name="jContentPane"
-     */
     private javax.swing.JPanel getJContentPane() {
         if (jContentPane == null) {
             jContentPane = new javax.swing.JPanel();
@@ -227,11 +157,6 @@ public class AddSamplePropDialog extends JDialog {
         return jContentPane;
     }
 
-    /**
-     *     This method initializes jLabel
-     *     @return   javax.swing.JLabel
-     *     @uml.property  name="jLabel"
-     */
     private javax.swing.JLabel getJLabel() {
         if (jLabel == null) {
             jLabel = new javax.swing.JLabel();
@@ -241,11 +166,6 @@ public class AddSamplePropDialog extends JDialog {
         return jLabel;
     }
 
-    /**
-     *     This method initializes jLabel1
-     *     @return   javax.swing.JLabel
-     *     @uml.property  name="jLabel1"
-     */
     private javax.swing.JLabel getJLabel1() {
         if (jLabel1 == null) {
             jLabel1 = new javax.swing.JLabel();
@@ -255,11 +175,6 @@ public class AddSamplePropDialog extends JDialog {
         return jLabel1;
     }
 
-    /**
-     *     This method initializes jPanel
-     *     @return   javax.swing.JPanel
-     *     @uml.property  name="jPanel"
-     */
     private javax.swing.JPanel getJPanel() {
         if (jPanel == null) {
             jPanel = new javax.swing.JPanel();
@@ -272,11 +187,6 @@ public class AddSamplePropDialog extends JDialog {
         return jPanel;
     }
 
-    /**
-     *     This method initializes jPanel1
-     *     @return   javax.swing.JPanel
-     *     @uml.property  name="jPanel1"
-     */
     private javax.swing.JPanel getJPanel1() {
         if (jPanel1 == null) {
             jPanel1 = new javax.swing.JPanel();
@@ -288,11 +198,6 @@ public class AddSamplePropDialog extends JDialog {
         return jPanel1;
     }
 
-    /**
-     *     This method initializes jPanel2
-     *     @return   javax.swing.JPanel
-     *     @uml.property  name="jPanel2"
-     */
     private javax.swing.JPanel getJPanel2() {
         if (jPanel2 == null) {
             jPanel2 = new javax.swing.JPanel();
@@ -305,11 +210,6 @@ public class AddSamplePropDialog extends JDialog {
         return jPanel2;
     }
 
-    /**
-     *     This method initializes tfSampleRefNum
-     *     @return   javax.swing.JTextField
-     *     @uml.property  name="tfSampleRefNum"
-     */
     private javax.swing.JTextField getTfSampleRefNum() {
         if (tfSampleRefNum == null) {
             tfSampleRefNum = new javax.swing.JTextField();
@@ -320,11 +220,6 @@ public class AddSamplePropDialog extends JDialog {
         return tfSampleRefNum;
     }
 
-    /**
-     * This method initializes this
-     *
-     *
-     */
     private void initialize() {
         this.setSize(350, 103);
         this.setContentPane(getJContentPane());

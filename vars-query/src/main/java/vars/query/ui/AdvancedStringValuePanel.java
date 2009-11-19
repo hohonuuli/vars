@@ -42,7 +42,7 @@ import org.mbari.text.IgnoreCaseToStringComparator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.VARSException;
-import vars.query.SpecialQueryDAO;
+import vars.query.QueryPersistenceService;
 
 /**
  * <p><!-- Insert Description --></p>
@@ -60,7 +60,7 @@ public class AdvancedStringValuePanel extends ValuePanel {
     private JList list;
     private final Icon listIcon;
     private ListListModel listModel;
-    private final SpecialQueryDAO queryDAO;
+    private final QueryPersistenceService queryDAO;
     private JScrollPane scrollPane;
     private JTextField textField;
     private final Icon textFieldIcon;
@@ -71,7 +71,7 @@ public class AdvancedStringValuePanel extends ValuePanel {
      * @param queryDAO
      */
     @Inject
-    public AdvancedStringValuePanel(String name, SpecialQueryDAO queryDAO) {
+    public AdvancedStringValuePanel(String name, QueryPersistenceService queryDAO) {
         super(name);
         this.queryDAO = queryDAO;
         listIcon = new ImageIcon(getClass().getResource("/images/vars/query/16px/table_view.png"));

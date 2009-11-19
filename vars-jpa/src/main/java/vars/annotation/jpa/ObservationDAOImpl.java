@@ -39,6 +39,11 @@ public class ObservationDAOImpl extends DAO implements ObservationDAO {
     @Inject
     public ObservationDAOImpl(EntityManager entityManager) {
         super(entityManager);
+        
+        /* 
+         * TODO This won't work if we move the Knowledgebase to a separate persistence unit.
+         * If that happens the KB lookups would need to be done in a separate transaction
+         */
         this.conceptDAO = new ConceptDAOImpl(entityManager);
     }
 

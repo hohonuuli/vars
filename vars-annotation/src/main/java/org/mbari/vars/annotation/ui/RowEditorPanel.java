@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)RowEditorPanel.java   2009.11.18 at 04:23:49 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
- * (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,9 +12,7 @@
  */
 
 
-/*
-Created on Mar 11, 2004
- */
+
 package org.mbari.vars.annotation.ui;
 
 import java.awt.BorderLayout;
@@ -51,24 +46,20 @@ import javax.swing.KeyStroke;
 import javax.swing.LayoutFocusTraversalPolicy;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-
 import org.bushe.swing.event.EventBus;
 import org.mbari.vars.annotation.ui.table.AssociationListEditorPanel;
-import org.mbari.vars.annotation.ui.table.ObservationTablePanel;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import vars.CacheClearedEvent;
 import vars.CacheClearedListener;
 import vars.UserAccount;
+import vars.annotation.AnnotationPersistenceService;
 import vars.annotation.Observation;
-import vars.annotation.SpecialAnnotationDAO;
 import vars.annotation.ui.Lookup;
-import vars.annotation.ui.PersistenceService;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.table.IObservationTable;
-import vars.knowledgebase.ConceptName;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptName;
 import vars.shared.ui.AllConceptNamesComboBox;
 
 /**
@@ -80,7 +71,6 @@ import vars.shared.ui.AllConceptNamesComboBox;
  */
 public class RowEditorPanel extends JPanel {
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
     private static final Set shifttab = new HashSet(1);
 
     // The keys which will be listened for in the JTextArea for a change in
@@ -90,9 +80,12 @@ public class RowEditorPanel extends JPanel {
     static {
         tab.add(KeyStroke.getKeyStroke("TAB"));
     }
+
     static {
         shifttab.add(KeyStroke.getKeyStroke("shift TAB"));
     }
+
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     /**
      *     The actions for changing the focus behavior of a JTextArea
@@ -103,7 +96,6 @@ public class RowEditorPanel extends JPanel {
             ((Component) evt.getSource()).transferFocus();
         }
     };
-
     protected Action prevFocusAction = new AbstractAction("Move Focus Backwards") {
 
 
@@ -111,30 +103,23 @@ public class RowEditorPanel extends JPanel {
             ((Component) evt.getSource()).transferFocusBackward();
         }
     };
-
     private JComboBox conceptComboBox;
-
     private JPanel jPanel;
-
-
     private AssociationListEditorPanel listPanel;
 
     /**
      *     A collection of names that we should not allow notes to be added to.
      */
     private Collection<String> notableConceptNames;
-
-
     private JTextArea notesArea;
-
     private final IObservationTable observationTable;
-
     private Observation selectedObservation;
-    
     private final ToolBelt toolBelt;
 
     /**
      * Constructor for the RowEditorPanel object
+     *
+     * @param toolBelt
      */
     public RowEditorPanel(ToolBelt toolBelt) {
         this((IObservationTable) Lookup.getObservationTableDispatcher().getValueObject(), toolBelt);
@@ -144,6 +129,7 @@ public class RowEditorPanel extends JPanel {
      * Constructor for the RowEditorPanel object
      *
      * @param  observationTable Description of the Parameter
+     * @param toolBelt
      */
     public RowEditorPanel(final IObservationTable observationTable, ToolBelt toolBelt) {
         super();
@@ -172,6 +158,7 @@ public class RowEditorPanel extends JPanel {
         toolBelt.getPersistenceCache().addCacheClearedListener(new CacheClearedListener() {
 
             public void afterClear(final CacheClearedEvent evt) {
+
                 // DO nothing
             }
 
@@ -184,10 +171,9 @@ public class RowEditorPanel extends JPanel {
 
     }
 
-
     private JComboBox getConceptComboBox() {
         if (conceptComboBox == null) {
-            conceptComboBox = new AllConceptNamesComboBox(toolBelt.getSpecialQueryDAO());
+            conceptComboBox = new AllConceptNamesComboBox(toolBelt.getQueryPersistenceService());
             conceptComboBox.setPreferredSize(new Dimension(250, 23));
 
             conceptComboBox.addItemListener(new ItemListener() {
@@ -202,9 +188,11 @@ public class RowEditorPanel extends JPanel {
                         final String conceptName = (String) conceptComboBox.getSelectedItem();
                         getNotesArea().setEditable(!getNotableConceptNames().contains(conceptName));
 
-                        if ((selectedObservation != null) && !selectedObservation.getConceptName().equals(conceptName)) {
+                        if ((selectedObservation != null) &&
+                                !selectedObservation.getConceptName().equals(conceptName)) {
                             selectedObservation.setConceptName(conceptName);
-                            final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+                            final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher()
+                                .getValueObject();
                             selectedObservation.setObserver(userAccount.getUserName());
                             selectedObservation.setObservationDate(new Date());
 
@@ -257,7 +245,8 @@ public class RowEditorPanel extends JPanel {
                         conceptComboBox.setEnabled(false);
 
                         try {
-                            final SpecialAnnotationDAO specialAnnotationDAO = toolBelt.getSpecialAnnotationDAO();
+                            final AnnotationPersistenceService specialAnnotationDAO = toolBelt
+                                .getAnnotationPersistenceService();
                             concept = specialAnnotationDAO.findConceptByName(selectedName);
                             primaryName = concept.getPrimaryConceptName().getName();
                         }
@@ -282,7 +271,6 @@ public class RowEditorPanel extends JPanel {
         return conceptComboBox;
     }
 
-
     private JPanel getJPanel() {
         if (jPanel == null) {
             jPanel = new JPanel();
@@ -295,10 +283,9 @@ public class RowEditorPanel extends JPanel {
         return jPanel;
     }
 
-
     private AssociationListEditorPanel getListPanel() {
         if (listPanel == null) {
-            listPanel = new AssociationListEditorPanel();
+            listPanel = new AssociationListEditorPanel(toolBelt);
             listPanel.setMinimumSize(new Dimension(200, 100));
         }
 
@@ -316,7 +303,7 @@ public class RowEditorPanel extends JPanel {
             notableConceptNames = new HashSet<String>();
 
             try {
-                final Concept rootConcept = toolBelt.getSpecialAnnotationDAO().findRootConcept();
+                final Concept rootConcept = toolBelt.getAnnotationPersistenceService().findRootConcept();
                 notableConceptNames.add(rootConcept.getPrimaryConceptName().getName());
                 final Collection<Concept> chillin = rootConcept.getChildConcepts();
                 for (final Iterator<Concept> i = chillin.iterator(); i.hasNext(); ) {
@@ -333,7 +320,6 @@ public class RowEditorPanel extends JPanel {
 
         return notableConceptNames;
     }
-
 
     private JTextArea getNotesArea() {
         if (notesArea == null) {
@@ -406,7 +392,7 @@ public class RowEditorPanel extends JPanel {
                 }
 
                 if (retval instanceof JList) {
-                    if (listPanel.getObservation().getAssociationList().size() == 0) {
+                    if (listPanel.getObservation().getAssociations().size() == 0) {
                         retval = this.getComponentAfter(focusCycleRoot, retval);
                     }
                 }
@@ -422,7 +408,7 @@ public class RowEditorPanel extends JPanel {
      * and down wraps at the top and bottom of the table.
      */
     private void mapKeys() {
-        
+
         final JTable jTable = observationTable.getJTable();
         this.getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.CTRL_DOWN_MASK),
                          "up-table");
@@ -430,8 +416,7 @@ public class RowEditorPanel extends JPanel {
 
 
             public void actionPerformed(final ActionEvent e) {
-                
-                
+
 
                 final int numRows = jTable.getRowCount();
                 final int currentRow = jTable.getSelectionModel().getLeadSelectionIndex();
@@ -444,7 +429,6 @@ public class RowEditorPanel extends JPanel {
         this.getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN,
                 InputEvent.CTRL_DOWN_MASK), "down-table");
         this.getActionMap().put("up-table", new AbstractAction() {
-
 
 
             public void actionPerformed(final ActionEvent e) {
@@ -481,8 +465,8 @@ public class RowEditorPanel extends JPanel {
 
         if (isNull) {
             try {
-                Concept rootConcept = toolBelt.getSpecialAnnotationDAO().findRootConcept();
-                
+                Concept rootConcept = toolBelt.getAnnotationPersistenceService().findRootConcept();
+
                 getConceptComboBox().setSelectedItem(rootConcept.getPrimaryConceptName().getName());
             }
             catch (final Exception e) {

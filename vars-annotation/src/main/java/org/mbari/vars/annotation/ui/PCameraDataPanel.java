@@ -30,7 +30,7 @@ import vars.annotation.CameraDirections;
 import vars.annotation.Observation;
 import vars.annotation.VideoFrame;
 import vars.annotation.ui.Lookup;
-import vars.annotation.ui.PersistenceService;
+import vars.annotation.ui.PersistenceController;
 
 /**
  * <p>
@@ -42,12 +42,12 @@ import vars.annotation.ui.PersistenceService;
 public class PCameraDataPanel extends PropertiesPanel {
 
     private ActionAdapter directionAction;
-    private final PersistenceService persistenceService;
+    private final PersistenceController persistenceService;
 
     /**
      * Constructs ...
      */
-    PCameraDataPanel(PersistenceService persistenceService) {
+    PCameraDataPanel(PersistenceController persistenceService) {
         super();
         this.persistenceService = persistenceService;
         setPropertyNames(new String[] {

@@ -137,7 +137,7 @@ public class AssociationList extends ArrayList<Association> {
 
     /**
      * Set the parent observation. Invoking his method will clear the contents 
-     * of the <code>AssociationList</code> and repopulate it with the tree of 
+     * of the <code>AssociationList</code> and re-populate it with the tree of 
      * child associations of the parent <Observation</code>
      * @param  observation
      */

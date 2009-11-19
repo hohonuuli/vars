@@ -40,7 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
-import vars.query.SpecialQueryDAO;
+import vars.query.QueryPersistenceService;
 
 /**
  * @author Brian Schlining
@@ -66,7 +66,7 @@ public class QueryFrame extends JFrame {
     private JTabbedPane tabbedPane = null;
     private ActionMap actionMap = new ActionMap();
     private final ConceptDAO conceptDAO;
-    private final SpecialQueryDAO queryDAO;
+    private final QueryPersistenceService queryDAO;
 
     /**
      *
@@ -76,7 +76,7 @@ public class QueryFrame extends JFrame {
      * @throws HeadlessException
      */
     @Inject
-    public QueryFrame(KnowledgebaseDAOFactory knowledgebaseDAOFactory, SpecialQueryDAO queryDAO)
+    public QueryFrame(KnowledgebaseDAOFactory knowledgebaseDAOFactory, QueryPersistenceService queryDAO)
             throws HeadlessException {
         super();
         this.conceptDAO = knowledgebaseDAOFactory.newConceptDAO();

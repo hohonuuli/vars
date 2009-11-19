@@ -25,7 +25,7 @@ import java.awt.event.FocusEvent;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.query.SpecialQueryDAO;
+import vars.query.QueryPersistenceService;
 
 /**
  * <h2><u>Description </u></h2>
@@ -57,13 +57,13 @@ public class AllConceptNamesComboBox extends ConceptNameComboBox {
      *
      */
     private final Logger log = LoggerFactory.getLogger(getClass());
-    private final SpecialQueryDAO queryDAO;
+    private final QueryPersistenceService queryDAO;
     /**
      *
      *
      * @param conceptNameDAO
      */
-    public AllConceptNamesComboBox(SpecialQueryDAO queryDAO) {
+    public AllConceptNamesComboBox(QueryPersistenceService queryDAO) {
         super();
         this.queryDAO = queryDAO;
         updateConceptNames();

@@ -50,7 +50,7 @@ import org.mbari.awt.event.ActionAdapter;
 import org.mbari.util.Dispatcher;
 import org.mbari.text.IgnoreCaseToStringComparator;
 import org.mbari.util.ImmutableCollection;
-import vars.query.SpecialQueryDAO;
+import vars.query.QueryPersistenceService;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -171,13 +171,13 @@ public class RefineSearchPanel extends JPanel {
     private Collection valuePanels;
     //~--- constructors -------------------------------------------------------
 
-    private final SpecialQueryDAO queryDAO;
+    private final QueryPersistenceService queryDAO;
 
     /**
      * This is the default constructor
      */
     @Inject
-    public RefineSearchPanel(SpecialQueryDAO queryDAO) {
+    public RefineSearchPanel(QueryPersistenceService queryDAO) {
         super();
         constraintNames = Arrays.asList(stringConstraints);
         this.queryDAO = queryDAO;

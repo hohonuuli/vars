@@ -48,7 +48,7 @@ import foxtrot.Worker;
 import foxtrot.Job;
 import org.bushe.swing.event.EventBus;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
-import vars.query.SpecialQueryDAO;
+import vars.query.QueryPersistenceService;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -365,7 +365,7 @@ public class SearchPanel extends JPanel {
  
     private ConceptNameSelectionPanel getConceptNameSelectionPanel() {
         if (conceptNameSelectionPanel == null) {
-            final SpecialQueryDAO queryDAO = injector.getInstance(SpecialQueryDAO.class);
+            final QueryPersistenceService queryDAO = injector.getInstance(QueryPersistenceService.class);
             final KnowledgebaseDAOFactory daoFactory = injector.getInstance(KnowledgebaseDAOFactory.class);
             conceptNameSelectionPanel = new ConceptNameSelectionPanel(queryDAO, daoFactory.newConceptDAO());
             final FancyComboBox cbConceptName = (FancyComboBox) conceptNameSelectionPanel.getCbConceptName();

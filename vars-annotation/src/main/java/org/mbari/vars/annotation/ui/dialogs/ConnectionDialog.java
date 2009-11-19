@@ -21,18 +21,19 @@ Created on Dec 4, 2003 @author achase
 package org.mbari.vars.annotation.ui.dialogs;
 
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import org.mbari.util.Dispatcher;
-import org.mbari.vars.annotation.ui.dispatchers.PredefinedDispatcher;
-import org.mbari.vars.model.UserAccount;
-import org.mbari.vars.util.AppFrameDispatcher;
 import org.mbari.vcr.IVCR;
 import org.mbari.vcr.ui.VCRSelectionPanel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import vars.UserAccount;
+import vars.annotation.ui.Lookup;
 
 /**
  * <p><!--Insert summary here--></p>
@@ -62,7 +63,7 @@ public class ConnectionDialog extends OkayCancelDialog {
 
 
     public ConnectionDialog() {
-        super(AppFrameDispatcher.getFrame(), true);
+        super((Frame) Lookup.getApplicationFrameDispatcher().getValueObject(), true);
         initialize();
     }
 

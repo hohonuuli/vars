@@ -39,7 +39,7 @@ import org.mbari.swing.SpinningDial;
 import org.mbari.swingworker.SwingWorker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.query.SpecialQueryDAO;
+import vars.query.QueryPersistenceService;
 
 /**
  * @author Brian Schlining
@@ -57,7 +57,7 @@ public class DateValuePanel extends ValuePanel {
     private JLabel minLabel = null;
     private MDateEntryField maxEntryField;
     private MDateEntryField minEntryField;
-    private final SpecialQueryDAO queryDAO;
+    private final QueryPersistenceService queryDAO;
     private JButton scanButton;
 
     /**
@@ -66,7 +66,7 @@ public class DateValuePanel extends ValuePanel {
      * @param name
      * @param queryDAO
      */
-    public DateValuePanel(String name, SpecialQueryDAO queryDAO) {
+    public DateValuePanel(String name, QueryPersistenceService queryDAO) {
         super(name);
         this.queryDAO = queryDAO;
         initialize();

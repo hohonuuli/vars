@@ -1,5 +1,5 @@
 /*
- * @(#)AssociationListCellRenderer.java   2009.11.17 at 11:18:54 PST
+ * @(#)AssociationListCellRenderer.java   2009.11.18 at 04:22:39 PST
  *
  * Copyright 2009 MBARI
  *

@@ -22,12 +22,12 @@ import vars.PersistenceCache;
 import vars.PersistenceCacheProvider;
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.AnnotationFactory;
-import vars.annotation.SpecialAnnotationDAO;
+import vars.annotation.AnnotationPersistenceService;
 import vars.knowledgebase.HistoryFactory;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.KnowledgebaseFactory;
-import vars.knowledgebase.SpecialKnowledgebaseDAO;
-import vars.query.SpecialQueryDAO;
+import vars.knowledgebase.KnowledgebasePersistenceService;
+import vars.query.QueryPersistenceService;
 
 /**
  *
@@ -42,24 +42,24 @@ public class ToolBelt {
     private final MiscDAOFactory miscDAOFactory;
     private final MiscFactory miscFactory;
     private final PersistenceCache persistenceCache;
-    private final PersistenceService persistenceService;
-    private final SpecialAnnotationDAO specialAnnotationDAO;
-    private final SpecialKnowledgebaseDAO specialKnowledgebaseDAO;
-    private final SpecialQueryDAO specialQueryDAO;
+    private final PersistenceController persistenceController;
+    private final AnnotationPersistenceService annotationPersistenceService;
+    private final KnowledgebasePersistenceService knowledgebasePersistenceService;
+    private final QueryPersistenceService queryPersistenceService;
 
     /**
      * Constructs ...
      *
      * @param annotationDAOFactory
      * @param annotationFactory
-     * @param annotationDAO
-     * @param knowledgebaseDAO
+     * @param annotationPersistenceService
+     * @param knowledgebasePersistenceService
      * @param knowledgebaseDAOFactory
      * @param knowledgebaseFactory
      * @param miscDAOFactory
      * @param miscFactory
      * @param persistenceCacheProvider
-     * @param queryDAO
+     * @param queryPersistenceService
      */
     @Inject
     public ToolBelt(AnnotationDAOFactory annotationDAOFactory, 
@@ -68,20 +68,20 @@ public class ToolBelt {
             KnowledgebaseFactory knowledgebaseFactory,
             MiscDAOFactory miscDAOFactory, MiscFactory miscFactory,
             PersistenceCacheProvider persistenceCacheProvider, 
-            PersistenceService persistenceService, 
-            SpecialAnnotationDAO annotationDAO,
-            SpecialKnowledgebaseDAO knowledgebaseDAO, SpecialQueryDAO queryDAO) {
+            PersistenceController persistenceService, 
+            AnnotationPersistenceService annotationPersistenceService,
+            KnowledgebasePersistenceService knowledgebasePersistenceService, QueryPersistenceService queryPersistenceService) {
         this.annotationDAOFactory = annotationDAOFactory;
-        this.specialAnnotationDAO = annotationDAO;
+        this.annotationPersistenceService = annotationPersistenceService;
         this.annotationFactory = annotationFactory;
-        this.specialKnowledgebaseDAO = knowledgebaseDAO;
+        this.knowledgebasePersistenceService = knowledgebasePersistenceService;
         this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
         this.knowledgebaseFactory = knowledgebaseFactory;
         this.miscDAOFactory = miscDAOFactory;
         this.miscFactory = miscFactory;
-        this.persistenceService = new PersistenceService(annotationDAOFactory, annotationFactory);
+        this.persistenceController = new PersistenceController(this);
         this.persistenceCache = new PersistenceCache(persistenceCacheProvider);
-        this.specialQueryDAO = queryDAO;
+        this.queryPersistenceService = queryPersistenceService;
         historyFactory = new HistoryFactory(knowledgebaseFactory);
     }
 
@@ -144,26 +144,26 @@ public class ToolBelt {
     /**
      * @return
      */
-    public SpecialAnnotationDAO getSpecialAnnotationDAO() {
-        return specialAnnotationDAO;
+    public AnnotationPersistenceService getAnnotationPersistenceService() {
+        return annotationPersistenceService;
     }
 
     /**
      * @return
      */
-    public SpecialKnowledgebaseDAO getSpecialKnowledgebaseDAO() {
-        return specialKnowledgebaseDAO;
+    public KnowledgebasePersistenceService getKnowledgebasePersistenceService() {
+        return knowledgebasePersistenceService;
     }
 
     /**
      * @return
      */
-    public SpecialQueryDAO getSpecialQueryDAO() {
-        return specialQueryDAO;
+    public QueryPersistenceService getQueryPersistenceService() {
+        return queryPersistenceService;
     }
 
-    public PersistenceService getPersistenceService() {
-        return persistenceService;
+    public PersistenceController getPersistenceController() {
+        return persistenceController;
     }
     
 }

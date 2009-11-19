@@ -5,15 +5,18 @@
 
 package vars.annotation;
 
+import java.util.Collection;
+
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
+import vars.knowledgebase.LinkTemplate;
 
 /**
  * DAO used by the Annotation application for special operations
  * 
  * @author brian
  */
-public interface SpecialAnnotationDAO {
+public interface AnnotationPersistenceService {
 
     boolean doesConceptNameExist(String conceptname);
     
@@ -35,6 +38,11 @@ public interface SpecialAnnotationDAO {
      * Retrieve the underlying {@link ConceptDAO} used.
      * @return
      */
-    ConceptDAO getConceptDAO();
+    ConceptDAO getReadOnlyConceptDAO();
+    
+    Collection<LinkTemplate> findLinkTemplatesFor(Concept concept);
+    
+    Collection<Observation> updateAndValidate(Collection<Observation> observations);
+    
 
 }

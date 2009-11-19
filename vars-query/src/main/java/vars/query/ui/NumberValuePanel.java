@@ -33,7 +33,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.List;
-import vars.query.SpecialQueryDAO;
+import vars.query.QueryPersistenceService;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -57,7 +57,7 @@ public class NumberValuePanel extends ValuePanel {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
     
-    private final SpecialQueryDAO queryDAO;
+    private final QueryPersistenceService queryDAO;
 
     
     //~--- constructors -------------------------------------------------------
@@ -68,7 +68,7 @@ public class NumberValuePanel extends ValuePanel {
      * @param name
      */
     @Inject
-    public NumberValuePanel(String name, SpecialQueryDAO queryDAO) {
+    public NumberValuePanel(String name, QueryPersistenceService queryDAO) {
         super(name);
         this.queryDAO = queryDAO;
         initialize();

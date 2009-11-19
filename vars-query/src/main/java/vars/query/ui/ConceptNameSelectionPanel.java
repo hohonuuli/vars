@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptName;
-import vars.query.SpecialQueryDAO;
+import vars.query.QueryPersistenceService;
 import vars.shared.ui.ConceptNameComboBox;
 
 /**
@@ -59,7 +59,7 @@ public class ConceptNameSelectionPanel extends JPanel {
     private JLabel jLabel = null;
     private JPanel pCheckBoxes = null;
     private final ConceptDAO conceptDAO;
-    private final SpecialQueryDAO queryDAO;
+    private final QueryPersistenceService queryDAO;
 
     /**
      *
@@ -68,7 +68,7 @@ public class ConceptNameSelectionPanel extends JPanel {
      * @param conceptDAO
      */
     @Inject
-    public ConceptNameSelectionPanel(SpecialQueryDAO queryDAO, ConceptDAO conceptDAO) {
+    public ConceptNameSelectionPanel(QueryPersistenceService queryDAO, ConceptDAO conceptDAO) {
         super();
         this.queryDAO = queryDAO;
         this.conceptDAO = conceptDAO;

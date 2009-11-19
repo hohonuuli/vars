@@ -1,5 +1,5 @@
 /*
- * @(#)AnnotationFrame.java   2009.11.13 at 11:01:28 PST
+ * @(#)AnnotationFrame.java   2009.11.18 at 04:24:23 PST
  *
  * Copyright 2009 MBARI
  *
@@ -65,6 +65,8 @@ public class AnnotationFrame extends JFrame {
 
     /**
      * Creates new form JFrame
+     *
+     * @param toolbelt
      */
     public AnnotationFrame(ToolBelt toolbelt) {
         super();
@@ -166,7 +168,7 @@ public class AnnotationFrame extends JFrame {
 
                 public void actionPerformed(final ActionEvent ae) {
                     if (viewer == null) {
-                        viewer = new VideoSetViewer();
+                        viewer = new VideoSetViewer(toolbelt);
                     }
 
                     viewer.setVisible(true);

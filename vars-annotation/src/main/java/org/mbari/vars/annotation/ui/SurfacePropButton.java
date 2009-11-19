@@ -12,7 +12,7 @@ import org.mbari.awt.event.ActionAdapter;
 import org.mbari.vars.annotation.ui.actions.AddPropertyAction;
 import org.mbari.vars.annotation.ui.dialogs.ToConceptSelectionDialog;
 
-import vars.annotation.SpecialAnnotationDAO;
+import vars.annotation.AnnotationPersistenceService;
 
 /**
  *
@@ -22,9 +22,9 @@ public class SurfacePropButton extends PropButton {
 
     private ActionAdapter showDialogAction;
     private AddPropertyAction addPropertyAction;
-    private final SpecialAnnotationDAO specialAnnotationDAO;
+    private final AnnotationPersistenceService specialAnnotationDAO;
 
-    public SurfacePropButton(SpecialAnnotationDAO specialAnnotationDAO) {
+    public SurfacePropButton(AnnotationPersistenceService specialAnnotationDAO) {
         super();
         this.specialAnnotationDAO = specialAnnotationDAO;
         setAction(getShowDialogAction());

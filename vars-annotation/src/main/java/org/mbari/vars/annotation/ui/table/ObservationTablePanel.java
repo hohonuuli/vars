@@ -1,5 +1,5 @@
 /*
- * @(#)ObservationTablePanel.java   2009.11.17 at 11:17:17 PST
+ * @(#)ObservationTablePanel.java   2009.11.18 at 04:22:45 PST
  *
  * Copyright 2009 MBARI
  *

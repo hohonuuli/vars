@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)ChangeTimeCodeFrame.java   2009.11.18 at 01:44:10 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
- * (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,9 +12,7 @@
  */
 
 
-/*
-Created on Sep 10, 2004
- */
+
 package org.mbari.vars.annotation.ui;
 
 import java.awt.event.ActionEvent;
@@ -25,10 +20,8 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
-
 import org.mbari.movie.Timecode;
 import org.mbari.util.Dispatcher;
-import org.mbari.util.IObserver;
 import org.mbari.vars.annotation.ui.actions.ChangeTimeCodeAction;
 import org.mbari.vcr.ui.TimeCodeSelectionFrame;
 import org.mbari.vcr.ui.TimeSelectPanel;
@@ -46,24 +39,20 @@ import vars.annotation.ui.Lookup;
  */
 public class ChangeTimeCodeFrame extends TimeCodeSelectionFrame {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = -3207616146049862321L;
-    private static final Logger log = LoggerFactory.getLogger(ChangeTimeCodeFrame.class);
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     /**
      * Constructor for the ChangeTimeCodeFrame object
      */
     public ChangeTimeCodeFrame() {
         super();
-        
+
         final Dispatcher dispatcher = Lookup.getSelectedObservationsDispatcher();
         dispatcher.addPropertyChangeListener(new PropertyChangeListener() {
-            
+
             public void propertyChange(PropertyChangeEvent evt) {
                 update(evt.getNewValue());
-                
+
             }
         });
 
@@ -82,7 +71,7 @@ public class ChangeTimeCodeFrame extends TimeCodeSelectionFrame {
                 public void actionPerformed(final ActionEvent e) {
                     final Dispatcher dispatcher = Lookup.getObservationTableDispatcher();
                     final Collection<Observation> observations = (Collection<Observation>) dispatcher.getValueObject();
-                    if (observations.size() != 1) {
+                    if (observations.size() == 1) {
                         final VideoFrame vf = observations.iterator().next().getVideoFrame();
                         synchronized (vf) {
                             action.setVideoFrame(vf);
@@ -92,7 +81,7 @@ public class ChangeTimeCodeFrame extends TimeCodeSelectionFrame {
                     }
 
                     setVisible(false);
-                    dispatcher.setValueObject(observations)(;
+                    dispatcher.setValueObject(observations);
                 }
                 private final ChangeTimeCodeAction action = new ChangeTimeCodeAction();
             };
@@ -104,8 +93,8 @@ public class ChangeTimeCodeFrame extends TimeCodeSelectionFrame {
     /**
      *  Receives notifications when the selected observation changes.
      *
-     * @param  observedObj The selected observation, could be null
-     * @param  changeCode No usedr
+     *
+     * @param selectedObservations
      */
     public void update(final Object selectedObservations) {
         if (selectedObservations == null) {
@@ -117,11 +106,11 @@ public class ChangeTimeCodeFrame extends TimeCodeSelectionFrame {
         int minute = 0;
         int second = 0;
         int frame = 0;
-        
-        if (obs != null && obs.size() == 1) {
-            
-        
-            final VideoFrame vf =  obs.iterator().next().getVideoFrame();
+
+        if ((obs != null) && (obs.size() == 1)) {
+
+
+            final VideoFrame vf = obs.iterator().next().getVideoFrame();
             if (vf != null) {
                 final String stc = vf.getTimecode();
                 if (stc != null) {
@@ -137,7 +126,7 @@ public class ChangeTimeCodeFrame extends TimeCodeSelectionFrame {
                     }
                 }
             }
-            
+
             final TimeSelectPanel tp = getTimePanel();
             tp.getHourWidget().setTime(hour);
             tp.getMinuteWidget().setTime(minute);

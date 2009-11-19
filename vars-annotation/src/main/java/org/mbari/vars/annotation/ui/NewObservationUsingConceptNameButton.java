@@ -51,7 +51,7 @@ import org.slf4j.LoggerFactory;
 import vars.CacheClearedEvent;
 import vars.CacheClearedListener;
 import vars.UserAccount;
-import vars.annotation.SpecialAnnotationDAO;
+import vars.annotation.AnnotationPersistenceService;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
@@ -173,7 +173,7 @@ public class NewObservationUsingConceptNameButton extends JFancyButton
 
             // Check that the name is in the knowledgebase
             try {
-                SpecialAnnotationDAO annotationDAO = toolbelt.getSpecialAnnotationDAO();
+                AnnotationPersistenceService annotationDAO = toolbelt.getAnnotationPersistenceService();
 
                 enable = annotationDAO.doesConceptNameExist(conceptName);
             }

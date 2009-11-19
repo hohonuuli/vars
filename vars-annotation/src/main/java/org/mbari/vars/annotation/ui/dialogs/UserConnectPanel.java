@@ -34,13 +34,17 @@ import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+
+import org.bushe.swing.event.EventBus;
 import org.mbari.swing.JFancyButton;
 import org.mbari.text.IgnoreCaseToStringComparator;
-import org.mbari.vars.annotation.ui.dispatchers.PersonDispatcher;
-import org.mbari.vars.dao.DAOException;
+
 import vars.Role;
-import org.mbari.vars.model.UserAccount;
-import org.mbari.vars.model.dao.UserAccountDAO;
+import vars.UserAccount;
+import vars.UserAccountRoles;
+import vars.annotation.ui.Lookup;
+import vars.annotation.ui.ToolBelt;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,71 +56,42 @@ import org.slf4j.LoggerFactory;
  */
 public class UserConnectPanel extends JPanel {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 4495664437481073744L;
-    private static final Logger log = LoggerFactory.getLogger(UserConnectPanel.class);
+  
 
-    /**
-     *     @uml.property  name="activeUser"
-     *     @uml.associationEnd
-     */
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    
+
     private UserAccount activeUser = null;
 
-    /**
-     *     @uml.property  name="createUserButton"
-     *     @uml.associationEnd
-     */
     private javax.swing.JButton createUserButton = null;
 
-    /**
-     *     @uml.property  name="editPassword"
-     *     @uml.associationEnd
-     */
     private javax.swing.JPasswordField editPassword = null;
 
-    /**
-     *     @uml.property  name="messageLabel"
-     *     @uml.associationEnd
-     */
+
     private JLabel messageLabel = null;
 
-    /**
-     *     @uml.property  name="passwordLabel"
-     *     @uml.associationEnd
-     */
     private javax.swing.JLabel passwordLabel = null;
 
-    /**
-     *     @uml.property  name="userComboBox"
-     *     @uml.associationEnd  multiplicity="(0 -1)" elementType="org.mbari.vars.model.UserAccount"
-     */
     private javax.swing.JComboBox userComboBox = null;
 
-    /**
-     *     @uml.property  name="userNameAndPasswordPanel"
-     *     @uml.associationEnd
-     */
     private JPanel userNameAndPasswordPanel = null;
 
-    /**
-     *     @uml.property  name="userNameLabel"
-     *     @uml.associationEnd
-     */
+ 
     private javax.swing.JLabel userNameLabel = null;
 
+    private final ToolBelt toolBelt;
+    
     /**
      * This is the default constructor
      */
-    public UserConnectPanel() {
+    public UserConnectPanel(ToolBelt toolBelt) {
         super();
+        this.toolBelt = toolBelt;
         initialize();
     }
 
     /**
      * attemptLogin -- method which performs the login action
-     *
      *
      * @return  true if login worked
      */
@@ -130,7 +105,7 @@ public class UserConnectPanel extends JPanel {
                 final String password = new String(passAttempt);
                 if (password.equalsIgnoreCase(UserAccount.PASSWORD_DEFAULT)) {
                     log.info("Logging user in using default password. Setting role to read-only.");
-                    selectedUser.setRole(Role.DEFAULT);
+                    selectedUser.setRole(UserAccountRoles.READONLY.getRoleName());
                     activeUser = selectedUser;
                     success = true;
                 }
@@ -167,19 +142,13 @@ public class UserConnectPanel extends JPanel {
         }
 
         if (success) {
-            final PersonDispatcher pd = PersonDispatcher.getInstance();
-            pd.setPerson(activeUser.getUserName());
+            Lookup.getUserAccountDispatcher().setValueObject(activeUser);
         }
 
         return success;
     }
 
-    /**
-     * Description of the Method
-     *
-     *
-     * @param  e             Description of the Parameter
-     */
+
     private void createNewUser(final ActionEvent e) {
         final NewUserDialog jDia = new NewUserDialog();
         jDia.setPreferredSize(new Dimension(350, 300));
@@ -195,7 +164,6 @@ public class UserConnectPanel extends JPanel {
     /**
      *     Get the current active user
      *     @return
-     *     @uml.property  name="activeUser"
      */
     public UserAccount getActiveUser() {
         if (activeUser == null) {
@@ -205,11 +173,6 @@ public class UserConnectPanel extends JPanel {
         return activeUser;
     }
 
-    /**
-     *     This method initializes createUserButton
-     *     @return   javax.swing.JButton
-     *     @uml.property  name="createUserButton"
-     */
     private javax.swing.JButton getCreateUserButton() {
         if (createUserButton == null) {
             createUserButton = new JFancyButton();
@@ -228,14 +191,10 @@ public class UserConnectPanel extends JPanel {
     }
 
     /**
-     *     This method initializes editPassword. The method is package accessible so that listeners can keep track of when the password has been updated.
+     *     This method initializes editPassword. The method is package accessible so that 
+     *     listeners can keep track of when the password has been updated.
      *     @return   javax.swing.JPasswordField
-     *     @uml.property  name="editPassword"
      */
-
-    // TODO If it is not okay to leave this password method non-private, then
-    // a variable should be setup that can be listened to by outside classes so
-    // that listeners can observe when the password is being typed.
     javax.swing.JPasswordField getEditPassword() {
         if (editPassword == null) {
             editPassword = new javax.swing.JPasswordField();
@@ -247,9 +206,10 @@ public class UserConnectPanel extends JPanel {
     }
 
     /**
-     *     This message label is updated by the component, but it is not placed whithin <tt>this</tt>. If you want to see the information on the label, you'll need to place it somewhere using this method to get it.
+     *     This message label is updated by the component, but it is not placed
+     *      within <tt>this</tt>. If you want to see the information on the label, 
+     *      you'll need to place it somewhere using this method to get it.
      *     @return
-     *     @uml.property  name="messageLabel"
      */
     private JLabel getMessageLabel() {
         if (messageLabel == null) {
@@ -260,11 +220,7 @@ public class UserConnectPanel extends JPanel {
         return messageLabel;
     }
 
-    /**
-     *     This method initializes passwordLabel
-     *     @return   javax.swing.JLabel
-     *     @uml.property  name="passwordLabel"
-     */
+
     private javax.swing.JLabel getPasswordLabel() {
         if (passwordLabel == null) {
             passwordLabel = new javax.swing.JLabel();
@@ -277,9 +233,9 @@ public class UserConnectPanel extends JPanel {
     }
 
     /**
-     *     This method initializes userComboBox. Method is package accessible to allow action listeners from other classes to listen to changes on this combo box.
+     *     This method initializes userComboBox. Method is package accessible to allow 
+     *     action listeners from other classes to listen to changes on this combo box.
      *     @return   javax.swing.JComboBox
-     *     @uml.property  name="userComboBox"
      */
     javax.swing.JComboBox getUserComboBox() {
         if (userComboBox == null) {
@@ -310,10 +266,6 @@ public class UserConnectPanel extends JPanel {
         return userComboBox;
     }
 
-    /**
-     *     @return  the userNameAndPasswordPanel
-     *     @uml.property  name="userNameAndPasswordPanel"
-     */
     private JPanel getUserNameAndPasswordPanel() {
         if (userNameAndPasswordPanel == null) {
 
@@ -352,7 +304,6 @@ public class UserConnectPanel extends JPanel {
             userNameAndPasswordPanel.setLayout(new GridBagLayout());
 
             // across the whole screen, to achieve that effect with this layout
-            // change cc.xy(4,4) to cc.xywh(3,3,3,1)
             userNameAndPasswordPanel.setBorder(Borders.DIALOG_BORDER);
             userNameAndPasswordPanel.add(getUserNameLabel(), gridBagConstraints);
             userNameAndPasswordPanel.add(getUserComboBox(), gridBagConstraints1);
@@ -365,11 +316,7 @@ public class UserConnectPanel extends JPanel {
         return userNameAndPasswordPanel;
     }
 
-    /**
-     *     This method initializes userNameLabel
-     *     @return   javax.swing.JLabel
-     *     @uml.property  name="userNameLabel"
-     */
+ 
     private javax.swing.JLabel getUserNameLabel() {
         if (userNameLabel == null) {
             userNameLabel = new javax.swing.JLabel();
@@ -379,49 +326,37 @@ public class UserConnectPanel extends JPanel {
         return userNameLabel;
     }
 
-    /**
-     * This method initializes this
-     *
-     *
-     */
+
     private void initialize() {
         this.setLayout(new javax.swing.BoxLayout(this, javax.swing.BoxLayout.Y_AXIS));
         this.add(getUserNameAndPasswordPanel(), null);
-
-        // Generated
     }
 
     /**
      * Retrieve the user accounts available.
      *
-     *
      * @return  Description of the Return Value
      */
     private UserAccount[] retrieveUserAccounts() {
-        Collection userAccounts = null;
+        Collection<UserAccount> userAccounts = null;
         UserAccount userAccount = null;
         try {
-            userAccounts = UserAccountDAO.getInstance().findAll();
+            userAccounts = toolBelt.getMiscDAOFactory().newUserAccountDAO().findAll();
         }
-        catch (final DAOException e) {
-            log.error("An exception was throws while attempting to retrieve the " +
-                      "UserAccounts from the VARS database. ", e);
-
-            // make sure this is null so that it will be inititialized to a
-            // default
+        catch (final Exception e) {
+            EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+            // make sure this is null so that it will be initialized to a default
             userAccounts = null;
-
-            // TODO 20031206 achase: I added this error message, do we want this
-            // here or not?
             setMessageLabelText("Error retrieving user accounts");
         }
 
         // Something failed, so supply a default user
         if ((userAccounts == null) || (userAccounts.size() == 0)) {
             log.warn("No user accounts are available. Using default.");
-            userAccount = new UserAccount("default");
+            userAccount = toolBelt.getMiscFactory().newUserAccount();
+            userAccount.setUserName(UserAccount.USERNAME_DEFAULT);
             userAccount.setPassword("");
-            userAccounts = new ArrayList(1);
+            userAccounts = new ArrayList<UserAccount>(1);
             userAccounts.add(userAccount);
         }
 

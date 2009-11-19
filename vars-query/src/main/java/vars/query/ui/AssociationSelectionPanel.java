@@ -43,7 +43,7 @@ import vars.knowledgebase.ConceptNameTypes;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.SimpleConceptNameBean;
-import vars.query.SpecialQueryDAO;
+import vars.query.QueryPersistenceService;
 import vars.shared.ui.AllConceptNamesComboBox;
 
 /**
@@ -72,7 +72,7 @@ public class AssociationSelectionPanel extends JPanel {
     private Collection conceptNames = new ArrayList();
     private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
     private final KnowledgebaseFactory knowledgebaseFactory;
-    private final SpecialQueryDAO queryDAO;
+    private final QueryPersistenceService queryDAO;
 
     /**
      *
@@ -83,7 +83,7 @@ public class AssociationSelectionPanel extends JPanel {
      */
     @Inject
     public AssociationSelectionPanel(KnowledgebaseDAOFactory knowledgebaseDAOFactory,
-                                     KnowledgebaseFactory knowledgebaseFactory, SpecialQueryDAO queryDAO) {
+                                     KnowledgebaseFactory knowledgebaseFactory, QueryPersistenceService queryDAO) {
         super();
         this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
         this.knowledgebaseFactory = knowledgebaseFactory;

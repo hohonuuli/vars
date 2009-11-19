@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)AssociationEditorPanel.java   2009.11.18 at 04:22:36 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
- * (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,11 +12,10 @@
  */
 
 
-/*
-Created on Dec 12, 2003
- */
+
 package org.mbari.vars.annotation.ui.table;
 
+import com.google.common.collect.ImmutableList;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import java.awt.Component;
@@ -33,10 +29,10 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
 import javax.swing.ImageIcon;
@@ -45,169 +41,70 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import org.exolab.castor.jdo.PersistenceException;
+import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.swing.FancyComboBox;
 import org.mbari.swing.JFancyButton;
 import org.mbari.swing.SearchableComboBoxModel;
 import org.mbari.swing.SortedComboBoxModel;
-import org.mbari.vars.annotation.model.Association;
-import vars.annotation.ISimpleConcept;
-import org.mbari.vars.annotation.model.Observation;
-import org.mbari.vars.dao.DAOEventQueue;
-import org.mbari.vars.knowledgebase.model.Concept;
-import org.mbari.vars.knowledgebase.model.ConceptName;
-import vars.knowledgebase.IConceptName;
-import org.mbari.vars.knowledgebase.model.LinkTemplate;
-import org.mbari.vars.knowledgebase.model.dao.CacheClearedEvent;
-import org.mbari.vars.knowledgebase.model.dao.CacheClearedListener;
-import org.mbari.vars.knowledgebase.model.dao.KnowledgeBaseCache;
-import org.mbari.vars.ui.HierachicalConceptNameComboBox;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.annotation.IAssociation;
-import vars.knowledgebase.IConcept;
+import vars.CacheClearedEvent;
+import vars.CacheClearedListener;
+import vars.ILink;
+import vars.annotation.AnnotationPersistenceService;
+import vars.annotation.Association;
+import vars.annotation.AssociationDAO;
+import vars.annotation.Observation;
+import vars.annotation.ui.Lookup;
+import vars.annotation.ui.ToolBelt;
+import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptName;
+import vars.knowledgebase.ConceptNameTypes;
+import vars.knowledgebase.LinkTemplate;
+import vars.knowledgebase.SimpleConceptNameBean;
+import vars.shared.ui.HierachicalConceptNameComboBox;
 
 /**
- * <p><!--Insert summary here--></p>
- *
  * @author  <a href="http://www.mbari.org">MBARI</a>
- * @version  $Id: AssociationEditorPanel.java 425 2006-11-15 22:52:24Z hohonuuli $
- * @stereotype  thing
  */
 public class AssociationEditorPanel extends JPanel {
 
-    private static final long serialVersionUID = 409355834002087878L;
-    private static final Logger log = LoggerFactory.getLogger(AssociationEditorPanel.class);
-
-    /**
-     * Stores a list of links available in the KnowledgeBase for cbLinks
-     */
-
-    // SearchableComboBoxModel linksModel = new SearchableComboBoxModel();
-
-    /**
-     *     The currently edited association. May be null if adding instead of editing.
-     *     @uml.property  name="association"
-     *     @uml.associationEnd
-     */
-    private Association association;
-
-    /**
-     *     @uml.property  name="btnAdd"
-     *     @uml.associationEnd
-     */
     private javax.swing.JButton btnAdd = null;
-
-    /**
-     *     @uml.property  name="btnCancel"
-     *     @uml.associationEnd
-     */
     private javax.swing.JButton btnCancel = null;
-
-    /**
-     *     @uml.property  name="cancelAction"
-     *     @uml.associationEnd
-     */
-    private ActionAdapter cancelAction;
-
-    /**
-     *     @uml.property  name="cbFromConcept"
-     *     @uml.associationEnd  multiplicity="(0 -1)" elementType="java.lang.String"
-     */
     private javax.swing.JComboBox cbFromConcept = null;
-
-    /**
-     *     @uml.property  name="cbLinks"
-     *     @uml.associationEnd  multiplicity="(0 -1)" elementType="java.lang.String"
-     */
     private javax.swing.JComboBox cbLinks = null;
-
-    /**
-     *     @uml.property  name="cbToConcept"
-     *     @uml.associationEnd
-     */
     private HierachicalConceptNameComboBox cbToConcept = null;
-
-    /**
-     *     Stores ISimpleConcepts. key = (String) concept[see setConceptNames() value=ISimpleConcept (Association or Observation) Temporary storage needed for retrieveing names like "concept (2)"
-     *     @uml.property  name="conceptMap"
-     *     @uml.associationEnd  qualifier="concept:java.lang.String org.mbari.vars.annotation.model.Association"
-     */
-    private final HashMap conceptMap = new HashMap();
-
-    /**
-     *     @uml.property  name="forLabel"
-     *     @uml.associationEnd  multiplicity="(1 1)"
-     */
-    private final javax.swing.JLabel forLabel = new JLabel("for");
-
-    /**
-     *     @uml.property  name="lbl3a"
-     *     @uml.associationEnd
-     */
     private javax.swing.JLabel lbl3a = null;
-
-    /**
-     *     @uml.property  name="lbl4a"
-     *     @uml.associationEnd
-     */
     private javax.swing.JLabel lbl4a = null;
-
-    /**
-     *     @uml.property  name="lbl5a"
-     *     @uml.associationEnd
-     */
     private javax.swing.JLabel lbl5a = null;
-
-    /**
-     *     @uml.property  name="nil"
-     */
-    private final String nil = "nil";
-
-    /**
-     *     @uml.property  name="nil3"
-     */
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    private final javax.swing.JLabel forLabel = new JLabel("for");
+    private final Map<String, Observation> conceptMap = new HashMap<String, Observation>();
+    private final String nil = ILink.VALUE_NIL;
+    private final javax.swing.JLabel searchLabel = new JLabel("Search");
+    private javax.swing.JTextField tfLinkName = null;
+    private javax.swing.JTextField tfLinkValue = null;
+    private javax.swing.JTextField tfSearch = null;
+    private vars.annotation.Association association;
+    private ActionAdapter cancelAction;
     private final String nil3;
 
     /**
-     *     The root observation of the Associations to be edited. Need to store this in order to set the selctedItem in cbFromConcept
-     *     @uml.property  name="observation"
-     *     @uml.associationEnd
+     *     The root observation of the Associations to be edited. Need to store this
+     *     in order to set the selctedItem in cbFromConcept
      */
     private Observation observation;
-
-    // private Observation[] observations = null;
-
-    /**
-     *     @uml.property  name="searchLabel"
-     *     @uml.associationEnd  multiplicity="(1 1)"
-     */
-    private final javax.swing.JLabel searchLabel = new JLabel("Search");
-
-    /**
-     *     @uml.property  name="tfLinkName"
-     *     @uml.associationEnd
-     */
-    private javax.swing.JTextField tfLinkName = null;
-
-    /**
-     *     @uml.property  name="tfLinkValue"
-     *     @uml.associationEnd
-     */
-    private javax.swing.JTextField tfLinkValue = null;
-
-    /**
-     *     @uml.property  name="tfSearch"
-     *     @uml.associationEnd
-     */
-    private javax.swing.JTextField tfSearch = null;
+    private final ToolBelt toolBelt;
 
     /**
      * This is the default constructor
+     *
+     * @param toolBelt
      */
-    public AssociationEditorPanel() {
+    public AssociationEditorPanel(ToolBelt toolBelt) {
         super();
+        this.toolBelt = toolBelt;
         nil3 = nil + " | " + nil + " | " + nil;
         initialize();
     }
@@ -225,13 +122,12 @@ public class AssociationEditorPanel extends JPanel {
     }
 
     /**
-     *  Adds a feature to the Association attribute of the AssociationEditorPanel object
      *
      * @param  parent The feature to be added to the Association attribute
      */
-    public void addAssociation(final ISimpleConcept parent) {
+    public void addAssociation(final Observation parent) {
 
-        // Gether the parts of the Link from the GUI
+        // Gather the parts of the Link from the GUI
         final String linkName = getTfLinkName().getText();
         final String toConcept = (String) getCbToConcept().getSelectedItem();
         final String linkValue = getTfLinkValue().getText();
@@ -241,30 +137,33 @@ public class AssociationEditorPanel extends JPanel {
         // update its particulars
         if (association != null) {
 
-            // Remove reference to old parent
-            final ISimpleConcept oldParent = association.getParent();
+            /*
+             *  DAOTX Remove reference to old parent
+             */
+            AssociationDAO associationDAO = toolBelt.getAnnotationDAOFactory().newAssociationDAO();
+            associationDAO.startTransaction();
+            association = associationDAO.merge(association);
+            final Observation oldParent = association.getObservation();
             oldParent.removeAssociation(association);
 
             // Add new parent
-            association.setParent(parent);
             parent.addAssociation(association);
             association.setLinkName(linkName);
             association.setToConcept(toConcept);
             association.setLinkValue(linkValue);
+            associationDAO.validateName(association);
+            associationDAO.endTransaction();
 
-            // Insert the new Association into the database.
-            association.validateToConceptName();
-            DAOEventQueue.updateVideoArchiveSet(association);
+            Collection<Observation> changedObservations = ImmutableList.of(oldParent, parent);
+            toolBelt.getPersistenceController().updateObservations(changedObservations);
+
         }
 
         // here a new Association is being created
         else {
-            a = new Association(linkName, toConcept, linkValue);
-            parent.addAssociation(a);
-
-            // Insert the new Association into the database.
-            a.validateToConceptName();
-            DAOEventQueue.insert(a);
+            a = toolBelt.getAnnotationFactory().newAssociation(linkName, toConcept, linkValue);
+            Collection<Observation> obs = ImmutableList.of(parent);
+            toolBelt.getPersistenceController().insertAssociations(obs, a);
         }
     }
 
@@ -286,25 +185,22 @@ public class AssociationEditorPanel extends JPanel {
             log.debug("Changing fromConcept to " + fromConcept);
         }
 
-        final Collection linkTemplatesAsStrings = new TreeSet();
+        final Collection<String> linkTemplatesAsStrings = new TreeSet<String>();
         try {
-            Collection linkTemplates = null;
+            Collection<LinkTemplate> linkTemplates = null;
 
             // Get the possible linkTemplates specific to a particular concept
-            if ((fromConcept != null) && (!fromConcept.equals(Association.NIL))) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Getting Hierarchical LinkTemplates from the " + "KnowledgeBase");
-                }
+            AnnotationPersistenceService service = toolBelt.getAnnotationPersistenceService();
+            if ((fromConcept != null) && (!fromConcept.equals(ILink.VALUE_NIL))) {
 
-                final IConcept c = KnowledgeBaseCache.getInstance().findConceptByName(fromConcept);
-                linkTemplates = Arrays.asList(c.getHierarchicalLinkTemplates());
+                final Concept c = service.findConceptByName(fromConcept);
+                linkTemplates = service.findLinkTemplatesFor(c);
             }
             else {
 
                 // If there is no toConcept, get all the linkTemplates
-                log.debug("Getting LinkTemplates from the KnowledgebaseCache");
-                final Concept c = KnowledgeBaseCache.getInstance().findRootConcept();
-                linkTemplates = c.getLinkTemplateSet();
+                Concept rootConcept = service.findRootConcept();
+                linkTemplates = toolBelt.getAnnotationPersistenceService().findLinkTemplatesFor(rootConcept);
             }
 
             // Convert the link templates to their string representations
@@ -313,16 +209,19 @@ public class AssociationEditorPanel extends JPanel {
                 linkTemplatesAsStrings.add(lt.stringValue());
             }
         }
-        catch (final PersistenceException e) {
-            log.warn("Failed to connect to knowledge base to get LinkTemplates.", e);
+        catch (final Exception e) {
+            EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
         }
 
         if (linkTemplatesAsStrings != null) {
             linksModel.addAll(linkTemplatesAsStrings);
         }
 
-        // If the new model contians the previously selected link use the link.
-        // Otherwise set it to nil3
+        /*
+         *  If the new model contains the previously selected link use the link. Otherwise set it to nil3
+         */
+
+        // 
         if (linksModel.contains(link)) {
             cbLinks_.setSelectedItem(link);
         }
@@ -336,9 +235,7 @@ public class AssociationEditorPanel extends JPanel {
     }
 
     /**
-     *     This method initializes jButton
      *     @return   javax.swing.JButton
-     *     @uml.property  name="btnAdd"
      */
     public javax.swing.JButton getBtnAdd() {
         if (btnAdd == null) {
@@ -349,11 +246,9 @@ public class AssociationEditorPanel extends JPanel {
 
                 public void actionPerformed(final ActionEvent e) {
 
-                    // Get the fromConcept (either an Observation or
-                    // VideoFrame)
+                    // Get the fromConcept from the Observation
                     if (observation != null) {
-                        final ISimpleConcept parent =
-                            (ISimpleConcept) conceptMap.get(getCbFromConcept().getSelectedItem());
+                        final Observation parent = (Observation) conceptMap.get(getCbFromConcept().getSelectedItem());
                         addAssociation(parent);
                     }
                 }
@@ -365,9 +260,8 @@ public class AssociationEditorPanel extends JPanel {
     }
 
     /**
-     *     This method initializes jButton
+     *     This method initializes and returns the Cancel Button
      *     @return   javax.swing.JButton
-     *     @uml.property  name="btnCancel"
      */
     public javax.swing.JButton getBtnCancel() {
         if (btnCancel == null) {
@@ -384,16 +278,10 @@ public class AssociationEditorPanel extends JPanel {
     /**
      *     Gets the cancelAction attribute of the AssociationEditorPanel object
      *     @return   The cancelAction value
-     *     @uml.property  name="cancelAction"
      */
     public ActionAdapter getCancelAction() {
         if (cancelAction == null) {
             cancelAction = new ActionAdapter() {
-
-                /**
-                 *
-                 */
-                private static final long serialVersionUID = 6353459203088739257L;
 
                 public void doAction() {
                     resetDisplay();
@@ -407,7 +295,6 @@ public class AssociationEditorPanel extends JPanel {
     /**
      *     This method initializes cbToConcept. It's underlying model is the <code>ListComboBoxModel</code>
      *     @return   javax.swing.JComboBox
-     *     @uml.property  name="cbFromConcept"
      */
     private javax.swing.JComboBox getCbFromConcept() {
         if (cbFromConcept == null) {
@@ -418,7 +305,7 @@ public class AssociationEditorPanel extends JPanel {
                 public void itemStateChanged(final ItemEvent e) {
                     if (e.getStateChange() == ItemEvent.SELECTED) {
                         final String displayedFromConcept = cbFromConcept.getSelectedItem().toString();
-                        final ISimpleConcept concept = (ISimpleConcept) conceptMap.get(displayedFromConcept);
+                        final Observation concept = (Observation) conceptMap.get(displayedFromConcept);
                         changeFromConcept(concept.getConceptName());
                     }
                 }
@@ -429,11 +316,6 @@ public class AssociationEditorPanel extends JPanel {
         return cbFromConcept;
     }
 
-    /**
-     *     This method initializes cbToConcept
-     *     @return   javax.swing.JComboBox
-     *     @uml.property  name="cbLinks"
-     */
     private javax.swing.JComboBox getCbLinks() {
         if (cbLinks == null) {
             cbLinks = new JComboBox();
@@ -453,14 +335,9 @@ public class AssociationEditorPanel extends JPanel {
         return cbLinks;
     }
 
-    /**
-     *     This method initializes cbToConcept
-     *     @return   javax.swing.JComboBox
-     *     @uml.property  name="cbToConcept"
-     */
     private HierachicalConceptNameComboBox getCbToConcept() {
         if (cbToConcept == null) {
-            cbToConcept = new HierachicalConceptNameComboBox();
+            cbToConcept = new HierachicalConceptNameComboBox(toolBelt.getAnnotationPersistenceService());
             cbToConcept.setToolTipText("To Concept");
             cbToConcept.addFocusListener(new FocusAdapter() {
 
@@ -473,21 +350,10 @@ public class AssociationEditorPanel extends JPanel {
         return cbToConcept;
     }
 
-    /**
-     *     This method initializes jLabel1
-     *     @return   javax.swing.JLabel
-     *     @uml.property  name="forLabel"
-     */
     private javax.swing.JLabel getForLabel() {
         return forLabel;
     }
 
-    /**
-     * This method initializes jLabel
-     *
-     *
-     * @return  javax.swing.JLabel
-     */
     private javax.swing.JLabel getLinkLabel() {
         if (lbl3a == null) {
             lbl3a = new javax.swing.JLabel();
@@ -498,20 +364,10 @@ public class AssociationEditorPanel extends JPanel {
         return lbl3a;
     }
 
-    /**
-     *     This method initializes jLabel
-     *     @return   javax.swing.JLabel
-     *     @uml.property  name="searchLabel"
-     */
     private javax.swing.JLabel getSearchLabel() {
         return searchLabel;
     }
 
-    /**
-     *     This method initializes jTextField
-     *     @return   javax.swing.JTextField
-     *     @uml.property  name="tfLinkName"
-     */
     private javax.swing.JTextField getTfLinkName() {
         if (tfLinkName == null) {
             tfLinkName = new javax.swing.JTextField();
@@ -529,11 +385,6 @@ public class AssociationEditorPanel extends JPanel {
         return tfLinkName;
     }
 
-    /**
-     *     This method initializes jTextField
-     *     @return   javax.swing.JTextField
-     *     @uml.property  name="tfLinkValue"
-     */
     private javax.swing.JTextField getTfLinkValue() {
         if (tfLinkValue == null) {
             tfLinkValue = new javax.swing.JTextField();
@@ -552,11 +403,6 @@ public class AssociationEditorPanel extends JPanel {
         return tfLinkValue;
     }
 
-    /**
-     *     This method initializes jTextField
-     *     @return   javax.swing.JTextField
-     *     @uml.property  name="tfSearch"
-     */
     private javax.swing.JTextField getTfSearch() {
         if (tfSearch == null) {
             tfSearch = new javax.swing.JTextField();
@@ -658,9 +504,6 @@ public class AssociationEditorPanel extends JPanel {
         final String columns = "0dlu, right:pref, " + hgap + ", left:pref:grow, " + hgap + ", right:pref, " + hgap +
                                ", left:pref:grow, " + " left:pref";
 
-        // String columns = "0dlu, right:pref, " + hgap + ", left:pref, "
-        // + hgap + ", right:pref, " + hgap + ", left:pref, "
-        // + " left:pref";
         final String rows = "0dlu, center:pref, " + vgap + ", center:pref, " + vgap + ", center:pref, " + vgap +
                             ", center:pref";
         final FormLayout layout = new FormLayout(columns, rows);
@@ -682,7 +525,7 @@ public class AssociationEditorPanel extends JPanel {
         add(getBtnAdd(), cc.xy(8, 8, "right, default"));
         add(getBtnCancel(), cc.xy(9, 8));
         setFocusPolicy();
-        changeFromConcept(Association.NIL);
+        changeFromConcept(ILink.VALUE_NIL);
         addComponentListener(new ComponentAdapter() {
 
             public void componentShown(final ComponentEvent e) {
@@ -694,7 +537,7 @@ public class AssociationEditorPanel extends JPanel {
         /*
          * If the cache is cleared then we should update this editor
          */
-        KnowledgeBaseCache.getInstance().addCacheClearedListener(new CacheClearedListener() {
+        toolBelt.getPersistenceCache().addCacheClearedListener(new CacheClearedListener() {
 
             public void afterClear(CacheClearedEvent evt) {
                 String conceptName = (observation == null) ? null : observation.getConceptName();
@@ -706,14 +549,12 @@ public class AssociationEditorPanel extends JPanel {
             }
 
         });
-        log.debug("Finished initialization...");
     }
 
     /**
      * Removes an <code>ActionListener</code>.
      *
-     *
-     * @param  l             the <code>ActionListener</code> to remove
+     * @param  l  the <code>ActionListener</code> to remove
      */
     public void removeActionListener(final ActionListener l) {
         getBtnAdd().removeActionListener(l);
@@ -721,7 +562,7 @@ public class AssociationEditorPanel extends JPanel {
     }
 
     /**
-     *  Description of the Method
+     *  Reset the editor to it's default state
      */
     public void resetDisplay() {
         getTfSearch().setText("");
@@ -739,12 +580,6 @@ public class AssociationEditorPanel extends JPanel {
         getCbToConcept().setEnabled(isEnabled);
         getCbFromConcept().setEnabled(isEnabled);
         getCbLinks().setEnabled(isEnabled);
-
-        // getJPanel1().setEnabled(isEnabled);
-        // getJPanel2().setEnabled(isEnabled);
-        // getJPanel3().setEnabled(isEnabled);
-        // getJPanel4().setEnabled(isEnabled);
-        // getJPanel5().setEnabled(isEnabled);
         getSearchLabel().setEnabled(isEnabled);
         getForLabel().setEnabled(isEnabled);
         getToLabel().setEnabled(isEnabled);
@@ -755,10 +590,6 @@ public class AssociationEditorPanel extends JPanel {
         getTfLinkValue().setEnabled(isEnabled);
     }
 
-    /**
-     * <p><!-- Method description --></p>
-     *
-     */
     private void setEnterBehavior() {
         getRootPane().setDefaultButton(getBtnAdd());
     }
@@ -791,7 +622,7 @@ public class AssociationEditorPanel extends JPanel {
                 if (aComponent == btnCancel) {
                     setFocusCycleRoot(false);
                     Component next = getFocusCycleRootAncestor().getFocusTraversalPolicy().getComponentAfter(
-                                         getFocusCycleRootAncestor(), btnCancel);
+                        getFocusCycleRootAncestor(), btnCancel);
                     setFocusCycleRoot(true);
 
                     return next;
@@ -803,7 +634,7 @@ public class AssociationEditorPanel extends JPanel {
                 if ((aComponent == tfSearch) || (aComponent == cbFromConcept)) {
                     setFocusCycleRoot(false);
                     Component next = getFocusCycleRootAncestor().getFocusTraversalPolicy().getComponentBefore(
-                                         getFocusCycleRootAncestor(), AssociationEditorPanel.this);
+                        getFocusCycleRootAncestor(), AssociationEditorPanel.this);
                     setFocusCycleRoot(true);
 
                     return next;
@@ -851,18 +682,15 @@ public class AssociationEditorPanel extends JPanel {
         final JTextField tfLinkValue_ = getTfLinkValue();
         final HierachicalConceptNameComboBox cbToConcept_ = getCbToConcept();
 
-        // final ComboBoxModel toConceptModel = (ListComboBoxModel) cbToConcept_.getModel();
         tfLinkName_.setText(nil);
 
-        // toConceptModel.clear();
         cbToConcept_.setOpaque(true);
         cbToConcept_.setEnabled(true);
         tfLinkValue_.setText(nil);
         tfLinkValue_.setOpaque(false);
         tfLinkValue_.setEditable(false);
 
-        // We need to handle both forms: "link to value" and "link | to |
-        // value"
+        // We need to handle both forms: "link to value" and "link | to | value"
         String delim = "|";
         final int ix = link.indexOf(delim);
         if (ix == -1) {
@@ -879,24 +707,20 @@ public class AssociationEditorPanel extends JPanel {
         tfLinkValue_.setText(linkValue);
 
         if (toConcept.equals(nil) || toConcept.equals("self")) {
-
-            // TODO 20030604 brian - not sure of the correct behavior here
-            cbToConcept_.addItem(new ConceptName(toConcept, IConceptName.NAMETYPE_COMMON));
+            ConceptName conceptName = new SimpleConceptNameBean(toConcept, ConceptNameTypes.COMMON.getName());
+            cbToConcept_.addItem(conceptName);
         }
         else {
 
-            // Retrive the child concepts and add to gui
+            // Retrieve the child concepts and add to gui
             try {
-                final Concept c = KnowledgeBaseCache.getInstance().findConceptByName(toConcept);
+                final Concept c = toolBelt.getAnnotationPersistenceService().findConceptByName(toConcept);
                 cbToConcept_.setConcept(c);
             }
-
-            // If we can't contact the KbServer, default to the toConcept.
-            // Not sure if this is the desired behavior but testign will show
-            // this.
             catch (final Exception e) {
-                log.warn("Failed to get ChildNames from KnowledgeBase.", e);
-                cbToConcept_.addItem(new ConceptName(toConcept, IConceptName.NAMETYPE_COMMON));
+                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+                ConceptName conceptName = new SimpleConceptNameBean(toConcept, ConceptNameTypes.COMMON.getName());
+                cbToConcept_.addItem(conceptName);
             }
         }
 
@@ -959,9 +783,9 @@ public class AssociationEditorPanel extends JPanel {
     }
 
     /**
-     * Sets the strings of possible concept names in a cbFromConcept. Possible
-     * concept names are Association.getFromConcept() and
-     * Observation.getConceptName(). Also sets the private field 'observation'
+     * Sets the strings of possible concept names in a cbFromConcept. The old way was to
+     * add concept names from Association.getFromConcept() and
+     * Observation.getConceptName(). The new ways is to only add observation.getConceptName()
      *
      *
      */
@@ -976,32 +800,6 @@ public class AssociationEditorPanel extends JPanel {
             fromConceptModel.addElement(concept);
             conceptMap.put(concept, observation);
 
-            for (final Iterator i = observation.getAssociationList().iterator(); i.hasNext(); ) {
-                final IAssociation assoc = (Association) i.next();
-                concept = assoc.getToConcept();
-
-                if (!((concept == null) || (concept.toLowerCase().equals("self")) || (concept.equals("")) ||
-                        (concept.toLowerCase().equals("nil")))) {
-
-                    /*
-                     * Because fromConceptModel is a SortedArrayList. Duplicate values
-                     * will not get added. Name munge so that extra names will be
-                     * added as "concept (2)"
-                     */
-                    String checkedConcept = concept;
-                    int n = 0;
-                    while (fromConceptModel.getItemIndex(checkedConcept) > 0) {
-                        n++;
-                        checkedConcept = concept + " (" + n + ")";
-                    }
-
-                    concept = checkedConcept;
-                    fromConceptModel.addElement(concept);
-                    conceptMap.put(concept, assoc);
-                }
-            }
         }
     }
 }
-
-//@jve:visual-info decl-index=0 visual-constraint="10,10"

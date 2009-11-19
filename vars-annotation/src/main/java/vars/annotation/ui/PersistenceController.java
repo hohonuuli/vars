@@ -18,25 +18,30 @@ package vars.annotation.ui;
 import java.util.ArrayList;
 import java.util.Collection;
 import vars.DAO;
+import vars.ILink;
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.AnnotationFactory;
+import vars.annotation.AnnotationPersistenceService;
 import vars.annotation.Association;
+import vars.annotation.AssociationDAO;
 import vars.annotation.Observation;
+import vars.annotation.ObservationDAO;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveSet;
 import vars.annotation.VideoFrame;
 
 /**
- * PersistenceService manages database transactions for the Userinterface. It will keep the
- * pesistent objects AND the user interface in synch.
+ * PersistenceService manages database transactions for the user-interface. It will keep the
+ * persistent objects AND the user interface in synch.
  *
  * @version        Enter version here..., 2009.11.16 at 10:49:40 PST
  * @author         Brian Schlining [brian@mbari.org]
  */
-public class PersistenceService {
+public class PersistenceController {
 
     private final AnnotationDAOFactory annotationDAOFactory;
     private final AnnotationFactory annotationFactory;
+    private final ToolBelt toolBelt;
     
 
     /**
@@ -44,10 +49,11 @@ public class PersistenceService {
      *
      * @param toolBelt
      */
-    public PersistenceService( AnnotationDAOFactory annotationDAOFactory, AnnotationFactory annotationFactory) {
+    public PersistenceController(ToolBelt toolBelt) {
         super();
-        this.annotationDAOFactory = annotationDAOFactory;
-        this.annotationFactory = annotationFactory;
+        this.toolBelt = toolBelt;
+        this.annotationDAOFactory = toolBelt.getAnnotationDAOFactory();
+        this.annotationFactory = toolBelt.getAnnotationFactory();
     }
     
     
@@ -67,11 +73,12 @@ public class PersistenceService {
      * @return
      */
     public Observation insertObservation(VideoFrame videoFrame, Observation observation) {
-        DAO dao = annotationDAOFactory.newDAO();
+        ObservationDAO dao = annotationDAOFactory.newObservationDAO();
         dao.startTransaction();
         videoFrame = dao.merge(videoFrame);
         videoFrame.addObservation(observation);
-        dao.persist(videoFrame);
+        dao.persist(observation);
+        dao.validateName(observation);
         Collection<Observation> obs = new ArrayList<Observation>(videoFrame.getObservations());
         dao.endTransaction();
         updateUI(obs); // update view
@@ -91,6 +98,7 @@ public class PersistenceService {
         videoArchive.addVideoFrame(videoFrame);
         dao.persist(videoFrame);
         dao.endTransaction();
+        // NO UI update is needed?
         return videoFrame;
     }
 
@@ -100,25 +108,19 @@ public class PersistenceService {
      * @return
      */
     public Collection<Observation> updateObservations(Collection<Observation> observations) {
-        DAO dao = annotationDAOFactory.newDAO();
-        final Collection<Observation> updatedObservations = new ArrayList<Observation>(observations.size());
-        dao.startTransaction();
-        for (Observation observation : observations) {
-            updatedObservations.add(dao.merge(observation));
-        }
-        dao.endTransaction();
+        AnnotationPersistenceService service = toolBelt.getAnnotationPersistenceService();
+        Collection<Observation> updatedObservations = service.updateAndValidate(observations);
         updateUI(updatedObservations); // update view
         return updatedObservations;
-
     }
-
+         
     /**
      *
      * @param videoFrame
      * @return
      */
     public Collection<VideoFrame> updateVideoFrames(Collection<VideoFrame> videoFrames) {
-        DAO dao = annotationDAOFactory.newDAO();
+        ObservationDAO dao = annotationDAOFactory.newObservationDAO();
         final Collection<VideoFrame> updatedVideoFrames = new ArrayList<VideoFrame>(videoFrames.size());
         final Collection<Observation> observations = new ArrayList<Observation>();
         dao.startTransaction();
@@ -127,15 +129,18 @@ public class PersistenceService {
             updatedVideoFrames.add(updatedVideoFrame);
             observations.addAll(updatedVideoFrame.getObservations());
         }
+        for (Observation observation : observations) {
+            dao.validateName(observation);
+        }
         dao.endTransaction();
         updateUI(observations); // update view
         return updatedVideoFrames;
     }
     
-    public Collection<Association> insertAssociations(Collection<Observation> observations, Association associationTemplate) {
+    public Collection<Association> insertAssociations(Collection<Observation> observations, ILink associationTemplate) {
         final Collection<Association> associations = new ArrayList<Association>(observations.size());
         final Collection<Observation> uiObservations = new ArrayList<Observation>();
-        final DAO dao = annotationDAOFactory.newDAO();
+        final AssociationDAO dao = annotationDAOFactory.newAssociationDAO();
         dao.startTransaction();
         for (Observation observation : observations) {
             observation = dao.merge(observation);
@@ -144,7 +149,8 @@ public class PersistenceService {
                     associationTemplate.getToConcept(), associationTemplate.getLinkValue());
             observation.addAssociation(ass);
             dao.persist(ass);
-            associations.add(associationTemplate);            
+            dao.validateName(ass);
+            associations.add(ass);            
         }
         dao.endTransaction();
         updateUI(uiObservations); // update view
@@ -152,12 +158,13 @@ public class PersistenceService {
     }
     
     public Collection<Association> updateAssociations(Collection<Association> associations) {
-        final DAO dao = annotationDAOFactory.newDAO();
+        final AssociationDAO dao = annotationDAOFactory.newAssociationDAO();
         Collection<Association> updatedAssociations = new ArrayList<Association>(associations.size());
         Collection<Observation> uiObservations = new ArrayList<Observation>();
         dao.startTransaction();
         for (Association association : associations) {
             association = dao.merge(association);
+            dao.validateName(association);
             updatedAssociations.add(association);
             uiObservations.add(association.getObservation());
         }
@@ -201,7 +208,23 @@ public class PersistenceService {
         updateUI();
     }
     
-    private void updateUI(Collection<Observation> observations) {
+    public Collection<Observation> deleteAllAssociationsFrom(Collection<Observation> observations) {
+        Collection<Observation> updateObservations = new ArrayList<Observation>();
+        DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
+        dao.startTransaction();
+        for (Observation observation : observations) {
+            observation = dao.merge(observation);
+            for (Association association : new ArrayList<Association>(observation.getAssociations())) {
+                observation.removeAssociation(association);
+                dao.remove(association);
+            }
+            updateObservations.add(observation);
+        }
+        updateUI();
+        return updateObservations;
+    }
+    
+    public void updateUI(Collection<Observation> observations) {
         // TODO implement this.
         
      // Redraw the table
@@ -212,11 +235,11 @@ public class PersistenceService {
 //        vad.setVideoArchive(vad.getVideoArchive());
     }
     
-    private void updateUI(VideoArchiveSet videoArchiveSet) {
+    public void updateUI(VideoArchiveSet videoArchiveSet) {
      // TODO implement me
     }
     
-    private void updateUI() {
+    public void updateUI() {
         
     }
     

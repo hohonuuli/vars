@@ -34,7 +34,7 @@ import vars.QueryableImpl;
  * SQL internally for speed reasons.
  * @author brian
  */
-public class SpecialQueryDAOImpl extends QueryableImpl implements SpecialQueryDAO {
+public class QueryPersistenceServiceImpl extends QueryableImpl implements QueryPersistenceService {
 
     private static final String jdbcPassword;
     private static final String jdbcUrl;
@@ -52,7 +52,7 @@ public class SpecialQueryDAOImpl extends QueryableImpl implements SpecialQueryDA
     /**
      * Constructs ...
      */
-    public SpecialQueryDAOImpl() {
+    public QueryPersistenceServiceImpl() {
         super(jdbcUrl, jdbcUsername, jdbcPassword, jdbcDriver);
     }
 

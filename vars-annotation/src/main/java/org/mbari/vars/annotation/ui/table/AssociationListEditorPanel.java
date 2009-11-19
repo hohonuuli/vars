@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)AssociationListEditorPanel.java   2009.11.18 at 04:22:38 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
- * (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,6 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 
 
 package org.mbari.vars.annotation.ui.table;
@@ -28,7 +26,6 @@ import java.awt.image.ImageObserver;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
-
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -42,7 +39,6 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.ToolTipManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-
 import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.awt.layout.VerticalFlowLayout;
@@ -50,11 +46,11 @@ import org.mbari.swing.JFancyButton;
 import org.mbari.swing.ListListModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import vars.annotation.Association;
 import vars.annotation.Observation;
+import vars.annotation.ui.AssociationList;
 import vars.annotation.ui.Lookup;
-import vars.annotation.ui.PersistenceService;
+import vars.annotation.ui.ToolBelt;
 
 /**
  * <p>
@@ -67,8 +63,8 @@ import vars.annotation.ui.PersistenceService;
  *                          1
  *  [JPanel] [Observation]---[AssociationList]
  *    A         /1
- *    |        
- *   1|       
+ *    |
+ *   1|
  *  [AssociationEditorPanel]---[AssociationListEditorPanel]
  *       |
  *       |
@@ -79,60 +75,39 @@ import vars.annotation.ui.PersistenceService;
  */
 public class AssociationListEditorPanel extends JPanel {
 
+    protected AssociationEditorPanel associationEditorPanel = null;
+    private JButton buttonAdd = null;
+    private JButton buttonEdit = null;
+    private JButton buttonRemove = null;
     private final Logger log = LoggerFactory.getLogger(getClass());
-    
 
-    public final int HEIGHT = ImageObserver.HEIGHT;
-
+    /**  */
     public final int WIDTH = ImageObserver.WIDTH;
 
-    JList jList;
-
- 
-    JScrollPane jScrollPane;
-
- 
-    protected AssociationEditorPanel associationEditorPanel = null;
-
- 
+    /**  */
+    public final int HEIGHT = ImageObserver.HEIGHT;
     VerticalFlowLayout verticalFlowLayout1 = new VerticalFlowLayout();
-
     JPanel listEditorPanel = new JPanel();
-
     private ActionAdapter addAction;
-
-    private JButton buttonAdd = null;
-
-    private JButton buttonEdit = null;
-
- 
     private JPanel buttonPanel;
-
-
-    private JButton buttonRemove = null;
-
     private PropertyChangeListener changeListener;
-
     private ActionAdapter editAction;
-
     private boolean editingAssociation;
-
-
+    JList jList;
+    JScrollPane jScrollPane;
     private Observation observation;
-
-
     private ActionAdapter removeAction;
-    
-    private final PersistenceService persistenceService;
+    private final ToolBelt toolBelt;
 
     /**
      * Constructor for the AssociationListEditorPanel object
+     *
+     * @param toolBelt
      */
-    public AssociationListEditorPanel(PersistenceService persistenceService) {
-        this.persistenceService = persistenceService;
+    public AssociationListEditorPanel(ToolBelt toolBelt) {
+        this.toolBelt = toolBelt;
         initialize();
     }
-
 
     private void enableButtons() {
         getButtonAdd().setEnabled(true);
@@ -146,7 +121,6 @@ public class AssociationListEditorPanel extends JPanel {
             getButtonEdit().setEnabled(true);
         }
     }
-
 
     ActionAdapter getAddAction() {
         if (addAction == null) {
@@ -177,7 +151,7 @@ public class AssociationListEditorPanel extends JPanel {
      */
     public AssociationEditorPanel getAssociationEditorPanel() {
         if (associationEditorPanel == null) {
-            associationEditorPanel = new AssociationEditorPanel();
+            associationEditorPanel = new AssociationEditorPanel(toolBelt);
             associationEditorPanel.validate();
             associationEditorPanel.addActionListener(new ActionListener() {
 
@@ -230,7 +204,6 @@ public class AssociationListEditorPanel extends JPanel {
         return buttonPanel;
     }
 
-
     private JButton getButtonRemove() {
         if (buttonRemove == null) {
             buttonRemove = new JFancyButton();
@@ -263,7 +236,6 @@ public class AssociationListEditorPanel extends JPanel {
         return changeListener;
     }
 
- 
     ActionAdapter getEditAction() {
         if (editAction == null) {
             editAction = new ActionAdapter() {
@@ -284,7 +256,6 @@ public class AssociationListEditorPanel extends JPanel {
 
         return editAction;
     }
-
 
     private JList getJList() {
         if (jList == null) {
@@ -386,9 +357,15 @@ public class AssociationListEditorPanel extends JPanel {
                         // the parent and the listModel
                         listModel.remove(j.getSelectedIndex());
 
- 
+
                         try {
-                            persistenceService.deleteAssociations(new ArrayList<Association>() {{ add(association); }} );
+                            toolBelt.getPersistenceController().deleteAssociations(new ArrayList<Association>() {
+
+                                {
+                                    add(association);
+                                }
+
+                            });
                         }
                         catch (final Exception ex) {
                             EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, ex);
@@ -435,21 +412,6 @@ public class AssociationListEditorPanel extends JPanel {
      *
      */
     private void layoutPanel() {
-
-        /*
-         *  String rows = "pref:grow, 2dlu, pref";
-         *  String columns = "pref:grow, pref, pref, pref";
-         *  FormLayout layout = new FormLayout(columns, rows);
-         *  setLayout(layout);
-         *  CellConstraints cc = new CellConstraints();
-         *  getJScrollPane().setPreferredSize(new Dimension(5, 5));
-         *  getJList().setPreferredSize(new Dimension(5, 5));
-         *  add(getJScrollPane(), cc.xywh(1, 1, 4, 1, "fill, fill"));
-         *  getButtonAdd().setVisible(true);
-         *  add(getButtonAdd(), cc.xy(2, 3));
-         *  add(getButtonEdit(), cc.xy(3, 3));
-         *  add(getButtonRemove(), cc.xy(4, 3));
-         */
         setLayout(new BorderLayout());
         add(getJScrollPane(), BorderLayout.CENTER);
         add(getButtonPanel(), BorderLayout.SOUTH);
@@ -478,7 +440,6 @@ public class AssociationListEditorPanel extends JPanel {
     /**
      *     Toggles which panel is visible. If true, the AssociationEditorPanel is visible. If false, the AssociationListEditorPanel is visible.
      *     @param isEditingItem  true if editing a single association.
-     *     @uml.property  name="editingAssociation"
      */
     public void setEditingAssociation(final boolean isEditingItem) {
         this.editingAssociation = isEditingItem;
@@ -489,10 +450,6 @@ public class AssociationListEditorPanel extends JPanel {
             listEditorPanel.setVisible(false);
             this.removeAll();
 
-            /*
-             *  CellConstraints cc = new CellConstraints();
-             *  this.add(associationEditorPanel, cc.xywh(1, 1, 4, 2, "fill, fill"));
-             */
             final JPanel p = getAssociationEditorPanel();
             add(p, BorderLayout.CENTER);
 
@@ -536,26 +493,23 @@ public class AssociationListEditorPanel extends JPanel {
 
     /**
      *     Sets the observation whos associations are to be edited.
-     *     @param  newObs
-     *     @uml.property  name="observation"
+     *
+     * @param newObs
      */
     public void setObservation(final Observation newObs) {
 
         // Remvoe listeners from existing
         if (observation != null) {
-            observation.getAssociationList().removePropertyChangeListener(getChangeListener());
-            observation.removePropertyChangeListener("conceptName", getChangeListener());
+            AssociationList associationList = new AssociationList(observation);
+            associationList.removePropertyChangeListener(getChangeListener());
+            observation.removePropertyChangeListener(Observation.PROP_CONCEPT_NAME, getChangeListener());
         }
 
         if (newObs != null) {
-            final AssociationList a = newObs.getAssociationList();
+            final AssociationList a = new AssociationList(newObs);
             a.addPropertyChangeListener(getChangeListener());
-            newObs.addPropertyChangeListener("conceptName", getChangeListener());
+            newObs.addPropertyChangeListener(Observation.PROP_CONCEPT_NAME, getChangeListener());
             setAssociationList(a);
-        }
-        else {
-
-            // TODO 20040430 brian: implement handiling if observation is null
         }
 
         observation = newObs;
@@ -572,16 +526,5 @@ public class AssociationListEditorPanel extends JPanel {
         getButtonRemove().setEnabled(false);
         super.setVisible(b);
 
-        if (!b) {
-
-            // Resize the row so that it fits the association list
-            //final ObservationTable table = ObservationTableDispatcher.getInstance().getObservationTable();
-            //final int selectedRow = table.getSelectedRow();
-            // table.packRows(selectedRow, selectedRow, 0);
-        }
     }
-
-    /*
-     *  # AssociationListCellRenderer lnkAssociationListCellRenderer;
-     */
 }

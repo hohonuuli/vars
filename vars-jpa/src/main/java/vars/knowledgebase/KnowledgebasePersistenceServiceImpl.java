@@ -16,7 +16,7 @@ import vars.annotation.Observation;
  * Time: 12:58:56 PM
  * To change this template use File | Settings | File Templates.
  */
-public class SpecialKnowledgebaseDAOImpl extends QueryableImpl implements SpecialKnowledgebaseDAO {
+public class KnowledgebasePersistenceServiceImpl extends QueryableImpl implements KnowledgebasePersistenceService {
 
     private static final String jdbcPassword;
     private static final String jdbcUrl;
@@ -34,7 +34,7 @@ public class SpecialKnowledgebaseDAOImpl extends QueryableImpl implements Specia
     /**
      * Constructs ...
      */
-    public SpecialKnowledgebaseDAOImpl() {
+    public KnowledgebasePersistenceServiceImpl() {
         super(jdbcUrl, jdbcUsername, jdbcPassword, jdbcDriver);
     }
 

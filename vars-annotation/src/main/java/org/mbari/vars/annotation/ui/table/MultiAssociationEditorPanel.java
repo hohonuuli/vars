@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)MultiAssociationEditorPanel.java   2009.11.18 at 04:22:42 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
- * (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,6 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 
 
 package org.mbari.vars.annotation.ui.table;
@@ -38,7 +36,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
@@ -51,20 +48,25 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import org.bushe.swing.event.EventBus;
 import org.mbari.swing.JFancyButton;
 import org.mbari.swing.ListListModel;
 import org.mbari.swing.SearchableComboBoxModel;
 import org.mbari.swing.SortedComboBoxModel;
 import org.mbari.util.SortedArrayList;
-import org.mbari.vars.annotation.model.Association;
-import org.mbari.vars.annotation.model.Observation;
-import org.mbari.vars.dao.DAOException;
-import org.mbari.vars.knowledgebase.model.Concept;
-import org.mbari.vars.knowledgebase.model.LinkTemplate;
-import org.mbari.vars.knowledgebase.model.dao.KnowledgeBaseCache;
-import org.mbari.vars.ui.ConceptNameComboBox;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.ILink;
+import vars.annotation.AnnotationPersistenceService;
+import vars.annotation.Association;
+import vars.annotation.Observation;
+import vars.annotation.ui.Lookup;
+import vars.annotation.ui.ToolBelt;
+import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptDAO;
+import vars.knowledgebase.ConceptName;
+import vars.knowledgebase.LinkTemplate;
+import vars.shared.ui.ConceptNameComboBox;
 
 /**
  * <p>More or less a copy and paste job reproducing the functionality of
@@ -97,154 +99,61 @@ public class MultiAssociationEditorPanel extends JPanel {
      */
     public final static int ERROR_OPTION = 987;
     private final static String nil = "nil";
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = 39830508533617483L;
     private final static String nil3 = nil + " | " + nil + " | " + nil;
-    private static final Logger log = LoggerFactory.getLogger(MultiAssociationEditorPanel.class);
-
-    /**
-     * Backing model for cbFromConcept. Created in initCbConcepts(). Refreshed
-     * in setConcepts().
-     */
-
-    // private SortedComboBoxModel fromConceptModel;
+    private javax.swing.JButton addAssociationButton = null;
+    private javax.swing.JButton cancelAssociationButton = null;
+    private JDialog dialog = null;
+    private javax.swing.JComboBox fromConceptComboBox = null;
+    private javax.swing.JLabel linkLabel = null;
+    private javax.swing.JTextField linkNameTextField = null;
+    private javax.swing.JTextField linkValueTextField = null;
+    private javax.swing.JComboBox linksComboBox = null;
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     /**
      *     Stores a list of links available in the KnowledgeBase for cbLinks
-     *     @uml.property  name="linksModel"
-     *     @uml.associationEnd  multiplicity="(1 1)"
      */
     SearchableComboBoxModel linksModel = new SearchableComboBoxModel();
-
-    /**
-     *     @uml.property  name="addAssociationButton"
-     *     @uml.associationEnd
-     */
-    private javax.swing.JButton addAssociationButton = null;
-
-    /**
-     *     @uml.property  name="cancelAssociationButton"
-     *     @uml.associationEnd
-     */
-    private javax.swing.JButton cancelAssociationButton = null;
-
-    /**
-     *     @uml.property  name="dialog"
-     *     @uml.associationEnd
-     */
-    private JDialog dialog = null;
-
-    /**
-     *     @uml.property  name="fromConceptComboBox"
-     *     @uml.associationEnd
-     */
-    private javax.swing.JComboBox fromConceptComboBox = null;
-
-    /**
-     *     @uml.property  name="linkLabel"
-     *     @uml.associationEnd
-     */
-    private javax.swing.JLabel linkLabel = null;
-
-    /**
-     *     @uml.property  name="linkNameTextField"
-     *     @uml.associationEnd
-     */
-    private javax.swing.JTextField linkNameTextField = null;
-
-    /**
-     *     @uml.property  name="linkValueTextField"
-     *     @uml.associationEnd
-     */
-    private javax.swing.JTextField linkValueTextField = null;
-
-    /**
-     *     @uml.property  name="linksComboBox"
-     *     @uml.associationEnd  multiplicity="(0 -1)" elementType="java.lang.String"
-     */
-    private javax.swing.JComboBox linksComboBox = null;
-
-    /**
-     *     The root observation of the Associations to be edited. Need to store this in order to set the selctedItem in cbFromConcept
-     *     @uml.property  name="observation"
-     *     @uml.associationEnd  readOnly="true"
-     */
-    private Observation observation;
-
-    /**
-     *     @uml.property  name="searchTextField"
-     *     @uml.associationEnd
-     */
     private javax.swing.JTextField searchTextField = null;
 
     /**
      *     Drop down list of toConcepts to link an association/observation to
-     *     @uml.property  name="toConceptComboBox"
-     *     @uml.associationEnd  multiplicity="(0 -1)" elementType="java.lang.String"
      */
     private javax.swing.JComboBox toConceptComboBox = null;
-
-    /**
-     *     @uml.property  name="searchLabel"
-     *     @uml.associationEnd  multiplicity="(1 1)"
-     */
     private final javax.swing.JLabel searchLabel = new JLabel("Search");
-
-    // the returnValue from a call to showDialog
-
-    /**
-     *     @uml.property  name="returnValue"
-     */
     private int returnValue = ERROR_OPTION;
 
     /**
-     *     Underlying storage for fromConceptModel and cbFromConcept. Stores Strings of the Observations 'fromConcept' and all child Associations 'toConcepts'.
-     *     @uml.property  name="fromConceptList"
-     *     @uml.associationEnd  multiplicity="(0 -1)" elementType="java.lang.String"
+     *     Underlying storage for fromConceptModel and cbFromConcept. Stores Strings
+     *     of the Observations 'fromConcept' and all child Associations 'toConcepts'.
      */
     private final java.util.List fromConceptList = new SortedArrayList();
-
-    /**
-     *     @uml.property  name="forLabel"
-     *     @uml.associationEnd  multiplicity="(1 1)"
-     */
     private final javax.swing.JLabel forLabel = new JLabel("for");
-
-    /**
-     *     @uml.property  name="toLabel"
-     *     @uml.associationEnd
-     */
     private javax.swing.JLabel toLabel = null;
-
-    /**
-     *     @uml.property  name="userGeneratedAssociation"
-     *     @uml.associationEnd  multiplicity="(1 1)"
-     */
-    private Association userGeneratedAssociation = new Association();
-
-    /**
-     *     @uml.property  name="valueLabel"
-     *     @uml.associationEnd
-     */
     private javax.swing.JLabel valueLabel = null;
+    private Observation observation;
+    private final ToolBelt toolBelt;
+    private Association userGeneratedAssociation;
 
     /**
      * This is the default constructor
+     *
+     * @param toolBelt
      */
-    public MultiAssociationEditorPanel() {
-        this("physical object");
+    public MultiAssociationEditorPanel(ToolBelt toolBelt) {
+        this("physical object", toolBelt);
     }
 
     /**
      * Constructor for the MultiAssociationEditorPanel object
      *
      * @param  conceptName Description of the Parameter
+     * @param toolBelt
      */
-    public MultiAssociationEditorPanel(final String conceptName) {
+    public MultiAssociationEditorPanel(final String conceptName, ToolBelt toolBelt) {
         super();
+        this.toolBelt = toolBelt;
+        userGeneratedAssociation = toolBelt.getAnnotationFactory().newAssociation();
         initialize();
         addComponentListener(new ComponentAdapter() {
 
@@ -303,53 +212,44 @@ public class MultiAssociationEditorPanel extends JPanel {
             log.debug("Changing fromConcept to " + fromConcept);
         }
 
-        final Collection linkTemplatesAsStrings = new TreeSet();
+        final Collection<String> linkTemplatesAsStrings = new TreeSet<String>();
         try {
-            Collection linkTemplates = null;
+            Collection<LinkTemplate> linkTemplates = null;
+            AnnotationPersistenceService service = toolBelt.getAnnotationPersistenceService();
 
             // Get the possible linkTemplates specific to a particular concept
-            if ((fromConcept != null) && (!fromConcept.equals(Association.NIL))) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Getting Hierarchical LinkTemplates from the " + "KnowledgeBase");
-                }
+            if ((fromConcept != null) && (!fromConcept.equals(ILink.VALUE_NIL))) {
 
-                final Concept c = KnowledgeBaseCache.getInstance().findConceptByName(fromConcept);
+                final Concept c = service.findConceptByName(fromConcept);
+
                 if (c == null) {
-                    linkTemplates = new ArrayList();
+                    linkTemplates = new ArrayList<LinkTemplate>();
                 }
                 else {
-                    linkTemplates = Arrays.asList(c.getHierarchicalLinkTemplates());
+                    linkTemplates = service.findLinkTemplatesFor(c);
                 }
-                
+
             }
             else {
-
-                // If there is no toConcept, get all the linkTemplates
-                if (log.isDebugEnabled()) {
-                    log.debug("Getting LinkTemplates from the KnowledgebaseCache");
-                }
-
-                final Concept c = KnowledgeBaseCache.getInstance().findRootConcept();
-                linkTemplates = c.getLinkTemplateSet();
+                final Concept c = service.findRootConcept();
+                linkTemplates = new ArrayList<LinkTemplate>(c.getConceptMetadata().getLinkTemplates());
             }
 
             // Convert the link templates to their string representations
-            for (final Iterator i = linkTemplates.iterator(); i.hasNext(); ) {
-                final LinkTemplate lt = (LinkTemplate) i.next();
+            for (final Iterator<LinkTemplate> i = linkTemplates.iterator(); i.hasNext(); ) {
+                final LinkTemplate lt = i.next();
                 linkTemplatesAsStrings.add(lt.stringValue());
             }
         }
-        catch (final DAOException e) {
-            if (log.isErrorEnabled()) {
-                log.error("Failed to connect to knowledge base to get " + "LinkTemplates.", e);
-            }
+        catch (final Exception e) {
+            EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
         }
 
         if (linkTemplatesAsStrings != null) {
             linksModel.addAll(linkTemplatesAsStrings);
         }
 
-        // If the new model contians the previously selected link use the link.
+        // If the new model contains the previously selected link use the link.
         // Otherwise set it to nil3
         if (linksModel.contains(link)) {
             cbLinks_.setSelectedItem(link);
@@ -366,7 +266,6 @@ public class MultiAssociationEditorPanel extends JPanel {
     /**
      *     This method initializes jButton
      *     @return   javax.swing.JButton
-     *     @uml.property  name="addAssociationButton"
      */
     public javax.swing.JButton getAddAssociationButton() {
         if (addAssociationButton == null) {
@@ -391,7 +290,6 @@ public class MultiAssociationEditorPanel extends JPanel {
     /**
      *     This method initializes jButton
      *     @return   javax.swing.JButton
-     *     @uml.property  name="cancelAssociationButton"
      */
     public javax.swing.JButton getCancelAssociationButton() {
         if (cancelAssociationButton == null) {
@@ -411,20 +309,10 @@ public class MultiAssociationEditorPanel extends JPanel {
         return cancelAssociationButton;
     }
 
-    /**
-     *     This method initializes jLabel1
-     *     @return   javax.swing.JLabel
-     *     @uml.property  name="forLabel"
-     */
     private javax.swing.JLabel getForLabel() {
         return forLabel;
     }
 
-    /**
-     *     This method initializes cbToConcept
-     *     @return   javax.swing.JComboBox
-     *     @uml.property  name="fromConceptComboBox"
-     */
     private javax.swing.JComboBox getFromConceptComboBox() {
         if (fromConceptComboBox == null) {
 
@@ -434,39 +322,40 @@ public class MultiAssociationEditorPanel extends JPanel {
              *  Add the 1st 3 levels of the hierarchy from the knowledgebase. This
              *  will give us access to all the linkTemplates that MBARI uses.
              */
-            final Set conceptNames = new TreeSet();
+            final Set<String> conceptNames = new TreeSet<String>();
+
+            AnnotationPersistenceService service = toolBelt.getAnnotationPersistenceService();
 
             // Stores conceptNames as Strings
             String rootName = null;
             try {
-                final Concept root = KnowledgeBaseCache.getInstance().findRootConcept();
-                rootName = root.getPrimaryConceptNameAsString();
+                final Concept root = service.findRootConcept();
+                rootName = root.getPrimaryConceptName().getName();
                 conceptNames.add(rootName);
-                final Collection rootChildren = root.getChildConceptColl();
-                for (final Iterator i = rootChildren.iterator(); i.hasNext(); ) {
-                    final Concept c = (Concept) i.next();
-                    conceptNames.add(c.getPrimaryConceptNameAsString());
-                    final Collection grandChildren = c.getChildConceptColl();
-                    for (final Iterator j = grandChildren.iterator(); j.hasNext(); ) {
-                        final Concept gc = (Concept) j.next();
-                        conceptNames.add(gc.getPrimaryConceptNameAsString());
+
+                for (Concept concept : new ArrayList<Concept>(root.getChildConcepts())) {
+                    conceptNames.add(concept.getPrimaryConceptName().getName());
+
+                    for (Concept grandChild : new ArrayList<Concept>(concept.getChildConcepts())) {
+                        conceptNames.add(grandChild.getPrimaryConceptName().getName());
                     }
                 }
             }
-            catch (final DAOException e) {
+            catch (final Exception e) {
                 conceptNames.clear();
 
-                // FIX ME: Try to get rid of this hard wired name
+                // TODO Try to get rid of this hard wired name
                 rootName = "physical object";
                 conceptNames.add(rootName);
+                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
             }
 
             fromConceptComboBox = new javax.swing.JComboBox();
             fromConceptComboBox.setToolTipText("From Concept");
 
             // Model for the fromConceptList
-            for (final Iterator i = conceptNames.iterator(); i.hasNext(); ) {
-                final String name = (String) i.next();
+            for (final Iterator<String> i = conceptNames.iterator(); i.hasNext(); ) {
+                final String name = i.next();
                 fromConceptList.add(name);
             }
 
@@ -483,17 +372,11 @@ public class MultiAssociationEditorPanel extends JPanel {
 
             });
 
-            // fromConceptComboBox.setEnabled(false);
         }
 
         return fromConceptComboBox;
     }
 
-    /**
-     *     This method initializes jLabel
-     *     @return   javax.swing.JLabel
-     *     @uml.property  name="linkLabel"
-     */
     private javax.swing.JLabel getLinkLabel() {
         if (linkLabel == null) {
             linkLabel = new javax.swing.JLabel();
@@ -504,11 +387,6 @@ public class MultiAssociationEditorPanel extends JPanel {
         return linkLabel;
     }
 
-    /**
-     *     This method initializes jTextField
-     *     @return   javax.swing.JTextField
-     *     @uml.property  name="linkNameTextField"
-     */
     private javax.swing.JTextField getLinkNameTextField() {
         if (linkNameTextField == null) {
             linkNameTextField = new javax.swing.JTextField();
@@ -527,11 +405,6 @@ public class MultiAssociationEditorPanel extends JPanel {
         return linkNameTextField;
     }
 
-    /**
-     *     This method initializes jTextField
-     *     @return   javax.swing.JTextField
-     *     @uml.property  name="linkValueTextField"
-     */
     private javax.swing.JTextField getLinkValueTextField() {
         if (linkValueTextField == null) {
             linkValueTextField = new javax.swing.JTextField();
@@ -550,11 +423,6 @@ public class MultiAssociationEditorPanel extends JPanel {
         return linkValueTextField;
     }
 
-    /**
-     *     This method initializes cbToConcept
-     *     @return   javax.swing.JComboBox
-     *     @uml.property  name="linksComboBox"
-     */
     private javax.swing.JComboBox getLinksComboBox() {
         if (linksComboBox == null) {
             linksComboBox = new javax.swing.JComboBox();
@@ -574,20 +442,10 @@ public class MultiAssociationEditorPanel extends JPanel {
         return linksComboBox;
     }
 
-    /**
-     *     This method initializes jLabel
-     *     @return   javax.swing.JLabel
-     *     @uml.property  name="searchLabel"
-     */
     private javax.swing.JLabel getSearchLabel() {
         return searchLabel;
     }
 
-    /**
-     *     This method initializes jTextField
-     *     @return   javax.swing.JTextField
-     *     @uml.property  name="searchTextField"
-     */
     private javax.swing.JTextField getSearchTextField() {
         if (searchTextField == null) {
             searchTextField = new javax.swing.JTextField();
@@ -598,14 +456,17 @@ public class MultiAssociationEditorPanel extends JPanel {
                 public void keyPressed(final KeyEvent e) {
                     final int keyCode = e.getKeyCode();
 
-                    // Ignore ENTERs. They're handled by the actionListener not
-                    // the keylistener
+                    /*
+                     * Ignore ENTERs. They're handled by the actionListener not
+                     * the keylistener
+                     */
                     if (keyCode != KeyEvent.VK_ENTER) {
                         String search = searchTextField.getText();
 
-                        // KeyEvents occur BEFORE tfSearch gets updated. So,
-                        // we need to grab the character and append it to the
-                        // existing text in tfSearch.
+                        /* KeyEvents occur BEFORE tfSearch gets updated. So,
+                         * we need to grab the character and append it to the
+                         * existing text in tfSearch.
+                         */
                         if (keyCode == KeyEvent.VK_BACK_SPACE) {
                             if (search.length() > 0) {
                                 search = search.substring(0, search.length() - 1);
@@ -643,8 +504,7 @@ public class MultiAssociationEditorPanel extends JPanel {
                     }
                     else {
 
-                        // If no match was found search from the start of the
-                        // list.
+                        // If no match was found search from the start of the list.
                         if (startIndex > 0) {
                             index = linksModel.searchForItemContaining(searchTextField.getText());
 
@@ -672,17 +532,8 @@ public class MultiAssociationEditorPanel extends JPanel {
         return searchTextField;
     }
 
-    /**
-     *     This method initializes cbToConcept
-     *     @return   javax.swing.JComboBox
-     *     @uml.property  name="toConceptComboBox"
-     */
     private javax.swing.JComboBox getToConceptComboBox() {
         if (toConceptComboBox == null) {
-
-            // cbToConcept = new ConceptNameComboBox();
-            // TODO 20040419 brian - Replace with ConceptNameComboBox. I'll
-            // have to avoid the use of a custom model to use it.
             toConceptComboBox = new ConceptNameComboBox();
             toConceptComboBox.setToolTipText("To Concept");
         }
@@ -690,11 +541,6 @@ public class MultiAssociationEditorPanel extends JPanel {
         return toConceptComboBox;
     }
 
-    /**
-     *     This method initializes jLabel
-     *     @return   javax.swing.JLabel
-     *     @uml.property  name="toLabel"
-     */
     private javax.swing.JLabel getToLabel() {
         if (toLabel == null) {
             toLabel = new javax.swing.JLabel();
@@ -707,17 +553,11 @@ public class MultiAssociationEditorPanel extends JPanel {
 
     /**
      *     @return   Returns the userGeneratedAssociation.
-     *     @uml.property  name="userGeneratedAssociation"
      */
     public Association getUserGeneratedAssociation() {
         return userGeneratedAssociation;
     }
 
-    /**
-     *     This method initializes jLabel1
-     *     @return   javax.swing.JLabel
-     *     @uml.property  name="valueLabel"
-     */
     private javax.swing.JLabel getValueLabel() {
         if (valueLabel == null) {
             valueLabel = new javax.swing.JLabel();
@@ -728,9 +568,6 @@ public class MultiAssociationEditorPanel extends JPanel {
         return valueLabel;
     }
 
-    /**
-     * This method initializes this
-     */
     private void initialize() {
         final String vgap = "2dlu";
         final String hgap = "2dlu";
@@ -820,7 +657,7 @@ public class MultiAssociationEditorPanel extends JPanel {
                 if (aComponent == cancelAssociationButton) {
                     setFocusCycleRoot(false);
                     Component next = getFocusCycleRootAncestor().getFocusTraversalPolicy().getComponentAfter(
-                                         getFocusCycleRootAncestor(), cancelAssociationButton);
+                        getFocusCycleRootAncestor(), cancelAssociationButton);
                     setFocusCycleRoot(true);
 
                     return next;
@@ -832,7 +669,7 @@ public class MultiAssociationEditorPanel extends JPanel {
                 if ((aComponent == searchTextField) || (aComponent == fromConceptComboBox)) {
                     setFocusCycleRoot(false);
                     Component next = getFocusCycleRootAncestor().getFocusTraversalPolicy().getComponentBefore(
-                                         getFocusCycleRootAncestor(), MultiAssociationEditorPanel.this);
+                        getFocusCycleRootAncestor(), MultiAssociationEditorPanel.this);
                     setFocusCycleRoot(true);
 
                     return next;
@@ -906,31 +743,25 @@ public class MultiAssociationEditorPanel extends JPanel {
         tfLinkValue_.setText(linkValue);
 
         if (toConcept.equals(nil) || toConcept.equals("self")) {
-
-            // TODO 20030604 brian - not sure of the correct behavior here
             cbModel.addElement(toConcept);
             cbToConcept_.setSelectedItem(toConcept);
             tfLinkValue_.setOpaque(true);
             tfLinkValue_.setEditable(true);
         }
         else {
-            Collection childList = null;
+            Collection<String> childList = new ArrayList<String>();
 
-            // Retrive the child concepts and add to gui
+            // Retrieve the child concepts and add to GUI
             try {
-                final Concept c = KnowledgeBaseCache.getInstance().findConceptByName(toConcept);
-                childList = c.getDescendentNames();
-            }
-
-            // If we can't contact the KbServer, default to the toConcept.
-            // Not sure if this is the desired behavior but testing will show
-            // this.
-            catch (final Exception e) {
-                if (log.isErrorEnabled()) {
-                    log.error("Failed to get ChildNames from KnowledgeBase.", e);
+                AnnotationPersistenceService service = toolBelt.getAnnotationPersistenceService();
+                ConceptDAO dao = service.getReadOnlyConceptDAO();
+                Collection<ConceptName> conceptNames = dao.findDescendentNames(dao.findByName(toConcept));
+                for (ConceptName conceptName : conceptNames) {
+                    childList.add(conceptName.getName());
                 }
-
-                childList = new ArrayList();
+            }
+            catch (final Exception e) {
+                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
                 childList.add(toConcept);
             }
 
@@ -1053,4 +884,7 @@ public class MultiAssociationEditorPanel extends JPanel {
     }
 }
 
+
+
 //@jve:visual-info decl-index=0 visual-constraint="10,10"
+

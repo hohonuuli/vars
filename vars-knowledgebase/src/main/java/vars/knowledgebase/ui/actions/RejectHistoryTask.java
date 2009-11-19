@@ -48,7 +48,7 @@ import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.ConceptNameDAO;
 import vars.knowledgebase.History;
 import vars.knowledgebase.HistoryDAO;
-import vars.knowledgebase.SpecialKnowledgebaseDAO;
+import vars.knowledgebase.KnowledgebasePersistenceService;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.LinkRealization;
@@ -75,7 +75,7 @@ public class RejectHistoryTask extends AbstractHistoryTask {
 
     @Inject
     public RejectHistoryTask(AnnotationDAOFactory annotationDAOFactory, 
-            SpecialKnowledgebaseDAO knowledgebaseDAO,
+            KnowledgebasePersistenceService knowledgebaseDAO,
             KnowledgebaseDAOFactory knowledgebaseDAOFactory,
             KnowledgebaseFactory knowledgebaseFactory) {
         super(knowledgebaseDAOFactory);
@@ -194,9 +194,9 @@ public class RejectHistoryTask extends AbstractHistoryTask {
 
     private class AddConceptNameTask extends GenericRejectTask {
 
-        private final SpecialKnowledgebaseDAO knowledgebaseDAO;
+        private final KnowledgebasePersistenceService knowledgebaseDAO;
 
-        public AddConceptNameTask(KnowledgebaseDAOFactory knowledgebaseDAOFactory, SpecialKnowledgebaseDAO knowledgebaseDAO) {
+        public AddConceptNameTask(KnowledgebaseDAOFactory knowledgebaseDAOFactory, KnowledgebasePersistenceService knowledgebaseDAO) {
             super(knowledgebaseDAOFactory);
             this.knowledgebaseDAO = knowledgebaseDAO;
         }
@@ -733,9 +733,9 @@ public class RejectHistoryTask extends AbstractHistoryTask {
     }
 
     private class ReplaceConceptNameTask extends GenericRejectTask {
-        private final SpecialKnowledgebaseDAO knowledgebaseDAO;
+        private final KnowledgebasePersistenceService knowledgebaseDAO;
 
-        public ReplaceConceptNameTask(SpecialKnowledgebaseDAO knowledgebaseDAO, KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
+        public ReplaceConceptNameTask(KnowledgebasePersistenceService knowledgebaseDAO, KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
             super(knowledgebaseDAOFactory);
             this.knowledgebaseDAO = knowledgebaseDAO;
         }

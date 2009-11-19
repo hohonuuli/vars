@@ -250,4 +250,6 @@ public class DAO implements vars.DAO, EntityManagerAspect {
         JPAEntity jpaEntity = (JPAEntity) object;
         return (T) findByPrimaryKey(object.getClass(), jpaEntity.getId());
     }
+    
+    
 }

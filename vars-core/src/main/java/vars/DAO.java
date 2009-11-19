@@ -85,4 +85,5 @@ public interface DAO {
     void remove(Object object);
 
     void startTransaction();
+    
 }

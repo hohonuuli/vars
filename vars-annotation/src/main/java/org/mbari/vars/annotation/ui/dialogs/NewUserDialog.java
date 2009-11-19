@@ -46,10 +46,11 @@ import javax.swing.border.TitledBorder;
 import org.mbari.swing.JFancyButton;
 import org.mbari.vars.dao.DAOException;
 import org.mbari.vars.dao.IDAO;
-import org.mbari.vars.model.UserAccount;
 import org.mbari.vars.model.dao.UserAccountDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import vars.UserAccount;
 
 /**
  * <p>Dialog for creating a new user for editing annotations.</p>

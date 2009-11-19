@@ -20,7 +20,7 @@ import org.mbari.swing.JFancyButton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import vars.annotation.SpecialAnnotationDAO;
+import vars.annotation.AnnotationPersistenceService;
 import vars.annotation.ui.Lookup;
 import vars.knowledgebase.Concept;
 import vars.shared.ui.ConceptNameComboBox;
@@ -31,7 +31,7 @@ public class ToConceptSelectionDialog extends JDialog {
     private JButton okButton;
     private JButton cancelButton;
     private ConceptNameComboBox comboBox;
-    private final SpecialAnnotationDAO specialAnnotationDAO;
+    private final AnnotationPersistenceService specialAnnotationDAO;
     
     private final Logger log = LoggerFactory.getLogger(getClass());
     
@@ -39,7 +39,7 @@ public class ToConceptSelectionDialog extends JDialog {
     /**
      * Create the dialog
      */
-    public ToConceptSelectionDialog(SpecialAnnotationDAO specialAnnotationDAO) {
+    public ToConceptSelectionDialog(AnnotationPersistenceService specialAnnotationDAO) {
         super((Frame) Lookup.getApplicationFrameDispatcher().getValueObject());
         this.specialAnnotationDAO = specialAnnotationDAO;
         try {
@@ -100,10 +100,10 @@ public class ToConceptSelectionDialog extends JDialog {
             }
             
             if (concept != null) {
-                comboBox = new HierachicalConceptNameComboBox(concept, specialAnnotationDAO.getConceptDAO());
+                comboBox = new HierachicalConceptNameComboBox(concept, specialAnnotationDAO.getReadOnlyConceptDAO());
             }
             else {
-                comboBox = new HierachicalConceptNameComboBox(specialAnnotationDAO.getConceptDAO());
+                comboBox = new HierachicalConceptNameComboBox(specialAnnotationDAO.getReadOnlyConceptDAO());
             }
         }
         return comboBox;

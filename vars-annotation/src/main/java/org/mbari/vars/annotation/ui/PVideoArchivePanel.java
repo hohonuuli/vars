@@ -40,7 +40,7 @@ import vars.annotation.Observation;
 import vars.annotation.CameraDeployment;
 import vars.annotation.Observation;
 import vars.annotation.ui.Lookup;
-import vars.annotation.ui.PersistenceService;
+import vars.annotation.ui.PersistenceController;
 
 /**
  * <p>
@@ -60,13 +60,13 @@ public class PVideoArchivePanel extends PropertiesPanel {
 
     private JDialog changeNameDialog;
     
-    private final PersistenceService persistenceService;
+    private final PersistenceController persistenceService;
 
     /**
      * Constructs ...
      *
      */
-    PVideoArchivePanel(PersistenceService persistenceService) {
+    PVideoArchivePanel(PersistenceController persistenceService) {
         super();
         this.persistenceService = persistenceService;
         setPropertyNames(new String[] {

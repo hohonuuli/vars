@@ -25,18 +25,12 @@ import java.util.Iterator;
 import javax.swing.Icon;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.movie.Timecode;
-import org.mbari.vars.annotation.model.VideoFrame;
-import org.mbari.vars.annotation.model.dao.VideoFrameDAO;
-import org.mbari.vars.annotation.ui.dispatchers.ObservationDispatcher;
-import org.mbari.vars.dao.DAOEventQueue;
-import org.mbari.vars.dao.DAOExceptionHandler;
-import org.mbari.vars.dao.IDataObject;
-import org.mbari.vars.util.AppFrameDispatcher;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.annotation.IVideoArchive;
-import vars.annotation.IObservation;
-import vars.annotation.IVideoFrame;
+import vars.annotation.VideoArchive;
+import vars.annotation.Observation;
+import vars.annotation.VideoFrame;
 
 /**
  *
