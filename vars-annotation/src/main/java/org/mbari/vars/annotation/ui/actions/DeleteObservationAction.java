@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)DeleteObservationAction.java   2009.11.19 at 01:50:57 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
- * (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,108 +12,53 @@
  */
 
 
+
 package org.mbari.vars.annotation.ui.actions;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import org.mbari.awt.event.ActionAdapter;
-import org.mbari.vars.annotation.model.Observation;
-import org.mbari.vars.annotation.model.VideoFrame;
-import org.mbari.vars.annotation.model.dao.ObservationDAO;
-import org.mbari.vars.annotation.model.dao.VideoFrameDAO;
-import org.mbari.vars.dao.DAOEventQueue;
-import org.mbari.vars.dao.DAOException;
-import org.mbari.vars.util.AppFrameDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.annotation.IVideoArchive;
-import vars.annotation.IVideoFrame;
-import vars.annotation.IObservation;
+import vars.annotation.Observation;
+import vars.annotation.VideoFrame;
+import vars.annotation.ui.PersistenceController;
 
 /**
  *  <p>Deletes an observation from the database. Also deletes the associated video
  *  frame, if appropriate.</p>
  *
  * @author  <a href="http://www.mbari.org">MBARI</a>
- * @created  February 3, 2004
- * @version  $Id: DeleteObservationAction.java 408 2006-10-31 23:53:27Z hohonuuli $
  */
 public class DeleteObservationAction extends ActionAdapter {
 
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    private Observation observation;
+    private final PersistenceController persistenceController;
+
     /**
+     * Constructs ...
      *
+     * @param persistenceController
      */
-    private static final long serialVersionUID = 1L;
-
-    /**
-     *  Description of the Field
-     */
-    private static final Logger log = LoggerFactory.getLogger(DeleteObservationAction.class);
-
-    /**
-     *     Description of the Field
-     *     @uml.property  name="observation"
-     *     @uml.associationEnd
-     */
-    private IObservation observation;
+    public DeleteObservationAction(PersistenceController persistenceController) {
+        super();
+        this.persistenceController = persistenceController;
+    }
 
     /**
      * @see  org.mbari.awt.event.IAction
      */
     public void doAction() {
         if (observation != null) {
-            final IVideoFrame vf = observation.getVideoFrame();
+            final VideoFrame vf = observation.getVideoFrame();
             if (vf != null) {
 
-                synchronized (DAOEventQueue.getInstance()) {
-                    DAOEventQueue.flush();
+                Collection<Observation> observationToDelete = new ArrayList<Observation>();
+                observationToDelete.add(observation);
+                persistenceController.deleteObservations(observationToDelete);
+                persistenceController.deleteEmptyVideoFramesFrom(vf.getVideoArchive());
 
-                    try {
-                        ObservationDAO.getInstance().delete((Observation) observation);
-                    }
-                    catch (DAOException e) {
-                        AppFrameDispatcher.showErrorDialog("An error occured while deleting " + observation +
-                                                           ". Reason:" + e.getLocalizedMessage());
-                    }
-
-                    vf.removeObservation(observation);
-
-                    final Collection obs = vf.getObservations();
-
-                    // Check to see that the VideoFrame has other observations. If
-                    // not then delete it.
-                    if (obs.size() == 0) {
-                        final IVideoArchive va = vf.getVideoArchive();
-
-                        // Delete the VideoFrame from the database.
-                        try {
-                            VideoFrameDAO.getInstance().delete((VideoFrame) vf);
-                        }
-                        catch (DAOException e) {
-                            AppFrameDispatcher.showErrorDialog("An error occured while deleting " + vf + ". Reason:" +
-                                                               e.getLocalizedMessage());
-                        }
-
-                        va.removeVideoFrame(vf);
-
-                    }
-                }
-
-//              //Delete the Observation from the database.
-//              vf.removeObservation(observation);
-//              DAOEventQueue.delete(observation);
-//              
-//              
-//              final Collection obs = vf.getObservations();
-//
-//              //Check to see that the VideoFrame has other observations. If
-//              //not then delete it.
-//              if(obs.size() == 0) {
-//               final VideoArchive va = vf.getVideoArchive();
-//
-//               // Delete the VideoFrame from the database.
-//               va.removeVideoFrame(vf);
-//               DAOEventQueue.delete(vf);
-//              }
             }
             else {
                 log.warn("Attempted to delete an observation without a parent" +
@@ -130,17 +72,15 @@ public class DeleteObservationAction extends ActionAdapter {
 
     /**
      *     @return
-     *     @uml.property  name="observation"
      */
-    public IObservation getObservation() {
+    public Observation getObservation() {
         return observation;
     }
 
     /**
      *     @param  observation
-     *     @uml.property  name="observation"
      */
-    public void setObservation(final IObservation observation) {
+    public void setObservation(final Observation observation) {
         this.observation = observation;
     }
 }

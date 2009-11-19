@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)AddPropertyAction.java   2009.11.19 at 09:29:15 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
- * (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,19 +12,19 @@
  */
 
 
+
 package org.mbari.vars.annotation.ui.actions;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import org.mbari.awt.event.ActionAdapter;
-import org.mbari.vars.annotation.model.Association;
-import org.mbari.vars.annotation.ui.dispatchers.ObservationTableDispatcher;
-import org.mbari.vars.annotation.ui.table.ObservationTable;
-import org.mbari.vars.dao.DAOEventQueue;
-import org.mbari.vars.dao.DAOExceptionHandler;
-import org.mbari.vars.util.AppFrameDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.annotation.IObservation;
-import vars.annotation.IAssociation;
+import vars.ILink;
+import vars.annotation.Association;
+import vars.annotation.Observation;
+import vars.annotation.ui.Lookup;
+import vars.annotation.ui.ToolBelt;
 
 /**
  * <p>
@@ -35,187 +32,97 @@ import vars.annotation.IAssociation;
  * </p>
  *
  * @author <a href="http://www.mbari.org">MBARI </a>
- * @version $Id: AddPropertyAction.java 332 2006-08-01 18:38:46Z hohonuuli $
  */
 public class AddPropertyAction extends ActionAdapter {
 
-    /** <!-- Field description --> */
-    public static final String NIL = "nil";
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
-    private static final Logger log = LoggerFactory.getLogger(AddPropertyAction.class);
-
-    /**
-     *     @uml.property  name="linkName"
-     */
+    /**  */
+    public static final String NIL = ILink.VALUE_NIL;
+    protected final Logger log = LoggerFactory.getLogger(getClass());
     private String linkName;
-
-    /**
-     *     @uml.property  name="linkValue"
-     */
     private String linkValue;
-
-    /**
-     *     @uml.property  name="toConcept"
-     */
     private String toConcept;
+    private final ToolBelt toolBelt;
 
     /**
      * Constructs ...
      *
+     *
+     * @param toolBelt
      */
-    public AddPropertyAction() {
-        this(NIL, NIL, NIL);
+    public AddPropertyAction(ToolBelt toolBelt) {
+        this(toolBelt, NIL, NIL, NIL);
     }
 
     /**
      * Constructs ...
      *
      *
+     *
+     * @param toolBelt
      * @param linkName
      * @param toConcept
      * @param linkValue
      */
-    public AddPropertyAction(final String linkName, final String toConcept, final String linkValue) {
+    public AddPropertyAction(ToolBelt toolBelt, final String linkName, final String toConcept, final String linkValue) {
+        this.toolBelt = toolBelt;
         setLinkName(linkName);
         setToConcept(toConcept);
         setLinkValue(linkValue);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mbari.vars.annotation.ui.actions.IAction#doAction()
-     */
-
     /**
-     * <p><!-- Method description --></p>
      *
      */
     public void doAction() {
-        final ObservationTable table = ObservationTableDispatcher.getInstance().getObservationTable();
-        if (table != null) {
-            final int[] selectedRows = table.getSelectedRows();
 
-            // Loop through each selected observation and add the association
-            for (int i = 0; i < selectedRows.length; i++) {
-                final int row = selectedRows[i];
-                if (row > -1) {
-                    final IObservation obs = table.getObservationAt(row);
-                    if (obs != null) {
-                        IAssociation a = new Association(linkName, toConcept, linkValue);
-                        a = obs.addAssociation(a);
-
-                        /*
-                         * This changes the observer to the person who adds the
-                         * association. It's commented out at the request of the
-                         * video-lab.
-                         */
-
-                        // final String person =
-                        // PersonDispatcher.getInstance().getPerson();
-                        // obs.setObserver(person);
-                        // if a is already in the database don't store it
-                        if (a.getId() == null || a.getId() == 0) {
-
-                            // Insert the association into the database
-                            DAOEventQueue.insert((Association) a, new InsertExceptionHandler(a));
-                        }
-                    }
-                    else {
-                        if (log.isWarnEnabled()) {
-                            log.warn("Unable to add an Association. No Observation was selected");
-                        }
-                    }
-                }
-            }
-
-            // Reset the table so that the rows that the user selected remain
-            // selected.
-            for (int i = 0; i < selectedRows.length; i++) {
-                table.addRowSelectionInterval(selectedRows[i], selectedRows[i]);
-            }
-
-            if (selectedRows.length == 1) {
-                table.scrollToVisible(selectedRows[0], 0);
-            }
-        }
+        Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+        Association associationTemplate = toolBelt.getAnnotationFactory().newAssociation(linkName, toConcept, linkValue);
+        // Pass a copy of the observation collection to the persistence controller to avoid threading issues
+        toolBelt.getPersistenceController().insertAssociations(new ArrayList<Observation>(observations), associationTemplate);
     }
 
     /**
-     *     @return  Returns the linkName.
-     *     @uml.property  name="linkName"
+     * @return
      */
     public String getLinkName() {
         return linkName;
     }
 
     /**
-     *     @return  Returns the linkValue.
-     *     @uml.property  name="linkValue"
+     * @return
      */
     public String getLinkValue() {
         return linkValue;
     }
 
     /**
-     *     @return  Returns the toConcept.
-     *     @uml.property  name="toConcept"
+     * @return
      */
     public String getToConcept() {
         return toConcept;
     }
 
     /**
-     *     @param linkName  The linkName to set.
-     *     @uml.property  name="linkName"
+     *
+     * @param linkName
      */
     public void setLinkName(final String linkName) {
         this.linkName = linkName;
     }
 
     /**
-     *     @param linkValue  The linkValue to set.
-     *     @uml.property  name="linkValue"
+     *
+     * @param linkValue
      */
     public void setLinkValue(final String linkValue) {
         this.linkValue = linkValue;
     }
 
     /**
-     *     @param toConcept  The toConcept to set.
-     *     @uml.property  name="toConcept"
+     *
+     * @param toConcept
      */
     public void setToConcept(final String toConcept) {
         this.toConcept = toConcept;
-    }
-
-    /**
-     *     Rolls back the data if a problem occurs in the insert transaction. This is needed to keep the UI in a state consistent with what's in the  database.
-     */
-    private class InsertExceptionHandler extends DAOExceptionHandler {
-
-        private final IAssociation association;
-
-        InsertExceptionHandler(final IAssociation association) {
-            this.association = association;
-        }
-
-        protected void doAction(final Exception e) {
-
-            /*
-             * Remove the reference to the associaiton to keep the in memory
-             * model in synch with the database. There's no need to redraw the
-             * UI since it listens to changes in the observation.
-             */
-            final IObservation observation = association.getObservation();
-            observation.removeAssociation(association);
-            AppFrameDispatcher.showErrorDialog("Failed to insert the association, '" + association +
-                                               "', into the database. The error was '" + e.getMessage() +
-                                               "'. You may need to restart VARS");
-        }
     }
 }

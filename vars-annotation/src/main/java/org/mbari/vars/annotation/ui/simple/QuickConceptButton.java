@@ -10,6 +10,8 @@ import javax.swing.ImageIcon;
 import org.mbari.vars.annotation.ui.PropButton;
 import org.mbari.vars.annotation.ui.actions.NewObservationUsingConceptNameAction;
 
+import vars.annotation.ui.ToolBelt;
+
 /**
  *
  * @author brian
@@ -21,7 +23,7 @@ public class QuickConceptButton extends PropButton {
      */
     public QuickConceptButton(String concept, String iconResource) {
         super();
-        setAction(new NewObservationUsingConceptNameAction(concept));
+        setAction(new NewObservationUsingConceptNameAction(toolBelt, concept));
         setIcon(new ImageIcon(getClass().getResource(iconResource)));
         setToolTipText(concept);
         setText(concept);

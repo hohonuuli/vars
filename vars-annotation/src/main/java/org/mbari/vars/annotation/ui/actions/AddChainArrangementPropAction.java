@@ -5,16 +5,16 @@
 
 package org.mbari.vars.annotation.ui.actions;
 
+import vars.annotation.ui.ToolBelt;
+
 /**
  *
  * @author brian
  */
 public class AddChainArrangementPropAction extends AddPropertyAction {
 
-    public AddChainArrangementPropAction() {
-        super("shape-arrangement", "self", "chain");
+    public AddChainArrangementPropAction(ToolBelt toolBelt) {
+        super(toolBelt, "shape-arrangement", "self", "chain");
     }
-    
-    
 
 }

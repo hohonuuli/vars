@@ -25,12 +25,13 @@ distributed to third parties without specific written permission from MBARI
  */
 package org.mbari.vars.annotation.ui.actions;
 
+import vars.annotation.ui.ToolBelt;
+
 /**
  * <p>Adds the association of "identity-reference"|"self"|[reference number]. Where
  * [reference number] is set by <code>setRefNumber</code></p>
  *
  * @author <a href="http://www.mbari.org">MBARI</a>
- * @version $Id: AddNewRefNumPropAction.java 314 2006-07-10 02:38:46Z hohonuuli $
  */
 public final class AddNewRefNumPropAction extends AddPropertyAction {
 
@@ -39,16 +40,12 @@ public final class AddNewRefNumPropAction extends AddPropertyAction {
      */
     private static int refNumber = 1;
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
 
     /**
      *
      */
-    public AddNewRefNumPropAction() {
-        super("identity-reference", "self", "0");
+    public AddNewRefNumPropAction(ToolBelt toolBelt) {
+        super(toolBelt, "identity-reference", "self", "0");
     }
 
     /**

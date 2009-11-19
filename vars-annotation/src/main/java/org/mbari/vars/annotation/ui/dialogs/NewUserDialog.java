@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)NewUserDialog.java   2009.11.19 at 08:46:03 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
- * (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,12 +11,6 @@
  * limitations under the License.
  */
 
-
-/**
- *              New User Dialog
- *
- * @author  VARS Team Copyright (C) 2002, Monterey Bay Aquarium Research Institute
- */
 package org.mbari.vars.annotation.ui.dialogs;
 
 import java.awt.BorderLayout;
@@ -43,89 +34,39 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
+import org.bushe.swing.event.EventBus;
 import org.mbari.swing.JFancyButton;
-import org.mbari.vars.dao.DAOException;
-import org.mbari.vars.dao.IDAO;
-import org.mbari.vars.model.dao.UserAccountDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import vars.DAO;
 import vars.UserAccount;
+import vars.annotation.ui.Lookup;
+import vars.annotation.ui.ToolBelt;
 
 /**
  * <p>Dialog for creating a new user for editing annotations.</p>
- *
- * @author  : $Author: hohonuuli $
- * @version  : $Revision: 332 $
  */
 public class NewUserDialog extends JDialog {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 7995947207747021055L;
-    private static final Logger log = LoggerFactory.getLogger(NewUserDialog.class);
-
-    // reference to the new UserAccount object
-
-    /**
-     *     @uml.property  name="newUser"
-     *     @uml.associationEnd
-     */
+    private final Logger log = LoggerFactory.getLogger(getClass());
     UserAccount newUser = null;
-
-    /**
-     *     @uml.property  name="cancelButton"
-     *     @uml.associationEnd
-     */
     private JButton cancelButton;
-
-    /**
-     *     @uml.property  name="connDialogPanel"
-     *     @uml.associationEnd
-     */
     private JPanel connDialogPanel;
-
-    /**
-     *     @uml.property  name="dbConnPanel"
-     *     @uml.associationEnd
-     */
     private JPanel dbConnPanel;
-
-    /**
-     *     @uml.property  name="editPassword"
-     *     @uml.associationEnd
-     */
     private JPasswordField editPassword;
-
-    /**
-     *     @uml.property  name="okActionListener"
-     */
     private ActionListener okActionListener;
-
-    /**
-     *     @uml.property  name="okButton"
-     *     @uml.associationEnd
-     */
     private JButton okButton;
-
-    /**
-     *     @uml.property  name="okCancelPanel"
-     *     @uml.associationEnd
-     */
     private JPanel okCancelPanel;
-
-    /**
-     *     @uml.property  name="userNameTextField"
-     *     @uml.associationEnd
-     */
+    private final ToolBelt toolBelt;
     private JTextField userNameTextField;
 
     /**
      * dialog constructor -- USE THIS ONE
+     *
+     * @param toolBelt
      */
-    public NewUserDialog() {
-        this(null, "VARS - Create New VARS User Account");
+    public NewUserDialog(ToolBelt toolBelt) {
+        this(null, "VARS - Create New VARS User Account", toolBelt);
     }
 
     /**
@@ -133,9 +74,11 @@ public class NewUserDialog extends JDialog {
      *
      * @param  frame parent frame for this window
      * @param  title title for this window
+     * @param toolBelt
      */
-    public NewUserDialog(final Frame frame, final String title) {
+    public NewUserDialog(final Frame frame, final String title, final ToolBelt toolBelt) {
         super(frame, title, true);
+        this.toolBelt = toolBelt;
 
         try {
             initialize();
@@ -152,17 +95,16 @@ public class NewUserDialog extends JDialog {
      * @return
      */
     public UserAccount createNewUser() {
-        newUser = new UserAccount();
+        newUser = toolBelt.getMiscFactory().newUserAccount();
         newUser.setUserName(getUserNameTextField().getText());
         newUser.setPassword(new String(getEditPassword().getPassword()));
-        final IDAO dao = UserAccountDAO.getInstance();
-        try {
 
-            // We're keeping this on the event dispatch thread on purpose
-            dao.insert(newUser);
+        try {
+            DAO dao = toolBelt.getMiscDAOFactory().newUserAccountDAO();
+            dao.persist(newUser);
         }
-        catch (final DAOException e) {
-            log.error("Unable to create a new user in the database.", e);
+        catch (final Exception e) {
+            EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
         }
 
         // close the popup window
@@ -177,7 +119,6 @@ public class NewUserDialog extends JDialog {
      * @return  created vcr interface for type of login selected
      */
 
-    // public vcr_interface doLogin() {
     public UserAccount doNewUser() {
         this.setSize(new Dimension(400, 300));
 
@@ -201,7 +142,6 @@ public class NewUserDialog extends JDialog {
     /**
      *     Method description
      *     @return
-     *     @uml.property  name="cancelButton"
      */
     public JButton getCancelButton() {
         if (cancelButton == null) {
@@ -222,7 +162,6 @@ public class NewUserDialog extends JDialog {
     /**
      *     Method description
      *     @return
-     *     @uml.property  name="connDialogPanel"
      */
     public JPanel getConnDialogPanel() {
         if (connDialogPanel == null) {
@@ -246,32 +185,27 @@ public class NewUserDialog extends JDialog {
     /**
      *     Method description
      *     @return
-     *     @uml.property  name="dbConnPanel"
      */
     public JPanel getDbConnPanel() {
         if (dbConnPanel == null) {
             final GridBagConstraints gridBagConstraints3 = new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
-                                                               GridBagConstraints.WEST, GridBagConstraints.NONE,
-                                                               new Insets(0, 0, 0, 0), 0, 0);
+                GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0);
             gridBagConstraints3.insets = new Insets(4, 10, 4, 4);
             gridBagConstraints3.gridy = 2;
             gridBagConstraints3.gridx = 0;
             final GridBagConstraints gridBagConstraints2 = new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-                                                               GridBagConstraints.WEST, GridBagConstraints.NONE,
-                                                               new Insets(0, 0, 0, 0), 0, 0);
+                GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0);
             gridBagConstraints2.insets = new Insets(4, 10, 4, 4);
             gridBagConstraints2.gridy = 1;
             gridBagConstraints2.gridx = 0;
             final GridBagConstraints gridBagConstraints1 = new GridBagConstraints(1, 2, 2, 1, 0.0, 0.0,
-                                                               GridBagConstraints.WEST, GridBagConstraints.NONE,
-                                                               new Insets(0, 0, 0, 0), 0, 0);
+                GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0);
             gridBagConstraints1.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints1.gridx = 1;
             gridBagConstraints1.gridy = 2;
             gridBagConstraints1.insets = new Insets(4, 4, 4, 10);
             final GridBagConstraints gridBagConstraints = new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
-                                                              GridBagConstraints.WEST, GridBagConstraints.NONE,
-                                                              new Insets(0, 0, 0, 0), 0, 0);
+                GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0);
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = 1;
@@ -298,7 +232,6 @@ public class NewUserDialog extends JDialog {
     /**
      *     Method description
      *     @return
-     *     @uml.property  name="editPassword"
      */
     public JPasswordField getEditPassword() {
         if (editPassword == null) {
@@ -316,7 +249,6 @@ public class NewUserDialog extends JDialog {
 
     /**
      *     @return  the okActionListener
-     *     @uml.property  name="okActionListener"
      */
     public ActionListener getOkActionListener() {
         if (okActionListener == null) {
@@ -335,7 +267,6 @@ public class NewUserDialog extends JDialog {
     /**
      *     Method description
      *     @return
-     *     @uml.property  name="okButton"
      */
     public JButton getOkButton() {
         if (okButton == null) {
@@ -352,7 +283,6 @@ public class NewUserDialog extends JDialog {
     /**
      *     Method description
      *     @return
-     *     @uml.property  name="okCancelPanel"
      */
     public JPanel getOkCancelPanel() {
         if (okCancelPanel == null) {
@@ -373,7 +303,6 @@ public class NewUserDialog extends JDialog {
     /**
      *     Method description
      *     @return
-     *     @uml.property  name="userNameTextField"
      */
     public JTextField getUserNameTextField() {
         if (userNameTextField == null) {
@@ -388,17 +317,10 @@ public class NewUserDialog extends JDialog {
         return userNameTextField;
     }
 
-    /**
-     *  jbInit is JBuilder's init method -- it modifies this code to create the dialogs
-     *
-     * @exception  Exception
-     */
     private void initialize() throws Exception {
 
         this.getContentPane().add(getConnDialogPanel(), null);
         setSize(new Dimension(400, 300));
-
-        //setPreferredSize(new Dimension(400, 300));
 
     }
 }

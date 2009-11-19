@@ -17,24 +17,21 @@
 
 package org.mbari.vars.annotation.ui.actions;
 
+import vars.annotation.ui.ToolBelt;
+
 /**
  * <p>Adds 'image-quality | self | good' property to the Observation set in
  * the ObservationDispatcher</p>
  *
  * @author <a href="http://www.mbari.org">MBARI</a>
- * @version $Id: AddGoodImagePropAction.java 314 2006-07-10 02:38:46Z hohonuuli $
  */
 public final class AddGoodImagePropAction extends AddPropertyAction {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
 
     /**
      *
      */
-    public AddGoodImagePropAction() {
-        super("image-quality", "self", "good");
+    public AddGoodImagePropAction(ToolBelt toolBelt) {
+        super(toolBelt, "image-quality", "self", "good");
     }
 }

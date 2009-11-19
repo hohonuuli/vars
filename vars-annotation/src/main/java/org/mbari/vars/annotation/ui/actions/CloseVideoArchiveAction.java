@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)CloseVideoArchiveAction.java   2009.11.19 at 01:17:51 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
- * (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,23 +12,23 @@
  */
 
 
+
 package org.mbari.vars.annotation.ui.actions;
 
+import foxtrot.Job;
+import foxtrot.Worker;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
-import javax.swing.JProgressBar;
+import javax.swing.JComponent;
 import org.mbari.awt.event.ActionAdapter;
-import org.mbari.swing.ProgressDialog;
+import org.mbari.swing.LabeledSpinningDialWaitIndicator;
 import org.mbari.vars.annotation.locale.UploadStillImageActionFactory;
-import org.mbari.vars.annotation.ui.dispatchers.ObservationDispatcher;
-import org.mbari.vars.dao.DAOEventQueue;
-import org.mbari.vars.dao.IDataObject;
-import org.mbari.vars.util.AppFrameDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.annotation.IVideoArchive;
-import vars.annotation.IObservation;
-import vars.annotation.IVideoFrame;
+import vars.annotation.Observation;
+import vars.annotation.VideoArchive;
+import vars.annotation.ui.Lookup;
+import vars.annotation.ui.PersistenceController;
 
 /**
  * <p>This performs cleanup actions on the VideoArchive when it is closed.
@@ -39,39 +36,24 @@ import vars.annotation.IVideoFrame;
  * the StillImageURLs in the database.</p>
  *
  * @author <a href="http://www.mbari.org">MBARI</a>
- * @version $Id: CloseVideoArchiveAction.java 332 2006-08-01 18:38:46Z hohonuuli $
  */
 public class CloseVideoArchiveAction extends ActionAdapter implements IVideoArchiveProperty {
 
-    /** <!-- Field description --> */
+    /**  */
     public static final String ACTION_NAME = "Close Video-archive";
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
-    private static final Logger log = LoggerFactory.getLogger(CloseVideoArchiveAction.class);
-
-    // private UpdateVideoArchiveAction action1 = new UpdateVideoArchiveAction();
-
-    /**
-     *     @uml.property  name="action2"
-     *     @uml.associationEnd  multiplicity="(1 1)"
-     */
-    private final org.mbari.vars.annotation.locale.UploadStillImageAction action2 =
-        UploadStillImageActionFactory.getAction();
-
-    /**
-     *     @uml.property  name="videoArchive"
-     *     @uml.associationEnd
-     */
-    private IVideoArchive videoArchive;
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    private final org.mbari.vars.annotation.locale.UploadStillImageAction action2 = UploadStillImageActionFactory.getAction();
+    private final PersistenceController persistenceController;
+    private VideoArchive videoArchive;
 
     /**
      * Constructor
+     *
+     * @param persistenceController
      */
-    public CloseVideoArchiveAction() {
+    public CloseVideoArchiveAction(PersistenceController persistenceController) {
         super(ACTION_NAME);
+        this.persistenceController = persistenceController;
     }
 
     /**
@@ -79,8 +61,9 @@ public class CloseVideoArchiveAction extends ActionAdapter implements IVideoArch
      * also does a pattern match such that if any files exist with the same
      * name as the image but a different extension, they are also copied.
      */
+    @SuppressWarnings("unchecked")
     public void doAction() {
-        if ((videoArchive == null) ||!isEnabled()) {
+        if ((videoArchive == null) || !isEnabled()) {
             return;
         }
 
@@ -88,79 +71,67 @@ public class CloseVideoArchiveAction extends ActionAdapter implements IVideoArch
             log.info("Closing video archive, " + videoArchive);
         }
 
-        final ProgressDialog progressDialog = AppFrameDispatcher.getProgressDialog();
-        progressDialog.setLabel("Closing " + videoArchive.getVideoArchiveName());
-        final JProgressBar progressBar = progressDialog.getProgressBar();
-        progressBar.setMinimum(0);
-        progressBar.setMaximum(4);
-        progressBar.setString("");
-        progressBar.setStringPainted(true);
-        progressDialog.setVisible(true);
+        JComponent component = (JComponent) Lookup.getApplicationFrameDispatcher().getValueObject();
+        LabeledSpinningDialWaitIndicator waitIndicator = new LabeledSpinningDialWaitIndicator(component);
+        waitIndicator.setLabel("Closing " + videoArchive.getName());
 
         /*
-         * Save the last annotation
+         * Save the last annotations
          */
-        final IObservation observation = ObservationDispatcher.getInstance().getObservation();
+        waitIndicator.setLabel("Saving changes");
+        final Collection<Observation> observations = (Collection<Observation>) Worker.post(new Job() {
 
-        if ((observation != null) && (observation.getVideoFrame() != null)) {
-            progressBar.setString("Saving " + observation.getVideoFrame().getTimeCode());
-            progressBar.setValue(1);
-            DAOEventQueue.updateVideoArchiveSet((IDataObject) observation);
-        }
+            @Override
+            public Object run() {
+                Collection<Observation> observations = (Collection<Observation>) Lookup
+                    .getSelectedObservationsDispatcher().getValueObject();
+                observations = new ArrayList<Observation>(observations);    // Copy collection to avoid threading issues
+                observations = persistenceController.updateObservations(observations);
+                return observations;
+            }
+        });
 
-        /*
-         * Flush all pending events from the UI.
-         */
-        //progressBar.setString("Commiting changes to the database");
-        //progressBar.setValue(2);
-        //DAOEventQueue.flush();
 
         /*
          * We want to scroll through all VideoFrames. If they do not have any
          * observations attached we want to delete them
          */
-        if (log.isInfoEnabled()) {
-            log.info("Removing empty VideoFrames from " + videoArchive);
-        }
-        progressBar.setString("Removing empty video-frames");
-        progressBar.setValue(3);
-        final Collection videoFrames = videoArchive.getVideoFrames();
-        for (final Iterator i = videoFrames.iterator(); i.hasNext(); ) {
-            final IVideoFrame videoFrame = (IVideoFrame) i.next();
-            final Collection observations = videoFrame.getObservations();
-            if (observations.size() == 0) {
-                DAOEventQueue.delete((IDataObject) videoFrame);
+        waitIndicator.setLabel("Removing empty video-frames");
+        Worker.post(new Job() {
+
+            @Override
+            public Object run() {
+                persistenceController.deleteEmptyVideoFramesFrom(videoArchive);
+                return null;
             }
-        }
+        });
 
         // Move images to server and update URL's
-        action2.doAction();
-        progressBar.setValue(4);
-        progressDialog.setVisible(false);
-        
-        /*
-         * Again, flush all pending events from the UI.
-         */
-        DAOEventQueue.flush();
-        
+        waitIndicator.setLabel("Moving images");
+        Worker.post(new Job() {
+
+            @Override
+            public Object run() {
+                action2.doAction();
+                return null;
+            }
+        });
+
     }
 
     /**
      *     @return  Returns the videoArchive.
-     *     @uml.property  name="videoArchive"
      */
-    public final IVideoArchive getVideoArchive() {
+    public final VideoArchive getVideoArchive() {
         return videoArchive;
     }
 
     /**
      *     @param videoArchive  The videoArchive to set.
-     *     @uml.property  name="videoArchive"
      */
-    public final void setVideoArchive(final IVideoArchive videoArchive) {
+    public final void setVideoArchive(final VideoArchive videoArchive) {
         this.videoArchive = videoArchive;
 
-        // action1.setVideoArchive(videoArchive);
         action2.setVideoArchive(videoArchive);
     }
 }

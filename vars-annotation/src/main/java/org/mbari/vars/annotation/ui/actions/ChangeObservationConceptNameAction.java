@@ -17,27 +17,24 @@
 
 package org.mbari.vars.annotation.ui.actions;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.mbari.awt.event.ActionAdapter;
-import org.mbari.vars.annotation.ui.dispatchers.ObservationDispatcher;
-import vars.annotation.IObservation;
+import vars.annotation.Observation;
+import vars.annotation.ui.Lookup;
+import vars.annotation.ui.PersistenceController;
 
 /**
  * <p>Changes the conceptName of the currently selected Observation</p>
  *
  * @author <a href="http://www.mbari.org">MBARI</a>
- * @version $Id: ChangeObservationConceptNameAction.java 332 2006-08-01 18:38:46Z hohonuuli $
  */
 public class ChangeObservationConceptNameAction extends ActionAdapter {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
-
-    /**
-     *     @uml.property  name="conceptName"
-     */
+ 
     private final String conceptName;
+    private final PersistenceController persistenceController;
 
     /**
      * Constructs ...
@@ -45,8 +42,9 @@ public class ChangeObservationConceptNameAction extends ActionAdapter {
      *
      * @param conceptName
      */
-    public ChangeObservationConceptNameAction(final String conceptName) {
+    public ChangeObservationConceptNameAction(final String conceptName, PersistenceController persistenceController) {
         this.conceptName = conceptName;
+        this.persistenceController = persistenceController;
     }
 
     /**
@@ -55,24 +53,16 @@ public class ChangeObservationConceptNameAction extends ActionAdapter {
      *
      */
     public void doAction() {
-
-        // Get the current observation
-        final IObservation observation = ObservationDispatcher.getInstance().getObservation();
-        if (observation != null) {
+        
+        Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+        observations = new ArrayList<Observation>(observations); // Make collection copy to avoid threading issues
+        for (Observation observation : observations) {
             observation.setConceptName(conceptName);
         }
+        persistenceController.updateObservations(observations);
 
-        /*
-         * Note we do not need to notify the ObservationTable to redraw because
-         * the table listens to each observation directly using
-         * PropertyChangeListeners
-         */
     }
 
-    /**
-     *     @return  The conceptName used by this action
-     *     @uml.property  name="conceptName"
-     */
     public String getConceptName() {
         return conceptName;
     }

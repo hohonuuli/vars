@@ -21,6 +21,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.TreeSet;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import vars.CacheClearedEvent;
@@ -30,6 +33,7 @@ import vars.PersistenceCache;
 import vars.QueryableImpl;
 import vars.annotation.jpa.AssociationDAOImpl;
 import vars.annotation.jpa.ObservationDAOImpl;
+import vars.annotation.jpa.VideoArchiveDAOImpl;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.LinkTemplate;
@@ -203,6 +207,29 @@ public class AnnotationPersistenceServiceImpl extends QueryableImpl implements A
     public Collection<LinkTemplate> findLinkTemplatesFor(Concept concept) {
         LinkTemplateDAO dao = new LinkTemplateDAOImpl(getReadOnlyEntityManager());
         return dao.findAllApplicableToConcept(concept);
+    }
+    
+    /**
+     * Looks up the 'identity-reference' values for a given concept within a {@link VideoArchiveSet}
+     * These are used to tag an annotation as the same creature that's been seen before.
+     */
+    public Collection<Integer> findAllReferenceNumbers(VideoArchiveSet videoArchiveSet, Concept concept) {
+        VideoArchiveDAO dao = new VideoArchiveDAOImpl(getReadOnlyEntityManager(), null);
+        Collection<Integer> referenceNumbers = new TreeSet<Integer>();
+        for (VideoArchive videoArchive : new ArrayList<VideoArchive>(videoArchiveSet.getVideoArchives())) {
+            // TODO identity-reference is hard coded. It should be pulled out into a properties file
+            Set<String> values = dao.findAllLinkValues(videoArchive, "identity-reference", concept);
+            for (String string : values) {
+                try {
+                    Integer v = Integer.valueOf(string);
+                    referenceNumbers.add(v);
+                }
+                catch (Exception e) {
+                    log.info("Unable to parse integer from " + string);
+                }
+            }
+        }
+        return referenceNumbers;
     }
     
 

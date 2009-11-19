@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)UserConnectDialog.java   2009.11.19 at 08:49:58 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
- * (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,44 +12,36 @@
  */
 
 
-/*
-Created on Dec 4, 2003 @author achase
- */
+
 package org.mbari.vars.annotation.ui.dialogs;
 
-import java.awt.Container;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import javax.swing.SwingUtilities;
-import org.mbari.vars.util.AppFrameDispatcher;
+import vars.annotation.ui.Lookup;
+import vars.annotation.ui.ToolBelt;
 
 /**
  * <p>A dialog box for connecting a user. Basically a wrapper for UserConnectPanel,
  * but with "okay" and "cancel" buttons added in.</p>
  *
  * @author  <a href="http://www.mbari.org">MBARI</a>
- * @version  $Id: UserConnectDialog.java 332 2006-08-01 18:38:46Z hohonuuli $
  */
 public class UserConnectDialog extends OkayCancelDialog {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 6888182274269467835L;
-
-    /**
-     *     @uml.property  name="userConnectPanel"
-     *     @uml.associationEnd
-     */
     private UserConnectPanel userConnectPanel = null;
 
     /**
      * This is the default constructor
+     *
+     * @param toolBelt
      */
-    public UserConnectDialog() {
-        super(AppFrameDispatcher.getFrame(), "VARS - User Login", true);
+    public UserConnectDialog(ToolBelt toolBelt) {
+        super((Frame) Lookup.getApplicationFrameDispatcher().getValueObject(), "VARS - User Login", true);
+        userConnectPanel = new UserConnectPanel(toolBelt);
         initialize();
     }
 
@@ -75,14 +64,7 @@ public class UserConnectDialog extends OkayCancelDialog {
         });
     }
 
-    /**
-     *     @return
-     *     @uml.property  name="userConnectPanel"
-     */
     private UserConnectPanel getUserConnectPanel() {
-        if (userConnectPanel == null) {
-            userConnectPanel = new UserConnectPanel();
-        }
 
         return userConnectPanel;
     }

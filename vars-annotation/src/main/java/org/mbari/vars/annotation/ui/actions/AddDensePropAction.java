@@ -17,6 +17,8 @@
 
 package org.mbari.vars.annotation.ui.actions;
 
+import vars.annotation.ui.ToolBelt;
+
 /**
  * <p>Adds 'population-density | self | dense' property to the Observation set in
  * the ObservationDispatcher</p>
@@ -27,15 +29,11 @@ package org.mbari.vars.annotation.ui.actions;
 public final class AddDensePropAction extends AddPropertyAction {
 
     /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
-
-    /**
      * Constructs ...
      *
      */
-    public AddDensePropAction() {
+    public AddDensePropAction(ToolBelt toolBelt) {
+        super(toolBelt);
         setLinkName("population-density");
         setToConcept("self");
         setLinkValue("dense");

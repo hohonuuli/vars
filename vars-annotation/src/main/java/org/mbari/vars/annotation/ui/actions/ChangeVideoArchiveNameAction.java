@@ -17,31 +17,29 @@
 
 package org.mbari.vars.annotation.ui.actions;
 
-import org.mbari.vars.annotation.model.VideoArchive;
-import org.mbari.vars.annotation.model.VideoArchiveSet;
-import org.mbari.vars.annotation.model.dao.VideoArchiveSetDAO;
-import org.mbari.vars.annotation.ui.dispatchers.VideoArchiveDispatcher;
-import org.mbari.vars.dao.DAOEventQueue;
-import org.mbari.vars.dao.DAOExceptionHandler;
-import org.mbari.vars.util.AppFrameDispatcher;
-import vars.annotation.IVideoArchiveSet;
-import vars.annotation.IVideoArchive;
+
+import org.bushe.swing.event.EventBus;
+
+import vars.annotation.AnnotationDAOFactory;
+import vars.annotation.VideoArchiveSet;
+import vars.annotation.VideoArchive;
+import vars.annotation.ui.Lookup;
 
 /**
  * <p>Changes the videoArchvieName property of  a VideoArchive. At MBARI,
  * the videoArchiveName is a composite key of platform, seqNumber and
- * tapeNumber, so we have to be sure that the renamed archvie gets associationed
+ * tapeNumber, so we have to be sure that the renamed archive gets associated
  * with the correct properties.</p>
  *
  * @author <a href="http://www.mbari.org">MBARI</a>
- * @version $Id: ChangeVideoArchiveNameAction.java 332 2006-08-01 18:38:46Z hohonuuli $
  */
 public class ChangeVideoArchiveNameAction extends OpenVideoArchiveUsingParamsAction {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
+
+
+    public ChangeVideoArchiveNameAction(AnnotationDAOFactory annotationDAOFactory) {
+        super(annotationDAOFactory);
+    }
 
     /**
      *  Initiates the action.
@@ -51,18 +49,17 @@ public class ChangeVideoArchiveNameAction extends OpenVideoArchiveUsingParamsAct
             return;
         }
 
-        final IVideoArchive va = VideoArchiveDispatcher.getInstance().getVideoArchive();
-        IVideoArchiveSet newVas;
+        final VideoArchive va = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+        VideoArchiveSet newVas;
         try {
             newVas = resolveVideoArchiveSet(va);
         }
         catch (final Exception e) {
-            AppFrameDispatcher.showErrorDialog("Failed to connect to the " + "database. Reason: " + e.getMessage());
-
+            EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
             return;
         }
 
-        final IVideoArchiveSet orgVas = va.getVideoArchiveSet();
+        final VideoArchiveSet orgVas = va.getVideoArchiveSet();
         orgVas.removeVideoArchive(va);
 
         try {
@@ -102,14 +99,14 @@ public class ChangeVideoArchiveNameAction extends OpenVideoArchiveUsingParamsAct
      *
      * @throws Exception
      */
-    private IVideoArchiveSet resolveVideoArchiveSet(final IVideoArchive va) throws Exception {
+    private VideoArchiveSet resolveVideoArchiveSet(final VideoArchive va) throws Exception {
 
         /*
          *  Check to see if the existing vas is a match. If so use it, otherwise
          *  we'll need to check to see if a match exists in the database. If
          *  no match is found then we'll need to create one and insert it.
          */
-        IVideoArchiveSet vas = null;
+        VideoArchiveSet vas = null;
         if (verifyVideoArchiveSetIsChanging()) {
             final String p = getPlatform();
             final int sn = getSeqNumber();
@@ -147,7 +144,7 @@ public class ChangeVideoArchiveNameAction extends OpenVideoArchiveUsingParamsAct
          *  exit
          */
         final String newName = makeName();
-        final IVideoArchive va = VideoArchiveDispatcher.getInstance().getVideoArchive();
+        final VideoArchive va = VideoArchiveDispatcher.getInstance().getVideoArchive();
         if (va != null) {
             final String orgName = va.getVideoArchiveName();
             final boolean sameName = newName.equals(orgName);
@@ -177,8 +174,8 @@ public class ChangeVideoArchiveNameAction extends OpenVideoArchiveUsingParamsAct
 
         // Check that all required info is entered
         if ((p == null) || (sn == 0) || (tn == 0)) {
-            AppFrameDispatcher.showWarningDialog("Some of the information " +
-                    "required to carry out this action is missing. You're " + "request is being ignored.");
+            EventBus.publish(Lookup.TOPIC_WARNING, "Some of the information " +
+                    "required to carry out this action is missing. You're request is being ignored.");
             ok = false;
         }
 
@@ -188,15 +185,15 @@ public class ChangeVideoArchiveNameAction extends OpenVideoArchiveUsingParamsAct
     /**
      * @return  true if The platform and sequence number do not match those in
      *  the current videoArchiveSet. This means we'll need to do a database
-     *  llokup to see if a match exists.
+     *  lookup to see if a match exists.
      */
     private boolean verifyVideoArchiveSetIsChanging() {
         boolean ok = true;
         final String p = getPlatform();
         final int sn = getSeqNumber();
-        final IVideoArchive va = VideoArchiveDispatcher.getInstance().getVideoArchive();
+        final VideoArchive va = VideoArchiveDispatcher.getInstance().getVideoArchive();
         if (va != null) {
-            final IVideoArchiveSet vas = va.getVideoArchiveSet();
+            final VideoArchiveSet vas = va.getVideoArchiveSet();
             if (vas.hasSeqNumber(sn) && vas.getPlatformName().equals(p)) {
                 ok = false;
             }
@@ -205,44 +202,4 @@ public class ChangeVideoArchiveNameAction extends OpenVideoArchiveUsingParamsAct
         return ok;
     }
 
-    /**
-     *     @author  brian
-     */
-    private class ErrorHandler1 extends DAOExceptionHandler {
-
-        final IVideoArchiveSet newVas;
-        final String oldName;
-        final IVideoArchiveSet oldVas;
-        final IVideoArchive va;
-
-        /**
-         * Constructs ...
-         *
-         *
-         *
-         * @param newVas
-         * @param oldVas
-         * @param va
-         * @param oldName
-         */
-        public ErrorHandler1(final IVideoArchiveSet newVas, final IVideoArchiveSet oldVas, final IVideoArchive va,
-                             final String oldName) {
-            this.newVas = newVas;
-            this.va = va;
-            this.oldVas = oldVas;
-            this.oldName = oldName;
-        }
-
-        /**
-         * <p><!-- Method description --></p>
-         *
-         *
-         * @param e
-         */
-        protected void doAction(final Exception e) {
-            newVas.removeVideoArchive(va);
-            oldVas.addVideoArchive(va);
-            va.setVideoArchiveName(oldName);
-        }
-    }
 }

@@ -5,14 +5,16 @@
 
 package org.mbari.vars.annotation.ui.actions;
 
+import vars.annotation.ui.ToolBelt;
+
 /**
  *
  * @author brian
  */
 public class AddRedSurfaceColorPropAction extends AddPropertyAction {
 
-    public AddRedSurfaceColorPropAction() {
-        super("surface-color", "self", "red");
+    public AddRedSurfaceColorPropAction(ToolBelt toolBelt) {
+        super(toolBelt, "surface-color", "self", "red");
     }
 
 }

@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import vars.UserAccount;
 import vars.annotation.ui.Lookup;
+import vars.annotation.ui.ToolBelt;
 
 /**
  * <p><!--Insert summary here--></p>
@@ -43,11 +44,7 @@ import vars.annotation.ui.Lookup;
  */
 public class ConnectionDialog extends OkayCancelDialog {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = -6222636112271072028L;
-    private static final Logger log = LoggerFactory.getLogger(ConnectionDialog.class);
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
 
     private javax.swing.JPanel jContentPane = null;
@@ -62,8 +59,9 @@ public class ConnectionDialog extends OkayCancelDialog {
     private VCRSelectionPanel vcrConnectionPanel = null;
 
 
-    public ConnectionDialog() {
+    public ConnectionDialog(ToolBelt toolBelt) {
         super((Frame) Lookup.getApplicationFrameDispatcher().getValueObject(), true);
+        userConnectPanel = new UserConnectPanel(toolBelt);
         initialize();
     }
 
@@ -93,10 +91,7 @@ public class ConnectionDialog extends OkayCancelDialog {
         return activeUser;
     }
 
-    /**
-     * This method initializes jContentPane
-     * @return   javax.swing.JPanel
-     */
+
     private javax.swing.JPanel getJContentPane() {
         if (jContentPane == null) {
             jContentPane = new javax.swing.JPanel();
@@ -107,11 +102,7 @@ public class ConnectionDialog extends OkayCancelDialog {
         return jContentPane;
     }
 
-    /**
-     * This method initializes jPanel
-     * @return   javax.swing.JPanel
-     * @uml.property  name="jPanel"
-     */
+
     private javax.swing.JPanel getJPanel() {
         if (jPanel == null) {
             jPanel = new javax.swing.JPanel();
@@ -127,19 +118,15 @@ public class ConnectionDialog extends OkayCancelDialog {
 
     /**
      * @return  Initialized UserConnectPanel
-     * @uml.property  name="userConnectPanel"
      */
     public UserConnectPanel getUserConnectPanel() {
-        if (userConnectPanel == null) {
-            userConnectPanel = new UserConnectPanel();
-        }
+
 
         return userConnectPanel;
     }
 
     /**
      * @return  Initialized VCRConnectionPanel
-     * @uml.property  name="vcrConnectionPanel"
      */
     public VCRSelectionPanel getVcrConnectionPanel() {
         if (vcrConnectionPanel == null) {
@@ -166,7 +153,7 @@ public class ConnectionDialog extends OkayCancelDialog {
         this.setTitle("VARS - Connect");
         this.pack();
         this.setSize(400, this.getHeight());
-        this.setLocationRelativeTo(AppFrameDispatcher.getFrame());
+        this.setLocationRelativeTo((Frame) Lookup.getApplicationFrameDispatcher().getValueObject());
         initializeOkayButton();
     }
 

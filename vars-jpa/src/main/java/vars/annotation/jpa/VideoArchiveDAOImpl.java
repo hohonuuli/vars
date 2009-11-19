@@ -46,7 +46,7 @@ public class VideoArchiveDAOImpl extends DAO implements VideoArchiveDAO {
     }
 
     /**
-     * This should only be called withint JPA/DAO transaction
+     * This should only be called within JPA/DAO transaction
      * @param videoArchive
      * @param linkName
      * @param concept
@@ -74,13 +74,17 @@ public class VideoArchiveDAOImpl extends DAO implements VideoArchiveDAO {
         return linkValues;
     }
 
+    /**
+     * Call this within a transaction. The returned {@link VideoArchive} will be 
+     * in the database
+     */
     public VideoArchive findOrCreateByParameters(String platform, int sequenceNumber, String videoArchiveName) {
 
         // ---- Step 1: Look up VideoArchive by Name
         VideoArchive videoArchive = findByName(videoArchiveName);
 
         if (videoArchive == null) {
-            // ---- Step 2: No match was found. See if the desired deployement exists
+            // ---- Step 2: No match was found. See if the desired deployment exists
             VideoArchiveSet videoArchiveSet = null;
             Map<String, Object> params2 = new HashMap<String, Object>();
             params2.put("platform", platform);
@@ -89,17 +93,25 @@ public class VideoArchiveDAOImpl extends DAO implements VideoArchiveDAO {
             if (vas.size() == 1) {
                 videoArchiveSet = vas.get(0);
             } else if (vas.size() > 1) {
-                throw new VARSPersistenceException("There's a problem!! More than one VideoArchvieSet " +
+                throw new VARSPersistenceException("There's a problem!! More than one VideoArchiveSet " +
                         "with platform = " + platform + " and sequenceNumber = " + sequenceNumber +
                         " exists in the database");
-            } else {
+            } 
+            else {
                 videoArchiveSet = annotationFactory.newVideoArchiveSet();
+                persist(videoArchiveSet);
                 videoArchiveSet.setPlatformName(platform);
                 CameraDeployment cameraDeployment = annotationFactory.newCameraDeployment();
                 cameraDeployment.setSequenceNumber(sequenceNumber);
                 videoArchiveSet.addCameraDeployment(cameraDeployment);
-                videoArchiveSet.addVideoArchive(videoArchive);
+                persist(cameraDeployment);
             }
+            
+            videoArchive = annotationFactory.newVideoArchive();
+            videoArchive.setName(videoArchiveName);
+            videoArchiveSet.addVideoArchive(videoArchive);
+            persist(videoArchive);
+            
         }
 
         return videoArchive;

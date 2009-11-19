@@ -11,19 +11,24 @@
 
 package org.mbari.vars.annotation.ui.actions;
 
+
+import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
-import org.mbari.vars.annotation.model.dao.VideoArchiveDAO;
-import org.mbari.vars.annotation.ui.dispatchers.VideoArchiveDispatcher;
-import org.mbari.vars.dao.DAOException;
-import org.mbari.vars.knowledgebase.model.dao.KnowledgeBaseCache;
-import org.mbari.vars.util.AppFrameDispatcher;
+import org.mbari.util.Dispatcher;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.annotation.IVideoArchive;
+
+import vars.CacheClearedEvent;
+import vars.CacheClearedListener;
+import vars.PersistenceCache;
+import vars.annotation.VideoArchive;
+import vars.annotation.VideoArchiveDAO;
+import vars.annotation.ui.Lookup;
+import vars.annotation.ui.ToolBelt;
 
 /**
- * This action refreshes the knowledgebase used by the Annotation Application. As a side-effect, the
- * open {@link IVideoArchive} must be closed since we need to expire the Castor cache.
+ * This action refreshes the knowledgebase used by the Annotation Application. 
  *
  * @author brian
  * @version $Id: $
@@ -32,14 +37,16 @@ public class ClearDatabaseCacheAction extends ActionAdapter {
 
     /** Field description */
     public static final String ACTION_NAME = "Refresh Data";
-    private static final Logger log = LoggerFactory.getLogger(ClearDatabaseCacheAction.class);
 
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    private final ToolBelt toolBelt;
     /**
      * Constructs ...
      *
      */
-    public ClearDatabaseCacheAction() {
+    public ClearDatabaseCacheAction(ToolBelt toolBelt) {
         super(ACTION_NAME);
+        this.toolBelt = toolBelt;
     }
 
     /**
@@ -47,51 +54,57 @@ public class ClearDatabaseCacheAction extends ActionAdapter {
      *
      */
     @Override public void doAction() {
-        try {
 
-            IVideoArchive videoArchive = VideoArchiveDispatcher.getInstance().getVideoArchive();
-            String videoArchiveName = null;
-
-            /*
-             * Close any open archives before the cache is expired by the clear call
-             */
-            if (videoArchive != null) {
-
-                // Get the current name
-                videoArchiveName = videoArchive.getVideoArchiveName();
-
-                // Close the current VideoArchive
-                CloseVideoArchiveAction closeAction = new CloseVideoArchiveAction();
-                closeAction.setVideoArchive(videoArchive);
-                closeAction.doAction();
-                VideoArchiveDispatcher.getInstance().setVideoArchive(null);
-            }
-
-            /*
-             * This call also exprires the cache so you need to reopne the current VideoArchiveSet
-             */
-            KnowledgeBaseCache.getInstance().clear();
-
-            /*
-             * Reopen the VideoArchive
-             */
-            if (videoArchiveName != null) {
-                videoArchive = VideoArchiveDAO.getInstance().findByVideoArchiveName(videoArchiveName);
-
-                if (videoArchive == null) {
-                    AppFrameDispatcher.showWarningDialog("Unable to find " + videoArchiveName + " in the database");
+            final Dispatcher dispatcher = Lookup.getVideoArchiveDispatcher();
+            final VideoArchive videoArchive = (VideoArchive) dispatcher.getValueObject();
+            // We need this to reopen the VideoArchive after refresh
+            final String name = videoArchive == null ? null : videoArchive.getName(); 
+            dispatcher.setValueObject(null);
+            
+            final PersistenceCache persistenceCache = toolBelt.getPersistenceCache();
+            final CacheClearedListener listener = new CacheClearedListener() {
+                
+                public void beforeClear(CacheClearedEvent evt) {
+                    // Do Nothing
                 }
-                else {
-                    VideoArchiveDispatcher.getInstance().setVideoArchive(videoArchive);
+                
+                public void afterClear(CacheClearedEvent evt) {
+                    try {
+                        /*
+                         * Reopen the VideoArchive
+                         */
+                        if (name != null) {
+                            // DAOTX
+                            VideoArchiveDAO dao = toolBelt.getAnnotationDAOFactory().newVideoArchiveDAO();
+                            dao.startTransaction();
+                            VideoArchive refreshedVideoArchive = dao.findByName(name);
+    
+                            if (refreshedVideoArchive == null) {
+                                EventBus.publish(Lookup.TOPIC_WARNING, "Unable to find " + name + " in the database");
+                            }
+                            else {
+                                dispatcher.setValueObject(videoArchive);
+                            }
+                        }
+                        
+                        // Cleanup
+                        persistenceCache.removeCacheClearedListener(this);
+                    }
+                    catch (Exception e) {
+                        log.error("Failed to refresh the knowledgbase", e);
+                        EventBus.publish(Lookup.TOPIC_FATAL_ERROR, e);
+                    }
+                    
                 }
-            }
+            };
+            
+            
+            persistenceCache.addCacheClearedListener(listener);
+            persistenceCache.clear();
+            
 
 
-        }
-        catch (DAOException e) {
-            log.error("Failed to refresh the knowledgbase", e);
-            AppFrameDispatcher.showErrorDialog("Unable to refresh the knowledgebase! You should restart VARS");
-        }
 
     }
+    
 }

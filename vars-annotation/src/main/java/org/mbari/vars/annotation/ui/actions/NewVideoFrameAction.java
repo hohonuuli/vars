@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)NewVideoFrameAction.java   2009.11.19 at 10:09:07 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
- * (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,51 +12,32 @@
  */
 
 
-/*
-The Monterey Bay Aquarium Research Institute (MBARI) provides this
-documentation and code 'as is', with no warranty, express or
-implied, of its quality or consistency. It is provided without support and
-without obligation on the part of MBARI to assist in its use, correction,
-modification, or enhancement. This information should not be published or
-distributed to third parties without specific written permission from MBARI
- */
+
 package org.mbari.vars.annotation.ui.actions;
 
 import java.awt.Toolkit;
 import java.util.Date;
 import javax.swing.Action;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.movie.Timecode;
 import org.mbari.util.NumberUtilities;
-import org.mbari.vars.annotation.model.CameraData;
-import org.mbari.vars.annotation.model.Observation;
-import org.mbari.vars.annotation.model.PhysicalData;
-import org.mbari.vars.annotation.model.VideoFrame;
-import org.mbari.vars.annotation.model.dao.VideoFrameDAO;
-import org.mbari.vars.annotation.ui.dispatchers.ObservationTableDispatcher;
-import org.mbari.vars.annotation.ui.dispatchers.PersonDispatcher;
-import org.mbari.vars.annotation.ui.dispatchers.PredefinedDispatcher;
-import org.mbari.vars.annotation.ui.dispatchers.VcrDispatcher;
-import org.mbari.vars.annotation.ui.dispatchers.VideoArchiveDispatcher;
-import org.mbari.vars.annotation.ui.table.ObservationTable;
-import org.mbari.vars.dao.DAOEventQueue;
-import org.mbari.vars.dao.DAOException;
-import org.mbari.vars.dao.DAOExceptionHandler;
-import vars.knowledgebase.IConceptName;
-import org.mbari.vars.knowledgebase.model.dao.CacheClearedEvent;
-import org.mbari.vars.knowledgebase.model.dao.CacheClearedListener;
-import org.mbari.vars.knowledgebase.model.dao.KnowledgeBaseCache;
-import org.mbari.vars.util.AppFrameDispatcher;
 import org.mbari.vcr.IVCR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.annotation.IVideoFrame;
-import vars.annotation.IVideoArchive;
-import vars.annotation.IObservation;
-import vars.annotation.ICameraData;
-import vars.annotation.IPhysicalData;
+import vars.CacheClearedEvent;
+import vars.CacheClearedListener;
+import vars.UserAccount;
+import vars.annotation.CameraData;
+import vars.annotation.CameraDirections;
+import vars.annotation.Observation;
+import vars.annotation.VideoArchive;
+import vars.annotation.VideoFrame;
+import vars.annotation.ui.Lookup;
+import vars.annotation.ui.PersistenceController;
+import vars.annotation.ui.ToolBelt;
+import vars.annotation.ui.VideoService;
+import vars.knowledgebase.ConceptName;
 
 /**
  * <p>Action to add a new VideoFrame and a 'nearly' empty Observation
@@ -67,38 +45,28 @@ import vars.annotation.IPhysicalData;
  * is handled by the table.</p>
  *
  * @author  <a href="http://www.mbari.org">MBARI</a>
- * @version  $Id: NewVideoFrameAction.java 376 2006-10-26 18:21:43Z hohonuuli $
  */
 public final class NewVideoFrameAction extends ActionAdapter {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
-    private static final Logger log = LoggerFactory.getLogger(NewVideoFrameAction.class);
-
-    /**
-     *     @uml.property  name="defaultConceptName"
-     */
-    private String defaultConceptName;
-
-    /**
-     *     @uml.property  name="timeCodeObj"
-     *     @uml.associationEnd  multiplicity="(1 1)"
-     */
+    private final Logger log = LoggerFactory.getLogger(getClass());
     private final Timecode timeCodeObj = new Timecode();
+    private String defaultConceptName;
+    private final ToolBelt toolBelt;
 
     /**
      * Constructor for the NewVideoFrameAction object
+     *
+     * @param toolBelt
      */
-    public NewVideoFrameAction() {
+    public NewVideoFrameAction(final ToolBelt toolBelt) {
         super();
+        this.toolBelt = toolBelt;
 
         try {
-            defaultConceptName = KnowledgeBaseCache.getInstance().findRootConcept().getPrimaryConceptNameAsString();
+            defaultConceptName = toolBelt.getAnnotationPersistenceService().findRootConcept().getPrimaryConceptName().getName();
         }
-        catch (final DAOException e) {
-            defaultConceptName = IConceptName.NAME_DEFAULT;
+        catch (final Exception e) {
+            defaultConceptName = ConceptName.NAME_DEFAULT;
 
             if (log.isWarnEnabled()) {
                 log.warn("Failed to lookup root concept from database", e);
@@ -108,15 +76,14 @@ public final class NewVideoFrameAction extends ActionAdapter {
         /*
          * If the cache is cleared the default concept name MAY change. We need to listen for that change
          */
-        KnowledgeBaseCache.getInstance().addCacheClearedListener(new CacheClearedListener() {
+        toolBelt.getPersistenceCache().addCacheClearedListener(new CacheClearedListener() {
 
             public void afterClear(CacheClearedEvent evt) {
                 try {
-                    defaultConceptName =
-                        KnowledgeBaseCache.getInstance().findRootConcept().getPrimaryConceptNameAsString();
+                    defaultConceptName = toolBelt.getAnnotationPersistenceService().findRootConcept().getPrimaryConceptName().getName();
                 }
-                catch (DAOException e) {
-                    defaultConceptName = IConceptName.NAME_DEFAULT;
+                catch (Exception e) {
+                    defaultConceptName = ConceptName.NAME_DEFAULT;
 
                     if (log.isWarnEnabled()) {
                         log.warn("Failed to lookup root concept from database", e);
@@ -125,7 +92,7 @@ public final class NewVideoFrameAction extends ActionAdapter {
             }
 
             public void beforeClear(CacheClearedEvent evt) {
-                defaultConceptName = IConceptName.NAME_DEFAULT;
+                defaultConceptName = ConceptName.NAME_DEFAULT;
             }
 
         });
@@ -137,7 +104,7 @@ public final class NewVideoFrameAction extends ActionAdapter {
     }
 
     /**
-     * Intiates the action. using the DEFAULT_CONCEPTNAME
+     * Initiates the action. using the DEFAULT_CONCEPTNAME
      * @see  org.mbari.awt.event.IAction
      */
     public void doAction() {
@@ -157,11 +124,12 @@ public final class NewVideoFrameAction extends ActionAdapter {
      * @param  conceptName
      * @return The observation created. null if none was created.
      */
-    public IObservation doAction(final String conceptName) {
-        IObservation observation = null;
+    public Observation doAction(final String conceptName) {
+        Observation observation = null;
 
         // Need the VCR to get a current timecode
-        final IVCR vcr = VcrDispatcher.getInstance().getVcr();
+        VideoService videoService = (VideoService) Lookup.getVideoServiceDispatcher().getValueObject();
+        final IVCR vcr = videoService.getVCR();
         if (vcr != null) {
             final String timecode = vcr.getVcrTimecode().toString();
             observation = doAction(conceptName, timecode);
@@ -179,15 +147,15 @@ public final class NewVideoFrameAction extends ActionAdapter {
      * @param timecode A timecode in the format of HH:MM:SS:FF
      * @return The observation created. null if none was created.
      */
-    public IObservation doAction(final String conceptName, final String timecode) {
-        IObservation observation = null;
+    public Observation doAction(final String conceptName, final String timecode) {
+        Observation observation = null;
 
         // Need a videoArchive to add a VideoFrame too.
-        final IVideoArchive va = VideoArchiveDispatcher.getInstance().getVideoArchive();
+        final VideoArchive va = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
         if (va != null) {
 
             /*
-             * Verfiy that the timecode is acceptable
+             * Verify that the timecode is acceptable
              */
             boolean isTimeOK = false;
             try {
@@ -200,20 +168,23 @@ public final class NewVideoFrameAction extends ActionAdapter {
                 }
             }
 
-            final IVCR vcr = VcrDispatcher.getInstance().getVcr();
+            final VideoService videoService = (VideoService) Lookup.getVideoServiceDispatcher().getValueObject();
+            final IVCR vcr = videoService.getVCR();
             if ((conceptName != null) && (timecode != null) && isTimeOK) {
-                String person = PersonDispatcher.getInstance().getPerson();
+                UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+                final PersistenceController persistenceController = toolBelt.getPersistenceController();
+
+                String person = userAccount.getUserName();
                 if (person == null) {
-                    person = "default";
+                    person = UserAccount.USERNAME_DEFAULT;
                 }
 
                 // See if a VideoFrame with the given time code already exists
-                IVideoFrame vf = va.findVideoFrameByTimeCode(timecode);
-                boolean vfIsOk = true;
+                VideoFrame vf = va.findVideoFrameByTimeCode(timecode);
 
                 // If none are found create a new one.
                 if (vf == null) {
-                    vf = new VideoFrame();
+                    vf = toolBelt.getAnnotationFactory().newVideoFrame();
                     Date utcDate = null;
 
                     /*
@@ -237,85 +208,25 @@ public final class NewVideoFrameAction extends ActionAdapter {
                     }
 
                     vf.setRecordedDate(utcDate);
-                    vf.setTimeCode(timecode);
-                    va.addVideoFrame(vf);
-                    final String cameraDirection =
-                        (String) PredefinedDispatcher.CAMERA_DIRECTION.getDispatcher().getValueObject();
-                    if (cameraDirection != null) {
-                        ICameraData cd = vf.getCameraData();
-                        if (cd == null) {
-                            cd = new CameraData();
-                            vf.setCameraData(cd);
-                        }
+                    vf.setTimecode(timecode);
 
+                    CameraDirections cameraDirections = (CameraDirections) Lookup.getCameraDirectionDispatcher().getValueObject();
+                    final String cameraDirection = cameraDirections.getDirection();
+                    if (cameraDirection != null) {
+                        CameraData cd = vf.getCameraData();
                         cd.setDirection(cameraDirection);
                     }
 
-                    /*
-                     * I added this so that it's easier to merge data in post-
-                     * processing. Without this we have to use a stored
-                     * procedure to create a physcal data record and increment
-                     * the uniqueId table.
-                     */
-                    IPhysicalData physicalData = vf.getPhysicalData();
-                    if (physicalData == null) {
-                        physicalData = new PhysicalData();
-                        vf.setPhysicalData(physicalData);
-                    }
+                    vf = persistenceController.insertVideoFrame(va, vf);
 
-
-                    /*
-                     * We don't want any other transactions to occur while
-                     * we are inserting the new videoframe so we synchronize
-                     * on the DAOEventQueue.
-                     */
-                    synchronized (DAOEventQueue.getInstance()) {
-
-                        /*
-                         * Flush the DAOQueue so that we don't need to worry about
-                         * multi-threading issues. This makes exception handling
-                         * easier to deal with here so that we can roll back
-                         * changes on an error.
-                         */
-                        DAOEventQueue.flush();
-
-                        // Insert the new VideoFrame into the database
-                        try {
-                            VideoFrameDAO.getInstance().insert((VideoFrame) vf);
-                        }
-                        catch (final Exception e) {
-
-                            /*
-                             * If an exception occurs, the insert was not successful, so we
-                             * roll back the change.
-                             */
-                            log.error("Failed to insert " + vf, e);
-                            va.removeVideoFrame(vf);
-                            vfIsOk = false;
-                            AppFrameDispatcher.showErrorDialog(
-                                "Unable to insert new data in the database. You should restart VARS");
-                        }
-                    }
                 }
 
-                if (vfIsOk) {
-
-                    // Create a new observation and add it to the videoFrame
-                    observation = new Observation();
-                    observation.setConceptName(conceptName);
-                    observation.setObserver(person);
-                    observation.setObservationDate(new Date());
-                    vf.addObservation(observation);
-
-                    // Insert the new Observation into the database.
-                    DAOEventQueue.insert((Observation) observation, new FailedObservationInsertHandler(observation));
-
-                    // Add the new observation to the table and set it as
-                    // the item to be edited.
-                    final ObservationTable table = ObservationTableDispatcher.getInstance().getObservationTable();
-                    table.addObservation(observation);
-                    table.setSelectedObservation(observation);
-                }
+                // Create a new observation and add it to the videoFrame
+                observation = toolBelt.getAnnotationFactory().newObservation();
+                observation.setConceptName(conceptName);
+                observation.setObserver(person);
+                observation.setObservationDate(new Date());
+                toolBelt.getPersistenceController().insertObservation(vf, observation);
 
 
             }
@@ -328,44 +239,5 @@ public final class NewVideoFrameAction extends ActionAdapter {
         }
 
         return observation;
-    }
-
-    /**
-     * If an observation fails to get inserted we need to notify the user
-     * and delete it from the table.
-     */
-    private class FailedObservationInsertHandler extends DAOExceptionHandler {
-
-        FailedObservationInsertHandler(final IObservation observation) {
-            setObject(observation);
-        }
-
-        protected void doAction(final Exception e) {
-
-            /*
-             * Set the model to match the database
-             */
-            final IObservation observation = (IObservation) getObject();
-            final IVideoFrame videoFrame = observation.getVideoFrame();
-            videoFrame.removeObservation(observation);
-
-            /*
-             * Remvoe the observation from the UI
-             */
-            final ObservationTable table = ObservationTableDispatcher.getInstance().getObservationTable();
-            SwingUtilities.invokeLater(new Runnable() {
-
-                public void run() {
-                    table.removeObservation((IObservation) getObject());
-                }
-
-            });
-
-            /*
-             * Alert the user
-             */
-            AppFrameDispatcher.showErrorDialog("Failed to insert " + getObject() + ". Reason: " + e.getMessage());
-
-        }
     }
 }

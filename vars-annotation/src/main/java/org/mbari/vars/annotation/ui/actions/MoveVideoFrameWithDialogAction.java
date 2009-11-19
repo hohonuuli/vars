@@ -20,14 +20,19 @@ package org.mbari.vars.annotation.ui.actions;
 import java.awt.Frame;
 import java.util.Collection;
 import javax.swing.JDialog;
+
+import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.vars.annotation.locale.OpenVideoArchiveSetUsingParamsDialog;
-import org.mbari.vars.annotation.model.VideoArchive;
-import org.mbari.vars.annotation.model.dao.VideoArchiveDAO;
-import org.mbari.vars.dao.DAOException;
-import org.mbari.vars.util.AppFrameDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import vars.annotation.VideoArchive;
+import vars.annotation.VideoArchiveDAO;
+import vars.annotation.VideoFrame;
+import vars.annotation.ui.Lookup;
+import vars.annotation.ui.PersistenceController;
+import vars.annotation.ui.ToolBelt;
 
 /**
  * Prompts a user with a dialog for platform, seqNumber and tapeNumber. Finds the
@@ -47,31 +52,21 @@ public class MoveVideoFrameWithDialogAction extends ActionAdapter {
     /** <!-- Field description --> */
     public static final String ACTION_NAME = "Move Frames";
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
-    private final Logger log = LoggerFactory.getLogger(MoveVideoFrameWithDialogAction.class);
-
-    /**
-     *     @uml.property  name="moveAction"
-     *     @uml.associationEnd  multiplicity="(1 1)"
-     */
+    private final Logger log = LoggerFactory.getLogger(getClass());
+ 
     private final MoveVideoFrameAction moveAction = new MoveVideoFrameAction();
 
-    /**
-     *     The owner of the dialog. For modal dialogs, if we don't set this it could put up the wrong frame, confusing users.
-     *     @uml.property  name="owner"
-     */
     private final Frame owner;
+    
+    private final ToolBelt toolBelt;
 
     /**
-     *
      *
      * @param owner
      */
-    public MoveVideoFrameWithDialogAction(final Frame owner) {
+    public MoveVideoFrameWithDialogAction(final Frame owner, ToolBelt toolBelt) {
         super(ACTION_NAME);
+        this.toolBelt = toolBelt;
         this.owner = owner;
     }
 
@@ -85,21 +80,15 @@ public class MoveVideoFrameWithDialogAction extends ActionAdapter {
     }
 
     /**
-     * <p><!-- Method description --></p>
-     *
      *
      * @param videoFrames
      */
-    public void setVideoFrames(final Collection videoFrames) {
+    public void setVideoFrames(final Collection<VideoFrame> videoFrames) {
         moveAction.setVideoFrames(videoFrames);
     }
 
     private class MoveDialog extends OpenVideoArchiveSetUsingParamsDialog {
 
-        /**
-         *
-         */
-        private static final long serialVersionUID = 1L;
 
         /**
          * Constructs ...
@@ -122,26 +111,26 @@ public class MoveVideoFrameWithDialogAction extends ActionAdapter {
             if (okButtonAction == null) {
                 okButtonAction = new ActionAdapter() {
 
-                    /**
-                     *
-                     */
-                    private static final long serialVersionUID = 2616673187662138550L;
-
                     public void doAction() {
                         final int seqNumber = Integer.parseInt(getTfDiveNumber().getText());
                         final String platform = (String) getCbCameraPlatform().getSelectedItem();
                         final int tapeNumber = Integer.parseInt(getTfTapeNumber().getText());
 
-                        // TODO 20061114 brian: HD is mbari specific; may need to facor out.
+                        // TODO 20061114 brian: HD is mbari specific; may need to factor out.
                         final String postfix = getCbHD().isSelected() ? "HD" : null;
+                        final String name = PersistenceController.makeVideoArchiveName(platform, seqNumber, tapeNumber, postfix);
                         VideoArchive va;
                         try {
-                            va = VideoArchiveDAO.getInstance().openByParameters(platform, seqNumber, tapeNumber,
-                                    postfix);
+                            // DAOTX 
+                            VideoArchiveDAO dao = toolBelt.getAnnotationDAOFactory().newVideoArchiveDAO();
+                            dao.startTransaction();
+                            va = dao.findOrCreateByParameters(platform, seqNumber, name);
+                            dao.persist(va);
+                            dao.endTransaction();
                         }
-                        catch (final DAOException e) {
+                        catch (final Exception e) {
                             log.error("Failed to open a videoarchive", e);
-                            AppFrameDispatcher.showErrorDialog("Unable to talk to database!");
+                            EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
 
                             return;
                         }

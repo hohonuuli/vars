@@ -5,14 +5,16 @@
 
 package org.mbari.vars.annotation.ui.actions;
 
+import vars.annotation.ui.ToolBelt;
+
 /**
  *
  * @author brian
  */
 public class AddJuvenileLifeStagePropAction extends AddPropertyAction {
 
-    public AddJuvenileLifeStagePropAction() {
-        super("life-stage", "self", "juvenile");
+    public AddJuvenileLifeStagePropAction(ToolBelt toolBelt) {
+        super(toolBelt, "life-stage", "self", "juvenile");
     }
 
 }

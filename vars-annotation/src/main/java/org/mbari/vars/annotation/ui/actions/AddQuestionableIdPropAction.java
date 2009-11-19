@@ -17,24 +17,22 @@
 
 package org.mbari.vars.annotation.ui.actions;
 
+import vars.annotation.ui.ToolBelt;
+
 /**
  * <p>Adds 'identity-certainty | self | maybe' property to the Observation set in
  * the ObservationDispatcher</p>
  *
  * @author <a href="http://www.mbari.org">MBARI</a>
- * @version $Id: AddQuestionableIdPropAction.java 314 2006-07-10 02:38:46Z hohonuuli $
  */
 public final class AddQuestionableIdPropAction extends AddPropertyAction {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
+
 
     /**
      *
      */
-    public AddQuestionableIdPropAction() {
-        super("identity-certainty", "self", "maybe");
+    public AddQuestionableIdPropAction(ToolBelt toolBelt) {
+        super(toolBelt, "identity-certainty", "self", "maybe");
     }
 }

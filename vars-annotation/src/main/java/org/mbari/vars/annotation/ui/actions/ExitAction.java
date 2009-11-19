@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)ExitAction.java   2009.11.19 at 10:38:09 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
- * (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,14 +12,10 @@
  */
 
 
+
 package org.mbari.vars.annotation.ui.actions;
 
-import org.exolab.castor.jdo.Database;
 import org.mbari.awt.event.ActionAdapter;
-import org.mbari.vars.annotation.ui.AnnotationApp;
-import org.mbari.vars.annotation.ui.dispatchers.PredefinedDispatcher;
-import org.mbari.vars.dao.DAOEventQueue;
-import org.mbari.vars.dao.ObjectDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,11 +30,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ExitAction extends ActionAdapter {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
-    private static final Logger log = LoggerFactory.getLogger(ExitAction.class);
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     /**
      * C onstructor for the ExitAction object
@@ -54,26 +43,8 @@ public class ExitAction extends ActionAdapter {
      *  Performs any tasks needed when closing a <code>VideoArchive</code>
      */
     public void doAction() {
-        
+
         log.info("Shutting down");
-        
-        /*
-         * It's important to make this call. This triggers listeners in 
-         * PredefinedDispatchers to properly close up resources
-         */
-        PredefinedDispatcher[] dispatchers = PredefinedDispatcher.values();
-        for (PredefinedDispatcher predefinedDispatcher : dispatchers) {
-            try {
-                if (!predefinedDispatcher.equals(predefinedDispatcher.OBSERVATIONTABLE)) {
-                    predefinedDispatcher.reset();
-                }
-            }
-            catch (Exception e) {
-                log.error("An error occured while reseting " + predefinedDispatcher.name());
-            }
-        }
-
-
 
         System.exit(0);
     }

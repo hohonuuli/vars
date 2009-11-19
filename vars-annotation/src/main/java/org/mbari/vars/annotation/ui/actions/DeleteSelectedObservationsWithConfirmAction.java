@@ -23,43 +23,39 @@ Window - Preferences - Java - Code Generation - Code and Comments
  */
 package org.mbari.vars.annotation.ui.actions;
 
+import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
+import java.util.Collection;
+
 import javax.swing.Action;
 import javax.swing.JOptionPane;
-import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.awt.event.IAction;
-import org.mbari.vars.annotation.ui.dispatchers.ObservationTableDispatcher;
-import org.mbari.vars.util.AppFrameDispatcher;
+
+import vars.annotation.Observation;
+import vars.annotation.ui.Lookup;
+import vars.annotation.ui.PersistenceController;
 
 /**
  * <p>Provides a wrapper around the DeleteSelectedObservationsAction so that the
  * user must confirm that the delete should occur.</p>
  *
  * @author <a href="http://www.mbari.org">MBARI</a>
- * @version $Id: DeleteSelectedObservationsWithConfirmAction.java 332 2006-08-01 18:38:46Z hohonuuli $
  * @see DeleteSelectedObservationsAction
  */
 public class DeleteSelectedObservationsWithConfirmAction extends ActionAdapter {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
 
-    /**
-     *     @uml.property  name="action"
-     *     @uml.associationEnd  multiplicity="(1 1)"
-     */
-    final IAction action = new DeleteSelectedObservationsAction();
+    final IAction action;
 
     /**
      * Constructs ...
      *
      */
-    public DeleteSelectedObservationsWithConfirmAction() {
+    public DeleteSelectedObservationsWithConfirmAction(PersistenceController persistenceController) {
+        action = new DeleteSelectedObservationsAction(persistenceController);
         putValue(Action.NAME, "Delete observations");
         putValue(Action.ACTION_COMMAND_KEY, "delete observations");
         putValue(Action.ACCELERATOR_KEY,
@@ -70,10 +66,10 @@ public class DeleteSelectedObservationsWithConfirmAction extends ActionAdapter {
      * @see org.mbari.awt.event.IAction#doAction()
      */
     public void doAction() {
-        final JTable table = ObservationTableDispatcher.getInstance().getObservationTable();
-        final int count = table.getSelectedRowCount();
+        Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+        final int count = observations.size();
         final Object[] options = { "OK", "CANCEL" };
-        final int confirm = JOptionPane.showOptionDialog(AppFrameDispatcher.getFrame(),
+        final int confirm = JOptionPane.showOptionDialog((Frame) Lookup.getApplicationFrameDispatcher().getValueObject(),
                                 "Do you want to delete " + count + " observation(s)?", "VARS - Confirm Delete",
                                 JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
         if (confirm == JOptionPane.YES_OPTION) {

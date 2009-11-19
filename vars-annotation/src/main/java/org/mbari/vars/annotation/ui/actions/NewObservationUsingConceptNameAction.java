@@ -19,40 +19,30 @@ package org.mbari.vars.annotation.ui.actions;
 
 import org.mbari.awt.event.ActionAdapter;
 
+import vars.annotation.ui.ToolBelt;
+
 /**
  * <p>Creates a new Observation using the specified concept-name.</p>
  *
  * @author  <a href="http://www.mbari.org">MBARI</a>
- * @version  $Id: NewObservationUsingConceptNameAction.java 332 2006-08-01 18:38:46Z hohonuuli $
  */
 public class NewObservationUsingConceptNameAction extends ActionAdapter {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
 
-    /**
-     *     @uml.property  name="action1"
-     *     @uml.associationEnd  multiplicity="(1 1)"
-     */
     NewVideoFrameAction action1;
 
-    /**
-     *     @uml.property  name="conceptName"
-     */
+
     private String conceptName;
 
     /**
      * @param  conceptName Observations created by this action will have this
      * name
      */
-    public NewObservationUsingConceptNameAction(final String conceptName) {
+    public NewObservationUsingConceptNameAction(ToolBelt toolBelt, final String conceptName) {
         super();
         this.conceptName = conceptName;
-        action1 = new NewVideoFrameAction();
+        action1 = new NewVideoFrameAction(toolBelt);
 
-        // action2 = new ChangeObservationConceptNameAction(conceptName);
     }
 
     /**
@@ -67,7 +57,6 @@ public class NewObservationUsingConceptNameAction extends ActionAdapter {
     /**
      *     Gets the conceptName attribute of the NewObservationUsingConceptNameAction object
      *     @return   The conceptName value
-     *     @uml.property  name="conceptName"
      */
     public String getConceptName() {
         return conceptName;

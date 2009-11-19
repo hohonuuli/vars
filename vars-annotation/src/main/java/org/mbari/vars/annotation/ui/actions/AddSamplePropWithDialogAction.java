@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)AddSamplePropWithDialogAction.java   2009.11.19 at 01:46:13 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
- * (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,36 +12,34 @@
  */
 
 
+
 package org.mbari.vars.annotation.ui.actions;
 
 import javax.swing.JDialog;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.vars.annotation.ui.dialogs.AddSamplePropDialog;
+import vars.annotation.ui.ToolBelt;
 
 /**
  * <p>Displays a dialog that prompts the user to input parameters needed to
  * set the samples properties.</p>
  *
  * @author <a href="http://www.mbari.org">MBARI</a>
- * @version $Id: AddSamplePropWithDialogAction.java 314 2006-07-10 02:38:46Z hohonuuli $
  */
 public class AddSamplePropWithDialogAction extends ActionAdapter {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
-    private static final JDialog dialog = new AddSamplePropDialog();
+    private final JDialog dialog;
 
     /**
      *
+     *
+     * @param toolBelt
      */
-    public AddSamplePropWithDialogAction() {
-        super();
+    public AddSamplePropWithDialogAction(ToolBelt toolBelt) {
+        dialog = new AddSamplePropDialog(toolBelt);
     }
 
     /**
-     * <p><!-- Method description --></p>
      *
      */
     public void doAction() {

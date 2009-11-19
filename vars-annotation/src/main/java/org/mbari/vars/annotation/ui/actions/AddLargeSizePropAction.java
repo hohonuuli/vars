@@ -5,14 +5,16 @@
 
 package org.mbari.vars.annotation.ui.actions;
 
+import vars.annotation.ui.ToolBelt;
+
 /**
  *
  * @author brian
  */
 public class AddLargeSizePropAction extends AddPropertyAction {
 
-    public AddLargeSizePropAction() {
-        super("relative-size", "self", "large");
+    public AddLargeSizePropAction(ToolBelt toolBelt) {
+        super(toolBelt, "relative-size", "self", "large");
     }
 
 }

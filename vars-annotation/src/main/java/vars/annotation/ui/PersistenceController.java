@@ -15,7 +15,10 @@
 
 package vars.annotation.ui;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import vars.DAO;
 import vars.ILink;
@@ -38,6 +41,9 @@ import vars.annotation.VideoFrame;
  * @author         Brian Schlining [brian@mbari.org]
  */
 public class PersistenceController {
+    
+    private static final NumberFormat f0123 = new DecimalFormat("0000");
+    private static final NumberFormat f01 = new DecimalFormat("00");
 
     private final AnnotationDAOFactory annotationDAOFactory;
     private final AnnotationFactory annotationFactory;
@@ -190,6 +196,22 @@ public class PersistenceController {
         updateUI(modifiedObservations);
     }
     
+    public VideoArchive deleteEmptyVideoFramesFrom(VideoArchive videoArchive) {
+        final DAO dao = annotationDAOFactory.newDAO();
+        dao.startTransaction();
+        videoArchive = dao.merge(videoArchive);
+        Collection<VideoFrame> videoFrames = new ArrayList<VideoFrame>(videoArchive.getVideoFrames());
+        for (VideoFrame videoFrame : videoFrames) {
+            if (videoFrame.getObservations().size() == 0) {
+                videoArchive.removeVideoFrame(videoFrame);
+                dao.remove(videoFrame);
+            }
+        }
+        dao.endTransaction();
+        return videoArchive;
+    }
+    
+    
     public void deleteObservations(Collection<Observation> observations) {
         final DAO dao = annotationDAOFactory.newDAO();
         dao.startTransaction();
@@ -233,6 +255,19 @@ public class PersistenceController {
 //        // Update everything that's listening to the videoarchive.
 //        final VideoArchiveDispatcher vad = VideoArchiveDispatcher.getInstance();
 //        vad.setVideoArchive(vad.getVideoArchive());
+        
+        // if no obs selected scroll to last line
+//        Arrays.sort(rows);
+//        final int rowCount = table.getRowCount();
+//        int activeRow = rows[n - 1] - n + 1;
+//        if (activeRow > rowCount - 1) {
+//            activeRow = rowCount - 1;
+//        }
+//
+//        if (rowCount > 0) {
+//            table.setSelectedObservation(table.getObservationAt(activeRow));
+//            table.scrollToVisible(activeRow, 0);
+//        }
     }
     
     public void updateUI(VideoArchiveSet videoArchiveSet) {
@@ -241,6 +276,39 @@ public class PersistenceController {
     
     public void updateUI() {
         
+    }
+    
+    /**
+     * Convenience method very specific to MBARI internal usage and naming
+     * conventions. MBARI likes to name video archives so that a tape #3 from
+     * dive# 302 (seqNumber)using the ROV Tiburon (platform) would be named
+     * T0302-03.
+     *
+     * @param platform The platform name. THe first character of the name
+     *          is used. This is stored in the VideoArchiveSet
+     * @param seqNumber In MBARI's case we use dive number. seqNumber is
+     *          stored in the CameraPlatformDeployment. Numbers with more than
+     *          4 digits are not supported.
+     * @param tapeNumber This is an MBARI specific value. It is not stored in
+     *          the VARS database. Numbers of more than 2 digits are not supported.
+     * @param postfix This is any text to be appended to the end of the {@link VideoArchive}'s name. At MBARI,
+     *          we use this to indicate HD tapes by appending 'HD'. If it's null nothing will be
+     *          appended
+     * @return A string name that is generated from the supplied arguments
+     */
+    public static String makeVideoArchiveName(final String platform, final int seqNumber, final int tapeNumber,
+            final String postfix) {
+        StringBuffer sb = new StringBuffer();
+        sb.append(platform.charAt(0));
+        sb.append(f0123.format((long) seqNumber));
+        sb.append("-");
+        sb.append(f01.format((long) tapeNumber));
+
+        if (postfix != null) {
+            sb.append(postfix);
+        }
+
+        return sb.toString();
     }
     
 

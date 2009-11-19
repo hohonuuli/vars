@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)NewRefNumPropDialog.java   2009.11.19 at 08:40:34 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
- * (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,16 +12,18 @@
  */
 
 
+
 package org.mbari.vars.annotation.ui.dialogs;
 
+import java.awt.Frame;
 import java.awt.event.KeyEvent;
 import javax.swing.JDialog;
 import javax.swing.JTextField;
 import org.mbari.swing.JFancyButton;
 import org.mbari.vars.annotation.ui.actions.AddNewRefNumPropAction;
-import org.mbari.vars.util.AppFrameDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.annotation.ui.Lookup;
 
 /**
  * <p>This dialog is used to set the Reference Number property for the
@@ -43,66 +42,25 @@ import org.slf4j.LoggerFactory;
  *  [AddNewRefNumPropAction]&lt--[NewRefNumPropButton]
  * </pre>
  *
- * @author  <a href="http://www.mbari.org">MBARI</a>
- * @version  $Id: NewRefNumPropDialog.java 378 2006-10-26 20:53:17Z hohonuuli $
  */
 public class NewRefNumPropDialog extends JDialog {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1058890312877879823L;
-    private static final Logger log = LoggerFactory.getLogger(NewRefNumPropDialog.class);
-
-    /**
-     *     @uml.property  name="btnCancel"
-     *     @uml.associationEnd
-     */
     private javax.swing.JButton btnCancel = null;
-
-    /**
-     *     @uml.property  name="btnOk"
-     *     @uml.associationEnd
-     */
     private javax.swing.JButton btnOk = null;
-
-    /**
-     *     @uml.property  name="jContentPane"
-     *     @uml.associationEnd
-     */
     private javax.swing.JPanel jContentPane = null;
-
-    /**
-     *     @uml.property  name="jLabel"
-     *     @uml.associationEnd
-     */
     private javax.swing.JLabel jLabel = null;
-
-    /**
-     *     @uml.property  name="jPanel"
-     *     @uml.associationEnd
-     */
     private javax.swing.JPanel jPanel = null;
-
-    /**
-     *     @uml.property  name="jTextField"
-     *     @uml.associationEnd
-     */
     private javax.swing.JTextField jTextField = null;
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     /**
      * This is the default constructor
      */
     public NewRefNumPropDialog() {
-        super(AppFrameDispatcher.getFrame(), true);
+        super((Frame) Lookup.getApplicationFrameDispatcher().getValueObject(), true);
         initialize();
     }
 
-    /**
-     *     This method initializes btnCancel
-     *     @return   javax.swing.JButton
-     *     @uml.property  name="btnCancel"
-     */
     private javax.swing.JButton getBtnCancel() {
         if (btnCancel == null) {
             btnCancel = new JFancyButton();
@@ -118,11 +76,6 @@ public class NewRefNumPropDialog extends JDialog {
         return btnCancel;
     }
 
-    /**
-     *     This method initializes btnOk
-     *     @return   javax.swing.JButton
-     *     @uml.property  name="btnOk"
-     */
     private javax.swing.JButton getBtnOk() {
         if (btnOk == null) {
             btnOk = new JFancyButton();
@@ -146,11 +99,6 @@ public class NewRefNumPropDialog extends JDialog {
         return btnOk;
     }
 
-    /**
-     *     This method initializes jContentPane
-     *     @return   javax.swing.JPanel
-     *     @uml.property  name="jContentPane"
-     */
     private javax.swing.JPanel getJContentPane() {
         if (jContentPane == null) {
             jContentPane = new javax.swing.JPanel();
@@ -163,11 +111,6 @@ public class NewRefNumPropDialog extends JDialog {
         return jContentPane;
     }
 
-    /**
-     *     This method initializes jLabel
-     *     @return   javax.swing.JLabel
-     *     @uml.property  name="jLabel"
-     */
     private javax.swing.JLabel getJLabel() {
         if (jLabel == null) {
             jLabel = new javax.swing.JLabel();
@@ -179,11 +122,6 @@ public class NewRefNumPropDialog extends JDialog {
         return jLabel;
     }
 
-    /**
-     *     This method initializes jPanel
-     *     @return   javax.swing.JPanel
-     *     @uml.property  name="jPanel"
-     */
     private javax.swing.JPanel getJPanel() {
         if (jPanel == null) {
             jPanel = new javax.swing.JPanel();
@@ -194,11 +132,6 @@ public class NewRefNumPropDialog extends JDialog {
         return jPanel;
     }
 
-    /**
-     *     This method initializes jTextField
-     *     @return   javax.swing.JTextField
-     *     @uml.property  name="jTextField"
-     */
     private javax.swing.JTextField getJTextField() {
         if (jTextField == null) {
             jTextField = new javax.swing.JTextField();
@@ -219,11 +152,6 @@ public class NewRefNumPropDialog extends JDialog {
         return jTextField;
     }
 
-    /**
-     * This method initializes this
-     *
-     *
-     */
     private void initialize() {
         this.setSize(250, 100);
         this.setContentPane(getJContentPane());
@@ -231,12 +159,11 @@ public class NewRefNumPropDialog extends JDialog {
     }
 
     /**
-     * Method description
-     *
      *
      * @param b
      */
-    @Override public void setVisible(final boolean b) {
+    @Override
+    public void setVisible(final boolean b) {
         super.setVisible(b);
 
         if (b) {
@@ -251,8 +178,9 @@ public class NewRefNumPropDialog extends JDialog {
      *  Overridden show method.
      * @deprecated
      */
-    @Override @SuppressWarnings(value = { "deprecated}" })
-    @Deprecated public void show() {
+    @Override
+    @Deprecated
+    public void show() {
         setVisible(true);
     }
 }

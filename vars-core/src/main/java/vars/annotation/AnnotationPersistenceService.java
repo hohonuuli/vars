@@ -44,5 +44,7 @@ public interface AnnotationPersistenceService {
     
     Collection<Observation> updateAndValidate(Collection<Observation> observations);
     
+    Collection<Integer> findAllReferenceNumbers(VideoArchiveSet videoArchiveSet, Concept concept);
+    
 
 }

@@ -17,14 +17,16 @@
 
 package org.mbari.vars.annotation.ui.actions;
 
+import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
-import org.mbari.vars.annotation.model.VideoArchive;
-import org.mbari.vars.annotation.model.dao.VideoArchiveDAO;
-import org.mbari.vars.annotation.ui.dispatchers.PredefinedDispatcher;
-import org.mbari.vars.dao.DAOException;
-import org.mbari.vars.util.AppFrameDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import vars.annotation.AnnotationDAOFactory;
+import vars.annotation.VideoArchive;
+import vars.annotation.VideoArchiveDAO;
+import vars.annotation.ui.Lookup;
+import vars.annotation.ui.PersistenceController;
 
 /**
  * <p>Opens a <code>VideoArchive</code> for editing. You must first set the
@@ -43,33 +45,25 @@ import org.slf4j.LoggerFactory;
  */
 public class OpenVideoArchiveUsingParamsAction extends ActionAdapter {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
-    private static final Logger log = LoggerFactory.getLogger("vars.annotation");
-
-    /**
-     * @uml.property  name="platform"
-     */
+ 
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    
     private String platform;
     private String postfix;
 
-    /**
-     * @uml.property  name="seqNumber"
-     */
     private int seqNumber;
 
-    /**
-     * @uml.property  name="tapeNumber"
-     */
+ 
     private int tapeNumber;
 
+    protected final AnnotationDAOFactory annotationDAOFactory;
+    
     /**
      * Constructor
      */
-    public OpenVideoArchiveUsingParamsAction() {
+    public OpenVideoArchiveUsingParamsAction(AnnotationDAOFactory annotationDAOFactory) {
         super("Open archive");
+        this.annotationDAOFactory = annotationDAOFactory;
     }
 
     /**
@@ -79,42 +73,27 @@ public class OpenVideoArchiveUsingParamsAction extends ActionAdapter {
         if (platform != null) {
 
             // Create a name like T0123-01 or V3210-10
-            final String videoArchiveName = makeName();
+            final String videoArchiveName = PersistenceController.makeVideoArchiveName(platform, seqNumber, tapeNumber, postfix);
             try {
+                
+                // DAOTX
+                VideoArchiveDAO videoArchiveDAO = annotationDAOFactory.newVideoArchiveDAO();
+                videoArchiveDAO.startTransaction();
 
-                // See if a videoarchive with this id already exists
-                VideoArchive videoArchive = VideoArchiveDAO.getInstance().findByVideoArchiveName(videoArchiveName);
+                // Get a video archive to attach this too
+                VideoArchive videoArchive = videoArchiveDAO.findOrCreateByParameters(platform, seqNumber, videoArchiveName);
+                videoArchiveDAO.endTransaction();
+                Lookup.getVideoArchiveDispatcher().setValueObject(videoArchive);
 
-                // if no matching videoarchive is found create it.
-                if (videoArchive == null) {
-                    videoArchive = VideoArchiveDAO.getInstance().openByParameters(platform, seqNumber, tapeNumber,
-                            postfix);
-                }
-                else {
-                    AppFrameDispatcher.showWarningDialog(
-                        "You are opening a dive that already exists in the database. Please check your dive number.");
-                }
-
-                if (videoArchive != null) {
-                    PredefinedDispatcher.VIDEOARCHIVE.getDispatcher().setValueObject(videoArchive);
-                }
-                else {
-                    if (log.isErrorEnabled()) {
-                        log.error("Unable to find or create a VideoArchive.");
-                    }
-                }
             }
-            catch (final DAOException e) {
-                if (log.isErrorEnabled()) {
-                    log.error("Database exception", e);
-                }
+            catch (final Exception e) {
+                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
             }
         }
     }
 
     /**
      * @return
-     * @uml.property  name="platform"
      */
     public String getPlatform() {
         return platform;
@@ -132,7 +111,6 @@ public class OpenVideoArchiveUsingParamsAction extends ActionAdapter {
 
     /**
      * @return
-     * @uml.property  name="seqNumber"
      */
     public int getSeqNumber() {
         return seqNumber;
@@ -140,33 +118,21 @@ public class OpenVideoArchiveUsingParamsAction extends ActionAdapter {
 
     /**
      * @return
-     * @uml.property  name="tapeNumber"
      */
     public int getTapeNumber() {
         return tapeNumber;
     }
 
-    /**
-     * <p><!-- Method description --></p>
-     *
-     *
-     * @return
-     */
-    protected String makeName() {
-        return VideoArchive.makeVideoArchiveName(platform, seqNumber, tapeNumber, postfix);
-    }
+
 
     /**
      * @param  string
-     * @uml.property  name="platform"
      */
     public void setPlatform(final String string) {
         platform = string;
     }
 
     /**
-     * Method description
-     *
      *
      * @param postfix
      */
@@ -176,7 +142,6 @@ public class OpenVideoArchiveUsingParamsAction extends ActionAdapter {
 
     /**
      * @param  i
-     * @uml.property  name="seqNumber"
      */
     public void setSeqNumber(final int i) {
         seqNumber = i;
@@ -184,7 +149,6 @@ public class OpenVideoArchiveUsingParamsAction extends ActionAdapter {
 
     /**
      * @param  i
-     * @uml.property  name="tapeNumber"
      */
     public void setTapeNumber(final int i) {
         tapeNumber = i;

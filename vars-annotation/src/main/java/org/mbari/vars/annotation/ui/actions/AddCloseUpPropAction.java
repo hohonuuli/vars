@@ -17,27 +17,21 @@
 
 package org.mbari.vars.annotation.ui.actions;
 
+import vars.annotation.ui.ToolBelt;
+
 /**
  * <p>Adds 'perspective | self | close-up' property to the Observation set in
  * the ObservationDispatcher</p>
  *
  * @author <a href="http://www.mbari.org">MBARI</a>
- * @version $Id: AddCloseUpPropAction.java 314 2006-07-10 02:38:46Z hohonuuli $
  */
 public final class AddCloseUpPropAction extends AddPropertyAction {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
 
     /**
      * Constructs ...
      *
      */
-    public AddCloseUpPropAction() {
-        setLinkName("perspective");
-        setToConcept("self");
-        setLinkValue("close-up");
+    public AddCloseUpPropAction(ToolBelt toolBelt) {
+        super(toolBelt, "perspective", "self", "close-up");
     }
 }

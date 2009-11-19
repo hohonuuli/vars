@@ -17,6 +17,8 @@
 
 package org.mbari.vars.annotation.ui.actions;
 
+import vars.annotation.ui.ToolBelt;
+
 /**
  * <p>Adds 'population-quantity | self | 999' property to the Observation set in
  * the ObservationDispatcher</p>
@@ -26,15 +28,11 @@ package org.mbari.vars.annotation.ui.actions;
  */
 public final class AddPopulationPropAction extends AddPropertyAction {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
 
     /**
      *
      */
-    public AddPopulationPropAction() {
-        super("population-quantity", "self", "999");
+    public AddPopulationPropAction(ToolBelt toolBelt) {
+        super(toolBelt, "population-quantity", "self", "999");
     }
 }

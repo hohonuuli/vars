@@ -25,19 +25,15 @@ distributed to third parties without specific written permission from MBARI
  */
 package org.mbari.vars.annotation.ui.actions;
 
+import vars.annotation.ui.ToolBelt;
+
 /**
  * <p>Adds 'identity-reference | self | [some integer]' property to the Observation set in
  * the ObservationDispatcher</p>
  *
  * @author <a href="http://www.mbari.org">MBARI</a>
- * @version $Id: AddOldRefNumPropAction.java 314 2006-07-10 02:38:46Z hohonuuli $
  */
 public final class AddOldRefNumPropAction extends AddPropertyAction {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
 
     /**
      * It's static so all instance share the same number
@@ -47,8 +43,8 @@ public final class AddOldRefNumPropAction extends AddPropertyAction {
     /**
      *
      */
-    public AddOldRefNumPropAction() {
-        super("identity-reference", "self", "0");
+    public AddOldRefNumPropAction(ToolBelt toolBelt) {
+        super(toolBelt, "identity-reference", "self", "0");
     }
 
     /**
@@ -75,8 +71,6 @@ public final class AddOldRefNumPropAction extends AddPropertyAction {
     }
 
     /**
-     * <p><!-- Method description --></p>
-     *
      *
      * @param refNumber_
      */

@@ -52,7 +52,6 @@ import org.slf4j.LoggerFactory;
  * <p>Panel that provides input for opeining a user account.</p>
  *
  * @author  <a href="http://www.mbari.org">MBARI</a>
- * @version  $Id: UserConnectPanel.java 332 2006-08-01 18:38:46Z hohonuuli $
  */
 public class UserConnectPanel extends JPanel {
 
@@ -150,7 +149,7 @@ public class UserConnectPanel extends JPanel {
 
 
     private void createNewUser(final ActionEvent e) {
-        final NewUserDialog jDia = new NewUserDialog();
+        final NewUserDialog jDia = new NewUserDialog(toolBelt);
         jDia.setPreferredSize(new Dimension(350, 300));
         final UserAccount user = jDia.doNewUser();
 

@@ -35,7 +35,6 @@ import vars.annotation.VideoFrame;
 /**
  *
  * @author brian
- * @version $Id: ChangeTimeCodeAction.java 332 2006-08-01 18:38:46Z hohonuuli $
  */
 public class ChangeTimeCodeAction extends ActionAdapter {
 
