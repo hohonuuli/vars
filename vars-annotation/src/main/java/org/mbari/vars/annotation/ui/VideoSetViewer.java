@@ -313,7 +313,7 @@ public class VideoSetViewer extends JFrame {
     private class MoveAction extends MoveVideoFrameWithDialogAction {
 
         MoveAction() {
-            super(VideoSetViewer.this);
+            super(VideoSetViewer.this, toolBelt);
         }
 
         /**

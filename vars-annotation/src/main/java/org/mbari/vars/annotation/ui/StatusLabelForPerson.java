@@ -33,6 +33,7 @@ import org.mbari.vars.annotation.ui.actions.OpenUserAccountAction;
 
 import vars.UserAccount;
 import vars.annotation.ui.Lookup;
+import vars.annotation.ui.ToolBelt;
 
 /**
  * <p>Indicates the status of the annotator. green means an annotator is logged
@@ -46,13 +47,14 @@ public class StatusLabelForPerson extends StatusLabel {
 
 
   
-    private final OpenUserAccountAction action = new OpenUserAccountAction();
+    private final OpenUserAccountAction action;
 
     /**
      * Constructor
      */
-    public StatusLabelForPerson() {
+    public StatusLabelForPerson(ToolBelt toolBelt) {
         super();
+        action = new OpenUserAccountAction(toolBelt);
         final Dispatcher pd = Lookup.getUserAccountDispatcher();
         final UserAccount userAccount = (UserAccount) pd.getValueObject();
         update(userAccount);

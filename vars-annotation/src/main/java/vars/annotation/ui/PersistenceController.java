@@ -107,6 +107,15 @@ public class PersistenceController {
         // NO UI update is needed?
         return videoFrame;
     }
+    
+    public VideoArchive updateVideoArchive(VideoArchive videoArchive) {
+        DAO dao = annotationDAOFactory.newDAO();
+        dao.startTransaction();
+        videoArchive = dao.merge(videoArchive);
+        dao.endTransaction();
+        updateUI();
+        return videoArchive;
+    }
 
     /**
      *
@@ -311,6 +320,23 @@ public class PersistenceController {
         return sb.toString();
     }
     
+    
+    /**
+     * VideoFrames need to be loaded from the database. Call this method to fetch all
+     * of them for a particular {@link VideoArchive}. Be sre to grab the returned reference
+     * in order to access them.
+     * @param videoArchive
+     * @return
+     */
+    public VideoArchive loadVideoFramesFor(VideoArchive videoArchive) {
+        DAO dao = annotationDAOFactory.newDAO();
+        dao.startTransaction();
+        videoArchive = dao.merge(videoArchive);
+        @SuppressWarnings("unused")
+        Collection<VideoFrame> videoFrames = videoArchive.getVideoFrames();
+        dao.endTransaction();
+        return videoArchive;
+    }
 
 
     

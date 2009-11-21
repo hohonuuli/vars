@@ -9,6 +9,8 @@ public interface VideoService {
     
     IVCR getVCR();
     
+    void setVCR(IVCR vcr);
+    
     String lookupCurrentTimecode();
 
     Date lookupCurrentRecordedDate();

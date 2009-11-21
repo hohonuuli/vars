@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)LocaleFactory.java   2009.11.20 at 03:31:56 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1 
- * (the "License"); you may not use this file except in compliance 
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,25 +12,24 @@
  */
 
 
-/*
- * Created on Dec 16, 2004
- */
+
 package org.mbari.vars.annotation.locale;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Set;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.mbari.util.IObserver;
-import org.mbari.vars.annotation.ui.dispatchers.VcrDispatcher;
-import vars.util.VARSProperties;
+import org.mbari.util.Dispatcher;
 import org.mbari.vcr.IVCR;
 import org.mbari.vcr.timer.DefaultMonitoringVCR;
 import org.mbari.vcr.timer.Monitor;
 import org.mbari.vcr.timer.MonitoringVCR;
 import org.mbari.vcr.timer.TimecodeMonitor;
 import org.mbari.vcr.udp01.VCR;
-
-//~--- classes ----------------------------------------------------------------
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import vars.annotation.ui.Lookup;
+import vars.annotation.ui.VideoService;
+import vars.util.VARSProperties;
 
 /**
  * Acquires the deployment location (Shore, Point Lobos, Western Flyer) from a
@@ -54,17 +50,14 @@ public class LocaleFactory {
     private static boolean isInitialized;
     private static String locale;
 
-    //~--- constructors -------------------------------------------------------
-
     /**
      *
      */
     private LocaleFactory() {
         super();
+
         // No external instantiation allowed
     }
-
-    //~--- get methods --------------------------------------------------------
 
     /**
      *
@@ -89,8 +82,6 @@ public class LocaleFactory {
         return locale;
     }
 
-    //~--- methods ------------------------------------------------------------
-
     /**
      * <p><!-- Method description --></p>
      *
@@ -105,6 +96,8 @@ public class LocaleFactory {
                 }
             }
 
+            final Dispatcher dispatcher = Lookup.getVideoServiceDispatcher();
+
             /*
              * If VARS is running on one of the ships, we want the VCR to 'play' by
              * default. On this ships, since we don't actually control the VCR with
@@ -112,29 +105,29 @@ public class LocaleFactory {
              *
              */
             if (locale != null) {
-                    
-                final VcrDispatcher vcrDispatcher = VcrDispatcher.getInstance();
-                    
+
                 /*
                  * Automatically start 'playing' when VARS is started
                  */
                 try {
-                    vcrDispatcher.addObserver(new IObserver() {
+                    dispatcher.addPropertyChangeListener(new PropertyChangeListener() {
 
-                        public void update(Object obj, Object changeCode) {
-                            if ((obj != null) && (obj instanceof IVCR)) {
-                                ((IVCR) obj).play();
+                        public void propertyChange(PropertyChangeEvent evt) {
+                            VideoService videoService = (VideoService) evt.getNewValue();
+                            IVCR vcr = (videoService == null) ? null : videoService.getVCR();
+                            if (vcr != null) {
+                                vcr.play();
                             }
-                        }
 
+                        }
                     });
 
-                } catch (Exception e) {
+                }
+                catch (Exception e) {
                     log.error("Auto-play on " + cameraPlatform + "failed.", e);
                 }
-                
             }
-            
+
             /*
              * If a remote URL for the VCR is specified try to connect to it.
              */
@@ -143,6 +136,7 @@ public class LocaleFactory {
             if (vcrUrl != null) {
                 MonitoringVCR vcr = null;
                 try {
+
                     // Slow down the timecode sampling rate when working over the network
                     vcr = new DefaultMonitoringVCR(new VCR(vcrUrl, VARSProperties.getVcrPort()));
                     Set<Monitor> monitors = vcr.getMonitors();
@@ -152,12 +146,15 @@ public class LocaleFactory {
                             break;
                         }
                     }
-                    VcrDispatcher.DISPATCHER.setValueObject(vcr);
-                } catch (Exception ex) {
+
+                    VideoService videoService = (VideoService) dispatcher.getValueObject();
+                    videoService.setVCR(vcr);
+                }
+                catch (Exception ex) {
                     if (log.isWarnEnabled()) {
                         log.warn("Failed to connect to VCR on " + vcrUrl + ":" + vcrPort);
                     }
-                } 
+                }
             }
 
             isInitialized = true;

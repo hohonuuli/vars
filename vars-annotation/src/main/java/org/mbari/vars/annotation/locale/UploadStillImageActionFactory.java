@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)UploadStillImageActionFactory.java   2009.11.20 at 04:18:11 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1 
- * (the "License"); you may not use this file except in compliance 
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,42 +12,37 @@
  */
 
 
-/*
- * Created on Dec 16, 2004 by Brian Schlining
- */
+
 package org.mbari.vars.annotation.locale;
 
-//~--- classes ----------------------------------------------------------------
+import vars.annotation.ui.PersistenceController;
 
 /**
  * <p></p>
  *
  * @author <a href="http://www.mbari.org">MBARI</a>
- * @version $Id: UploadStillImageActionFactory.java 3 2005-10-27 16:20:12Z hohonuuli $
  */
 public class UploadStillImageActionFactory {
 
+    private final PersistenceController persistenceController;
+
     /**
-     *
+     * @param persistenceController
      */
-    private UploadStillImageActionFactory() {
-        // No instantiation
+    public UploadStillImageActionFactory(PersistenceController persistenceController) {
+        this.persistenceController = persistenceController;
     }
 
-    //~--- get methods --------------------------------------------------------
-
     /**
-     * <p><!-- Method description --></p>
-     *
-     *
      * @return
      */
-    public static UploadStillImageAction getAction() {
+    public UploadStillImageAction getAction() {
         final String platform = LocaleFactory.getCameraPlatform();
         UploadStillImageAction action = null;
         if ((platform == null) || platform.toLowerCase().equals("shore")) {
-            action = new org.mbari.vars.annotation.locale.shore.UploadStillImageAction();
-        } else {
+            action = new org.mbari.vars.annotation.locale.shore.UploadStillImageAction(persistenceController);
+        }
+        else {
             action = new org.mbari.vars.annotation.locale.UploadStillImageAction();
         }
 

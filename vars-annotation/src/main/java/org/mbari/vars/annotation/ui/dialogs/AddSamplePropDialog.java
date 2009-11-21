@@ -108,8 +108,8 @@ public class AddSamplePropDialog extends JDialog {
                     getCbSampler().getEditor().selectAll();
                     dispose();
                 }
-                AddPropertyAction action1 = new AddSamplePropAction();
-                AddPropertyAction action2 = new AddPropertyAction("sample-reference", "self", "0");
+                AddPropertyAction action1 = new AddSamplePropAction(toolBelt);
+                AddPropertyAction action2 = new AddPropertyAction(toolBelt, "sample-reference", "self", "0");
 
             });
             btnOk.setFocusable(true);

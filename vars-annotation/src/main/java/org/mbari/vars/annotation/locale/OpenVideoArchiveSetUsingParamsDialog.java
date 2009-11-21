@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)OpenVideoArchiveSetUsingParamsDialog.java   2009.11.20 at 03:41:39 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
- * (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,14 +12,11 @@
  */
 
 
-/*
-Created on Feb 25, 2004
- */
+
 package org.mbari.vars.annotation.locale;
 
-import java.awt.Container;
-import java.awt.Frame;
 import java.awt.BorderLayout;
+import java.awt.Frame;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -38,10 +32,11 @@ import javax.swing.JTextField;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.vars.annotation.ui.actions.OpenVideoArchiveUsingParamsAction;
 import org.mbari.vars.annotation.ui.dialogs.OkayCancelDialog;
-import org.mbari.vars.util.AppFrameDispatcher;
-import vars.util.VARSProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.annotation.AnnotationDAOFactory;
+import vars.annotation.ui.Lookup;
+import vars.util.VARSProperties;
 
 /**
  * <p>
@@ -51,85 +46,32 @@ import org.slf4j.LoggerFactory;
  *
  *
  * @author  <a href="http://www.mbari.org">MBARI </a>
- * @version  $Id: OpenVideoArchiveSetUsingParamsDialog.java,v 1.2 2004/04/09
- *          22:24:31 brian Exp $
  */
 public class OpenVideoArchiveSetUsingParamsDialog extends OkayCancelDialog {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 3089267384853022800L;
-    private static final Logger log = LoggerFactory.getLogger(OpenVideoArchiveSetUsingParamsDialog.class);
-
-    /**
-     *     @uml.property  name="okButtonAction"
-     *     @uml.associationEnd
-     */
-    protected ActionAdapter okButtonAction;    //  @jve:decl-index=0:
-
-    /**
-     *     @uml.property  name="cbCameraPlatform"
-     *     @uml.associationEnd
-     */
     private javax.swing.JComboBox cbCameraPlatform = null;
     private JCheckBox cbHD = null;
-
-    /**
-     *     @uml.property  name="jLabel"
-     *     @uml.associationEnd
-     */
     private javax.swing.JLabel jLabel = null;
     private JLabel jLabel1 = null;
-
-    /**
-     *     @uml.property  name="jPanel"
-     *     @uml.associationEnd
-     */
     private javax.swing.JPanel jPanel = null;
-
-    /**
-     *     @uml.property  name="jPanel1"
-     *     @uml.associationEnd
-     */
     private javax.swing.JPanel jPanel1 = null;
-
-    /**
-     *     @uml.property  name="jPanel3"
-     *     @uml.associationEnd
-     */
     private javax.swing.JPanel jPanel3 = null;
-    private JPanel jPanel4 = null;    //  @jve:decl-index=0:visual-constraint="161,368"
-
-    /**
-     *     @uml.property  name="lblCameraPlatform"
-     *     @uml.associationEnd
-     */
+    private JPanel jPanel4 = null;
     private javax.swing.JLabel lblCameraPlatform = null;
-
-    /**
-     *     @uml.property  name="lblDiveNumber"
-     *     @uml.associationEnd
-     */
     private javax.swing.JLabel lblDiveNumber = null;
-
-    /**
-     *     @uml.property  name="tfDiveNumber"
-     *     @uml.associationEnd
-     */
+    private final Logger log = LoggerFactory.getLogger(getClass());
     private javax.swing.JTextField tfDiveNumber = null;
-
-    /**
-     *     @uml.property  name="tfTapeNumber"
-     *     @uml.associationEnd
-     */
     private javax.swing.JTextField tfTapeNumber = null;
+    private final AnnotationDAOFactory annotationDAOFactory;
+    protected ActionAdapter okButtonAction;
 
     /**
      * This is the default constructor
+     *
+     * @param annotationDAOFactory
      */
-    public OpenVideoArchiveSetUsingParamsDialog() {
-        this(AppFrameDispatcher.getFrame());
+    public OpenVideoArchiveSetUsingParamsDialog(AnnotationDAOFactory annotationDAOFactory) {
+        this((Frame) Lookup.getApplicationFrameDispatcher().getValueObject(), annotationDAOFactory);
     }
 
     /**
@@ -137,18 +79,14 @@ public class OpenVideoArchiveSetUsingParamsDialog extends OkayCancelDialog {
      *
      *
      * @param owner
+     * @param annotationDAOFactory
      */
-    public OpenVideoArchiveSetUsingParamsDialog(Frame owner) {
+    public OpenVideoArchiveSetUsingParamsDialog(Frame owner, AnnotationDAOFactory annotationDAOFactory) {
         super(owner, "VARS - Create Video Archive", true);
+        this.annotationDAOFactory = annotationDAOFactory;
         initialize();
     }
 
-    /**
-     * <p><!-- Method description --></p>
-     *
-     *
-     * @param b
-     */
     private void enableOkayButton(boolean b) {
         final JButton btn = getOkayButton();
         btn.setEnabled(b);
@@ -159,15 +97,15 @@ public class OpenVideoArchiveSetUsingParamsDialog extends OkayCancelDialog {
     /**
      *     This method initializes and returns cbCameraPlatform
      *     @return   javax.swing.JComboBox
-     *     @uml.property  name="cbCameraPlatform"
      */
+    @SuppressWarnings("unchecked")
     public javax.swing.JComboBox getCbCameraPlatform() {
         if (cbCameraPlatform == null) {
             cbCameraPlatform = new javax.swing.JComboBox();
             cbCameraPlatform.setFocusable(true);
-            Collection cameraPlatforms = VARSProperties.getCameraPlatforms();
+            Collection<String> cameraPlatforms = VARSProperties.getCameraPlatforms();
             for (Iterator i = cameraPlatforms.iterator(); i.hasNext(); ) {
-                cbCameraPlatform.addItem((String) i.next());
+                cbCameraPlatform.addItem(i.next());
             }
         }
 
@@ -193,7 +131,6 @@ public class OpenVideoArchiveSetUsingParamsDialog extends OkayCancelDialog {
     /**
      *     This method initializes jLabel
      *     @return   javax.swing.JLabel
-     *     @uml.property  name="jLabel"
      */
     private javax.swing.JLabel getJLabel() {
         if (jLabel == null) {
@@ -204,11 +141,6 @@ public class OpenVideoArchiveSetUsingParamsDialog extends OkayCancelDialog {
         return jLabel;
     }
 
-    /**
-     *     This method initializes jPanel
-     *     @return   javax.swing.JPanel
-     *     @uml.property  name="jPanel"
-     */
     private javax.swing.JPanel getJPanel() {
         if (jPanel == null) {
             jPanel = new javax.swing.JPanel();
@@ -223,11 +155,6 @@ public class OpenVideoArchiveSetUsingParamsDialog extends OkayCancelDialog {
         return jPanel;
     }
 
-    /**
-     *     This method initializes jPanel1
-     *     @return   javax.swing.JPanel
-     *     @uml.property  name="jPanel1"
-     */
     private javax.swing.JPanel getJPanel1() {
         if (jPanel1 == null) {
             jPanel1 = new javax.swing.JPanel();
@@ -242,11 +169,6 @@ public class OpenVideoArchiveSetUsingParamsDialog extends OkayCancelDialog {
         return jPanel1;
     }
 
-    /**
-     *     This method initializes jPanel3
-     *     @return   javax.swing.JPanel
-     *     @uml.property  name="jPanel3"
-     */
     private javax.swing.JPanel getJPanel3() {
         if (jPanel3 == null) {
             jPanel3 = new javax.swing.JPanel();
@@ -261,11 +183,6 @@ public class OpenVideoArchiveSetUsingParamsDialog extends OkayCancelDialog {
         return jPanel3;
     }
 
-    /**
-     * This method initializes jPanel4
-     *
-     * @return javax.swing.JPanel
-     */
     private JPanel getJPanel4() {
         if (jPanel4 == null) {
             jLabel1 = new JLabel();
@@ -282,11 +199,6 @@ public class OpenVideoArchiveSetUsingParamsDialog extends OkayCancelDialog {
         return jPanel4;
     }
 
-    /**
-     *     This method initializes lblCameraPlatform
-     *     @return   javax.swing.JLabel
-     *     @uml.property  name="lblCameraPlatform"
-     */
     private javax.swing.JLabel getLblCameraPlatform() {
         if (lblCameraPlatform == null) {
             lblCameraPlatform = new javax.swing.JLabel();
@@ -298,11 +210,6 @@ public class OpenVideoArchiveSetUsingParamsDialog extends OkayCancelDialog {
         return lblCameraPlatform;
     }
 
-    /**
-     *     This method initializes lblDiveNumber
-     *     @return   javax.swing.JLabel
-     *     @uml.property  name="lblDiveNumber"
-     */
     private javax.swing.JLabel getLblDiveNumber() {
         if (lblDiveNumber == null) {
             lblDiveNumber = new javax.swing.JLabel();
@@ -317,13 +224,11 @@ public class OpenVideoArchiveSetUsingParamsDialog extends OkayCancelDialog {
     /**
      *     Gets the okButtonAction attribute of the OpenVideoArchiveSetUsingParamsDialog object
      *     @return   The okButtonAction value
-     *     @uml.property  name="okButtonAction"
      */
     public ActionAdapter getOkButtonAction() {
         if (okButtonAction == null) {
             okButtonAction = new ActionAdapter() {
 
-                private static final long serialVersionUID = 1L;
                 public void doAction() {
                     int seqNumber = Integer.parseInt(getTfDiveNumber().getText());
                     String platform = (String) getCbCameraPlatform().getSelectedItem();
@@ -336,28 +241,22 @@ public class OpenVideoArchiveSetUsingParamsDialog extends OkayCancelDialog {
                     action.doAction();
                     dispose();
                 }
-                private final OpenVideoArchiveUsingParamsAction action = new OpenVideoArchiveUsingParamsAction();
+                private final OpenVideoArchiveUsingParamsAction action = new OpenVideoArchiveUsingParamsAction(
+                    annotationDAOFactory);
             };
         }
 
         return okButtonAction;
     }
 
-    /**
-     *     This method initializes tfDiveNumber
-     *     @return   javax.swing.JTextField
-     *     @uml.property  name="tfDiveNumber"
-     */
     protected javax.swing.JTextField getTfDiveNumber() {
         if (tfDiveNumber == null) {
             tfDiveNumber = new javax.swing.JTextField();
             tfDiveNumber.setFocusable(true);
             tfDiveNumber.setMinimumSize(new java.awt.Dimension(70, 19));
 
-            // Generated
             tfDiveNumber.setPreferredSize(new java.awt.Dimension(70, 19));
 
-            // Generated
             tfDiveNumber.addKeyListener(makeKeyListener(tfDiveNumber));
         }
 
@@ -367,7 +266,6 @@ public class OpenVideoArchiveSetUsingParamsDialog extends OkayCancelDialog {
     /**
      *     This method initializes tfTapeNumber
      *     @return   javax.swing.JTextField
-     *     @uml.property  name="tfTapeNumber"
      */
     protected javax.swing.JTextField getTfTapeNumber() {
         if (tfTapeNumber == null) {
@@ -379,11 +277,6 @@ public class OpenVideoArchiveSetUsingParamsDialog extends OkayCancelDialog {
         return tfTapeNumber;
     }
 
-    /**
-     * This method initializes this
-     *
-     *
-     */
     private void initialize() {
         if (log.isDebugEnabled()) {
             log.debug("Initializing " + getClass().getName());
@@ -394,43 +287,24 @@ public class OpenVideoArchiveSetUsingParamsDialog extends OkayCancelDialog {
         initializeContentPane();
     }
 
-    /**
-     * <p><!-- Method description --></p>
-     *
-     */
     private void initializeContentPane() {
         JPanel jContentPane = new JPanel();
         getContentPane().add(jContentPane, BorderLayout.CENTER);
         jContentPane.add(getJPanel(), null);
 
-        // Generated
         jContentPane.add(getJPanel1(), null);
 
-        // Generated
         jContentPane.add(getJPanel3(), null);
         jContentPane.add(getJPanel4(), null);
         jContentPane.setLayout(new javax.swing.BoxLayout(jContentPane, javax.swing.BoxLayout.Y_AXIS));
     }
 
-    /**
-     * This method initializes btnOk
-     *
-     *
-     */
     private void initializeOkayButton() {
         setCloseDialogOnOkay(false);
         getOkayButton().addActionListener(getOkButtonAction());
         updateOkayButtonsEnabledProperty();
     }
 
-    /**
-     * <p><!-- Method description --></p>
-     *
-     *
-     * @param tf
-     *
-     * @return
-     */
     private KeyListener makeKeyListener(final JTextField tf) {
         KeyListener keyListener = new KeyAdapter() {
 
@@ -459,17 +333,12 @@ public class OpenVideoArchiveSetUsingParamsDialog extends OkayCancelDialog {
         return keyListener;
     }
 
-    /**
-     * <p><!-- Method description --></p>
-     *
-     */
     private void updateOkayButtonsEnabledProperty() {
 
-        // Toggle the state of the ok button as
-        // approapriate.
+        // Toggle the state of the ok button as appropriate.
         final JButton btn = getOkayButton();
-        if ((getTfDiveNumber().getText() != null) &&!getTfDiveNumber().getText().equals("") &&
-                (getTfTapeNumber().getText() != null) &&!getTfTapeNumber().getText().equals("")) {
+        if ((getTfDiveNumber().getText() != null) && !getTfDiveNumber().getText().equals("") &&
+                (getTfTapeNumber().getText() != null) && !getTfTapeNumber().getText().equals("")) {
             btn.setEnabled(true);
             btn.setFocusable(true);
             btn.setRequestFocusEnabled(true);

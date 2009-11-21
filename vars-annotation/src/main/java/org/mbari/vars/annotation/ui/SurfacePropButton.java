@@ -13,6 +13,7 @@ import org.mbari.vars.annotation.ui.actions.AddPropertyAction;
 import org.mbari.vars.annotation.ui.dialogs.ToConceptSelectionDialog;
 
 import vars.annotation.AnnotationPersistenceService;
+import vars.annotation.ui.ToolBelt;
 
 /**
  *
@@ -22,11 +23,11 @@ public class SurfacePropButton extends PropButton {
 
     private ActionAdapter showDialogAction;
     private AddPropertyAction addPropertyAction;
-    private final AnnotationPersistenceService specialAnnotationDAO;
+    private final ToolBelt toolBelt;
 
-    public SurfacePropButton(AnnotationPersistenceService specialAnnotationDAO) {
+    public SurfacePropButton(ToolBelt toolBelt) {
         super();
-        this.specialAnnotationDAO = specialAnnotationDAO;
+        this.toolBelt = toolBelt;
         setAction(getShowDialogAction());
         setToolTipText("upon");
         setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/surfacebutton.png")));
@@ -39,7 +40,7 @@ public class SurfacePropButton extends PropButton {
      */
     protected AddPropertyAction getAddPropertyAction() {
         if (addPropertyAction == null) {
-            addPropertyAction = new AddPropertyAction("upon", "physical object", "nil");
+            addPropertyAction = new AddPropertyAction(toolBelt, "upon", "physical object", "nil");
         }
         return addPropertyAction;
     }
@@ -64,7 +65,7 @@ public class SurfacePropButton extends PropButton {
 
         protected ToConceptSelectionDialog getDialog() {
             if (dialog == null) {
-                dialog = new ToConceptSelectionDialog(specialAnnotationDAO);
+                dialog = new ToConceptSelectionDialog(toolBelt.getAnnotationPersistenceService());
                 dialog.setLocationRelativeTo(SurfacePropButton.this);
                 dialog.getOkButton().addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {

@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)UploadStillImageAction.java   2009.11.20 at 04:15:37 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1 
- * (the "License"); you may not use this file except in compliance 
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,9 +12,7 @@
  */
 
 
-/*
- * Created on Dec 16, 2004
- */
+
 package org.mbari.vars.annotation.locale.shore;
 
 import java.io.File;
@@ -30,24 +25,22 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import javax.swing.JProgressBar;
+import javax.swing.JComponent;
+import org.bushe.swing.event.EventBus;
+import org.mbari.swing.LabeledSpinningDialWaitIndicator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.mbari.swing.ProgressDialog;
-import org.mbari.vars.dao.DAOEventQueue;
-import org.mbari.vars.dao.DAOExceptionHandler;
-import org.mbari.vars.util.AppFrameDispatcher;
+import vars.annotation.CameraData;
+import vars.annotation.CameraDeployment;
+import vars.annotation.VideoArchive;
+import vars.annotation.VideoArchiveSet;
+import vars.annotation.VideoFrame;
+import vars.annotation.ui.Lookup;
+import vars.annotation.ui.PersistenceController;
 import vars.util.VARSProperties;
-import org.mbari.vars.annotation.model.VideoFrame;
-import vars.annotation.IVideoArchiveSet;
-import vars.annotation.IVideoArchive;
-import vars.annotation.IVideoFrame;
-import vars.annotation.ICameraData;
-import vars.annotation.ICameraPlatformDeployment;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * <p>
@@ -57,41 +50,24 @@ import vars.annotation.ICameraPlatformDeployment;
  * </p>
  *
  * @author  <a href="http://www.mbari.org">MBARI </a>
- * @created  November 2, 2004
- * @version  $Id: UploadStillImageAction.java 453 2006-12-08 00:46:21Z hohonuuli $
  */
-public class UploadStillImageAction
-        extends org.mbari.vars.annotation.locale.UploadStillImageAction {
+public class UploadStillImageAction extends org.mbari.vars.annotation.locale.UploadStillImageAction {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = -2827861342447323501L;
-    private static final Logger log = LoggerFactory.getLogger(UploadStillImageAction.class);
-
-    /** 
-     * 
-     */
+    /**  */
     public static final String ACTION_NAME = "Upload Still images";
-
-    //~--- fields -------------------------------------------------------------
-
-    /**
-	 * @uml.property  name="uploadLocation"
-	 * @uml.associationEnd  inverse="this$0:org.mbari.vars.annotation.locale.shore.UploadStillImageAction$UploadLocation"
-	 */
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    private final PersistenceController persistenceController;
     private UploadLocation uploadLocation;
-
-    //~--- constructors -------------------------------------------------------
 
     /**
      * Constructor for the UploadStillImageAction object
+     *
+     * @param persistenceController
      */
-    public UploadStillImageAction() {
+    public UploadStillImageAction(PersistenceController persistenceController) {
         super();
+        this.persistenceController = persistenceController;
     }
-
-    //~--- methods ------------------------------------------------------------
 
     /**
      * @param  src This will be a file URL like "file:/C:/Program Files/Documents
@@ -139,7 +115,7 @@ public class UploadStillImageAction
          */
         File[] matches = srcFile.listFiles(filter);
         for (int i = 0; i < matches.length; i++) {
-            copy(matches[i].toURL(), new File(dst, matches[i].getName()));
+            copy(matches[i].toURI().toURL(), new File(dst, matches[i].getName()));
         }
 
         return filepath;
@@ -171,8 +147,7 @@ public class UploadStillImageAction
      * Description of the Method
      */
     public void doAction() {
-        if ((videoArchive == null) ||!isEnabled() ||
-                (uploadLocation == null)) {
+        if ((videoArchive == null) || !isEnabled() || (uploadLocation == null)) {
             if (log.isWarnEnabled()) {
                 log.warn("Unable to upload images.");
             }
@@ -184,8 +159,7 @@ public class UploadStillImageAction
         final File dst = uploadLocation.getUploadDirectory();
         if (dst == null) {
             if (log.isWarnEnabled()) {
-                log.warn(
-                        "Unable to create a directory to move the images into. No frame grabs have been moved.");
+                log.warn("Unable to create a directory to move the images into. No frame grabs have been moved.");
             }
 
             return;
@@ -198,9 +172,7 @@ public class UploadStillImageAction
 
             if (!success) {
                 if (log.isWarnEnabled()) {
-                    log.warn(
-                            "Failed to create the directory, " +
-                            dst.getAbsolutePath() + ", to move images into.");
+                    log.warn("Failed to create the directory, " + dst.getAbsolutePath() + ", to move images into.");
                 }
 
                 return;
@@ -210,9 +182,9 @@ public class UploadStillImageAction
         // Move the images
         if (success) {
             moveImages(dst);
-        } else {
-            AppFrameDispatcher.showWarningDialog(
-                    "Unable to copy framegrabs to " + dst.getAbsolutePath());
+        }
+        else {
+            EventBus.publish(Lookup.TOPIC_WARNING, "Unable to copy framegrabs to " + dst.getAbsolutePath());
         }
     }
 
@@ -237,130 +209,103 @@ public class UploadStillImageAction
      * @param  dst Description of the Parameter
      */
     private void moveImages(File dst) {
-        Collection vfs = videoArchive.getVideoFrames();
 
-        ProgressDialog progressDialog = AppFrameDispatcher.getProgressDialog();
-        progressDialog.setLabel("Uploading images from " + videoArchive.getVideoArchiveName());
-        JProgressBar progressBar = progressDialog.getProgressBar();
-        progressBar.setMinimum(0);
-        progressBar.setMaximum(vfs.size());
-        progressBar.setString("");
-        progressBar.setStringPainted(true);
-        progressBar.setValue(0);
-        progressDialog.setVisible(true);
-        
+        VideoArchive va = persistenceController.loadVideoFramesFor(videoArchive);
+        Collection<VideoFrame> vfs = new ArrayList<VideoFrame>(va.getVideoFrames());
+
+        JComponent component = (JComponent) Lookup.getApplicationFrameDispatcher().getValueObject();
+        LabeledSpinningDialWaitIndicator waitIndicator = new LabeledSpinningDialWaitIndicator(component);
+        waitIndicator.setLabel("Uploading images");
+
+        Collection<VideoFrame> videoFramesToUpdate = new ArrayList<VideoFrame>();
+
+
         int count = 0;
-        synchronized (vfs) {
-            for (Iterator i = vfs.iterator(); i.hasNext(); ) {
-                final IVideoFrame vf = (IVideoFrame) i.next();
-                ICameraData cd = vf.getCameraData();
-                if (cd != null) {
-                    /*
-                     *  src is a URL (as a String)
-                     */
-                    final String src = cd.getStillImage();
-                    if ((src != null) && src.startsWith("file")) {
-                        try {
-                            progressBar.setString("Copying " + src);
-                            final File filecopied = copy(src, dst);
-                            updateDatabase(vf, filecopied);
-                        } catch (IOException e) {
-                            if (log.isErrorEnabled()) {
-                                log.error(
-                                        "Failed to copy " + src + " to " + dst,
-                                        e);
-                            }
-                        }
+        for (Iterator<VideoFrame> i = vfs.iterator(); i.hasNext(); ) {
+            final VideoFrame vf = i.next();
+            CameraData cd = vf.getCameraData();
+
+            /*
+             *  src is a URL (as a String)
+             */
+            final String src = cd.getImageReference();
+            if ((src != null) && src.startsWith("file")) {
+                try {
+                    waitIndicator.setLabel("Copying " + src);
+                    final File filecopied = copy(src, dst);
+                    updateDatabase(vf, filecopied);
+                    videoFramesToUpdate.add(vf);
+                }
+                catch (IOException e) {
+                    if (log.isErrorEnabled()) {
+                        log.error("Failed to copy " + src + " to " + dst, e);
                     }
                 }
-                progressBar.setValue(++count);
-                progressBar.setString("");
             }
+
         }
 
-        progressDialog.setVisible(false);
-    }
+        waitIndicator.setLabel("Updating database");
+        persistenceController.updateVideoFrames(videoFramesToUpdate);
 
-    //~--- set methods --------------------------------------------------------
+        waitIndicator.dispose();
+    }
 
     /**
      * @param  videoArchive The videoArchive to set.
      */
-    public void setVideoArchive(IVideoArchive videoArchive) {
+    public void setVideoArchive(VideoArchive videoArchive) {
         this.videoArchive = videoArchive;
 
         if (videoArchive != null) {
             try {
                 uploadLocation = new UploadLocation(videoArchive);
                 setEnabled(true);
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 if (log.isErrorEnabled()) {
                     log.error("Trouble", e);
                 }
 
                 uploadLocation = null;
             }
-        } else {
+        }
+        else {
             uploadLocation = null;
         }
     }
-
-    //~--- methods ------------------------------------------------------------
 
     /**
      * @param  videoFrame The videoFrame to update
      * @param  dst The File where the image that this videoFrame refers to was
      *            copied.
      */
-    private void updateDatabase(final IVideoFrame videoFrame, final File dst) {
+    private void updateDatabase(final VideoFrame videoFrame, final File dst) {
         URL dstUrl = null;
         try {
             if (uploadLocation != null) {
                 dstUrl = uploadLocation.fileToUrl(dst);
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             dstUrl = null;
 
             if (log.isWarnEnabled()) {
-                log.warn(
-                        "Failed to convert a path to a url. The database " +
-                        "sillImageURL reference will not be updated.",
-                        e);
+                log.warn("Failed to convert a path to a url. The database " +
+                         "sillImageURL reference will not be updated.", e);
             }
 
             return;
         }
 
         if (dstUrl != null) {
-            final ICameraData cameraData = videoFrame.getCameraData();
-            final String oldStillImage = cameraData.getStillImage();
-            cameraData.setStillImage(dstUrl.toExternalForm());
-
-            try {
-                DAOEventQueue.update(
-                        (VideoFrame) videoFrame,
-                        new VFUpdateErrorHandler(cameraData, oldStillImage));
-            } catch (Exception e) {
-                cameraData.setStillImage(oldStillImage);
-
-                if (log.isWarnEnabled()) {
-                    log.warn(
-                            "Failed to update stillImage, " + dstUrl +
-                            ". Rolled back change",
-                            e);
-                }
-            }
+            final CameraData cameraData = videoFrame.getCameraData();
+            final String oldStillImage = cameraData.getImageReference();
+            cameraData.setImageReference(dstUrl.toExternalForm());
         }
     }
 
-    //~--- inner classes ------------------------------------------------------
-
-    /**
-	 * Description of the Class
-	 * @author   brian
-	 * @created   November 2, 2004
-	 */
-    private class UploadLocation {
+    class UploadLocation {
 
         private final NumberFormat format4i = new DecimalFormat("0000");
 
@@ -383,7 +328,7 @@ public class UploadStillImageAction
         /**
          * The videoArchive of interest
          */
-        private final IVideoArchive videoArchive_;
+        private final VideoArchive videoArchive_;
 
         /**
          * Constructor for the UploadLocation object
@@ -393,23 +338,16 @@ public class UploadStillImageAction
          * @exception  IllegalArgumentException Description of the Exception
          * @throws  MalformedURLException
          */
-        UploadLocation(IVideoArchive videoArchive)
-                throws MalformedURLException, IllegalArgumentException {
+        UploadLocation(VideoArchive videoArchive) throws MalformedURLException, IllegalArgumentException {
             if (videoArchive == null) {
-                throw new IllegalArgumentException(
-                        "VideoArchive can not be null");
+                throw new IllegalArgumentException("VideoArchive can not be null");
             }
 
             videoArchive_ = videoArchive;
-            //final ResourceBundle rb = ResourceBundle.getBundle("vars");
-            //uploadUrl = new URL(rb.getString("image.archive.url"));
             uploadUrl = new URL(VARSProperties.getImageArchiveURL());
             uploadRoot = new File(VARSProperties.getImageArchiveDirectory());
-            //String s = rb.getString("image.archive.dir");
-            //uploadRoot = new File(s);
 
-            if ((uploadRoot == null) ||!uploadRoot.exists() ||
-                    !uploadRoot.canWrite()) {
+            if ((uploadRoot == null) || !uploadRoot.exists() || !uploadRoot.canWrite()) {
                 setEnabled(false);
             }
         }
@@ -423,16 +361,14 @@ public class UploadStillImageAction
          * @exception  IllegalArgumentException Description of the Exception
          * @throws  MalformedURLException
          */
-        URL fileToUrl(final File targetFile)
-                throws IllegalArgumentException, MalformedURLException {
+        URL fileToUrl(final File targetFile) throws IllegalArgumentException, MalformedURLException {
 
-            //**** Ensure that the file provided is located under the image archive directory
+            // ---- Ensure that the file provided is located under the image archive directory
             String targetPath = targetFile.getAbsolutePath();
             final String rootPath = uploadRoot.getAbsolutePath();
             if (!targetPath.startsWith(rootPath)) {
                 throw new IllegalArgumentException("The file, " + targetPath +
-                        ", is not located in the expected location, " +
-                            rootPath);
+                                                   ", is not located in the expected location, " + rootPath);
             }
 
 
@@ -450,12 +386,14 @@ public class UploadStillImageAction
                     b = true;
                 }
             }
-            String dstUrlString = dstUrl.toString().replaceAll(" ", "%20"); // Space break things
+
+            String dstUrlString = dstUrl.toString().replaceAll(" ", "%20");    // Space break things
 
             URL out = null;
             try {
                 out = new URL(dstUrlString);
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 if (log.isWarnEnabled()) {
                     log.warn("Strings in Java suck!!!", e);
                 }
@@ -465,63 +403,29 @@ public class UploadStillImageAction
         }
 
         /**
-		 * Returns the directory where images should be uploaded into. The directory is  a file of [imageArchive]\[platform]\images\[dive]
-		 * @return   The uploadDirectory value
-		 * @uml.property  name="uploadDirectory"
-		 */
+         * Returns the directory where images should be uploaded into. The directory is  a
+         * file of [imageArchive]\[platform]\images\[dive]
+         * @return   The uploadDirectory value
+         */
         File getUploadDirectory() {
             if (uploadDirectory == null) {
+
                 /*
                  *  Construct a file of [imageArchive]\[platform]\images\[dive]
                  */
-                final IVideoArchiveSet vas = videoArchive_.getVideoArchiveSet();
+                final VideoArchiveSet vas = videoArchive_.getVideoArchiveSet();
                 final String platform = vas.getPlatformName();
-                Collection cpds = vas.getCameraPlatformDeployments();
+                Collection<CameraDeployment> cpds = vas.getCameraDeployments();
                 if (cpds.size() == 0) {
                     return null;
                 }
 
-                ICameraPlatformDeployment cpd = (ICameraPlatformDeployment) cpds.iterator().next();
-                uploadDirectory = new File(
-                        new File(new File(uploadRoot, platform), "images"),
-                            format4i.format((long) cpd.getSeqNumber()) + "");
+                CameraDeployment cpd = cpds.iterator().next();
+                uploadDirectory = new File(new File(new File(uploadRoot, platform), "images"),
+                                           format4i.format((long) cpd.getSequenceNumber()) + "");
             }
 
             return uploadDirectory;
-        }
-    }
-
-
-    /**
-	 * @author  brian
-	 */
-    private class VFUpdateErrorHandler extends DAOExceptionHandler {
-
-        private final ICameraData cameraData;
-        private final String oldStillImage;
-
-        /**
-         * Constructs ...
-         *
-         *
-         * @param cameraData
-         * @param oldStillImage
-         */
-        VFUpdateErrorHandler(ICameraData cameraData, String oldStillImage) {
-            this.cameraData = cameraData;
-            this.oldStillImage = oldStillImage;
-        }
-
-        protected void doAction(Exception e) {
-            cameraData.setStillImage(oldStillImage);
-
-            if (log.isWarnEnabled()) {
-                log.warn(
-                        "Failed to change a CameraDatas stillImage from" +
-                        oldStillImage + " to " + cameraData.getStillImage() +
-                            ". Rolling back change",
-                        e);
-            }
         }
     }
 }
