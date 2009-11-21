@@ -191,7 +191,7 @@ public class NewRefNumPropButton extends PropButton implements IPopup {
         /**
          * This action adds the association to the selected observation
          */
-        private final AddNewRefNumPropAction newRefNumAction = new AddNewRefNumPropAction();
+        private final AddNewRefNumPropAction newRefNumAction = new AddNewRefNumPropAction(toolBelt);
 
         /**
          * Constructs ...

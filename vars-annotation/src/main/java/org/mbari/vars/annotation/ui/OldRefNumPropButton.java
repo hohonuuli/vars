@@ -20,6 +20,8 @@ package org.mbari.vars.annotation.ui;
 import javax.swing.ImageIcon;
 import org.mbari.vars.annotation.ui.actions.AddOldRefNumPropWithDialogAction;
 
+import vars.annotation.ui.ToolBelt;
+
 /**
  * <p>
  * A button that calls the <code>AddOldRefNumPropWithDialogAction</code> object.
@@ -29,17 +31,13 @@ import org.mbari.vars.annotation.ui.actions.AddOldRefNumPropWithDialogAction;
  */
 public class OldRefNumPropButton extends PropButton {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 2674794812728840741L;
 
     /**
      * Constructor for the OldRefNumPropButton object
      */
-    public OldRefNumPropButton() {
+    public OldRefNumPropButton(ToolBelt toolBelt) {
         super();
-        setAction(new AddOldRefNumPropWithDialogAction());
+        setAction(new AddOldRefNumPropWithDialogAction(toolBelt));
         setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/oldnum.png")));
         setToolTipText("choose from existing reference numbers");
         setEnabled(false);

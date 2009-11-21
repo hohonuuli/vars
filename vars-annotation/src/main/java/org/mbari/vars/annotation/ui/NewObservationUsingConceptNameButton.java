@@ -100,7 +100,7 @@ public class NewObservationUsingConceptNameButton extends JFancyButton
         final DragSource dragSource = DragSource.getDefaultDragSource();
 
         dragSource.createDefaultDragGestureRecognizer(this, DnDConstants.ACTION_COPY_OR_MOVE, this);
-        setAction(new NewObservationUsingConceptNameAction(conceptName));
+        setAction(new NewObservationUsingConceptNameAction(toolbelt, conceptName));
         setText(conceptName);
         setToolTipText(conceptName);
 

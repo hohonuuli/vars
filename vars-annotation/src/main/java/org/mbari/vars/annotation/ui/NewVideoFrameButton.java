@@ -27,6 +27,7 @@ import org.mbari.util.Dispatcher;
 import org.mbari.vars.annotation.ui.actions.NewVideoFrameAction;
 
 import vars.annotation.ui.Lookup;
+import vars.annotation.ui.ToolBelt;
 
 
 /**
@@ -36,7 +37,7 @@ import vars.annotation.ui.Lookup;
  */
 public class NewVideoFrameButton extends JFancyButton {
 
-    private final Action action = new NewVideoFrameAction();
+    private final Action action;
     private boolean hasPerson;
     private boolean hasVcr;
     private boolean hasVideoArchive;
@@ -44,8 +45,9 @@ public class NewVideoFrameButton extends JFancyButton {
     /**
      * Constructor for the NewVideoFrameButton object
      */
-    public NewVideoFrameButton() {
+    public NewVideoFrameButton(ToolBelt toolBelt) {
         super();
+        action = new NewVideoFrameAction(toolBelt);
         setAction(action);
         setToolTipText("Create an Observation with a new timecode [" +
                        SwingUtils.getKeyString((KeyStroke) action.getValue(Action.ACCELERATOR_KEY)) + "]");

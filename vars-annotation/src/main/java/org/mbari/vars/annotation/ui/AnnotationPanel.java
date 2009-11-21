@@ -76,7 +76,7 @@ public class AnnotationPanel extends JPanel {
         if (buttonPanel == null) {
             buttonPanel = new JPanel(new BorderLayout());
             buttonPanel.add(new VCRPanel(), BorderLayout.EAST);    // TODO comment this line for OPENHOUSE
-            final ActionPanel ap = new ActionPanel();
+            final ActionPanel ap = new ActionPanel(toolBelt);
             buttonPanel.add(ap, BorderLayout.CENTER);
             ap.registerHotKeys();
         }

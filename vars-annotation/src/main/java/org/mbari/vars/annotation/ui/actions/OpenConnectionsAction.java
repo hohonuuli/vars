@@ -21,35 +21,28 @@ import javax.swing.JDialog;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.vars.annotation.ui.dialogs.ConnectionDialog;
 
+import vars.annotation.ui.ToolBelt;
+
 /**
  * <p>Brings up a dialog to sign in as a user and
  * to connect to the VCR</p>
  *
  * @author  <a href="http://www.mbari.org">MBARI</a>
- * @version  $Id: OpenConnectionsAction.java 332 2006-08-01 18:38:46Z hohonuuli $
  */
 public class OpenConnectionsAction extends ActionAdapter {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
-
-    /**
-     *     @uml.property  name="dialog"
-     *     @uml.associationEnd  multiplicity="(1 1)"
-     */
-    private final JDialog dialog = new ConnectionDialog();
+    private final JDialog dialog;
 
     /**
      * Constructor for the OpenConnectionsAction object
      */
-    public OpenConnectionsAction() {
+    public OpenConnectionsAction(ToolBelt toolBelt) {
         super("Connect");
+        dialog = new ConnectionDialog(toolBelt);
     }
 
     /**
-     * Intiates the action.
+     * Initiates the action.
      * @see  org.mbari.vars.annotation.ui.actions.IAction#doAction()
      */
     public void doAction() {

@@ -31,6 +31,7 @@ import org.mbari.vars.annotation.ui.actions.NewObservationAction;
 import vars.UserAccount;
 import vars.annotation.Observation;
 import vars.annotation.ui.Lookup;
+import vars.annotation.ui.ToolBelt;
 
 /**
  * <p>Create a new observation using the current time-code from the VCR</p>
@@ -44,9 +45,9 @@ public class NewObservationButton extends JFancyButton {
     /**
      * Constructor for the NewObservationButton object
      */
-    public NewObservationButton() {
+    public NewObservationButton(ToolBelt toolBelt) {
         super();
-        setAction(new NewObservationAction());
+        setAction(new NewObservationAction(toolBelt));
         setToolTipText("Create an Observation using the selected timecode [" +
                        SwingUtils.getKeyString((KeyStroke) getAction().getValue(Action.ACCELERATOR_KEY)) + "]");
         setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/obs_copytc.png")));

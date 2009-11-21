@@ -23,9 +23,7 @@ import org.jdesktop.layout.LayoutStyle;
 import org.mbari.awt.event.NonDigitConsumingKeyListener;
 import org.mbari.text.IgnoreCaseToStringComparator;
 import org.mbari.vars.annotation.ui.actions.OpenQT4JVideoArchiveAction;
-import org.mbari.vars.util.AppFrameDispatcher;
 import vars.util.VARSProperties;
-import org.mbari.vcr.qt.TimeSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

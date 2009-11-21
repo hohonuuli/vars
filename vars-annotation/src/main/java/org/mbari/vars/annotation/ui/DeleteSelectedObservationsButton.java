@@ -29,6 +29,7 @@ import org.mbari.swing.SwingUtils;
 import org.mbari.vars.annotation.ui.actions.DeleteSelectedObservationsWithConfirmAction;
 import vars.UserAccount;
 import vars.annotation.ui.Lookup;
+import vars.annotation.ui.ToolBelt;
 
 /**
  * <p>Deletes the observations selected in the Table. This button will bring
@@ -42,9 +43,9 @@ public class DeleteSelectedObservationsButton extends JFancyButton {
     /**
      * Constructor
      */
-    public DeleteSelectedObservationsButton() {
+    public DeleteSelectedObservationsButton(ToolBelt toolBelt) {
         super();
-        setAction(new DeleteSelectedObservationsWithConfirmAction());
+        setAction(new DeleteSelectedObservationsWithConfirmAction(toolBelt.getPersistenceController()));
         setToolTipText("Delete selected observations [" +
                        SwingUtils.getKeyString((KeyStroke) getAction().getValue(Action.ACCELERATOR_KEY)) + "]");
         setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/obs_delete.png")));

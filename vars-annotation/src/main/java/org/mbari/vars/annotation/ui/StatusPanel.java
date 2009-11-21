@@ -1,5 +1,5 @@
 /*
- * @(#)StatusPanel.java   2009.11.17 at 09:37:01 PST
+ * @(#)StatusPanel.java   2009.11.20 at 06:05:30 PST
  *
  * Copyright 2009 MBARI
  *
@@ -22,6 +22,7 @@ import org.bushe.swing.event.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.ui.Lookup;
+import vars.annotation.ui.ToolBelt;
 
 /**
  */
@@ -35,16 +36,16 @@ public class StatusPanel extends JPanel {
 
     /**
      * This is the default constructor
+     *
+     * @param toolBelt
      */
-    public StatusPanel() {
+    public StatusPanel(ToolBelt toolBelt) {
         super();
+        personLabel = new StatusLabelForPerson(toolBelt);
         initialize();
     }
 
     private javax.swing.JLabel getPersonLabel() {
-        if (personLabel == null) {
-            personLabel = new StatusLabelForPerson();
-        }
 
         return personLabel;
     }

@@ -20,26 +20,23 @@ package org.mbari.vars.annotation.ui;
 import javax.swing.ImageIcon;
 import org.mbari.vars.annotation.ui.actions.AddQuestionableIdPropAction;
 
+import vars.annotation.ui.ToolBelt;
+
 /**
  * <p>Adds a questionable id association to the currently selected observation.</p>
  *
  * @author <a href="http://www.mbari.org">MBARI</a>
- * @version $Id: QuestionableIdPropButton.java 314 2006-07-10 02:38:46Z hohonuuli $
- * @see org.mbari.vars.annotation.ui.actions.AddQuestionableIdPropAction
  */
 public class QuestionableIdPropButton extends PropButton {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1949614784906779977L;
+
 
     /**
      *
      */
-    public QuestionableIdPropButton() {
+    public QuestionableIdPropButton(ToolBelt toolBelt) {
         super();
-        setAction(new AddQuestionableIdPropAction());
+        setAction(new AddQuestionableIdPropAction(toolBelt));
         setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/question.png")));
         setToolTipText("identity in question");
         setEnabled(false);

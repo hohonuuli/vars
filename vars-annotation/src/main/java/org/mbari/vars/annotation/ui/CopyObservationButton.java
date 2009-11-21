@@ -32,6 +32,7 @@ import org.mbari.vcr.IVCR;
 import vars.UserAccount;
 import vars.annotation.Observation;
 import vars.annotation.ui.Lookup;
+import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.VideoService;
 
 /**
@@ -45,9 +46,9 @@ public class CopyObservationButton extends JFancyButton {
     /**
      * Constructor
      */
-    public CopyObservationButton() {
+    public CopyObservationButton(ToolBelt toolBelt) {
         super();
-        setAction(new CopyObservationAction());
+        setAction(new CopyObservationAction(toolBelt));
         setToolTipText("Copy an observation to a new timecode [" +
                        SwingUtils.getKeyString((KeyStroke) getAction().getValue(Action.ACCELERATOR_KEY)) + "]");
         setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/obs_copyanno.png")));

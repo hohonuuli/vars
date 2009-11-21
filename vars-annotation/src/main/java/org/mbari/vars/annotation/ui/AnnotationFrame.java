@@ -128,7 +128,7 @@ public class AnnotationFrame extends JFrame {
             menuFile.setMnemonic('F');
 
             // create Connect menu item
-            final JMenuItem connect = new JMenuItem(new OpenConnectionsAction());
+            final JMenuItem connect = new JMenuItem(new OpenConnectionsAction(toolbelt));
 
             menuFile.add(connect);
             menuFile.setMnemonic('C');
@@ -141,7 +141,7 @@ public class AnnotationFrame extends JFrame {
             menuFile.setMnemonic('O');
 
             // Clears the kb cache and resets the kb tree
-            JMenuItem clearCache = new JMenuItem(new ClearDatabaseCacheAction());
+            JMenuItem clearCache = new JMenuItem(new ClearDatabaseCacheAction(toolbelt));
 
             menuFile.add(clearCache);
 
@@ -238,7 +238,7 @@ public class AnnotationFrame extends JFrame {
 
     private JPanel getQuickControlsPanel() {
         if (quickControlsPanel == null) {
-            quickControlsPanel = new QuickControlsPanel();
+            quickControlsPanel = new QuickControlsPanel(toolbelt.getPersistenceController());
         }
 
         return quickControlsPanel;
@@ -246,7 +246,7 @@ public class AnnotationFrame extends JFrame {
 
     private JPanel getStatusPanel() {
         if (statusPanel == null) {
-            statusPanel = new StatusPanel();
+            statusPanel = new StatusPanel(toolbelt);
         }
 
         return statusPanel;

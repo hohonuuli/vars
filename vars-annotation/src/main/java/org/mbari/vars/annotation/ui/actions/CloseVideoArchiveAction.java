@@ -42,7 +42,7 @@ public class CloseVideoArchiveAction extends ActionAdapter implements IVideoArch
     /**  */
     public static final String ACTION_NAME = "Close Video-archive";
     private final Logger log = LoggerFactory.getLogger(getClass());
-    private final org.mbari.vars.annotation.locale.UploadStillImageAction action2 = UploadStillImageActionFactory.getAction();
+    private final org.mbari.vars.annotation.locale.UploadStillImageAction action2;
     private final PersistenceController persistenceController;
     private VideoArchive videoArchive;
 
@@ -54,6 +54,7 @@ public class CloseVideoArchiveAction extends ActionAdapter implements IVideoArch
     public CloseVideoArchiveAction(PersistenceController persistenceController) {
         super(ACTION_NAME);
         this.persistenceController = persistenceController;
+        action2 = UploadStillImageActionFactory.getAction(persistenceController);
     }
 
     /**

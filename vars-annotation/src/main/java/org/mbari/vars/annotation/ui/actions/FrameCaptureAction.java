@@ -44,27 +44,20 @@ import javax.imageio.ImageIO;
 import javax.swing.Action;
 import javax.swing.KeyStroke;
 import org.mbari.awt.event.ActionAdapter;
-import org.mbari.framegrab.Framegrabber2;
 import org.mbari.movie.Timecode;
 import org.mbari.util.Dispatcher;
 import org.mbari.util.IObserver;
-import org.mbari.vars.annotation.model.CameraData;
-import org.mbari.vars.annotation.model.CameraPlatformDeployment;
-import org.mbari.vars.annotation.ui.dispatchers.ObservationDispatcher;
-import org.mbari.vars.annotation.ui.dispatchers.ObservationTableDispatcher;
-import org.mbari.vars.annotation.ui.dispatchers.VcrDispatcher;
-import org.mbari.vars.annotation.ui.dispatchers.VideoArchiveDispatcher;
-import org.mbari.vars.annotation.ui.table.ObservationTable;
-import org.mbari.vars.util.AppFrameDispatcher;
+
 import vars.util.VARSProperties;
 import org.mbari.vcr.IVCR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.annotation.ICameraData;
-import vars.annotation.IVideoFrame;
-import vars.annotation.IVideoArchive;
-import vars.annotation.IObservation;
-import vars.annotation.IVideoArchiveSet;
+import vars.annotation.CameraData;
+import vars.annotation.VideoFrame;
+import vars.annotation.VideoArchive;
+import vars.annotation.Observation;
+import vars.annotation.VideoArchiveSet;
+import vars.annotation.ui.VideoService;
 
 /**
  * <p>Action for capturing a frame an performing related activities on it.</p>
@@ -84,40 +77,29 @@ public class FrameCaptureAction extends ActionAdapter {
      */
     public final static String UNKNOWN_SEQNUMBER = "0000";
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
+
     private final static NumberFormat format4i = new DecimalFormat("0000");
 
-    //private final static NumberFormat format2i = new DecimalFormat("000");
     private final static NumberFormat format3i = new DecimalFormat("000");
     private final static DateFormat dateFormat = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy");
     private final static DateFormat timezoneFormat = new SimpleDateFormat("ZZ");
     private static final Logger log = LoggerFactory.getLogger(FrameCaptureAction.class);
     private static final String imageCopyrightOwner = VARSProperties.getImageCopyrightOwner();
 
-    /** Field description */
-    public static final Object DISPATCHER_KEY_FRAMEGRABBER = Framegrabber2.class;
+
 
     /**
      * This is the class that actually performs all Video IO operations
-     * @uml.property  name="framegrabber"
-     * @uml.associationEnd  multiplicity="(1 1)"
      */
-    private Framegrabber2 framegrabber;
+    private VideoService videoService;
 
     /**
      * This class does all the heavy lifting.
-     * @uml.property  name="helper"
-     * @uml.associationEnd  multiplicity="(1 1)" inverse="this$0:org.mbari.vars.annotation.ui.actions.FrameCaptureAction$FrameCaptureHelper"
      */
     private FrameCaptureHelper helper;
 
     /**
      * Provides information about where to save the images
-     * @uml.property  name="imageDirectory"
-     * @uml.associationEnd  multiplicity="(1 1)" inverse="this$0:org.mbari.vars.annotation.ui.actions.FrameCaptureAction$ImageDirectory"
      */
     private final ImageDirectory imageDirectory = new ImageDirectory();
 

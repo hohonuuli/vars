@@ -29,9 +29,6 @@ import vars.annotation.ui.ToolBelt;
 public final class AddPopulationPropAction extends AddPropertyAction {
 
 
-    /**
-     *
-     */
     public AddPopulationPropAction(ToolBelt toolBelt) {
         super(toolBelt, "population-quantity", "self", "999");
     }

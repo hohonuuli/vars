@@ -1,5 +1,5 @@
 /*
- * @(#)UploadStillImageActionFactory.java   2009.11.20 at 04:18:11 PST
+ * @(#)UploadStillImageActionFactory.java   2009.11.20 at 05:03:28 PST
  *
  * Copyright 2009 MBARI
  *
@@ -24,19 +24,22 @@ import vars.annotation.ui.PersistenceController;
  */
 public class UploadStillImageActionFactory {
 
-    private final PersistenceController persistenceController;
-
     /**
-     * @param persistenceController
+     *
      */
-    public UploadStillImageActionFactory(PersistenceController persistenceController) {
-        this.persistenceController = persistenceController;
+    private UploadStillImageActionFactory(PersistenceController persistenceController) {
+
+        // No instantiation
     }
 
     /**
+     *
+     *
+     *
+     * @param persistenceController
      * @return
      */
-    public UploadStillImageAction getAction() {
+    public static UploadStillImageAction getAction(PersistenceController persistenceController) {
         final String platform = LocaleFactory.getCameraPlatform();
         UploadStillImageAction action = null;
         if ((platform == null) || platform.toLowerCase().equals("shore")) {

@@ -27,37 +27,34 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
+
 import org.mbari.awt.layout.WrappingFlowLayout;
 import org.slf4j.LoggerFactory;
+
+import vars.annotation.ui.ToolBelt;
 
 /**
  * <p> This panel contains buttons for actions that can modify the contents of the
  *  <code>ObservatonTable</code></p>
  *
  * @author  <a href="http://www.mbari.org">MBARI</a>
- * @version  $Id: ActionPanel.java 332 2006-08-01 18:38:46Z hohonuuli $
  * @created  February 17, 2004
  */
 public class ActionPanel extends JPanel {
 
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(ActionPanel.class);
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = -1419176371578397037L;
 
-
-    JButton btnDeepCopy = new CopyObservationButton();
+    JButton btnDeepCopy;
 
   
-    JButton btnDelete = new DeleteSelectedObservationsButton();
+    JButton btnDelete;
 
 
-    JButton btnNew = new NewVideoFrameButton();
+    JButton btnNew;
 
 
-    JButton btnShallowCopy = new NewObservationButton();
+    JButton btnShallowCopy;
 
  
     JButton btnFramegrab = new FrameCaptureButton();
@@ -68,8 +65,12 @@ public class ActionPanel extends JPanel {
     /**
      *  Constructor for the ActionPanel object
      */
-    public ActionPanel() {
+    public ActionPanel(ToolBelt toolBelt) {
         super();
+        btnDeepCopy = new CopyObservationButton(toolBelt);
+        btnDelete = new DeleteSelectedObservationsButton(toolBelt);
+        btnNew = new NewVideoFrameButton(toolBelt);
+        btnShallowCopy = new NewObservationButton(toolBelt);
         initialize();
         registerHotKeys();
     }

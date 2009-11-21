@@ -20,6 +20,8 @@ package org.mbari.vars.annotation.ui;
 import javax.swing.ImageIcon;
 import org.mbari.vars.annotation.ui.actions.AddDensePropAction;
 
+import vars.annotation.ui.ToolBelt;
+
 /**
  * <p>
  * Adds a 'dense' annotation to the currently selected observations.
@@ -27,21 +29,16 @@ import org.mbari.vars.annotation.ui.actions.AddDensePropAction;
  *
  *
  * @author <a href="http://www.mbari.org">MBARI</a>
- * @version $Id: DensePropButton.java 314 2006-07-10 02:38:46Z hohonuuli $
  */
 public class DensePropButton extends PropButton {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1911458013400590503L;
 
     /**
      *      Constructor
      */
-    public DensePropButton() {
+    public DensePropButton(ToolBelt toolBelt) {
         super();
-        setAction(new AddDensePropAction());
+        setAction(new AddDensePropAction(toolBelt));
         setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/dbutton.png")));
         setToolTipText("dense population");
         setEnabled(false);

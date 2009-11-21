@@ -41,6 +41,7 @@ import vars.annotation.CameraDeployment;
 import vars.annotation.Observation;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.PersistenceController;
+import vars.annotation.ui.ToolBelt;
 
 /**
  * <p>
@@ -60,15 +61,15 @@ public class PVideoArchivePanel extends PropertiesPanel {
 
     private JDialog changeNameDialog;
     
-    private final PersistenceController persistenceService;
+    private final ToolBelt toolBelt;
 
     /**
      * Constructs ...
      *
      */
-    PVideoArchivePanel(PersistenceController persistenceService) {
+    PVideoArchivePanel(ToolBelt toolBelt) {
         super();
-        this.persistenceService = persistenceService;
+        this.toolBelt = toolBelt;
         setPropertyNames(new String[] {
             "recordedDate", "videoArchiveName", "shipName", "platformName", "formatCode", "startDate", "endDate",
             "chiefScientist", "diveNumber", "trackingNumber"
@@ -104,7 +105,7 @@ public class PVideoArchivePanel extends PropertiesPanel {
                             vas.setShipName(f2.getText());
     
                             try {
-                                persistenceService.updateVideoArchiveSet(vas);
+                                toolBelt.getPersistenceController().updateVideoArchiveSet(vas);
                             }
                             catch (final Exception e1) {
                                 EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e1);
@@ -136,7 +137,7 @@ public class PVideoArchivePanel extends PropertiesPanel {
                             vas.setPlatformName(f3.getText());
     
                             try {
-                                persistenceService.updateVideoArchiveSet(vas);
+                                toolBelt.getPersistenceController().updateVideoArchiveSet(vas);
                             }
                             catch (final Exception e1) {
                                 EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e1);
@@ -166,7 +167,7 @@ public class PVideoArchivePanel extends PropertiesPanel {
 
     private JDialog getChangeNameDialog() {
         if (changeNameDialog == null) {
-            changeNameDialog = new OpenVideoArchiveSetUsingParamsDialog() {
+            changeNameDialog = new OpenVideoArchiveSetUsingParamsDialog(toolBelt.getAnnotationDAOFactory()) {
 
                 /**
                  *  @see org.mbari.vars.annotation.ui.dialogs.OpenVideoArchiveSetUsingParamsDialog#getOkButtonAction()
@@ -184,7 +185,7 @@ public class PVideoArchivePanel extends PropertiesPanel {
                                 action.doAction();
                                 dispose();
                             }
-                            private final ChangeVideoArchiveNameAction action = new ChangeVideoArchiveNameAction();
+                            private final ChangeVideoArchiveNameAction action = new ChangeVideoArchiveNameAction(toolBelt.getAnnotationDAOFactory());
                         };
                     }
 

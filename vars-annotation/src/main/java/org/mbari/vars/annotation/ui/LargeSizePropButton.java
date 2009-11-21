@@ -8,15 +8,17 @@ package org.mbari.vars.annotation.ui;
 import javax.swing.ImageIcon;
 import org.mbari.vars.annotation.ui.actions.AddLargeSizePropAction;
 
+import vars.annotation.ui.ToolBelt;
+
 /**
  *
  * @author brian
  */
 public class LargeSizePropButton extends PropButton {
 
-    public LargeSizePropButton() {
+    public LargeSizePropButton(ToolBelt toolBelt) {
         super();
-        setAction(new AddLargeSizePropAction());
+        setAction(new AddLargeSizePropAction(toolBelt));
         setToolTipText("relatively large size");
         setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/largebutton.png")));
         setEnabled(false);

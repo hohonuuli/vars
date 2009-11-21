@@ -28,6 +28,8 @@ import vars.annotation.CameraDirections;
 import vars.annotation.FormatCodes;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.Lookup;
+import vars.annotation.ui.PersistenceController;
+import vars.annotation.ui.ToolBelt;
 
 /**
  *
@@ -35,7 +37,7 @@ import vars.annotation.ui.Lookup;
  */
 public class QuickControlsPanel extends JPanel {
 
-    private final ChangeAnnotationModeAction action = new ChangeAnnotationModeAction();
+    private final ChangeAnnotationModeAction action;
     private JLabel cameraLabel;
     private JComboBox cbCameraDirection;
     private javax.swing.JComboBox modeChoiceBox;
@@ -45,8 +47,9 @@ public class QuickControlsPanel extends JPanel {
     /**
      * Constructs ...
      */
-    public QuickControlsPanel() {
+    public QuickControlsPanel(PersistenceController persistenceController) {
         super();
+        action = new ChangeAnnotationModeAction(persistenceController);
         initialize();
     }
 

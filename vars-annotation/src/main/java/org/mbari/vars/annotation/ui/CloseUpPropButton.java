@@ -20,25 +20,21 @@ package org.mbari.vars.annotation.ui;
 import javax.swing.ImageIcon;
 import org.mbari.vars.annotation.ui.actions.AddCloseUpPropAction;
 
+import vars.annotation.ui.ToolBelt;
+
 /**
  * <p>Adds a close up annotation to the selected observations.</p>
  *
  * @author  <a href="http://www.mbari.org">MBARI</a>
- * @version  $Id: CloseUpPropButton.java 314 2006-07-10 02:38:46Z hohonuuli $
  */
 public class CloseUpPropButton extends PropButton {
 
     /**
-     *
-     */
-    private static final long serialVersionUID = -2574100082484232549L;
-
-    /**
      * Constructor.
      */
-    public CloseUpPropButton() {
+    public CloseUpPropButton(ToolBelt toolBelt) {
         super();
-        setAction(new AddCloseUpPropAction());
+        setAction(new AddCloseUpPropAction(toolBelt));
         setToolTipText("close-up");
         setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/ccbutton.png")));
         setEnabled(false);

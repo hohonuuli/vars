@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)MoveVideoFrameWithDialogAction.java   2009.11.20 at 06:00:10 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
- * (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,18 +12,17 @@
  */
 
 
+
 package org.mbari.vars.annotation.ui.actions;
 
 import java.awt.Frame;
 import java.util.Collection;
 import javax.swing.JDialog;
-
 import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.vars.annotation.locale.OpenVideoArchiveSetUsingParamsDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveDAO;
 import vars.annotation.VideoFrame;
@@ -45,33 +41,29 @@ import vars.annotation.ui.ToolBelt;
  * </pre>
  *
  * @author brian
- * @version $Id: MoveVideoFrameWithDialogAction.java 418 2006-11-14 22:04:36Z hohonuuli $
  */
 public class MoveVideoFrameWithDialogAction extends ActionAdapter {
 
     /** <!-- Field description --> */
     public static final String ACTION_NAME = "Move Frames";
-
     private final Logger log = LoggerFactory.getLogger(getClass());
- 
-    private final MoveVideoFrameAction moveAction = new MoveVideoFrameAction();
-
+    private final MoveVideoFrameAction moveAction;
     private final Frame owner;
-    
     private final ToolBelt toolBelt;
 
     /**
      *
      * @param owner
+     * @param toolBelt
      */
     public MoveVideoFrameWithDialogAction(final Frame owner, ToolBelt toolBelt) {
         super(ACTION_NAME);
         this.toolBelt = toolBelt;
         this.owner = owner;
+        moveAction = new MoveVideoFrameAction(toolBelt);
     }
 
     /**
-     * <p><!-- Method description --></p>
      *
      */
     public void doAction() {
@@ -89,7 +81,6 @@ public class MoveVideoFrameWithDialogAction extends ActionAdapter {
 
     private class MoveDialog extends OpenVideoArchiveSetUsingParamsDialog {
 
-
         /**
          * Constructs ...
          *
@@ -97,13 +88,10 @@ public class MoveVideoFrameWithDialogAction extends ActionAdapter {
          * @param owner
          */
         MoveDialog(final Frame owner) {
-            super(owner);
+            super(owner, toolBelt.getAnnotationDAOFactory());
         }
 
         /**
-         * <p><!-- Method description --></p>
-         *
-         *
          * @return
          */
         @Override
@@ -116,11 +104,12 @@ public class MoveVideoFrameWithDialogAction extends ActionAdapter {
                         final String platform = (String) getCbCameraPlatform().getSelectedItem();
                         final int tapeNumber = Integer.parseInt(getTfTapeNumber().getText());
 
-                        // TODO 20061114 brian: HD is mbari specific; may need to factor out.
                         final String postfix = getCbHD().isSelected() ? "HD" : null;
-                        final String name = PersistenceController.makeVideoArchiveName(platform, seqNumber, tapeNumber, postfix);
+                        final String name = PersistenceController.makeVideoArchiveName(platform, seqNumber, tapeNumber,
+                            postfix);
                         VideoArchive va;
                         try {
+
                             // DAOTX 
                             VideoArchiveDAO dao = toolBelt.getAnnotationDAOFactory().newVideoArchiveDAO();
                             dao.startTransaction();
