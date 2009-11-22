@@ -33,28 +33,19 @@ import org.mbari.sql.QueryResults;
 import org.mbari.swing.ImageFrame;
 import org.mbari.swing.table.TableSorter;
 
-//~--- classes ----------------------------------------------------------------
 
 /**
- * <p><!-- Insert Description --></p>
  *
  * @author Brian Schlining
- * @version $Id: QueryResultsTable.java 332 2006-08-01 18:38:46Z hohonuuli $
  */
 public class QueryResultsTable extends JTable {
 
-    private static final long serialVersionUID = 7287763714952601055L;
 
     private static final Logger log = LoggerFactory.getLogger(QueryResultsTable.class);
 
-    //~--- fields -------------------------------------------------------------
 
-    /**
-	 * @uml.property  name="urlMouseListener"
-	 */
     private MouseListener urlMouseListener;
 
-    //~--- constructors -------------------------------------------------------
 
     /**
      * Constructs ...
@@ -78,12 +69,10 @@ public class QueryResultsTable extends JTable {
         addMouseListener(getUrlMouseListener());
     }
 
-    //~--- get methods --------------------------------------------------------
 
     /**
 	 * Creates a mouselistener that listens for double clicks. If a double click occurs in a cell starting with 'http', it attempts to display it in an <code>ImageFrame</code.
 	 * @return  A MouseListener that displays image URLs when double clicked.
-	 * @uml.property  name="urlMouseListener"
 	 */
     private MouseListener getUrlMouseListener() {
         if (urlMouseListener == null) {
@@ -146,7 +135,6 @@ public class QueryResultsTable extends JTable {
         return urlMouseListener;
     }
 
-    //~--- set methods --------------------------------------------------------
 
     /**
      * Process all the values in the tables to set the column width so that all
@@ -176,7 +164,6 @@ public class QueryResultsTable extends JTable {
         }
     }
 
-    //~--- inner classes ------------------------------------------------------
 
     /**
      * <p>Generates a non-editable TableModel based on the contents of a queryResult.</p>
@@ -184,7 +171,6 @@ public class QueryResultsTable extends JTable {
      */
     class QueryResultsTableModel extends DefaultTableModel {
 
-        private static final long serialVersionUID = 5826353861954250422L;
 
         /**
          *

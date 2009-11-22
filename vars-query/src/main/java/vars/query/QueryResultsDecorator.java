@@ -13,17 +13,20 @@ import java.util.Set;
 import org.mbari.sql.QueryResults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import vars.annotation.AnnotationPersistenceService;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
+import vars.knowledgebase.KnowledgebaseDAOFactory;
 
 public class QueryResultsDecorator {
     
     private static final Logger log = LoggerFactory.getLogger(QueryResultsDecorator.class);
+    private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
 
-    private final ConceptDAO conceptDAO;
 
-    public QueryResultsDecorator(ConceptDAO conceptDAO) {
-        this.conceptDAO = conceptDAO;
+    public QueryResultsDecorator(KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
+        this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
     }
 
 
@@ -45,7 +48,7 @@ public class QueryResultsDecorator {
                 Map<String, String> map = new HashMap<String, String>();
                 for (String n : uniqueNames) {
 
-                    Concept concept = conceptDAO.findByName(n);
+                    Concept concept = knowledgebaseDAOFactory.newConceptDAO().findByName(n);
 
                     /*
                      * Generate a List of Concepts as we walk up the heirarchy
@@ -145,7 +148,7 @@ public class QueryResultsDecorator {
                  */
                 Map<String, List<String>> map = new HashMap<String, List<String>>();
                 for (String n : uniqueNames) {
-                    Concept concept = conceptDAO.findByName(n);
+                    Concept concept = knowledgebaseDAOFactory.newConceptDAO().findByName(n);
 
                     /*
                      * Generate a List of Concepts as we walk up the heirarchy.
@@ -255,7 +258,7 @@ public class QueryResultsDecorator {
                  */
                 Map<String, List<String>> map = new HashMap<String, List<String>>();
                 for (String n : uniqueNames) {
-                    Concept concept = conceptDAO.findByName(n);
+                    Concept concept = knowledgebaseDAOFactory.newConceptDAO().findByName(n);
 
                     /*
                      * Generate a List of Concepts as we walk up the heirarchy.

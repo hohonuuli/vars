@@ -70,9 +70,7 @@ public class AssociationSelectionPanel extends JPanel {
     private JTextField tfSearch = null;
     private JPanel topPanel = null;
     private Collection conceptNames = new ArrayList();
-    private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
-    private final KnowledgebaseFactory knowledgebaseFactory;
-    private final QueryPersistenceService queryDAO;
+    private final QueryPersistenceService queryPersistenceService;
 
     /**
      *
@@ -82,12 +80,9 @@ public class AssociationSelectionPanel extends JPanel {
      * @param queryDAO
      */
     @Inject
-    public AssociationSelectionPanel(KnowledgebaseDAOFactory knowledgebaseDAOFactory,
-                                     KnowledgebaseFactory knowledgebaseFactory, QueryPersistenceService queryDAO) {
+    public AssociationSelectionPanel(QueryPersistenceService queryPersistenceService) {
         super();
-        this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
-        this.knowledgebaseFactory = knowledgebaseFactory;
-        this.queryDAO = queryDAO;
+        this.queryPersistenceService = queryPersistenceService;
         initialize();
     }
 
@@ -151,7 +146,7 @@ public class AssociationSelectionPanel extends JPanel {
 
     private AllConceptNamesComboBox getCbToConcept() {
         if (cbToConcept == null) {
-            cbToConcept = new AllConceptNamesComboBox(queryDAO);
+            cbToConcept = new AllConceptNamesComboBox(queryPersistenceService);
             cbToConcept.addItem(nilConceptName);
             cbToConcept.addItem(selfConceptName);
         }
@@ -325,10 +320,10 @@ public class AssociationSelectionPanel extends JPanel {
         try {
             if (conceptNames.contains(ILink.VALUE_NIL.toLowerCase()) ||
                     conceptNames.contains(ILink.VALUE_NIL.toUpperCase())) {
-                associationBeans = queryDAO.findAllLinkTemplates();
+                associationBeans = queryPersistenceService.findAllLinkTemplates();
             }
             else {
-                associationBeans = queryDAO.findByConceptNames(conceptNames);
+                associationBeans = queryPersistenceService.findByConceptNames(conceptNames);
             }
         }
         catch (Exception e) {

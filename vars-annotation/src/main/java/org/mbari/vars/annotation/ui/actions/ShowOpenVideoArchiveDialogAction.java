@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)ShowOpenVideoArchiveDialogAction.java   2009.11.21 at 09:05:49 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
- * (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,40 +12,36 @@
  */
 
 
-/*
-Created on Apr 7, 2004
- */
+
 package org.mbari.vars.annotation.ui.actions;
 
 import javax.swing.JDialog;
 import org.mbari.awt.event.ActionAdapter;
-import org.mbari.vars.annotation.locale.OpenVideoArchiveSetUsingParamsDialogFactory;
+import org.mbari.vars.annotation.locale.OpenVideoArchiveSetDialog3;
+import vars.annotation.AnnotationDAOFactory;
 
 /**
  * <p>Action that opens a <code>OpenVideoArchiveSetUsingParamsDialog</code></p>
  *
  * @author <a href="http://www.mbari.org">MBARI</a>
- * @version $Id: ShowOpenVideoArchiveDialogAction.java 314 2006-07-10 02:38:46Z hohonuuli $
  */
 public class ShowOpenVideoArchiveDialogAction extends ActionAdapter {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
-    private final static JDialog dialog = OpenVideoArchiveSetUsingParamsDialogFactory.getDialog();
+    private final JDialog dialog;
 
     /**
      * Constructor
+     *
+     * @param annotationDAOFactory
      */
-    public ShowOpenVideoArchiveDialogAction() {
+    public ShowOpenVideoArchiveDialogAction(AnnotationDAOFactory annotationDAOFactory) {
         super("Open Archive");
+        dialog = new OpenVideoArchiveSetDialog3(annotationDAOFactory);
 
-        // TODO Auto-generated constructor stub
     }
 
     /**
-     *  Intiates the action
+     *  Initiates the action
      */
     public void doAction() {
         dialog.setVisible(true);

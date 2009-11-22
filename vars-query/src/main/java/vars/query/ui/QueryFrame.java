@@ -47,8 +47,7 @@ import vars.query.QueryPersistenceService;
  */
 public class QueryFrame extends JFrame {
 
-    private static final long serialVersionUID = 1528090325157653848L;
-    private static final Logger log = LoggerFactory.getLogger(QueryFrame.class);
+    private final Logger log = LoggerFactory.getLogger(getClass());
     private JMenuItem aboutMenuItem = null;
     private JMenu fileMenu = null;
     private JMenu helpMenu = null;
@@ -65,8 +64,8 @@ public class QueryFrame extends JFrame {
     private SearchPanel searchPanel = null;
     private JTabbedPane tabbedPane = null;
     private ActionMap actionMap = new ActionMap();
-    private final ConceptDAO conceptDAO;
     private final QueryPersistenceService queryDAO;
+    private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
 
     /**
      *
@@ -79,7 +78,7 @@ public class QueryFrame extends JFrame {
     public QueryFrame(KnowledgebaseDAOFactory knowledgebaseDAOFactory, QueryPersistenceService queryDAO)
             throws HeadlessException {
         super();
-        this.conceptDAO = knowledgebaseDAOFactory.newConceptDAO();
+        this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
         this.queryDAO = queryDAO;
         initialize();
     }
@@ -183,7 +182,6 @@ public class QueryFrame extends JFrame {
         if (resetAction == null) {
             resetAction = new ActionAdapter() {
 
-                private static final long serialVersionUID = -4071195135236367475L;
 
                 public void doAction() {
                     final ActionMap actionMap = getActionMap();
@@ -219,7 +217,6 @@ public class QueryFrame extends JFrame {
         if (searchAction == null) {
             searchAction = new ActionAdapter() {
 
-                private static final long serialVersionUID = 80316860610009593L;
 
                 public void doAction() {
 
@@ -235,7 +232,7 @@ public class QueryFrame extends JFrame {
                     /*
                      * Create a QueryAction
                      */
-                    QueryAction queryAction = new QueryAction(query, queryDAO, conceptDAO,
+                    QueryAction queryAction = new QueryAction(query, queryDAO, knowledgebaseDAOFactory,
                         getSearchPanel().getCbHierarchy().isSelected(), getSearchPanel().getCbPhylogeny().isSelected(),
                         getSearchPanel().getCbFullPhylogeny().isSelected());
 

@@ -23,6 +23,8 @@ import javax.swing.JDialog;
 import org.mbari.swing.SwingUtils;
 import org.mbari.util.Dispatcher;
 import org.mbari.vars.annotation.ui.actions.ShowOpenVideoArchiveDialogAction;
+
+import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.Lookup;
 
@@ -36,12 +38,14 @@ import vars.annotation.ui.Lookup;
 public class StatusLabelForVideoArchive extends StatusLabel {
 
     private ShowOpenVideoArchiveDialogAction action;
+    private final AnnotationDAOFactory annotationDAOFactory;
 
     /**
      * Constructor for the StatusLabelForVideoArchive object
      */
-    public StatusLabelForVideoArchive() {
+    public StatusLabelForVideoArchive(AnnotationDAOFactory annotationDAOFactory) {
         super();
+        this.annotationDAOFactory = annotationDAOFactory;
         Dispatcher dispatcher = Lookup.getVideoArchiveDispatcher();
         dispatcher.addPropertyChangeListener(new PropertyChangeListener() {
 
@@ -73,7 +77,7 @@ public class StatusLabelForVideoArchive extends StatusLabel {
 
     private ShowOpenVideoArchiveDialogAction getAction() {
         if (action == null) {
-            action = new ShowOpenVideoArchiveDialogAction();
+            action = new ShowOpenVideoArchiveDialogAction(annotationDAOFactory);
         }
 
         return action;

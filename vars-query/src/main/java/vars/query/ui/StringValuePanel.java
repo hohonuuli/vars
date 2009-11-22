@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)StringValuePanel.java   2009.11.21 at 08:16:56 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1 
- * (the "License"); you may not use this file except in compliance 
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,6 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 
 
 package vars.query.ui;
@@ -25,31 +23,14 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.mbari.swing.ListListModel;
 
-//~--- classes ----------------------------------------------------------------
-
 /**
  * @author Brian Schlining
- * @version $Id: StringValuePanel.java 332 2006-08-01 18:38:46Z hohonuuli $
  */
 public class StringValuePanel extends ValuePanel {
 
-    private static final long serialVersionUID = -8550914763894420669L;
-    /**
-	 * @uml.property  name="scrollPane"
-	 * @uml.associationEnd  
-	 */
-    private JScrollPane scrollPane = null;
-    /**
-	 * @uml.property  name="list"
-	 * @uml.associationEnd  
-	 */
     private JList list = null;
-    /**
-	 * @uml.property  name="values"
-	 */
+    private JScrollPane scrollPane = null;
     private final List values;
-
-    //~--- constructors -------------------------------------------------------
 
     /**
      * This is the default constructor
@@ -63,13 +44,6 @@ public class StringValuePanel extends ValuePanel {
         initialize();
     }
 
-    //~--- get methods --------------------------------------------------------
-
-    /**
-	 * <p><!-- Method description --></p>
-	 * @return
-	 * @uml.property  name="list"
-	 */
     private JList getList() {
         if (list == null) {
             list = new JList();
@@ -81,14 +55,7 @@ public class StringValuePanel extends ValuePanel {
         return list;
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see query.ui.ValuePanel#getSQL()
-     */
-
     /**
-     * <p><!-- Method description --></p>
-     *
      *
      * @return
      */
@@ -98,12 +65,15 @@ public class StringValuePanel extends ValuePanel {
             Object[] obj = getList().getSelectedValues();
             if (obj.length > 0) {
                 sb.append(" ").append(getValueName()).append(" IN (");
+
                 for (int i = 0; i < obj.length; i++) {
                     sb.append("'").append(obj[i].toString()).append("'");
-                    if (obj.length > 0 && i < obj.length - 1) {
+
+                    if ((obj.length > 0) && (i < obj.length - 1)) {
                         sb.append(", ");
                     }
                 }
+
                 sb.append(")");
             }
         }
@@ -111,11 +81,6 @@ public class StringValuePanel extends ValuePanel {
         return sb.toString();
     }
 
-    /**
-	 * <p><!-- Method description --></p>
-	 * @return
-	 * @uml.property  name="scrollPane"
-	 */
     private JScrollPane getScrollPane() {
         if (scrollPane == null) {
             scrollPane = new JScrollPane();
@@ -125,12 +90,6 @@ public class StringValuePanel extends ValuePanel {
         return scrollPane;
     }
 
-    //~--- methods ------------------------------------------------------------
-
-    /**
-     * This method initializes this
-     *
-     */
     private void initialize() {
         Dimension d = new Dimension(120, 80);
         setPreferredSize(d);

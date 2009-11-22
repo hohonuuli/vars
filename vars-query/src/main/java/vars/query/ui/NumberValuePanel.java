@@ -35,11 +35,9 @@ import java.awt.event.KeyEvent;
 import java.util.List;
 import vars.query.QueryPersistenceService;
 
-//~--- classes ----------------------------------------------------------------
 
 /**
  * @author Brian Schlining
- * @version $Id: NumberValuePanel.java 332 2006-08-01 18:38:46Z hohonuuli $
  */
 public class NumberValuePanel extends ValuePanel {
 
@@ -60,7 +58,6 @@ public class NumberValuePanel extends ValuePanel {
     private final QueryPersistenceService queryDAO;
 
     
-    //~--- constructors -------------------------------------------------------
 
     /**
      * This is the default constructor
@@ -74,16 +71,7 @@ public class NumberValuePanel extends ValuePanel {
         initialize();
     }
 
-    //~--- get methods --------------------------------------------------------
-
-    /*
-     *  (non-Javadoc)
-     * @see query.ui.ValuePanel#getSQL()
-     */
-
     /**
-     * <p><!-- Method description --></p>
-     *
      *
      * @return
      */
@@ -106,11 +94,6 @@ public class NumberValuePanel extends ValuePanel {
         return sb.toString();
     }
 
-    /**
-	 * This method initializes jTextField1
-	 * @return  javax.swing.JTextField
-	 * @uml.property  name="maxTextField"
-	 */
     private JTextField getMaxTextField() {
         if (maxTextField == null) {
             maxTextField = new JTextField();
@@ -154,11 +137,6 @@ public class NumberValuePanel extends ValuePanel {
         return maxTextField;
     }
 
-    /**
-	 * This method initializes jTextField
-	 * @return  javax.swing.JTextField
-	 * @uml.property  name="minTextField"
-	 */
     private JTextField getMinTextField() {
         if (minTextField == null) {
             minTextField = new JTextField();
@@ -276,7 +254,6 @@ public class NumberValuePanel extends ValuePanel {
         return scanButton;
     }
 
-    //~--- methods ------------------------------------------------------------
 
     /**
      * This method initializes this

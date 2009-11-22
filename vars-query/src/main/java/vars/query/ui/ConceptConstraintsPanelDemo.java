@@ -23,32 +23,19 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import vars.query.QueryModule;
 
-//~--- classes ----------------------------------------------------------------
 
 /**
  * @author Brian Schlining
- * @version $Id: ConceptConstraintsPanelDemo.java 332 2006-08-01 18:38:46Z hohonuuli $
  */
 public class ConceptConstraintsPanelDemo extends JFrame {
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 6929871871834413950L;
-    /**
-	 * @uml.property  name="jContentPane"
-	 * @uml.associationEnd  
-	 */
+
     private javax.swing.JPanel jContentPane = null;
-    /**
-	 * @uml.property  name="jPanel"
-	 * @uml.associationEnd  
-	 */
+
     private JPanel jPanel = null;
 
     private final Injector injector;
 
-    //~--- constructors -------------------------------------------------------
 
     /**
      * This is the default constructor
@@ -59,13 +46,8 @@ public class ConceptConstraintsPanelDemo extends JFrame {
         initialize();
     }
 
-    //~--- get methods --------------------------------------------------------
 
-    /**
-	 * This method initializes jContentPane
-	 * @return  javax.swing.JPanel
-	 * @uml.property  name="jContentPane"
-	 */
+
     private javax.swing.JPanel getJContentPane() {
         if (jContentPane == null) {
             jContentPane = new javax.swing.JPanel();
@@ -76,11 +58,7 @@ public class ConceptConstraintsPanelDemo extends JFrame {
         return jContentPane;
     }
 
-    /**
-	 * This method initializes jPanel
-	 * @return  javax.swing.JPanel
-	 * @uml.property  name="jPanel"
-	 */
+
     private JPanel getJPanel() {
         if (jPanel == null) {
             jPanel = new SearchPanel(injector);
@@ -89,12 +67,7 @@ public class ConceptConstraintsPanelDemo extends JFrame {
         return jPanel;
     }
 
-    //~--- methods ------------------------------------------------------------
 
-    /**
-     * This method initializes this
-     *
-     */
     private void initialize() {
         this.setSize(300, 200);
         this.setContentPane(getJContentPane());
@@ -102,8 +75,6 @@ public class ConceptConstraintsPanelDemo extends JFrame {
     }
 
     /**
-     * <p><!-- Method description --></p>
-     *
      *
      * @param args
      */

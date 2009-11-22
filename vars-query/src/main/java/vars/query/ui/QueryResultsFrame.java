@@ -40,130 +40,62 @@ import org.slf4j.LoggerFactory;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.sql.QueryResults;
 
-//~--- classes ----------------------------------------------------------------
 
 /**
  * @author Brian Schlining
- * @version $Id: QueryResultsFrame.java 332 2006-08-01 18:38:46Z hohonuuli $
  */
 public class QueryResultsFrame extends JFrame {
 
-    private static final long serialVersionUID = -6087595829674389171L;
-    /**
-     * @uml.property  name="jContentPane"
-     * @uml.associationEnd
-     */
+
     private javax.swing.JPanel jContentPane = null;
-    /**
-     * @uml.property  name="helpMenuItem"
-     * @uml.associationEnd
-     */
+
     private JMenuItem helpMenuItem = null;
-    /**
-     * @uml.property  name="helpMenu"
-     * @uml.associationEnd
-     */
+
     private JMenu helpMenu = null;
-    /**
-     * @uml.property  name="fileMenu"
-     * @uml.associationEnd
-     */
+
     private JMenu fileMenu = null;
-    /**
-     * @uml.property  name="closeMenuItem"
-     * @uml.associationEnd
-     */
+
     private JMenuItem closeMenuItem = null;
-    /**
-     * @uml.property  name="aboutMenuItem"
-     * @uml.associationEnd
-     */
+
     private JMenuItem aboutMenuItem = null;
-    /**
-     * @uml.property  name="aMenuBar"
-     * @uml.associationEnd
-     */
+
     private JMenuBar aMenuBar = null;
-    /**
-     * @uml.property  name="query"
-     */
+
     private final String query;
-    /**
-     * @uml.property  name="queryResults"
-     * @uml.associationEnd  multiplicity="(1 1)"
-     */
+ 
     private final QueryResults queryResults;
-    /**
-     * @uml.property  name="saveMenuItem"
-     * @uml.associationEnd
-     */
+
     private JMenuItem saveMenuItem = null;
-    /**
-     * @uml.property  name="saveImagesMenuItem"
-     * @uml.associationEnd
-     */
+
     private JMenuItem saveImagesMenuItem = null;
-    /**
-     * @uml.property  name="toolBar"
-     * @uml.associationEnd
-     */
+
     private JToolBar toolBar = null;
-    /**
-     * @uml.property  name="tabbedPane"
-     * @uml.associationEnd
-     */
+
     private JTabbedPane tabbedPane = null;
-    /**
-     * @uml.property  name="saveImagesButton"
-     * @uml.associationEnd
-     */
+
     private JButton saveImagesButton = null;
-    /**
-     * @uml.property  name="saveImagesAction"
-     * @uml.associationEnd
-     */
+ 
     private ActionAdapter saveImagesAction = null;
-    /**
-     * @uml.property  name="saveButton"
-     * @uml.associationEnd
-     */
+  
     private JButton saveButton = null;
-    /**
-     * @uml.property  name="saveAction"
-     * @uml.associationEnd
-     */
+
     private ActionAdapter saveAction = null;
     private JButton saveAsKMLButton = null;
     private ActionAdapter saveAsKMLAction = null;
-    /**
-     * @uml.property  name="queryPanel"
-     * @uml.associationEnd
-     */
-    private JPanel queryPanel = null;
-    /**
-     * @uml.property  name="queryLabel"
-     * @uml.associationEnd
-     */
-    private JLabel queryLabel = null;
-    /**
-     * @uml.property  name="dataTable"
-     * @uml.associationEnd
-     */
-    private JTable dataTable = null;
-    /**
-     * @uml.property  name="dataScrollPane"
-     * @uml.associationEnd
-     */
-    private JScrollPane dataScrollPane = null;
-    /**
-     * @uml.property  name="dataPanel"
-     * @uml.associationEnd
-     */
-    private JPanel dataPanel = null; // @jve:decl-index=0:visual-constraint="539,142"
-    private static final Logger log = LoggerFactory.getLogger(QueryResultsFrame.class);
 
+    private JPanel queryPanel = null;
+  
+    private JLabel queryLabel = null;
+
+    private JTable dataTable = null;
+ 
+    private JScrollPane dataScrollPane = null;
+ 
+    private JPanel dataPanel = null; 
+
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    
     private String databaseUrl;
-    //~--- constructors -------------------------------------------------------
 
     /**
      * This is the default constructor

@@ -33,6 +33,7 @@ public class StatusPanel extends JPanel {
     private javax.swing.JLabel varsLabel = null;
     private javax.swing.JLabel vcrLabel = null;
     private javax.swing.JLabel videoArchiveLabel = null;
+    
 
     /**
      * This is the default constructor
@@ -42,6 +43,7 @@ public class StatusPanel extends JPanel {
     public StatusPanel(ToolBelt toolBelt) {
         super();
         personLabel = new StatusLabelForPerson(toolBelt);
+        videoArchiveLabel = new StatusLabelForVideoArchive(toolBelt.getAnnotationDAOFactory());
         initialize();
     }
 
@@ -67,9 +69,6 @@ public class StatusPanel extends JPanel {
     }
 
     private javax.swing.JLabel getVideoArchiveLabel() {
-        if (videoArchiveLabel == null) {
-            videoArchiveLabel = new StatusLabelForVideoArchive();
-        }
 
         return videoArchiveLabel;
     }

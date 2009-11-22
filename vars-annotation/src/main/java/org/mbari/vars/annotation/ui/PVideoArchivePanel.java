@@ -185,7 +185,7 @@ public class PVideoArchivePanel extends PropertiesPanel {
                                 action.doAction();
                                 dispose();
                             }
-                            private final ChangeVideoArchiveNameAction action = new ChangeVideoArchiveNameAction(toolBelt.getAnnotationDAOFactory());
+                            private final ChangeVideoArchiveNameAction action = new ChangeVideoArchiveNameAction(toolBelt);
                         };
                     }
 

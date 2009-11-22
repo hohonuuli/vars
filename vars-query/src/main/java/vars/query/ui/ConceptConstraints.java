@@ -45,32 +45,21 @@ import vars.ILink;
  */
 public class ConceptConstraints {
 
-    /** <!-- Field description --> */
     public static final String WILD_CARD_STRING = ILink.VALUE_NIL;
 
-    /** <!-- Field description --> */
     public static final String EMPTY_SQL = "";
 
-    //~--- fields -------------------------------------------------------------
 
-    /**
-	 * @uml.property  name="associationBean"
-	 * @uml.associationEnd  
-	 */
     private LinkBean associationBean;
 
     /**
 	 * A Collection of Strings. This represents the concepts that we're attempting lookup
-	 * @uml.property  name="conceptNamesAsStrings"
-	 * @uml.associationEnd  multiplicity="(0 -1)" elementType="java.lang.String"
 	 */
     private Collection conceptNamesAsStrings;
 
-    //~--- get methods --------------------------------------------------------
 
     /**
 	 * @return  Returns the associationBean.
-	 * @uml.property  name="associationBean"
 	 */
     public LinkBean getAssociationBean() {
         return associationBean;
@@ -78,16 +67,12 @@ public class ConceptConstraints {
 
     /**
 	 * @return  Returns the conceptNamesAsStrings.
-	 * @uml.property  name="conceptNamesAsStrings"
 	 */
     public Collection getConceptNamesAsStrings() {
         return conceptNamesAsStrings;
     }
 
     /**
-     * <p><!-- Method description --></p>
-     *
-     *
      * @return
      */
     public String getSQL() {
@@ -226,11 +211,9 @@ public class ConceptConstraints {
         return wildCard;
     }
 
-    //~--- set methods --------------------------------------------------------
 
     /**
 	 * @param associationBean  The associationBean to set.
-	 * @uml.property  name="associationBean"
 	 */
     public void setAssociationBean(LinkBean associationBean) {
         this.associationBean = associationBean;
@@ -238,16 +221,13 @@ public class ConceptConstraints {
 
     /**
 	 * @param conceptNamesAsStrings  The conceptNamesAsStrings to set.
-	 * @uml.property  name="conceptNamesAsStrings"
 	 */
     public void setConceptNamesAsStrings(Collection conceptNamesAsStrings) {
         this.conceptNamesAsStrings = conceptNamesAsStrings;
     }
 
-    //~--- methods ------------------------------------------------------------
 
     /**
-     * <p><!-- Method description --></p>
      *
      *
      * @return

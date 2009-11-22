@@ -26,6 +26,7 @@ import org.mbari.util.ExceptionHandlerSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.knowledgebase.ConceptDAO;
+import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.query.QueryResultsDecorator;
 
 /**
@@ -76,41 +77,23 @@ import vars.query.QueryResultsDecorator;
  */
 public class QueryAction extends ActionAdapter {
 
-    private static final long serialVersionUID = -7024848875942066527L;
     private static final Logger log = LoggerFactory.getLogger(QueryAction.class);
 
-    /**
-         * @uml.property  name="changeSupport"
-         */
     private PropertyChangeSupport changeSupport2 = new PropertyChangeSupport(this);
 
-    /**
-         * @uml.property  name="exceptionSupport"
-         * @uml.associationEnd  multiplicity="(1 1)"
-         */
+
     private ExceptionHandlerSupport exceptionSupport = new ExceptionHandlerSupport();
 
-    /**
-         * @uml.property  name="finished"
-         */
+
     private volatile boolean finished;
 
-    /**
-         * @uml.property  name="query"
-         */
+ 
     private final String query;
 
-    /**
-         * @uml.property  name="queryResults"
-         * @uml.associationEnd
-         */
+  
     private volatile QueryResults queryResults;
     private final QueryResultsDecorator queryResultsDecorator;
 
-    /**
-         * @uml.property  name="queryable"
-         * @uml.associationEnd  multiplicity="(1 1)"
-         */
     private final IQueryable queryable;
     private boolean showBasicPhylogeny;
     private boolean showFullPhylogeny;
@@ -118,9 +101,6 @@ public class QueryAction extends ActionAdapter {
 
     private final String coalesceKey;
 
-    /**
-         * @uml.property  name="thread"
-         */
     private Thread thread;
 
     /**
@@ -130,8 +110,8 @@ public class QueryAction extends ActionAdapter {
      * @param  queryable Description of the Parameter
      * @param conceptDAO
      */
-    public QueryAction(final String query, IQueryable queryable, ConceptDAO conceptDAO) {
-        this(query, queryable, conceptDAO, false, false, false);
+    public QueryAction(final String query, IQueryable queryable, KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
+        this(query, queryable, knowledgebaseDAOFactory, false, false, false);
     }
 
     /**
@@ -144,11 +124,11 @@ public class QueryAction extends ActionAdapter {
      * @param showBasicPhylogeny
      * @param showFullPhylogeny
      */
-    public QueryAction(final String query, IQueryable queryable, ConceptDAO conceptDAO, boolean showHiearchy,
-                       boolean showBasicPhylogeny, boolean showFullPhylogeny) {
+    public QueryAction(final String query, IQueryable queryable, KnowledgebaseDAOFactory knowledgebaseDAOFactory,
+            boolean showHiearchy, boolean showBasicPhylogeny, boolean showFullPhylogeny) {
         this.query = query;
         this.queryable = queryable;
-        this.queryResultsDecorator = new QueryResultsDecorator(conceptDAO);
+        this.queryResultsDecorator = new QueryResultsDecorator(knowledgebaseDAOFactory);
         this.showHierarchy = showHiearchy;
         this.showBasicPhylogeny = showBasicPhylogeny;
         this.showFullPhylogeny = showFullPhylogeny;
@@ -163,11 +143,6 @@ public class QueryAction extends ActionAdapter {
     public synchronized void addExceptionHandler(ExceptionHandler eh) {
         exceptionSupport.addExceptionHandler(eh);
     }
-
-    /*
-     *  (non-Javadoc)
-     *  @see javax.swing.AbstractAction#addPropertyChangeListener(java.beans.PropertyChangeListener)
-     */
 
     /**
      *  Adds a feature to the PropertyChangeListener attribute of the QueryAction object
@@ -252,7 +227,6 @@ public class QueryAction extends ActionAdapter {
 
     /**
          * @return  Returns the query.
-         * @uml.property  name="query"
          */
     public String getQuery() {
         return query;
@@ -260,7 +234,6 @@ public class QueryAction extends ActionAdapter {
 
     /**
          * @return   Returns the queryResults.
-         * @uml.property  name="queryResults"
          */
     public synchronized QueryResults getQueryResults() {
         return queryResults;
@@ -279,11 +252,6 @@ public class QueryAction extends ActionAdapter {
     public synchronized void removeExceptionHandler(ExceptionHandler eh) {
         exceptionSupport.removeExceptionHandler(eh);
     }
-
-    /*
-     *  (non-Javadoc)
-     *  @see javax.swing.AbstractAction#removePropertyChangeListener(java.beans.PropertyChangeListener)
-     */
 
     /**
      *  Description of the Method
@@ -305,7 +273,6 @@ public class QueryAction extends ActionAdapter {
 
     /**
          * @param  complete
-         * @uml.property  name="finished"
          */
     synchronized void setFinished(final boolean complete) {
         boolean oldValue = this.finished;
@@ -316,7 +283,6 @@ public class QueryAction extends ActionAdapter {
 
     /**
          * @param queryResults  The queryResults to set.
-         * @uml.property  name="queryResults"
          */
     synchronized void setQueryResults(QueryResults queryResults) {
         QueryResults oldValue = this.queryResults;

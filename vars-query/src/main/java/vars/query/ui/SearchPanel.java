@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)SearchPanel.java   2009.11.21 at 08:14:57 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1 
- * (the "License"); you may not use this file except in compliance 
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,10 +12,12 @@
  */
 
 
+
 package vars.query.ui;
 
-
 import com.google.inject.Injector;
+import foxtrot.Job;
+import foxtrot.Worker;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -28,86 +27,73 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Collection;
-import javax.swing.*;
+import javax.swing.ActionMap;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.swing.FancyComboBox;
 import org.mbari.swing.ListListModel;
-import org.mbari.swing.WaitIndicator;
 import org.mbari.swing.SpinningDialWaitIndicator;
+import org.mbari.swing.WaitIndicator;
 import org.mbari.util.Dispatcher;
 import org.mbari.util.ImmutableList;
-import foxtrot.Worker;
-import foxtrot.Job;
-import org.bushe.swing.event.EventBus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.query.QueryPersistenceService;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * <p></p>
  *
  * @author Brian Schlining
- * @version $Id: SearchPanel.java 431 2006-11-21 00:07:43Z hohonuuli $
  */
 public class SearchPanel extends JPanel {
 
     private static final int RESPONSE_DELAY = 750;
-    private final Logger log = LoggerFactory.getLogger(getClass());
-    
- 
-    private JCheckBox cbAllAssociations;
- 
-    private JCheckBox cbAllInterpretations;
-    
-    private JCheckBox cbHierarchy;
-    
-    private JCheckBox cbPhylogeny;
-    
-    private JCheckBox cbFullPhylogeny;
- 
-    private ActionAdapter clearAction;
-
-    private final Timer delayTimer;
- 
-    private JPanel topPanel = null;
- 
-    private JScrollPane scrollPane = null;
- 
-    private JButton removeButton = null;
- 
-    private JPanel middlePanel = null;
- 
-    private JPanel mainPanel = null;    
-
-    private ConceptNameSelectionPanel conceptNameSelectionPanel = null;
-
-    private JList conceptConstraintsList = null;
-
-    private JButton clearButton = null;
-
-    private JPanel bottomPanel = null;
-
-    private AssociationSelectionPanel associationSelectionPanel = null;
-
-    private JPanel allPanel = null;
-  
     private JButton addButton = null;
-
+    private JPanel allPanel = null;
+    private AssociationSelectionPanel associationSelectionPanel = null;
+    private JPanel bottomPanel = null;
+    private JButton clearButton = null;
+    private JList conceptConstraintsList = null;
+    private ConceptNameSelectionPanel conceptNameSelectionPanel = null;
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    private JPanel mainPanel = null;
+    private JPanel middlePanel = null;
+    private JButton removeButton = null;
+    private JScrollPane scrollPane = null;
+    private JPanel topPanel = null;
+    private JCheckBox cbAllAssociations;
+    private JCheckBox cbAllInterpretations;
+    private JCheckBox cbFullPhylogeny;
+    private JCheckBox cbHierarchy;
+    private JCheckBox cbPhylogeny;
+    private ActionAdapter clearAction;
+    private final Timer delayTimer;
     private final Injector injector;
 
-
+    /**
+     * Constructs ...
+     *
+     * @param injector
+     */
     public SearchPanel(Injector injector) {
         super();
         this.injector = injector;
+
         /*
          * We're adding a slight delay here so that db lookups don't try to
          * occur as a person types.
@@ -127,13 +113,11 @@ public class SearchPanel extends JPanel {
         initialize();
     }
 
-
     private JButton getAddButton() {
         if (addButton == null) {
             addButton = new JButton();
             addButton.setText("Add");
-            final ImageIcon icon = new ImageIcon(
-                getClass().getResource("/images/vars/query/add_conceptname.png"));
+            final ImageIcon icon = new ImageIcon(getClass().getResource("/images/vars/query/add_conceptname.png"));
             addButton.setIcon(icon);
             addButton.addActionListener(new ActionListener() {
 
@@ -141,28 +125,28 @@ public class SearchPanel extends JPanel {
                     ConceptConstraints conceptConstraints = new ConceptConstraints();
                     try {
                         conceptConstraints.setConceptNamesAsStrings(
-                                getConceptNameSelectionPanel().getSelectedConceptNamesAsStrings());
-                    } catch (Exception e1) {
+                            getConceptNameSelectionPanel().getSelectedConceptNamesAsStrings());
+                    }
+                    catch (Exception e1) {
+
                         // Fire eventbus message
                         EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e1);
                         log.error("Problem accessing the database", e1);
                         return;
                     }
 
-                    conceptConstraints.setAssociationBean(
-                            getAssociationSelectionPanel().getAssociationBean());
+                    conceptConstraints.setAssociationBean(getAssociationSelectionPanel().getAssociationBean());
                     ListListModel model = (ListListModel) getConceptConstraintsList().getModel();
                     model.add(conceptConstraints);
                 }
 
             });
-            
+
             /*
              * The clear button should only be enabled if there are items in
              * the list model.
              */
-            getConceptConstraintsList().getModel().addListDataListener(
-                    new ListDataListener() {
+            getConceptConstraintsList().getModel().addListDataListener(new ListDataListener() {
 
                 public void intervalAdded(ListDataEvent e) {
                     update();
@@ -186,9 +170,9 @@ public class SearchPanel extends JPanel {
     }
 
     /**
-	 * The all panel contains checkboxes for 'all interpretations' and 'all associations
-	 * @return
-	 */
+         * The all panel contains checkboxes for 'all interpretations' and 'all associations
+         * @return
+         */
     private JPanel getAllPanel() {
         if (allPanel == null) {
             allPanel = new JPanel();
@@ -211,7 +195,6 @@ public class SearchPanel extends JPanel {
         return associationSelectionPanel;
     }
 
-
     private JPanel getBottomPanel() {
         if (bottomPanel == null) {
             bottomPanel = new JPanel();
@@ -223,13 +206,11 @@ public class SearchPanel extends JPanel {
         return bottomPanel;
     }
 
-
     protected JCheckBox getCbAllAssociations() {
         if (cbAllAssociations == null) {
             cbAllAssociations = new JCheckBox();
             cbAllAssociations.setText("Return related associations");
-            cbAllAssociations.setToolTipText(
-                    "Return all associations for the returned annotations");
+            cbAllAssociations.setToolTipText("Return all associations for the returned annotations");
         }
 
         return cbAllAssociations;
@@ -240,43 +221,42 @@ public class SearchPanel extends JPanel {
             cbAllInterpretations = new JCheckBox();
             cbAllInterpretations.setText("Return concurrent observations");
             cbAllInterpretations.setToolTipText(
-                    "Return all observations that occur in the same video-frames as the returned annotations");
+                "Return all observations that occur in the same video-frames as the returned annotations");
         }
 
         return cbAllInterpretations;
     }
-    
-    protected JCheckBox getCbHierarchy() {
-    	if (cbHierarchy == null) {
-    		cbHierarchy = new JCheckBox();
-    		cbHierarchy.setText("Return concept hierarchy");
-            cbHierarchy.setToolTipText(
-                    "Return the hierarchy of the concepts");
-    	}
-    	return cbHierarchy;
-    }
-    
-    protected JCheckBox getCbPhylogeny() {
-    	if (cbPhylogeny == null) {
-    	    cbPhylogeny = new JCheckBox();
-    	    cbPhylogeny.setText("Return basic organism phylogeny");
-            cbPhylogeny.setToolTipText(
-                    "Return the phylogeny of the organisms");
-    	}
-    	return cbPhylogeny;
-    }
-    
+
     protected JCheckBox getCbFullPhylogeny() {
-    	if (cbFullPhylogeny == null) {
-    	    cbFullPhylogeny = new JCheckBox();
-    	    cbFullPhylogeny.setText("Return detailed organism phylogeny");
-            cbFullPhylogeny.setToolTipText(
-                    "Return the detailed phylogeny of the organisms");
-    	}
-    	return cbFullPhylogeny;
+        if (cbFullPhylogeny == null) {
+            cbFullPhylogeny = new JCheckBox();
+            cbFullPhylogeny.setText("Return detailed organism phylogeny");
+            cbFullPhylogeny.setToolTipText("Return the detailed phylogeny of the organisms");
+        }
+
+        return cbFullPhylogeny;
     }
 
- 
+    protected JCheckBox getCbHierarchy() {
+        if (cbHierarchy == null) {
+            cbHierarchy = new JCheckBox();
+            cbHierarchy.setText("Return concept hierarchy");
+            cbHierarchy.setToolTipText("Return the hierarchy of the concepts");
+        }
+
+        return cbHierarchy;
+    }
+
+    protected JCheckBox getCbPhylogeny() {
+        if (cbPhylogeny == null) {
+            cbPhylogeny = new JCheckBox();
+            cbPhylogeny.setText("Return basic organism phylogeny");
+            cbPhylogeny.setToolTipText("Return the phylogeny of the organisms");
+        }
+
+        return cbPhylogeny;
+    }
+
     private ActionAdapter getClearAction() {
         if (clearAction == null) {
             clearAction = new ActionAdapter() {
@@ -293,15 +273,14 @@ public class SearchPanel extends JPanel {
         return clearAction;
     }
 
- 
     private JButton getClearButton() {
         if (clearButton == null) {
             clearButton = new JButton();
             clearButton.setText("Clear");
-            final ImageIcon icon = new ImageIcon(
-                getClass().getResource("/images/vars/query/clear_conceptnames.png"));
+            final ImageIcon icon = new ImageIcon(getClass().getResource("/images/vars/query/clear_conceptnames.png"));
             clearButton.setIcon(icon);
             clearButton.addActionListener(getClearAction());
+
             /*
              * The clear button is only enabled when there are actually
              * items in the list
@@ -312,8 +291,7 @@ public class SearchPanel extends JPanel {
              * The clear button should only be enabled if there are items in
              * the list model.
              */
-            getConceptConstraintsList().getModel().addListDataListener(
-                    new ListDataListener() {
+            getConceptConstraintsList().getModel().addListDataListener(new ListDataListener() {
 
                 public void intervalAdded(ListDataEvent e) {
                     update();
@@ -350,24 +328,22 @@ public class SearchPanel extends JPanel {
     }
 
     /**
-	 * This method initializes a JList that contains the ConceptConstraints that are to be used for querying. The Model used is a ListListModel
-	 * @return  javax.swing.JList
-	 */
+         * This method initializes a JList that contains the ConceptConstraints that are to be used for querying. The Model used is a ListListModel
+         * @return  javax.swing.JList
+         */
     protected JList getConceptConstraintsList() {
         if (conceptConstraintsList == null) {
-            conceptConstraintsList = new JList(
-                    new ListListModel(new ArrayList()));
+            conceptConstraintsList = new JList(new ListListModel(new ArrayList()));
         }
 
         return conceptConstraintsList;
     }
 
- 
     private ConceptNameSelectionPanel getConceptNameSelectionPanel() {
         if (conceptNameSelectionPanel == null) {
             final QueryPersistenceService queryDAO = injector.getInstance(QueryPersistenceService.class);
             final KnowledgebaseDAOFactory daoFactory = injector.getInstance(KnowledgebaseDAOFactory.class);
-            conceptNameSelectionPanel = new ConceptNameSelectionPanel(queryDAO, daoFactory.newConceptDAO());
+            conceptNameSelectionPanel = new ConceptNameSelectionPanel(queryDAO, daoFactory);
             final FancyComboBox cbConceptName = (FancyComboBox) conceptNameSelectionPanel.getCbConceptName();
 
             /*
@@ -395,14 +371,10 @@ public class SearchPanel extends JPanel {
                     delayTimer.restart();
                 }
             };
-            conceptNameSelectionPanel.getCParent().addChangeListener(
-                    changeListener);
-            conceptNameSelectionPanel.getCSiblings().addChangeListener(
-                    changeListener);
-            conceptNameSelectionPanel.getCChildren().addChangeListener(
-                    changeListener);
-            conceptNameSelectionPanel.getCDescendant().addChangeListener(
-                    changeListener);
+            conceptNameSelectionPanel.getCParent().addChangeListener(changeListener);
+            conceptNameSelectionPanel.getCSiblings().addChangeListener(changeListener);
+            conceptNameSelectionPanel.getCChildren().addChangeListener(changeListener);
+            conceptNameSelectionPanel.getCDescendant().addChangeListener(changeListener);
 
             /*
              * If the user presses ENTER, update the associationSelectionPanel
@@ -429,11 +401,6 @@ public class SearchPanel extends JPanel {
         return conceptNameSelectionPanel;
     }
 
-    /**
-	 * This method initializes jPanel
-	 * @return  javax.swing.JPanel
-	 * @uml.property  name="mainPanel"
-	 */
     private JPanel getMainPanel() {
         if (mainPanel == null) {
             mainPanel = new JPanel();
@@ -445,16 +412,10 @@ public class SearchPanel extends JPanel {
         return mainPanel;
     }
 
-    /**
-	 * This method initializes jPanel4
-	 * @return  javax.swing.JPanel
-	 * @uml.property  name="middlePanel"
-	 */
     private JPanel getMiddlePanel() {
         if (middlePanel == null) {
             middlePanel = new JPanel();
-            middlePanel.setLayout(
-                    new BoxLayout(middlePanel, BoxLayout.X_AXIS));
+            middlePanel.setLayout(new BoxLayout(middlePanel, BoxLayout.X_AXIS));
             middlePanel.add(getAddButton(), null);
             middlePanel.add(getRemoveButton(), null);
             middlePanel.add(getClearButton(), null);
@@ -463,17 +424,11 @@ public class SearchPanel extends JPanel {
         return middlePanel;
     }
 
-    /**
-	 * This method initializes jButton
-	 * @return  javax.swing.JButton
-	 * @uml.property  name="removeButton"
-	 */
     private JButton getRemoveButton() {
         if (removeButton == null) {
             removeButton = new JButton();
             removeButton.setText("Remove");
-            final ImageIcon icon = new ImageIcon(
-                getClass().getResource("/images/vars/query/remove_conceptname.png"));
+            final ImageIcon icon = new ImageIcon(getClass().getResource("/images/vars/query/remove_conceptname.png"));
             removeButton.setIcon(icon);
             removeButton.addActionListener(new ActionListener() {
 
@@ -486,6 +441,7 @@ public class SearchPanel extends JPanel {
                 }
 
             });
+
             /*
              * The remove button is only enabled if something is selected in
              * the conceptConstraintsList
@@ -496,8 +452,7 @@ public class SearchPanel extends JPanel {
              * If no values are selected in the list then the remove button
              * should be disabled.
              */
-            getConceptConstraintsList().addListSelectionListener(
-                    new ListSelectionListener() {
+            getConceptConstraintsList().addListSelectionListener(new ListSelectionListener() {
 
                 public void valueChanged(ListSelectionEvent e) {
                     boolean enableRemoveButton = false;
@@ -514,29 +469,17 @@ public class SearchPanel extends JPanel {
         return removeButton;
     }
 
-    /**
-	 * This method initializes jScrollPane
-	 * @return  javax.swing.JScrollPane
-	 * @uml.property  name="scrollPane"
-	 */
     private JScrollPane getScrollPane() {
         if (scrollPane == null) {
             scrollPane = new JScrollPane();
 
-            // scrollPane.setBounds(65, 5, 3, 3);
             scrollPane.setViewportView(getConceptConstraintsList());
-            scrollPane.setHorizontalScrollBarPolicy(
-                    javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+            scrollPane.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         }
 
         return scrollPane;
     }
 
-    /**
-	 * This method initializes jPanel
-	 * @return  javax.swing.JPanel
-	 * @uml.property  name="topPanel"
-	 */
     private JPanel getTopPanel() {
         if (topPanel == null) {
             topPanel = new JPanel();
@@ -547,8 +490,6 @@ public class SearchPanel extends JPanel {
 
         return topPanel;
     }
-
-    //~--- methods ------------------------------------------------------------
 
     /**
      * This method initializes this
@@ -576,7 +517,7 @@ public class SearchPanel extends JPanel {
          * the QueryFrame.
          */
         actionMap.put("RESET_SearchPanel", new ActionAdapter() {
-            
+
             private static final long serialVersionUID = -3079307381079657219L;
 
             public void doAction() {
@@ -591,10 +532,8 @@ public class SearchPanel extends JPanel {
      */
     public void reset() {
         getClearAction().doAction();
-        getConceptNameSelectionPanel().getCbConceptName().setSelectedItem(
-                ConceptConstraints.WILD_CARD_STRING);
+        getConceptNameSelectionPanel().getCbConceptName().setSelectedItem(ConceptConstraints.WILD_CARD_STRING);
     }
-
 
     /**
      * <p><!-- Method description --></p>
@@ -609,22 +548,26 @@ public class SearchPanel extends JPanel {
          * draw the WaitIndicator.
          */
         Worker.post(new Job() {
+
             public Object run() {
                 Collection names = null;
                 try {
                     names = getConceptNameSelectionPanel().getSelectedConceptNamesAsStrings();
-                } catch (Exception e) {
+                }
+                catch (Exception e) {
                     EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
-                    log.error( "Failed to retrieve concept names from the database.", e);
+                    log.error("Failed to retrieve concept names from the database.", e);
                 }
 
                 getAssociationSelectionPanel().setConceptNames(names);
-                return null;  
+                return null;
             }
+
         });
 
         waitIndicator.dispose();
         log.debug("Completed updating UI with information from the VARS database");
     }
-}    // @jve:decl-index=0:visual-constraint="10,10"
+
+}  
 

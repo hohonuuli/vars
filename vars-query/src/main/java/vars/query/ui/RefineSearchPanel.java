@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)RefineSearchPanel.java   2009.11.21 at 08:13:30 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
- * (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,6 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 
 
 package vars.query.ui;
@@ -31,7 +29,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -44,25 +41,21 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
+import org.mbari.awt.event.ActionAdapter;
+import org.mbari.text.IgnoreCaseToStringComparator;
+import org.mbari.util.Dispatcher;
+import org.mbari.util.ImmutableCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.mbari.awt.event.ActionAdapter;
-import org.mbari.util.Dispatcher;
-import org.mbari.text.IgnoreCaseToStringComparator;
-import org.mbari.util.ImmutableCollection;
 import vars.query.QueryPersistenceService;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * @author Brian Schlining
- * @version $Id: RefineSearchPanel.java 334 2006-08-01 22:43:31Z hohonuuli $
  */
 public class RefineSearchPanel extends JPanel {
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
-    
     private static final Comparator<Object> COMPARATOR = new IgnoreCaseToStringComparator();
+
     /**
      * This is a list of Colunn names who's return boxes should be checked by default
      * if found in the database.
@@ -71,6 +64,7 @@ public class RefineSearchPanel extends JPanel {
      * file.
      */
     private static final Set<String> DEFAULT_RETURNS = new TreeSet<String>(COMPARATOR);
+
     /**
      * In order to make usage easier for users we're grouping related columns
      * together in the user interface. To do this we have to know what
@@ -80,6 +74,7 @@ public class RefineSearchPanel extends JPanel {
      * "Other" group.
      */
     private static final Map<String, Set<String>> COLUMN_GROUPS = new TreeMap<String, Set<String>>(COMPARATOR);
+
     static {
         DEFAULT_RETURNS.add("Associations");
         DEFAULT_RETURNS.add("ConceptName");
@@ -92,6 +87,7 @@ public class RefineSearchPanel extends JPanel {
         DEFAULT_RETURNS.add("TapeTimeCode");
         DEFAULT_RETURNS.add("VideoArchiveName");
     }
+
     static {
 
         /*
@@ -155,26 +151,25 @@ public class RefineSearchPanel extends JPanel {
         set.add("Salinity");
         set.add("Temperature");
     }
- 
+
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    private String[] stringConstraints = new String[] { "Observer", "ShipName", "PlatformName", "ChiefScientist",
+            "Direction" };
     private Collection constraintNames;
+
     /**
      * Metadata representing information about the Annotations view in the database.
      */
     private Map metadata;
-
     private JPanel panel;
-
-    private JScrollPane scrollPane;
-  
-    private String[] stringConstraints = new String[]{"Observer", "ShipName", "PlatformName", "ChiefScientist", "Direction"};
-
-    private Collection valuePanels;
-    //~--- constructors -------------------------------------------------------
-
     private final QueryPersistenceService queryDAO;
+    private JScrollPane scrollPane;
+    private Collection valuePanels;
 
     /**
      * This is the default constructor
+     *
+     * @param queryDAO
      */
     @Inject
     public RefineSearchPanel(QueryPersistenceService queryDAO) {
@@ -183,12 +178,7 @@ public class RefineSearchPanel extends JPanel {
         this.queryDAO = queryDAO;
         initialize();
     }
-    //~--- methods ------------------------------------------------------------
 
-    /**
-     * <p><!-- Method description --></p>
-     *
-     */
     private void addGroupPanels() {
 
         /*
@@ -197,7 +187,7 @@ public class RefineSearchPanel extends JPanel {
          */
         Map panelMap = new TreeMap(COMPARATOR);
         Collection panels = getValuePanels();
-        for (Iterator i = panels.iterator(); i.hasNext();) {
+        for (Iterator i = panels.iterator(); i.hasNext(); ) {
             ValuePanel vp = (ValuePanel) i.next();
             panelMap.put(vp.getValueName(), vp);
         }
@@ -214,18 +204,19 @@ public class RefineSearchPanel extends JPanel {
          */
         Collection columnsFound = new ArrayList();
         Set groups = COLUMN_GROUPS.keySet();
-        for (Iterator i = groups.iterator(); i.hasNext();) {
+        for (Iterator i = groups.iterator(); i.hasNext(); ) {
             JPanel groupPanel = null;
             String groupName = (String) i.next();
             Collection columnNames = (Collection) COLUMN_GROUPS.get(groupName);
-            for (Iterator j = columnNames.iterator(); j.hasNext();) {
+            for (Iterator j = columnNames.iterator(); j.hasNext(); ) {
                 String columnName = (String) j.next();
                 ValuePanel valuePanel = (ValuePanel) panelMap.get(columnName);
                 if (valuePanel != null) {
                     if (groupPanel == null) {
                         groupPanel = new JPanel();
                         groupPanel.setLayout(new BoxLayout(groupPanel, BoxLayout.Y_AXIS));
-                        groupPanel.setBorder(BorderFactory.createTitledBorder(border, groupName, TitledBorder.LEFT, TitledBorder.TOP, font, Color.BLACK));
+                        groupPanel.setBorder(BorderFactory.createTitledBorder(border, groupName, TitledBorder.LEFT,
+                                TitledBorder.TOP, font, Color.BLACK));
                         getPanel().add(groupPanel);
                         groupPanel.add(makeLabelPanel());
                     }
@@ -240,7 +231,7 @@ public class RefineSearchPanel extends JPanel {
          * Remove the valuePanels that have been added to the UI from our
          * panelMap
          */
-        for (Iterator i = columnsFound.iterator(); i.hasNext();) {
+        for (Iterator i = columnsFound.iterator(); i.hasNext(); ) {
             String columnName = (String) i.next();
             panelMap.remove(columnName);
         }
@@ -251,31 +242,31 @@ public class RefineSearchPanel extends JPanel {
         if (panelMap.size() > 0) {
             JPanel p = new JPanel();
             p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
-            p.setBorder(BorderFactory.createTitledBorder(border, "Miscellaneous", TitledBorder.LEFT, TitledBorder.TOP, font, Color.BLACK));
+            p.setBorder(BorderFactory.createTitledBorder(border, "Miscellaneous", TitledBorder.LEFT, TitledBorder.TOP,
+                    font, Color.BLACK));
             getPanel().add(p);
             p.add(makeLabelPanel());
             List columnNames = new ArrayList(panelMap.keySet());
             Collections.sort(columnNames);
 
-            for (Iterator i = columnNames.iterator(); i.hasNext();) {
+            for (Iterator i = columnNames.iterator(); i.hasNext(); ) {
                 String columName = (String) i.next();
                 ValuePanel valuePanel = (ValuePanel) panelMap.get(columName);
                 p.add(valuePanel);
             }
         }
     }
-    //~--- get methods --------------------------------------------------------
 
     /**
      * Retrieve the metadata from the Annotation view. This is a Map<String,String> where key = columnName, value = data type.
      * @return
-     * @uml.property  name="metadata"
      */
     private Map getMetadata() {
         if (metadata == null) {
             try {
                 metadata = queryDAO.getMetaData();
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 log.error("Failed to lookup metadata from database", e);
                 metadata = new HashMap();
             }
@@ -284,11 +275,6 @@ public class RefineSearchPanel extends JPanel {
         return metadata;
     }
 
-    /**
-     * <p><!-- Method description --></p>
-     * @return
-     * @uml.property  name="panel"
-     */
     private JPanel getPanel() {
         if (panel == null) {
             panel = new JPanel();
@@ -299,11 +285,6 @@ public class RefineSearchPanel extends JPanel {
         return panel;
     }
 
-    /**
-     * <p><!-- Method description --></p>
-     * @return
-     * @uml.property  name="scrollPane"
-     */
     private JScrollPane getScrollPane() {
         if (scrollPane == null) {
             scrollPane = new JScrollPane();
@@ -313,25 +294,19 @@ public class RefineSearchPanel extends JPanel {
         return scrollPane;
     }
 
-    /**
-     * <p><!-- Method description --></p>
-     *
-     *
-     * @param name
-     * @param type
-     *
-     * @return
-     */
     private ValuePanel getValuePanel(final String name, final String type) {
         if (log.isDebugEnabled()) {
             log.debug("Creating a ValuePanel for " + name + " [" + type + "]");
         }
+
         ValuePanel valuePanel = null;
 
         if (type.equals("java.lang.String")) {
             try {
+
                 // values = AnnotationBeanDAO.getUniqueValuesByColumn(name);
                 if (constraintNames.contains(name)) {
+
                     /*
                      * List values = (List) Worker.post(new Task() {
                      *
@@ -342,19 +317,25 @@ public class RefineSearchPanel extends JPanel {
                      * });
                      * valuePanel = new StringValuePanel(name, values);
                      */
+
                     //valuePanel = new StringLikeValuePanel(name);
                     valuePanel = new AdvancedStringValuePanel(name, queryDAO);
-                } else {
+                }
+                else {
                     valuePanel = new AdvancedStringValuePanel(name, queryDAO);
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 log.error("Failed to create ValuePanel for " + name, e);
             }
-        } else if (type.equals("java.sql.Timestamp")) {
+        }
+        else if (type.equals("java.sql.Timestamp")) {
             valuePanel = new DateValuePanel(name, queryDAO);
-        } else if (type.equals("java.lang.Boolean")) {
+        }
+        else if (type.equals("java.lang.Boolean")) {
             valuePanel = new BooleanValuePanel(name);
-        } else {
+        }
+        else {
             valuePanel = new NumberValuePanel(name, queryDAO);
         }
 
@@ -366,7 +347,6 @@ public class RefineSearchPanel extends JPanel {
     }
 
     /**
-     * <p><!-- Method description --></p>
      *
      *
      * @return
@@ -384,15 +364,17 @@ public class RefineSearchPanel extends JPanel {
              */
             if (metaData != null) {
                 Set keySet = metaData.keySet();
-                for (Iterator i = keySet.iterator(); i.hasNext();) {
+                for (Iterator i = keySet.iterator(); i.hasNext(); ) {
                     String columnName = (String) i.next();
                     if (columnName.toUpperCase().indexOf("ID_FK") < 0) {
                         ValuePanel valuePanel = null;
                         try {
                             valuePanel = getValuePanel(columnName, (String) metaData.get(columnName));
-                        } catch (RuntimeException e) {
+                        }
+                        catch (RuntimeException e) {
                             log.warn("Failed to create a ValuePanel for " + columnName, e);
                         }
+
                         if (valuePanel != null) {
                             valuePanels.add(valuePanel);
                         }
@@ -403,12 +385,7 @@ public class RefineSearchPanel extends JPanel {
 
         return new ImmutableCollection(valuePanels);
     }
-    //~--- methods ------------------------------------------------------------
 
-    /**
-     * This method initializes this
-     *
-     */
     private void initialize() {
         this.setLayout(new BorderLayout(0, 0));
         this.add(getScrollPane(), BorderLayout.CENTER);
@@ -437,12 +414,6 @@ public class RefineSearchPanel extends JPanel {
         });
     }
 
-    /**
-     * <p><!-- Method description --></p>
-     *
-     *
-     * @return
-     */
     private JPanel makeLabelPanel() {
         JPanel p = new JPanel();
         p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
@@ -472,6 +443,7 @@ public class RefineSearchPanel extends JPanel {
          */
         Component[] c = myPanel.getComponents();
         for (int i = 0; i < c.length; i++) {
+
             /*
              * If it's a ValuePanel we want to turn off the constrain checkbox
              * and toggle the returns checkbox as appropriate.

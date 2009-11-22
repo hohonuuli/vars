@@ -20,6 +20,7 @@ Created on Jan 12, 2005
  */
 package org.mbari.vars.annotation.ui.actions;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import javax.swing.Icon;
@@ -28,9 +29,14 @@ import org.mbari.movie.Timecode;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import vars.DAO;
+import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.VideoArchive;
 import vars.annotation.Observation;
 import vars.annotation.VideoFrame;
+import vars.annotation.ui.Lookup;
+import vars.annotation.ui.ToolBelt;
 
 /**
  *
@@ -45,95 +51,60 @@ public class ChangeTimeCodeAction extends ActionAdapter {
      * This is the timecode we want to change to
      */
     private final Timecode timeCode = new Timecode();
-
-    /**
-     * This is the videoframe whose timecode we want to change
-     */
-    private VideoFrame videoFrame;
+    private final ToolBelt toolBelt;
 
     /**
      *
      */
-    public ChangeTimeCodeAction() {
+    public ChangeTimeCodeAction(ToolBelt toolBelt) {
         super();
+        this.toolBelt = toolBelt;
     }
 
     /**
      * @param name
      */
-    public ChangeTimeCodeAction(final String name) {
+    public ChangeTimeCodeAction(final String name, ToolBelt toolBelt) {
         super(name);
+        this.toolBelt = toolBelt;
     }
 
     /**
      * @param name
      * @param icon
      */
-    public ChangeTimeCodeAction(final String name, final Icon icon) {
+    public ChangeTimeCodeAction(final String name, final Icon icon, ToolBelt toolBelt) {
         super(name, icon);
+        this.toolBelt = toolBelt;
     }
 
     /**
-     * <p><!-- Method description --></p>
      *
      */
     public void doAction() {
-        final Observation obs = ObservationDispatcher.getInstance().getObservation();
-        if (obs != null) {
-            VideoFrame vf =  obs.getVideoFrame();
-            synchronized (vf) {
-                final String oldTimeCode = vf.getTimeCode();
-                final IVideoArchive va = vf.getVideoArchive();
-                final VideoFrame vfTarget = (VideoFrame) va.findVideoFrameByTimeCode(getTimeCode());
-                if (vfTarget == null) {
-                    vf.setTimeCode(getTimeCode());
-                }
-                else {
-
-                    // Move observations to the target
-                    final Collection siblingObs = vf.getObservations();
-                    synchronized (siblingObs) {
-                        for (final Iterator i = siblingObs.iterator(); i.hasNext(); ) {
-                            final IObservation sibling = (IObservation) i.next();
-                            vf.removeObservation(sibling);
-                            vfTarget.addObservation(sibling);
-                        }
-                    }
-
-                    final IVideoArchive parentVa = vf.getVideoArchive();
-                    parentVa.removeVideoFrame(vf);
-
-                    try {
-                        VideoFrameDAO.getInstance().delete((IDataObject) vf);
-                        vf = vfTarget;
-                    }
-                    catch (final Exception e) {
-
-                        /*
-                         * If the db transaction fails roll back the cahnges so that
-                         * the model in memory matches the database.
-                         */
-                        synchronized (siblingObs) {
-                            for (final Iterator i = siblingObs.iterator(); i.hasNext(); ) {
-                                final IObservation sibling = (IObservation) i.next();
-                                vfTarget.removeObservation(sibling);
-                                vf.addObservation(sibling);
-                            }
-                        }
-
-                        parentVa.addVideoFrame(vf);
-                        AppFrameDispatcher.showErrorDialog("Unable to save the change to time-code! Reason: " +
-                                                           e.getMessage() + ".");
-                        log.error("Failed to move Observations to a different " + "pre-existing VideoFrame", e);
-                    }
-                }
-
-                DAOEventQueue.update((IDataObject) vf, new VFUpdateErrorHandler((VideoFrame) vf, oldTimeCode));
+        Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+        observations = new ArrayList<Observation>(observations);
+        // DAOTX
+        DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
+        dao.startTransaction();
+        for (Observation observation : observations) {
+            observation = dao.merge(observation);
+            VideoFrame sourceVideoFrame = observation.getVideoFrame();
+            VideoArchive videoArchive = sourceVideoFrame.getVideoArchive();
+            VideoFrame targetVideoFrame = videoArchive.findVideoFrameByTimeCode(getTimeCode());
+            if (targetVideoFrame == null) {
+                sourceVideoFrame.setTimecode(getTimeCode());
+            }
+            else {
+                // Move observations to target
+                sourceVideoFrame.removeObservation(observation);
+                targetVideoFrame.addObservation(observation);
             }
         }
-
-        final ObservationDispatcher dispatcher = ObservationDispatcher.getInstance();
-        dispatcher.setObservation(dispatcher.getObservation());
+        dao.endTransaction();
+        
+        toolBelt.getPersistenceController().updateUI(observations);
+        
     }
 
     /**
@@ -144,13 +115,6 @@ public class ChangeTimeCodeAction extends ActionAdapter {
     }
 
     /**
-     *     @return  Returns the videoFrame.
-     */
-    public VideoFrame getVideoFrame() {
-        return videoFrame;
-    }
-
-    /**
      *
      * @param timeCodeString
      */
@@ -158,43 +122,7 @@ public class ChangeTimeCodeAction extends ActionAdapter {
         timeCode.setTimecode(timeCodeString);
     }
 
-    /**
-     *     @param videoFrame  The videoFrame to set.
-     */
-    public void setVideoFrame(final VideoFrame videoFrame) {
-        this.videoFrame = videoFrame;
-    }
 
-    /**
-     *     <p>ExceptionHandler that rolls back the change to the timecode in memory if the database transaction bombs.</p>
-     *     @author  Brian Schlining
-     *     @version  $Id: ChangeTimeCodeAction.java 332 2006-08-01 18:38:46Z hohonuuli $
-     */
-    private final class VFUpdateErrorHandler extends DAOExceptionHandler {
 
-        private final String oldTimeCode;
-        private final VideoFrame videoFrame;
-
-        /**
-         * Constructs ...
-         *
-         *
-         * @param videoFrame
-         * @param oldTimeCode
-         */
-        public VFUpdateErrorHandler(final VideoFrame videoFrame, final String oldTimeCode) {
-            this.videoFrame = videoFrame;
-            this.oldTimeCode = oldTimeCode;
-        }
-
-        /**
-         * <p><!-- Method description --></p>
-         *
-         *
-         * @param e
-         */
-        protected void doAction(final Exception e) {
-            videoFrame.setTimeCode(oldTimeCode);
-        }
-    }
+ 
 }

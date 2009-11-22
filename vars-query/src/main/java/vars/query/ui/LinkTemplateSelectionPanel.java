@@ -40,6 +40,7 @@ import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.ConceptNameTypes;
+import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.LinkTemplateDAO;
 import vars.knowledgebase.SimpleConceptBean;
 import vars.knowledgebase.SimpleConceptNameBean;
@@ -70,9 +71,7 @@ public class LinkTemplateSelectionPanel extends JPanel {
     private JTextField tfLinkValue = null;
     private JTextField tfSearch = null;
     private JPanel topPanel = null;
-    private final ConceptDAO conceptDAO;
-    private final LinkTemplateDAO linkTemplateDAO;
-    private final QueryPersistenceService queryDAO;
+    private final ToolBelt toolBelt;
 
     /**
      *
@@ -81,63 +80,13 @@ public class LinkTemplateSelectionPanel extends JPanel {
      * @param linkTemplateDAO
      * @param queryDAO
      */
-    public LinkTemplateSelectionPanel(ConceptDAO conceptDAO, LinkTemplateDAO linkTemplateDAO,
-                                      QueryPersistenceService queryDAO) {
+    public LinkTemplateSelectionPanel(ToolBelt toolBelt) {
         super();
-        this.conceptDAO = conceptDAO;
-        this.queryDAO = queryDAO;
-        this.linkTemplateDAO = linkTemplateDAO;
+        this.toolBelt = toolBelt;
         initialize();
     }
 
-    /**
-     *
-     * @param conceptDAO
-     * @param linkTemplateDAO
-     * @param queryDAO
-     * @param isDoubleBuffered
-     */
-    public LinkTemplateSelectionPanel(ConceptDAO conceptDAO, LinkTemplateDAO linkTemplateDAO, QueryPersistenceService queryDAO,
-                                      boolean isDoubleBuffered) {
-        super(isDoubleBuffered);
-        this.conceptDAO = conceptDAO;
-        this.queryDAO = queryDAO;
-        this.linkTemplateDAO = linkTemplateDAO;
-        initialize();
-    }
 
-    /**
-     *
-     * @param conceptDAO
-     * @param linkTemplateDAO
-     * @param queryDAO
-     * @param layout
-     */
-    public LinkTemplateSelectionPanel(ConceptDAO conceptDAO, LinkTemplateDAO linkTemplateDAO, QueryPersistenceService queryDAO,
-                                      LayoutManager layout) {
-        super(layout);
-        this.conceptDAO = conceptDAO;
-        this.queryDAO = queryDAO;
-        this.linkTemplateDAO = linkTemplateDAO;
-        initialize();
-    }
-
-    /**
-     *
-     * @param conceptDAO
-     * @param linkTemplateDAO
-     * @param queryDAO
-     * @param layout
-     * @param isDoubleBuffered
-     */
-    public LinkTemplateSelectionPanel(ConceptDAO conceptDAO, LinkTemplateDAO linkTemplateDAO, QueryPersistenceService queryDAO,
-                                      LayoutManager layout, boolean isDoubleBuffered) {
-        super(layout, isDoubleBuffered);
-        this.conceptDAO = conceptDAO;
-        this.linkTemplateDAO = linkTemplateDAO;
-        this.queryDAO = queryDAO;
-        initialize();
-    }
 
     private JPanel getBottomPanel() {
         if (bottomPanel == null) {
@@ -181,7 +130,7 @@ public class LinkTemplateSelectionPanel extends JPanel {
 
     private HierachicalConceptNameComboBox getCbToConcept() {
         if (cbToConcept == null) {
-            cbToConcept = new HierachicalConceptNameComboBox(conceptDAO);
+            cbToConcept = new HierachicalConceptNameComboBox(toolBelt.getAnnotationPersistenceService());
         }
 
         return cbToConcept;
@@ -297,7 +246,7 @@ public class LinkTemplateSelectionPanel extends JPanel {
 
         if (concept == null) {
             try {
-                concept = conceptDAO.findRoot();
+                concept = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO().findRoot();
             }
             catch (Exception e) {
                 log.error("Failed to lookup root concept", e);
@@ -312,7 +261,7 @@ public class LinkTemplateSelectionPanel extends JPanel {
         Collection linkTemplates = (Collection) Worker.post(new Job() {
 
             public Object run() {
-                return Arrays.asList(linkTemplateDAO.findAllApplicableToConcept(fConcept));
+                return Arrays.asList(toolBelt.getKnowledgebaseDAOFactory().newLinkTemplateDAO().findAllApplicableToConcept(fConcept));
             }
         });
 
@@ -353,6 +302,7 @@ public class LinkTemplateSelectionPanel extends JPanel {
         }
         else {
             try {
+                ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
                 toConcept = conceptDAO.findByName(linkTemplate.getToConcept());
 
                 if (toConcept == null) {

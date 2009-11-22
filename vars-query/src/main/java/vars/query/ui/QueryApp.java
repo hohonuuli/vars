@@ -69,25 +69,13 @@ public class QueryApp {
     public static final Date MIN_RECORDED_DATE = new Date(378720000L * 1000L);
     private static Logger log;
 
-    /**
-         * @uml.property  name="actionMap"
-         * @uml.associationEnd
-         */
     private ActionMap actionMap;
     private final EventTopicSubscriber<Exception> fatalErrorSubscriber;
 
-    /**
-         * @uml.property  name="inputMap"
-         * @uml.associationEnd
-         */
     private InputMap inputMap;
     private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
     private final EventTopicSubscriber nonFatalErrorSubscriber;
 
-    /**
-         * @uml.property  name="queryFrame"
-         * @uml.associationEnd
-         */
     private QueryFrame queryFrame;
 
     /**
@@ -121,9 +109,8 @@ public class QueryApp {
     }
 
     /**
-         * @return  Returns the actionMap.
-         * @uml.property  name="actionMap"
-         */
+     * @return  Returns the actionMap.
+     */
     public ActionMap getActionMap() {
         if (actionMap == null) {
             actionMap = new ActionMap();
@@ -146,9 +133,8 @@ public class QueryApp {
     }
 
     /**
-         * @return  Returns the inputMap.
-         * @uml.property  name="inputMap"
-         */
+     * @return  Returns the inputMap.
+     */
     public InputMap getInputMap() {
         if (inputMap == null) {
             inputMap = new InputMap();
@@ -170,10 +156,8 @@ public class QueryApp {
     }
 
     /**
-         * <p><!-- Method description --></p>
-         * @return
-         * @uml.property  name="queryFrame"
-         */
+     * @return
+     */
     public QueryFrame getQueryFrame() {
         if (queryFrame == null) {
 
@@ -185,10 +169,6 @@ public class QueryApp {
         return queryFrame;
     }
 
-    /**
-     * <p><!-- Method description --></p>
-     *
-     */
     private void initialize() {
         ImageIcon mbariLogo = new ImageIcon(getClass().getResource("/images/vars/query/query-splash.png"));
         SplashFrame splashFrame = new SplashFrame(mbariLogo);
@@ -205,7 +185,7 @@ public class QueryApp {
         splashFrame.repaint();
 
         /*
-         * Load the KB in a seperate thread so the UI remains responsive.
+         * Load the KB in a separate thread so the UI remains responsive.
          */
         try {
             Worker.post(new Task() {

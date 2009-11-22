@@ -23,6 +23,8 @@ package org.mbari.vars.annotation.locale;
 //import java.util.Collection;
 import javax.swing.JDialog;
 
+import vars.annotation.AnnotationDAOFactory;
+
 //import org.mbari.vars.annotation.model.VideoArchiveSet;
 
 /**
@@ -35,6 +37,7 @@ import javax.swing.JDialog;
  * @version $Id: $
  */
 public class OpenVideoArchiveSetUsingParamsDialogFactory {
+    
 
     /**
      *
@@ -42,7 +45,6 @@ public class OpenVideoArchiveSetUsingParamsDialogFactory {
     public OpenVideoArchiveSetUsingParamsDialogFactory() {
         super();
 
-        // TODO Auto-generated constructor stub
     }
 
     /**
@@ -51,27 +53,8 @@ public class OpenVideoArchiveSetUsingParamsDialogFactory {
      *
      * @return
      */
-    public static JDialog getDialog() {
+    public static JDialog getDialog(AnnotationDAOFactory annotationDAOFactory) {
 
-        /*
-         * Grab the standard dialog used to open video archives.
-         */
-
-        //final OpenVideoArchiveSetUsingParamsDialog dialog = new OpenVideoArchiveSetUsingParamsDialog();
-
-        /*
-         * For ship locations, we try to preset the selected platform in the dialog
-         * box so users don't accidently use the wrong platform.
-         */
-
-        //final String cameraPlatform = LocaleFactory.getCameraPlatform();
-        //final Collection platformNames = VideoArchiveSet.getCameraPlatforms();
-        //if (platformNames.contains(cameraPlatform)) {
-        //    dialog.getCbCameraPlatform().getModel().setSelectedItem(
-        //            cameraPlatform);
-        //}
-
-        //return dialog;
-        return new OpenVideoArchiveSetDialog3();
+        return new OpenVideoArchiveSetDialog3(annotationDAOFactory);
     }
 }

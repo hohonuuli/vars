@@ -57,7 +57,7 @@ public class DateValuePanel extends ValuePanel {
     private JLabel minLabel = null;
     private MDateEntryField maxEntryField;
     private MDateEntryField minEntryField;
-    private final QueryPersistenceService queryDAO;
+    private final QueryPersistenceService queryPersistenceService;
     private JButton scanButton;
 
     /**
@@ -68,7 +68,7 @@ public class DateValuePanel extends ValuePanel {
      */
     public DateValuePanel(String name, QueryPersistenceService queryDAO) {
         super(name);
-        this.queryDAO = queryDAO;
+        this.queryPersistenceService = queryDAO;
         initialize();
     }
 
@@ -202,7 +202,7 @@ public class DateValuePanel extends ValuePanel {
                         @Override
                         protected Object doInBackground() throws Exception {
                             try {
-                                queryResults = queryDAO.executeQuery(sql);
+                                queryResults = queryPersistenceService.executeQuery(sql);
                             }
                             catch (Exception e1) {
                                 EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR,

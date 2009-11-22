@@ -19,20 +19,13 @@ package vars.query.ui;
 
 import javax.swing.JPanel;
 
-//~--- classes ----------------------------------------------------------------
 
 /**
- * <p><!-- Insert Description --></p>
  *
  * @author Brian Schlining
- * @version $Id: BooleanValuePanel.java 314 2006-07-10 02:38:46Z hohonuuli $
  */
 public class BooleanValuePanel extends ValuePanel {
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 6982730305624742487L;
 
     /**
      * @param name
@@ -42,15 +35,8 @@ public class BooleanValuePanel extends ValuePanel {
         initialize();
     }
 
-    //~--- get methods --------------------------------------------------------
-
-    /*
-     *  (non-Javadoc)
-     * @see query.ui.ValuePanel#getSQL()
-     */
 
     /**
-     * <p><!-- Method description --></p>
      *
      *
      * @return
@@ -60,12 +46,7 @@ public class BooleanValuePanel extends ValuePanel {
         return "";
     }
 
-    //~--- methods ------------------------------------------------------------
 
-    /**
-     * <p><!-- Method description --></p>
-     *
-     */
     private void initialize() {
         getConstrainCheckBox().setEnabled(false);
         add(new JPanel());

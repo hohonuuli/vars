@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptName;
+import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.query.QueryPersistenceService;
 import vars.shared.ui.ConceptNameComboBox;
 
@@ -45,12 +46,10 @@ import vars.shared.ui.ConceptNameComboBox;
  * </pre>
  *
  * @author Brian Schlining
- * @version $Id: ConceptNameSelectionPanel.java 332 2006-08-01 18:38:46Z hohonuuli $
  */
 public class ConceptNameSelectionPanel extends JPanel {
-
-    private static final long serialVersionUID = 5758588674236575449L;
-    private static final Logger log = LoggerFactory.getLogger(ConceptNameSelectionPanel.class);
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    
     private JCheckBox cChildren = null;
     private JCheckBox cDescendant = null;
     private JCheckBox cParent = null;
@@ -58,8 +57,8 @@ public class ConceptNameSelectionPanel extends JPanel {
     private JComboBox cbConceptName = null;
     private JLabel jLabel = null;
     private JPanel pCheckBoxes = null;
-    private final ConceptDAO conceptDAO;
     private final QueryPersistenceService queryDAO;
+    private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
 
     /**
      *
@@ -68,17 +67,15 @@ public class ConceptNameSelectionPanel extends JPanel {
      * @param conceptDAO
      */
     @Inject
-    public ConceptNameSelectionPanel(QueryPersistenceService queryDAO, ConceptDAO conceptDAO) {
+    public ConceptNameSelectionPanel(QueryPersistenceService queryDAO, KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
         super();
         this.queryDAO = queryDAO;
-        this.conceptDAO = conceptDAO;
-
-        // TODO Auto-generated constructor stub
+        this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
         initialize();
     }
 
     /**
-     * Convience method to load all concept-names from a concept into a collection
+     * Convenience method to load all concept-names from a concept into a collection
      * Used in support of getSelectedConceptNamesAsString
      *
      * @param storage
@@ -203,7 +200,7 @@ public class ConceptNameSelectionPanel extends JPanel {
     public Collection<String> getSelectedConceptNamesAsStrings() {
         Collection<String> nameStorage = new HashSet<String>();
         String name = (String) getCbConceptName().getSelectedItem();
-        Concept concept = conceptDAO.findByName(name);
+        Concept concept = knowledgebaseDAOFactory.newConceptDAO().findByName(name);
 
         /*
          * Concept is null if it was not found in the knowledgebase. In general

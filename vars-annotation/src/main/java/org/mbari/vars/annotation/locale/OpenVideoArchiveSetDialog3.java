@@ -22,6 +22,8 @@ import java.awt.event.ContainerListener;
 import javax.swing.JButton;
 import org.mbari.vars.annotation.ui.dialogs.OkayCancelDialog;
 import org.mbari.vars.annotation.ui.dialogs.VideoSourceSelectionPanel;
+
+import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.ui.Lookup;
 
 /**
@@ -31,16 +33,18 @@ import vars.annotation.ui.Lookup;
 public class OpenVideoArchiveSetDialog3 extends OkayCancelDialog {
 
     private VideoSourceSelectionPanel selectionPanel;
+    private final AnnotationDAOFactory annotationDAOFactory;
 
     /** Creates a new instance of OpenVideoArchiveSetDialog3 */
-    public OpenVideoArchiveSetDialog3() {
+    public OpenVideoArchiveSetDialog3(AnnotationDAOFactory annotationDAOFactory) {
         super((Frame) Lookup.getApplicationFrameDispatcher().getValueObject());
+        this.annotationDAOFactory = annotationDAOFactory;
         initialize();
     }
 
     private VideoSourceSelectionPanel getSelectionPanel() {
         if (selectionPanel == null) {
-            selectionPanel = new VideoSourceSelectionPanel();
+            selectionPanel = new VideoSourceSelectionPanel(annotationDAOFactory);
 
             // Resize the frame when the videosource changes.
             selectionPanel.addContainerListener(new ContainerListener() {

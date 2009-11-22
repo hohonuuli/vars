@@ -135,7 +135,7 @@ public class AnnotationFrame extends JFrame {
 
 
             // create Open menu item
-            final JMenuItem openVideoArchive = new JMenuItem(new ShowOpenVideoArchiveDialogAction());
+            final JMenuItem openVideoArchive = new JMenuItem(new ShowOpenVideoArchiveDialogAction(toolbelt.getAnnotationDAOFactory()));
 
             menuFile.add(openVideoArchive);
             menuFile.setMnemonic('O');

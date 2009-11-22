@@ -51,37 +51,22 @@ import org.mbari.util.ExceptionHandler;
  * </ol></p>
  *
  * @author Brian Schlining
- * @version $Id: QueryActionUI.java 332 2006-08-01 18:38:46Z hohonuuli $
  */
 public class QueryActionUI {
 
-    private static final Logger log = LoggerFactory.getLogger(QueryActionUI.class);
 
-    //~--- fields -------------------------------------------------------------
-
-    /**
-	 * @uml.property  name="queryAction"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    
     private final QueryAction queryAction;
-    /**
-	 * @uml.property  name="queryResultsListener"
-	 */
+
     private final PropertyChangeListener queryResultsListener = new QueryResultsListener();
-    /**
-	 * @uml.property  name="queryExceptionHandler"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
+
     private final ExceptionHandler queryExceptionHandler = new QueryExceptionHandler();
-    /**
-	 * @uml.property  name="queryActionDialog"
-	 * @uml.associationEnd  multiplicity="(1 1)" inverse="this$0:org.mbari.vars.query.ui.QueryActionUI$QueryActionDialog"
-	 */
+
     private final QueryActionDialog queryActionDialog = new QueryActionDialog();
 
     private final String databaseUrl;
 
-    //~--- constructors -------------------------------------------------------
 
     /**
      * Constructs ...
@@ -120,10 +105,6 @@ public class QueryActionUI {
 	 */
     private class QueryActionDialog extends JDialog {
 
-        /**
-         *
-         */
-        private static final long serialVersionUID = 1847201127479900758L;
         private JPanel buttonPanel;
         private JButton cancelButton;
         private JPanel mainPanel;
@@ -167,7 +148,6 @@ public class QueryActionUI {
         /**
 		 * <p><!-- Method description --></p>
 		 * @return
-		 * @uml.property  name="buttonPanel"
 		 */
         private JPanel getButtonPanel() {
             if (buttonPanel == null) {
@@ -181,11 +161,6 @@ public class QueryActionUI {
             return buttonPanel;
         }
 
-        /**
-		 * <p><!-- Method description --></p>
-		 * @return
-		 * @uml.property  name="cancelButton"
-		 */
         private JButton getCancelButton() {
             if (cancelButton == null) {
                 cancelButton = new JButton();
@@ -207,11 +182,7 @@ public class QueryActionUI {
             return cancelButton;
         }
 
-        /**
-		 * <p><!-- Method description --></p>
-		 * @return
-		 * @uml.property  name="mainPanel"
-		 */
+
         private JPanel getMainPanel() {
             if (mainPanel == null) {
                 mainPanel = new JPanel();
@@ -226,11 +197,6 @@ public class QueryActionUI {
             return mainPanel;
         }
 
-        /**
-		 * <p><!-- Method description --></p>
-		 * @return
-		 * @uml.property  name="startLabel"
-		 */
         private JLabel getStartLabel() {
             if (startLabel == null) {
                 startLabel = new JLabel("    Started at " +
@@ -240,11 +206,6 @@ public class QueryActionUI {
             return startLabel;
         }
 
-        /**
-		 * <p><!-- Method description --></p>
-		 * @return
-		 * @uml.property  name="timerLabel"
-		 */
         private JLabel getTimerLabel() {
             if (timerLabel == null) {
                 timerLabel = new JLabel();
@@ -254,11 +215,6 @@ public class QueryActionUI {
             return timerLabel;
         }
 
-        /**
-		 * <p><!-- Method description --></p>
-		 * @return
-		 * @uml.property  name="topLabel"
-		 */
         private JLabel getTopLabel() {
             if (topLabel == null) {
                 topLabel = new JLabel("Executing query");
@@ -267,10 +223,6 @@ public class QueryActionUI {
             return topLabel;
         }
 
-        /**
-         * <p><!-- Method description --></p>
-         *
-         */
         private void initialize() {
             this.getContentPane().add(getMainPanel());
             this.pack();
@@ -295,8 +247,6 @@ public class QueryActionUI {
         }
 
         /**
-         * <p><!-- Method description --></p>
-         *
          *
          * @param e
          */

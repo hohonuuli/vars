@@ -18,12 +18,16 @@
 package org.mbari.vars.annotation.ui.actions;
 
 
+import java.util.Collection;
+
 import org.bushe.swing.event.EventBus;
 
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.VideoArchiveSet;
 import vars.annotation.VideoArchive;
+import vars.annotation.VideoArchiveSetDAO;
 import vars.annotation.ui.Lookup;
+import vars.annotation.ui.ToolBelt;
 
 /**
  * <p>Changes the videoArchvieName property of  a VideoArchive. At MBARI,
@@ -34,11 +38,14 @@ import vars.annotation.ui.Lookup;
  * @author <a href="http://www.mbari.org">MBARI</a>
  */
 public class ChangeVideoArchiveNameAction extends OpenVideoArchiveUsingParamsAction {
+    
+    private final ToolBelt toolBelt;
 
 
 
-    public ChangeVideoArchiveNameAction(AnnotationDAOFactory annotationDAOFactory) {
-        super(annotationDAOFactory);
+    public ChangeVideoArchiveNameAction(ToolBelt toolBelt) {
+        super(toolBelt.getAnnotationDAOFactory());
+        this.toolBelt = toolBelt;
     }
 
     /**
@@ -110,12 +117,17 @@ public class ChangeVideoArchiveNameAction extends OpenVideoArchiveUsingParamsAct
         if (verifyVideoArchiveSetIsChanging()) {
             final String p = getPlatform();
             final int sn = getSeqNumber();
-            final VideoArchiveSetDAO vasDao = VideoArchiveSetDAO.getInstance();
+            final VideoArchiveSetDAO vasDAO = toolBelt.getAnnotationDAOFactory().newVideoArchiveSetDAO();
+            
 
             /*
              *  Check the database for an existing match
              */
-            vas = vasDao.findByPlatformAndSequenceNumber(p, sn);
+            Collection<VideoArchiveSet> videoArchiveSets = vasDAO.findAllByPlatformAndSequenceNumber(p, sn);
+            if (videoArchiveSets.size() > 0) {
+                vas
+            }
+            
 
             /*
              *  If no match was found create one and insert it.
@@ -132,32 +144,6 @@ public class ChangeVideoArchiveNameAction extends OpenVideoArchiveUsingParamsAct
         return vas;
     }
 
-    /**
-     * @return  true if the new name is going to be different than the current
-     *          name
-     */
-    private boolean verifyNameIsChanging() {
-        boolean ok = true;
-
-        /*
-         *  Verify that the name is indeed being changed. If its the same then
-         *  exit
-         */
-        final String newName = makeName();
-        final VideoArchive va = VideoArchiveDispatcher.getInstance().getVideoArchive();
-        if (va != null) {
-            final String orgName = va.getVideoArchiveName();
-            final boolean sameName = newName.equals(orgName);
-            if (sameName) {
-                AppFrameDispatcher.showWarningDialog("The information you " +
-                        "entered is the same as the Tape you are currently " +
-                        "annotating. You're request is being ignored.");
-                ok = false;
-            }
-        }
-
-        return ok;
-    }
 
     /**
      * @return  true if all the params are valid
@@ -191,10 +177,10 @@ public class ChangeVideoArchiveNameAction extends OpenVideoArchiveUsingParamsAct
         boolean ok = true;
         final String p = getPlatform();
         final int sn = getSeqNumber();
-        final VideoArchive va = VideoArchiveDispatcher.getInstance().getVideoArchive();
-        if (va != null) {
-            final VideoArchiveSet vas = va.getVideoArchiveSet();
-            if (vas.hasSeqNumber(sn) && vas.getPlatformName().equals(p)) {
+        final VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+        if (videoArchive != null) {
+            final VideoArchiveSet vas = videoArchive.getVideoArchiveSet();
+            if (vas.hasSequenceNumber(sn) && vas.getPlatformName().equals(p)) {
                 ok = false;
             }
         }
