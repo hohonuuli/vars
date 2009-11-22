@@ -44,6 +44,7 @@ import vars.knowledgebase.SimpleConceptBean;
 import vars.knowledgebase.SimpleConceptNameBean;
 import vars.shared.ui.ILockableEditor;
 import vars.knowledgebase.ui.Lookup;
+import vars.knowledgebase.ui.ToolBelt;
 import vars.shared.ui.HierachicalConceptNameComboBox;
 import vars.shared.ui.OkCancelButtonPanel;
 
@@ -108,6 +109,7 @@ public class LinkEditorDialog extends JDialog implements ILockableEditor {
         }
 
     };
+    private final ToolBelt toolBelt;
     private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
     private ILink link;
 
@@ -116,9 +118,10 @@ public class LinkEditorDialog extends JDialog implements ILockableEditor {
      * @param knowledgebaseDAOFactory
      * @throws HeadlessException
      */
-    public LinkEditorDialog(KnowledgebaseDAOFactory knowledgebaseDAOFactory) throws HeadlessException {
+    public LinkEditorDialog(ToolBelt toolBelt) throws HeadlessException {
         super();
-        this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
+        this.toolBelt = toolBelt;
+        this.knowledgebaseDAOFactory = toolBelt.getKnowledgebaseDAOFactory();
         setModal(true);
         initialize();
     }
@@ -128,9 +131,10 @@ public class LinkEditorDialog extends JDialog implements ILockableEditor {
      * @param knowledgebaseDAOFactory
      * @throws HeadlessException
      */
-    public LinkEditorDialog(Frame owner, KnowledgebaseDAOFactory knowledgebaseDAOFactory) throws HeadlessException {
+    public LinkEditorDialog(Frame owner, ToolBelt toolBelt) throws HeadlessException {
         super(owner);
-        this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
+        this.toolBelt = toolBelt;
+        this.knowledgebaseDAOFactory = toolBelt.getKnowledgebaseDAOFactory();
         setModal(true);
         initialize();
     }
@@ -309,7 +313,7 @@ public class LinkEditorDialog extends JDialog implements ILockableEditor {
      */
     public HierachicalConceptNameComboBox getToConceptComboBox() {
         if (toConceptComboBox == null) {
-            toConceptComboBox = new HierachicalConceptNameComboBox(knowledgebaseDAOFactory.newConceptDAO());
+            toConceptComboBox = new HierachicalConceptNameComboBox(toolBelt.getAnnotationPersistenceService());
         }
 
         return toConceptComboBox;

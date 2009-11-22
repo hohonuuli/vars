@@ -33,16 +33,19 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+
+import org.bushe.swing.event.EventBus;
 import org.mbari.awt.WaitCursorEventQueue;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.vars.annotation.ui.actions.ClearDatabaseCacheAction;
 import org.mbari.vars.annotation.ui.actions.ExitAction;
-import org.mbari.vars.annotation.ui.actions.FrameCaptureAction2;
 import org.mbari.vars.annotation.ui.actions.OpenConnectionsAction;
 import org.mbari.vars.annotation.ui.actions.ShowOpenVideoArchiveDialogAction;
 import org.mbari.vars.annotation.ui.dialogs.AboutDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
 
 /**
@@ -181,13 +184,10 @@ public class AnnotationFrame extends JFrame {
             // Create Quicktime settings menu item
             final JMenuItem quicktime = new JMenuItem(new ActionAdapter() {
 
-                /**
-                 *
-                 */
-                private static final long serialVersionUID = -5027677027442672087L;
 
                 public void doAction() {
-                    FrameCaptureAction2.showSettingsDialog();
+                    EventBus.publish(Lookup.TOPIC_WARNING, "Not implemented");
+                    //FrameCaptureAction2.showSettingsDialog();
                 }
             });
 

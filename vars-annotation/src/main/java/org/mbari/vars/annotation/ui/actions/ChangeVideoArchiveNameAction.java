@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)ChangeVideoArchiveNameAction.java   2009.11.22 at 01:47:34 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
- * (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,18 +12,19 @@
  */
 
 
+
 package org.mbari.vars.annotation.ui.actions;
 
-
 import java.util.Collection;
-
 import org.bushe.swing.event.EventBus;
-
-import vars.annotation.AnnotationDAOFactory;
-import vars.annotation.VideoArchiveSet;
+import vars.annotation.AnnotationFactory;
+import vars.annotation.CameraDeployment;
 import vars.annotation.VideoArchive;
+import vars.annotation.VideoArchiveDAO;
+import vars.annotation.VideoArchiveSet;
 import vars.annotation.VideoArchiveSetDAO;
 import vars.annotation.ui.Lookup;
+import vars.annotation.ui.PersistenceController;
 import vars.annotation.ui.ToolBelt;
 
 /**
@@ -38,11 +36,14 @@ import vars.annotation.ui.ToolBelt;
  * @author <a href="http://www.mbari.org">MBARI</a>
  */
 public class ChangeVideoArchiveNameAction extends OpenVideoArchiveUsingParamsAction {
-    
+
     private final ToolBelt toolBelt;
 
-
-
+    /**
+     * Constructs ...
+     *
+     * @param toolBelt
+     */
     public ChangeVideoArchiveNameAction(ToolBelt toolBelt) {
         super(toolBelt.getAnnotationDAOFactory());
         this.toolBelt = toolBelt;
@@ -52,98 +53,70 @@ public class ChangeVideoArchiveNameAction extends OpenVideoArchiveUsingParamsAct
      *  Initiates the action.
      */
     public void doAction() {
-        if (!verifyParams() ||!verifyNameIsChanging()) {
+        if (!verifyParams()) {
             return;
         }
 
-        final VideoArchive va = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
-        VideoArchiveSet newVas;
-        try {
-            newVas = resolveVideoArchiveSet(va);
-        }
-        catch (final Exception e) {
-            EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
-            return;
-        }
+        VideoArchive va = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+        String newName = PersistenceController.makeVideoArchiveName(getPlatform(), getTapeNumber(), getTapeNumber(), getPostfix());
 
-        final VideoArchiveSet orgVas = va.getVideoArchiveSet();
-        orgVas.removeVideoArchive(va);
-
+        // DAOTX
         try {
 
             /*
-             * We're flushing all pending Database transactions first before we
-             * change the name of the archive. This makes error handling much
-             * simpler since now we only have to worry about the current thread.
+             * Check the database for a matching videarchive. We don't want to try to overwrite an existing one
              */
-            final DAOEventQueue eventQueue = DAOEventQueue.getInstance();
-            synchronized (eventQueue) {
-                DAOEventQueue.flush();
-                VideoArchiveSetDAO.getInstance().updateVideoArchiveSet((VideoArchiveSet) orgVas);
+            VideoArchiveDAO vaDAO = toolBelt.getAnnotationDAOFactory().newVideoArchiveDAO();
+            vaDAO.startTransaction();
+            VideoArchive matchingVideoArchive = vaDAO.findByName(newName);
+            vaDAO.endTransaction();
+
+            if (matchingVideoArchive != null) {
+                EventBus.publish(Lookup.TOPIC_WARNING, "A VideoArchive named " + newName + " already exists");
+                return;
             }
-        }
-        catch (final Exception e1) {
-            AppFrameDispatcher.showErrorDialog("Failed to change the name in the database. Reason: " + e1.getMessage());
-            orgVas.addVideoArchive(va);
 
-            return;
-        }
-
-        newVas.addVideoArchive(va);
-        final String oldName = va.getVideoArchiveName();
-        va.setVideoArchiveName(makeName());
-        DAOEventQueue.update((VideoArchiveSet) newVas, new ErrorHandler1((VideoArchiveSet) newVas, (VideoArchiveSet) orgVas, (VideoArchive) va, oldName));
-        VideoArchiveDispatcher.getInstance().setVideoArchive(va);
-    }
-
-    /**
-     * <p><!-- Method description --></p>
-     *
-     *
-     * @param va
-     *
-     * @return
-     *
-     * @throws Exception
-     */
-    private VideoArchiveSet resolveVideoArchiveSet(final VideoArchive va) throws Exception {
-
-        /*
-         *  Check to see if the existing vas is a match. If so use it, otherwise
-         *  we'll need to check to see if a match exists in the database. If
-         *  no match is found then we'll need to create one and insert it.
-         */
-        VideoArchiveSet vas = null;
-        if (verifyVideoArchiveSetIsChanging()) {
-            final String p = getPlatform();
-            final int sn = getSeqNumber();
-            final VideoArchiveSetDAO vasDAO = toolBelt.getAnnotationDAOFactory().newVideoArchiveSetDAO();
-            
+            VideoArchiveSetDAO dao = toolBelt.getAnnotationDAOFactory().newVideoArchiveSetDAO();
+            dao.startTransaction();
+            va = dao.merge(va);
 
             /*
-             *  Check the database for an existing match
+             *  Check the database for an existing matching VideoArchiveSet
              */
-            Collection<VideoArchiveSet> videoArchiveSets = vasDAO.findAllByPlatformAndSequenceNumber(p, sn);
+            VideoArchiveSet videoArchiveSet = null;
+            Collection<VideoArchiveSet> videoArchiveSets = dao.findAllByPlatformAndSequenceNumber(getPlatform(),
+                getSeqNumber());
             if (videoArchiveSets.size() > 0) {
-                vas
+                videoArchiveSet = videoArchiveSets.iterator().next();
             }
-            
+            else {
 
-            /*
-             *  If no match was found create one and insert it.
-             */
-            if (vas == null) {
-                vas = VideoArchiveSet.makeVideoArchiveSet(p, sn);
-                DAOEventQueue.insert((VideoArchiveSet) vas);
+                /*
+                 * No matching VideoArchiveSet was found so create one
+                 */
+                AnnotationFactory annotationFactory = toolBelt.getAnnotationFactory();
+                videoArchiveSet = annotationFactory.newVideoArchiveSet();
+                videoArchiveSet.setPlatformName(getPlatform());
+                dao.persist(videoArchiveSet);
+                CameraDeployment cameraDeployment = annotationFactory.newCameraDeployment();
+                cameraDeployment.setSequenceNumber(getSeqNumber());
+                videoArchiveSet.addCameraDeployment(cameraDeployment);
+                dao.persist(cameraDeployment);
             }
+
+            // Move the VideoArchive form the old set to the new one
+            va.getVideoArchiveSet().removeVideoArchive(va);
+            va.setName(newName);
+            videoArchiveSet.addVideoArchive(va);
+            dao.endTransaction();
+
+
         }
-        else {
-            vas = va.getVideoArchiveSet();
+        catch (Exception e) {
+            EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
         }
 
-        return vas;
     }
-
 
     /**
      * @return  true if all the params are valid
@@ -167,25 +140,4 @@ public class ChangeVideoArchiveNameAction extends OpenVideoArchiveUsingParamsAct
 
         return ok;
     }
-
-    /**
-     * @return  true if The platform and sequence number do not match those in
-     *  the current videoArchiveSet. This means we'll need to do a database
-     *  lookup to see if a match exists.
-     */
-    private boolean verifyVideoArchiveSetIsChanging() {
-        boolean ok = true;
-        final String p = getPlatform();
-        final int sn = getSeqNumber();
-        final VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
-        if (videoArchive != null) {
-            final VideoArchiveSet vas = videoArchive.getVideoArchiveSet();
-            if (vas.hasSequenceNumber(sn) && vas.getPlatformName().equals(p)) {
-                ok = false;
-            }
-        }
-
-        return ok;
-    }
-
 }

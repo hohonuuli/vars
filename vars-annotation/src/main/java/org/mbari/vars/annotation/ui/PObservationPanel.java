@@ -91,7 +91,7 @@ public class PObservationPanel extends PropertiesPanel {
 
     private ActionAdapter getTimeCodeAction() {
         if (timeCodeAction == null) {
-            timeCodeAction = new ChangeTimeCodeActionWithDialog() {
+            timeCodeAction = new ChangeTimeCodeActionWithDialog(toolBelt) {
 
                 public void doAction() {
                     super.doAction();

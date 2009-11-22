@@ -12,6 +12,7 @@ import vars.PersistenceCache;
 import vars.PersistenceCacheProvider;
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.AnnotationFactory;
+import vars.annotation.AnnotationPersistenceService;
 import vars.knowledgebase.HistoryFactory;
 import vars.knowledgebase.KnowledgebasePersistenceService;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
@@ -29,6 +30,7 @@ public class ToolBelt {
     private final ApproveHistoryTask approveHistoryTask;
     private final AnnotationDAOFactory annotationDAOFactory;
     private final AnnotationFactory annotationFactory;
+    private final AnnotationPersistenceService annotationPersistenceService;
     private final KnowledgebasePersistenceService knowledgebaseDAO;
     private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
     private final KnowledgebaseFactory knowledgebaseFactory;
@@ -41,11 +43,13 @@ public class ToolBelt {
 
     @Inject
     public ToolBelt(AnnotationDAOFactory annotationDAOFactory, AnnotationFactory annotationFactory,
+            AnnotationPersistenceService annotationPersistenceService,
             KnowledgebasePersistenceService knowledgebaseDAO, KnowledgebaseDAOFactory knowledgebaseDAOFactory,
             KnowledgebaseFactory knowledgebaseFactory, MiscDAOFactory miscDAOFactory,
             MiscFactory miscFactory, PersistenceCacheProvider persistenceCacheProvider, QueryPersistenceService queryDAO) {
         this.annotationDAOFactory = annotationDAOFactory;
         this.annotationFactory = annotationFactory;
+        this.annotationPersistenceService = annotationPersistenceService;
         this.knowledgebaseDAO = knowledgebaseDAO;
         this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
         this.knowledgebaseFactory = knowledgebaseFactory;
@@ -105,6 +109,12 @@ public class ToolBelt {
     public PersistenceCache getPersistenceCache() {
         return persistenceCache;
     }
+
+    public AnnotationPersistenceService getAnnotationPersistenceService() {
+        return annotationPersistenceService;
+    }
+    
+    
 
 
 }

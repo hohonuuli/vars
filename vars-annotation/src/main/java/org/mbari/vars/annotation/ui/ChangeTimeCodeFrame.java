@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import vars.annotation.Observation;
 import vars.annotation.VideoFrame;
 import vars.annotation.ui.Lookup;
+import vars.annotation.ui.ToolBelt;
 
 /**
  * <p>A dialog that allows the annotator to edit the time-code for the currently
@@ -40,13 +41,14 @@ import vars.annotation.ui.Lookup;
 public class ChangeTimeCodeFrame extends TimeCodeSelectionFrame {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
+    private final ToolBelt toolBelt;
 
     /**
      * Constructor for the ChangeTimeCodeFrame object
      */
-    public ChangeTimeCodeFrame() {
+    public ChangeTimeCodeFrame(ToolBelt toolBelt) {
         super();
-
+        this.toolBelt = toolBelt;
         final Dispatcher dispatcher = Lookup.getSelectedObservationsDispatcher();
         dispatcher.addPropertyChangeListener(new PropertyChangeListener() {
 
@@ -74,7 +76,6 @@ public class ChangeTimeCodeFrame extends TimeCodeSelectionFrame {
                     if (observations.size() == 1) {
                         final VideoFrame vf = observations.iterator().next().getVideoFrame();
                         synchronized (vf) {
-                            action.setVideoFrame(vf);
                             action.setTimeCode(getTimePanel().getTimeAsString());
                             action.doAction();
                         }
@@ -83,7 +84,7 @@ public class ChangeTimeCodeFrame extends TimeCodeSelectionFrame {
                     setVisible(false);
                     dispatcher.setValueObject(observations);
                 }
-                private final ChangeTimeCodeAction action = new ChangeTimeCodeAction();
+                private final ChangeTimeCodeAction action = new ChangeTimeCodeAction(toolBelt);
             };
         }
 

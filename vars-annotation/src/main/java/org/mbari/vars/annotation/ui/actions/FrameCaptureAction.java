@@ -27,6 +27,8 @@ package org.mbari.vars.annotation.ui.actions;
 
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -43,6 +45,8 @@ import java.util.TimeZone;
 import javax.imageio.ImageIO;
 import javax.swing.Action;
 import javax.swing.KeyStroke;
+
+import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.movie.Timecode;
 import org.mbari.util.Dispatcher;
@@ -52,11 +56,17 @@ import vars.util.VARSProperties;
 import org.mbari.vcr.IVCR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.ImmutableList;
+
 import vars.annotation.CameraData;
+import vars.annotation.CameraDeployment;
 import vars.annotation.VideoFrame;
 import vars.annotation.VideoArchive;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchiveSet;
+import vars.annotation.ui.Lookup;
+import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.VideoService;
 
 /**
@@ -85,13 +95,9 @@ public class FrameCaptureAction extends ActionAdapter {
     private final static DateFormat timezoneFormat = new SimpleDateFormat("ZZ");
     private static final Logger log = LoggerFactory.getLogger(FrameCaptureAction.class);
     private static final String imageCopyrightOwner = VARSProperties.getImageCopyrightOwner();
+    private final ToolBelt toolBelt;
 
 
-
-    /**
-     * This is the class that actually performs all Video IO operations
-     */
-    private VideoService videoService;
 
     /**
      * This class does all the heavy lifting.
@@ -106,25 +112,11 @@ public class FrameCaptureAction extends ActionAdapter {
     /**
      * Constructor for the FrameCaptureAction object
      */
-    public FrameCaptureAction() {
+    public FrameCaptureAction(ToolBelt toolBelt) {
         super();
+        this.toolBelt = toolBelt;
         boolean ok = false;
-        try {
-
-            // Check to see if quicktime is installed first
-            Class.forName("quicktime.QTSession");
-            framegrabber = new Framegrabber2();
-            ok = framegrabber.isAvailable();
-            helper = new FrameCaptureHelper();
-            Dispatcher.getDispatcher(DISPATCHER_KEY_FRAMEGRABBER).setValueObject(framegrabber);
-        }
-        catch (final Exception e) {
-            framegrabber = null;
-            log.error("Frame-capture is not available", e);
-            AppFrameDispatcher.showWarningDialog(
-                "QuickTime for Java is not installed. VARS functions requiring QuickTime will be disabled");
-        }
-
+        helper = new FrameCaptureHelper();
         putValue(Action.NAME, "Frame Capture");
         putValue(Action.ACTION_COMMAND_KEY, "frame capture");
         putValue(Action.ACCELERATOR_KEY,
@@ -145,19 +137,10 @@ public class FrameCaptureAction extends ActionAdapter {
     /**
      *  Gets the available attribute of the FrameCaptureAction object
      *
-     * @return  true if a frame-capture card is installed that uses the
-     *  quicktime API. False otherwise.
+     * @return  true if a frame-capture card is installed and accessable
      */
     public boolean isAvailable() {
-        boolean ok = (framegrabber != null) && framegrabber.isAvailable();
-        if (!ok) {
-
-            // TODO 20040917 brian: Show a dialog indicating that its not
-            // avaialbe.
-            setEnabled(false);
-        }
-
-        return ok;
+        return Lookup.getVideoServiceDispatcher().getValueObject() != null;
     }
 
     /**
@@ -253,11 +236,6 @@ public class FrameCaptureAction extends ActionAdapter {
         s[1] = png.getAbsolutePath() + " (MAIN)";
         s[2] = snapTime.getFormattedGmtTime() + " GMT (local +" +
                snapTime.getGmtOffset().replaceFirst("-", "").replaceAll("0", "") + ")";
-
-        /*
-         *  TODO 20040921 brian: Will need to pass a String representation of a the annotation
-         *  into s[3]
-         */
         s[3] = "";
 
         return s;
@@ -267,13 +245,13 @@ public class FrameCaptureAction extends ActionAdapter {
      * Method description
      *
      */
-    public static void showSettingsDialog() {
-        final Framegrabber2 framegrabber2 =
-            (Framegrabber2) Dispatcher.getDispatcher(DISPATCHER_KEY_FRAMEGRABBER).getValueObject();
-        if (framegrabber2 != null) {
-            framegrabber2.showSettingsDialog();
-        }
-    }
+//    public static void showSettingsDialog() {
+//        final Framegrabber2 framegrabber2 =
+//            (Framegrabber2) Dispatcher.getDispatcher(DISPATCHER_KEY_FRAMEGRABBER).getValueObject();
+//        if (framegrabber2 != null) {
+//            framegrabber2.showSettingsDialog();
+//        }
+//    }
 
     /**
      * Performs the frame-capture related tasks, then updates the VideoArchive object.
@@ -281,17 +259,23 @@ public class FrameCaptureAction extends ActionAdapter {
      */
     private class FrameCaptureHelper {
 
-        private final NewVideoFrameAction action = new NewVideoFrameAction();
+        private final NewVideoFrameAction action = new NewVideoFrameAction(toolBelt);
         private File jpg;
         private SnapTime snapTime;
         private IVCR vcr;
-        private IVideoArchive videoArchive;
+        private VideoArchive videoArchive;
 
         /**
          *  Capture an image
          *
          */
         public void capture() {
+            
+            VideoService videoService = (VideoService) Lookup.getVideoServiceDispatcher().getValueObject();
+            if (videoService == null) {
+                EventBus.publish(Lookup.TOPIC_WARNING, "No Video Service is available or frame capure");
+                return;
+            }
 
             /*
              *  Clear any previously set variables
@@ -300,23 +284,21 @@ public class FrameCaptureAction extends ActionAdapter {
             snapTime = null;
             vcr = null;
             videoArchive = null;
-            videoArchive = VideoArchiveDispatcher.getInstance().getVideoArchive();
+            videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
 
             if (videoArchive == null) {
-                AppFrameDispatcher.showErrorDialog(
-                    "No video-archive is open for annotating. Unable to capture an image.");
-
+                EventBus.publish(Lookup.TOPIC_WARNING,
+                        "No video-archive is open for annotating. Unable to capture an image.");
                 return;
             }
 
             /*
              *  This method grabs the timecode from the VCR.
              */
-            vcr = VcrDispatcher.getInstance().getVcr();
+            vcr = videoService.getVCR();
 
             if (vcr == null) {
-                AppFrameDispatcher.showErrorDialog("You are not connected to the VCR. Unable to capture a frame.");
-
+                EventBus.publish(Lookup.TOPIC_WARNING, "You are not connected to the VCR. Unable to capture a frame.");
                 return;
             }
 
@@ -325,46 +307,17 @@ public class FrameCaptureAction extends ActionAdapter {
             final String timecode_ = snapTime.getTimeCodeAsName();
 
             /*
-             *  Create the pict image, which we dipsose of later, and the PNG file
-             *
-             * File png = null;
-             * Image pictImage = null;
-             *
-             * TODO 20060210 brian: Testing in memory conversion of captured
-             * pict to png. This block is the old code used with Framegrabber
-             *
-             * try {
-             *   final File imageDir = imageDirectory.getImageDirectory();
-             *   final File pict = new File(imageDir, timecode_ + ".pict");
-             *   pict.deleteOnExit();
-             *   frameGrabber.capture(pict);
-             *   png = new File(imageDirectory.getImageDirectory(),
-             *           timecode_ + ".png");
-             *   pictImage = frameGrabber.readPict(pict);
-             *   frameGrabber.imageToPng(pictImage, png);
-             * } catch (Exception e) {
-             *   AppFrameDispatcher.showErrorDialog(
-             *           "ERROR!! Failed to capture the frame. Reason given is " +
-             *           e.getMessage() +
-             *               ". See vars.log for more details.");
-             *   log.error("Frame-grab failed", e);
-             *   return;
-             * }
-             */
-
-            /*
              * Grab the image from the videoChannel.
              */
             File png = null;
             try {
                 png = new File(imageDirectory.getImageDirectory(), timecode_ + ".png");
-                framegrabber.capture(png);
+                videoService.grabImageAndSaveTo(png);
             }
             catch (final Exception e) {
-                AppFrameDispatcher.showErrorDialog("ERROR!! Failed to capture the frame. Reason given is " +
+                EventBus.publish(Lookup.TOPIC_WARNING, "ERROR!! Failed to capture the frame. Reason given is " +
                                                    e.getMessage() + ". See vars.log for more details.");
                 log.error("Frame-grab failed", e);
-
                 return;
             }
 
@@ -387,10 +340,10 @@ public class FrameCaptureAction extends ActionAdapter {
             try {
                 image = ImageIO.read(png);
                 jpg = new File(png.getAbsolutePath().replaceFirst(".png", ".jpg"));
-                Framegrabber2.createJpgWithOverlay(image, jpg, overlayText);
+                FrameCaptureUtilities.createJpgWithOverlay(image, jpg, overlayText);
             }
             catch (final Exception e) {
-                AppFrameDispatcher.showErrorDialog("ERROR!! Failed to create preview image. Reason given is " +
+                EventBus.publish(Lookup.TOPIC_WARNING, "ERROR!! Failed to create preview image. Reason given is " +
                                                    e.getMessage() + ". See vars.log for more details.");
                 log.error("Frame-grab failed", e);
 
@@ -408,17 +361,13 @@ public class FrameCaptureAction extends ActionAdapter {
          * Populate a videoFrame with the correct information
          */
         private void updateVideoArchive() {
-            final IObservation observation = action.doAction("physical object", snapTime.getTimeCodeAsString());
+            final Observation observation = action.doAction("physical object", snapTime.getTimeCodeAsString());
             if (observation != null) {
-                final IVideoFrame videoFrame = observation.getVideoFrame();
-                ICameraData cameraData = videoFrame.getCameraData();
-                if (cameraData == null) {
-                    cameraData = new CameraData();
-                    videoFrame.setCameraData(cameraData);
-                }
+                final VideoFrame videoFrame = observation.getVideoFrame();
+                CameraData cameraData = videoFrame.getCameraData();
 
                 try {
-                    cameraData.setStillImage(jpg.toURL().toExternalForm());
+                    cameraData.setImageReference(jpg.toURI().toURL().toExternalForm());
                 }
                 catch (final MalformedURLException e) {
                     if (log.isErrorEnabled()) {
@@ -426,28 +375,23 @@ public class FrameCaptureAction extends ActionAdapter {
                     }
                 }
             }
-
-            final ObservationTable table = ObservationTableDispatcher.getInstance().getObservationTable();
-            table.setSelectedObservation(observation);
-
-            /*
-             * For some reason the above call is not redrawign the FrameGrabPanel
-             * This call is a work around to address this.
-             */
-            ObservationDispatcher.getInstance().setObservation(observation);
+            
+            final Collection<Observation> selectedObservations = ImmutableList.of(observation);
+            toolBelt.getPersistenceController().updateUI(selectedObservations);
+            Lookup.getSelectedObservationsDispatcher().setValueObject(selectedObservations);
         }
     }
 
     /**
-     * A convience class that represents the location to write the images into. This
+     * A convenience class that represents the location to write the images into. This
      * class updates automatically based on information from the VideoArchive. If
      * the VideoArchive is changed in the annotation app then this class will update
-     * to relect this change.
+     * to reflect this change.
      *
      * @author  brian
      * @version
      */
-    private class ImageDirectory implements IObserver {
+    private class ImageDirectory implements PropertyChangeListener {
 
         private File imageDir;
 
@@ -456,7 +400,7 @@ public class FrameCaptureAction extends ActionAdapter {
          *
          */
         ImageDirectory() {
-            VideoArchiveDispatcher.getInstance().addObserver(this);
+            Lookup.getVideoArchiveDispatcher().addPropertyChangeListener(this);
         }
 
         /**
@@ -476,8 +420,8 @@ public class FrameCaptureAction extends ActionAdapter {
                 final File iDir = new File(varsDir, "data");
 
                 // Get the platform name. Defaults to unknown
-                final IVideoArchive va = VideoArchiveDispatcher.getInstance().getVideoArchive();
-                final IVideoArchiveSet vas = va.getVideoArchiveSet();
+                final VideoArchive va = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+                final VideoArchiveSet vas = va.getVideoArchiveSet();
                 String platform = UNKNOWN_PLATFORM;
                 if (vas != null) {
                     platform = vas.getPlatformName();
@@ -490,11 +434,11 @@ public class FrameCaptureAction extends ActionAdapter {
                 final File rovDir = new File(new File(iDir, platform), "images");
 
                 // Get the dive number. Defaults to 0000
-                final Collection cpds = vas.getCameraPlatformDeployments();
+                final Collection<CameraDeployment> cpds = vas.getCameraDeployments();
                 String diveNumber = UNKNOWN_SEQNUMBER;
                 if (cpds.size() != 0) {
-                    final CameraPlatformDeployment cd = (CameraPlatformDeployment) cpds.iterator().next();
-                    diveNumber = format4i.format(cd.getSeqNumber());
+                    final CameraDeployment cd = cpds.iterator().next();
+                    diveNumber = format4i.format(cd.getSequenceNumber());
                 }
 
                 /*
@@ -525,15 +469,7 @@ public class FrameCaptureAction extends ActionAdapter {
             return imageDir;
         }
 
-        /**
-         * This class is registered with the VideoArchiveDispatcher
-         *
-         * @param  observedObj Description of the Parameter
-         * @param  changeCode Description of the Parameter
-         * @see  org.mbari.util.IObserver#update(java.lang.Object, java.lang.Object)
-         */
-        public void update(final Object observedObj, final Object changeCode) {
-
+        public void propertyChange(PropertyChangeEvent evt) {
             /*
              *  Setting the imageDir to null causes the next call to getImageDirectory
              *  to regenerate a new path to the image directory. We do this to defer

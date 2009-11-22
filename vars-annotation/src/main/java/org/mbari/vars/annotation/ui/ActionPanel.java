@@ -57,7 +57,7 @@ public class ActionPanel extends JPanel {
     JButton btnShallowCopy;
 
  
-    JButton btnFramegrab = new FrameCaptureButton();
+    JButton btnFramegrab;
 
 
     FlowLayout flowLayout = new WrappingFlowLayout();
@@ -71,6 +71,7 @@ public class ActionPanel extends JPanel {
         btnDelete = new DeleteSelectedObservationsButton(toolBelt);
         btnNew = new NewVideoFrameButton(toolBelt);
         btnShallowCopy = new NewObservationButton(toolBelt);
+        btnFramegrab = new FrameCaptureButton(toolBelt);
         initialize();
         registerHotKeys();
     }

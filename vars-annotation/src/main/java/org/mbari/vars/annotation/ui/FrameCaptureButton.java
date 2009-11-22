@@ -24,9 +24,11 @@ import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
 import org.mbari.swing.JFancyButton;
 import org.mbari.swing.SwingUtils;
-import org.mbari.vars.annotation.ui.actions.FrameCaptureAction2;
+import org.mbari.vars.annotation.ui.actions.FrameCaptureAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import vars.annotation.ui.ToolBelt;
 
 /**
  * <p>
@@ -37,24 +39,20 @@ import org.slf4j.LoggerFactory;
  *
  *
  * @author  : $Author: hohonuuli $
- * @version  : $Id: FrameCaptureButton.java 314 2006-07-10 02:38:46Z hohonuuli $
  */
 public class FrameCaptureButton extends JFancyButton {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = -7034181609667604680L;
+
     private static final Logger log = LoggerFactory.getLogger(FrameCaptureButton.class);
 
     /**
      * Constructor for the FrameCaptureButton object
      */
-    public FrameCaptureButton() {
+    public FrameCaptureButton(ToolBelt toolBelt) {
         super();
 
         try {
-            setAction(new WorkerAction());
+            setAction(new WorkerAction(toolBelt));
         }
         catch (final Exception e) {
             log.warn("Unable to set-up frame-grabbing. You may not have Quicktime installed.", e);
@@ -69,15 +67,14 @@ public class FrameCaptureButton extends JFancyButton {
 
     /**
      * Don't hhang the UI when we grab a Frame. Use Foxtrot.
-     * @author digitaladmin
      *
      */
-    private class WorkerAction extends FrameCaptureAction2 {
+    private class WorkerAction extends FrameCaptureAction {
 
-        /**
-         *
-         */
-        private static final long serialVersionUID = 899661232182758639L;
+
+        public WorkerAction(ToolBelt toolBelt) {
+            super(toolBelt);
+        }
 
         /**
          * Method description
