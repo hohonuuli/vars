@@ -12,6 +12,9 @@ import javax.persistence.EntityManagerFactory;
 
 import org.eclipse.persistence.internal.jpa.EntityManagerFactoryImpl;
 
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
+
 /**
  * Provides a method to clear the 2nd level cache used by Hibernate JPA. This
  * is specific to Hibernate and will need to be rewritten if using s different
@@ -42,8 +45,10 @@ public class JPACacheProvider implements PersistenceCacheProvider {
 //            GMedia.class,
 //            GUsage.class);
 
-    
-    public JPACacheProvider(EntityManagerFactory entityManagerFactory) {
+    @Inject
+    public JPACacheProvider(@Named("knowledgebasePersistenceUnit") EntityManagerFactory entityManagerFactory) {
+        // TODO this is hardcoded to the kb pu. Have to think about how to deal with things if 
+        // I separate out the kb from the anno persistence.
         this.entityManagerFactory = entityManagerFactory;
     }
 

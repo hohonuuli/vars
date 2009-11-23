@@ -16,6 +16,8 @@
 package vars.annotation;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -74,7 +76,7 @@ public class AnnotationPersistenceServiceImpl extends QueryableImpl implements A
      * @param persistenceCache
      */
     @Inject
-    public AnnotationPersistenceServiceImpl(EntityManagerFactory entityManagerFactory,
+    public AnnotationPersistenceServiceImpl(@Named("annotationPersistenceUnit") EntityManagerFactory entityManagerFactory,
             PersistenceCache persistenceCache) {
         super(jdbcUrl, jdbcUsername, jdbcPassword, jdbcDriver);
         this.entityManagerFactory = entityManagerFactory;

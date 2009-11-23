@@ -21,10 +21,15 @@ import com.google.inject.name.Names;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
+
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+
 import vars.ExternalDataDAO;
 import vars.ExternalDataDaoExpdImpl;
 import vars.MiscDAOFactory;
 import vars.MiscFactory;
+import vars.PersistenceCacheProvider;
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.AnnotationFactory;
 import vars.annotation.AnnotationPersistenceService;
@@ -76,6 +81,11 @@ public class VarsJpaModule implements Module {
             setTimeZone(TimeZone.getTimeZone("UTC"));
         }};
         binder.bind(DateFormat.class).toInstance(dateFormatISO);
+        
+        // Bind the EntityManagerFactories
+        binder.bind(EntityManagerFactory.class).annotatedWith(Names.named("annotationPersistenceUnit")).toInstance(Persistence.createEntityManagerFactory(annotationPersistenceUnit));
+        binder.bind(EntityManagerFactory.class).annotatedWith(Names.named("knowledgebasePersistenceUnit")).toInstance(Persistence.createEntityManagerFactory(knowledgebasePersistenceUnit));
+        binder.bind(EntityManagerFactory.class).annotatedWith(Names.named("miscPersistenceUnit")).toInstance(Persistence.createEntityManagerFactory(miscPersistenceUnit));
 
 
         // Bind the names of the persistence units
@@ -87,13 +97,14 @@ public class VarsJpaModule implements Module {
         // Bind annotation object and DAO factories
         binder.bind(AnnotationDAOFactory.class).to(AnnotationDAOFactoryImpl.class).in(Scopes.SINGLETON);;
         binder.bind(AnnotationFactory.class).to(AnnotationFactoryImpl.class);
-        binder.bind(ExternalDataDAO.class).to(ExternalDataDaoExpdImpl.class);
-        binder.bind(KnowledgebaseDAOFactory.class).to(KnowledgebaseDAOFactoryImpl.class).in(Scopes.SINGLETON);;
-        binder.bind(KnowledgebaseFactory.class).to(KnowledgebaseFactoryImpl.class);
-        binder.bind(MiscDAOFactory.class).to(MiscDAOFactoryImpl.class).in(Scopes.SINGLETON);;
-        binder.bind(MiscFactory.class).to(MiscFactoryImpl.class);
         binder.bind(AnnotationPersistenceService.class).to(AnnotationPersistenceServiceImpl.class).in(Scopes.SINGLETON);
+        binder.bind(ExternalDataDAO.class).to(ExternalDataDaoExpdImpl.class);
+        binder.bind(KnowledgebaseDAOFactory.class).to(KnowledgebaseDAOFactoryImpl.class).in(Scopes.SINGLETON);
         binder.bind(KnowledgebasePersistenceService.class).to(KnowledgebasePersistenceServiceImpl.class);
+        binder.bind(KnowledgebaseFactory.class).to(KnowledgebaseFactoryImpl.class);
+        binder.bind(MiscDAOFactory.class).to(MiscDAOFactoryImpl.class).in(Scopes.SINGLETON);
+        binder.bind(MiscFactory.class).to(MiscFactoryImpl.class);
+        binder.bind(PersistenceCacheProvider.class).to(JPACacheProvider.class);
         binder.bind(QueryPersistenceService.class).to(QueryPersistenceServiceImpl.class);
         binder.bind(VarsUserPreferencesFactory.class).to(VarsUserPreferencesFactoryImpl.class).in(Scopes.SINGLETON);
 
