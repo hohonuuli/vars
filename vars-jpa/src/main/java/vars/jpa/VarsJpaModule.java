@@ -27,6 +27,7 @@ import vars.ExternalDataPersistenceService;
 import vars.EXPDDataPersistenceService;
 import vars.MiscDAOFactory;
 import vars.MiscFactory;
+import vars.PersistenceCacheProvider;
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.AnnotationFactory;
 import vars.annotation.AnnotationPersistenceService;
@@ -97,10 +98,11 @@ public class VarsJpaModule implements Module {
         binder.bind(ExternalDataPersistenceService.class).to(EXPDDataPersistenceService.class);
         binder.bind(KnowledgebaseDAOFactory.class).to(KnowledgebaseDAOFactoryImpl.class).in(Scopes.SINGLETON);
         binder.bind(KnowledgebaseFactory.class).to(KnowledgebaseFactoryImpl.class);
-        binder.bind(MiscDAOFactory.class).to(MiscDAOFactoryImpl.class).in(Scopes.SINGLETON);;
+        binder.bind(MiscDAOFactory.class).to(MiscDAOFactoryImpl.class).in(Scopes.SINGLETON);
         binder.bind(MiscFactory.class).to(MiscFactoryImpl.class);
         binder.bind(AnnotationPersistenceService.class).to(AnnotationPersistenceServiceImpl.class).in(Scopes.SINGLETON);
         binder.bind(KnowledgebasePersistenceService.class).to(KnowledgebasePersistenceServiceImpl.class);
+        binder.bind(PersistenceCacheProvider.class).to(JPACacheProvider.class).in(Scopes.SINGLETON);
         binder.bind(QueryPersistenceService.class).to(QueryPersistenceServiceImpl.class);
         binder.bind(VarsUserPreferencesFactory.class).to(VarsUserPreferencesFactoryImpl.class).in(Scopes.SINGLETON);
 

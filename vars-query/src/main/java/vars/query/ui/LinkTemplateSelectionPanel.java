@@ -36,15 +36,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.ILink;
 import vars.LinkBean;
+import vars.annotation.AnnotationPersistenceService;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.ConceptNameTypes;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
-import vars.knowledgebase.LinkTemplateDAO;
 import vars.knowledgebase.SimpleConceptBean;
 import vars.knowledgebase.SimpleConceptNameBean;
-import vars.query.QueryPersistenceService;
 import vars.shared.ui.HierachicalConceptNameComboBox;
 
 /**
@@ -71,7 +70,8 @@ public class LinkTemplateSelectionPanel extends JPanel {
     private JTextField tfLinkValue = null;
     private JTextField tfSearch = null;
     private JPanel topPanel = null;
-    private final ToolBelt toolBelt;
+    private final AnnotationPersistenceService annotationPersistenceService;
+    private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
 
     /**
      *
@@ -80,9 +80,11 @@ public class LinkTemplateSelectionPanel extends JPanel {
      * @param linkTemplateDAO
      * @param queryDAO
      */
-    public LinkTemplateSelectionPanel(ToolBelt toolBelt) {
+    public LinkTemplateSelectionPanel(AnnotationPersistenceService annotationPersistenceService, 
+            KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
         super();
-        this.toolBelt = toolBelt;
+        this.annotationPersistenceService = annotationPersistenceService;
+        this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
         initialize();
     }
 
@@ -130,7 +132,7 @@ public class LinkTemplateSelectionPanel extends JPanel {
 
     private HierachicalConceptNameComboBox getCbToConcept() {
         if (cbToConcept == null) {
-            cbToConcept = new HierachicalConceptNameComboBox(toolBelt.getAnnotationPersistenceService());
+            cbToConcept = new HierachicalConceptNameComboBox(annotationPersistenceService);
         }
 
         return cbToConcept;
@@ -246,7 +248,7 @@ public class LinkTemplateSelectionPanel extends JPanel {
 
         if (concept == null) {
             try {
-                concept = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO().findRoot();
+                concept = knowledgebaseDAOFactory.newConceptDAO().findRoot();
             }
             catch (Exception e) {
                 log.error("Failed to lookup root concept", e);
@@ -261,7 +263,7 @@ public class LinkTemplateSelectionPanel extends JPanel {
         Collection linkTemplates = (Collection) Worker.post(new Job() {
 
             public Object run() {
-                return Arrays.asList(toolBelt.getKnowledgebaseDAOFactory().newLinkTemplateDAO().findAllApplicableToConcept(fConcept));
+                return Arrays.asList(knowledgebaseDAOFactory.newLinkTemplateDAO().findAllApplicableToConcept(fConcept));
             }
         });
 
@@ -280,8 +282,6 @@ public class LinkTemplateSelectionPanel extends JPanel {
     }
 
     /**
-     * <p><!-- Method description --></p>
-     *
      *
      * @param linkTemplate
      */
@@ -302,7 +302,7 @@ public class LinkTemplateSelectionPanel extends JPanel {
         }
         else {
             try {
-                ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
+                ConceptDAO conceptDAO = knowledgebaseDAOFactory.newConceptDAO();
                 toConcept = conceptDAO.findByName(linkTemplate.getToConcept());
 
                 if (toConcept == null) {

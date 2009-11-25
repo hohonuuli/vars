@@ -5,6 +5,8 @@
 
 package vars.jpa;
 
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import vars.PersistenceCacheProvider;
 
 import javax.persistence.Cache;
@@ -42,8 +44,8 @@ public class JPACacheProvider implements PersistenceCacheProvider {
 //            GMedia.class,
 //            GUsage.class);
 
-    
-    public JPACacheProvider(EntityManagerFactory entityManagerFactory) {
+    @Inject
+    public JPACacheProvider(@Named("knowledgebasePersistenceUnit") EntityManagerFactory entityManagerFactory) {
         this.entityManagerFactory = entityManagerFactory;
     }
 

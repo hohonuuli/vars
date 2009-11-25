@@ -27,18 +27,15 @@ public abstract class AbstractHistoryTask {
      * @param history
      * @return
      */
-    public abstract void doTask(final UserAccount userAccount, final History history);
+    public abstract void doTask(final UserAccount userAccount, final History history, DAO dao);
     
-    protected void dropHistory(History h, final String msg) {
+    protected void dropHistory(History h, final String msg, DAO dao) {
         EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, msg);
 
-        DAO dao = knowledgebaseDAOFactory.newDAO();
-        dao.startTransaction();
         h = dao.merge(h);
         final ConceptMetadata conceptMetadata = h.getConceptMetadata();
         conceptMetadata.removeHistory(h);
         dao.remove(h);
-        dao.endTransaction();
 
     }
     
