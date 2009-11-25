@@ -11,11 +11,18 @@
  */
 package vars;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
+import java.util.Collection;
+import java.util.Comparator;
+
 /**
  *
  * @author brian
  */
 public class LinkUtilities {
+
+    private static final Comparator<ILink> linkComparator = new LinkComparator();
 
     public static String formatAsLongString(ILink link) {
         StringBuilder sb = new StringBuilder();
@@ -36,5 +43,13 @@ public class LinkUtilities {
         sb.append(link.getLinkValue());
 
         return sb.toString();
+    }
+
+    public static Collection<ILink> findMatchesIn(final ILink link, Collection<ILink> links) {
+        return Collections2.filter(links, new Predicate<ILink>() {
+            public boolean apply(ILink arg0) {
+                return linkComparator.compare(link, arg0) == 0;
+            }
+        });
     }
 }
