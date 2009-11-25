@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author brian
  */
-public class ExternalDataDaoExpdImpl implements ExternalDataDAO {
+public class EXPDDataPersistenceService implements ExternalDataPersistenceService {
 
     public static final int SAMPLERATE_MILLSEC = 15 * 1000;
     private static final Calendar CALENDAR = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
@@ -83,7 +83,7 @@ public class ExternalDataDaoExpdImpl implements ExternalDataDAO {
     /**
      * Constructs ...
      */
-    public ExternalDataDaoExpdImpl() {
+    public EXPDDataPersistenceService() {
         ResourceBundle bundle = ResourceBundle.getBundle("external-jdbc");
         jdbcUrl = bundle.getString("jdbc.url");
         jdbcUsername = bundle.getString("jdbc.username");

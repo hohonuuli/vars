@@ -2,9 +2,10 @@ package vars.jpa;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 import vars.MiscDAOFactory;
+import vars.UserAccountDAO;
 
 /**
  * Created by IntelliJ IDEA.
@@ -18,8 +19,8 @@ public class MiscDAOFactoryImpl implements MiscDAOFactory, EntityManagerFactoryA
     private final EntityManagerFactory entityManagerFactory;
 
     @Inject
-    public MiscDAOFactoryImpl(@Named("miscPersistenceUnit") String persistenceUnit) {
-        this.entityManagerFactory = Persistence.createEntityManagerFactory(persistenceUnit);
+    public MiscDAOFactoryImpl(@Named("miscPersistenceUnit") EntityManagerFactory entityManagerFactory) {
+        this.entityManagerFactory = entityManagerFactory;
     }
 
     public vars.UserAccountDAO newUserAccountDAO() {
@@ -28,6 +29,10 @@ public class MiscDAOFactoryImpl implements MiscDAOFactory, EntityManagerFactoryA
 
     public EntityManagerFactory getEntityManagerFactory() {
         return entityManagerFactory;
+    }
+
+    public UserAccountDAO newUserAccountDAO(EntityManager entityManager) {
+        return new UserAccountDAOImpl(entityManager);
     }
 
 

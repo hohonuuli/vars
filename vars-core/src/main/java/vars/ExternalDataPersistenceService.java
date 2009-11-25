@@ -15,7 +15,7 @@ import java.util.List;
  * 
  * @author brian
  */
-public interface ExternalDataDAO {
+public interface ExternalDataPersistenceService {
 
     /**
      * Interpolate a timecode based on a given date. I

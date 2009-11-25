@@ -21,8 +21,10 @@ import com.google.inject.name.Names;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
-import vars.ExternalDataDAO;
-import vars.ExternalDataDaoExpdImpl;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import vars.ExternalDataPersistenceService;
+import vars.EXPDDataPersistenceService;
 import vars.MiscDAOFactory;
 import vars.MiscFactory;
 import vars.annotation.AnnotationDAOFactory;
@@ -78,6 +80,11 @@ public class VarsJpaModule implements Module {
         binder.bind(DateFormat.class).toInstance(dateFormatISO);
 
 
+        binder.bind(EntityManagerFactory.class).annotatedWith(Names.named("annotationPersistenceUnit")).toInstance(Persistence.createEntityManagerFactory(annotationPersistenceUnit));
+        binder.bind(EntityManagerFactory.class).annotatedWith(Names.named("knowledgebasePersistenceUnit")).toInstance(Persistence.createEntityManagerFactory(knowledgebasePersistenceUnit));
+        binder.bind(EntityManagerFactory.class).annotatedWith(Names.named("miscPersistenceUnit")).toInstance(Persistence.createEntityManagerFactory(miscPersistenceUnit));
+
+
         // Bind the names of the persistence units
         binder.bindConstant().annotatedWith(Names.named("annotationPersistenceUnit")).to(annotationPersistenceUnit);
         binder.bindConstant().annotatedWith(Names.named("knowledgebasePersistenceUnit")).to(
@@ -85,10 +92,10 @@ public class VarsJpaModule implements Module {
         binder.bindConstant().annotatedWith(Names.named("miscPersistenceUnit")).to(miscPersistenceUnit);
 
         // Bind annotation object and DAO factories
-        binder.bind(AnnotationDAOFactory.class).to(AnnotationDAOFactoryImpl.class).in(Scopes.SINGLETON);;
+        binder.bind(AnnotationDAOFactory.class).to(AnnotationDAOFactoryImpl.class).in(Scopes.SINGLETON);
         binder.bind(AnnotationFactory.class).to(AnnotationFactoryImpl.class);
-        binder.bind(ExternalDataDAO.class).to(ExternalDataDaoExpdImpl.class);
-        binder.bind(KnowledgebaseDAOFactory.class).to(KnowledgebaseDAOFactoryImpl.class).in(Scopes.SINGLETON);;
+        binder.bind(ExternalDataPersistenceService.class).to(EXPDDataPersistenceService.class);
+        binder.bind(KnowledgebaseDAOFactory.class).to(KnowledgebaseDAOFactoryImpl.class).in(Scopes.SINGLETON);
         binder.bind(KnowledgebaseFactory.class).to(KnowledgebaseFactoryImpl.class);
         binder.bind(MiscDAOFactory.class).to(MiscDAOFactoryImpl.class).in(Scopes.SINGLETON);;
         binder.bind(MiscFactory.class).to(MiscFactoryImpl.class);

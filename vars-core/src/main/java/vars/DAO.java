@@ -16,6 +16,7 @@ package vars;
 
 import java.util.List;
 import java.util.Map;
+import javax.persistence.EntityManager;
 
 /**
  *
@@ -85,5 +86,7 @@ public interface DAO {
     void remove(Object object);
 
     void startTransaction();
+ 
+    EntityManager getEntityManager();
     
 }

@@ -1,5 +1,6 @@
 package vars.knowledgebase;
 
+import javax.persistence.EntityManager;
 import vars.DAO;
 
 /**
@@ -20,5 +21,15 @@ public interface KnowledgebaseDAOFactory {
     LinkTemplateDAO newLinkTemplateDAO();
     MediaDAO newMediaDAO();
     UsageDAO newUsageDAO();
+
+    DAO newDAO(EntityManager entityManager);
+    ConceptDAO newConceptDAO(EntityManager entityManager);
+    ConceptMetadataDAO newConceptMetadataDAO(EntityManager entityManager);
+    ConceptNameDAO newConceptNameDAO(EntityManager entityManager);
+    HistoryDAO newHistoryDAO(EntityManager entityManager);
+    LinkRealizationDAO newLinkRealizationDAO(EntityManager entityManager);
+    LinkTemplateDAO newLinkTemplateDAO(EntityManager entityManager);
+    MediaDAO newMediaDAO(EntityManager entityManager);
+    UsageDAO newUsageDAO(EntityManager entityManager);
 
 }

@@ -26,18 +26,18 @@ import vars.jpa.VarsJpaTestModule;
  *
  * @author brian
  */
-public class ExternalDataDaoExpdTest {
+public class EXPDDataPeristenceServiceTest {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
     
     DateFormat dateFormat;
-    ExternalDataDAO dao;
+    ExternalDataPersistenceService dao;
 
     @Before
     public void setup() {
         Injector injector = Guice.createInjector(new VarsJpaTestModule());
-        dao = injector.getInstance(ExternalDataDAO.class);
+        dao = injector.getInstance(ExternalDataPersistenceService.class);
         dateFormat = injector.getInstance(DateFormat.class);
     }
 

@@ -4,8 +4,8 @@ import vars.DAO;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.AnnotationFactory;
 import vars.annotation.AssociationDAO;
@@ -32,10 +32,10 @@ public class AnnotationDAOFactoryImpl implements AnnotationDAOFactory, EntityMan
     private final KnowledgebaseDAOFactory kbFactory;
 
     @Inject
-    public AnnotationDAOFactoryImpl(@Named("annotationPersistenceUnit") String persistenceUnit,
+    public AnnotationDAOFactoryImpl(@Named("annotationPersistenceUnit") EntityManagerFactory entityManagerFactory,
             AnnotationFactory annotationFactory,
             KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
-        this.entityManagerFactory = Persistence.createEntityManagerFactory(persistenceUnit);
+        this.entityManagerFactory = entityManagerFactory;
         this.annotationFactory = annotationFactory;
         this.kbFactory = knowledgebaseDAOFactory;
     }
@@ -78,6 +78,42 @@ public class AnnotationDAOFactoryImpl implements AnnotationDAOFactory, EntityMan
 
     public EntityManagerFactory getEntityManagerFactory() {
         return entityManagerFactory;
+    }
+
+    public AssociationDAO newAssociationDAO(EntityManager entityManager) {
+        return new AssociationDAOImpl(entityManager);
+    }
+
+    public CameraDataDAO newCameraDataDAO(EntityManager entityManager) {
+        return new CameraDataDAOImpl(entityManager);
+    }
+
+    public CameraDeploymentDAO newCameraDeploymentDAO(EntityManager entityManager) {
+        return new CameraDeploymentDAOImpl(entityManager);
+    }
+
+    public ObservationDAO newObservationDAO(EntityManager entityManager) {
+        return new ObservationDAOImpl(entityManager);
+    }
+
+    public PhysicalDataDAO newPhysicalDataDAO(EntityManager entityManager) {
+        return new PhysicalDataDAOImpl(entityManager);
+    }
+
+    public VideoArchiveDAO newVideoArchiveDAO(EntityManager entityManager) {
+        return new VideoArchiveDAOImpl(entityManager, annotationFactory);
+    }
+
+    public VideoArchiveSetDAO newVideoArchiveSetDAO(EntityManager entityManager) {
+        return new VideoArchiveSetDAOImpl(entityManager, annotationFactory);
+    }
+
+    public VideoFrameDAO newVideoFrameDAO(EntityManager entityManager) {
+        return new VideoFrameDAOImpl(entityManager);
+    }
+
+    public DAO newDAO(EntityManager entityManager) {
+        return new vars.jpa.DAO(entityManager);
     }
 
 }

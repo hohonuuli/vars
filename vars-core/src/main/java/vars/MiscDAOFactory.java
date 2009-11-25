@@ -1,5 +1,7 @@
 package vars;
 
+import javax.persistence.EntityManager;
+
 /**
  * Created by IntelliJ IDEA.
  * User: brian
@@ -9,4 +11,6 @@ package vars;
  */
 public interface MiscDAOFactory {
     UserAccountDAO newUserAccountDAO();
+
+    UserAccountDAO newUserAccountDAO(EntityManager entityManager);
 }

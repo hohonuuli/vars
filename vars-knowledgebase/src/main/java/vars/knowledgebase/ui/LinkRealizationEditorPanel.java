@@ -356,7 +356,7 @@ public class LinkRealizationEditorPanel extends EditorPanel {
     private HierachicalConceptNameComboBox getToConceptComboBox() {
         if (toConceptComboBox == null) {
             toConceptComboBox = new HierachicalConceptNameComboBox(
-                getToolBelt().getKnowledgebaseDAOFactory().newConceptDAO());
+                getToolBelt().getAnnotationPersistenceService());
         }
 
         return toConceptComboBox;
@@ -547,7 +547,7 @@ public class LinkRealizationEditorPanel extends EditorPanel {
 
             MyLinkEditorDialog() {
                 super((Frame) Lookup.getApplicationFrameDispatcher().getValueObject(),
-                      getToolBelt().getKnowledgebaseDAOFactory());
+                         getToolBelt());
                 getLinkField().setEditable(false);
                 setLocationRelativeTo((Frame) Lookup.getApplicationFrameDispatcher().getValueObject());
                 this.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);

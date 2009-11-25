@@ -12,6 +12,7 @@ import vars.knowledgebase.MediaDAO;
 import vars.knowledgebase.UsageDAO;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import vars.jpa.EntityManagerFactoryAspect;
@@ -70,5 +71,41 @@ import vars.jpa.EntityManagerFactoryAspect;
 
     public EntityManagerFactory getEntityManagerFactory() {
         return entityManagerFactory;
+    }
+
+    public ConceptDAO newConceptDAO(EntityManager entityManager) {
+        return new ConceptDAOImpl(entityManager);
+    }
+
+    public ConceptMetadataDAO newConceptMetadataDAO(EntityManager entityManager) {
+        return new ConceptMetadataDAOImpl(entityManager);
+    }
+
+    public ConceptNameDAO newConceptNameDAO(EntityManager entityManager) {
+        return new ConceptNameDAOImpl(entityManager);
+    }
+
+    public HistoryDAO newHistoryDAO(EntityManager entityManager) {
+        return new HistoryDAOImpl(entityManager);
+    }
+
+    public LinkRealizationDAO newLinkRealizationDAO(EntityManager entityManager) {
+        return new LinkRealizationDAOImpl(entityManager);
+    }
+
+    public LinkTemplateDAO newLinkTemplateDAO(EntityManager entityManager) {
+        return new LinkTemplateDAOImpl(entityManager);
+    }
+
+    public MediaDAO newMediaDAO(EntityManager entityManager) {
+        return new MediaDAOImpl(entityManager);
+    }
+
+    public UsageDAO newUsageDAO(EntityManager entityManager) {
+        return new UsageDAOImpl(entityManager);
+    }
+
+    public DAO newDAO(EntityManager entityManager) {
+        return new vars.jpa.DAO(entityManager);
     }
 }

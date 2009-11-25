@@ -37,8 +37,8 @@ public class VarsUserPreferencesFactoryImpl implements VarsUserPreferencesFactor
      * @param eao
      */
     @Inject
-    public VarsUserPreferencesFactoryImpl(@Named("miscPersistenceUnit") String persistenceUnit) {
-        this.entityManagerFactory = Persistence.createEntityManagerFactory(persistenceUnit);
+    public VarsUserPreferencesFactoryImpl(@Named("miscPersistenceUnit") EntityManagerFactory entityManagerFactory) {
+        this.entityManagerFactory = entityManagerFactory;
     }
 
     /**

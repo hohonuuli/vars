@@ -38,12 +38,12 @@ import vars.ILink;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptNameTypes;
-import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.LinkTemplate;
 import vars.knowledgebase.SimpleConceptBean;
 import vars.knowledgebase.SimpleConceptNameBean;
 import vars.shared.ui.ILockableEditor;
 import vars.knowledgebase.ui.Lookup;
+import vars.knowledgebase.ui.ToolBelt;
 import vars.shared.ui.HierachicalConceptNameComboBox;
 import vars.shared.ui.OkCancelButtonPanel;
 
@@ -108,17 +108,17 @@ public class LinkEditorDialog extends JDialog implements ILockableEditor {
         }
 
     };
-    private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
     private ILink link;
+    private final ToolBelt toolBelt;
 
     /**
      *
      * @param knowledgebaseDAOFactory
      * @throws HeadlessException
      */
-    public LinkEditorDialog(KnowledgebaseDAOFactory knowledgebaseDAOFactory) throws HeadlessException {
+    public LinkEditorDialog(ToolBelt toolBelt) throws HeadlessException {
         super();
-        this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
+        this.toolBelt = toolBelt;
         setModal(true);
         initialize();
     }
@@ -128,9 +128,9 @@ public class LinkEditorDialog extends JDialog implements ILockableEditor {
      * @param knowledgebaseDAOFactory
      * @throws HeadlessException
      */
-    public LinkEditorDialog(Frame owner, KnowledgebaseDAOFactory knowledgebaseDAOFactory) throws HeadlessException {
+    public LinkEditorDialog(Frame owner, ToolBelt toolBelt) throws HeadlessException {
         super(owner);
-        this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
+        this.toolBelt = toolBelt;
         setModal(true);
         initialize();
     }
@@ -309,7 +309,7 @@ public class LinkEditorDialog extends JDialog implements ILockableEditor {
      */
     public HierachicalConceptNameComboBox getToConceptComboBox() {
         if (toConceptComboBox == null) {
-            toConceptComboBox = new HierachicalConceptNameComboBox(knowledgebaseDAOFactory.newConceptDAO());
+            toConceptComboBox = new HierachicalConceptNameComboBox(toolBelt.getAnnotationPersistenceService());
         }
 
         return toConceptComboBox;
@@ -374,7 +374,7 @@ public class LinkEditorDialog extends JDialog implements ILockableEditor {
          */
         Collection<LinkTemplate> matchingLinkTemplates = null;
         try {
-            matchingLinkTemplates = knowledgebaseDAOFactory.newLinkTemplateDAO().findAllByLinkName(link.getLinkName());
+            matchingLinkTemplates = toolBelt.getKnowledgebaseDAOFactory().newLinkTemplateDAO().findAllByLinkName(link.getLinkName());
         }
         catch (Exception e) {
             log.error("Failed to lookup LinkTemplates with linkName = " + link.getLinkName(), e);
@@ -414,7 +414,8 @@ public class LinkEditorDialog extends JDialog implements ILockableEditor {
         }
         else {
             try {
-                ConceptDAO conceptDAO = knowledgebaseDAOFactory.newConceptDAO();
+                // DAOTX
+                ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
                 concept = conceptDAO.findByName(toConceptAsString);
                 selectedConcept = conceptDAO.findByName(link.getToConcept());
                 cb.setConcept(concept);

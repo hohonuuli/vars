@@ -23,12 +23,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
-
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
 import org.mbari.swing.SearchableComboBoxModel;
