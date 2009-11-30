@@ -27,6 +27,7 @@ import org.bushe.swing.event.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.ILink;
+import vars.LinkUtilities;
 import vars.UserAccount;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
@@ -118,15 +119,19 @@ public class AddLinkTemplateDialog extends JDialog {
                      * Lookup the fromConcept
                      */
                     Concept c = null;
+                    // DAOTX
                     ConceptDAO conceptDAO = knowledgebaseDAOFactory.newConceptDAO();
+                    conceptDAO.startTransaction();
                     try {
                         c = conceptDAO.findByName(p.getFromConcept());
+                        c.getConceptMetadata(); // Lazy Load relation
                     }
                     catch (Exception e2) {
                         EventBus.publish(Lookup.TOPIC_FATAL_ERROR,
                                          "Failed to lookup '" + p.getFromConcept() + "' from the" +
                                          " database. Unable to add '" + linkTemplate.stringValue() + "'");
                     }
+                    conceptDAO.endTransaction();
 
                     /*
                      * Add the new linkTemplate and refresh the view
@@ -134,29 +139,24 @@ public class AddLinkTemplateDialog extends JDialog {
                     if (c != null) {
 
                         // Verify that the linkName isn't already being used.
-                        Collection links = new ArrayList();
+                        Collection<ILink> links = new ArrayList<ILink>();
+                        // DAOTX
                         LinkTemplateDAO linkTemplateDAO = knowledgebaseDAOFactory.newLinkTemplateDAO();
+                        linkTemplateDAO.startTransaction();
                         try {
-                            links = linkTemplateDAO.findAllByLinkName(linkTemplate.getLinkName());
+                            links.addAll(linkTemplateDAO.findAllByLinkName(linkTemplate.getLinkName()));
                         }
                         catch (Exception e1) {
                             log.error("Failed to look up linkname", e1);
                             EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e1);
                         }
+                        linkTemplateDAO.endTransaction();
 
                         // verify that the linkName and linkValue aren't already used.
-                        boolean matchExists = false;
-                        for (Iterator i = links.iterator(); i.hasNext(); ) {
-                            LinkTemplate link = (LinkTemplate) i.next();
-                            if (link.getLinkName().equalsIgnoreCase(linkTemplate.getLinkName()) &&
-                                    link.getLinkValue().equalsIgnoreCase(linkTemplate.getLinkValue())) {
-                                matchExists = true;
+                        Collection<ILink> matchingLinks = LinkUtilities.findMatchingLinksIn(links, linkTemplate);
 
-                                break;
-                            }
-                        }
 
-                        if (matchExists) {
+                        if (matchingLinks.size() > 0) {
 
                             // Don't allow duplicate link names
                             EventBus.publish(Lookup.TOPIC_WARNING,
@@ -170,6 +170,7 @@ public class AddLinkTemplateDialog extends JDialog {
                             UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
                             History history = historyFactory.add(userAccount, linkTemplate);
                             try {
+                                // DAOTX
                                 linkTemplateDAO.startTransaction();
                                 linkTemplateDAO.merge(c);
                                 c.getConceptMetadata().addLinkTemplate(linkTemplate);
@@ -180,17 +181,13 @@ public class AddLinkTemplateDialog extends JDialog {
                             
                             }
                             catch (Exception e1) {
-                                c.getConceptMetadata().removeLinkTemplate(linkTemplate);
                                 EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e1);
-
                             }
 
                             EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
 
-                            // Clear the database cache
-                            EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, c.getPrimaryConceptName().getName());
-
                         }
+                        
                     }
 
                     setConcept(null);

@@ -195,7 +195,6 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
             linkRealizations = new ArrayList<LinkRealization>();
         }
 
-
         return linkRealizations;
     }
 

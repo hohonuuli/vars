@@ -17,6 +17,8 @@ package vars;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.EntityManager;
+
 /**
  *
  * @author brian
@@ -86,4 +88,5 @@ public interface DAO {
 
     void startTransaction();
     
+    EntityManager getEntityManager();
 }

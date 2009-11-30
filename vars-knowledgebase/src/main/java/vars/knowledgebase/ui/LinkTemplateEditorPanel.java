@@ -1,7 +1,8 @@
 /*
- * @(#)LinkTemplateEditorPanel.java   2009.11.09 at 03:42:15 PST
+ * @(#)LinkTemplateEditorPanel.java   2009.11.23 at 10:17:37 PST
  *
  * Copyright 2009 MBARI
+ *
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -45,8 +46,7 @@ import vars.knowledgebase.ui.dialogs.AddLinkTemplateDialog;
  */
 public class LinkTemplateEditorPanel extends EditorPanel {
 
-    private static final Logger log = LoggerFactory.getLogger(LinkTemplateEditorPanel.class);
-    private static final long serialVersionUID = 1034645432734979217L;
+    private final Logger log = LoggerFactory.getLogger(getClass());
     private ActionAdapter deleteAction;
     private EditorButtonPanel editorButtonPanel;
     private LinkEditorPanel linkEditorPanel;
@@ -64,10 +64,6 @@ public class LinkTemplateEditorPanel extends EditorPanel {
         setLocked(isLocked());
     }
 
-    /**
-     * @return  the deleteAction
-     * @uml.property  name="deleteAction"
-     */
     private ActionAdapter getDeleteAction() {
         if (deleteAction == null) {
             deleteAction = new DeleteAction();
@@ -76,10 +72,6 @@ public class LinkTemplateEditorPanel extends EditorPanel {
         return deleteAction;
     }
 
-    /**
-     * @return  the editorButtonPanel
-     * @uml.property  name="editorButtonPanel"
-     */
     private EditorButtonPanel getEditorButtonPanel() {
         if (editorButtonPanel == null) {
             editorButtonPanel = new EditorButtonPanel();
@@ -91,10 +83,6 @@ public class LinkTemplateEditorPanel extends EditorPanel {
         return editorButtonPanel;
     }
 
-    /**
-     * @return  the linkEditorPanel
-     * @uml.property  name="linkEditorPanel"
-     */
     private LinkEditorPanel getLinkEditorPanel() {
         if (linkEditorPanel == null) {
             linkEditorPanel = new LinkEditorPanel(getToolBelt());
@@ -104,9 +92,6 @@ public class LinkTemplateEditorPanel extends EditorPanel {
         return linkEditorPanel;
     }
 
-    /**
-     * @return  the newAction
-     */
     private ActionAdapter getNewAction() {
         if (newAction == null) {
             newAction = new NewAction();
@@ -115,9 +100,6 @@ public class LinkTemplateEditorPanel extends EditorPanel {
         return newAction;
     }
 
-    /**
-     * @return  the updateAction
-     */
     private ActionAdapter getUpdateAction() {
         if (updateAction == null) {
             updateAction = new UpdateAction();
@@ -131,12 +113,20 @@ public class LinkTemplateEditorPanel extends EditorPanel {
         add(getEditorButtonPanel(), BorderLayout.SOUTH);
     }
 
+    /**
+     *
+     * @param concept
+     */
     @Override
     public void setConcept(Concept concept) {
         super.setConcept(concept);
         linkEditorPanel.setConcept(concept);
     }
 
+    /**
+     *
+     * @param locked
+     */
     @Override
     public void setLocked(boolean locked) {
         super.setLocked(locked);
@@ -148,8 +138,9 @@ public class LinkTemplateEditorPanel extends EditorPanel {
 
     private class DeleteAction extends ActionAdapter {
 
-        private static final long serialVersionUID = 326290691726170616L;
 
+        /**
+         */
         public void doAction() {
 
 
@@ -174,12 +165,17 @@ public class LinkTemplateEditorPanel extends EditorPanel {
                     String name = linkTemplate.getConceptMetadata().getConcept().getPrimaryConceptName().getName();
                     try {
 
+                        // DAOTX
                         DAO dao = getToolBelt().getKnowledgebaseDAOFactory().newDAO();
                         dao.startTransaction();
-                        linkTemplate = dao.merge(linkTemplate);
+                        /*
+                         * Don't merge linkTemplate as it may have been modified in the history appoval
+                         * process. Instead let's just find it in the database
+                         */
+                        linkTemplate = dao.findInDatastore(linkTemplate); 
                         ConceptMetadata conceptMetadata = linkTemplate.getConceptMetadata();
-                        conceptMetadata.removeLinkTemplate(linkTemplate);
-                        dao.remove(linkTemplate);
+                        //conceptMetadata.removeLinkTemplate(linkTemplate);
+                        //dao.remove(linkTemplate);
                         final History history = getToolBelt().getHistoryFactory().delete(userAccount, linkTemplate);
                         conceptMetadata.addHistory(history);
                         dao.persist(history);
@@ -198,23 +194,19 @@ public class LinkTemplateEditorPanel extends EditorPanel {
     }
 
 
-    /**
-         * @author  brian
-         */
+
     private class NewAction extends ActionAdapter {
 
-        private static final long serialVersionUID = -5786656103234187207L;
         AddLinkTemplateDialog dialog;
 
+        /**
+         */
         public void doAction() {
             getDialog().setConcept(getConcept());
             getDialog().setVisible(true);
         }
 
-        /**
-         * @return  the dialog
-         * @uml.property  name="dialog"
-         */
+ 
         private AddLinkTemplateDialog getDialog() {
             if (dialog == null) {
                 Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
@@ -228,8 +220,9 @@ public class LinkTemplateEditorPanel extends EditorPanel {
 
     private class UpdateAction extends ActionAdapter {
 
-        private static final long serialVersionUID = 943111369958005649L;
 
+        /**
+         */
         public void doAction() {
 
             final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
@@ -240,8 +233,10 @@ public class LinkTemplateEditorPanel extends EditorPanel {
                     EventBus.publish(Lookup.TOPIC_WARNING, "No LinkTemplate has been selected");
                 }
                 else if (!(link instanceof LinkTemplate)) {
+
                     // This happens when you try to delete 'nil | nil | nil'
-                    EventBus.publish(Lookup.TOPIC_WARNING, "You are not allowed to delete '" + link.stringValue() + "'");
+                    EventBus.publish(Lookup.TOPIC_WARNING,
+                                     "You are not allowed to delete '" + link.stringValue() + "'");
                 }
                 else {
 
@@ -299,7 +294,8 @@ public class LinkTemplateEditorPanel extends EditorPanel {
                             if (updateLink) {
 
                                 // Verify that the link name/ link value combo is unique
-                                LinkTemplateDAO linkTemplateDAO = getToolBelt().getKnowledgebaseDAOFactory().newLinkTemplateDAO();
+                                LinkTemplateDAO linkTemplateDAO = getToolBelt().getKnowledgebaseDAOFactory()
+                                    .newLinkTemplateDAO();
                                 Collection<LinkTemplate> links = new ArrayList<LinkTemplate>();
                                 boolean okToProceed = true;
                                 try {
@@ -331,7 +327,7 @@ public class LinkTemplateEditorPanel extends EditorPanel {
                                     panel.setLink(linkTemplate);
                                 }
                                 else {
-                                    
+
                                     try {
                                         linkTemplateDAO.startTransaction();
                                         final LinkTemplate lt = linkTemplateDAO.merge(linkTemplate);

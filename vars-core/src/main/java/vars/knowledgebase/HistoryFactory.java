@@ -53,11 +53,11 @@ public class HistoryFactory {
     }
 
     public History add(UserAccount userAccount, LinkRealization linkRealization) {
-        return newHistory(userAccount, History.ACTION_ADD, History.FIELD_LINKREALIZATION, null, linkRealization.toString());
+        return newHistory(userAccount, History.ACTION_ADD, History.FIELD_LINKREALIZATION, null, linkRealization.stringValue());
     }
 
     public History add(UserAccount userAccount, LinkTemplate linkTemplate) {
-        return newHistory(userAccount, History.ACTION_ADD, History.FIELD_LINKTEMPLATE, null, linkTemplate.toString());
+        return newHistory(userAccount, History.ACTION_ADD, History.FIELD_LINKTEMPLATE, null, linkTemplate.stringValue());
     }
 
     public History add(UserAccount userAccount, Media media) {
@@ -79,7 +79,7 @@ public class HistoryFactory {
     }
 
     public History delete(UserAccount userAccount, LinkRealization linkRealization) {
-        return newHistory(userAccount, History.ACTION_DELETE, History.FIELD_LINKREALIZATION, linkRealization.toString(), null);
+        return newHistory(userAccount, History.ACTION_DELETE, History.FIELD_LINKREALIZATION, linkRealization.stringValue(), null);
     }
 
     public History delete(UserAccount userAccount, LinkTemplate linkTemplate) {

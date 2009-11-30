@@ -27,7 +27,7 @@ public class InjectorModule implements Module {
     private final String annotationPersistenceUnit;
     private final String knowledgebasePersistenceUnit;
     private final String miscPersistenceUnit;
-    private final String cacheProvider;
+    //private final String cacheProvider;
 
     public InjectorModule(String bundleName) {
         this(ResourceBundle.getBundle(bundleName));
@@ -38,14 +38,14 @@ public class InjectorModule implements Module {
         annotationPersistenceUnit = bundle.getString("annotation.persistence.unit");
         knowledgebasePersistenceUnit = bundle.getString("knowledgebase.persistence.unit");
         miscPersistenceUnit = bundle.getString("misc.persistence.unit");
-        cacheProvider = bundle.getString("cache.provider.class");
+        //cacheProvider = bundle.getString("cache.provider.class");
     }
 
     public void configure(Binder binder) {
         try {
             binder.install(new VarsJpaModule(annotationPersistenceUnit, knowledgebasePersistenceUnit, miscPersistenceUnit));
-            binder.bind(PersistenceCacheProvider.class).to((Class<PersistenceCacheProvider>) Class.forName(cacheProvider));
-        } catch (ClassNotFoundException ex) {
+            //binder.bind(PersistenceCacheProvider.class).to((Class<PersistenceCacheProvider>) Class.forName(cacheProvider));
+        } catch (Exception ex) {
             throw new VARSException("Failed to intialize dependency injection", ex);
         }
     }

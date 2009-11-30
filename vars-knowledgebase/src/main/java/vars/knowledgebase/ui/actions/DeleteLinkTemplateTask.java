@@ -47,7 +47,7 @@ public class DeleteLinkTemplateTask {
             try {
                 DAO dao = knowledgebaseDAOFactory.newDAO();
                 dao.startTransaction();
-                linkTemplate = dao.merge(linkTemplate);
+                linkTemplate = dao.findInDatastore(linkTemplate);
                 linkTemplate.getConceptMetadata().removeLinkTemplate(linkTemplate);
                 dao.remove(linkTemplate);
                 dao.endTransaction();

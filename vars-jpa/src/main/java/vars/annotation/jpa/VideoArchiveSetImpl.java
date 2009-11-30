@@ -128,7 +128,7 @@ public class VideoArchiveSetImpl implements Serializable, VideoArchiveSet, JPAEn
 
     public Set<CameraDeployment> getCameraDeployments() {
         if (cameraDeployments == null) {
-            cameraDeployments = new HashSet();
+            cameraDeployments = new HashSet<CameraDeployment>();
         }
         return cameraDeployments;
     }

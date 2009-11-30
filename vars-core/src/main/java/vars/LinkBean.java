@@ -28,12 +28,12 @@ public class LinkBean implements ILink {
     public LinkBean(String stringRepresentation) {
         String[] tokens = stringRepresentation.split(DELIMITER_REGEXP);
 
-        if (tokens.length == 2) {
+        if (tokens.length == 3) {
             linkName = tokens[0];
             linkValue = tokens[1];
             toConcept = tokens[2];
         }
-        else if (tokens.length == 3){
+        else if (tokens.length == 4){
             fromConcept = tokens[0];
             linkName = tokens[1];
             linkValue = tokens[2];

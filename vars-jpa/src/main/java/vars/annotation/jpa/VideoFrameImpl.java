@@ -125,10 +125,12 @@ public class VideoFrameImpl implements Serializable, VideoFrame, JPAEntity {
     String timecode;
 
     /** Optimistic lock to prevent concurrent overwrites */
+    @SuppressWarnings("unused")
     @Version
     @Column(name = "LAST_UPDATED_TIME")
     private Timestamp updatedTime;
-    @ManyToOne(optional = false, targetEntity = VideoArchiveImpl.class)
+    
+    @ManyToOne(optional = false, targetEntity = VideoArchiveImpl.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "VideoArchiveID_FK")
     VideoArchive videoArchive;
 

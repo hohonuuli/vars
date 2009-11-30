@@ -66,6 +66,7 @@ public class VideoArchiveImpl implements Serializable, VideoArchive, JPAEntity {
     Long id;
 
     /** Optimistic lock to prevent concurrent overwrites */
+    @SuppressWarnings("unused")
     @Version
     @Column(name = "LAST_UPDATED_TIME")
     private Timestamp updatedTime;

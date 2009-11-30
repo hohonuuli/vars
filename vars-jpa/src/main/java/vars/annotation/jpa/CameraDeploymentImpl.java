@@ -95,6 +95,7 @@ public class CameraDeploymentImpl implements Serializable, CameraDeployment, JPA
     Date startDate;
 
     /** Optimistic lock to prevent concurrent overwrites */
+    @SuppressWarnings("unused")
     @Version
     @Column(name = "LAST_UPDATED_TIME")
     private Timestamp updatedTime;

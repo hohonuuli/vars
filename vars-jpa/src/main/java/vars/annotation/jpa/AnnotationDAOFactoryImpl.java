@@ -1,11 +1,8 @@
 package vars.annotation.jpa;
 
-import vars.DAO;
-import vars.knowledgebase.KnowledgebaseDAOFactory;
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
+
+import vars.DAO;
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.AnnotationFactory;
 import vars.annotation.AssociationDAO;
@@ -18,6 +15,9 @@ import vars.annotation.VideoArchiveSetDAO;
 import vars.annotation.VideoFrameDAO;
 import vars.jpa.EntityManagerFactoryAspect;
 
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
+
 /**
  * Created by IntelliJ IDEA.
  * User: brian
@@ -29,15 +29,12 @@ public class AnnotationDAOFactoryImpl implements AnnotationDAOFactory, EntityMan
 
     private final EntityManagerFactory entityManagerFactory;
     private final AnnotationFactory annotationFactory;
-    private final KnowledgebaseDAOFactory kbFactory;
 
     @Inject
-    public AnnotationDAOFactoryImpl(@Named("annotationPersistenceUnit") String persistenceUnit,
-            AnnotationFactory annotationFactory,
-            KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
-        this.entityManagerFactory = Persistence.createEntityManagerFactory(persistenceUnit);
+    public AnnotationDAOFactoryImpl(@Named("annotationPersistenceUnit") EntityManagerFactory entityManagerFactory,
+            AnnotationFactory annotationFactory) {
+        this.entityManagerFactory = entityManagerFactory;
         this.annotationFactory = annotationFactory;
-        this.kbFactory = knowledgebaseDAOFactory;
     }
 
     public AssociationDAO newAssociationDAO() {

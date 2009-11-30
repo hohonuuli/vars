@@ -33,7 +33,7 @@
       <groupId>vars-redux</groupId>
       <artifactId>vars-jpa</artifactId>
       <version>${project.version}</version>
-      <scope>compile</scope>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>foxtrot</groupId>

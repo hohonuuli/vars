@@ -47,7 +47,7 @@ public class DeleteLinkRealizationTask {
             try {
                 DAO dao = knowledgebaseDAOFactory.newDAO();
                 dao.startTransaction();
-                linkRealization = dao.merge(linkRealization);
+                linkRealization = dao.findInDatastore(linkRealization);
             	linkRealization.getConceptMetadata().removeLinkRealization(linkRealization);
                 dao.remove(linkRealization);
                 dao.endTransaction();

@@ -14,27 +14,30 @@
 
 package vars.knowledgebase.ui.actions;
 
-import foxtrot.Job;
-import foxtrot.Worker;
 import java.awt.Frame;
+
 import javax.swing.JProgressBar;
+
 import org.bushe.swing.event.EventBus;
 import org.mbari.swing.ProgressDialog;
 import org.mbari.util.Dispatcher;
-import vars.knowledgebase.HistoryFactory;
-import vars.knowledgebase.ui.KnowledgebaseFrame;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import vars.DAO;
 import vars.UserAccount;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.ConceptNameDAO;
 import vars.knowledgebase.History;
-import vars.knowledgebase.KnowledgebasePersistenceService;
+import vars.knowledgebase.HistoryFactory;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.KnowledgebaseFactory;
+import vars.knowledgebase.KnowledgebasePersistenceService;
+import vars.knowledgebase.ui.KnowledgebaseFrame;
 import vars.knowledgebase.ui.Lookup;
+import foxtrot.Job;
+import foxtrot.Worker;
 
 /**
  * Class description
@@ -69,8 +72,13 @@ public class DeleteConceptNameTask {
              */
             UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
             History history = historyFactory.delete(userAccount, conceptName);
-            final Concept concept = conceptName.getConcept();
+            // DAOTX
+            DAO dao = knowledgebaseDAOFactory.newConceptDAO();
+            dao.startTransaction();
+            final Concept concept = dao.findInDatastore(conceptName.getConcept());
             concept.getConceptMetadata().addHistory(history);
+            dao.persist(concept);
+            dao.endTransaction();
 
             ProgressDialog progressDialog = Lookup.getProgressDialog();
             progressDialog.setLabel("Deleting '" + conceptName.getName() + "'");
@@ -121,9 +129,13 @@ public class DeleteConceptNameTask {
                          * Delete the offending conceptName
                          */
                         try {
+                            // DAOTX
                             ConceptNameDAO conceptNameDAO = knowledgebaseDAOFactory.newConceptNameDAO();
-                            concept.removeConceptName(conceptName);
+                            conceptNameDAO.startTransaction();
+                            ConceptName myConceptName = conceptNameDAO.findInDatastore(conceptName);
+                            myConceptName.getConcept().removeConceptName(myConceptName);
                             conceptNameDAO.remove(conceptName);
+                            conceptNameDAO.endTransaction();
                         }
                         catch (Exception e) {
                             if (log.isErrorEnabled()) {

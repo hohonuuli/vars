@@ -5,10 +5,12 @@
 
 package vars.knowledgebase.jpa;
 
+import javax.persistence.EntityManagerFactory;
+
+import vars.jpa.JPACacheProvider;
+
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import javax.persistence.Persistence;
-import vars.jpa.JPACacheProvider;
 
 /**
  *
@@ -17,8 +19,8 @@ import vars.jpa.JPACacheProvider;
 public class KnowledgbaseCacheProvider extends JPACacheProvider {
 
     @Inject
-    public KnowledgbaseCacheProvider(@Named("knowledgebasePersistenceUnit") String persistenceUnit) {
-        super(Persistence.createEntityManagerFactory(persistenceUnit));
+    public KnowledgbaseCacheProvider(@Named("knowledgebasePersistenceUnit") EntityManagerFactory entityManagerFactory) {
+        super(entityManagerFactory);
     }
 
 }

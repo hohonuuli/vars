@@ -1,10 +1,11 @@
 package vars.jpa;
 
+import javax.persistence.EntityManagerFactory;
+
+import vars.MiscDAOFactory;
+
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import vars.MiscDAOFactory;
 
 /**
  * Created by IntelliJ IDEA.
@@ -18,8 +19,8 @@ public class MiscDAOFactoryImpl implements MiscDAOFactory, EntityManagerFactoryA
     private final EntityManagerFactory entityManagerFactory;
 
     @Inject
-    public MiscDAOFactoryImpl(@Named("miscPersistenceUnit") String persistenceUnit) {
-        this.entityManagerFactory = Persistence.createEntityManagerFactory(persistenceUnit);
+    public MiscDAOFactoryImpl(@Named("miscPersistenceUnit") EntityManagerFactory entityManagerFactory) {
+        this.entityManagerFactory = entityManagerFactory;
     }
 
     public vars.UserAccountDAO newUserAccountDAO() {

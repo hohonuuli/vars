@@ -70,14 +70,6 @@ import vars.knowledgebase.ConceptNameTypes;
 })
 public class ConceptImpl implements Serializable, Concept, JPAEntity {
 
-    @Transient
-    private final List<String> PROP_NAMES = new ArrayList<String>() {{
-
-            //PROP_ORIGINATOR, PROP_RANK_LEVEL, PROP_RANK_NAME
-            add(PROP_ORIGINATOR);
-            add(PROP_RANK_LEVEL);
-            add(PROP_RANK_NAME);
-        }};
 
     @OneToMany(
         targetEntity = ConceptImpl.class,
@@ -89,7 +81,7 @@ public class ConceptImpl implements Serializable, Concept, JPAEntity {
 
     @OneToOne(
         mappedBy = "concept",
-        fetch = FetchType.EAGER,
+        fetch = FetchType.LAZY,
         cascade = { CascadeType.ALL },
         targetEntity = ConceptMetadataImpl.class
     )
@@ -127,10 +119,9 @@ public class ConceptImpl implements Serializable, Concept, JPAEntity {
     private String originator;
 
     @ManyToOne(
-        fetch = FetchType.EAGER,
+        fetch = FetchType.LAZY,
         optional = true,
-        targetEntity = ConceptImpl.class,
-        cascade = { CascadeType.MERGE }
+        targetEntity = ConceptImpl.class
     )
     @JoinColumn(name = "ParentConceptID_FK")
     private Concept parentConcept;

@@ -29,9 +29,7 @@ import vars.ILink;
 public interface LinkTemplate extends KnowledgebaseObject, ILink {
 
     /**
-     * <p><!-- Method description --></p>
      * @return
-     * @uml.property  name="conceptDelegate"
      */
     ConceptMetadata getConceptMetadata();
 

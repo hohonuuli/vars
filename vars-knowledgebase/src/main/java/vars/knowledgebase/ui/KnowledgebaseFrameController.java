@@ -21,8 +21,6 @@ import org.mbari.swing.WaitIndicator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.PersistenceCache;
-import vars.jpa.JPACacheProvider;
-import vars.jpa.EntityManagerFactoryAspect;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 import vars.shared.ui.tree.ConceptTreePanel;

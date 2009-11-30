@@ -114,7 +114,7 @@ public class ConceptDAOImpl extends DAO implements ConceptDAO {
     }
 
     /**
-     * This method will start and stop the transaction on it's own.
+     * This method will start and stop the transaction on it's own. 
      */
     public void cascadeRemove(Concept concept) {
         // Bring ALL child concepts into the transaction first

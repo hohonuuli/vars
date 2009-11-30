@@ -45,7 +45,7 @@ public class DeleteMediaTask {
             try {
                 DAO dao = knowledgebaseDAOFactory.newDAO();
                 dao.startTransaction();
-                media = dao.merge(media);
+                media = dao.findInDatastore(media);
                 media.getConceptMetadata().removeMedia(media);
                 dao.remove(media);
                 dao.endTransaction();

@@ -11,11 +11,19 @@
  */
 package vars;
 
+import java.util.Collection;
+import java.util.Comparator;
+
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
+
 /**
  *
  * @author brian
  */
 public class LinkUtilities {
+    
+    private static final Comparator<ILink> COMPARATOR = new LinkComparator();
 
     public static String formatAsLongString(ILink link) {
         StringBuilder sb = new StringBuilder();
@@ -36,5 +44,21 @@ public class LinkUtilities {
         sb.append(link.getLinkValue());
 
         return sb.toString();
+    }
+    
+    /**
+     * Return all links in a collection that match a given {@link ILink}. This compares the linkName,
+     * toConcept, and linkValue fields
+     * 
+     * @param links
+     * @param templateLink
+     * @return
+     */
+    public static Collection<ILink> findMatchingLinksIn(Collection<ILink> links, final ILink templateLink) {
+        return Collections2.filter(links, new Predicate<ILink>() {
+            public boolean apply(ILink input) {
+                return COMPARATOR.compare(input, templateLink) == 0;
+            }
+        });
     }
 }
