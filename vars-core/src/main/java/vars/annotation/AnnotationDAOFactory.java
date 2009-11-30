@@ -1,5 +1,6 @@
 package vars.annotation;
 
+import javax.persistence.EntityManager;
 import vars.DAO;
 
 /**
@@ -20,5 +21,15 @@ public interface AnnotationDAOFactory {
     VideoFrameDAO newVideoFrameDAO();
     VideoArchiveDAO newVideoArchiveDAO();
     VideoArchiveSetDAO newVideoArchiveSetDAO();
+
+    DAO newDAO(EntityManager entityManager);
+    AssociationDAO newAssociationDAO(EntityManager entityManager);
+    CameraDataDAO newCameraDataDAO(EntityManager entityManager);
+    CameraDeploymentDAO newCameraDeploymentDAO(EntityManager entityManager);
+    ObservationDAO newObservationDAO(EntityManager entityManager);
+    PhysicalDataDAO newPhysicalDataDAO(EntityManager entityManager);
+    VideoFrameDAO newVideoFrameDAO(EntityManager entityManager);
+    VideoArchiveDAO newVideoArchiveDAO(EntityManager entityManager);
+    VideoArchiveSetDAO newVideoArchiveSetDAO(EntityManager entityManager);
 
 }

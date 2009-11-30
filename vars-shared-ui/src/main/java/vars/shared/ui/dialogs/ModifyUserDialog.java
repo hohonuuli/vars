@@ -14,7 +14,6 @@
 
 package vars.shared.ui.dialogs;
 
-import com.sun.media.jai.opimage.LookupCRIF;
 import java.awt.BorderLayout;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;

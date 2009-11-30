@@ -3,6 +3,11 @@ package vars.annotation.jpa;
 import javax.persistence.EntityManagerFactory;
 
 import vars.DAO;
+import vars.knowledgebase.KnowledgebaseDAOFactory;
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.AnnotationFactory;
 import vars.annotation.AssociationDAO;
@@ -15,9 +20,6 @@ import vars.annotation.VideoArchiveSetDAO;
 import vars.annotation.VideoFrameDAO;
 import vars.jpa.EntityManagerFactoryAspect;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
-
 /**
  * Created by IntelliJ IDEA.
  * User: brian
@@ -29,12 +31,15 @@ public class AnnotationDAOFactoryImpl implements AnnotationDAOFactory, EntityMan
 
     private final EntityManagerFactory entityManagerFactory;
     private final AnnotationFactory annotationFactory;
+    private final KnowledgebaseDAOFactory kbFactory;
 
     @Inject
     public AnnotationDAOFactoryImpl(@Named("annotationPersistenceUnit") EntityManagerFactory entityManagerFactory,
-            AnnotationFactory annotationFactory) {
+            AnnotationFactory annotationFactory,
+            KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
         this.entityManagerFactory = entityManagerFactory;
         this.annotationFactory = annotationFactory;
+        this.kbFactory = knowledgebaseDAOFactory;
     }
 
     public AssociationDAO newAssociationDAO() {
@@ -75,6 +80,42 @@ public class AnnotationDAOFactoryImpl implements AnnotationDAOFactory, EntityMan
 
     public EntityManagerFactory getEntityManagerFactory() {
         return entityManagerFactory;
+    }
+
+    public AssociationDAO newAssociationDAO(EntityManager entityManager) {
+        return new AssociationDAOImpl(entityManager);
+    }
+
+    public CameraDataDAO newCameraDataDAO(EntityManager entityManager) {
+        return new CameraDataDAOImpl(entityManager);
+    }
+
+    public CameraDeploymentDAO newCameraDeploymentDAO(EntityManager entityManager) {
+        return new CameraDeploymentDAOImpl(entityManager);
+    }
+
+    public ObservationDAO newObservationDAO(EntityManager entityManager) {
+        return new ObservationDAOImpl(entityManager);
+    }
+
+    public PhysicalDataDAO newPhysicalDataDAO(EntityManager entityManager) {
+        return new PhysicalDataDAOImpl(entityManager);
+    }
+
+    public VideoArchiveDAO newVideoArchiveDAO(EntityManager entityManager) {
+        return new VideoArchiveDAOImpl(entityManager, annotationFactory);
+    }
+
+    public VideoArchiveSetDAO newVideoArchiveSetDAO(EntityManager entityManager) {
+        return new VideoArchiveSetDAOImpl(entityManager, annotationFactory);
+    }
+
+    public VideoFrameDAO newVideoFrameDAO(EntityManager entityManager) {
+        return new VideoFrameDAOImpl(entityManager);
+    }
+
+    public DAO newDAO(EntityManager entityManager) {
+        return new vars.jpa.DAO(entityManager);
     }
 
 }
