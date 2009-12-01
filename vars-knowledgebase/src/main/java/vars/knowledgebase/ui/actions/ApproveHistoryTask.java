@@ -1,7 +1,8 @@
 /*
- * @(#)ApproveHistoryTask.java   2009.10.02 at 03:37:20 PDT
+ * @(#)ApproveHistoryTask.java   2009.12.01 at 03:16:25 PST
  *
  * Copyright 2009 MBARI
+ *
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,16 +23,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
-
 import javax.swing.JOptionPane;
-
 import org.bushe.swing.event.EventBus;
 import org.mbari.util.Dispatcher;
-
 import vars.DAO;
 import vars.ILink;
 import vars.LinkBean;
@@ -46,13 +41,11 @@ import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.ConceptNameDAO;
 import vars.knowledgebase.ConceptNameTypes;
 import vars.knowledgebase.History;
-import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.LinkRealization;
 import vars.knowledgebase.LinkTemplate;
 import vars.knowledgebase.Media;
 import vars.knowledgebase.ui.Lookup;
 import vars.knowledgebase.ui.ToolBelt;
-
 
 /**
  * <!-- Class Description -->
@@ -66,17 +59,16 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
     /*
      * Map<String, AbstractHistoryTask>
      */
-    private final Map<String, Map<String, GenericApproveTask>> actionMap = new HashMap<String, Map<String, GenericApproveTask>>();
+    private final Map<String, Map<String, GenericApproveTask>> actionMap = new HashMap<String,
+        Map<String, GenericApproveTask>>();
     private final GenericApproveTask DEFAULT_TASK;
     private final ToolBelt toolBelt;
 
     /**
      * Constructs ...
      *
-     * @param annotationDAOFactory
-     * @param knowledgebaseDAO
-     * @param knowledgebaseDAOFactory
-     * @param knowledgebaseFactory
+     *
+     * @param toolBelt
      */
     @Inject
     public ApproveHistoryTask(ToolBelt toolBelt) {
@@ -91,6 +83,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
          * for acceptable values. The Map holds that process the approval
          */
         final Map<String, GenericApproveTask> addMap = new HashMap<String, GenericApproveTask>();
+
         actionMap.put(History.ACTION_ADD, addMap);
         addMap.put(History.FIELD_CONCEPT_CHILD, DEFAULT_TASK);
         addMap.put(History.FIELD_CONCEPTNAME, DEFAULT_TASK);
@@ -103,6 +96,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
          * deleteMap<String, IAction> String defines which field was Added
          */
         final Map<String, GenericApproveTask> deleteMap = new HashMap<String, GenericApproveTask>();
+
         actionMap.put(History.ACTION_DELETE, deleteMap);
 
         /*
@@ -117,10 +111,17 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
         deleteMap.put(History.FIELD_MEDIA, new ADeleteMediaTask());
 
         final Map<String, GenericApproveTask> replaceMap = new HashMap<String, GenericApproveTask>();
+
         actionMap.put(History.ACTION_REPLACE, replaceMap);
         replaceMap.put(History.FIELD_CONCEPT_PARENT, DEFAULT_TASK);
     }
 
+    /**
+     *
+     * @param userAccount
+     * @param history
+     * @param dao
+     */
     public void approve(final UserAccount userAccount, final History history, DAO dao) {
         if ((history != null) && !history.isProcessed()) {
             if (log.isDebugEnabled()) {
@@ -129,6 +130,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
 
             final Map<String, GenericApproveTask> approveActions = actionMap.get(history.getAction());
             GenericApproveTask processer = approveActions.get(history.getField());
+
             if (processer == null) {
                 processer = DEFAULT_TASK;
             }
@@ -137,110 +139,139 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
         }
     }
 
+    /**
+     *
+     * @param userAccount
+     * @param history
+     */
     public void doTask(final UserAccount userAccount, final History history) {
-    	DAO dao = toolBelt.getKnowledgebaseDAOFactory().newDAO();
-    	try {
-    		dao.startTransaction();
-        	approve(userAccount, history, dao);
-    	}
-    	catch (Exception e) {
-    		EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
-    	}
-    	finally {
-    		dao.endTransaction();
-    	}
+        DAO dao = toolBelt.getKnowledgebaseDAOFactory().newDAO();
+
+        try {
+            dao.startTransaction();
+            approve(userAccount, history, dao);
+        }
+        catch (Exception e) {
+            EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+        }
+        finally {
+            dao.endTransaction();
+        }
     }
 
     private class ADeleteChildConceptTask extends GenericApproveTask {
 
 
+        /**
+         *
+         * @param userAccount
+         * @param history
+         * @param dao
+         */
         public void approve(final UserAccount userAccount, History history, DAO dao) {
 
             /*
              * Find the child concept to be deleted.
              */
             String nameToDelete = history.getOldValue();
-            history = dao.findInDatastore(history);
+
+            history = dao.merge(history);
+
             final Concept parentConcept = history.getConceptMetadata().getConcept();
             final Collection<Concept> children = new ArrayList<Concept>(parentConcept.getChildConcepts());
             Concept concept = null;
+
             for (Concept child : children) {
                 final ConceptName conceptName = child.getConceptName(nameToDelete);
+
                 if (conceptName != null) {
                     concept = child;
+
                     break;
                 }
             }
-            
+
             if (concept == null) {
                 dropHistory(history,
-                        "No child Concept containg the name '" + history.getOldValue() +
-                        "' was found. I'll remove the obsolete history information", dao);
+                            "No child Concept containg the name '" + history.getOldValue() +
+                            "' was found. I'll remove the obsolete history information", dao);
+
                 return;
             }
-            
+
             /*
              * Get a count of all the concepts we're about to disappear forever
              */
             ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO(dao.getEntityManager());
-            concept = conceptDAO.findInDatastore(concept);
+
+            concept = conceptDAO.merge(concept);
+
             Collection<Concept> conceptsToBeDeleted = conceptDAO.findDescendents(concept);
-            
+
             /*
              * Let the user know just how much damage they're about to do to the database
              */
             Dispatcher dispatcher = Lookup.getApplicationFrameDispatcher();
             Frame frame = (Frame) dispatcher.getValueObject();
-            int option = JOptionPane.showConfirmDialog( frame,
-                    "You are about to delete " + conceptsToBeDeleted.size() +
-                    " concept(s) from the \nknowledgebase. Are you sure you want to continue?",
-                    "VARS - Delete Concepts",
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.WARNING_MESSAGE);
-            
+            int option = JOptionPane.showConfirmDialog(frame,
+                "You are about to delete " + conceptsToBeDeleted.size() +
+                " concept(s) from the \nknowledgebase. Are you sure you want to continue?", "VARS - Delete Concepts",
+                    JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+
             if (option != JOptionPane.YES_OPTION) {
                 return;
             }
-            
+
             /*
              * Get all concept-names that will be deleted. Use those to find all the Observations that
-             * will be affected.
+             * will be affected. ObservationDAO and conceptDAO may use different EntityManagerFactories
+             * so we don't share a transaction
              */
-            ObservationDAO observationDAO = toolBelt.getAnnotationDAOFactory().newObservationDAO(dao.getEntityManager());
+            ObservationDAO observationDAO = toolBelt.getAnnotationDAOFactory().newObservationDAO();
+            observationDAO.startTransaction();
             Collection<Observation> observations = observationDAO.findAllByConcept(concept, true);
-            final String newName = parentConcept.getPrimaryConceptName().getName();
-            final String msg = observations.size() + " Observations were found using '" + nameToDelete +
-                    "' or one of it's \nchildren. Do you want to update the names to '" + newName +
-                    "' or \nignore them and leave them as is?";
-            
-            /*
-             * Report the usages to the user. Allow them to replace with parent concept or leave as is.
-             */
-            final Object[] options = { "Update", "Ignore", "Cancel" };
-            option = JOptionPane.showOptionDialog(frame, msg, "VARS - Removing '" + nameToDelete + "'",
-                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[2]);
-            switch (option) {
-            case JOptionPane.YES_OPTION:
-                // Updated
-                for (Observation observation : observations) {
-                    observation.setConceptName(newName);
+
+            if (observations.size() > 0) {
+                final String newName = parentConcept.getPrimaryConceptName().getName();
+                final String msg = observations.size() + " Observations were found using '" + nameToDelete +
+                                   "' or one of it's \nchildren. Do you want to update the names to '" + newName +
+                                   "' or \nignore them and leave them as is?";
+
+                /*
+                 * Report the usages to the user. Allow them to replace with parent concept or leave as is.
+                 */
+                final Object[] options = { "Update", "Ignore", "Cancel" };
+
+                option = JOptionPane.showOptionDialog(frame, msg, "VARS - Removing '" + nameToDelete + "'",
+                        JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[2]);
+
+                switch (option) {
+                case JOptionPane.YES_OPTION:
+
+                    // Updated
+                    for (Observation observation : observations) {
+                        observation.setConceptName(newName);
+                    }
+
+                    break;
+
+                case JOptionPane.NO_OPTION:
+
+                    // Ignore
+                    break;
+
+                default:
+
+                    // Cancel
+                    return;
                 }
-                break;
-
-            case JOptionPane.NO_OPTION:
-                // Ignore
-                break;
-
-            default:
-                // Cancel
-                return;
             }
-            
+            observationDAO.endTransaction();
+
             // Delete the concept and it's children
+            super.approve(userAccount, history, dao);
             conceptDAO.endTransaction();
-            conceptDAO.cascadeRemove(concept); // This handles starting and stopping the transaction internally
-
-
+            conceptDAO.cascadeRemove(concept);    // This handles starting and stopping the transaction internally
 
         }
     }
@@ -249,90 +280,111 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
     private class ADeleteConceptNameAction extends GenericApproveTask {
 
 
+        /**
+         *
+         * @param userAccount
+         * @param history
+         * @param dao
+         */
         @Override
         public void approve(final UserAccount userAccount, History history, DAO dao) {
-        	
-        	final String conceptNameToDelete = history.getOldValue();
-        	
-        	if (canDo(userAccount, history)) {
+
+            final String conceptNameToDelete = history.getOldValue();
+
+            if (canDo(userAccount, history)) {
 
                 final Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
-                final int option = JOptionPane.showConfirmDialog(frame,
-                            "Are you sure you want to delete '" + conceptNameToDelete +
-                            "' ? Be aware that this will change existing annotations that use it.",
-                        "VARS - Delete ConceptName", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                final int option = JOptionPane
+                    .showConfirmDialog(
+                        frame, "Are you sure you want to delete '" + conceptNameToDelete +
+                        "' ? Be aware that this will change existing annotations that use it.", "VARS - Delete ConceptName", JOptionPane
+                            .YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+
                 if (option != JOptionPane.YES_OPTION) {
                     return;
                 }
-                
-                
-        	}
-        	
-        	/*
-             * Bring objects into persistence transaction 
-             */
-            history = dao.findInDatastore(history);
+
+
+            }
+
+            /*
+         * Bring objects into persistence transaction
+         */
+            history = dao.merge(history);
+
             final Concept concept = history.getConceptMetadata().getConcept();
-            
+
             /*
              * Make sure that no annotations are using the concept-name that is
              * being deleted.
              */
             Thread thread = new Thread(new Runnable() {
-				
-				public void run() {
-					try {
-						toolBelt.getKnowledgebasePersistenceService().updateConceptNameUsedByAnnotations(concept);
-					}
-					catch (Exception e) {
-						EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
-					}
-					
-				}
-			}, "Update thread for annotations named " + conceptNameToDelete);
+
+                public void run() {
+                    try {
+                        toolBelt.getKnowledgebasePersistenceService().updateConceptNameUsedByAnnotations(concept);
+                    }
+                    catch (Exception e) {
+                        EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+                    }
+
+                }
+            }, "Update thread for annotations named " + conceptNameToDelete);
+
             thread.setDaemon(false);
             thread.start();
-            
+
             /*
              * Drop the conceptname from the database
              */
-            ConceptNameDAO conceptNameDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptNameDAO(dao.getEntityManager());
+            ConceptNameDAO conceptNameDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptNameDAO(
+                dao.getEntityManager());
             ConceptName conceptName = conceptNameDAO.findByName(conceptNameToDelete);
+
             if (conceptName != null) {
-	            if (conceptName.getNameType().equals(ConceptNameTypes.PRIMARY.getName())) {
-	            	EventBus.publish(Lookup.TOPIC_WARNING, "You are attempting to delete a primary concept-name." +
-	            			" This is NOT allowed.");
-	            	return;
-	            }
-	            
-	            conceptName.getConcept().removeConceptName(conceptName);
-	            dao.remove(conceptName);
-	            super.approve(userAccount, history, conceptNameDAO);
-	            
+                if (conceptName.getNameType().equals(ConceptNameTypes.PRIMARY.getName())) {
+                    EventBus.publish(Lookup.TOPIC_WARNING,
+                                     "You are attempting to delete a primary concept-name." + " This is NOT allowed.");
+
+                    return;
+                }
+
+                conceptName.getConcept().removeConceptName(conceptName);
+                dao.remove(conceptName);
+                super.approve(userAccount, history, conceptNameDAO);
+
             }
             else {
-            	dropHistory(history, "Unable to locate '" + conceptNameToDelete +
-                        "'. I'll remove the History reference.", dao);
+                dropHistory(history,
+                            "Unable to locate '" + conceptNameToDelete + "'. I'll remove the History reference.", dao);
             }
         }
     }
 
 
     private class ADeleteLinkRealizationTask extends GenericApproveTask {
-        
+
+        /**
+         *
+         * @param userAccount
+         * @param history
+         * @param dao
+         */
         @Override
         public void approve(UserAccount userAccount, History history, DAO dao) {
 
-        	if (canDo(userAccount, history)) {
-                
+            if (canDo(userAccount, history)) {
+
                 /*
                  * Confirm that we really want to do this
                  */
                 final Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
-                final int option = JOptionPane.showConfirmDialog(frame,
-                        "Are you sure you want to delete '" + history.getOldValue() + 
-                        "' ? Be aware that this will not effect existing annotations that use it.", 
-                        "VARS - Delete LinkRealization", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                final int option = JOptionPane
+                    .showConfirmDialog(
+                        frame, "Are you sure you want to delete '" + history.getOldValue() +
+                        "' ? Be aware that this will not effect existing annotations that use it.", "VARS - Delete LinkRealization", JOptionPane
+                            .YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+
                 if (option != JOptionPane.YES_OPTION) {
                     return;
                 }
@@ -340,20 +392,24 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
                 // Convenient means to parse the string stored in the history
                 final LinkBean link = new LinkBean(history.getOldValue());
                 final LinkRealization exampleRealization = toolBelt.getKnowledgebaseFactory().newLinkRealization();
+
                 exampleRealization.setLinkName(link.getLinkName());
                 exampleRealization.setToConcept(link.getToConcept());
                 exampleRealization.setLinkValue(link.getLinkValue());
 
                 // DAOTX
-                history = dao.findInDatastore(history);
+                history = dao.merge(history);
+
                 final ConceptMetadata conceptMetadata = history.getConceptMetadata();
 
                 /*
                  * Find the matching linkTemplate
                  */
                 Collection<ILink> linkRealizations = new ArrayList<ILink>(conceptMetadata.getLinkRealizations());
-                Collection<ILink> matchingLinkRealizations = LinkUtilities.findMatchingLinksIn(linkRealizations, exampleRealization);
+                Collection<ILink> matchingLinkRealizations = LinkUtilities.findMatchingLinksIn(linkRealizations,
+                    exampleRealization);
                 LinkRealization linkRealization = null;
+
                 if (matchingLinkRealizations.size() > 0) {
                     linkRealization = (LinkRealization) matchingLinkRealizations.iterator().next();
                     conceptMetadata.removeLinkRealization(linkRealization);
@@ -362,31 +418,39 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
 
                 }
                 else {
-                    dropHistory(history, "Unable to locate '" + history.getOldValue() +
+                    dropHistory(history,
+                                "Unable to locate '" + history.getOldValue() +
                                 "'. It may have \nbeen moved. I'll remove the History reference.", dao);
                 }
             }
         }
-
     }
 
 
     private class ADeleteLinkTemplateTask extends GenericApproveTask {
 
 
+        /**
+         *
+         * @param userAccount
+         * @param history
+         * @param dao
+         */
         @Override
         public void approve(UserAccount userAccount, History history, DAO dao) {
 
             if (canDo(userAccount, history)) {
-                
+
                 /*
                  * Confirm that we really want to do this
                  */
                 final Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
-                final int option = JOptionPane.showConfirmDialog(frame,
-                            "Are you sure you want to delete '" + history.getOldValue() +
-                            "' ? Be aware that this will not effect existing annotations that use it.",
-                        "VARS - Delete LinkTemplate", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                final int option = JOptionPane
+                    .showConfirmDialog(
+                        frame, "Are you sure you want to delete '" + history.getOldValue() +
+                        "' ? Be aware that this will not effect existing annotations that use it.", "VARS - Delete LinkTemplate", JOptionPane
+                            .YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+
                 if (option != JOptionPane.YES_OPTION) {
                     return;
                 }
@@ -394,20 +458,24 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
                 // Convenient means to parse the string stored in the history
                 final LinkBean link = new LinkBean(history.getOldValue());
                 final LinkTemplate exampleTemplate = toolBelt.getKnowledgebaseFactory().newLinkTemplate();
+
                 exampleTemplate.setLinkName(link.getLinkName());
                 exampleTemplate.setToConcept(link.getToConcept());
                 exampleTemplate.setLinkValue(link.getLinkValue());
 
                 // DAOTX
-                history = dao.findInDatastore(history);
+                history = dao.merge(history);
+
                 final ConceptMetadata conceptMetadata = history.getConceptMetadata();
 
                 /*
                  * Find the matching linkTemplate
                  */
                 Collection<ILink> linkTemplates = new ArrayList<ILink>(conceptMetadata.getLinkTemplates());
-                Collection<ILink> matchingLinkTemplates = LinkUtilities.findMatchingLinksIn(linkTemplates, exampleTemplate);
+                Collection<ILink> matchingLinkTemplates = LinkUtilities.findMatchingLinksIn(linkTemplates,
+                    exampleTemplate);
                 LinkTemplate linkTemplate = null;
+
                 if (matchingLinkTemplates.size() > 0) {
                     linkTemplate = (LinkTemplate) matchingLinkTemplates.iterator().next();
                     conceptMetadata.removeLinkTemplate(linkTemplate);
@@ -415,7 +483,8 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
                     super.approve(userAccount, history, dao);
                 }
                 else {
-                    dropHistory(history, "Unable to locate '" + history.getOldValue() +
+                    dropHistory(history,
+                                "Unable to locate '" + history.getOldValue() +
                                 "'. It may have \nbeen moved. I'll remove the History reference.", dao);
                 }
             }
@@ -425,36 +494,47 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
 
     private class ADeleteMediaTask extends GenericApproveTask {
 
+        /**
+         *
+         * @param userAccount
+         * @param history
+         * @param dao
+         */
         @Override
         public void approve(UserAccount userAccount, History history, DAO dao) {
 
-        	if (canDo(userAccount, history)) {
-        		
-        		final String imageReference = history.getOldValue();
+            if (canDo(userAccount, history)) {
+
+                final String imageReference = history.getOldValue();
 
                 final Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
                 final int option = JOptionPane.showConfirmDialog(frame,
-                            "Are you sure you want to delete '" + imageReference + "' ? ",
-                        "VARS - Delete Media", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                    "Are you sure you want to delete '" + imageReference + "' ? ", "VARS - Delete Media",
+                    JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+
                 if (option != JOptionPane.YES_OPTION) {
                     return;
                 }
 
                 // DAOTX
-                history = dao.findInDatastore(history);
+                history = dao.merge(history);
+
                 final ConceptMetadata conceptMetadata = history.getConceptMetadata();
 
                 /*
                  * Find the matching Media
                  */
                 Collection<Media> medias = new ArrayList<Media>(conceptMetadata.getMedias());
-                Collection<Media> matchingMedia = Collections2.filter(medias, new Predicate<Media>(){
-					public boolean apply(Media input) {
-						return input.getUrl().equals(imageReference);
-					}
+                Collection<Media> matchingMedia = Collections2.filter(medias, new Predicate<Media>() {
+
+                    public boolean apply(Media input) {
+                        return input.getUrl().equals(imageReference);
+                    }
+
                 });
-                
+
                 Media media = null;
+
                 if (matchingMedia.size() > 0) {
                     media = matchingMedia.iterator().next();
                     conceptMetadata.removeMedia(media);
@@ -462,7 +542,8 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
                     super.approve(userAccount, history, dao);
                 }
                 else {
-                    dropHistory(history, "Unable to locate '" + imageReference +
+                    dropHistory(history,
+                                "Unable to locate '" + imageReference +
                                 "'. It may have \nbeen moved. I'll remove the History reference.", dao);
                 }
             }
@@ -477,10 +558,16 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
      */
     private class GenericApproveTask extends AbstractHistoryTask implements IApproveHistoryTask {
 
-
+        /**
+         *
+         * @param userAccount
+         * @param history
+         * @param dao
+         */
         public void approve(UserAccount userAccount, History history, DAO dao) {
-        	history = dao.findInDatastore(history);
-        	if (canDo(userAccount, history)) {
+            history = dao.merge(history);
+
+            if (canDo(userAccount, history)) {
                 history = dao.findInDatastore(history);
                 history.setProcessedDate(new Date());
                 history.setProcessorName(userAccount.getUserName());
@@ -488,16 +575,18 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
             }
             else {
                 final String msg = "Unable to approve the History [" + history + "]";
+
                 EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, msg);
             }
         }
 
         /**
+         *
+         * @param userAccount
+         * @param history
          */
         public void doTask(final UserAccount userAccount, History history) {
             throw new UnsupportedOperationException("Don't call doTask(), call approve() instead!");
         }
-
     }
-
 }

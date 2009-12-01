@@ -336,33 +336,17 @@ public class AddConceptDialog extends javax.swing.JDialog {
     private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {    //GEN-FIRST:event_okButtonActionPerformed
         setVisible(false);
 
-        if (concept == null) {
-            concept = controller.createConcept();
-        }
-
         try {
-            if (concept != null) {
-                controller.updateValues(concept);
+        	if (concept == null) {
+                concept = controller.createConcept();
+            }
+        	else {
+                controller.updateConcept(concept);
             }
         }
         catch (Exception ex) {
-            log.error("Update failed for " + concept, ex);
+            log.error("User operation failed for " + concept, ex);
             EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, ex);
-        }
-
-        final Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
-        if ((frame != null) && (frame instanceof KnowledgebaseFrame) && (concept != null)) {
-            final String name = concept.getPrimaryConceptName().getName();
-            Worker.post(new Job() {
-
-                public Object run() {
-                    ((KnowledgebaseFrame) frame).refreshTreeAndOpenNode(name);
-
-                    return null;
-                }
-
-
-            });
         }
 
         setConcept(null);
@@ -429,25 +413,13 @@ public class AddConceptDialog extends javax.swing.JDialog {
              * Get the parent concept
              */
             Concept concept = null;
-            Concept parentConcept = null;
+            
+            // DAOTX
             ConceptDAO dao = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
-            try {
-                
-                dao.startTransaction();
-                parentConcept = dao.findByName((String) getConceptComboBox().getSelectedItem());
-                dao.endTransaction();
-            }
-            catch (Exception ex) {
-                String msg = "Failed to lookup '" + getConceptComboBox().getSelectedItem() +
-                             "'. Canceling your request";
-                log.error(msg, ex);
-                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, msg);
-
-                return concept;
-            }
+            dao.startTransaction();
+            Concept parentConcept = dao.findByName((String) getConceptComboBox().getSelectedItem());
 
             if (parentConcept == null) {
-
                 // TODO brian: Make sure that there are no existing root concepts
                 throw new VARSException("No parent Concept was specified. You MUST Specify a parent Concept");
             }
@@ -456,120 +428,63 @@ public class AddConceptDialog extends javax.swing.JDialog {
              * Check userAccount status
              */
             UserAccount userAccount = (UserAccount) GlobalLookup.getUserAccountDispatcher().getValueObject();
-            boolean okToProceed = (userAccount != null);
 
             String primaryName = nameField.getText();
-            if (okToProceed && (primaryName != null)) {
+            if (userAccount != null && primaryName != null) {
 
                 // Do not add a concept with a name that already exists in the database
-                Concept existingConcept = null;
-                try {
-
-                    dao.startTransaction();
-                    existingConcept = dao.findByName(primaryName);
-                    dao.endTransaction();
-                }
-                catch (Exception e) {
-                    if (log.isErrorEnabled()) {
-                        log.error("Failed to lookup '" + primaryName + "' in the knowledgebase", e);
-                    }
-
-                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR,
-                                     "Unable to complete " + "your request. An error occured while attempting " +
-                                     "to query the database");
-                    okToProceed = false;
-                }
-
-                if (okToProceed && (existingConcept != null)) {
-                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR,
-                                     "Unable to complete your " + "request. The name, '" + primaryName +
-                                     "' already exists in the knowledgebase.");
-                    okToProceed = false;
-                }
+                Concept existingConcept = dao.findByName(primaryName);
 
                 // Add the concept to the database;
-
-                if (okToProceed) {
+                if (existingConcept == null) {
                     KnowledgebaseFactory knowledgebaseFactory = toolBelt.getKnowledgebaseFactory();
                     concept = knowledgebaseFactory.newConcept();
 
-                    // Set reuired fields
+                    // Set required fields
                     ConceptName conceptName = knowledgebaseFactory.newConceptName();
                     conceptName.setName(primaryName);
                     conceptName.setNameType(ConceptNameTypes.PRIMARY.toString());
                     concept.addConceptName(conceptName);
                     concept.setOriginator(userAccount.getUserName());
                     
+                    parentConcept.addChildConcept(concept);
+                    dao.persist(concept);
 
-                    try {
-                        dao.startTransaction();
-                        parentConcept = dao.merge(parentConcept);
-                        parentConcept.addChildConcept(concept);
-                        dao.persist(concept);
-                        dao.endTransaction();
-                    }
-                    catch (Exception e) {
-                        log.error("Failed to insert " + concept, e);
-                        EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR,
-                                         "Unable to complete " + "your request. There was a problem with the " +
-                                         "database transaction.");
-                        parentConcept.removeChildConcept(concept);
-                        okToProceed = false;
-                    }
-                }
-
-                // Generate a history for the new Concept
-                History history = null;
-                if (okToProceed) {
-                    history = toolBelt.getHistoryFactory().add(userAccount, concept);
+                    // Add History
+                    History history = toolBelt.getHistoryFactory().add(userAccount, concept);
                     parentConcept.getConceptMetadata().addHistory(history);
-
-                    if (log.isDebugEnabled()) {
-                        log.debug("Adding " + history + " to " + parentConcept);
-                    }
-
-                    try {
-                        dao.startTransaction();
-                        parentConcept = dao.merge(parentConcept);
-                        parentConcept.getConceptMetadata().addHistory(history);
-                        dao.persist(parentConcept);
-                        dao.endTransaction();
-                    }
-                    catch (Exception e) {
-                        log.error("Failed to update " + parentConcept, e);
-                        EventBus.publish(Lookup.TOPIC_WARNING,
-                                         "There is a problem " +
-                                         "with the database connection. Unable to add history" +
-                                         " information to the database.");
-                    }
-
+                    dao.persist(history);
+                    
                     EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
+                    
                 }
-
+                else {
+                	EventBus.publish(Lookup.TOPIC_WARNING, "The name '" + primaryName + "' already exists in the database.");
+                }
 
             }
 
             return concept;
         }
 
-        void updateValues(Concept concept) {
+        void updateConcept(Concept concept) {
 
-            final UserAccount userAccount = (UserAccount) GlobalLookup.getUserAccountDispatcher().getValueObject();
+            final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
             final HistoryFactory historyFactory = toolBelt.getHistoryFactory();
-            final ApproveHistoryTask approveHistoryTask = toolBelt.getApproveHistoryTask();
             final List<History> histories = new ArrayList<History>();
+            final String parentName = (String) getConceptComboBox().getSelectedItem();
 
             /*
-            * Modify the parent concept
-            */
-            final String parentName = (String) getConceptComboBox().getSelectedItem();
-            Concept oldParentConcept = (Concept) concept.getParentConcept();
+             * DAOTX Modify the parent concept
+             */
             ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
             conceptDAO.startTransaction();
+            concept = conceptDAO.merge(concept);
+            Concept oldParentConcept = concept.getParentConcept();
+            
             final Concept newParentConcept = conceptDAO.findByName(parentName);
             boolean hasDescendent = concept.hasDescendent(parentName);
-            conceptDAO.endTransaction();
-
+ 
             /*
              * Make sure that you didn't tyr to add it to a descendant
              */
@@ -581,18 +496,12 @@ public class AddConceptDialog extends javax.swing.JDialog {
             }
             else if (!newParentConcept.equals(oldParentConcept) && !newParentConcept.equals(concept)) {
 
-                conceptDAO.startTransaction();
-
-                oldParentConcept = conceptDAO.merge(oldParentConcept);
-                concept = conceptDAO.merge(concept);
                 if (oldParentConcept != null) {
                     oldParentConcept.removeChildConcept(concept);
-                    conceptDAO.remove(concept);
                 }
 
                 newParentConcept.addChildConcept(concept);
-                History history1 = historyFactory.replaceParentConcept(userAccount, oldParentConcept,
-                    newParentConcept);
+                History history1 = historyFactory.replaceParentConcept(userAccount, oldParentConcept, newParentConcept);
                 concept.getConceptMetadata().addHistory(history1);
                 conceptDAO.persist(history1);
                 conceptDAO.endTransaction();
@@ -607,13 +516,9 @@ public class AddConceptDialog extends javax.swing.JDialog {
                     ((nodcCode == null) && (oldNodcCode != null))) {
                 History history2 = historyFactory.replaceNodcCode(userAccount, oldNodcCode, nodcCode);
 
-                conceptDAO.startTransaction();
-                concept = conceptDAO.merge(concept);
                 concept.getConceptMetadata().addHistory(history2);
                 conceptDAO.persist(history2);
                 concept.setNodcCode(nodcCode);
-                conceptDAO.endTransaction();
-
                 //histories.add(history2);
             }
 
@@ -624,13 +529,9 @@ public class AddConceptDialog extends javax.swing.JDialog {
                     ((rankName == null) && (oldRankName != null))) {
                 History history3 = historyFactory.replaceRankName(userAccount, oldRankName, rankName);
 
-                conceptDAO.startTransaction();
-                concept = conceptDAO.merge(concept);
                 concept.getConceptMetadata().addHistory(history3);
                 concept.setRankName(rankName);
                 conceptDAO.persist(history3);
-                conceptDAO.endTransaction();
-
                 //histories.add(history3);
             }
 
@@ -641,12 +542,9 @@ public class AddConceptDialog extends javax.swing.JDialog {
                     ((rankLevel == null) && (oldRankLevel != null))) {
                 History history4 = historyFactory.replaceRankLevel(userAccount, oldRankLevel, rankLevel);
 
-                conceptDAO.startTransaction();
-                concept = conceptDAO.merge(concept);
                 concept.getConceptMetadata().addHistory(history4);
                 concept.setRankLevel(rankLevel);
                 conceptDAO.persist(history4);
-                conceptDAO.endTransaction();
 
                 //histories.add(history4);
             }
@@ -656,19 +554,12 @@ public class AddConceptDialog extends javax.swing.JDialog {
             if (((reference != null) && !reference.equals(oldReference)) ||
                     ((reference == null) && (oldReference != null))) {
                 History history5 = historyFactory.replaceReference(userAccount, oldReference, reference);
-
-                conceptDAO.startTransaction();
-                concept = conceptDAO.merge(concept);
                 concept.getConceptMetadata().addHistory(history5);
                 concept.setReference(reference);
                 conceptDAO.persist(history5);
-                conceptDAO.endTransaction();
-
                 //histories.add(history5);
             }
 
-            conceptDAO.startTransaction();
-            concept = conceptDAO.merge(concept);
             final String author = authorField.getText();
             final ConceptName primaryName = (ConceptName) concept.getPrimaryConceptName();
             if (isValidString(author)) {

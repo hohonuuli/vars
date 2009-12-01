@@ -284,3 +284,11 @@ UPDATE VideoFrame
     SET LAST_UPDATED_TIME='2009-01-01 00:00:00'
     WHERE LAST_UPDATED_TIME IS NULL
 GO
+
+-- Update my testing password
+UPDATE
+    UserAccount
+SET
+    Password = 'Vzt4WKZEiP+mfOTrYxBcW7HjcC+erlB1'
+WHERE
+    UserName = 'brian'

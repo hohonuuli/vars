@@ -14,7 +14,6 @@
 
 package vars.knowledgebase.ui;
 
-import com.google.inject.Guice;
 import com.google.inject.Injector;
 import foxtrot.Task;
 import foxtrot.Worker;
@@ -48,7 +47,6 @@ import vars.knowledgebase.ui.actions.PopulateDatabaseAction;
 
 /**
  *
- * @version    $Id: KnowledgebaseApp.java 295 2006-07-06 23:47:31Z hohonuuli $
  * @author     <a href="http://www.mbari.org">Monterey Bay Aquarium Research Institute</a>
  */
 public class KnowledgebaseApp {
