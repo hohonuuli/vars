@@ -1,7 +1,9 @@
+-- Association --------------------------------------------------------
 ALTER TABLE Association
 	ADD LAST_UPDATED_TIME DATETIME NULL
 GO
 
+-- CameraData ---------------------------------------------------------
 ALTER TABLE CameraData
     ADD LogDTG DATETIME NULL
 GO
@@ -10,54 +12,153 @@ ALTER TABLE CameraData
     ADD LAST_UPDATED_TIME DATETIME NULL
 GO
 
+ALTER TABLE CameraData
+    ADD X FLOAT
+GO
+
+ALTER TABLE CameraData
+    ADD Y FLOAT
+GO
+
+ALTER TABLE CameraData
+    ADD Z FLOAT
+GO
+
+ALTER TABLE CameraData
+    ADD PITCH FLOAT
+GO
+
+ALTER TABLE CameraData
+    ADD ROLL FLOAT
+GO
+
+ALTER TABLE CameraData
+    ADD XYUNITS VARCHAR(50)
+GO
+
+ALTER TABLE CameraData
+    ADD ZUNITS VARCHAR(50)
+GO
+
+ALTER TABLE CameraData
+    ADD HEADING FLOAT
+GO
+
+-- Enforce the 1:1 relationship between VideoFrame and CameraData tables: TODO Duplicate keys already exist
+ALTER TABLE CameraData
+    ADD CONSTRAINT uc_VideoFrameID_FK UNIQUE (VideoFrameID_FK)
+GO
+
+-- CameraPlatformDeployment -------------------------------------------
 ALTER TABLE CameraPlatformDeployment
     ADD LAST_UPDATED_TIME DATETIME NULL
 GO
 
+-- Concept ------------------------------------------------------------
 ALTER TABLE Concept
     ADD LAST_UPDATED_TIME DATETIME NULL
 GO
 
+UPDATE Concept
+SET ParentConceptID_FK = NULL
+WHERE ParentConceptID_FK = 0
+GO
+
+-- ConceptDelegate ----------------------------------------------------
 ALTER TABLE ConceptDelegate
     ADD LAST_UPDATED_TIME DATETIME NULL
 GO
 
+ALTER TABLE ConceptDelegate -- TODO this filas need to drop ConceptID_indx first then readd it after altering table
+    ALTER COLUMN ConceptID_FK bigint NOT NULL
+GO
+
+ALTER TABLE ConceptDelegate -- TODO this fails
+	ALTER UsageID_FK bigint NOT NULL
+GO
+
+-- Enforce the 1:1 relationship between Concept and ConceptDelegate tables
+ALTER TABLE ConceptDelegate
+    ADD CONSTRAINT uc_ConceptID_FK UNIQUE (ConceptID_FK)
+GO
+
+-- ConceptName --------------------------------------------------------
 ALTER TABLE ConceptName
     ADD LAST_UPDATED_TIME DATETIME NULL
 GO
 
+-- Allow case sensitive comparison. This is needed for the uc_ConceptName constraint to work correctly. 
+-- TODO need to drop any indices on this column first 
+ALTER TABLE ConceptName 
+    ALTER COLUMN ConceptName VARCHAR(50) COLLATE SQL_Latin1_General_CP1_CS_AS
+GO
+
+ALTER TABLE ConceptName -- TODO fails unless case sensitive is added
+    ADD CONSTRAINT uc_ConceptName UNIQUE (ConceptName)
+GO
+
+-- History ------------------------------------------------------------
 ALTER TABLE History
     ADD LAST_UPDATED_TIME DATETIME NULL
 GO
 
+-- Fix up History tabel to our liking
+EXEC dbo.sp_rename N'[dbo].[History].ApprovalDTG' , N'ProcessedDTG', 'COLUMN'
+GO
+
+EXEC dbo.sp_rename N'[dbo].[History].ApproverName' , N'ProcessorName', 'COLUMN'
+GO
+
+EXEC dbo.sp_rename N'[dbo].[History].Rejected' , N'Approved', 'COLUMN'
+GO
+
+-- LinkRealization ----------------------------------------------------
 ALTER TABLE LinkRealization
     ADD LAST_UPDATED_TIME DATETIME NULL
 GO
 
+-- LinkTemplate -------------------------------------------------------
 ALTER TABLE LinkTemplate
     ADD LAST_UPDATED_TIME DATETIME NULL
 GO
 
+-- Media --------------------------------------------------------------
 ALTER TABLE Media
     ADD LAST_UPDATED_TIME DATETIME NULL
 GO
-
+ -- Observation -------------------------------------------------------
 ALTER TABLE Observation
     ADD LAST_UPDATED_TIME DATETIME NULL
 GO
 
+ALTER TABLE Observation
+    ADD X FLOAT NULL
+GO
+
+ALTER TABLE Observation
+    ADD Y FLOAT NULL
+GO
+
+-- PhysicalData -------------------------------------------------------
 ALTER TABLE PhysicalData
     ADD LogDTG DATETIME NULL
 GO
 
+-- Enforce the 1:1 relationship between VideoFrame and CameraData tables. TODO dupliate keys exist
+ALTER TABLE PhysicalData
+    ADD CONSTRAINT uc_VideoFrameID_FK UNIQUE (VideoFrameID_FK)
+GO
+
 ALTER TABLE PhysicalData
     ADD LAST_UPDATED_TIME DATETIME NULL
 GO
 
+-- Usage --------------------------------------------------------------
 ALTER TABLE USAGE
     ADD LAST_UPDATED_TIME DATETIME NULL
 GO
 
+-- UserAccount --------------------------------------------------------
 ALTER TABLE UserAccount
     ADD LAST_UPDATED_TIME DATETIME NULL
 GO
@@ -73,23 +174,31 @@ ALTER TABLE UserAccount
     ADD LastName varchar(50) NULL
 GO
 
+ALTER TABLE UserAccount
+    ADD Email varchar(50)
+GO
+
+-- VideoArchive -------------------------------------------------------
 ALTER TABLE VideoArchive
     ADD LAST_UPDATED_TIME DATETIME NULL
 GO
 
+ALTER TABLE VideoArchive -- TODO dupliate keys exist
+    ADD CONSTRAINT uc_VideoArchiveName UNIQUE (VideoArchiveName)
+GO
+
+-- VideoArchiveSet ----------------------------------------------------
 ALTER TABLE VideoArchiveSet
     ADD LAST_UPDATED_TIME DATETIME NULL
 GO
 
+-- VideoFrame ---------------------------------------------------------
 ALTER TABLE VideoFrame
     ADD LAST_UPDATED_TIME DATETIME NULL
 GO
 
-UPDATE Concept
-SET ParentConceptID_FK = NULL
-WHERE ParentConceptID_FK = 0
-GO
-
+-- --------------------------------------------------------------------
+-- Reset ALL the LAST_UPDATED_TIME fields. This will take a very long time
 UPDATE Association
 	SET LAST_UPDATED_TIME='2009-01-01 00:00:00'
 	WHERE LAST_UPDATED_TIME IS NULL
@@ -175,33 +284,3 @@ UPDATE VideoFrame
     SET LAST_UPDATED_TIME='2009-01-01 00:00:00'
     WHERE LAST_UPDATED_TIME IS NULL
 GO
-
--- Allow case sensitive comparison. This is needed for the uc_ConceptName constraint to work correctly. 
--- May need to drop any indices on this column first
-ALTER TABLE ConceptName 
-    ALTER COLUMN ConceptName VARCHAR(50) COLLATE SQL_Latin1_General_CP1_CS_AS
-GO
-
-ALTER TABLE ConceptName
-    ADD CONSTRAINT uc_ConceptName UNIQUE (ConceptName)
-GO
-
--- Enforce the 1:1 relationship between Concept and ConceptDelegate tables
-ALTER TABLE ConceptDelegate
-    ADD CONSTRAINT uc_ConceptID_FK UNIQUE (ConceptID_FK)
-GO
-
-ALTER TABLE VideoArchive
-    ADD CONSTRAINT uc_VideoArchiveName UNIQUE (VideoArchiveName)
-GO
-
--- Enforce the 1:1 relationship between VideoFrame and CameraData tables
-ALTER TABLE PhysicalData
-    ADD CONSTRAINT uc_VideoFrameID_FK UNIQUE (VideoFrameID_FK)
-GO
-
--- Enforce the 1:1 relationship between VideoFrame and CameraData tables
-ALTER TABLE CameraData
-    ADD CONSTRAINT uc_VideoFrameID_FK UNIQUE (VideoFrameID_FK)
-GO
-

@@ -20,10 +20,13 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import org.mbari.awt.event.ActionAdapter;
@@ -41,11 +44,16 @@ public class SaveQueryResultsAsKMLAction extends ActionAdapter {
     private static final String KEY_IMAGE = "image";
     private static final String KEY_LATITUDE = "latitude";
     private static final String KEY_LONGITUDE = "longitude";
+    private static final String KEY_RECORDEDDATE = "recordeddate";
+    private static final String KEY_DEPTH = "depth";
     private static final Logger log = LoggerFactory.getLogger(SaveQueryResultsAsKMLAction.class);
     private final String databaseUrl;
     private final File file;
     private final String query;
     private final QueryResults queryResults;
+    final DateFormat dateFormatISO = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'") {{
+        setTimeZone(TimeZone.getTimeZone("UTC"));
+    }};
 
     /**
      *
@@ -151,6 +159,8 @@ public class SaveQueryResultsAsKMLAction extends ActionAdapter {
             List<String> conceptNames = (List<String>) resultsMap.get(lowerCaseKeys.get(KEY_CONCEPTNAME));
             List<Number> latitudes = (List<Number>) resultsMap.get(lowerCaseKeys.get(KEY_LATITUDE));
             List<Number> longitudes = (List<Number>) resultsMap.get(lowerCaseKeys.get(KEY_LONGITUDE));
+            List<Date> recordedDates = (List<Date>) resultsMap.get(lowerCaseKeys.get(KEY_RECORDEDDATE));
+            List<Number> depths = (List<Number>) resultsMap.get(lowerCaseKeys.get(KEY_DEPTH));
 
             // Remove those keys 
             lowerCaseKeys.remove(KEY_CONCEPTNAME);
@@ -164,36 +174,36 @@ public class SaveQueryResultsAsKMLAction extends ActionAdapter {
                 sb.append("    <Placemark>\n");    // START PLACEMARK
                 sb.append("      <name>").append(conceptName).append("</name>\n");
 
-                //sb.append("      <styleUrl>#varsStyleMap</styleUrl>\n");
                 sb.append("      <description><![CDATA[\n");    // START DESCRIPTION
 
                 /*
-                 * TODO The descrition content needs to be done generically.
-                 * 1) Retrive keys
+                 * The descrition content needs to be done generically.
+                 * 1) Retrieve keys
                  * 2) Remove keys we've already dealt with (lat, long, conceptname)
                  * 3) Iterate throught the keys
                  * 4) If the key does not contain any content then skip it for that record
                  * 5) Write out the details as a list item. If it starts with HTTP
                  *      then put it in it's own div and create a link to it.
                  */
-
                 for (String key : lowerCaseKeys.keySet()) {
                     Object value = ((List) resultsMap.get(lowerCaseKeys.get(key))).get(i);
                     if (value != null) {
-                        sb.append("        <div>");
-                        String valueString = value.toString();
-                        if (valueString.toLowerCase().startsWith("http://")) {
-                            sb.append("<img src=\"").append(valueString).append("\" />");
-                            styleUrl = "#varsPhotoStyleMap";
-                        }
-                        else if (!key.endsWith("id_fk")) {
-                            sb.append(lowerCaseKeys.get(key)).append(": ").append(valueString);
-                        }
+                        
+                        if (!key.endsWith("id_fk")) {
+                            String valueString = (value instanceof Date) ? dateFormatISO.format(value) : value.toString();
+                            sb.append("        <div>");
+                            if (valueString.toLowerCase().startsWith("http://")) {
+                                sb.append("<img src=\"").append(valueString).append("\" />");
+                                styleUrl = "#varsPhotoStyleMap";
+                            }
+                            else {
+                                sb.append(lowerCaseKeys.get(key)).append(": ").append(valueString);
+                            }
 
-                        sb.append("</div>\n");
+                            sb.append("</div>\n");
+                        }
                     }
                 }
-
 
                 sb.append("      ]]></description>\n");         // END DESCRIPTION
                 sb.append("      <styleUrl>").append(styleUrl).append("</styleUrl>\n");
@@ -201,9 +211,18 @@ public class SaveQueryResultsAsKMLAction extends ActionAdapter {
                 // WRITE POSITION
                 Number latitude = latitudes.get(i);
                 Number longitude = longitudes.get(i);
+                Number depth = (depths == null || depths.get(i) == null) ? 0 : -depths.get(i).floatValue();
                 if ((latitude != null) && (longitude != null)) {
-                    sb.append("      <Point><coordinates>").append(longitude).append(",");
-                    sb.append(latitude).append(",0</coordinates></Point>\n");
+                    sb.append("      <Point><altitudeMode>absolute</altitudeMode><coordinates>").append(longitude).append(",");
+                    sb.append(latitude).append(",").append(depth).append("</coordinates></Point>\n");
+                }
+
+                // Add TimeStamp
+                Date recordedDate = recordedDates.get(i);
+                if (recordedDate != null) {
+                    sb.append("      <TimeStamp>");
+                    sb.append("<when>").append(dateFormatISO.format(recordedDate)).append("</when>");
+                    sb.append("</TimeStamp>\n");
                 }
 
                 sb.append("    </Placemark>\n");    // END PLACEMARK
