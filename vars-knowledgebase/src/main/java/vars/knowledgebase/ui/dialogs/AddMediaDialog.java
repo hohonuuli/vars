@@ -22,7 +22,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Set;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -32,6 +31,8 @@ import org.bushe.swing.event.EventBus;
 import org.mbari.swing.ProgressDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import vars.DAO;
 import vars.UserAccount;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.History;
@@ -40,7 +41,6 @@ import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.Media;
 import vars.knowledgebase.MediaTypes;
-import vars.knowledgebase.ui.KnowledgebaseApp;
 import vars.knowledgebase.ui.Lookup;
 import vars.knowledgebase.ui.MediaViewPanel;
 import vars.knowledgebase.ui.ToolBelt;
@@ -190,8 +190,13 @@ public class AddMediaDialog extends JDialog {
 
         public void actionPerformed(ActionEvent e) {
             setVisible(false);
+            
+            // DAOTX
+            DAO dao = knowledgebaseDAOFactory.newDAO();
+            dao.startTransaction();
 
-            final Concept concept = getConcept();
+            final Concept concept = dao.merge(getConcept());
+            
 
             final ProgressDialog progressDialog = Lookup.getProgressDialog();
             progressDialog.setTitle("VARS - Adding Media");
@@ -230,8 +235,8 @@ public class AddMediaDialog extends JDialog {
 
                 // Make sure that this concept does not already contain a media with the same URL
                 Collection<Media> mediaSet = concept.getConceptMetadata().getMedias();
-                for (Iterator i = mediaSet.iterator(); i.hasNext(); ) {
-                    Media m = (Media) i.next();
+                for (Iterator<Media> i = mediaSet.iterator(); i.hasNext(); ) {
+                    Media m = i.next();
                     if (m.getUrl().equalsIgnoreCase(url.toExternalForm())) {
                         setConcept(null);
                         progressDialog.setVisible(false);
@@ -281,30 +286,23 @@ public class AddMediaDialog extends JDialog {
                 History history = null;
                 try {
                     concept.getConceptMetadata().addMedia(media);
-                    knowledgebaseDAOFactory.newMediaDAO().persist(concept);
+                    dao.persist(media);
 
                     // Build the History
                     final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
                     history = historyFactory.add(userAccount, media);
                     concept.getConceptMetadata().addHistory(history);
-                    knowledgebaseDAOFactory.newHistoryDAO().persist(history);
+                    dao.persist(history);
                     
                     if (userAccount.isAdministrator()) {
-                        approveHistoryTask.approve(userAccount, history);
+                        approveHistoryTask.approve(userAccount, history, dao);
                     }
                 }
                 catch (Exception e1) {
-                    concept.getConceptMetadata().removeMedia(media);
-
-                    if (history != null) {
-                        concept.getConceptMetadata().removeHistory(history);
-                    }
-
                     final String s = "Failed to upate '" + concept.getPrimaryConceptName().getName() +
                                      "' in the database. Removing the media reference to '" + url.toExternalForm() +
                                      "'.";
-                    log.error(s, e1);
-                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR);
+                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, s);
                 }
 
                 progressBar.setString("Refreshing");

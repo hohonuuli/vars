@@ -26,7 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Persistence service implementation for use in Java SE environments. Bascially,
+ * Persistence service implementation for use in Java SE environments. Basically,
  * it's a decorator for EntityManager
  * Use as:
  * <code>

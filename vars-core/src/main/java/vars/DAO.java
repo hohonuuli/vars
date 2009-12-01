@@ -1,7 +1,8 @@
 /*
- * @(#)DAO.java   2009.11.06 at 07:58:58 PST
+ * @(#)DAO.java   2009.11.30 at 11:49:51 PST
  *
  * Copyright 2009 MBARI
+ *
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,13 +19,6 @@ import java.util.List;
 import java.util.Map;
 import javax.persistence.EntityManager;
 
-import javax.persistence.EntityManager;
-
-/**
- *
- * @author brian
- */
-
 /**
  *
  * @author brian
@@ -36,7 +30,7 @@ public interface DAO {
     void endTransaction();
 
     /**
-     * True if the to bojects represnt the same object in the datastore. (e.g.
+     * True if the to objects represent the same object in the datastore. (e.g.
      * It basically compares the primary key)
      * @return
      */
@@ -55,18 +49,20 @@ public interface DAO {
      * @return A list of objects returned by the query.
      */
     List findByNamedQuery(String name, Map<String, Object> namedParameters);
-    
-    <T> T findInDatastore(T object);
 
     <T> T findByPrimaryKey(Class<T> clazz, Object primaryKey);
 
+    <T> T findInDatastore(T object);
+
+    EntityManager getEntityManager();
+
     /**
-     * Many one-to-many relations are lazy loaded in JPA. For convience, this
+     * Many one-to-many relations are lazy loaded in JPA. For convenience, this
      * method will load all lazy relations of an IEntity object. This method has
-     * no effect on objects that are not persistant
+     * no effect on objects that are not persistent
      *
      * @param entity
-     *            The persistent object whos children will be loaded from the
+     *            The persistent object who's children will be loaded from the
      *            database.
      */
     void loadLazyRelations(Object entity);
@@ -74,22 +70,16 @@ public interface DAO {
     <T> T merge(T object);
 
     /**
-     * TODO: Add JavaDoc
      *
      * @param object
      */
     void persist(Object object);
 
     /**
-     * TODO: Add JavaDoc
      *
      * @param object
      */
     void remove(Object object);
 
     void startTransaction();
- 
-    EntityManager getEntityManager();
-    
-    EntityManager getEntityManager();
 }

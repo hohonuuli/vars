@@ -37,6 +37,7 @@ import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import org.bushe.swing.event.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.mbari.swing.ListListModel;
@@ -79,7 +80,6 @@ public class HistoryEditorPanel extends EditorPanel implements ILockableEditor {
     private final ApproveHistoryTask approveHistoryTask;
     private final RejectHistoryTask rejectHistoryTask;
 
-    //~--- constructors -------------------------------------------------------
 
     /**
      * This is the default constructor
@@ -92,7 +92,6 @@ public class HistoryEditorPanel extends EditorPanel implements ILockableEditor {
         rejectHistoryTask = toolBelt.getRejectHistoryTask();
     }
 
-    //~--- get methods --------------------------------------------------------
 
     /**
      * This method initializes acceptButton
@@ -104,12 +103,6 @@ public class HistoryEditorPanel extends EditorPanel implements ILockableEditor {
     }
 
 
-
-    /**
-	 * This method initializes buttonPanel
-	 * @return  javax.swing.JPanel
-	 * @uml.property  name="buttonPanel"
-	 */
     private OkCancelButtonPanel getButtonPanel() {
         if (buttonPanel == null) {
             final OkCancelButtonPanel p = new OkCancelButtonPanel();
@@ -125,7 +118,7 @@ public class HistoryEditorPanel extends EditorPanel implements ILockableEditor {
                     final UserAccount userAccount = getUserAccount();
                     final History history = (History) getHistoryList().getSelectedValue();
                     String name = history.getConceptMetadata().getConcept().getPrimaryConceptName().getName();
-                    approveHistoryTask.approve(userAccount, history);
+                    approveHistoryTask.doTask(userAccount, history);
                     final KnowledgebaseApp app = (KnowledgebaseApp) Lookup.getApplicationDispatcher().getValueObject();
 
                     /*
@@ -140,8 +133,7 @@ public class HistoryEditorPanel extends EditorPanel implements ILockableEditor {
                         // Do nothing
                     }
 
-                    // TODO the refresh should be done by the individual tasks. A full refresh may not always be needed.
-                    app.getKnowledgebaseFrame().refreshTreeAndOpenNode(name);
+                    EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, name);
                 }
                 
             });
@@ -157,7 +149,7 @@ public class HistoryEditorPanel extends EditorPanel implements ILockableEditor {
                     final UserAccount userAccount = getUserAccount();
                     final History history = (History) getHistoryList().getSelectedValue();
                     String name = history.getConceptMetadata().getConcept().getPrimaryConceptName().getName();
-                    rejectHistoryTask.reject(userAccount, history);
+                    rejectHistoryTask.doTask(userAccount, history);
                     final KnowledgebaseApp app = (KnowledgebaseApp) Lookup.getApplicationDispatcher().getValueObject();
 
 /*

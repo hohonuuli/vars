@@ -116,7 +116,7 @@ class NamesEditorPanelController {
         boolean okToProceed = true;
 
         ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
-        KnowledgebasePersistenceService knowledgebaseDAO = toolBelt.getKnowledgebaseDAO();
+        KnowledgebasePersistenceService knowledgebaseDAO = toolBelt.getKnowledgebasePersistenceService();
         KnowledgebaseFactory knowledgebaseFactory = toolBelt.getKnowledgebaseFactory();
 
 

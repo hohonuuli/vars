@@ -42,6 +42,8 @@ import org.mbari.swing.ImageFrame;
 import org.mbari.swing.ListListModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import vars.DAO;
 import vars.UserAccount;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.History;
@@ -249,22 +251,25 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
 
     private class DeleteAction extends ActionAdapter {
 
-        private static final long serialVersionUID = -2240738902892207112L;
-
         public void doAction() {
             final Media media = (Media) getMediaList().getSelectedValue();
             final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+            
+            
             History history = getToolBelt().getHistoryFactory().delete(userAccount, media);
-            final Concept concept = media.getConceptMetadata().getConcept();
+            
+            // DAOTX
+            DAO dao = getToolBelt().getKnowledgebaseDAOFactory().newDAO();
+            Concept concept = media.getConceptMetadata().getConcept();
+            concept = dao.merge(concept);
             concept.getConceptMetadata().addHistory(history);
-            getToolBelt().getKnowledgebaseDAOFactory().newHistoryDAO().persist(history);
+            dao.persist(history);
 
             if (userAccount.isAdministrator()) {
-                getToolBelt().getApproveHistoryTask().approve(userAccount, history);
+                getToolBelt().getApproveHistoryTask().approve(userAccount, history, dao);
             }
 
-            ((KnowledgebaseApp) Lookup.getApplicationFrameDispatcher().getValueObject()).getKnowledgebaseFrame()
-                .refreshTreeAndOpenNode(concept.getPrimaryConceptName().getName());
+            EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, concept.getPrimaryConceptName().getName());
         }
     }
 
@@ -274,7 +279,6 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
      */
     private class NewAction extends ActionAdapter {
 
-        private static final long serialVersionUID = -2681737638703696425L;
         private AddMediaDialog dialog;
 
         public void doAction() {
@@ -299,17 +303,9 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
 
     private class UpdateAction extends ActionAdapter {
 
-        private static final long serialVersionUID = -89011999566883148L;
 
         public void doAction() {
             final Media media = (Media) getMediaList().getSelectedValue();
-
-            // Store old values in case we need to reset the UI on DB Exception
-            final String oldCaption = media.getCaption();
-            final String oldCredit = media.getCredit();
-            final String oldType = media.getType();
-            final String oldUrl = media.getUrl();
-            final boolean oldIsPrimary = media.isPrimary();
 
             // Set the new values
             final MediaViewPanel panel = getMediaViewPanel();
@@ -359,21 +355,18 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
             }
 
             try {
+                // DAOTX
                 MediaDAO mediaDAO = getToolBelt().getKnowledgebaseDAOFactory().newMediaDAO();
+                mediaDAO.startTransaction();
                 mediaDAO.merge(media);
                 mediaDAO.merge(oldPrimaryMedia);
+                mediaDAO.endTransaction();
 
                 // TODO 20070628 brian - verify that this redraws the media table
                 getMediaList().paintImmediately(getMediaList().getBounds());
             }
             catch (Exception e) {
                 log.warn("Failed to update " + media + " in the database", e);
-                media.setCaption(oldCaption);
-                media.setCredit(oldCredit);
-                media.setType(oldType);
-                media.setUrl(oldUrl);
-                media.setPrimary(oldIsPrimary);
-                oldPrimaryMedia.setPrimary(true);
                 EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR,
                                  "Failed to write changes to the database. Rolling back to original values");
             }

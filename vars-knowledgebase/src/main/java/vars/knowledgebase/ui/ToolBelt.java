@@ -59,7 +59,7 @@ public class ToolBelt {
         this.queryDAO = queryDAO;
         historyFactory = new HistoryFactory(knowledgebaseFactory);
         approveHistoryTask = new  ApproveHistoryTask(this);
-        rejectHistoryTask = new RejectHistoryTask(annotationDAOFactory, knowledgebaseDAO, knowledgebaseDAOFactory, knowledgebaseFactory);
+        rejectHistoryTask = new RejectHistoryTask(this);
     }
 
     public AnnotationDAOFactory getAnnotationDAOFactory() {
@@ -78,7 +78,7 @@ public class ToolBelt {
         return historyFactory;
     }
 
-    public KnowledgebasePersistenceService getKnowledgebaseDAO() {
+    public KnowledgebasePersistenceService getKnowledgebasePersistenceService() {
         return knowledgebaseDAO;
     }
 

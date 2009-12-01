@@ -20,7 +20,7 @@ public abstract class AbstractHistoryTask {
      * @param history
      * @return
      */
-    public abstract void doTask(final UserAccount userAccount, final History history, DAO dao);
+    public abstract void doTask(final UserAccount userAccount, final History history);
     
     /**
      * Called when an error occurs where the history is void. Gets rid of the 

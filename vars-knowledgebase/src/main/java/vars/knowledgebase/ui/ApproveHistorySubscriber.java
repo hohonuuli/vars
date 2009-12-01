@@ -44,7 +44,7 @@ public class ApproveHistorySubscriber implements EventTopicSubscriber<History> {
             final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
             try {
                 if ((userAccount != null) && (userAccount.isAdministrator()) && (!history.isProcessed())) {
-                    approveHistoryTask.approve(userAccount, history);
+                    approveHistoryTask.doTask(userAccount, history);
                 }
             }
             catch (Exception e) {

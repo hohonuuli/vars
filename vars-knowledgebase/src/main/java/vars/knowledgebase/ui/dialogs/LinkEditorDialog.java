@@ -38,6 +38,7 @@ import vars.ILink;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptNameTypes;
+import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.LinkTemplate;
 import vars.knowledgebase.SimpleConceptBean;
 import vars.knowledgebase.SimpleConceptNameBean;
