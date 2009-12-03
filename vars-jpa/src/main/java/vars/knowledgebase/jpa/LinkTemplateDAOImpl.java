@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.ArrayList;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 import com.google.inject.Inject;
 import javax.persistence.EntityManager;
 
@@ -31,41 +33,46 @@ public class LinkTemplateDAOImpl extends DAO implements LinkTemplateDAO {
         this.conceptDAO = new ConceptDAOImpl(entityManager);
     }
 
-    public Collection<LinkTemplate> findAllByLinkFields(String linkName, String toConcept, String linkValue) {
+    @SuppressWarnings("unchecked")
+	public Collection<LinkTemplate> findAllByLinkFields(String linkName, String toConcept, String linkValue) {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("linkName", linkName);
         params.put("toConcept", toConcept);
         params.put("linkValue", linkValue);
-        return findByNamedQuery("LinkTemplate.findByFields", params);
+        return (Collection<LinkTemplate>) findByNamedQuery("LinkTemplate.findByFields", params);
     }
 
-    public Collection<LinkTemplate> findAllByLinkName(String linkName) {
+    @SuppressWarnings("unchecked")
+	public Collection<LinkTemplate> findAllByLinkName(String linkName) {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("linkName", linkName);
-        return findByNamedQuery("LinkTemplate.findByLinkName", params);
+        return (Collection<LinkTemplate>) findByNamedQuery("LinkTemplate.findByLinkName", params);
     }
 
-    public Collection<LinkTemplate> findAllByLinkName(String linkName, Concept concept) {
-        Map<String, Object> params = new HashMap<String, Object>();
-        params.put("linkName", linkName);
-        Collection<LinkTemplate> linkTemplates0 = findByNamedQuery("LinkTemplate.findByLinkName", params);
-        Collection<LinkTemplate> linkTemplates = new ArrayList<LinkTemplate>();
-        for (LinkTemplate linkTemplate : linkTemplates0) {
-            // TODO FInish implementation
-        }
-        return linkTemplates;
-
+    /**
+     * Find {@link LinkTemplate}s containing 'linkName' that are applicable to the 
+     * provided concept. You should call this within a transaction
+     */
+    public Collection<LinkTemplate> findAllByLinkName(final String linkName, Concept concept) {
+    	
+    	Collection<LinkTemplate> linkTemplates = findAllApplicableToConcept(concept);
+    	return Collections2.filter(linkTemplates, new Predicate<LinkTemplate>() {
+        	public boolean apply(LinkTemplate linkTemplate) {
+        		return linkTemplate.getLinkName().equals(linkName);
+        	}
+		});
     }
 
+    /**
+     * Call this inside a transaction
+     */
     public Collection<LinkTemplate> findAllApplicableToConcept(Concept concept) {
 
         Collection<LinkTemplate> linkTemplates = new ArrayList<LinkTemplate>();
-        startTransaction();
         while (concept != null) {
             linkTemplates.addAll(concept.getConceptMetadata().getLinkTemplates());
             concept = concept.getParentConcept();
         }
-        endTransaction();
 
         return linkTemplates;
     }

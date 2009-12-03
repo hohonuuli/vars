@@ -148,7 +148,7 @@ public class HistoryImpl implements Serializable, History, JPAEntity {
     }
 
     public Boolean isApproved() {
-        return approved == 1;
+        return isProcessed() ? approved == 1 : false;
     }
 
     public boolean isDelete() {
@@ -160,7 +160,7 @@ public class HistoryImpl implements Serializable, History, JPAEntity {
     }
 
     public boolean isRejected() {
-        return !isApproved();
+        return isProcessed() ? !isApproved() : false;
     }
 
     public boolean isProcessed() {

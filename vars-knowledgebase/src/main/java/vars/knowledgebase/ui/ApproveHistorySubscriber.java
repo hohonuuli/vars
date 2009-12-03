@@ -1,7 +1,8 @@
 /*
- * @(#)ApproveHistorySubscriber.java   2009.11.09 at 03:36:36 PST
+ * @(#)ApproveHistorySubscriber.java   2009.12.02 at 10:00:44 PST
  *
  * Copyright 2009 MBARI
+ *
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -39,9 +40,16 @@ public class ApproveHistorySubscriber implements EventTopicSubscriber<History> {
         this.approveHistoryTask = approveHistoryTask;
     }
 
+    /**
+     *
+     * @param topic
+     * @param history
+     */
     public void onEvent(String topic, History history) {
         if (Lookup.TOPIC_APPROVE_HISTORY.equals(topic)) {
             final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+
+
             try {
                 if ((userAccount != null) && (userAccount.isAdministrator()) && (!history.isProcessed())) {
                     approveHistoryTask.doTask(userAccount, history);
@@ -51,6 +59,7 @@ public class ApproveHistorySubscriber implements EventTopicSubscriber<History> {
                 EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
             }
             finally {
+
                 EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE,
                                  history.getConceptMetadata().getConcept().getPrimaryConceptName().getName());
             }

@@ -25,6 +25,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Vector;
+
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JLabel;
@@ -32,6 +34,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
@@ -82,7 +85,6 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
         if (buttonPanel == null) {
             buttonPanel = new EditorButtonPanel();
 
-            // TODO 20060606 brian: ECLIPSE VE Chokes when the following three lines are uncommented
             buttonPanel.getNewButton().addActionListener(new NewAction());
             buttonPanel.getUpdateButton().addActionListener(new UpdateAction());
             buttonPanel.getDeleteButton().addActionListener(new DeleteAction());
@@ -95,7 +97,7 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
     private JList getMediaList() {
         if (mediaList == null) {
             mediaList = new JList();
-            mediaList.setModel(new ListListModel(Collections.synchronizedList(new ArrayList())));
+            mediaList.setModel(new ListListModel(new Vector()));
             mediaList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             mediaList.addListSelectionListener(new ListSelectionListener() {
 
@@ -255,21 +257,17 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
             final Media media = (Media) getMediaList().getSelectedValue();
             final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
             
-            
             History history = getToolBelt().getHistoryFactory().delete(userAccount, media);
             
             // DAOTX
             DAO dao = getToolBelt().getKnowledgebaseDAOFactory().newDAO();
-            Concept concept = media.getConceptMetadata().getConcept();
-            concept = dao.merge(concept);
+            dao.startTransaction();
+            Concept concept = dao.find(media.getConceptMetadata().getConcept());
             concept.getConceptMetadata().addHistory(history);
             dao.persist(history);
+            dao.endTransaction();
 
-            if (userAccount.isAdministrator()) {
-                getToolBelt().getApproveHistoryTask().approve(userAccount, history, dao);
-            }
-
-            EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, concept.getPrimaryConceptName().getName());
+            EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
         }
     }
 
@@ -294,6 +292,7 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
             if (dialog == null) {
                 final Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
                 dialog = new AddMediaDialog(frame, getToolBelt());
+                dialog.setLocationRelativeTo(frame);
             }
 
             return dialog;
@@ -305,7 +304,12 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
 
 
         public void doAction() {
-            final Media media = (Media) getMediaList().getSelectedValue();
+
+            // DAOTX
+            DAO dao = getToolBelt().getKnowledgebaseDAOFactory().newDAO();
+            dao.startTransaction();
+
+            final Media media = dao.find((Media) getMediaList().getSelectedValue());
 
             // Set the new values
             final MediaViewPanel panel = getMediaViewPanel();
@@ -353,23 +357,10 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
                     oldPrimaryMedia.setPrimary(false);
                 }
             }
+            dao.endTransaction();
 
-            try {
-                // DAOTX
-                MediaDAO mediaDAO = getToolBelt().getKnowledgebaseDAOFactory().newMediaDAO();
-                mediaDAO.startTransaction();
-                mediaDAO.merge(media);
-                mediaDAO.merge(oldPrimaryMedia);
-                mediaDAO.endTransaction();
+            getMediaList().paintImmediately(getMediaList().getBounds());
 
-                // TODO 20070628 brian - verify that this redraws the media table
-                getMediaList().paintImmediately(getMediaList().getBounds());
-            }
-            catch (Exception e) {
-                log.warn("Failed to update " + media + " in the database", e);
-                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR,
-                                 "Failed to write changes to the database. Rolling back to original values");
-            }
         }
     }
 

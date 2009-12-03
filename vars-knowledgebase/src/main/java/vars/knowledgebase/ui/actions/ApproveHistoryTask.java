@@ -144,11 +144,18 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
      * @param userAccount
      * @param history
      */
-    public void doTask(final UserAccount userAccount, final History history) {
+    public void doTask(final UserAccount userAccount, History history) {
         DAO dao = toolBelt.getKnowledgebaseDAOFactory().newDAO();
 
         try {
             dao.startTransaction();
+            // Bring History into transaction
+            try {
+            	history = dao.merge(history);
+            }
+            catch (Exception e) {
+            	history = dao.find(history);
+            }
             approve(userAccount, history, dao);
         }
         catch (Exception e) {
@@ -165,7 +172,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
         /**
          *
          * @param userAccount
-         * @param history
+         * @param history Should already be part of the dao's transaction
          * @param dao
          */
         public void approve(final UserAccount userAccount, History history, DAO dao) {
@@ -175,8 +182,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
              */
             String nameToDelete = history.getOldValue();
 
-            history = dao.merge(history);
-
+            // DAOTX
             final Concept parentConcept = history.getConceptMetadata().getConcept();
             final Collection<Concept> children = new ArrayList<Concept>(parentConcept.getChildConcepts());
             Concept concept = null;
@@ -283,7 +289,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
         /**
          *
          * @param userAccount
-         * @param history
+         * @param history Should already be part of the dao's transaction
          * @param dao
          */
         @Override
@@ -294,8 +300,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
             if (canDo(userAccount, history)) {
 
                 final Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
-                final int option = JOptionPane
-                    .showConfirmDialog(
+                final int option = JOptionPane.showConfirmDialog(
                         frame, "Are you sure you want to delete '" + conceptNameToDelete +
                         "' ? Be aware that this will change existing annotations that use it.", "VARS - Delete ConceptName", JOptionPane
                             .YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
@@ -308,10 +313,8 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
             }
 
             /*
-         * Bring objects into persistence transaction
-         */
-            history = dao.merge(history);
-
+	         * DAOTX Bring objects into persistence transaction
+	         */
             final Concept concept = history.getConceptMetadata().getConcept();
 
             /*
@@ -367,7 +370,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
         /**
          *
          * @param userAccount
-         * @param history
+         * @param history Should already be part of the dao's transaction
          * @param dao
          */
         @Override
@@ -379,8 +382,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
                  * Confirm that we really want to do this
                  */
                 final Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
-                final int option = JOptionPane
-                    .showConfirmDialog(
+                final int option = JOptionPane.showConfirmDialog(
                         frame, "Are you sure you want to delete '" + history.getOldValue() +
                         "' ? Be aware that this will not effect existing annotations that use it.", "VARS - Delete LinkRealization", JOptionPane
                             .YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
@@ -398,8 +400,6 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
                 exampleRealization.setLinkValue(link.getLinkValue());
 
                 // DAOTX
-                history = dao.merge(history);
-
                 final ConceptMetadata conceptMetadata = history.getConceptMetadata();
 
                 /*
@@ -433,7 +433,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
         /**
          *
          * @param userAccount
-         * @param history
+         * @param history Should already be part of the dao's transaction
          * @param dao
          */
         @Override
@@ -445,8 +445,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
                  * Confirm that we really want to do this
                  */
                 final Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
-                final int option = JOptionPane
-                    .showConfirmDialog(
+                final int option = JOptionPane.showConfirmDialog(
                         frame, "Are you sure you want to delete '" + history.getOldValue() +
                         "' ? Be aware that this will not effect existing annotations that use it.", "VARS - Delete LinkTemplate", JOptionPane
                             .YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
@@ -464,8 +463,6 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
                 exampleTemplate.setLinkValue(link.getLinkValue());
 
                 // DAOTX
-                history = dao.merge(history);
-
                 final ConceptMetadata conceptMetadata = history.getConceptMetadata();
 
                 /*
@@ -497,7 +494,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
         /**
          *
          * @param userAccount
-         * @param history
+         * @param history Should already be part of the dao's transaction
          * @param dao
          */
         @Override
@@ -517,8 +514,6 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
                 }
 
                 // DAOTX
-                history = dao.merge(history);
-
                 final ConceptMetadata conceptMetadata = history.getConceptMetadata();
 
                 /*
@@ -565,10 +560,8 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
          * @param dao
          */
         public void approve(UserAccount userAccount, History history, DAO dao) {
-            history = dao.merge(history);
 
             if (canDo(userAccount, history)) {
-                history = dao.findInDatastore(history);
                 history.setProcessedDate(new Date());
                 history.setProcessorName(userAccount.getUserName());
                 history.setApproved(Boolean.TRUE);

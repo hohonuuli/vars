@@ -30,7 +30,7 @@ public abstract class AbstractHistoryTask {
      */
     protected void dropHistory(History h, final String msg, DAO dao) {
         EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, msg);
-        h = dao.findInDatastore(h);
+        h = dao.find(h);
         final ConceptMetadata conceptMetadata = h.getConceptMetadata();
         conceptMetadata.removeHistory(h);
         dao.remove(h);

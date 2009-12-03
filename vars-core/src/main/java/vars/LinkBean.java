@@ -30,14 +30,14 @@ public class LinkBean implements ILink {
 
         if (tokens.length == 3) {
             linkName = tokens[0];
-            linkValue = tokens[1];
-            toConcept = tokens[2];
+            toConcept = tokens[1];
+            linkValue = tokens[2];
         }
         else if (tokens.length == 4){
             fromConcept = tokens[0];
             linkName = tokens[1];
-            linkValue = tokens[2];
-            toConcept = tokens[3];
+            toConcept = tokens[2];
+            linkValue = tokens[3];
         }
         else {
             throw new IllegalArgumentException("Argument " +  stringRepresentation +

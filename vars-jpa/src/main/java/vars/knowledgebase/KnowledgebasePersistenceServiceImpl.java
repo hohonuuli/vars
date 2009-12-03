@@ -55,7 +55,7 @@ public class KnowledgebasePersistenceServiceImpl extends QueryableImpl implement
         Collection<ConceptName> conceptNames = new ArrayList<ConceptName>(concept.getConceptNames());
         conceptNames.remove(concept.getPrimaryConceptName());
 
-        for (ConceptName conceptName : concept.getConceptNames()) {
+        for (ConceptName conceptName : conceptNames) {
 
             // Update Observations
             String sql = "UPDATE Observation SET ConceptName = '" +

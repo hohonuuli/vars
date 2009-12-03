@@ -1,7 +1,8 @@
 /*
- * @(#)AddMediaDialog.java   2009.10.07 at 10:57:02 PDT
+ * @(#)AddMediaDialog.java   2009.12.02 at 04:00:15 PST
  *
  * Copyright 2009 MBARI
+ *
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,14 +15,16 @@
 
 package vars.knowledgebase.ui.dialogs;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 import java.awt.BorderLayout;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -31,7 +34,6 @@ import org.bushe.swing.event.EventBus;
 import org.mbari.swing.ProgressDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import vars.DAO;
 import vars.UserAccount;
 import vars.knowledgebase.Concept;
@@ -44,7 +46,6 @@ import vars.knowledgebase.MediaTypes;
 import vars.knowledgebase.ui.Lookup;
 import vars.knowledgebase.ui.MediaViewPanel;
 import vars.knowledgebase.ui.ToolBelt;
-import vars.knowledgebase.ui.actions.ApproveHistoryTask;
 import vars.shared.ui.OkCancelButtonPanel;
 
 /**
@@ -60,7 +61,6 @@ public class AddMediaDialog extends JDialog {
     private JPanel jContentPane = null;
     private MediaViewPanel mediaViewPanel = null;
     private final Logger log = LoggerFactory.getLogger(getClass());
-    private final ApproveHistoryTask approveHistoryTask;
     private Concept concept;
     private final HistoryFactory historyFactory;
     private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
@@ -68,16 +68,13 @@ public class AddMediaDialog extends JDialog {
 
     /**
      * @param owner
-     * @param approveHistoryTask
-     * @param knowledgebaseDAOFactory
-     * @param knowledgebaseFactory
+     * @param toolBelt
      */
     public AddMediaDialog(Frame owner, ToolBelt toolBelt) {
         super(owner);
         this.knowledgebaseDAOFactory = toolBelt.getKnowledgebaseDAOFactory();
         this.knowledgebaseFactory = toolBelt.getKnowledgebaseFactory();
         this.historyFactory = toolBelt.getHistoryFactory();
-        this.approveHistoryTask = toolBelt.getApproveHistoryTask();
         initialize();
     }
 
@@ -151,6 +148,7 @@ public class AddMediaDialog extends JDialog {
 
                 void update() {
                     String text = mediaViewPanel.getUrlField().getText();
+
                     getButtonPanel().getOkButton().setEnabled((getConcept() != null) && (text != null) &&
                             (text.length() > 5));
                 }
@@ -176,11 +174,14 @@ public class AddMediaDialog extends JDialog {
      */
     public void setConcept(Concept concept) {
         final MediaViewPanel p = getMediaViewPanel();
+
         p.getCaptionArea().setText(null);
         p.getCreditArea().setText(null);
         p.getTypeComboBox().setSelectedIndex(0);
         p.getUrlField().setText(null);
+
         final boolean locked = (concept == null);
+
         p.setLocked(locked);
         getButtonPanel().getOkButton().setEnabled(concept != null);
         this.concept = concept;
@@ -188,35 +189,45 @@ public class AddMediaDialog extends JDialog {
 
     private class OkActionListener implements ActionListener {
 
+        /**
+         *
+         * @param e
+         */
         public void actionPerformed(ActionEvent e) {
             setVisible(false);
-            
+
             // DAOTX
             DAO dao = knowledgebaseDAOFactory.newDAO();
+
             dao.startTransaction();
 
-            final Concept concept = dao.merge(getConcept());
-            
+            final Concept concept = dao.find(getConcept());
+
 
             final ProgressDialog progressDialog = Lookup.getProgressDialog();
+
             progressDialog.setTitle("VARS - Adding Media");
+
             final JProgressBar progressBar = progressDialog.getProgressBar();
+
             progressBar.setMinimum(0);
             progressBar.setMaximum(3);
             progressBar.setIndeterminate(true);
             progressBar.setString("Searching for media");
             progressDialog.setVisible(true);
 
-
             final MediaViewPanel p = getMediaViewPanel();
 
             boolean isUrlValid = false;
 
             URL url = null;
+
             try {
                 url = new URL(p.getUrlField().getText());
+
                 final InputStream in = url.openStream();
                 final int b = in.read();
+
                 isUrlValid = (b > -1);
 
                 if (!isUrlValid) {
@@ -225,6 +236,7 @@ public class AddMediaDialog extends JDialog {
             }
             catch (Exception e1) {
                 final String s = "Failed to open URL, " + p.getUrlField().getText();
+
                 EventBus.publish(Lookup.TOPIC_WARNING, s);
                 log.warn(s, e1);
             }
@@ -234,41 +246,50 @@ public class AddMediaDialog extends JDialog {
             if (isUrlValid) {
 
                 // Make sure that this concept does not already contain a media with the same URL
-                Collection<Media> mediaSet = concept.getConceptMetadata().getMedias();
-                for (Iterator<Media> i = mediaSet.iterator(); i.hasNext(); ) {
-                    Media m = i.next();
-                    if (m.getUrl().equalsIgnoreCase(url.toExternalForm())) {
-                        setConcept(null);
-                        progressDialog.setVisible(false);
-                        EventBus.publish(Lookup.TOPIC_WARNING,
-                                         "A media with the URL, '" + url.toExternalForm() +
-                                         "', was already found in '" + concept.getPrimaryConceptName().getName() +
-                                         "'.");
+                final URL fUrl = url;
+                Collection<Media> mediaSet = new ArrayList<Media>(concept.getConceptMetadata().getMedias());
+                Collection<Media> matchingMedia = Collections2.filter(mediaSet, new Predicate<Media>() {
 
-                        return;
+                    public boolean apply(Media input) {
+                        return input.getUrl().equals(fUrl.toExternalForm());
                     }
+
+                });
+
+                if (matchingMedia.size() > 0) {
+                    setConcept(null);
+                    progressDialog.setVisible(false);
+                    EventBus.publish(Lookup.TOPIC_WARNING,
+                                     "A media with the URL, '" + url.toExternalForm() + "', was already found in '" +
+                                     concept.getPrimaryConceptName().getName() + "'.");
                 }
+
 
                 progressBar.setString("Building data");
                 progressBar.setValue(1);
 
                 // Build the Media
                 Media media = knowledgebaseFactory.newMedia();
+
                 media.setUrl(url.toExternalForm());
                 media.setCaption(p.getCaptionArea().getText());
                 media.setCredit(p.getCreditArea().getText());
+
                 final String type = (String) p.getTypeComboBox().getSelectedItem();
+
                 media.setType(type);
 
-                /**
+                /*
                  * Each concept can only have a single primary media for each media type
                  *  i.e. only 1 primary image, 1 primary movie and 1 primary icon
                  */
                 boolean isPrimary = p.getPrimaryCheckBox().isSelected();
+
                 media.setPrimary(isPrimary);
 
                 if (isPrimary) {
                     final Media primaryMedia = concept.getConceptMetadata().getPrimaryMedia(MediaTypes.getType(type));
+
                     if (primaryMedia != null) {
                         log.info("You are adding a primary media of '" + media.getUrl() + "' to " +
                                  concept.getPrimaryConceptName().getName() +
@@ -284,29 +305,34 @@ public class AddMediaDialog extends JDialog {
 
                 // Update the database
                 History history = null;
+
                 try {
                     concept.getConceptMetadata().addMedia(media);
                     dao.persist(media);
 
                     // Build the History
                     final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+
                     history = historyFactory.add(userAccount, media);
                     concept.getConceptMetadata().addHistory(history);
                     dao.persist(history);
-                    
-                    if (userAccount.isAdministrator()) {
-                        approveHistoryTask.approve(userAccount, history, dao);
-                    }
+
                 }
                 catch (Exception e1) {
                     final String s = "Failed to upate '" + concept.getPrimaryConceptName().getName() +
                                      "' in the database. Removing the media reference to '" + url.toExternalForm() +
                                      "'.";
+
                     EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, s);
+                }
+                finally {
+                    dao.endTransaction();
                 }
 
                 progressBar.setString("Refreshing");
                 progressBar.setValue(3);
+
+                EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
 
             }
 

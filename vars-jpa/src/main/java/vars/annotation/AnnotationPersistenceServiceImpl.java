@@ -208,7 +208,11 @@ public class AnnotationPersistenceServiceImpl extends QueryableImpl implements A
     
     public Collection<LinkTemplate> findLinkTemplatesFor(Concept concept) {
         LinkTemplateDAO dao = new LinkTemplateDAOImpl(getReadOnlyEntityManager());
-        return dao.findAllApplicableToConcept(concept);
+        dao.startTransaction();
+        concept = dao.find(concept);
+        Collection<LinkTemplate> linkTemplates = dao.findAllApplicableToConcept(concept);
+        dao.endTransaction();
+        return linkTemplates;
     }
     
     /**

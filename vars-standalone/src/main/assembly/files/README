@@ -1,0 +1,7 @@
+-- Example for obtaining a DAO object in the Groovy shell
+
+import vars.knowledgebase.ui.Lookup
+import vars.knowledgebase.ui.ToolBelt
+injector = Lookup.guiceInjectorDispatcher.valueObject
+toolBelt = injector.getInstance(ToolBelt.class)                           
+dao = toolBelt.knowledgebaseDAOFactory.newDAO()

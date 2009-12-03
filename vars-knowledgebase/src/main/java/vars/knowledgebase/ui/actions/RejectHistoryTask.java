@@ -1,5 +1,5 @@
 /*
- * @(#)RejectHistoryTask.java   2009.11.30 at 04:29:39 PST
+ * @(#)RejectHistoryTask.java   2009.12.02 at 09:46:45 PST
  *
  * Copyright 2009 MBARI
  *
@@ -134,11 +134,19 @@ public class RejectHistoryTask extends AbstractHistoryTask {
      * @param userAccount
      * @param history
      */
-    public void doTask(final UserAccount userAccount, final History history) {
+    public void doTask(final UserAccount userAccount, History history) {
         DAO dao = toolBelt.getKnowledgebaseDAOFactory().newDAO();
 
         try {
             dao.startTransaction();
+
+            try {
+                history = dao.merge(history);
+            }
+            catch (Exception e) {
+                history = dao.find(history);
+            }
+
             reject(userAccount, history, dao);
         }
         catch (Exception e) {
@@ -201,7 +209,7 @@ public class RejectHistoryTask extends AbstractHistoryTask {
         /**
          *
          * @param userAccount
-         * @param history
+         * @param history Should already be part of the dao's transaction
          * @param dao
          */
         @Override
@@ -216,7 +224,6 @@ public class RejectHistoryTask extends AbstractHistoryTask {
             /*
              * Verify that the concept name still exists in the knowledgebase
              */
-            history = dao.findInDatastore(history);
 
             final String name = history.getNewValue();
 
@@ -297,7 +304,7 @@ public class RejectHistoryTask extends AbstractHistoryTask {
         /**
          *
          * @param userAccount
-         * @param history
+         * @param history Should already be part of the dao's transaction
          * @param dao
          */
         @Override
@@ -305,8 +312,6 @@ public class RejectHistoryTask extends AbstractHistoryTask {
             if (!canDo(userAccount, history)) {
                 return;
             }
-
-            history = dao.findInDatastore(history);
 
             final String rejectedName = history.getNewValue();
 
@@ -412,7 +417,7 @@ public class RejectHistoryTask extends AbstractHistoryTask {
         /**
          *
          * @param userAccount
-         * @param history
+         * @param history Should already be part of the dao's transaction
          * @param dao
          */
         @Override
@@ -423,7 +428,6 @@ public class RejectHistoryTask extends AbstractHistoryTask {
             }
 
             // DAOTX
-            history = dao.findInDatastore(history);
 
             // Convenient means to parse the string stored in the history
             final LinkBean linkBean = new LinkBean(history.getNewValue());
@@ -474,7 +478,7 @@ public class RejectHistoryTask extends AbstractHistoryTask {
         /**
          *
          * @param userAccount
-         * @param history
+         * @param history Should already be part of the dao's transaction
          * @param dao
          */
         @Override
@@ -484,7 +488,6 @@ public class RejectHistoryTask extends AbstractHistoryTask {
             }
 
             // DAOTX
-            history = dao.findInDatastore(history);
 
             // Convenient means to parse the string stored in the history
             final LinkBean linkBean = new LinkBean(history.getNewValue());
@@ -537,27 +540,27 @@ public class RejectHistoryTask extends AbstractHistoryTask {
         /**
          *
          * @param userAccount
-         * @param aHistory
+         * @param history
          * @param dao
          */
         @Override
-        public void reject(UserAccount userAccount, History aHistory, DAO dao) {
-            if (canDo(userAccount, aHistory)) {
+        public void reject(UserAccount userAccount, History history, DAO dao) {
+            if (canDo(userAccount, history)) {
 
                 MediaDAO mediaDAO = toolBelt.getKnowledgebaseDAOFactory().newMediaDAO();
 
                 mediaDAO.startTransaction();
 
-                final History history = mediaDAO.merge(aHistory);
                 ConceptMetadata conceptMetadata = history.getConceptMetadata();
 
                 // Iterate on copy to avoid threading issues
                 final Set<Media> mediaSet = new HashSet<Media>(conceptMetadata.getMedias());
 
+                final History aHistory = history;
                 final Collection<Media> matches = Collections2.filter(mediaSet, new Predicate<Media>() {
 
                     public boolean apply(Media input) {
-                        return input.getUrl().equals(history.getNewValue());
+                        return input.getUrl().equals(aHistory.getNewValue());
                     }
 
                 });
@@ -595,7 +598,6 @@ public class RejectHistoryTask extends AbstractHistoryTask {
          */
         public void reject(final UserAccount userAccount, History history, DAO dao) {
             if (canDo(userAccount, history)) {
-                history = dao.findInDatastore(history);
                 history.setProcessedDate(new Date());
                 history.setApproved(Boolean.FALSE);
                 history.setProcessorName(userAccount.getUserName());
@@ -609,12 +611,11 @@ public class RejectHistoryTask extends AbstractHistoryTask {
         /**
          *
          * @param userAccount
-         * @param history
+         * @param history Should already be part of the dao's transaction
          * @param dao
          */
         @Override
         public void reject(UserAccount userAccount, History history, DAO dao) {
-            history = dao.findInDatastore(history);
 
             if (canDo(userAccount, history)) {
 
@@ -684,7 +685,6 @@ public class RejectHistoryTask extends AbstractHistoryTask {
         @Override
         public void reject(UserAccount userAccount, History history, DAO dao) {
             if (canDo(userAccount, history)) {
-                history = dao.findInDatastore(history);
 
                 final Concept concept = history.getConceptMetadata().getConcept();
                 String currentValue = concept.getNodcCode();
@@ -713,13 +713,12 @@ public class RejectHistoryTask extends AbstractHistoryTask {
         /**
          *
          * @param userAccount
-         * @param history
+         * @param history Should already be part of the dao's transaction
          * @param dao
          */
         @Override
         public void reject(UserAccount userAccount, History history, DAO dao) {
             if (canDo(userAccount, history)) {
-                history = dao.findInDatastore(history);
 
                 final ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO(
                     dao.getEntityManager());
@@ -831,12 +830,11 @@ public class RejectHistoryTask extends AbstractHistoryTask {
         /**
          *
          * @param userAccount
-         * @param history
+         * @param history Should already be part of the dao's transaction
          * @param dao
          */
         @Override
         public void reject(UserAccount userAccount, History history, DAO dao) {
-            history = dao.findInDatastore(history);
 
             if (canDo(userAccount, history)) {
                 final Concept concept = history.getConceptMetadata().getConcept();
@@ -866,12 +864,11 @@ public class RejectHistoryTask extends AbstractHistoryTask {
         /**
          *
          * @param userAccount
-         * @param history
+         * @param history Should already be part of the dao's transaction
          * @param dao
          */
         @Override
         public void reject(UserAccount userAccount, History history, DAO dao) {
-            history = dao.findInDatastore(history);
 
             if (canDo(userAccount, history)) {
                 final Concept concept = history.getConceptMetadata().getConcept();
@@ -901,12 +898,11 @@ public class RejectHistoryTask extends AbstractHistoryTask {
         /**
          *
          * @param userAccount
-         * @param history
+         * @param history Should already be part of the dao's transaction
          * @param dao
          */
         @Override
         public void reject(UserAccount userAccount, History history, DAO dao) {
-            history = dao.findInDatastore(history);
 
             if (canDo(userAccount, history)) {
                 final Concept concept = history.getConceptMetadata().getConcept();

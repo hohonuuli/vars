@@ -220,7 +220,7 @@ public class KnowledgebaseApp {
 
     /**
      * Do NOT initialize a log until the 'user.timezone' property has been
-     * set or you will not be able to stroe dates in the UTC timezone! This
+     * set or you will not be able to store dates in the UTC timezone! This
      */
     private static Logger getLog() {
         if (log == null) {
@@ -247,7 +247,7 @@ public class KnowledgebaseApp {
         splashFrame.repaint();
 
         /*
-         * Load the KB in a seperate thread so the UI remains responsive.
+         * Load the KB in a separate thread so the UI remains responsive.
          */
         try {
             Worker.post(new Task() {

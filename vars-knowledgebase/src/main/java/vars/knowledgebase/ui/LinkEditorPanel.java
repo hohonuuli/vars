@@ -442,7 +442,8 @@ public class LinkEditorPanel extends javax.swing.JPanel implements ILockableEdit
     /**
      * @param concept  the concept to set
      */
-    public void setConcept(Concept concept) {
+    @SuppressWarnings("unchecked")
+	public void setConcept(Concept concept) {
 
         log.info("Retrieveing LinkTemplates from " + concept);
 
@@ -465,8 +466,13 @@ public class LinkEditorPanel extends javax.swing.JPanel implements ILockableEdit
         List<ILink> linkTemplates = (List<ILink>) Worker.post(new Job() {
 
             public Object run() {
+            	// DAOTX
                 LinkTemplateDAO linkTemplateDAO = toolBelt.getKnowledgebaseDAOFactory().newLinkTemplateDAO();
-                return new Vector<ILink>(linkTemplateDAO.findAllApplicableToConcept(fConcept));
+                linkTemplateDAO.startTransaction();
+                Concept daoConcept = linkTemplateDAO.find(fConcept);
+                List<ILink> links = new Vector<ILink>(linkTemplateDAO.findAllApplicableToConcept(daoConcept));
+                linkTemplateDAO.endTransaction();
+                return links;
             }
 
         });
@@ -542,8 +548,8 @@ public class LinkEditorPanel extends javax.swing.JPanel implements ILockableEdit
 
                 /*
                  * In case the database lookup fails will create a Concept
-                 * objecdt so that the GUI continues to function in a
-                 * predicatable manner
+                 * object so that the GUI continues to function in a
+                 * predictable manner
                  */
                 KnowledgebaseFactory knowledgebaseFactory = toolBelt.getKnowledgebaseFactory();
                 toConcept = knowledgebaseFactory.newConcept();
@@ -576,7 +582,6 @@ public class LinkEditorPanel extends javax.swing.JPanel implements ILockableEdit
 
     /**
          * @param locked  the locked to set
-         * @uml.property  name="locked"
          */
     public void setLocked(boolean locked) {
         this.locked = locked;

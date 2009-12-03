@@ -169,13 +169,11 @@ public class LinkTemplateEditorPanel extends EditorPanel {
                         DAO dao = getToolBelt().getKnowledgebaseDAOFactory().newDAO();
                         dao.startTransaction();
                         /*
-                         * Don't merge linkTemplate as it may have been modified in the history appoval
+                         * Don't merge linkTemplate as it may have been modified in the history approval
                          * process. Instead let's just find it in the database
                          */
-                        linkTemplate = dao.findInDatastore(linkTemplate); 
+                        linkTemplate = dao.find(linkTemplate); 
                         ConceptMetadata conceptMetadata = linkTemplate.getConceptMetadata();
-                        //conceptMetadata.removeLinkTemplate(linkTemplate);
-                        //dao.remove(linkTemplate);
                         final History history = getToolBelt().getHistoryFactory().delete(userAccount, linkTemplate);
                         conceptMetadata.addHistory(history);
                         dao.persist(history);

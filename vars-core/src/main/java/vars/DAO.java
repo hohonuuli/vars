@@ -52,7 +52,11 @@ public interface DAO {
 
     <T> T findByPrimaryKey(Class<T> clazz, Object primaryKey);
 
-    <T> T findInDatastore(T object);
+    /**
+     * Retrieves the object from the datastore. This ignores all state changes
+     * in the provided object and returns the copy as found in the data store.
+     */
+    <T> T find(T object);
 
     EntityManager getEntityManager();
 

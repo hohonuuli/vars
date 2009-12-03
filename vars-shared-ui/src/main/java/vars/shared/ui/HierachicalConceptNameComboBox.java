@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)HierachicalConceptNameComboBox.java   2009.12.02 at 10:38:27 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1 
- * (the "License"); you may not use this file except in compliance 
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,6 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 
 
 package vars.shared.ui;
@@ -24,32 +22,27 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
 import org.mbari.swing.SortedComboBoxModel;
-
 import vars.annotation.AnnotationPersistenceService;
 import vars.knowledgebase.Concept;
-import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptName;
 
-//~--- classes ----------------------------------------------------------------
-
 /**
- * <p>Displays the Concept and all it's children in the drop-down list</p>
+ * <p>Displays the Concept and all it's children in the drop-down list. Names are stored internally as Strings</p>
  *
  * @author <a href="http://www.mbari.org">MBARI</a>
  * @version $Id: HierachicalConceptNameComboBox.java 265 2006-06-20 05:30:09Z hohonuuli $
  */
 public class HierachicalConceptNameComboBox extends ConceptNameComboBox {
 
-    private Concept concept;
     private final AnnotationPersistenceService annotationPersistenceService;
-
-    //~--- constructors -------------------------------------------------------
+    private Concept concept;
 
     /**
      * Constructs ...
      *
+     *
+     * @param annotationPersistenceService
      */
     public HierachicalConceptNameComboBox(AnnotationPersistenceService annotationPersistenceService) {
         super();
@@ -61,8 +54,10 @@ public class HierachicalConceptNameComboBox extends ConceptNameComboBox {
      *
      *
      * @param concept
+     * @param annotationPersistenceService
      */
     public HierachicalConceptNameComboBox(Concept concept, AnnotationPersistenceService annotationPersistenceService) {
+
         // WARNING!! getDescendentNames can be very slow the first time it is called.
         super();
         this.annotationPersistenceService = annotationPersistenceService;
@@ -70,7 +65,9 @@ public class HierachicalConceptNameComboBox extends ConceptNameComboBox {
         initialize();
     }
 
- 
+    /**
+     * @return
+     */
     public Concept getConcept() {
         return concept;
     }
@@ -90,6 +87,7 @@ public class HierachicalConceptNameComboBox extends ConceptNameComboBox {
 
         });
         setMaximumRowCount(12);
+
         // When focused all characters should be selected so that
         // a user can just start typing.
         addFocusListener(new FocusAdapter() {
@@ -101,15 +99,21 @@ public class HierachicalConceptNameComboBox extends ConceptNameComboBox {
         });
     }
 
+    /**
+     *
+     * @param concept
+     */
     public void setConcept(Concept concept) {
         this.concept = concept;
 
         if (concept != null) {
             Collection<ConceptName> conceptNames = annotationPersistenceService.getReadOnlyConceptDAO().findDescendentNames(concept);
             List<String> namesAsStrings = new ArrayList<String>(conceptNames.size());
+
             for (ConceptName cn : conceptNames) {
                 namesAsStrings.add(cn.getName());
             }
+
             ((SortedComboBoxModel) getModel()).setItems(namesAsStrings);
         }
         else {

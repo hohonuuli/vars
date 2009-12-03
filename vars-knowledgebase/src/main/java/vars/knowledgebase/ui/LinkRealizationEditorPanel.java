@@ -17,6 +17,7 @@ package vars.knowledgebase.ui;
 import foxtrot.Job;
 import foxtrot.Worker;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -26,7 +27,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Vector;
+
 import javax.swing.BorderFactory;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -35,6 +39,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -49,6 +55,7 @@ import org.slf4j.LoggerFactory;
 import vars.DAO;
 import vars.ILink;
 import vars.LinkBean;
+import vars.LinkUtilities;
 import vars.UserAccount;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
@@ -65,6 +72,7 @@ import vars.knowledgebase.SimpleConceptNameBean;
 import vars.knowledgebase.ui.dialogs.AddLinkRealizationDialog;
 import vars.knowledgebase.ui.dialogs.LinkEditorDialog;
 import vars.shared.ui.HierachicalConceptNameComboBox;
+import vars.shared.ui.LinkListCellRenderer;
 
 /**
  * Class description
@@ -216,11 +224,7 @@ public class LinkRealizationEditorPanel extends EditorPanel {
         return linkEditorPanel;
     }
 
-    /**
-     * This method initializes linkField
-     *
-     * @return javax.swing.JTextField
-     */
+
     private JTextField getLinkField() {
         if (linkField == null) {
             linkField = new JTextField();
@@ -229,11 +233,6 @@ public class LinkRealizationEditorPanel extends EditorPanel {
         return linkField;
     }
 
-    /**
-     * This method initializes linkList
-     *
-     * @return javax.swing.JList
-     */
     private JList getLinkList() {
         if (linkList == null) {
             linkList = new JList();
@@ -263,16 +262,14 @@ public class LinkRealizationEditorPanel extends EditorPanel {
                     getEditorButtonPanel().getUpdateButton().setEnabled(enable);
                 }
             });
+            
+            linkList.setCellRenderer(new LinkListCellRenderer());
         }
 
         return linkList;
     }
 
-    /**
-     * This method initializes linkValueScrollPane
-     *
-     * @return javax.swing.JScrollPane
-     */
+
     private JScrollPane getLinkValueScrollPane() {
         if (linkValueScrollPane == null) {
             linkValueScrollPane = new JScrollPane();
@@ -282,11 +279,7 @@ public class LinkRealizationEditorPanel extends EditorPanel {
         return linkValueScrollPane;
     }
 
-    /**
-     * This method initializes linkValueTextArea
-     *
-     * @return javax.swing.JTextArea
-     */
+ 
     private JTextArea getLinkValueTextArea() {
         if (linkValueTextArea == null) {
             linkValueTextArea = new JTextArea();
@@ -298,7 +291,7 @@ public class LinkRealizationEditorPanel extends EditorPanel {
 
     private ListListModel getListModel() {
         if (listModel == null) {
-            List<LinkRealization> list = Collections.synchronizedList(new ArrayList<LinkRealization>());
+            List<LinkRealization> list = new Vector<LinkRealization>();
             listModel = new ListListModel(list);
         }
 
@@ -313,11 +306,6 @@ public class LinkRealizationEditorPanel extends EditorPanel {
         return newAction;
     }
 
-    /**
-     * This method initializes propertiesPanel
-     *
-     * @return javax.swing.JPanel
-     */
     private JPanel getPropertiesPanel() {
         if (propertiesPanel == null) {
             propertiesPanel = new JPanel();
@@ -332,11 +320,6 @@ public class LinkRealizationEditorPanel extends EditorPanel {
         return propertiesPanel;
     }
 
-    /**
-     * This method initializes scrollPane
-     *
-     * @return javax.swing.JScrollPane
-     */
     private JScrollPane getScrollPane() {
         if (scrollPane == null) {
             scrollPane = new JScrollPane();
@@ -348,11 +331,6 @@ public class LinkRealizationEditorPanel extends EditorPanel {
         return scrollPane;
     }
 
-    /**
-     * This method initializes toConceptComboBox
-     *
-     * @return javax.swing.JComboBox
-     */
     private HierachicalConceptNameComboBox getToConceptComboBox() {
         if (toConceptComboBox == null) {
             toConceptComboBox = new HierachicalConceptNameComboBox(getToolBelt().getAnnotationPersistenceService());
@@ -443,10 +421,13 @@ public class LinkRealizationEditorPanel extends EditorPanel {
             /*
              * Find the LinkTemplate that the LinkRealization is based on.
              */
-            Concept toConcept = link.getConceptMetadata().getConcept();
+            // DAOTX
             LinkTemplateDAO linkTemplateDAO = getToolBelt().getKnowledgebaseDAOFactory().newLinkTemplateDAO();
-            Collection<LinkTemplate> matchingLinkTemplates = linkTemplateDAO.findAllByLinkName(link.getLinkName(),
-                toConcept);
+            linkTemplateDAO.startTransaction();
+            LinkRealization linkRealization = linkTemplateDAO.find(link);
+            Concept toConcept = linkRealization.getConceptMetadata().getConcept();
+            Collection<LinkTemplate> matchingLinkTemplates = linkTemplateDAO.findAllByLinkName(link.getLinkName(), toConcept);
+            linkTemplateDAO.endTransaction();
 
             /*
              * Get the toConceptAsString that's used. It will be a child of the toConceptAsString in the LinkTemplate
@@ -461,35 +442,35 @@ public class LinkRealizationEditorPanel extends EditorPanel {
                 toConceptAsString = matchingLink.getToConcept();
             }
 
-            /*
-             *
-             */
             WaitIndicator waitIndicator = new SpinningDialWaitIndicator(this);
-            final String theToConcept = toConceptAsString;
+            final String fToConceptAsString = toConceptAsString;
             Worker.post(new Job() {
 
                 public Object run() {
                     Concept concept = null;
                     Concept selectedConcept = null;
-                    HierachicalConceptNameComboBox cb = getToConceptComboBox();
+                    final HierachicalConceptNameComboBox cb = getToConceptComboBox();
                     cb.removeAllItems();
 
-                    if (theToConcept.equalsIgnoreCase(ILink.VALUE_SELF)) {
+                    if (fToConceptAsString.equalsIgnoreCase(ILink.VALUE_SELF)) {
                         concept = SELF_CONCEPT;
                         selectedConcept = SELF_CONCEPT;
                         cb.addItem(SELF_CONCEPT.getPrimaryConceptName());
                     }
-                    else if (theToConcept.equalsIgnoreCase(ILink.VALUE_NIL)) {
+                    else if (fToConceptAsString.equalsIgnoreCase(ILink.VALUE_NIL)) {
                         concept = NIL_CONCEPT;
                         selectedConcept = NIL_CONCEPT;
                         cb.addItem(NIL_CONCEPT.getPrimaryConceptName());
                     }
                     else {
                         try {
+                        	// DAOTX
                             ConceptDAO conceptDAO = getToolBelt().getKnowledgebaseDAOFactory().newConceptDAO();
-                            concept = conceptDAO.findByName(theToConcept);
+                            conceptDAO.startTransaction();
+                            concept = conceptDAO.findByName(fToConceptAsString);
                             selectedConcept = conceptDAO.findByName(link.getToConcept());
-                            cb.setConcept(concept);    // TODO app hangs up here. Need to optimize
+                            conceptDAO.endTransaction();
+                            cb.setConcept(concept);
                         }
                         catch (Exception e) {
                             log.error("", e);
@@ -501,7 +482,14 @@ public class LinkRealizationEditorPanel extends EditorPanel {
                         }
                     }
 
-                    cb.setSelectedItem(selectedConcept.getPrimaryConceptName());
+                    final Concept fSelectedConcept = selectedConcept;
+                    SwingUtilities.invokeLater(new Runnable() {
+						public void run() {
+							cb.setSelectedItem(fSelectedConcept.getPrimaryConceptName());
+							cb.repaint();
+						}
+					});
+                    
 
                     return null;    // TODO Verify this default implementation is correct
                 }
@@ -509,9 +497,8 @@ public class LinkRealizationEditorPanel extends EditorPanel {
             waitIndicator.dispose();
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug("Update with " + link + " is complete");
-        }
+       log.debug("Update with {} is complete", link);
+        
     }
 
     private class ANewAction extends ActionAdapter {
@@ -563,8 +550,7 @@ public class LinkRealizationEditorPanel extends EditorPanel {
                 concept.getConceptMetadata().addLinkRealization(linkRealization);
 
                 try {
-                    LinkRealizationDAO linkRealizationDAO = getToolBelt().getKnowledgebaseDAOFactory()
-                        .newLinkRealizationDAO();
+                    LinkRealizationDAO linkRealizationDAO = getToolBelt().getKnowledgebaseDAOFactory().newLinkRealizationDAO();
                     linkRealizationDAO.persist(linkRealization);
                 }
                 catch (Exception e) {
@@ -592,7 +578,7 @@ public class LinkRealizationEditorPanel extends EditorPanel {
 
                     DAO dao = getToolBelt().getKnowledgebaseDAOFactory().newDAO();
                     dao.startTransaction();
-                    linkRealization = dao.merge(linkRealization);
+                    linkRealization = dao.find(linkRealization);
                     ConceptMetadata conceptDelegate = linkRealization.getConceptMetadata();
                     conceptDelegate.addHistory(history);
                     dao.persist(history);
@@ -634,7 +620,7 @@ public class LinkRealizationEditorPanel extends EditorPanel {
                 LinkRealization linkRealization = (LinkRealization) linkList.getSelectedValue();
 
 
-                String name = ((ConceptName) getToConceptComboBox().getSelectedItem()).getName();
+                String name = (String) getToConceptComboBox().getSelectedItem();
                 if (ILink.VALUE_NIL.equalsIgnoreCase(name) || ILink.VALUE_SELF.equalsIgnoreCase(name)) {
 
                     // Do nothing

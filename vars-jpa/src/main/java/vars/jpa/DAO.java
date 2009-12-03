@@ -152,10 +152,8 @@ public class DAO implements vars.DAO, EntityManagerAspect {
 
     public <T> T findByPrimaryKey(Class<T> clazz, Object primaryKey) {
         T value = null;
-        if (log.isDebugEnabled()) {
-            log.debug("Executing FIND for " + clazz + " using primary key = " + primaryKey);
-        }
-
+        log.debug("Executing FIND for {} using primary key = {}", clazz, primaryKey);
+        
         value = entityManager.find(clazz, primaryKey);
 
         return value;
@@ -175,9 +173,8 @@ public class DAO implements vars.DAO, EntityManagerAspect {
      *            database.
      */
     public void loadLazyRelations(Object entity) {
-        if (log.isDebugEnabled()) {
-            log.debug("Executing " + TransactionType.LOAD_LAZY_RELATIONS + " on " + entity);
-        }
+
+        log.debug("Executing {} on {}", TransactionType.LOAD_LAZY_RELATIONS, entity);
 
         try {
             Method method = entity.getClass().getMethod("invokeLazyGetters", new Class[0]);
@@ -199,10 +196,7 @@ public class DAO implements vars.DAO, EntityManagerAspect {
      *            database.
      */
     public <T> T merge(T entity) {
-        if (log.isDebugEnabled()) {
-            log.debug("Executing " + TransactionType.MERGE + " on " + entity);
-        }
-
+        log.debug("Executing {} on {}", TransactionType.MERGE, entity);
         return entityManager.merge(entity);
     }
 
@@ -213,18 +207,12 @@ public class DAO implements vars.DAO, EntityManagerAspect {
      *            The entity object to persist in the database
      */
     public void persist(Object entity) {
-        if (log.isDebugEnabled()) {
-            log.debug("Executing " + TransactionType.PERSIST + " on " + entity);
-        }
-
+        log.debug("Executing {} on {}", TransactionType.PERSIST, entity);
         entityManager.persist(entity);
     }
 
     public void remove(Object entity) {
-        if (log.isDebugEnabled()) {
-            log.debug("Executing " + TransactionType.REMOVE + " on " + entity);
-        }
-
+    	log.debug("Executing {} on {}", TransactionType.REMOVE, entity);
         entityManager.remove(entity);
     }
 
@@ -246,14 +234,19 @@ public class DAO implements vars.DAO, EntityManagerAspect {
         }
     }
 
+
     /**
      * Retrieves the object from the datastore. This ignores all state changes
      * in the provided object and returns the copy as found in the data store.
      */
-    public <T> T findInDatastore(T object) {
-        JPAEntity jpaEntity = (JPAEntity) object;
-        return (T) findByPrimaryKey(object.getClass(), jpaEntity.getId());
-    }
+	@SuppressWarnings("unchecked")
+	public <T> T find(T object) {
+		log.debug("Executing FIND on {}", object);
+		final JPAEntity jpaEntity = (JPAEntity) object;
+		return (T) entityManager.find(jpaEntity.getClass(), jpaEntity.getId());
+	}
+    
+    
     
     
 }

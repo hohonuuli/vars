@@ -1,5 +1,5 @@
 /*
- * @(#)LinkTemplateSelectionPanel.java   2009.11.16 at 08:54:59 PST
+ * @(#)LinkTemplateSelectionPanel.java   2009.12.02 at 01:46:41 PST
  *
  * Copyright 2009 MBARI
  *
@@ -17,15 +17,14 @@ package vars.query.ui;
 
 import foxtrot.Job;
 import foxtrot.Worker;
-import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Vector;
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -42,6 +41,8 @@ import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.ConceptNameTypes;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
+import vars.knowledgebase.LinkTemplate;
+import vars.knowledgebase.LinkTemplateDAO;
 import vars.knowledgebase.SimpleConceptBean;
 import vars.knowledgebase.SimpleConceptNameBean;
 import vars.shared.ui.HierachicalConceptNameComboBox;
@@ -76,19 +77,17 @@ public class LinkTemplateSelectionPanel extends JPanel {
     /**
      *
      *
-     * @param conceptDAO
-     * @param linkTemplateDAO
-     * @param queryDAO
+     *
+     * @param annotationPersistenceService
+     * @param knowledgebaseDAOFactory
      */
-    public LinkTemplateSelectionPanel(AnnotationPersistenceService annotationPersistenceService, 
-            KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
+    public LinkTemplateSelectionPanel(AnnotationPersistenceService annotationPersistenceService,
+                                      KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
         super();
         this.annotationPersistenceService = annotationPersistenceService;
         this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
         initialize();
     }
-
-
 
     private JPanel getBottomPanel() {
         if (bottomPanel == null) {
@@ -243,6 +242,7 @@ public class LinkTemplateSelectionPanel extends JPanel {
     /**
      * @param concept
      */
+    @SuppressWarnings("unchecked")
     public void setConcept(Concept concept) {
         log.info("Retrieveing LinkTemplates from " + concept);
 
@@ -260,10 +260,22 @@ public class LinkTemplateSelectionPanel extends JPanel {
          * has to load the entire knowledgebase
          */
         final Concept fConcept = concept;
-        Collection linkTemplates = (Collection) Worker.post(new Job() {
+        Collection<ILink> linkTemplates = (Collection<ILink>) Worker.post(new Job() {
 
             public Object run() {
-                return Arrays.asList(knowledgebaseDAOFactory.newLinkTemplateDAO().findAllApplicableToConcept(fConcept));
+
+                // DAOTX
+                LinkTemplateDAO linkTemplateDAO = knowledgebaseDAOFactory.newLinkTemplateDAO();
+
+                linkTemplateDAO.startTransaction();
+
+                Concept daoConcept = linkTemplateDAO.find(fConcept);
+                Collection<LinkTemplate> links = (Collection<LinkTemplate>) linkTemplateDAO.findAllApplicableToConcept(
+                    daoConcept);
+
+                linkTemplateDAO.endTransaction();
+
+                return new Vector<ILink>(links);
             }
         });
 
@@ -271,7 +283,7 @@ public class LinkTemplateSelectionPanel extends JPanel {
          * Concepts return immutable lists from accessor methods. We need to add
          * to the collection so we generate a copy.
          */
-        linkTemplates = new ArrayList(linkTemplates);
+        linkTemplates = new ArrayList<ILink>(linkTemplates);
         linkTemplates.add(nilLinkTemplate);
 
         SearchableComboBoxModel model = (SearchableComboBoxModel) getCbLinkTemplates().getModel();
@@ -303,6 +315,7 @@ public class LinkTemplateSelectionPanel extends JPanel {
         else {
             try {
                 ConceptDAO conceptDAO = knowledgebaseDAOFactory.newConceptDAO();
+
                 toConcept = conceptDAO.findByName(linkTemplate.getToConcept());
 
                 if (toConcept == null) {
@@ -313,8 +326,8 @@ public class LinkTemplateSelectionPanel extends JPanel {
                 log.error("Failed to lookup " + linkTemplate.getToConcept(), e);
 
                 /*
-                 * In case the database lookup fails will create a Concept objecdt
-                 * so that the GUI continues to function in a predicatable manner
+                 * In case the database lookup fails will create a Concept object
+                 * so that the GUI continues to function in a predictable manner
                  */
                 toConcept = new SimpleConceptBean();
 

@@ -25,7 +25,9 @@ public class LinkComparator implements Comparator<ILink> {
     private final Comparator comparator = new IgnoreCaseToStringComparator();
 
     public int compare(ILink o1, ILink o2) {
+    	
         int c = comparator.compare(o1.getLinkName(), o2.getLinkName());
+        
         if (c == 0) {
             c = comparator.compare(o1.getToConcept(), o2.getToConcept());
         }

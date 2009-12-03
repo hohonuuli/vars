@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)ConceptNameComboBox.java   2009.12.02 at 10:40:04 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1 
- * (the "License"); you may not use this file except in compliance 
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,20 +12,23 @@
  */
 
 
+
 package vars.shared.ui;
 
+import java.awt.Component;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusListener;
 import java.util.Arrays;
-
 import java.util.Collection;
+
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JList;
+
 import org.mbari.swing.FancyComboBox;
 import org.mbari.swing.SortedComboBoxModel;
 import org.mbari.text.IgnoreCaseToStringComparator;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptName;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * A <code>ConceptNameComboBox</code> displays all the current
@@ -37,13 +37,7 @@ import vars.knowledgebase.ConceptName;
  * @author  brian
  * @created  February 22, 2005
  */
-public class ConceptNameComboBox extends FancyComboBox
-        implements ConceptChangeListener {
-
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 3453850210369068276L;
+public class ConceptNameComboBox extends FancyComboBox implements ConceptChangeListener {
 
     /**
      * Constructor for the ConceptNameComboBox object
@@ -64,8 +58,6 @@ public class ConceptNameComboBox extends FancyComboBox
         updateModel(items);
     }
 
-    //~--- methods ------------------------------------------------------------
-
     /**
      * Adds the specified <code>ConceptName</code> item to the model for this
      * <code>ConceptNameComboBox</code>.
@@ -76,7 +68,6 @@ public class ConceptNameComboBox extends FancyComboBox
         ((SortedComboBoxModel) getModel()).addElement(item.getName());
     }
 
-    // Impl for ConceptChangeListener
 
     /**
      *  Description of the Method
@@ -85,6 +76,7 @@ public class ConceptNameComboBox extends FancyComboBox
      */
     public void addedConcept(Concept concept) {
         Collection<? extends ConceptName> conceptNames = concept.getConceptNames();
+
         for (ConceptName cn : conceptNames) {
             addItem(cn);
         }
@@ -138,14 +130,17 @@ public class ConceptNameComboBox extends FancyComboBox
      * @param  concept Description of the Parameter
      */
     public void removedConcept(Concept concept) {
+
         // Recursive for all children Concept objects.
         Collection<Concept> concepts = concept.getChildConcepts();
+
         for (Concept c : concepts) {
             removedConcept(c);
         }
 
         // Remove all names of the specified Concept
         Collection<ConceptName> conceptNames = concept.getConceptNames();
+
         for (ConceptName cn : conceptNames) {
             removeItem(cn);
         }
