@@ -8,12 +8,13 @@ package vars.shared.ui;
 import java.awt.Frame;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
+
 import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.EventTopicSubscriber;
 import org.mbari.util.Dispatcher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import vars.UserAccount;
+import vars.shared.ui.event.LoggingSubscriber;
 
 /**
  * Central lookup for coordinating shared UI resources.
@@ -41,8 +42,11 @@ public class GlobalLookup {
 
     public static final String TOPIC_USERACCOUNT = "vars.shared.ui.GlobalLookup-UserAccount";
 
-    public static final EventTopicSubscriber<Object> LOGGING_SUBSCRIBER = new LoggingSubscriber();
-
+    @SuppressWarnings("unchecked")
+	public static final EventTopicSubscriber LOGGING_SUBSCRIBER = new LoggingSubscriber();
+    
+    private static File settingsDirectory;
+    
     /*
      * Throw an exception if the wrong parameter type is set
      */
@@ -77,7 +81,22 @@ public class GlobalLookup {
             }
         });
         
+        
+        /*
+         * Create an application settings directory if needed and create the log directory
+         */
+        String home = System.getProperty("user.home");
+        settingsDirectory = new File(home, ".vars");
 
+        if (!settingsDirectory.exists()) {
+            settingsDirectory.mkdir();
+        }
+
+        File logDirectory = new File(settingsDirectory, "logs");
+
+        if (!logDirectory.exists()) {
+            logDirectory.mkdir();
+        }
 
         EventBus.subscribe(TOPIC_EXIT, LOGGING_SUBSCRIBER);
         EventBus.subscribe(TOPIC_USERACCOUNT, LOGGING_SUBSCRIBER);
@@ -88,7 +107,7 @@ public class GlobalLookup {
 
     /**
      * Reference to a Dispatcher that should be used to manage the currently selected frame
-     * @return A Dispatcher refering to a java.awt.Frame object
+     * @return A Dispatcher referring to a java.awt.Frame object
      */
     public static Dispatcher getSelectedFrameDispatcher() {
         return Dispatcher.getDispatcher(KEY_DISPATCHER_SELECTED_FRAME);
@@ -96,26 +115,17 @@ public class GlobalLookup {
 
     /**
      *
-     * @return A Dispatcher refering to a vars.UserAccount object. The intent is
+     * @return A Dispatcher referring to a vars.UserAccount object. The intent is
      *      that this is the currently used UserAccount in a UI application
      */
     public static Dispatcher getUserAccountDispatcher() {
         return Dispatcher.getDispatcher(KEY_DISPATCHER_USERACCOUNT);
     }
-
-    /**
-     * Log events in debug mode
-     */
-    static class LoggingSubscriber implements EventTopicSubscriber {
-
-        private final Logger log = LoggerFactory.getLogger(getClass());
-
-        public void onEvent(String topic, Object data) {
-            if (log.isDebugEnabled()) {
-                log.debug("Event Published:\n\tTOPIC: " + topic +  "\n\tDATA: " + data);
-            }
-        }
-
+    
+    public static File getSettingsDirectory() {
+    	return settingsDirectory;
     }
+
+
 
 }

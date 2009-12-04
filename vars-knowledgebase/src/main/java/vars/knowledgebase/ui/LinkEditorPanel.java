@@ -172,12 +172,12 @@ public class LinkEditorPanel extends javax.swing.JPanel implements ILockableEdit
         jLabel1 = new javax.swing.JLabel();
         linkNameField = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
-        toConceptComboBox = new AllConceptNamesComboBox(toolBelt.getQueryDAO());
+        toConceptComboBox = new AllConceptNamesComboBox(toolBelt.getQueryPersistenceService());
         jLabel3 = new javax.swing.JLabel();
         linkValueField = new javax.swing.JTextField();
         jSeparator1 = new javax.swing.JSeparator();
         jLabel5 = new javax.swing.JLabel();
-        fromConceptComboBox = new AllConceptNamesComboBox(toolBelt.getQueryDAO());
+        fromConceptComboBox = new AllConceptNamesComboBox(toolBelt.getQueryPersistenceService());
 
         jLabel4.setText("Search:");
 

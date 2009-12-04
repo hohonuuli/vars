@@ -1,50 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <artifactId>vars-redux</artifactId>
-    <groupId>vars-redux</groupId>
-    <version>1.0-SNAPSHOT</version>
-  </parent>
-  <groupId>vars-redux</groupId>
-  <artifactId>vars-shared-ui</artifactId>
-  <name>vars-shared-ui [Library]</name>
-  <dependencies>
-    <dependency>
-      <groupId>vars-redux</groupId>
-      <artifactId>vars-core</artifactId>
-      <version>${project.version}</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>vars-redux</groupId>
-      <artifactId>vars-jpa</artifactId>
-      <version>${project.version}</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.bushe</groupId>
-      <artifactId>eventbus</artifactId>
-      <version>1.3</version>
-    </dependency>
-    <dependency>
-      <groupId>org.swinglabs</groupId>
-      <artifactId>swingx</artifactId>
-      <version>1.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.swinglabs</groupId>
-      <artifactId>swing-layout</artifactId>
-      <version>1.0.3</version>
-    </dependency>
-    <dependency>
-      <groupId>net.sourceforge.foxtrot</groupId>
-      <artifactId>foxtrot-core</artifactId>
-      <version>3.0</version>
-    </dependency>
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>vars-redux</artifactId>
+        <groupId>vars-redux</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>vars-shared-ui</artifactId>
+    <name>vars-shared-ui [Library]</name>
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>vars-core</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>vars-jpa</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.bushe</groupId>
+            <artifactId>eventbus</artifactId>
+            <version>1.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.swinglabs</groupId>
+            <artifactId>swingx</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.swinglabs</groupId>
+            <artifactId>swing-layout</artifactId>
+            <version>1.0.3</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sourceforge.foxtrot</groupId>
+            <artifactId>foxtrot-core</artifactId>
+            <version>3.0</version>
+        </dependency>
 
-  </dependencies>
+    </dependencies>
 </project>
 
 

@@ -30,13 +30,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import org.mbari.awt.event.ActionAdapter;
-import org.mbari.vars.annotation.ui.actions.OpenVideoArchiveUsingParamsAction;
-import org.mbari.vars.annotation.ui.dialogs.OkayCancelDialog;
+import vars.annotation.ui.dialogs.OkayCancelDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.ui.Lookup;
-import vars.util.VARSProperties;
+import vars.annotation.ui.VARSProperties;
+import vars.annotation.ui.actions.OpenVideoArchiveUsingParamsAction;
 
 /**
  * <p>

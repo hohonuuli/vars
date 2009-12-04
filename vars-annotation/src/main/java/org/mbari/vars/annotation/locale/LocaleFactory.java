@@ -28,8 +28,8 @@ import org.mbari.vcr.udp01.VCR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.ui.Lookup;
+import vars.annotation.ui.VARSProperties;
 import vars.annotation.ui.VideoService;
-import vars.util.VARSProperties;
 
 /**
  * Acquires the deployment location (Shore, Point Lobos, Western Flyer) from a

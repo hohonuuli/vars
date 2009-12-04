@@ -10,18 +10,12 @@
   <artifactId>vars-core</artifactId>
   <name>vars-core [Library]</name>
   <url>http://maven.apache.org</url>
-  <dependencies>
-    <dependency>
-      <groupId>org.mbari</groupId>
-      <artifactId>mbarix4j</artifactId>
-      <version>1.8-SNAPSHOT</version>
-      <scope>compile</scope>
-    </dependency>
+  <!-- <dependencies>
     <dependency>
       <groupId>com.google.collections</groupId>
       <artifactId>google-collections</artifactId>
       <version>1.0-rc3</version>
     </dependency>
-  </dependencies>
+  </dependencies> -->
 </project>
 

@@ -40,7 +40,7 @@ import vars.annotation.VideoArchiveSet;
 import vars.annotation.VideoFrame;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.PersistenceController;
-import vars.util.VARSProperties;
+import vars.annotation.ui.VARSProperties;
 
 /**
  * <p>

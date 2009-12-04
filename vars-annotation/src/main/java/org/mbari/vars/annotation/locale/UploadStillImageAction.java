@@ -16,8 +16,8 @@
 package org.mbari.vars.annotation.locale;
 
 import org.mbari.awt.event.ActionAdapter;
-import org.mbari.vars.annotation.ui.actions.IVideoArchiveProperty;
 import vars.annotation.VideoArchive;
+import vars.annotation.ui.actions.IVideoArchiveProperty;
 
 /**
  * @author brian

@@ -1,7 +1,8 @@
 /*
- * @(#)QueryApp.java   2009.09.24 at 09:56:26 PDT
+ * @(#)QueryApp.java   2009.12.03 at 10:01:14 PST
  *
  * Copyright 2009 MBARI
+ *
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,6 +28,8 @@ import javax.swing.ActionMap;
 import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+
 import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.EventTopicSubscriber;
 import org.mbari.awt.WaitCursorEventQueue;
@@ -37,8 +40,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.query.QueryModule;
-import vars.shared.ui.FatalErrorSubscriber;
-import vars.shared.ui.NonFatalErrorSubscriber;
+import vars.shared.ui.GlobalLookup;
+import vars.shared.ui.event.FatalExceptionSubscriber;
+import vars.shared.ui.event.NonFatalErrorSubscriber;
+import vars.shared.ui.event.WarningSubscriber;
 
 /**
  * <p><!-- Insert Description --></p>
@@ -54,28 +59,18 @@ import vars.shared.ui.NonFatalErrorSubscriber;
  */
 public class QueryApp {
 
-    /**
-     * Key used to retrieve the current QueryApp instance from a Dispatcher object.
-     * Use as:
-     * <pre>
-     * QueryApp queryApp = (QueryApp) Dispatcher.getDispatcher(QueryApp.DISPATCHER_KEY_QUERYAPP).getValueObject();
-     * </pre>
-     */
-    public static final String KEY_DISPATCHER_QUERYAPP = "QueryApp";
 
     /**
      * 378720000 = 1982-01-01
      */
     public static final Date MIN_RECORDED_DATE = new Date(378720000L * 1000L);
     private static Logger log;
-
     private ActionMap actionMap;
     private final EventTopicSubscriber<Exception> fatalErrorSubscriber;
-
     private InputMap inputMap;
     private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
     private final EventTopicSubscriber nonFatalErrorSubscriber;
-
+    private final EventTopicSubscriber<String> warningSubscriber;
     private QueryFrame queryFrame;
 
     /**
@@ -97,14 +92,16 @@ public class QueryApp {
 
 
         initialize();
-        fatalErrorSubscriber = new FatalErrorSubscriber(getQueryFrame());
+        fatalErrorSubscriber = new FatalExceptionSubscriber(getQueryFrame());
         nonFatalErrorSubscriber = new NonFatalErrorSubscriber(getQueryFrame());
+        warningSubscriber = new WarningSubscriber(getQueryFrame());
 
         /*
          * Subscribe to all our favorite topics
          */
         EventBus.subscribe(Lookup.TOPIC_FATAL_ERROR, fatalErrorSubscriber);
         EventBus.subscribe(Lookup.TOPIC_NONFATAL_ERROR, nonFatalErrorSubscriber);
+        EventBus.subscribe(Lookup.TOPIC_WARNING, warningSubscriber);
 
     }
 
@@ -119,18 +116,6 @@ public class QueryApp {
         return actionMap;
     }
 
-    static Injector getGuiceInjector() {
-
-        Dispatcher dispatcher = Lookup.getGuiceInjectorDispatcher();
-        Injector injector = (Injector) dispatcher.getValueObject();
-        if (injector == null) {
-            injector = Guice.createInjector(new QueryModule());
-            dispatcher.setValueObject(injector);
-        }
-
-        return injector;
-
-    }
 
     /**
      * @return  Returns the inputMap.
@@ -162,7 +147,8 @@ public class QueryApp {
         if (queryFrame == null) {
 
             // Let's let Guice autowire the dependencies
-            queryFrame = getGuiceInjector().getInstance(QueryFrame.class);
+        	Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
+            queryFrame = injector.getInstance(QueryFrame.class);
             Lookup.getApplicationFrameDispatcher().setValueObject(queryFrame);
         }
 
@@ -228,9 +214,11 @@ public class QueryApp {
         splashFrame.setMessage(" Initializing the GUI...");
         splashFrame.repaint();
         getQueryFrame().pack();
+
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         Dimension frameSize = getQueryFrame().getSize();
         double newHeight = (screenSize.getHeight() - 150);
+
         frameSize.setSize(frameSize.getWidth(), (int) newHeight);
         getQueryFrame().setSize(frameSize);
         getQueryFrame().setVisible(true);
@@ -257,24 +245,14 @@ public class QueryApp {
          * start.
          */
         System.setProperty("user.timezone", "UTC");
+        GlobalLookup.getSettingsDirectory(); // Not used
 
-        /*
-         * Create an application settings directory if needed and create the log directory
-         */
-        String home = System.getProperty("user.home");
-        File settingsDirectory = new File(home, ".vars");
-        if (!settingsDirectory.exists()) {
-            settingsDirectory.mkdir();
-        }
-
-        File logDirectory = new File(settingsDirectory, "logs");
-        if (!logDirectory.exists()) {
-            logDirectory.mkdir();
-        }
 
         final Logger mainLog = getLog();
+
         if (mainLog.isInfoEnabled()) {
             final Date date = new Date();
+
             mainLog.info("This application was launched at " + date.toString());
         }
 
@@ -284,24 +262,15 @@ public class QueryApp {
         if (SystemUtilities.isMacOS()) {
             SystemUtilities.configureMacOSApplication("VARS Query");
         }
+        
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        }
+        catch (final Exception e) {
+            mainLog.info("Unable to set look and feel", e);
+        }
 
-        /*
-         * Java 8 on windows has a bug in the Window L&F that causes
-         * redraw issues. Until this bug is fixed the workaround is to use
-         * Metal L&F on Windows.
-         */
-
-//        if (!SystemUtilities.isWindowsOS()) {
-//            try {
-//                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-//            }
-//            catch (Exception e) {
-//                mainLog.info("Unable to set look and feel", e);
-//            }
-//        }
-
-
-        final Injector injector = getGuiceInjector();
+        final Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
 
         SwingUtilities.invokeLater(new Runnable() {
 
@@ -310,8 +279,8 @@ public class QueryApp {
                     final QueryApp queryApp = injector.getInstance(QueryApp.class);
                 }
                 catch (Exception e) {
-                    FatalErrorSubscriber subscriber = new FatalErrorSubscriber(null);
-                    subscriber.onEvent(FatalErrorSubscriber.TOPIC_FATAL_ERROR, e);
+                    FatalExceptionSubscriber subscriber = new FatalExceptionSubscriber(null);
+                    subscriber.onEvent(Lookup.TOPIC_FATAL_ERROR, e);
                 }
             }
 

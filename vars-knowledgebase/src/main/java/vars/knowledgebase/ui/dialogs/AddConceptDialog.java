@@ -124,7 +124,7 @@ public class AddConceptDialog extends javax.swing.JDialog {
         authorField = new javax.swing.JTextField();
         nameField = new javax.swing.JTextField();
         parentLabel = new javax.swing.JLabel();
-        conceptComboBox = new AllConceptNamesComboBox(toolBelt.getQueryDAO());
+        conceptComboBox = new AllConceptNamesComboBox(toolBelt.getQueryPersistenceService());
         cancelButton = new JFancyButton();
         okButton = new JFancyButton();
         jScrollPane1 = new javax.swing.JScrollPane();

@@ -6,7 +6,6 @@
         <groupId>vars-redux</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <groupId>vars-redux</groupId>
     <artifactId>vars-standalone</artifactId>
     <name>vars-standalone</name>
     <dependencies>
@@ -32,18 +31,6 @@
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
             <version>1.6.7</version>
-        </dependency>
-        <dependency>
-            <artifactId>vars-query</artifactId>
-            <groupId>vars-redux</groupId>
-            <type>jar</type>
-            <version>1.0-SNAPSHOT</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>groovy</artifactId>
-                    <groupId>org.codehaus.groovy</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>commons-cli</groupId>

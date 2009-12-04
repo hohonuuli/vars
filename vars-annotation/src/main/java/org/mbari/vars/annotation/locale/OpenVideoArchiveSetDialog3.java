@@ -20,8 +20,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
 import javax.swing.JButton;
-import org.mbari.vars.annotation.ui.dialogs.OkayCancelDialog;
-import org.mbari.vars.annotation.ui.dialogs.VideoSourceSelectionPanel;
+import vars.annotation.ui.dialogs.OkayCancelDialog;
+import vars.annotation.ui.dialogs.VideoSourceSelectionPanel;
 
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.ui.Lookup;

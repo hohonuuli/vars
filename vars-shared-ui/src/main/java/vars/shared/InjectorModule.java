@@ -10,7 +10,6 @@ import com.google.inject.Module;
 import java.util.ResourceBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.PersistenceCacheProvider;
 import vars.VARSException;
 import vars.jpa.VarsJpaModule;
 

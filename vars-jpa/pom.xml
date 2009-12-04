@@ -30,15 +30,9 @@
 -->
     <dependencies>
         <dependency>
-            <groupId>vars-redux</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>vars-core</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <!-- NOTE: when this goes 1.0 it will be moved into guava -->
-        <dependency>
-            <groupId>com.google.collections</groupId>
-            <artifactId>google-collections</artifactId>
-            <version>1.0-rc3</version>
         </dependency>
         <dependency>
             <groupId>org.dbunit</groupId>

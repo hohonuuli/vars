@@ -18,7 +18,6 @@ package vars.annotation.ui;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import vars.DAO;
 import vars.ILink;
