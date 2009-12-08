@@ -47,13 +47,11 @@ import org.mbari.swing.JFancyButton;
 public class OkayCancelDialog extends JDialog {
 
  
-    private static final long serialVersionUID = 4684462712730934969L;
 
     private JButton cancelButton = null;
 
     private final CloseWindowListener closeWindowListener = new CloseWindowListener();
 
-    private Container internalContentPane = null;
 
     private JButton okayButton = null;
 
@@ -185,33 +183,17 @@ public class OkayCancelDialog extends JDialog {
         initialize();
     }
 
-    /**
-     *     @return  the cancelButton
-     *     @uml.property  name="cancelButton"
-     */
+
     final JButton getCancelButton() {
         if (cancelButton == null) {
             cancelButton = new JFancyButton("Cancel");
-            cancelButton.setIcon(new ImageIcon(getClass().getResource("/images/vars/knowledgebase/delete2.png")));
+            cancelButton.setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/delete2.png")));
             cancelButton.addActionListener(closeWindowListener);
         }
 
         return cancelButton;
     }
 
-    /**
-     *  Gets the contentPane attribute of the OkayCancelDialog object
-     *
-     * @return  The contentPane value
-     */
-//    @Override
-//    public Container getContentPane() {
-//        if (internalContentPane == null) {
-//            internalContentPane = new JPanel();
-//        }
-//
-//        return internalContentPane;
-//    }
 
     /**
      *     @return  the okayButton
@@ -219,7 +201,7 @@ public class OkayCancelDialog extends JDialog {
     public JButton getOkayButton() {
         if (okayButton == null) {
             okayButton = new JFancyButton("Okay");
-            okayButton.setIcon(new ImageIcon(getClass().getResource("/images/vars/knowledgebase/check2.png")));
+            okayButton.setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/check2.png")));
             okayButton.addActionListener(closeWindowListener);
 
             // this property is being removed when the dialog is closed.
@@ -249,13 +231,11 @@ public class OkayCancelDialog extends JDialog {
     }
 
     private final void initialize() {
-       // final Container contentPane = super.getContentPane();
         setLayout(new BorderLayout());
         final JPanel buttonPanel = ButtonBarFactory.buildOKCancelBar(getCancelButton(), getOkayButton());
         buttonPanel.setBorder(Borders.DIALOG_BORDER);
         buttonPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
         add(buttonPanel, BorderLayout.SOUTH);
-        //add(getContentPane(), BorderLayout.CENTER);
     }
 
     /**
@@ -286,17 +266,6 @@ public class OkayCancelDialog extends JDialog {
         }
     }
 
-    /**
-     *  Sets the contentPane attribute of the OkayCancelDialog object
-     *
-     * @param  contentPane The new contentPane value
-     */
-//    @Override
-//    public void setContentPane(final Container contentPane) {
-//        super.getContentPane().remove(getContentPane());
-//        super.getContentPane().add(contentPane, BorderLayout.CENTER);
-//        internalContentPane = contentPane;
-//    }
 
     /**
      *  The main program for the OkayCancelDialog class

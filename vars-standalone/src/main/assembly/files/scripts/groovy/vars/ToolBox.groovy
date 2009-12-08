@@ -1,11 +1,12 @@
+package vars
 import com.google.inject.Injector
 import vars.annotation.ui.Lookup
 import vars.annotation.ui.ToolBelt
 
-class ToolBox
+class ToolBox {
 
-    ToolBelt toolBelt
-    Injector injector
+    final toolBelt
+    final injector
     
     def ToolBox() {
         injector = Lookup.guiceInjectorDispatcher.valueObject

@@ -34,8 +34,8 @@ import vars.knowledgebase.ConceptName;
  */
 public class ConceptTreeCellRenderer extends DefaultTreeCellRenderer {
 
-    private static final String DEFAULT = "/images/vars/knowledgebase/nav_plain_blue.png";
-    private static final String PENDING = "/images/vars/knowledgebase/nav_plain_red.png";
+    private static final String DEFAULT = "/vars/images/16/nav_plain_blue.png";
+    private static final String PENDING = "/vars/images/16/nav_plain_red.png";
     private static final long serialVersionUID = -7382528013502852004L;
     private static final Color pendingTextColor = Color.RED.brighter().brighter();
     private static final Color loadingTextColor = Color.GRAY;

@@ -31,9 +31,9 @@ import org.mbari.swing.SwingUtils;
 import org.mbari.util.Dispatcher;
 
 import vars.UserAccount;
-import vars.annotation.ui.Lookup;
-import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.actions.OpenUserAccountAction;
+import vars.old.annotation.ui.StatusLabel;
+import vars.shared.ui.dialogs.LoginAction;
 
 /**
  * <p>Indicates the status of the annotator. green means an annotator is logged
@@ -47,14 +47,15 @@ public class StatusLabelForPerson extends StatusLabel {
 
 
   
-    private final OpenUserAccountAction action;
+   // private final OpenUserAccountAction action;
+	private final LoginAction action;
 
     /**
      * Constructor
      */
     public StatusLabelForPerson(ToolBelt toolBelt) {
         super();
-        action = new OpenUserAccountAction(toolBelt);
+        action = new LoginAction(toolBelt.getMiscDAOFactory(), toolBelt.getMiscFactory());
         final Dispatcher pd = Lookup.getUserAccountDispatcher();
         final UserAccount userAccount = (UserAccount) pd.getValueObject();
         update(userAccount);

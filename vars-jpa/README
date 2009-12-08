@@ -27,3 +27,26 @@ To delete from the database:
 	// ---- Step 2: Execute delete
 	dao.makeTransient(concept);
 	
+	
+Creating your database:
+
+JPA can auto-generate your database tables. However, you may need to intialize your UniqueId table with the following:
+
+INSERT INTO UNIQUEID (tablename, nextid) VALUES ('CameraPlatformDeployment', 100);
+INSERT INTO UNIQUEID (tablename, nextid) VALUES ('VideoArchiveSet', 100);
+INSERT INTO UNIQUEID (tablename, nextid) VALUES ('VideoArchive', 100);
+INSERT INTO UNIQUEID (tablename, nextid) VALUES ('VideoFrame', 100);
+INSERT INTO UNIQUEID (tablename, nextid) VALUES ('CameraData', 100);
+INSERT INTO UNIQUEID (tablename, nextid) VALUES ('PhysicalData', 100);
+INSERT INTO UNIQUEID (tablename, nextid) VALUES ('Observation', 100);
+INSERT INTO UNIQUEID (tablename, nextid) VALUES ('Association', 100);
+INSERT INTO UNIQUEID (tablename, nextid) VALUES ('Concept', 100);
+INSERT INTO UNIQUEID (tablename, nextid) VALUES ('ConceptName', 100)
+INSERT INTO UNIQUEID (tablename, nextid) VALUES ('ConceptDelegate', 100)
+INSERT INTO UNIQUEID (tablename, nextid) VALUES ('LinkTemplate', 100)
+INSERT INTO UNIQUEID (tablename, nextid) VALUES ('History', 100)
+INSERT INTO UNIQUEID (tablename, nextid) VALUES ('SectionInfo', 100)
+INSERT INTO UNIQUEID (tablename, nextid) VALUES ('Media', 100)
+INSERT INTO UNIQUEID (tablename, nextid) VALUES ('LinkRealization', 100)
+INSERT INTO UNIQUEID (tablename, nextid) VALUES ('UserName', 100)
+	

@@ -1,5 +1,5 @@
 /*
- * @(#)AnnotationFrame.java   2009.11.18 at 04:24:23 PST
+ * @(#)AnnotationFrame.java   2009.12.07 at 04:29:40 PST
  *
  * Copyright 2009 MBARI
  *
@@ -13,271 +13,270 @@
 
 
 
-/**
- * @created  December 16, 2003
- */
 package vars.annotation.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
-import java.util.ResourceBundle;
+import java.awt.HeadlessException;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Vector;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-
+import javax.swing.JSplitPane;
+import javax.swing.JToolBar;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import org.bushe.swing.event.EventBus;
-import org.mbari.awt.WaitCursorEventQueue;
-import org.mbari.awt.event.ActionAdapter;
-import vars.annotation.ui.dialogs.AboutDialog;
+import org.bushe.swing.event.EventTopicSubscriber;
+import org.mbari.util.Dispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.Observation;
-
-import vars.annotation.ui.actions.ClearDatabaseCacheAction;
-import vars.annotation.ui.actions.ExitAction;
-import vars.annotation.ui.actions.OpenConnectionsAction;
-import vars.annotation.ui.actions.ShowOpenVideoArchiveDialogAction;
+import vars.annotation.VideoArchive;
+import vars.annotation.VideoFrame;
+import vars.annotation.ui.table.IObservationTableModel;
+import vars.annotation.ui.table.JXObservationTable;
+import vars.annotation.ui.cbpanel.ConceptButtonPanel;
 
 /**
- * <p>This frame is the parent frame of all UI components in the annotation
- * application.</p>
  *
- * @author  <a href="http://www.mbari.org">MBARI</a>
+ * @author brian
  */
 public class AnnotationFrame extends JFrame {
 
-    private static final Logger log = LoggerFactory.getLogger(AnnotationFrame.class);
-    private VideoSetViewer viewer = null;
-    private JPanel bottomPanel;
-    private JPanel contentPanel;
-    private EventQueue eventQueue;
-    private JMenuBar myMenuBar;
-    private JPanel quickControlsPanel;
-    private JPanel statusPanel;
-    private final ToolBelt toolbelt;
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     /**
-     * Creates new form JFrame
-     *
-     * @param toolbelt
+     * When observations are deleted we need to remove them from the view.
+     * The AppFrameController contains a subscriber that deletes them from the
+     * data store
      */
-    public AnnotationFrame(ToolBelt toolbelt) {
-        super();
-        this.toolbelt = toolbelt;
-        Lookup.getSelectedObservationsDispatcher().setValueObject(new Vector<Observation>());
+    private final EventTopicSubscriber<Collection<Observation>> deleteObservationsSubscriber = new EventTopicSubscriber<Collection<Observation>>() {
+
+        public void onEvent(String topic, Collection<Observation> data) {
+            if (log.isDebugEnabled()) {
+                log.debug("Removing observations from table\nDATA: " + data);
+            }
+
+            final IObservationTableModel model = (IObservationTableModel) getTable().getModel();
+
+            for (Observation observation : data) {
+                model.removeObservation(observation);
+            }
+        }
+    };
+
+    /**
+     * When observations are persisted we need to add them to the view.
+     * The AppFrameController contains a subscriber that persists them into the
+     * data store
+     */
+    private final EventTopicSubscriber<Collection<Observation>> persistObservationsSubscriber = new EventTopicSubscriber<Collection<Observation>>() {
+
+        public void onEvent(String topic, Collection<Observation> data) {
+            if (log.isDebugEnabled()) {
+                log.debug("Adding observations to table\nDATA: " + data);
+            }
+
+            final IObservationTableModel model = (IObservationTableModel) getTable().getModel();
+
+            for (Observation observation : data) {
+                model.addObservation(observation);
+            }
+
+            /*
+             * If we just added one select it in the table
+             */
+            if (data.size() == 1) {
+                final Observation observation = data.iterator().next();
+                getTable().setSelectedObservation(observation);
+            }
+
+        }
+    };
+
+    /**
+     * When observations are updated we redraw the table
+     */
+    private final EventTopicSubscriber<Collection<Observation>> mergeObservationsSubscriber = new EventTopicSubscriber<Collection<Observation>>() {
+
+        public void onEvent(String topic, Collection<Observation> data) {
+            if (log.isDebugEnabled()) {
+                log.debug("Removing observations from table\nDATA: " + data);
+            }
+
+            getTable().redrawAll();
+        }
+    };
+    private JPanel conceptButtonPanel;
+    private final AnnotationFrameController controller;
+    private JSplitPane innerSplitPane;
+    private JPanel miscTabsPanel;
+    private JSplitPane outerSplitPane;
+    private QuickControlsPanel quickControlsPanel;
+    private JXObservationTable table;
+    private JToolBar toolBar;
+    private final ToolBelt toolBelt;
+
+    /**
+     * Constructs ...
+     *
+     * @param toolBelt
+     *
+     * @throws HeadlessException
+     */
+    public AnnotationFrame(ToolBelt toolBelt) throws HeadlessException {
+        this.toolBelt = toolBelt;
+        this.controller = new AnnotationFrameController(this, toolBelt.getPersistenceController());
         initialize();
-        pack();
     }
 
-    /**
-     * Exit the Application
-     *
-     * @param  evt             Description of the Parameter
-     */
-    private void exitForm(final WindowEvent evt) {
-
-        (new ExitAction()).doAction();
-    }
-
-    private JPanel getBottomPanel() {
-        if (bottomPanel == null) {
-            bottomPanel = new JPanel();
-            bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.X_AXIS));
-            bottomPanel.add(getQuickControlsPanel());
-            bottomPanel.add(Box.createHorizontalGlue());
-            bottomPanel.add(getStatusPanel());
-
-            // bottomPanel.add(getClockPanel(), BorderLayout.EAST);
+    private JPanel getConceptButtonPanel() {
+        if (conceptButtonPanel == null) {
+            conceptButtonPanel = new ConceptButtonPanel(toolBelt);
         }
 
-        return bottomPanel;
+        return conceptButtonPanel;
     }
 
-    private JPanel getContentPanel() {
-        if (contentPanel == null) {
-            contentPanel = new AnnotationPanel(toolbelt);
-            contentPanel.setPreferredSize(new Dimension(300, 200));
+    private JSplitPane getInnerSplitPane() {
+        if (innerSplitPane == null) {
+            innerSplitPane = new JSplitPane();
+            innerSplitPane.setLeftComponent(getTable());
+            innerSplitPane.setRightComponent(getMiscTabsPanel());
         }
 
-        return contentPanel;
+        return innerSplitPane;
     }
 
-    EventQueue getEventQueue() {
-        if (eventQueue == null) {
-            eventQueue = new WaitCursorEventQueue(500);
+    private JPanel getMiscTabsPanel() {
+        if (miscTabsPanel == null) {
+            miscTabsPanel = new MiscTabsPanel(toolBelt);
         }
 
-        return eventQueue;
+        return miscTabsPanel;
     }
 
-    private JMenuBar getMyMenuBar() {
-        if (myMenuBar == null) {
-            myMenuBar = new JMenuBar();
-
-            /*
-             *  File Menu
-             */
-            final JMenu menuFile = new JMenu("File");
-
-            menuFile.setMnemonic('F');
-
-            // create Connect menu item
-            final JMenuItem connect = new JMenuItem(new OpenConnectionsAction(toolbelt));
-
-            menuFile.add(connect);
-            menuFile.setMnemonic('C');
-
-
-            // create Open menu item
-            final JMenuItem openVideoArchive = new JMenuItem(new ShowOpenVideoArchiveDialogAction(toolbelt.getAnnotationDAOFactory()));
-
-            menuFile.add(openVideoArchive);
-            menuFile.setMnemonic('O');
-
-            // Clears the kb cache and resets the kb tree
-            JMenuItem clearCache = new JMenuItem(new ClearDatabaseCacheAction(toolbelt));
-
-            menuFile.add(clearCache);
-
-            // create Exit menu item
-            final JMenuItem fileExit = new JMenuItem(new ExitAction());
-
-            fileExit.setMnemonic('X');
-            menuFile.add(fileExit);
-
-
-            /*
-             *  View Menu
-             */
-            final JMenu menuView = new JMenu("View");
-
-            menuView.setMnemonic('V');
-
-            // Opens a Window that views all Observations in a set
-            final JMenuItem viewVideoSet = new JMenuItem("Video Set");
-
-            viewVideoSet.setMnemonic('V');
-            viewVideoSet.setToolTipText("View the video set which the currently opened video archive belongs to");
-            viewVideoSet.addActionListener(new ActionListener() {
-
-                public void actionPerformed(final ActionEvent ae) {
-                    if (viewer == null) {
-                        viewer = new VideoSetViewer(toolbelt);
-                    }
-
-                    viewer.setVisible(true);
-                    viewer.toFront();
-                }
-
-            });
-            menuView.add(viewVideoSet);
-
-            // Create Quicktime settings menu item
-            final JMenuItem quicktime = new JMenuItem(new ActionAdapter() {
-
-
-                public void doAction() {
-                    EventBus.publish(Lookup.TOPIC_WARNING, "Not implemented");
-                    //FrameCaptureAction2.showSettingsDialog();
-                }
-            });
-
-            quicktime.setText("QuickTime Settings");
-            menuView.add(quicktime);
-
-            /*
-             *  About Menu
-             */
-            final JMenu menuHelp = new JMenu("Help");
-
-            menuHelp.setMnemonic('H');
-
-            // create About menu item
-            final JMenuItem helpAbout = new JMenuItem("About");
-
-            helpAbout.setMnemonic('A');
-            helpAbout.addActionListener(new ActionListener() {
-
-                public void actionPerformed(final ActionEvent e) {
-                    final AboutDialog aboutDialog = new AboutDialog(AnnotationFrame.this, true);
-                    final Dimension frameSize = getSize();
-                    final Dimension aboutSize = aboutDialog.getPreferredSize();
-                    int x = getLocation().x + (frameSize.width - aboutSize.width) / 2;
-                    int y = getLocation().y + (frameSize.height - aboutSize.height) / 2;
-
-                    if (x < 0) {
-                        x = 0;
-                    }
-
-                    if (y < 0) {
-                        y = 0;
-                    }
-
-                    aboutDialog.setLocation(x, y);
-                    aboutDialog.setVisible(true);
-                }
-
-            });
-            menuHelp.add(helpAbout);
-            myMenuBar.add(menuFile);
-            myMenuBar.add(menuView);
-            myMenuBar.add(menuHelp);
+    private JSplitPane getOuterSplitPane() {
+        if (outerSplitPane == null) {
+            outerSplitPane = new JSplitPane();
+            outerSplitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
+            outerSplitPane.setLeftComponent(getInnerSplitPane());
+            outerSplitPane.setRightComponent(getConceptButtonPanel());
         }
 
-        return myMenuBar;
+        return outerSplitPane;
     }
 
-    private JPanel getQuickControlsPanel() {
+    private QuickControlsPanel getQuickControlPanel() {
         if (quickControlsPanel == null) {
-            quickControlsPanel = new QuickControlsPanel(toolbelt.getPersistenceController());
+            quickControlsPanel = new QuickControlsPanel(toolBelt.getPersistenceController());
         }
 
         return quickControlsPanel;
     }
 
-    private JPanel getStatusPanel() {
-        if (statusPanel == null) {
-            statusPanel = new StatusPanel(toolbelt);
+    private JXObservationTable getTable() {
+        if (table == null) {
+            table = new JXObservationTable();
+
+            /*
+             * Watch the selected rows and notify the world when the selected rows
+             * are changed
+             */
+            table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+
+                public void valueChanged(ListSelectionEvent e) {
+                    if (!e.getValueIsAdjusting()) {
+                        int[] rows = table.getSelectedRows();
+                        final Dispatcher dispatcher = Lookup.getSelectedObservationsDispatcher();
+                        final List<Observation> selectedObservations = new Vector<Observation>(rows.length);
+
+                        for (int i = 0; i < rows.length; i++) {
+                            selectedObservations.add(table.getObservationAt(rows[i]));
+                        }
+
+                        dispatcher.setValueObject(selectedObservations);
+                    }
+                }
+            });
+
+            /*
+             * Watch for opening of a new videoarchive. When that happens we
+             * have to re-populate the Table
+             */
+            Lookup.getVideoArchiveDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
+
+                public void propertyChange(PropertyChangeEvent evt) {
+
+                    VideoArchive videoArchive = (VideoArchive) evt.getNewValue();
+
+                    // Get the TableModel
+                    final IObservationTableModel model = (IObservationTableModel) table.getModel();
+
+                    // Remove the current contents
+                    model.clear();
+
+                    // Repopulate it with the contents of the new VideoArchive
+                    if (videoArchive != null) {
+
+                        /*
+                         * Use copies of collections to avoid synchronization issues
+                         */
+                        final Collection<VideoFrame> vfs = new HashSet<VideoFrame>(videoArchive.getVideoFrames());
+
+                        for (VideoFrame videoFrame : vfs) {
+                            final Collection<Observation> observations = new ArrayList<Observation>(
+                                videoFrame.getObservations());
+
+                            for (Observation observation : observations) {
+                                model.addObservation(observation);
+                            }
+                        }
+                    }
+                }
+
+            });
+
+            /*
+             * When observations are deleted we remove them from the view.
+             */
+            EventBus.subscribe(Lookup.TOPIC_DELETE_OBSERVATIONS, deleteObservationsSubscriber);
+
+            /*
+             * When observations are persisted we add them to the view.
+             */
+            EventBus.subscribe(Lookup.TOPIC_PERSIST_OBSERVATIONS, persistObservationsSubscriber);
+
+            /*
+             * When observations are updated we redraw them in the view.
+             */
+            EventBus.subscribe(Lookup.TOPIC_MERGE_OBSERVATIONS, mergeObservationsSubscriber);
+
         }
 
-        return statusPanel;
+        return table;
     }
 
-    /**
-     * This method is called from within the constructor to initialize the form.
-     */
+    private JToolBar getToolBar() {
+        if (toolBar == null) {
+            toolBar = new JToolBar();
+            toolBar.add(new StatusLabelForPerson(toolBelt));
+
+            //toolBar.add(new StatusLabelForVcr());
+            toolBar.add(new StatusLabelForVideoArchive(toolBelt.getAnnotationDAOFactory()));
+        }
+
+        return toolBar;
+    }
+
     private void initialize() {
-        getContentPane().setLayout(new BorderLayout());
-        getContentPane().add(getContentPanel(), BorderLayout.CENTER);
-
-        // set title
-        ResourceBundle bundle = ResourceBundle.getBundle("vars-annotation");
-        final String title = bundle.getString("frame.title");
-
-        setTitle(title);
-
-        // add status bar
-        getContentPane().add(getBottomPanel(), BorderLayout.SOUTH);
-
-        // add menu bar
-        setJMenuBar(getMyMenuBar());
-        addWindowListener(new java.awt.event.WindowAdapter() {
-
-            @Override
-            public void windowClosing(final java.awt.event.WindowEvent evt) {
-                exitForm(evt);
-            }
-        });
-        Toolkit.getDefaultToolkit().getSystemEventQueue().push(getEventQueue());
+        getContentPane().add(getOuterSplitPane(), BorderLayout.CENTER);
+        getContentPane().add(getQuickControlPanel(), BorderLayout.SOUTH);
+        getContentPane().add(getToolBar(), BorderLayout.NORTH);
     }
 }

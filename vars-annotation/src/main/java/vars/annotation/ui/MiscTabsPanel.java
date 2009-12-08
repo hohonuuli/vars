@@ -15,7 +15,6 @@
 
 package vars.annotation.ui;
 
-import vars.annotation.ui.FrameGrabPanel;
 import java.awt.Component;
 import javax.swing.JTabbedPane;
 import javax.swing.JTree;
@@ -24,13 +23,17 @@ import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.EventTopicSubscriber;
 import org.jdesktop.swingx.JXTree;
 import org.mbari.swing.SearchableTreePanel;
-import vars.annotation.ui.Lookup;
-import vars.annotation.ui.ToolBelt;
+
 import vars.shared.ui.UIDecorator;
 import vars.shared.ui.tree.ConceptTreeCellRenderer;
 import vars.shared.ui.tree.ConceptTreeModel;
 import vars.shared.ui.tree.ConceptTreePanel;
 import vars.shared.ui.tree.JTreeDragAndDropDecorator;
+import vars.annotation.ui.ppanel.FrameGrabPanel;
+import vars.annotation.ui.ppanel.PCameraDataPanel;
+import vars.annotation.ui.ppanel.PObservationPanel;
+import vars.annotation.ui.ppanel.PPhysicalDataPanel;
+import vars.annotation.ui.ppanel.PVideoArchivePanel;
 
 /**
  * <p>JPanel that contains various tabbed panes used in the annotation
@@ -48,6 +51,7 @@ public class MiscTabsPanel extends javax.swing.JPanel {
     @SuppressWarnings("unused")
     private UIDecorator treeDecorator;
     private SearchableTreePanel treePanel;
+    private EventTopicSubscriber<String> lookupConceptSubscriber;
 
     /**
      * Creates new form MiscTabsPanel
@@ -70,17 +74,19 @@ public class MiscTabsPanel extends javax.swing.JPanel {
             final JTree tree = new JXTree(treeModel);
             tree.setCellRenderer(new ConceptTreeCellRenderer());
             treeDecorator = new JTreeDragAndDropDecorator(tree);
-
-            /*
-             * Listen to messages to select a concept in the tree
-             */
-            EventBus.subscribe(Lookup.TOPIC_SELECT_CONCEPT, new EventTopicSubscriber<String>() {
+            treePanel.setJTree(tree);
+            lookupConceptSubscriber = new EventTopicSubscriber<String>() {
 
                 public void onEvent(String topic, String data) {
                     treePanel.goToMatchingNode(data, false);
                 }
 
-            });
+            };
+
+            /*
+             * Listen to messages to select a concept in the tree
+             */
+            EventBus.subscribe(Lookup.TOPIC_SELECT_CONCEPT, lookupConceptSubscriber);
 
         }
 
@@ -103,11 +109,12 @@ public class MiscTabsPanel extends javax.swing.JPanel {
 
     private void initTabs() {
         tabbedPane.add("Frame-grab", new FrameGrabPanel());
+        tabbedPane.add("Knowledge Base", getTreePanel());
         tabbedPane.add("Observation", new PObservationPanel(toolbelt));
         tabbedPane.add("Video Archive", new PVideoArchivePanel(toolbelt));
         tabbedPane.add("Physical Data", new PPhysicalDataPanel());
         tabbedPane.add("Camera Data", new PCameraDataPanel(toolbelt.getPersistenceController()));
-        tabbedPane.add("Knowledge Base", getTreePanel());
+        
     }
 
     private void resizeHandler(final java.awt.event.ComponentEvent evt) {

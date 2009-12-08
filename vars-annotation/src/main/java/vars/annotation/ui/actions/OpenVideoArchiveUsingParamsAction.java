@@ -17,6 +17,7 @@
 
 package vars.annotation.ui.actions;
 
+import java.util.Collection;
 import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
 import org.slf4j.Logger;
@@ -25,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveDAO;
+import vars.annotation.VideoFrame;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.PersistenceController;
 
@@ -82,7 +84,19 @@ public class OpenVideoArchiveUsingParamsAction extends ActionAdapter {
 
                 // Get a video archive to attach this too
                 VideoArchive videoArchive = videoArchiveDAO.findOrCreateByParameters(platform, seqNumber, videoArchiveName);
+                Collection<VideoFrame> videoFrames = videoArchive.getVideoFrames(); // Load the videoFrames while the transaction is open
+                /*
+                 * Some JPA implementation may not loade the object unless it's touched.
+                 * So I'll give the lazy loaded objects some love here.
+                 */
+                int i = 0;
+                for (VideoFrame videoFrame : videoFrames) {
+                    videoFrame.getTimecode();
+                    i++;
+                }
+                log.debug("Loaded " + i + " videoFrame");
                 videoArchiveDAO.endTransaction();
+                
                 Lookup.getVideoArchiveDispatcher().setValueObject(videoArchive);
 
             }

@@ -31,9 +31,9 @@ import vars.annotation.AnnotationPersistenceService;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveSet;
-import vars.annotation.ui.Lookup;
-import vars.annotation.ui.ToolBelt;
 import vars.knowledgebase.Concept;
+import vars.annotation.ui.ToolBelt;
+import vars.annotation.ui.Lookup;
 
 /**
  * <p>Adds 'identity-reference | self | [some integer]' property to the Observation set in

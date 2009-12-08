@@ -21,8 +21,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import javax.swing.SwingUtilities;
-import vars.annotation.ui.Lookup;
+
 import vars.annotation.ui.ToolBelt;
+import vars.annotation.ui.Lookup;
 
 /**
  * <p>A dialog box for connecting a user. Basically a wrapper for UserConnectPanel,

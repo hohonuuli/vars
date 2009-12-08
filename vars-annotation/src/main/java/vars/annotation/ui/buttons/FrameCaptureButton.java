@@ -27,8 +27,8 @@ import org.mbari.swing.SwingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.actions.FrameCaptureAction;
+import vars.annotation.ui.ToolBelt;
 
 /**
  * <p>

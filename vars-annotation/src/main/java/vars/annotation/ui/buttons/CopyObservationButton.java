@@ -30,10 +30,10 @@ import org.mbari.vcr.IVCR;
 
 import vars.UserAccount;
 import vars.annotation.Observation;
-import vars.annotation.ui.Lookup;
-import vars.annotation.ui.ToolBelt;
-import vars.annotation.ui.VideoService;
 import vars.annotation.ui.actions.CopyObservationAction;
+import vars.annotation.ui.ToolBelt;
+import vars.old.annotation.ui.VideoService;
+import vars.annotation.ui.Lookup;
 
 /**
  * <p>Performs a deep copy of an selected observation to a new time code.</p>

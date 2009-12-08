@@ -42,8 +42,8 @@ import org.mbari.text.IgnoreCaseToStringComparator;
 import vars.Role;
 import vars.UserAccount;
 import vars.UserAccountRoles;
-import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
+import vars.annotation.ui.Lookup;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -176,7 +176,7 @@ public class UserConnectPanel extends JPanel {
         if (createUserButton == null) {
             createUserButton = new JFancyButton();
             createUserButton.setText("New");
-            createUserButton.setIcon(new ImageIcon(getClass().getResource("/images/vars/knowledgebase/user1_add.png")));
+            createUserButton.setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/user1_add.png")));
             createUserButton.setPreferredSize(new java.awt.Dimension(70, 26));
             createUserButton.addActionListener(new java.awt.event.ActionListener() {
 

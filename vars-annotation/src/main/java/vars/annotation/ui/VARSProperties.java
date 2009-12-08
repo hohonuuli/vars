@@ -19,6 +19,7 @@ import java.util.ResourceBundle;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.annotation.ui.Lookup;
 
 /**
  * Retrieve VARS properties. Most of the properties are configured in the file 'vars.properties'. However,
@@ -76,7 +77,7 @@ public class VARSProperties {
          * cameraplatform keys. Sort by name.
          */
         platforms = new HashMap<String, String>();
-        ResourceBundle bundle = ResourceBundle.getBundle("vars"); 
+        ResourceBundle bundle = ResourceBundle.getBundle(Lookup.RESOURCE_BUNDLE);
         Enumeration<String> keys = bundle.getKeys();
         while (keys.hasMoreElements()) {
             String key = keys.nextElement();
@@ -87,11 +88,11 @@ public class VARSProperties {
                 String shipKey = "ship" + idx;
                 String ship = "";
                 try {
-                    log.debug("Looking for " + shipKey + " in vars properties");
+                    log.debug("Looking for " + shipKey + " in " + Lookup.RESOURCE_BUNDLE);
                     ship = bundle.getString(shipKey);
                 }
                 catch (MissingResourceException e) {
-                    log.info("Failed to find key '" + shipKey + "' in vars.properties");
+                    log.info("Failed to find key '" + shipKey + "' in " + Lookup.RESOURCE_BUNDLE);
                     /*
                      * If we fail to find a corresponding ship just use the
                      * cameraPlatform as the ship name.
@@ -110,7 +111,7 @@ public class VARSProperties {
             deploymentLocale = getProperty("deployment.locale");
         } 
         catch (MissingResourceException e) {
-            log.info("The property 'deployment.locale' was not found in vars.properties");
+            log.info("The property 'deployment.locale' was not found in " + Lookup.RESOURCE_BUNDLE);
             deploymentLocale = null;
         }
         
@@ -118,7 +119,7 @@ public class VARSProperties {
             imageCopyrightOwner = getProperty("image.copyright.owner");
         } 
         catch (MissingResourceException e) {
-            log.info("The property 'image.copyright.owner' was not found in vars.properties");
+            log.info("The property 'image.copyright.owner' was not found in " + Lookup.RESOURCE_BUNDLE);
             imageCopyrightOwner = "";
         }
         
@@ -134,7 +135,7 @@ public class VARSProperties {
             }
         }
         catch (MissingResourceException e) {
-            log.info("The property 'vcr.url' was not found in vars.properties");
+            log.info("The property 'vcr.url' was not found in " + Lookup.RESOURCE_BUNDLE);
             vcrUrl = null;
             vcrPort = -1;
         }
@@ -143,14 +144,14 @@ public class VARSProperties {
             imageArchiveDirectory = getProperty("image.archive.dir");
         }
         catch (MissingResourceException e) {
-            log.info("The property 'image.archive.dir' was not found in vars.properties");
+            log.info("The property 'image.archive.dir' was not found in " + Lookup.RESOURCE_BUNDLE);
         }
         
         try {
             imageArchiveURL = getProperty("image.archive.url");
         }
         catch (MissingResourceException e) {
-            log.info("The property 'image.archive.url' was not found in vars.properties");
+            log.info("The property 'image.archive.url' was not found in + " + Lookup.RESOURCE_BUNDLE);
         }
         
 

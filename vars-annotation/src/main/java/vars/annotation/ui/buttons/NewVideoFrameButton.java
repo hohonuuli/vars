@@ -25,9 +25,9 @@ import org.mbari.swing.JFancyButton;
 import org.mbari.swing.SwingUtils;
 import org.mbari.util.Dispatcher;
 
-import vars.annotation.ui.Lookup;
-import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.actions.NewVideoFrameAction;
+import vars.annotation.ui.ToolBelt;
+import vars.annotation.ui.Lookup;
 
 
 /**

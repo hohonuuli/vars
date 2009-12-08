@@ -35,14 +35,7 @@ public class VideoSourceSelectionPanel extends JPanel {
         
         // Set up the default VideoSourcePanel
         String defaultVideoSource = controller.getProperty("video.source.default");
-        if (defaultVideoSource == null || defaultVideoSource.equalsIgnoreCase("tape")) {
-            getVideoSourceComboBox().setSelectedItem(videoSource);
-            ((VideoSourcePanelTape) tapePanel).getHdCheckBox().setSelected(false);
-        }
-        else {
-            getVideoSourceComboBox().setSelectedItem(videoSource);
-            ((VideoSourcePanelTape) tapePanel).getHdCheckBox().setSelected(true);
-        }
+        setVideoSource(defaultVideoSource);
     }
     
     protected JComboBox getVideoSourceComboBox() {
@@ -107,6 +100,17 @@ public class VideoSourceSelectionPanel extends JPanel {
     
     
     public void setVideoSource(String source) {
+
+        if (source == null || source.equalsIgnoreCase("tape")) {
+            getVideoSourceComboBox().setSelectedItem(videoSource);
+            ((VideoSourcePanelTape) tapePanel).getHdCheckBox().setSelected(false);
+        }
+        else {
+            getVideoSourceComboBox().setSelectedItem(videoSource);
+            ((VideoSourcePanelTape) tapePanel).getHdCheckBox().setSelected(true);
+        }
+
+
         selectedPanel = (JPanel) tapePanel;
         videoSourcePanel.removeAll();
         videoSourcePanel.add(selectedPanel, BorderLayout.CENTER);

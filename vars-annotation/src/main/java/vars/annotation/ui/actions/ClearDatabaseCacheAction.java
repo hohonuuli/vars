@@ -24,8 +24,8 @@ import vars.CacheClearedListener;
 import vars.PersistenceCache;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveDAO;
-import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
+import vars.annotation.ui.Lookup;
 
 /**
  * This action refreshes the knowledgebase used by the Annotation Application. 

@@ -17,8 +17,8 @@ import org.mbari.awt.event.NonDigitConsumingKeyListener;
 import org.mbari.text.IgnoreCaseToStringComparator;
 
 import vars.annotation.AnnotationDAOFactory;
-import vars.annotation.ui.VARSProperties;
 import vars.annotation.ui.actions.OpenVideoArchiveUsingParamsAction;
+import vars.annotation.ui.VARSProperties;
 
 /**
  *

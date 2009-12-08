@@ -27,9 +27,9 @@ import javax.swing.event.ListSelectionListener;
 import org.mbari.swing.JFancyButton;
 import org.mbari.swing.SwingUtils;
 import vars.UserAccount;
-import vars.annotation.ui.Lookup;
-import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.actions.DeleteSelectedObservationsWithConfirmAction;
+import vars.annotation.ui.ToolBelt;
+import vars.annotation.ui.Lookup;
 
 /**
  * <p>Deletes the observations selected in the Table. This button will bring

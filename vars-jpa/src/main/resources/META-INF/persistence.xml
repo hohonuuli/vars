@@ -60,7 +60,7 @@
             <property name="javax.persistence.jdbc.user" value="${DEVELOPMENT_JDBC_USERNAME}"/>
             <property name="javax.persistence.jdbc.driver" value="${DEVELOPMENT_JDBC_DRIVER}"/>
             <property name="javax.persistence.jdbc.password" value="${DEVELOPMENT_JDBC_PASSWORD}"/>
-            <property name="eclipselink.logging.level" value="FINE"/>
+            <property name="eclipselink.logging.level" value="CONFIG"/>
            <!--  <property name="eclipselink.ddl-generation" value="create-tables"/> -->
         </properties>
     </persistence-unit>
@@ -94,10 +94,10 @@
             <property name="eclipselink.logging.level" value="FINE"/>
 
             <!-- Logging -->
-			<property name="eclipselink.logging.level" value="FINE" />
-			<property name="eclipselink.logging.timestamp" value="false" />
-			<property name="eclipselink.logging.session" value="false" />
-			<property name="eclipselink.logging.thread" value="false" />
+            <property name="eclipselink.logging.level" value="CONFIG" />
+            <property name="eclipselink.logging.timestamp" value="false" />
+            <property name="eclipselink.logging.session" value="false" />
+            <property name="eclipselink.logging.thread" value="false" />
 
             <!-- Database Table generation -->
             <property name="eclipselink.ddl-generation" value="create-tables"/>

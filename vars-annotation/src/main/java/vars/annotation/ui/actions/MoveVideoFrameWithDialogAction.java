@@ -26,9 +26,9 @@ import org.slf4j.LoggerFactory;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveDAO;
 import vars.annotation.VideoFrame;
+import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.PersistenceController;
-import vars.annotation.ui.ToolBelt;
 
 /**
  * Prompts a user with a dialog for platform, seqNumber and tapeNumber. Finds the

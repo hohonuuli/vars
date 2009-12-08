@@ -33,11 +33,11 @@ import vars.annotation.CameraDirections;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoFrame;
+import vars.knowledgebase.ConceptName;
+import vars.annotation.ui.ToolBelt;
+import vars.old.annotation.ui.VideoService;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.PersistenceController;
-import vars.annotation.ui.ToolBelt;
-import vars.annotation.ui.VideoService;
-import vars.knowledgebase.ConceptName;
 
 /**
  * <p>Action to add a new VideoFrame and a 'nearly' empty Observation

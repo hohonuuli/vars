@@ -31,10 +31,10 @@ import org.mbari.swing.JFancyButton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.AnnotationPersistenceService;
-import vars.annotation.ui.Lookup;
 import vars.knowledgebase.Concept;
 import vars.shared.ui.ConceptNameComboBox;
 import vars.shared.ui.HierachicalConceptNameComboBox;
+import vars.annotation.ui.Lookup;
 
 /**
  *

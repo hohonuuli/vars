@@ -22,8 +22,8 @@ import javax.swing.JTextField;
 import org.mbari.swing.JFancyButton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.annotation.ui.Lookup;
 import vars.annotation.ui.actions.AddNewRefNumPropAction;
+import vars.annotation.ui.Lookup;
 
 /**
  * <p>This dialog is used to set the Reference Number property for the

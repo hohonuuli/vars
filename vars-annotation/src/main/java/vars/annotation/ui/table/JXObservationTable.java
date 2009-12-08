@@ -18,8 +18,6 @@ package vars.annotation.ui.table;
 import java.awt.Component;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.util.Collection;
-import java.util.HashSet;
 
 import javax.swing.JTable;
 import javax.swing.JViewport;
@@ -32,8 +30,7 @@ import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.Observation;
-import vars.annotation.VideoArchive;
-import vars.annotation.VideoFrame;
+
 
 /**  
  */
@@ -47,7 +44,6 @@ public class JXObservationTable extends JXTable implements IObservationTable {
      */
     public JXObservationTable() {
         super();
-
         final TableColumnModel tableColumnModel = new JXObservationTableColumnModel();
         final TableModel model = new JXObservationTableModel(tableColumnModel);
 
@@ -119,38 +115,6 @@ public class JXObservationTable extends JXTable implements IObservationTable {
         return height;
     }
 
-    /**
-     *
-     * @param videoArchive
-     */
-    @SuppressWarnings("unchecked")
-    public void populateWithObservations(final VideoArchive videoArchive) {
-
-        // Get the TableModel
-        final IObservationTableModel model = (IObservationTableModel) getModel();
-
-        // Remove the current contents
-        model.clear();
-
-        // Repopulate it with the contents of the new VideoArchive
-        if (videoArchive != null) {
-            final VideoArchive va = videoArchive;
-
-            /*
-             * Use copies of collections to avoid synchronization issues
-             */
-            final Collection<VideoFrame> vfs = new HashSet<VideoFrame>(va.getVideoFrames());
-
-            for (VideoFrame videoFrame : vfs) {
-                final Collection<Observation> observations = new HashSet<Observation>(videoFrame.getObservations());
-
-                for (Observation observation : observations) {
-                    model.addObservation(observation);
-                }
-            }
-        }
-
-    }
 
     /**
      */
@@ -175,7 +139,7 @@ public class JXObservationTable extends JXTable implements IObservationTable {
     }
 
     /**
-     * Scrool to the corect row and column
+     * Scroll to the correct row and column
      * @param rowIndex
      * @param vColIndex
      */

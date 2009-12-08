@@ -19,8 +19,8 @@ package vars.annotation.ui.buttons;
 
 import javax.swing.ImageIcon;
 
-import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.actions.AddPropertyAction;
+import vars.annotation.ui.ToolBelt;
 
 /**
  * <p>Adds a close up annotation to the selected observations.</p>

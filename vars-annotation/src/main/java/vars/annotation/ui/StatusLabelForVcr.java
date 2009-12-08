@@ -29,8 +29,9 @@ import org.mbari.util.IObserver;
 import org.mbari.vcr.IVCR;
 import org.mbari.vcr.IVCRState;
 import org.mbari.vcr.ui.VCRSelectionDialog;
-import vars.annotation.ui.Lookup;
-import vars.annotation.ui.VideoService;
+
+import vars.old.annotation.ui.StatusLabel;
+import vars.old.annotation.ui.VideoService;
 
 /**
  * <p>Indicates connection state of the VCR. Clicking on this label will bring up

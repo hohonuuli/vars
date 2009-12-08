@@ -25,9 +25,9 @@ import javax.swing.JFrame;
 import org.mbari.awt.event.ActionAdapter;
 
 import vars.annotation.Observation;
-import vars.annotation.ui.ChangeTimeCodeFrame;
-import vars.annotation.ui.Lookup;
+import vars.old.annotation.ui.ChangeTimeCodeFrame;
 import vars.annotation.ui.ToolBelt;
+import vars.annotation.ui.Lookup;
 
 /**
  * <p>Pops up a dialog that allows the user to change the timecode of the

@@ -8,8 +8,8 @@ package vars.annotation.ui.buttons;
 import javax.swing.ImageIcon;
 
 
-import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.actions.AddPropertyAction;
+import vars.annotation.ui.ToolBelt;
 
 /**
  *

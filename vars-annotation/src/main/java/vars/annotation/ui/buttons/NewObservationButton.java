@@ -29,9 +29,9 @@ import org.mbari.swing.SwingUtils;
 
 import vars.UserAccount;
 import vars.annotation.Observation;
-import vars.annotation.ui.Lookup;
-import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.actions.NewObservationAction;
+import vars.annotation.ui.ToolBelt;
+import vars.annotation.ui.Lookup;
 
 /**
  * <p>Create a new observation using the current time-code from the VCR</p>

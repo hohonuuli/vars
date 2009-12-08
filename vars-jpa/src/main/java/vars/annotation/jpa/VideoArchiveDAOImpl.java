@@ -87,7 +87,7 @@ public class VideoArchiveDAOImpl extends DAO implements VideoArchiveDAO {
             // ---- Step 2: No match was found. See if the desired deployment exists
             VideoArchiveSet videoArchiveSet = null;
             Map<String, Object> params2 = new HashMap<String, Object>();
-            params2.put("platform", platform);
+            params2.put("platformName", platform);
             params2.put("sequenceNumber", sequenceNumber);
             List<VideoArchiveSet> vas = findByNamedQuery("VideoArchiveSet.findByPlatformAndSequenceNumber", params2);
             if (vas.size() == 1) {

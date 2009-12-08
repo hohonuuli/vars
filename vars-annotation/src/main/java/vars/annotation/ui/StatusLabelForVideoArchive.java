@@ -25,8 +25,8 @@ import org.mbari.util.Dispatcher;
 
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.VideoArchive;
-import vars.annotation.ui.Lookup;
 import vars.annotation.ui.actions.ShowOpenVideoArchiveDialogAction;
+import vars.old.annotation.ui.StatusLabel;
 
 /**
  * <p>Indicates which {@link VideoArchive} the annotator is editing. Clicking on the

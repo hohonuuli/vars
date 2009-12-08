@@ -64,11 +64,11 @@ import vars.annotation.VideoFrame;
 import vars.annotation.VideoArchive;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchiveSet;
-import vars.annotation.ui.FrameCaptureUtilities;
-import vars.annotation.ui.Lookup;
+import vars.old.annotation.ui.FrameCaptureUtilities;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.VARSProperties;
-import vars.annotation.ui.VideoService;
+import vars.old.annotation.ui.VideoService;
+import vars.annotation.ui.Lookup;
 
 /**
  * <p>Action for capturing a frame an performing related activities on it.</p>

@@ -8,9 +8,9 @@ package vars.annotation.ui.buttons.simple;
 import javax.swing.AbstractButton;
 import javax.swing.ImageIcon;
 
-import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.actions.NewObservationUsingConceptNameAction;
 import vars.annotation.ui.buttons.PropButton;
+import vars.annotation.ui.ToolBelt;
 
 /**
  *

@@ -15,6 +15,9 @@
 package vars.shared.ui.dialogs;
 
 import java.awt.Frame;
+
+import javax.swing.JDialog;
+
 import org.mbari.awt.event.ActionAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +63,10 @@ public class LoginAction extends ActionAdapter {
             log.debug("Attempting to log in");
         }
         loginDialog.setVisible(true);
+    }
+    
+    public JDialog getDialog() {
+    	return loginDialog;
     }
 
     /**

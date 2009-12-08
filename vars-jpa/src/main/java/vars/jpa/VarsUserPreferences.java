@@ -94,6 +94,7 @@ public class VarsUserPreferences extends AbstractPreferences {
     private void insert(PreferenceNode node) {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         EntityTransaction entityTransaction = entityManager.getTransaction();
+        entityTransaction.begin();
         entityManager.persist(node);
         entityTransaction.commit();
         entityManager.close();
@@ -102,6 +103,7 @@ public class VarsUserPreferences extends AbstractPreferences {
     private void update(PreferenceNode node) {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         EntityTransaction entityTransaction = entityManager.getTransaction();
+        entityTransaction.begin();
         entityManager.merge(node);
         entityTransaction.commit();
         entityManager.close();
@@ -110,6 +112,8 @@ public class VarsUserPreferences extends AbstractPreferences {
     private void delete(PreferenceNode node) {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         EntityTransaction entityTransaction = entityManager.getTransaction();
+        entityTransaction.begin();
+        node = entityManager.merge(node);
         entityManager.remove(node);
         entityTransaction.commit();
         entityManager.close();
@@ -163,6 +167,7 @@ public class VarsUserPreferences extends AbstractPreferences {
      */
     protected String getSpi(String key) {
         String prefValue = null;
+
         try {
             PreferenceNode node = findByKey(key);
             if (node != null) {
@@ -358,7 +363,7 @@ public class VarsUserPreferences extends AbstractPreferences {
     private List<PreferenceNode> findByNodeNameLike(String nodeName) {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("nodeName", nodeName + "%");
-        return findByNamedQuery("PreferencesNode.findAllLikeNodeName", params);
+        return findByNamedQuery("PreferenceNode.findAllLikeNodeName", params);
     }
 
 }

@@ -23,8 +23,8 @@ import org.slf4j.LoggerFactory;
 import vars.ILink;
 import vars.annotation.Association;
 import vars.annotation.Observation;
-import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
+import vars.annotation.ui.Lookup;
 
 /**
  * <p>

@@ -32,9 +32,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import vars.UserAccount;
-import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
-import vars.annotation.ui.VideoService;
+import vars.old.annotation.ui.VideoService;
+import vars.annotation.ui.Lookup;
 
 /**
  * <p><!--Insert summary here--></p>

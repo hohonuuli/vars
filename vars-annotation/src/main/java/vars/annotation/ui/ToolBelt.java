@@ -26,6 +26,7 @@ import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.KnowledgebasePersistenceService;
 import vars.query.QueryPersistenceService;
+import vars.annotation.ui.PersistenceController;
 
 /**
  *

@@ -35,10 +35,10 @@ import org.mbari.awt.event.ActionAdapter;
 import org.mbari.swing.IPopup;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveDAO;
-import vars.annotation.ui.Lookup;
-import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.actions.AddNewRefNumPropAction;
 import vars.annotation.ui.actions.UpdateNewRefNumAction;
+import vars.annotation.ui.ToolBelt;
+import vars.annotation.ui.Lookup;
 
 /**
  * <p>

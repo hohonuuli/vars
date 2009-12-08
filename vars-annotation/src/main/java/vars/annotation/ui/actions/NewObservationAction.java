@@ -28,9 +28,9 @@ import vars.UserAccount;
 import vars.annotation.AnnotationFactory;
 import vars.annotation.Observation;
 import vars.annotation.VideoFrame;
+import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.PersistenceController;
-import vars.annotation.ui.ToolBelt;
 
 /**
  * <p>Locates all the VideoFrames selected and adds a new Observation to them</p>

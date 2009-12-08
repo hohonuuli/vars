@@ -11,8 +11,8 @@ import javax.swing.ImageIcon;
 import org.mbari.awt.event.ActionAdapter;
 import vars.annotation.ui.dialogs.ToConceptSelectionDialog;
 
-import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.actions.AddPropertyAction;
+import vars.annotation.ui.ToolBelt;
 
 /**
  *

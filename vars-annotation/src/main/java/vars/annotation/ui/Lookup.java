@@ -22,11 +22,15 @@ import java.beans.PropertyChangeListener;
 import java.util.prefs.Preferences;
 import org.bushe.swing.event.EventBus;
 import org.mbari.util.Dispatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import vars.UserAccount;
 import vars.annotation.CameraDirections;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
 import vars.jpa.VarsUserPreferencesFactory;
+import vars.old.annotation.ui.AnnotationApp;
+import vars.old.annotation.ui.AnnotationFrame;
 import vars.shared.InjectorModule;
 import vars.shared.ui.GlobalLookup;
 
@@ -35,6 +39,8 @@ import vars.shared.ui.GlobalLookup;
  * @author brian
  */
 public class Lookup extends GlobalLookup {
+
+    public static Logger log = LoggerFactory.getLogger(Lookup.class);
 
     protected static final Object KEY_DISPATCHER_CAMERA_DIRECTION = "vars.annotation.ui.Lookup-CameraDirection";
     protected static final Object KEY_DISPATCHER_GUICE_INJECTOR = "vars.annotation.ui.Lookup-Injector";
@@ -61,17 +67,22 @@ public class Lookup extends GlobalLookup {
      */
     public static final String TOPIC_REFRESH = "vars.annotation.ui.Lookup-Refresh";
 
+    
     /**
-     * Specifies the Observations that are selected in the Observation table. the
-     * data object will be a Collection&lt;Observation&gt;
+     * Specifies Observations that are being deleted
      */
-    public static final String TOPIC_SELECTED_OBSERVATIONS = "vars-annotation.ui.Lookup-SelectedObservations";
-
+    public static final String TOPIC_DELETE_OBSERVATIONS = "vars.annotation.ui.Lookup-DeleteObservations";
+    
     /**
-     * Change the {@link VideoArchive} being annotated. The data object will be an
-     * instance of {@link VideoArchive}
+     * Specifies Observations that are being deleted
      */
-    public static final String TOPIC_SELECTED_VIDEOARCHIVE = "vars.annotation.ui.Lookup-VideoArchive";
+    public static final String TOPIC_PERSIST_OBSERVATIONS = "vars.annotation.ui.Lookup-PersistObservations";
+    
+    /**
+     * Specifies Observations that are being updated
+     */
+    public static final String TOPIC_MERGE_OBSERVATIONS = "vars.annotation.ui.Lookup-MergeObservations";
+    
 
     /**
      * Message is sent when a concept should be selected in the concept tree. The
@@ -133,6 +144,9 @@ public class Lookup extends GlobalLookup {
                     throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
                                                        ", EXPECTED: " + VideoArchive.class.getName());
                 }
+                else {
+                    log.info("Using " + evt.getNewValue());
+                }
             }
 
         });
@@ -158,7 +172,6 @@ public class Lookup extends GlobalLookup {
             }
         });
 
-        EventBus.subscribe(TOPIC_SELECTED_VIDEOARCHIVE, LOGGING_SUBSCRIBER);
         EventBus.subscribe(TOPIC_REFRESH, LOGGING_SUBSCRIBER);
         EventBus.subscribe(TOPIC_DATABASE_STATUS, LOGGING_SUBSCRIBER);
 

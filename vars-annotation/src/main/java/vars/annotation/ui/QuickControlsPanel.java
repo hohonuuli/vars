@@ -27,6 +27,7 @@ import vars.annotation.CameraDirections;
 import vars.annotation.FormatCodes;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.actions.ChangeAnnotationModeAction;
+import vars.old.annotation.ui.CameraDirectionComboBox;
 
 /**
  *

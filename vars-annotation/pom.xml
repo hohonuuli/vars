@@ -10,6 +10,23 @@
     <version>1.0-SNAPSHOT</version>
     <name>vars-annotation</name>
     <url>http://maven.apache.org</url>
+    <!--
+    Build settings
+    -->
+    <build>
+        <filters>
+            <filter>src/main/filters/${environment}.properties</filter>
+        </filters>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+    </build>
+    <!--
+    DEPENDENCIES
+    -->
     <dependencies>
         <dependency>
             <groupId>org.swinglabs</groupId>
@@ -48,4 +65,57 @@
             <version>1.37</version>
         </dependency>
     </dependencies>
+    <!--
+    PROFILES
+
+    This should match the profiles in the vars-jpa module. We're setting the
+    enviroment variable used for filtering resources
+    -->
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <environment>dev</environment>
+            </properties>
+        </profile>
+        <profile>
+            <id>pl</id>
+            <properties>
+                <environment>pl</environment>
+            </properties>
+        </profile>
+        <profile>
+            <id>shore</id>
+            <properties>
+                <environment>shore</environment>
+            </properties>
+        </profile>
+        <profile>
+            <id>simpa</id>
+            <properties>
+                <environment>simpa</environment>
+            </properties>
+        </profile>
+        <profile>
+            <id>varspub</id>
+            <properties>
+                <environment>varspub</environment>
+            </properties>
+        </profile>
+        <profile>
+            <id>wf</id>
+            <properties>
+                <environment>wf</environment>
+            </properties>
+        </profile>
+        <profile>
+            <id>test</id>
+            <properties>
+                <environment>test</environment>
+            </properties>
+        </profile>
+    </profiles>
 </project>

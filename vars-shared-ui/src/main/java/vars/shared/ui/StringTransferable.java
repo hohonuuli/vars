@@ -42,7 +42,7 @@ public class StringTransferable implements Transferable {
      */
     private final static List<DataFlavor> flavorList = ImmutableList.of(StringTransferable.LOCAL_STRING_FLAVOR);
 
-    public final static DataFlavor[] flavors = (DataFlavor[]) flavorList.toArray();
+    public final static DataFlavor[] flavors = flavorList.toArray(new DataFlavor[0]);
 
     private String string;
 

@@ -88,7 +88,7 @@ public class NewUserDialog extends javax.swing.JDialog {
         jLabel3.setText("Password:");
 
         cancelButton.setText("Cancel");
-        cancelButton.setIcon(new ImageIcon(getClass().getResource("/images/vars/knowledgebase/delete2.png")));
+        cancelButton.setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/delete2.png")));
         cancelButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cancelButtonActionPerformed(evt);
@@ -102,7 +102,7 @@ public class NewUserDialog extends javax.swing.JDialog {
         });
 
         okButton.setText("OK");
-        okButton.setIcon(new ImageIcon(getClass().getResource("/images/vars/knowledgebase/check2.png")));
+        okButton.setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/check2.png")));
         okButton.setEnabled(false);
         okButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

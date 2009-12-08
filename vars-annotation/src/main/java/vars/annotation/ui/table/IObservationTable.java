@@ -3,18 +3,9 @@ package vars.annotation.ui.table;
 import javax.swing.JTable;
 
 import vars.annotation.Observation;
-import vars.annotation.VideoArchive;
 
 public interface IObservationTable {
 
-    /**
-     * Populates the table with the observations available in videoArchive. I'm
-     * using this a s a work around for a bug that I can't nail down when you
-     * delete certain observations.
-     * 
-     * @param videoArchive
-     */
-    void populateWithObservations(final VideoArchive videoArchive);
 
     /**
      * Delegate method that passes the call on to the ObservationTableModel

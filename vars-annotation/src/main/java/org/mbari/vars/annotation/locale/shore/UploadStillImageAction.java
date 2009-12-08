@@ -38,9 +38,9 @@ import vars.annotation.CameraDeployment;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveSet;
 import vars.annotation.VideoFrame;
+import vars.annotation.ui.VARSProperties;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.PersistenceController;
-import vars.annotation.ui.VARSProperties;
 
 /**
  * <p>

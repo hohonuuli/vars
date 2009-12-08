@@ -23,9 +23,9 @@ import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveDAO;
 import vars.annotation.VideoArchiveSet;
 import vars.annotation.VideoArchiveSetDAO;
+import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.PersistenceController;
-import vars.annotation.ui.ToolBelt;
 
 /**
  * <p>Changes the videoArchvieName property of  a VideoArchive. At MBARI,
