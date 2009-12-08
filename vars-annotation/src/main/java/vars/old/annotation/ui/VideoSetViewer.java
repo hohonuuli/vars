@@ -47,8 +47,8 @@ import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveSet;
 import vars.annotation.VideoFrame;
 import vars.annotation.ui.actions.MoveVideoFrameWithDialogAction;
-import vars.annotation.ui.table.IObservationTable;
-import vars.annotation.ui.table.IObservationTableModel;
+import vars.annotation.ui.table.ObservationTable;
+import vars.annotation.ui.table.ObservationTableModel;
 import vars.annotation.ui.table.JXObservationTable;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.Lookup;
@@ -148,7 +148,7 @@ public class VideoSetViewer extends JFrame {
 
     private SearchAndReplaceWidget getSearchAndReplaceWidget() {
         if (searchAndReplaceWidget == null) {
-            searchAndReplaceWidget = new SearchAndReplaceWidget(this, (IObservationTable) getTable(), toolBelt);
+            searchAndReplaceWidget = new SearchAndReplaceWidget(this, (ObservationTable) getTable(), toolBelt);
         }
 
         return searchAndReplaceWidget;
@@ -200,7 +200,7 @@ public class VideoSetViewer extends JFrame {
          * could think of).
          */
         JXObservationTable myTable = getTable();
-        ((IObservationTableModel) myTable.getModel()).clear();
+        ((ObservationTableModel) myTable.getModel()).clear();
 
         if (videoArchiveSet != null) {
             if (log.isDebugEnabled()) {

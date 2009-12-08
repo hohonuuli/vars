@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Vector;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 import javax.swing.event.ListSelectionEvent;
@@ -38,7 +39,7 @@ import org.slf4j.LoggerFactory;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoFrame;
-import vars.annotation.ui.table.IObservationTableModel;
+import vars.annotation.ui.table.ObservationTableModel;
 import vars.annotation.ui.table.JXObservationTable;
 import vars.annotation.ui.cbpanel.ConceptButtonPanel;
 
@@ -62,7 +63,7 @@ public class AnnotationFrame extends JFrame {
                 log.debug("Removing observations from table\nDATA: " + data);
             }
 
-            final IObservationTableModel model = (IObservationTableModel) getTable().getModel();
+            final ObservationTableModel model = (ObservationTableModel) getTable().getModel();
 
             for (Observation observation : data) {
                 model.removeObservation(observation);
@@ -82,7 +83,7 @@ public class AnnotationFrame extends JFrame {
                 log.debug("Adding observations to table\nDATA: " + data);
             }
 
-            final IObservationTableModel model = (IObservationTableModel) getTable().getModel();
+            final ObservationTableModel model = (ObservationTableModel) getTable().getModel();
 
             for (Observation observation : data) {
                 model.addObservation(observation);
@@ -121,6 +122,7 @@ public class AnnotationFrame extends JFrame {
     private JXObservationTable table;
     private JToolBar toolBar;
     private final ToolBelt toolBelt;
+    private JScrollPane tableScrollPane;
 
     /**
      * Constructs ...
@@ -146,7 +148,7 @@ public class AnnotationFrame extends JFrame {
     private JSplitPane getInnerSplitPane() {
         if (innerSplitPane == null) {
             innerSplitPane = new JSplitPane();
-            innerSplitPane.setLeftComponent(getTable());
+            innerSplitPane.setLeftComponent(getTableScrollPane());
             innerSplitPane.setRightComponent(getMiscTabsPanel());
         }
 
@@ -178,6 +180,14 @@ public class AnnotationFrame extends JFrame {
         }
 
         return quickControlsPanel;
+    }
+
+    private JScrollPane getTableScrollPane() {
+        if (tableScrollPane == null) {
+            tableScrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            tableScrollPane.setViewportView(getTable());
+        }
+        return tableScrollPane;
     }
 
     private JXObservationTable getTable() {
@@ -216,7 +226,7 @@ public class AnnotationFrame extends JFrame {
                     VideoArchive videoArchive = (VideoArchive) evt.getNewValue();
 
                     // Get the TableModel
-                    final IObservationTableModel model = (IObservationTableModel) table.getModel();
+                    final ObservationTableModel model = (ObservationTableModel) table.getModel();
 
                     // Remove the current contents
                     model.clear();
@@ -266,8 +276,7 @@ public class AnnotationFrame extends JFrame {
         if (toolBar == null) {
             toolBar = new JToolBar();
             toolBar.add(new StatusLabelForPerson(toolBelt));
-
-            //toolBar.add(new StatusLabelForVcr());
+            toolBar.add(new StatusLabelForVcr());
             toolBar.add(new StatusLabelForVideoArchive(toolBelt.getAnnotationDAOFactory()));
         }
 

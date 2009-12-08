@@ -58,8 +58,8 @@ import vars.ILink;
 import vars.LinkComparator;
 import vars.annotation.Association;
 import vars.annotation.Observation;
-import vars.annotation.ui.table.IObservationTable;
-import vars.annotation.ui.table.IObservationTableModel;
+import vars.annotation.ui.table.ObservationTable;
+import vars.annotation.ui.table.ObservationTableModel;
 import vars.knowledgebase.Concept;
 import vars.annotation.ui.ToolBelt;
 import vars.old.annotation.ui.VideoSetViewer;
@@ -96,7 +96,7 @@ public class SearchAndReplaceWidget extends JPanel {
     private final String[] waitMessage = { "Retrieving Concept Names ..." };
     private final Comparator<ILink> linkComparator = new LinkComparator();
     private final SearchAndReplaceService searchAndReplaceService;
-    private final IObservationTable table;
+    private final ObservationTable table;
     private final ToolBelt toolBelt;
     private final VideoSetViewer videoSetViewer;
 
@@ -107,7 +107,7 @@ public class SearchAndReplaceWidget extends JPanel {
      * @param  table Description of the Parameter
      * @param toolBelt
      */
-    public SearchAndReplaceWidget(final VideoSetViewer videoSetViewer, final IObservationTable table,
+    public SearchAndReplaceWidget(final VideoSetViewer videoSetViewer, final ObservationTable table,
                                   ToolBelt toolBelt) {
         this.videoSetViewer = videoSetViewer;
         this.table = table;
@@ -207,7 +207,7 @@ public class SearchAndReplaceWidget extends JPanel {
                 public void actionPerformed(final ActionEvent e) {
 
                     final JTable jTable = table.getJTable();
-                    final IObservationTableModel model = (IObservationTableModel) jTable.getModel();
+                    final ObservationTableModel model = (ObservationTableModel) jTable.getModel();
 
                     // Prompt user to make sure that they really want to do the delete
                     final int count = jTable.getSelectedRowCount();
@@ -484,7 +484,7 @@ public class SearchAndReplaceWidget extends JPanel {
      */
     public void redrawSelectedRows() {
         final JTable jTable = table.getJTable();
-        final IObservationTableModel model = (IObservationTableModel) jTable.getModel();
+        final ObservationTableModel model = (ObservationTableModel) jTable.getModel();
         final int[] selectedRows = jTable.getSelectedRows();
         for (int i = 0; i < selectedRows.length; i++) {
             model.redrawRow(selectedRows[i]);

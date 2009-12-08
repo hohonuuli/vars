@@ -13,14 +13,13 @@
 
 
 
-package vars.old.annotation.ui;
+package vars.annotation.ui.video;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import org.mbari.util.Dispatcher;
 import org.mbari.vcr.IVCR;
 
-import vars.old.annotation.ui.VideoService;
 import vars.annotation.ui.Lookup;
 
 /**
@@ -37,8 +36,8 @@ public class VCRPanel extends org.mbari.vcr.ui.VCRPanel implements PropertyChang
         super();
         final Dispatcher dispatcher = Lookup.getVideoServiceDispatcher();
         dispatcher.addPropertyChangeListener(this);
-        final VideoService videoService = (VideoService) dispatcher.getValueObject();
-        final IVCR vcr = (videoService == null) ? null : videoService.getVCR();
+        final VideoControlService videoService = (VideoControlService) dispatcher.getValueObject();
+        final IVCR vcr = (videoService == null) ? null : videoService;
         setVcr(vcr);
     }
 
@@ -47,8 +46,8 @@ public class VCRPanel extends org.mbari.vcr.ui.VCRPanel implements PropertyChang
      * @param evt
      */
     public void propertyChange(PropertyChangeEvent evt) {
-        final VideoService videoService = (VideoService) evt.getNewValue();
-        final IVCR vcr = (videoService == null) ? null : videoService.getVCR();
+        final VideoControlService videoService = (VideoControlService) evt.getNewValue();
+        final IVCR vcr = (videoService == null) ? null : videoService;
         setVcr(vcr);
     }
 }

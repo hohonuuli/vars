@@ -35,7 +35,7 @@ import vars.annotation.VideoArchive;
 import vars.annotation.VideoFrame;
 import vars.knowledgebase.ConceptName;
 import vars.annotation.ui.ToolBelt;
-import vars.old.annotation.ui.VideoService;
+import vars.annotation.ui.video.VideoControlService;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.PersistenceController;
 
@@ -128,8 +128,8 @@ public final class NewVideoFrameAction extends ActionAdapter {
         Observation observation = null;
 
         // Need the VCR to get a current timecode
-        VideoService videoService = (VideoService) Lookup.getVideoServiceDispatcher().getValueObject();
-        final IVCR vcr = videoService.getVCR();
+        VideoControlService videoService = (VideoControlService) Lookup.getVideoServiceDispatcher().getValueObject();
+        final IVCR vcr = videoService;
         if (vcr != null) {
             final String timecode = vcr.getVcrTimecode().toString();
             observation = doAction(conceptName, timecode);
@@ -168,8 +168,8 @@ public final class NewVideoFrameAction extends ActionAdapter {
                 }
             }
 
-            final VideoService videoService = (VideoService) Lookup.getVideoServiceDispatcher().getValueObject();
-            final IVCR vcr = videoService.getVCR();
+            final VideoControlService videoService = (VideoControlService) Lookup.getVideoServiceDispatcher().getValueObject();
+            final IVCR vcr = videoService;
             if ((conceptName != null) && (timecode != null) && isTimeOK) {
                 UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
                 final PersistenceController persistenceController = toolBelt.getPersistenceController();

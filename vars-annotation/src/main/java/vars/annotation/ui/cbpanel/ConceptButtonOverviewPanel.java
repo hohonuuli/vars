@@ -59,7 +59,7 @@ public class ConceptButtonOverviewPanel extends JPanel {
     public void loadPreferences() {
         getOverviewPanel().removeAll();
         Preferences userPreferences = (Preferences) Lookup.getPreferencesDispatcher().getValueObject();
-        final Preferences cpPreferences = userPreferences.node("CP");
+        final Preferences cpPreferences = userPreferences.node(ConceptButtonPanel.PREF_CP_NODE);
         if (cpPreferences != null) {
             String[] tabNames = null;
             try {
@@ -73,7 +73,7 @@ public class ConceptButtonOverviewPanel extends JPanel {
                 for (int i = 0; i < tabNames.length; i++) {
                     String tabName = tabNames[i];
                     JPanel panel = new ConceptButtonDropPanelWithHighlights(cpPreferences.node(tabName), toolBelt);
-                    panel.setBorder(javax.swing.BorderFactory.createTitledBorder(cpPreferences.node(tabName).get("tabName","")));
+                    panel.setBorder(javax.swing.BorderFactory.createTitledBorder(cpPreferences.node(tabName).get(ConceptButtonPanel.PREFKEY_TABNAME,"")));
                     getOverviewPanel().add(panel);
                 }
 

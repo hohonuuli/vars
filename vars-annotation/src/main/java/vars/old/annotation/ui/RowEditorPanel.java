@@ -54,7 +54,7 @@ import vars.CacheClearedListener;
 import vars.UserAccount;
 import vars.annotation.AnnotationPersistenceService;
 import vars.annotation.Observation;
-import vars.annotation.ui.table.IObservationTable;
+import vars.annotation.ui.table.ObservationTable;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptName;
 import vars.annotation.ui.ToolBelt;
@@ -111,7 +111,7 @@ public class RowEditorPanel extends JPanel {
      */
     private Collection<String> notableConceptNames;
     private JTextArea notesArea;
-    private final IObservationTable observationTable;
+    private final ObservationTable observationTable;
     private Observation selectedObservation;
     private final ToolBelt toolBelt;
 
@@ -121,7 +121,7 @@ public class RowEditorPanel extends JPanel {
      * @param toolBelt
      */
     public RowEditorPanel(ToolBelt toolBelt) {
-        this((IObservationTable) Lookup.getObservationTableDispatcher().getValueObject(), toolBelt);
+        this((ObservationTable) Lookup.getObservationTableDispatcher().getValueObject(), toolBelt);
     }
 
     /**
@@ -130,7 +130,7 @@ public class RowEditorPanel extends JPanel {
      * @param  observationTable Description of the Parameter
      * @param toolBelt
      */
-    public RowEditorPanel(final IObservationTable observationTable, ToolBelt toolBelt) {
+    public RowEditorPanel(final ObservationTable observationTable, ToolBelt toolBelt) {
         super();
         this.observationTable = observationTable;
         this.toolBelt = toolBelt;

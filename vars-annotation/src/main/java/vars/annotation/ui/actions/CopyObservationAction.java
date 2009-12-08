@@ -37,7 +37,7 @@ import vars.annotation.VideoFrame;
 import vars.annotation.VideoArchive;
 import vars.annotation.Observation;
 import vars.annotation.ui.ToolBelt;
-import vars.old.annotation.ui.VideoService;
+import vars.annotation.ui.video.VideoControlService;
 import vars.annotation.ui.Lookup;
 
 /**
@@ -81,8 +81,8 @@ public final class CopyObservationAction extends ActionAdapter {
             final AnnotationFactory annotationFactory = toolBelt.getAnnotationFactory();
 
             // Need the VCR to get a current timecode
-            final VideoService videoService = (VideoService) Lookup.getVideoServiceDispatcher().getValueObject();
-            final IVCR vcr = videoService == null ? null : videoService.getVCR();
+            final VideoControlService videoService = (VideoControlService) Lookup.getVideoServiceDispatcher().getValueObject();
+            final IVCR vcr = videoService == null ? null : videoService;
             if (vcr != null) {
                 
                 Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();

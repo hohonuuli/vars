@@ -15,6 +15,7 @@
 
 package vars.old.annotation.ui;
 
+import vars.annotation.ui.video.VCRPanel;
 import vars.annotation.ui.ToolBelt;
 import java.awt.BorderLayout;
 import java.awt.Dimension;

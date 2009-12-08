@@ -101,15 +101,15 @@ public class FGSCellRenderer extends JPanel implements TableCellRenderer {
         boolean hasSample = false;
 
         // Set the framegrab icon
-        if (IObservationTableModel.FRAMEGRAB.equals(obs)) {
+        if (ObservationTableModel.FRAMEGRAB.equals(obs)) {
             hasFramegrab = true;
             hasSample = false;
         }
-        else if (IObservationTableModel.SAMPLE.equals(obs)) {
+        else if (ObservationTableModel.SAMPLE.equals(obs)) {
             hasFramegrab = false;
             hasSample = true;
         }
-        else if (IObservationTableModel.FRAMEGRAB_AND_SAMPLE.equals(obs)) {
+        else if (ObservationTableModel.FRAMEGRAB_AND_SAMPLE.equals(obs)) {
             hasFramegrab = true;
             hasSample = true;
         }

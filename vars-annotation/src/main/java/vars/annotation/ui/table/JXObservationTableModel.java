@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import vars.annotation.Observation;
 
-public class JXObservationTableModel extends AbstractTableModel implements IObservationTableModel {
+public class JXObservationTableModel extends AbstractTableModel implements ObservationTableModel {
     
     private final List<Observation> observations = Collections.synchronizedList(new ArrayList<Observation>());
     private final Logger log = LoggerFactory.getLogger(getClass());

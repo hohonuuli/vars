@@ -53,9 +53,9 @@ public class ConceptButtonPanel extends JPanel {
     private JPanel buttonPanel = null;
     private JButton lockButton = null;
     private final Logger log = LoggerFactory.getLogger(getClass());
-    private final String PREF_CP_NODE = "vars.annotation.ui.cbpanel.ConceptButtonPanel";
-    private final String PREFKEY_TABNAME = "tabName";
-    private final String TAB_PREFIX = "tab";
+    public static final String PREF_CP_NODE = "vars.annotation.ui.cbpanel.ConceptButtonPanel";
+    public static final String PREFKEY_TABNAME = "tabName";
+    public static final String TAB_PREFIX = "tab";
 
     /**
      *     The button to move a new tab

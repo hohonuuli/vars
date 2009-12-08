@@ -25,7 +25,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.mbari.util.Dispatcher;
 import vars.annotation.Observation;
-import vars.annotation.ui.table.IObservationTable;
+import vars.annotation.ui.table.ObservationTable;
 import vars.annotation.ui.table.JXObservationTable;
 import vars.annotation.ui.Lookup;
 
@@ -37,7 +37,7 @@ import vars.annotation.ui.Lookup;
 public class ObservationTablePanel extends javax.swing.JPanel {
 
     private javax.swing.JScrollPane scrollPane;
-    private final IObservationTable table;
+    private final ObservationTable table;
 
     /**
      * Creates new form ObservationTablePanel
@@ -81,7 +81,7 @@ public class ObservationTablePanel extends javax.swing.JPanel {
      *
      * @return  The observationTable used for representing the data
      */
-    public IObservationTable getObservationTable() {
+    public ObservationTable getObservationTable() {
         return table;
     }
 

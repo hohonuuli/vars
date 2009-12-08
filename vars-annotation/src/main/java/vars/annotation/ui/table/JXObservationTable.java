@@ -21,10 +21,12 @@ import java.awt.Rectangle;
 
 import javax.swing.JTable;
 import javax.swing.JViewport;
+import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.JXTableHeader;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.slf4j.Logger;
@@ -35,10 +37,9 @@ import vars.annotation.Observation;
 /**  
  */
 @SuppressWarnings("serial")
-public class JXObservationTable extends JXTable implements IObservationTable {
+public class JXObservationTable extends JXTable implements ObservationTable {
 
     private final Logger log = LoggerFactory.getLogger(JXObservationTable.class);
-
     /**
      * Constructs ...
      */
@@ -46,9 +47,17 @@ public class JXObservationTable extends JXTable implements IObservationTable {
         super();
         final TableColumnModel tableColumnModel = new JXObservationTableColumnModel();
         final TableModel model = new JXObservationTableModel(tableColumnModel);
+        final JTableHeader tableHeader = new JXTableHeader(tableColumnModel);
 
         setModel(model);
         setColumnModel(tableColumnModel);
+        setAutoCreateColumnsFromModel(true);
+        setSortable(true);
+        setAutoscrolls(true);
+        tableHeader.setTable(this);
+        setTableHeader(tableHeader);
+        
+
         super.setHighlighters(new Highlighter[] { HighlighterFactory.createAlternateStriping() });
         setRowHeightEnabled(true);
     }
@@ -58,7 +67,7 @@ public class JXObservationTable extends JXTable implements IObservationTable {
      * @param observation
      */
     public void addObservation(final Observation observation) {
-        ((IObservationTableModel) getModel()).addObservation(observation);
+        ((ObservationTableModel) getModel()).addObservation(observation);
 
         if (log.isDebugEnabled()) {
             log.debug("Adding " + observation + " to the table model");
@@ -87,7 +96,7 @@ public class JXObservationTable extends JXTable implements IObservationTable {
      * @return
      */
     public Observation getObservationAt(final int row) {
-        final IObservationTableModel model = (IObservationTableModel) getModel();
+        final ObservationTableModel model = (ObservationTableModel) getModel();
 
         return model.getObservationAt(convertRowIndexToModel(row));
     }
@@ -119,7 +128,7 @@ public class JXObservationTable extends JXTable implements IObservationTable {
     /**
      */
     public void redrawAll() {
-        ((IObservationTableModel) getModel()).redrawAll();
+        ((ObservationTableModel) getModel()).redrawAll();
     }
 
     /**
@@ -127,7 +136,7 @@ public class JXObservationTable extends JXTable implements IObservationTable {
      * @param row
      */
     public void redrawRow(final int row) {
-        ((IObservationTableModel) getModel()).redrawRow(row);
+        ((ObservationTableModel) getModel()).redrawRow(row);
     }
 
     /**
@@ -135,7 +144,7 @@ public class JXObservationTable extends JXTable implements IObservationTable {
      * @param observation
      */
     public void removeObservation(final Observation observation) {
-        ((IObservationTableModel) getModel()).removeObservation(observation);
+        ((ObservationTableModel) getModel()).removeObservation(observation);
     }
 
     /**

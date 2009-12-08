@@ -4,7 +4,7 @@ import javax.swing.JTable;
 
 import vars.annotation.Observation;
 
-public interface IObservationTable {
+public interface ObservationTable {
 
 
     /**

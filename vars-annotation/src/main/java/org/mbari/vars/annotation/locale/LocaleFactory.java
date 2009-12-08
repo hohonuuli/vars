@@ -29,7 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import vars.annotation.ui.VARSProperties;
-import vars.old.annotation.ui.VideoService;
+import vars.annotation.ui.video.VideoControlService;
 import vars.annotation.ui.Lookup;
 
 /**
@@ -114,8 +114,8 @@ public class LocaleFactory {
                     dispatcher.addPropertyChangeListener(new PropertyChangeListener() {
 
                         public void propertyChange(PropertyChangeEvent evt) {
-                            VideoService videoService = (VideoService) evt.getNewValue();
-                            IVCR vcr = (videoService == null) ? null : videoService.getVCR();
+                            VideoControlService videoService = (VideoControlService) evt.getNewValue();
+                            IVCR vcr = (videoService == null) ? null : videoService;
                             if (vcr != null) {
                                 vcr.play();
                             }
@@ -148,7 +148,7 @@ public class LocaleFactory {
                         }
                     }
 
-                    VideoService videoService = (VideoService) dispatcher.getValueObject();
+                    VideoControlService videoService = (VideoControlService) dispatcher.getValueObject();
                     videoService.setVCR(vcr);
                 }
                 catch (Exception ex) {

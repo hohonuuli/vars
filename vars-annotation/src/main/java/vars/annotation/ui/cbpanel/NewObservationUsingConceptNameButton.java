@@ -53,7 +53,7 @@ import vars.annotation.AnnotationPersistenceService;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.actions.NewObservationUsingConceptNameAction;
 import vars.annotation.ui.ToolBelt;
-import vars.old.annotation.ui.VideoService;
+import vars.annotation.ui.video.VideoControlService;
 import vars.annotation.ui.Lookup;
 
 /**
@@ -144,8 +144,8 @@ public class NewObservationUsingConceptNameButton extends JFancyButton
         Lookup.getVideoServiceDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
             
             public void propertyChange(PropertyChangeEvent evt) {
-                VideoService videoService = (VideoService) evt.getNewValue();
-                hasVcr = (videoService != null && videoService.getVCR() != null);
+                VideoControlService videoService = (VideoControlService) evt.getNewValue();
+                hasVcr = (videoService != null && videoService.isConnected());
             }
         });
 
@@ -354,8 +354,8 @@ public class NewObservationUsingConceptNameButton extends JFancyButton
 
             hasPerson = (obj2 == null) ? false : true;
 
-            final VideoService videoService = (VideoService) Lookup.getVideoServiceDispatcher().getValueObject();
-            final Object obj3 = (videoService == null) ? null : videoService.getVCR();
+            final VideoControlService videoService = (VideoControlService) Lookup.getVideoServiceDispatcher().getValueObject();
+            final Object obj3 = (videoService == null) ? null : videoService;
 
             hasVcr = (obj3 == null) ? false : true;
         }

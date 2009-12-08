@@ -36,7 +36,7 @@ import vars.LinkComparator;
 import vars.UserAccount;
 import vars.annotation.Association;
 import vars.annotation.Observation;
-import vars.annotation.ui.table.IObservationTable;
+import vars.annotation.ui.table.ObservationTable;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.PersistenceController;
 
@@ -72,7 +72,7 @@ public class SearchAndReplaceService {
      * @return  An array of associations for observations at the selected
      *          rows. This include all child, grand-child, etc. associations.
      */
-    public Association[] getAssociationsAtRows(final IObservationTable table, final int[] rows) {
+    public Association[] getAssociationsAtRows(final ObservationTable table, final int[] rows) {
         if ((table == null) || (rows == null)) {
             throw new IllegalArgumentException("both arguments must be non-null");
         }
@@ -94,7 +94,7 @@ public class SearchAndReplaceService {
      * @param  table THe ObservationTable of interest
      * @return  An array of all associations in the table.
      */
-    public Association[] getAssociationsInTable(final IObservationTable table) {
+    public Association[] getAssociationsInTable(final ObservationTable table) {
         final SortedSet<Association> associations = new TreeSet<Association>();
         Observation observation;
         for (int i = 0; i < table.getJTable().getRowCount(); i++) {
@@ -113,7 +113,7 @@ public class SearchAndReplaceService {
      * @param  table The table of interest
      * @return  A string array of all conceptNames in the table.
      */
-    public String[] getConceptNamesInTable(final IObservationTable table) {
+    public String[] getConceptNamesInTable(final ObservationTable table) {
 
         final Set<String> conceptNamesInTable = new HashSet<String>();
         for (int i = 0; i < table.getJTable().getRowCount(); i++) {
@@ -136,7 +136,7 @@ public class SearchAndReplaceService {
      *          are not checked.
      * @return  indices of the matching rows.
      */
-    public int[] getMatchingRows(final IObservationTable table, final String conceptNameToSearchFor,
+    public int[] getMatchingRows(final ObservationTable table, final String conceptNameToSearchFor,
                                  final Association associationToSearchFor) {
         if (table == null) {
             throw new NullPointerException("ObservationTable argument must be non-null");
@@ -196,7 +196,7 @@ public class SearchAndReplaceService {
      * @param  table Description of the Parameter
      * @return  The selectedObservations value
      */
-    public Observation[] getSelectedObservations(final IObservationTable table) {
+    public Observation[] getSelectedObservations(final ObservationTable table) {
 
         final int[] selectedRows = table.getJTable().getSelectedRows();
         final List<Observation> observationList = new ArrayList<Observation>();
@@ -213,7 +213,7 @@ public class SearchAndReplaceService {
      *
      * @param  table Description of the Parameter
      */
-    public void removeAllAssociationsOnSelectedObservations(final IObservationTable table) {
+    public void removeAllAssociationsOnSelectedObservations(final ObservationTable table) {
         final int[] selectedRows = table.getJTable().getSelectedRows();
         Collection<Observation> observations = new ArrayList<Observation>(selectedRows.length);
         for (int i = 0; i < selectedRows.length; i++) {
@@ -229,7 +229,7 @@ public class SearchAndReplaceService {
      * @param  table Description of the Parameter
      * @param  association Description of the Parameter
      */
-    public void removeAssociationOnSelectedObservations(final IObservationTable table, final Association association) {
+    public void removeAssociationOnSelectedObservations(final ObservationTable table, final Association association) {
 
         final int[] selectedRows = table.getJTable().getSelectedRows();
         Collection<Association> associationsToDelete = new ArrayList<Association>();
@@ -256,7 +256,7 @@ public class SearchAndReplaceService {
      * @param  conceptNameToSearchFor The ConceptName to search for
      * @param  associationToSearchFor The Association to search for
      */
-    public void selectMatchingObservations(final IObservationTable table, final String conceptNameToSearchFor,
+    public void selectMatchingObservations(final ObservationTable table, final String conceptNameToSearchFor,
             final Association associationToSearchFor) {
 
         if ((conceptNameToSearchFor == null) && (associationToSearchFor == null)) {
@@ -278,7 +278,7 @@ public class SearchAndReplaceService {
      * @param  table The new conceptNameForSelectedObservations value
      * @param  conceptName The new conceptNameForSelectedObservations value
      */
-    public void setConceptNameForSelectedObservations(final IObservationTable table, final String conceptName) {
+    public void setConceptNameForSelectedObservations(final ObservationTable table, final String conceptName) {
         if (conceptName == null) {
             throw new IllegalArgumentException("conceptName argument must be non-null");
         }
@@ -306,7 +306,7 @@ public class SearchAndReplaceService {
      * @param  newAssociation Description of the Parameter
      * @param  oldAssociation Description of the Parameter
      */
-    public void updateAssociationOnSelectedObservations(final IObservationTable table,
+    public void updateAssociationOnSelectedObservations(final ObservationTable table,
             final Association newAssociation, final Association oldAssociation) {
 
         final int[] selectedRows = table.getJTable().getSelectedRows();

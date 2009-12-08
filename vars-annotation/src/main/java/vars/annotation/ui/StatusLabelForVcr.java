@@ -31,7 +31,7 @@ import org.mbari.vcr.IVCRState;
 import org.mbari.vcr.ui.VCRSelectionDialog;
 
 import vars.old.annotation.ui.StatusLabel;
-import vars.old.annotation.ui.VideoService;
+import vars.annotation.ui.video.VideoControlService;
 
 /**
  * <p>Indicates connection state of the VCR. Clicking on this label will bring up
@@ -87,8 +87,8 @@ public class StatusLabelForVcr extends StatusLabel {
          * it's value to trigger a notification.
          */
         final Dispatcher dispatcher = Lookup.getVideoServiceDispatcher();
-        final VideoService videoService = (VideoService) dispatcher.getValueObject();
-        final IVCR vcr = (videoService == null) ? null : videoService.getVCR();
+        final VideoControlService videoService = (VideoControlService) dispatcher.getValueObject();
+        final IVCR vcr = (videoService == null) ? null : videoService;
 
         dispatcher.addPropertyChangeListener(new VcrListener());
         setVcr(vcr);
@@ -147,10 +147,10 @@ public class StatusLabelForVcr extends StatusLabel {
          * @param evt
          */
         public void propertyChange(final PropertyChangeEvent evt) {
-            final VideoService newVideoService = (VideoService) evt.getNewValue();
-            final VideoService oldVideoService = (VideoService) evt.getOldValue();
-            final IVCR newVcr = (newVideoService == null) ? null : newVideoService.getVCR();
-            final IVCR oldVcr = (oldVideoService == null) ? null : oldVideoService.getVCR();
+            final VideoControlService newVideoService = (VideoControlService) evt.getNewValue();
+            final VideoControlService oldVideoService = (VideoControlService) evt.getOldValue();
+            final IVCR newVcr = (newVideoService == null) ? null : newVideoService;
+            final IVCR oldVcr = (oldVideoService == null) ? null : oldVideoService;
 
             if (log.isDebugEnabled()) {
                 final String label = (newVcr == null) ? NO_CONNECTION : "VCR: " + newVcr.getConnectionName();

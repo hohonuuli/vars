@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 
 import vars.UserAccount;
 import vars.annotation.ui.ToolBelt;
-import vars.old.annotation.ui.VideoService;
+import vars.annotation.ui.video.VideoControlService;
 import vars.annotation.ui.Lookup;
 
 /**
@@ -172,7 +172,7 @@ public class ConnectionDialog extends OkayCancelDialog {
                 // login complete, close dialog.
                 if (success) {
                     final IVCR vcr = vcrConnectionPanel.getVcr();
-                    VideoService videoService = (VideoService) Lookup.getVideoArchiveDispatcher().getValueObject();
+                    VideoControlService videoService = (VideoControlService) Lookup.getVideoArchiveDispatcher().getValueObject();
                     // TODO VideoService might be null. May have to instantiate it.
                     videoService.setVCR(vcr);
                     ConnectionDialog.this.dispose();
@@ -188,10 +188,11 @@ public class ConnectionDialog extends OkayCancelDialog {
      *
      * @param b
      */
+    @Override
     public void setVisible(final boolean b) {
         if (b) {
-            VideoService videoService = (VideoService) Lookup.getVideoArchiveDispatcher().getValueObject();
-            getVcrConnectionPanel().setVcr(videoService.getVCR());
+            VideoControlService videoService = (VideoControlService) Lookup.getVideoArchiveDispatcher().getValueObject();
+            getVcrConnectionPanel().setVcr(videoService);
         }
 
         super.setVisible(b);

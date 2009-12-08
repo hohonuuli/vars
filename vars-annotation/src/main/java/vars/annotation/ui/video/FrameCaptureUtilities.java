@@ -1,4 +1,4 @@
-package vars.old.annotation.ui;
+package vars.annotation.ui.video;
 
 import ij.IJ;
 import ij.process.ColorProcessor;

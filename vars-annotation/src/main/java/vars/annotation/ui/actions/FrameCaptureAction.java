@@ -64,10 +64,10 @@ import vars.annotation.VideoFrame;
 import vars.annotation.VideoArchive;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchiveSet;
-import vars.old.annotation.ui.FrameCaptureUtilities;
+import vars.annotation.ui.video.FrameCaptureUtilities;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.VARSProperties;
-import vars.old.annotation.ui.VideoService;
+import vars.annotation.ui.video.VideoControlService;
 import vars.annotation.ui.Lookup;
 
 /**
@@ -272,7 +272,7 @@ public class FrameCaptureAction extends ActionAdapter {
          */
         public void capture() {
             
-            VideoService videoService = (VideoService) Lookup.getVideoServiceDispatcher().getValueObject();
+            VideoControlService videoService = (VideoControlService) Lookup.getVideoServiceDispatcher().getValueObject();
             if (videoService == null) {
                 EventBus.publish(Lookup.TOPIC_WARNING, "No Video Service is available or frame capure");
                 return;

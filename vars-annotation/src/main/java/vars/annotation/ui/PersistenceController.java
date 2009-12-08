@@ -237,6 +237,17 @@ public class PersistenceController {
         dao.endTransaction();
         updateUI();
     }
+
+    public void moveObservationsTo(VideoArchive videoArchive, Collection<Observation> observations) {
+        Collection<Observation> updateObservations = new ArrayList<Observation>();
+        DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
+        dao.startTransaction();
+        videoArchive = dao.find(videoArchive);
+        for (Observation observation : updateObservations) {
+            observation = dao.find(observation);
+            throw new UnsupportedOperationException("Implementation isn't finished yet");
+        }
+    }
     
     public Collection<Observation> deleteAllAssociationsFrom(Collection<Observation> observations) {
         Collection<Observation> updateObservations = new ArrayList<Observation>();

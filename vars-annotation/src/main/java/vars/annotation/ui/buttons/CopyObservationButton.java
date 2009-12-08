@@ -32,7 +32,7 @@ import vars.UserAccount;
 import vars.annotation.Observation;
 import vars.annotation.ui.actions.CopyObservationAction;
 import vars.annotation.ui.ToolBelt;
-import vars.old.annotation.ui.VideoService;
+import vars.annotation.ui.video.VideoControlService;
 import vars.annotation.ui.Lookup;
 
 /**
@@ -66,8 +66,8 @@ public class CopyObservationButton extends JFancyButton {
                 Collection<Observation> obs = (Collection<Observation>) evt.getNewValue();
                 
                 final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher();
-                final VideoService videoService = (VideoService) Lookup.getVideoServiceDispatcher();
-                final IVCR vcr = videoService.getVCR();
+                final VideoControlService videoService = (VideoControlService) Lookup.getVideoServiceDispatcher();
+                final IVCR vcr = videoService;
                 if ((userAccount != null) && (obs.size() == 1) && (vcr != null)) {
                     setEnabled(true);
                 }

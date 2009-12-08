@@ -50,10 +50,10 @@ public class PCameraDataPanel extends PropertiesPanel {
         super();
         this.persistenceService = persistenceService;
         setPropertyNames(new String[] {
-            "Direction", "Name", "Zoom", "Focus", "Iris", "FieldWidth", "StillImage"
+            "Direction", "Name", "Zoom", "Focus", "Iris", "FieldWidth", "ImageReference"
         });
         addListeners();
-        addToolTip("StillImage");
+        addToolTip("ImageReference");
     }
 
     private void addListeners() {

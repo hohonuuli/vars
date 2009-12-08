@@ -2,7 +2,7 @@ package vars.annotation.ui.table;
 
 import vars.annotation.Observation;
 
-public interface IObservationTableModel {
+public interface ObservationTableModel {
     
     
     Integer SAMPLE = Integer.valueOf(3);

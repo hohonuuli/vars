@@ -239,16 +239,16 @@ public class JXObservationTableColumnModel extends DefaultTableColumnModelExt {
                 hasFramegrab = vf.hasImageReference();
             }
 
-            Integer out = IObservationTableModel.NONE;
+            Integer out = ObservationTableModel.NONE;
 
             if (hasFramegrab && hasSample) {
-                out = IObservationTableModel.FRAMEGRAB_AND_SAMPLE;
+                out = ObservationTableModel.FRAMEGRAB_AND_SAMPLE;
             }
             else if (!hasFramegrab && hasSample) {
-                out = IObservationTableModel.SAMPLE;
+                out = ObservationTableModel.SAMPLE;
             }
             else if (hasFramegrab && !hasSample) {
-                out = IObservationTableModel.FRAMEGRAB;
+                out = ObservationTableModel.FRAMEGRAB;
             }
 
             return out;

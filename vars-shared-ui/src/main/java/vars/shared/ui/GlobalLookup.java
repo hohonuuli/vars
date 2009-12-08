@@ -9,6 +9,9 @@ import java.awt.Frame;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 
 import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.EventTopicSubscriber;
@@ -22,6 +25,18 @@ import vars.shared.ui.event.LoggingSubscriber;
  * @author brian
  */
 public class GlobalLookup {
+
+    /**
+     * Standard format for all Dates used in SIMPA. No timezone is displayed.
+     * THe date will be formatted for the UTC timezone
+     */
+    public static final DateFormat DATE_FORMAT_UTC = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+    /**
+     * Formats the dates using whatever the local timezone is. TImezone info
+     * is displayed by this formatter
+     */
+    public static final DateFormat DATE_FORMAT_LOCAL = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
     
     protected static final Object KEY_DISPATCHER_SELECTED_FRAME = "vars.shared.ui.GlobalLookup-SelectedFrame";
     protected static final Object KEY_DISPATCHER_USERACCOUNT = "vars.shared.ui.GlobalLookup-UserAccount";
@@ -51,6 +66,9 @@ public class GlobalLookup {
      * Throw an exception if the wrong parameter type is set
      */
     static {
+
+        DATE_FORMAT_UTC.setTimeZone(TimeZone.getTimeZone("UTC"));
+
         getSelectedFrameDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 Object obj = evt.getNewValue();
