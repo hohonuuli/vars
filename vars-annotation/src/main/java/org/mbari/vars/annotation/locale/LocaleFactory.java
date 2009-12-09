@@ -18,6 +18,7 @@ package org.mbari.vars.annotation.locale;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Set;
+import org.bushe.swing.event.EventBus;
 import org.mbari.util.Dispatcher;
 import org.mbari.vcr.IVCR;
 import org.mbari.vcr.timer.DefaultMonitoringVCR;
@@ -31,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import vars.annotation.ui.VARSProperties;
 import vars.annotation.ui.video.VideoControlService;
 import vars.annotation.ui.Lookup;
+import vars.annotation.ui.video.UDPVideoControlService;
 
 /**
  * Acquires the deployment location (Shore, Point Lobos, Western Flyer) from a
@@ -97,7 +99,7 @@ public class LocaleFactory {
                 }
             }
 
-            final Dispatcher dispatcher = Lookup.getVideoServiceDispatcher();
+            final Dispatcher dispatcher = Lookup.getVideoControlServiceDispatcher();
 
             /*
              * If VARS is running on one of the ships, we want the VCR to 'play' by
@@ -135,25 +137,16 @@ public class LocaleFactory {
             String vcrUrl = VARSProperties.getVcrUrl();
             int vcrPort = VARSProperties.getVcrPort();
             if (vcrUrl != null) {
-                MonitoringVCR vcr = null;
                 try {
-
-                    // Slow down the timecode sampling rate when working over the network
-                    vcr = new DefaultMonitoringVCR(new VCR(vcrUrl, VARSProperties.getVcrPort()));
-                    Set<Monitor> monitors = vcr.getMonitors();
-                    for (Monitor monitor : monitors) {
-                        if (monitor.getName().equals(TimecodeMonitor.MONITOR_NAME)) {
-                            monitor.setIntervalMin(350);
-                            break;
-                        }
-                    }
-
-                    VideoControlService videoService = (VideoControlService) dispatcher.getValueObject();
-                    videoService.setVCR(vcr);
+                    VideoControlService videoControlService = new UDPVideoControlService();
+                    videoControlService.connect(new Object[] {vcrUrl, vcrPort, Double.valueOf(29.97)});
+                    Lookup.getVideoControlServiceDispatcher().setValueObject(videoControlService);
+                    
                 }
                 catch (Exception ex) {
+                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, "Failed to connect to VCR on " + vcrUrl + ":" + vcrPort );
                     if (log.isWarnEnabled()) {
-                        log.warn("Failed to connect to VCR on " + vcrUrl + ":" + vcrPort);
+                        log.warn("Failed to connect to VCR on " + vcrUrl + ":" + vcrPort, ex);
                     }
                 }
             }

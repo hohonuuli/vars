@@ -8,22 +8,9 @@
         </layout>
     </appender>
 
-
-    <logger name="org.hibernate.connection.DriverManagerConnectionProvider">
-        <level value="info" />
-    </logger>
-
-    <logger name="org.hibernate">
+    <logger name="org.mbari.vcr">
         <level value="warn" />
-    </logger>
-
-    <!-- <logger name="vars">
-        <level value="info" />
-    </logger>
-
-    <logger name="org.mbari">
-        <level value="info" />
-    </logger> -->
+    </logger> 
 
     <root>
         <priority value="debug" />

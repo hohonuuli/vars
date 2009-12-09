@@ -81,7 +81,7 @@ public final class CopyObservationAction extends ActionAdapter {
             final AnnotationFactory annotationFactory = toolBelt.getAnnotationFactory();
 
             // Need the VCR to get a current timecode
-            final VideoControlService videoService = (VideoControlService) Lookup.getVideoServiceDispatcher().getValueObject();
+            final VideoControlService videoService = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
             final IVCR vcr = videoService == null ? null : videoService;
             if (vcr != null) {
                 

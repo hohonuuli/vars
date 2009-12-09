@@ -1,5 +1,5 @@
 /*
- * @(#)OpenVideoArchiveSetDialog3.java   2009.11.20 at 03:33:03 PST
+ * @(#)OpenVideoArchiveSetDialog3.java   2009.12.09 at 01:58:27 PST
  *
  * Copyright 2009 MBARI
  *
@@ -11,6 +11,8 @@
  * limitations under the License.
  */
 
+
+
 package org.mbari.vars.annotation.locale;
 
 import java.awt.BorderLayout;
@@ -19,27 +21,42 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
-import javax.swing.JButton;
-import vars.annotation.ui.dialogs.OkayCancelDialog;
-import vars.annotation.ui.dialogs.VideoSourceSelectionPanel;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.ui.Lookup;
+import vars.annotation.ui.dialogs.VideoSourceSelectionPanel;
+import vars.shared.ui.dialogs.StandardDialog;
 
 /**
  * Dialog for opening a VideoArchive.
  * @author brian
  */
-public class OpenVideoArchiveSetDialog3 extends OkayCancelDialog {
+public class OpenVideoArchiveSetDialog3 extends StandardDialog {
 
-    private VideoSourceSelectionPanel selectionPanel;
     private final AnnotationDAOFactory annotationDAOFactory;
+    private VideoSourceSelectionPanel selectionPanel;
 
-    /** Creates a new instance of OpenVideoArchiveSetDialog3 */
+    /**
+     * Creates a new instance of OpenVideoArchiveSetDialog3
+     *
+     * @param annotationDAOFactory
+     */
     public OpenVideoArchiveSetDialog3(AnnotationDAOFactory annotationDAOFactory) {
         super((Frame) Lookup.getApplicationFrameDispatcher().getValueObject());
         this.annotationDAOFactory = annotationDAOFactory;
         initialize();
+        addKeyListener(new KeyAdapter() {
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+					okButtonAction();
+				}
+			}
+        	
+		});
     }
 
     private VideoSourceSelectionPanel getSelectionPanel() {
@@ -65,13 +82,20 @@ public class OpenVideoArchiveSetDialog3 extends OkayCancelDialog {
 
     void initialize() {
         getContentPane().add(getSelectionPanel(), BorderLayout.CENTER);
-        JButton okButton = getOkayButton();
-        okButton.addActionListener(new ActionListener() {
+        getOkayButton().addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
                 okButtonAction();
+                dispose();
             }
 
+        });
+        getCancelButton().addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+
+            }
         });
         pack();
     }

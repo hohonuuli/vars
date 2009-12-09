@@ -19,6 +19,7 @@ import java.awt.Toolkit;
 import java.util.Date;
 import javax.swing.Action;
 import javax.swing.KeyStroke;
+import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.movie.Timecode;
 import org.mbari.util.NumberUtilities;
@@ -128,11 +129,16 @@ public final class NewVideoFrameAction extends ActionAdapter {
         Observation observation = null;
 
         // Need the VCR to get a current timecode
-        VideoControlService videoService = (VideoControlService) Lookup.getVideoServiceDispatcher().getValueObject();
+        VideoControlService videoService = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
         final IVCR vcr = videoService;
         if (vcr != null) {
-            final String timecode = vcr.getVcrTimecode().toString();
-            observation = doAction(conceptName, timecode);
+            try {
+                final String timecode = vcr.getVcrTimecode().toString();
+                observation = doAction(conceptName, timecode);
+            }
+            catch (Exception e) {
+                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+            }
         }
 
         return observation;
@@ -168,7 +174,7 @@ public final class NewVideoFrameAction extends ActionAdapter {
                 }
             }
 
-            final VideoControlService videoService = (VideoControlService) Lookup.getVideoServiceDispatcher().getValueObject();
+            final VideoControlService videoService = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
             final IVCR vcr = videoService;
             if ((conceptName != null) && (timecode != null) && isTimeOK) {
                 UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();

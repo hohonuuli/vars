@@ -74,7 +74,7 @@ public class NewVideoFrameButton extends JFancyButton {
             }
         });
 
-        final Dispatcher videoServiceDispatcher = Lookup.getVideoServiceDispatcher();
+        final Dispatcher videoServiceDispatcher = Lookup.getVideoControlServiceDispatcher();
         hasVcr = videoArchiveDispatcher.getValueObject() != null;
         videoArchiveDispatcher.addPropertyChangeListener(new PropertyChangeListener() {
             

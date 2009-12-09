@@ -44,7 +44,7 @@ public class CameraDirectionComboBox extends JComboBox {
         // Add acceptable values
         final CameraDirections[] values = CameraDirections.values();
         for (int i = 0; i < values.length; i++) {
-            addItem(values[i].toString());
+            addItem(values[i]);
         }
 
         // Set the selected item

@@ -28,10 +28,10 @@ import org.mbari.util.Dispatcher;
 import org.mbari.util.IObserver;
 import org.mbari.vcr.IVCR;
 import org.mbari.vcr.IVCRState;
-import org.mbari.vcr.ui.VCRSelectionDialog;
 
 import vars.old.annotation.ui.StatusLabel;
 import vars.annotation.ui.video.VideoControlService;
+import vars.annotation.ui.video.VideoControlServiceDialog;
 
 /**
  * <p>Indicates connection state of the VCR. Clicking on this label will bring up
@@ -59,6 +59,9 @@ public class StatusLabelForVcr extends StatusLabel {
          */
         addMouseListener(new MouseAdapter() {
 
+            Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
+            private final JDialog videoDialog = new VideoControlServiceDialog(frame);
+
             @Override
             public void mouseClicked(final MouseEvent me) {
                 SwingUtils.flashJComponent(StatusLabelForVcr.this, 2);
@@ -74,8 +77,6 @@ public class StatusLabelForVcr extends StatusLabel {
                 videoDialog.setVisible(true);
             }
 
-            Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
-            private final JDialog videoDialog = new VCRSelectionDialog(frame);
 
         });
 
@@ -86,7 +87,7 @@ public class StatusLabelForVcr extends StatusLabel {
          * old obj are equal, so we have to set it to null and then back to
          * it's value to trigger a notification.
          */
-        final Dispatcher dispatcher = Lookup.getVideoServiceDispatcher();
+        final Dispatcher dispatcher = Lookup.getVideoControlServiceDispatcher();
         final VideoControlService videoService = (VideoControlService) dispatcher.getValueObject();
         final IVCR vcr = (videoService == null) ? null : videoService;
 

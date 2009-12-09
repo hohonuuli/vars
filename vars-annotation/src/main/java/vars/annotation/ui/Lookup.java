@@ -1,5 +1,5 @@
 /*
- * @(#)Lookup.java   2009.11.17 at 09:19:06 PST
+ * @(#)Lookup.java   2009.12.09 at 09:08:38 PST
  *
  * Copyright 2009 MBARI
  *
@@ -28,6 +28,9 @@ import vars.UserAccount;
 import vars.annotation.CameraDirections;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
+import vars.annotation.ui.table.ObservationTable;
+import vars.annotation.ui.video.ImageCaptureService;
+import vars.annotation.ui.video.VideoControlService;
 import vars.jpa.VarsUserPreferencesFactory;
 import vars.old.annotation.ui.AnnotationApp;
 import vars.old.annotation.ui.AnnotationFrame;
@@ -40,49 +43,42 @@ import vars.shared.ui.GlobalLookup;
  */
 public class Lookup extends GlobalLookup {
 
-    public static Logger log = LoggerFactory.getLogger(Lookup.class);
-
     protected static final Object KEY_DISPATCHER_CAMERA_DIRECTION = "vars.annotation.ui.Lookup-CameraDirection";
     protected static final Object KEY_DISPATCHER_GUICE_INJECTOR = "vars.annotation.ui.Lookup-Injector";
+    protected static final Object KEY_DISPATCHER_IMAGECAPTURESERVICE = "vars.annotation.ui.Lookup-ImageCaptureService";
     protected static final Object KEY_DISPATCHER_OBSERVATION_TABLE = "vars.annotation.ui.Lookup-ObservationTable";
     protected static final Object KEY_DISPATCHER_PREFERENCES = "vars.annotation.ui.Lookup-Preferences";
-    protected static final Object KEY_DISPATCHER_VIDEOARCHIVE = VideoArchive.class;
-    protected static final Object KEY_DISPATCHER_SELECTED_OBSERVATIONS = Observation.class;
-    protected static final Object KEY_DISPATCHER_APPLICATION_FRAME = AnnotationFrame.class;
-    protected static final Object KEY_DISPATCHER_APPLICATION = AnnotationApp.class;
-    protected static final Object KEY_DISPATCHER_VIDEO_SERVICE = "vars.annotation.ui.Lookup-VideoService";
+    protected static final Object KEY_DISPATCHER_VIDEOSERVICE = "vars.annotation.ui.Lookup-VideoService";
 
     /**  */
     public static final String RESOURCE_BUNDLE = "annotation-app";
 
-    /** 
-     * Subscribers to this topic will receive Boolean objects. 
-     * True = status is OK, 
+    /**
+     * Subscribers to this topic will receive Boolean objects.
+     * True = status is OK,
      * false = database problems
      */
     public static final String TOPIC_DATABASE_STATUS = "vars.annotation.ui.Lookup-DatabaseStatus";
 
     /**
-     * Refresh the persisted objects (aka clear 2nd level cache).
-     */
-    public static final String TOPIC_REFRESH = "vars.annotation.ui.Lookup-Refresh";
-
-    
-    /**
      * Specifies Observations that are being deleted
      */
     public static final String TOPIC_DELETE_OBSERVATIONS = "vars.annotation.ui.Lookup-DeleteObservations";
-    
-    /**
-     * Specifies Observations that are being deleted
-     */
-    public static final String TOPIC_PERSIST_OBSERVATIONS = "vars.annotation.ui.Lookup-PersistObservations";
-    
+
     /**
      * Specifies Observations that are being updated
      */
     public static final String TOPIC_MERGE_OBSERVATIONS = "vars.annotation.ui.Lookup-MergeObservations";
-    
+
+    /**
+     * Specifies Observations that are being deleted
+     */
+    public static final String TOPIC_PERSIST_OBSERVATIONS = "vars.annotation.ui.Lookup-PersistObservations";
+
+    /**
+     * Refresh the persisted objects (aka clear 2nd level cache).
+     */
+    public static final String TOPIC_REFRESH = "vars.annotation.ui.Lookup-Refresh";
 
     /**
      * Message is sent when a concept should be selected in the concept tree. The
@@ -90,6 +86,13 @@ public class Lookup extends GlobalLookup {
      * subscriber for the tree is in {@link MiscTabsPanel}
      */
     public static final String TOPIC_SELECT_CONCEPT = "vars-annotation.ui.Lookup-SelectedConcept";
+
+    /**  */
+    public static Logger log = LoggerFactory.getLogger(Lookup.class);
+    protected static final Object KEY_DISPATCHER_VIDEOARCHIVE = VideoArchive.class;
+    protected static final Object KEY_DISPATCHER_SELECTED_OBSERVATIONS = Observation.class;
+    protected static final Object KEY_DISPATCHER_APPLICATION_FRAME = AnnotationFrame.class;
+    protected static final Object KEY_DISPATCHER_APPLICATION = AnnotationApp.class;
 
     static {
         getApplicationDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
@@ -112,6 +115,16 @@ public class Lookup extends GlobalLookup {
                 }
             }
 
+        });
+
+        getCameraDirectionDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ((evt.getNewValue() != null) && !(evt.getNewValue() instanceof CameraDirections)) {
+                    throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
+                                                       ", EXPECTED: " + CameraDirections.class.getName());
+                }
+            }
         });
 
         getGuiceInjectorDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
@@ -151,6 +164,46 @@ public class Lookup extends GlobalLookup {
 
         });
 
+
+        getVideoControlServiceDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ((evt.getNewValue() != null) && !(evt.getNewValue() instanceof VideoControlService)) {
+                    throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
+                                                       ", EXPECTED: " + VideoControlService.class.getName());
+                }
+                else {
+                    log.info("Using " + evt.getNewValue());
+                    VideoControlService oldService = (VideoControlService) evt.getOldValue();
+                    if (oldService != null) {
+                        oldService.disconnect();
+                    }
+                }
+            }
+        });
+
+        getImageCaptureServiceDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ((evt.getNewValue() != null) && !(evt.getNewValue() instanceof ImageCaptureService)) {
+                    throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
+                                                       ", EXPECTED: " + ImageCaptureService.class.getName());
+                }
+                else {
+                    log.info("Using " + evt.getNewValue());
+                }
+            }
+        });
+
+        getObservationTableDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ((evt.getNewValue() != null) && !(evt.getNewValue() instanceof ObservationTable)) {
+                    throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
+                                                       ", EXPECTED: " + ObservationTable.class.getName());
+                }
+            }
+        });
 
         /*
          * When a UserAccount is sent to this topic on event bus make sure the preferences
@@ -214,6 +267,13 @@ public class Lookup extends GlobalLookup {
     }
 
     /**
+     * @return
+     */
+    public static Dispatcher getImageCaptureServiceDispatcher() {
+        return Dispatcher.getDispatcher(KEY_DISPATCHER_IMAGECAPTURESERVICE);
+    }
+
+    /**
      * Stores a reference to the {@link ConceptTree} so that other componenets
      * can reference it as needed.
      * @return
@@ -251,9 +311,7 @@ public class Lookup extends GlobalLookup {
     /**
      * @return
      */
-    public static Dispatcher getVideoServiceDispatcher() {
-        return Dispatcher.getDispatcher(KEY_DISPATCHER_VIDEO_SERVICE);
+    public static Dispatcher getVideoControlServiceDispatcher() {
+        return Dispatcher.getDispatcher(KEY_DISPATCHER_VIDEOSERVICE);
     }
-    
-
 }

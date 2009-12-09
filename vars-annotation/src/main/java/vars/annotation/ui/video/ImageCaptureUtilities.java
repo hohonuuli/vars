@@ -17,9 +17,9 @@ import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class FrameCaptureUtilities {
+public class ImageCaptureUtilities {
     
-    private static final Logger log = LoggerFactory.getLogger(FrameCaptureUtilities.class);
+    private static final Logger log = LoggerFactory.getLogger(ImageCaptureUtilities.class);
     
     
     /**

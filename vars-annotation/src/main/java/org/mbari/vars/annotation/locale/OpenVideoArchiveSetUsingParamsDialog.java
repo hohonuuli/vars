@@ -17,6 +17,8 @@ package org.mbari.vars.annotation.locale;
 
 import java.awt.BorderLayout;
 import java.awt.Frame;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -30,13 +32,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import org.mbari.awt.event.ActionAdapter;
-import vars.annotation.ui.dialogs.OkayCancelDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.ui.actions.OpenVideoArchiveUsingParamsAction;
 import vars.annotation.ui.VARSProperties;
 import vars.annotation.ui.Lookup;
+import vars.shared.ui.dialogs.StandardDialog;
 
 /**
  * <p>
@@ -47,7 +49,7 @@ import vars.annotation.ui.Lookup;
  *
  * @author  <a href="http://www.mbari.org">MBARI </a>
  */
-public class OpenVideoArchiveSetUsingParamsDialog extends OkayCancelDialog {
+public class OpenVideoArchiveSetUsingParamsDialog extends StandardDialog {
 
     private javax.swing.JComboBox cbCameraPlatform = null;
     private JCheckBox cbHD = null;
@@ -297,10 +299,14 @@ public class OpenVideoArchiveSetUsingParamsDialog extends OkayCancelDialog {
         jContentPane.add(getJPanel3(), null);
         jContentPane.add(getJPanel4(), null);
         jContentPane.setLayout(new javax.swing.BoxLayout(jContentPane, javax.swing.BoxLayout.Y_AXIS));
+        getCancelButton().addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				dispose();
+			}
+		});
     }
 
     private void initializeOkayButton() {
-        setCloseDialogOnOkay(false);
         getOkayButton().addActionListener(getOkButtonAction());
         updateOkayButtonsEnabledProperty();
     }

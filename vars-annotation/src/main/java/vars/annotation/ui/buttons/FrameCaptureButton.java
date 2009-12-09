@@ -27,7 +27,7 @@ import org.mbari.swing.SwingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import vars.annotation.ui.actions.FrameCaptureAction;
+import vars.annotation.ui.video.ImageCaptureAction;
 import vars.annotation.ui.ToolBelt;
 
 /**
@@ -69,7 +69,7 @@ public class FrameCaptureButton extends JFancyButton {
      * Don't hhang the UI when we grab a Frame. Use Foxtrot.
      *
      */
-    private class WorkerAction extends FrameCaptureAction {
+    private class WorkerAction extends ImageCaptureAction {
 
 
         public WorkerAction(ToolBelt toolBelt) {

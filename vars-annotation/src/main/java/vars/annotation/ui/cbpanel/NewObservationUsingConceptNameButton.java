@@ -141,7 +141,7 @@ public class NewObservationUsingConceptNameButton extends JFancyButton
             }
         });
         
-        Lookup.getVideoServiceDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
+        Lookup.getVideoControlServiceDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
             
             public void propertyChange(PropertyChangeEvent evt) {
                 VideoControlService videoService = (VideoControlService) evt.getNewValue();
@@ -354,7 +354,7 @@ public class NewObservationUsingConceptNameButton extends JFancyButton
 
             hasPerson = (obj2 == null) ? false : true;
 
-            final VideoControlService videoService = (VideoControlService) Lookup.getVideoServiceDispatcher().getValueObject();
+            final VideoControlService videoService = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
             final Object obj3 = (videoService == null) ? null : videoService;
 
             hasVcr = (obj3 == null) ? false : true;

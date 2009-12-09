@@ -19,7 +19,6 @@ package vars.annotation.ui.actions;
 
 import javax.swing.JDialog;
 import org.mbari.awt.event.ActionAdapter;
-import vars.annotation.ui.dialogs.ConnectionDialog;
 
 import vars.annotation.ui.ToolBelt;
 
@@ -28,6 +27,7 @@ import vars.annotation.ui.ToolBelt;
  * to connect to the VCR</p>
  *
  * @author  <a href="http://www.mbari.org">MBARI</a>
+ * @deprecated 
  */
 public class OpenConnectionsAction extends ActionAdapter {
 
@@ -38,7 +38,8 @@ public class OpenConnectionsAction extends ActionAdapter {
      */
     public OpenConnectionsAction(ToolBelt toolBelt) {
         super("Connect");
-        dialog = new ConnectionDialog(toolBelt);
+        dialog = null;
+       // dialog = new ConnectionDialog(toolBelt);
     }
 
     /**

@@ -66,7 +66,7 @@ public class CopyObservationButton extends JFancyButton {
                 Collection<Observation> obs = (Collection<Observation>) evt.getNewValue();
                 
                 final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher();
-                final VideoControlService videoService = (VideoControlService) Lookup.getVideoServiceDispatcher();
+                final VideoControlService videoService = (VideoControlService) Lookup.getVideoControlServiceDispatcher();
                 final IVCR vcr = videoService;
                 if ((userAccount != null) && (obs.size() == 1) && (vcr != null)) {
                     setEnabled(true);

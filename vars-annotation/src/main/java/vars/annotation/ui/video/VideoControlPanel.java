@@ -19,6 +19,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import org.mbari.util.Dispatcher;
 import org.mbari.vcr.IVCR;
+import org.mbari.vcr.ui.VCRPanel;
 
 import vars.annotation.ui.Lookup;
 
@@ -27,14 +28,14 @@ import vars.annotation.ui.Lookup;
  *
  * @author  <a href="http://www.mbari.org">MBARI</a>
  */
-public class VCRPanel extends org.mbari.vcr.ui.VCRPanel implements PropertyChangeListener {
+public class VideoControlPanel extends VCRPanel implements PropertyChangeListener {
 
     /**
      * Constructor
      */
-    public VCRPanel() {
+    public VideoControlPanel() {
         super();
-        final Dispatcher dispatcher = Lookup.getVideoServiceDispatcher();
+        final Dispatcher dispatcher = Lookup.getVideoControlServiceDispatcher();
         dispatcher.addPropertyChangeListener(this);
         final VideoControlService videoService = (VideoControlService) dispatcher.getValueObject();
         final IVCR vcr = (videoService == null) ? null : videoService;

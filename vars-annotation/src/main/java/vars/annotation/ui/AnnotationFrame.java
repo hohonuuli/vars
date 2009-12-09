@@ -222,35 +222,14 @@ public class AnnotationFrame extends JFrame {
             Lookup.getVideoArchiveDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
 
                 public void propertyChange(PropertyChangeEvent evt) {
-
                     VideoArchive videoArchive = (VideoArchive) evt.getNewValue();
-
-                    // Get the TableModel
-                    final ObservationTableModel model = (ObservationTableModel) table.getModel();
-
-                    // Remove the current contents
-                    model.clear();
-
-                    // Repopulate it with the contents of the new VideoArchive
-                    if (videoArchive != null) {
-
-                        /*
-                         * Use copies of collections to avoid synchronization issues
-                         */
-                        final Collection<VideoFrame> vfs = new HashSet<VideoFrame>(videoArchive.getVideoFrames());
-
-                        for (VideoFrame videoFrame : vfs) {
-                            final Collection<Observation> observations = new ArrayList<Observation>(
-                                videoFrame.getObservations());
-
-                            for (Observation observation : observations) {
-                                model.addObservation(observation);
-                            }
-                        }
-                    }
+                    toolBelt.getPersistenceController().updateUI(videoArchive);
                 }
 
             });
+
+            Lookup.getObservationTableDispatcher().setValueObject(table);
+
 
             /*
              * When observations are deleted we remove them from the view.
