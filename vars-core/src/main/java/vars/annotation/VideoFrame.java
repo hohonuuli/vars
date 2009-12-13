@@ -22,6 +22,7 @@ package vars.annotation;
 
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 import vars.VideoMoment;
 
@@ -58,7 +59,7 @@ public interface VideoFrame extends AnnotationObject, VideoMoment {
     /**
      * @return  The observations associated with this annotated frame. This  collection is synchronized.
      */
-    Set<Observation> getObservations();
+    List<Observation> getObservations();
 
     /**
      * Get the <code>PhysicalData</code> associated with this <code>VideoFrame</code>.

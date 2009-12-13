@@ -20,6 +20,8 @@ public interface ObservationTable {
      * @param observation
      */
     void removeObservation(final Observation observation);
+    
+    void updateObservation(Observation observation);
 
     /**
      * @param obs

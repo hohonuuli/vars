@@ -405,4 +405,8 @@ public class ObservationImpl implements Serializable, Observation, JPAEntity {
 
         return sb.toString();
     }
+    
+    public Object getPrimaryKey() {
+    	return getId();
+    }
 }

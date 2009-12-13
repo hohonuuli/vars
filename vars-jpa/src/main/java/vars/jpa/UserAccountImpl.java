@@ -226,4 +226,8 @@ public class UserAccountImpl implements Serializable, UserAccount, JPAEntity {
         sb.append("userName=").append(userName).append(")");
         return sb.toString();
     }
+    
+    public Object getPrimaryKey() {
+    	return getId();
+    }
 }

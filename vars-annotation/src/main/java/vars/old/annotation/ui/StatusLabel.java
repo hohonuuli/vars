@@ -40,8 +40,9 @@ public abstract class StatusLabel extends JLabel implements PropertyChangeListen
         offIcon = getImageIcon("/images/vars/annotation/error.png");
         onIcon = getImageIcon("/images/vars/annotation/check.png");
         setOk(false);
-        setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY, 1),
-                BorderFactory.createEmptyBorder(1, 2, 1, 2)));
+        setBorder(BorderFactory.createEmptyBorder(2, 10, 2, 10));
+//        setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY, 1),
+//                BorderFactory.createEmptyBorder(1, 2, 1, 2)));
     }
 
     private ImageIcon getImageIcon(final String relativePath) {

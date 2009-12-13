@@ -16,8 +16,10 @@ package vars.annotation.jpa;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -103,7 +105,7 @@ public class VideoFrameImpl implements Serializable, VideoFrame, JPAEntity {
         fetch = FetchType.EAGER,
         cascade = CascadeType.ALL
     )
-    Set<Observation> observations;
+    List<Observation> observations;
 
     @OneToOne(
         mappedBy = "videoFrame",
@@ -180,9 +182,9 @@ public class VideoFrameImpl implements Serializable, VideoFrame, JPAEntity {
         return id;
     }
 
-    public Set<Observation> getObservations() {
+    public List<Observation> getObservations() {
         if (observations == null) {
-            observations = new HashSet<Observation>();
+            observations = new ArrayList<Observation>();
         }
 
         return observations;
@@ -263,5 +265,9 @@ public class VideoFrameImpl implements Serializable, VideoFrame, JPAEntity {
         sb.append(", recordedDate=").append(recordedDate).append(")");
 
         return sb.toString();
+    }
+    
+    public Object getPrimaryKey() {
+    	return getId();
     }
 }

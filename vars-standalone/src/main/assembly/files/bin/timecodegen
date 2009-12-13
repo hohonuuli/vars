@@ -1,0 +1,24 @@
+#!/usr/bin/env groovy
+
+/**
+ * Script for simulation a udp VCR
+ */
+
+def port = (args.size() > 0) ? Integer.valueOf(args[0]) : 9000
+
+println("Localtime timecode generator attached to port ${port}")
+
+ 
+def socket = new DatagramSocket(port)
+def buffer = (' ' * 4096) as byte[]
+while(true) {
+    def incoming = new DatagramPacket(buffer, buffer.length)
+    socket.receive(incoming)
+    def c = new GregorianCalendar()
+    def f = c.get(Calendar.MILLISECOND) / 1000.0 * 29.97;
+    String reply = String.format('%tT:%02d', c, Math.round(f))
+    //println("Sending: ${reply}")
+    outgoing = new DatagramPacket(reply.bytes, reply.size(),
+            incoming.address, incoming.port);
+    socket.send(outgoing)
+}

@@ -301,6 +301,10 @@ public class HistoryImpl implements Serializable, History, JPAEntity {
     public String getOldValue() {
         return oldValue;
     }
+    
+    public Object getPrimaryKey() {
+    	return getId();
+    }
 
     public void setAction(String action) {
         this.action = action;

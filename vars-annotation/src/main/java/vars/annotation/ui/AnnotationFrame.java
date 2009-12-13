@@ -1,5 +1,5 @@
 /*
- * @(#)AnnotationFrame.java   2009.12.07 at 04:29:40 PST
+ * @(#)AnnotationFrame.java   2009.12.12 at 09:42:18 PST
  *
  * Copyright 2009 MBARI
  *
@@ -19,11 +19,9 @@ import java.awt.BorderLayout;
 import java.awt.HeadlessException;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
+import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -31,17 +29,14 @@ import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import org.bushe.swing.event.EventBus;
-import org.bushe.swing.event.EventTopicSubscriber;
 import org.mbari.util.Dispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
-import vars.annotation.VideoFrame;
-import vars.annotation.ui.table.ObservationTableModel;
-import vars.annotation.ui.table.JXObservationTable;
 import vars.annotation.ui.cbpanel.ConceptButtonPanel;
+import vars.annotation.ui.roweditor.RowEditorPanel;
+import vars.annotation.ui.table.JXObservationTable;
 
 /**
  *
@@ -50,79 +45,20 @@ import vars.annotation.ui.cbpanel.ConceptButtonPanel;
 public class AnnotationFrame extends JFrame {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
-
-    /**
-     * When observations are deleted we need to remove them from the view.
-     * The AppFrameController contains a subscriber that deletes them from the
-     * data store
-     */
-    private final EventTopicSubscriber<Collection<Observation>> deleteObservationsSubscriber = new EventTopicSubscriber<Collection<Observation>>() {
-
-        public void onEvent(String topic, Collection<Observation> data) {
-            if (log.isDebugEnabled()) {
-                log.debug("Removing observations from table\nDATA: " + data);
-            }
-
-            final ObservationTableModel model = (ObservationTableModel) getTable().getModel();
-
-            for (Observation observation : data) {
-                model.removeObservation(observation);
-            }
-        }
-    };
-
-    /**
-     * When observations are persisted we need to add them to the view.
-     * The AppFrameController contains a subscriber that persists them into the
-     * data store
-     */
-    private final EventTopicSubscriber<Collection<Observation>> persistObservationsSubscriber = new EventTopicSubscriber<Collection<Observation>>() {
-
-        public void onEvent(String topic, Collection<Observation> data) {
-            if (log.isDebugEnabled()) {
-                log.debug("Adding observations to table\nDATA: " + data);
-            }
-
-            final ObservationTableModel model = (ObservationTableModel) getTable().getModel();
-
-            for (Observation observation : data) {
-                model.addObservation(observation);
-            }
-
-            /*
-             * If we just added one select it in the table
-             */
-            if (data.size() == 1) {
-                final Observation observation = data.iterator().next();
-                getTable().setSelectedObservation(observation);
-            }
-
-        }
-    };
-
-    /**
-     * When observations are updated we redraw the table
-     */
-    private final EventTopicSubscriber<Collection<Observation>> mergeObservationsSubscriber = new EventTopicSubscriber<Collection<Observation>>() {
-
-        public void onEvent(String topic, Collection<Observation> data) {
-            if (log.isDebugEnabled()) {
-                log.debug("Removing observations from table\nDATA: " + data);
-            }
-
-            getTable().redrawAll();
-        }
-    };
+    private JPanel actionPanel;
     private JPanel conceptButtonPanel;
     private final AnnotationFrameController controller;
+    private JPanel controlsPanel;
     private JSplitPane innerSplitPane;
+    private JPanel lowerPanel;
     private JPanel miscTabsPanel;
     private JSplitPane outerSplitPane;
     private QuickControlsPanel quickControlsPanel;
     private JXObservationTable table;
+    private JScrollPane tableScrollPane;
     private JToolBar toolBar;
     private final ToolBelt toolBelt;
-    private JScrollPane tableScrollPane;
+    private JPanel rowEditorPanel;
 
     /**
      * Constructs ...
@@ -133,8 +69,16 @@ public class AnnotationFrame extends JFrame {
      */
     public AnnotationFrame(ToolBelt toolBelt) throws HeadlessException {
         this.toolBelt = toolBelt;
-        this.controller = new AnnotationFrameController(this, toolBelt.getPersistenceController());
+        this.controller = new AnnotationFrameController(this, toolBelt);
         initialize();
+    }
+
+    private JPanel getActionPanel() {
+        if (actionPanel == null) {
+            actionPanel = new ActionPanel(toolBelt);
+        }
+
+        return actionPanel;
     }
 
     private JPanel getConceptButtonPanel() {
@@ -145,6 +89,17 @@ public class AnnotationFrame extends JFrame {
         return conceptButtonPanel;
     }
 
+    private JPanel getControlsPanel() {
+        if (controlsPanel == null) {
+            controlsPanel = new JPanel();
+            controlsPanel.setLayout(new BoxLayout(controlsPanel, BoxLayout.X_AXIS));
+            controlsPanel.add(getRowEditorPanel());
+            controlsPanel.add(getActionPanel());
+        }
+
+        return controlsPanel;
+    }
+
     private JSplitPane getInnerSplitPane() {
         if (innerSplitPane == null) {
             innerSplitPane = new JSplitPane();
@@ -153,6 +108,17 @@ public class AnnotationFrame extends JFrame {
         }
 
         return innerSplitPane;
+    }
+
+    private JPanel getLowerPanel() {
+        if (lowerPanel == null) {
+            lowerPanel = new JPanel();
+            lowerPanel.setLayout(new BoxLayout(lowerPanel, BoxLayout.Y_AXIS));
+            lowerPanel.add(getControlsPanel());
+            lowerPanel.add(getConceptButtonPanel());
+        }
+
+        return lowerPanel;
     }
 
     private JPanel getMiscTabsPanel() {
@@ -168,7 +134,7 @@ public class AnnotationFrame extends JFrame {
             outerSplitPane = new JSplitPane();
             outerSplitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
             outerSplitPane.setLeftComponent(getInnerSplitPane());
-            outerSplitPane.setRightComponent(getConceptButtonPanel());
+            outerSplitPane.setRightComponent(getLowerPanel());
         }
 
         return outerSplitPane;
@@ -176,23 +142,23 @@ public class AnnotationFrame extends JFrame {
 
     private QuickControlsPanel getQuickControlPanel() {
         if (quickControlsPanel == null) {
-            quickControlsPanel = new QuickControlsPanel(toolBelt.getPersistenceController());
+            quickControlsPanel = new QuickControlsPanel(toolBelt);
         }
 
         return quickControlsPanel;
     }
 
-    private JScrollPane getTableScrollPane() {
-        if (tableScrollPane == null) {
-            tableScrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-            tableScrollPane.setViewportView(getTable());
+    private JPanel getRowEditorPanel() {
+        if (rowEditorPanel == null) {
+            rowEditorPanel = new RowEditorPanel(toolBelt);
         }
-        return tableScrollPane;
+        return rowEditorPanel;
     }
 
     private JXObservationTable getTable() {
         if (table == null) {
             table = new JXObservationTable();
+            table.setFocusable(false);    // The row editor panel should get focus NOT the table
 
             /*
              * Watch the selected rows and notify the world when the selected rows
@@ -230,33 +196,30 @@ public class AnnotationFrame extends JFrame {
 
             Lookup.getObservationTableDispatcher().setValueObject(table);
 
-
-            /*
-             * When observations are deleted we remove them from the view.
-             */
-            EventBus.subscribe(Lookup.TOPIC_DELETE_OBSERVATIONS, deleteObservationsSubscriber);
-
-            /*
-             * When observations are persisted we add them to the view.
-             */
-            EventBus.subscribe(Lookup.TOPIC_PERSIST_OBSERVATIONS, persistObservationsSubscriber);
-
-            /*
-             * When observations are updated we redraw them in the view.
-             */
-            EventBus.subscribe(Lookup.TOPIC_MERGE_OBSERVATIONS, mergeObservationsSubscriber);
-
         }
 
         return table;
     }
 
+    private JScrollPane getTableScrollPane() {
+        if (tableScrollPane == null) {
+            tableScrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                                              JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            tableScrollPane.setViewportView(getTable());
+        }
+
+        return tableScrollPane;
+    }
+
     private JToolBar getToolBar() {
         if (toolBar == null) {
             toolBar = new JToolBar();
+            toolBar.add(new RefreshButton(toolBelt));
             toolBar.add(new StatusLabelForPerson(toolBelt));
             toolBar.add(new StatusLabelForVcr());
-            toolBar.add(new StatusLabelForVideoArchive(toolBelt.getAnnotationDAOFactory()));
+            toolBar.add(new StatusLabelForVideoArchive(toolBelt.getPersistenceController()));
+
+
         }
 
         return toolBar;

@@ -13,7 +13,7 @@
 
 
 
-package vars.old.annotation.ui;
+package vars.annotation.ui.roweditor;
 
 import com.google.common.collect.ImmutableList;
 import com.jgoodies.forms.layout.CellConstraints;
@@ -56,14 +56,14 @@ import vars.annotation.AnnotationPersistenceService;
 import vars.annotation.Association;
 import vars.annotation.AssociationDAO;
 import vars.annotation.Observation;
+import vars.annotation.ui.Lookup;
+import vars.annotation.ui.ToolBelt;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.ConceptNameTypes;
 import vars.knowledgebase.LinkTemplate;
 import vars.knowledgebase.SimpleConceptNameBean;
-import vars.annotation.ui.ToolBelt;
 import vars.shared.ui.HierachicalConceptNameComboBox;
-import vars.annotation.ui.Lookup;
 
 /**
  * @author  <a href="http://www.mbari.org">MBARI</a>

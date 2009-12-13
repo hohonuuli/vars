@@ -253,6 +253,10 @@ public class VideoArchiveSetImpl implements Serializable, VideoArchiveSet, JPAEn
     public Long getId() {
         return id;
     }
+    
+    public Object getPrimaryKey() {
+    	return getId();
+    }
 
     private class NamePredicate implements Predicate<VideoArchive> {
 

@@ -16,10 +16,12 @@
 package vars.annotation.ui.actions;
 
 import org.mbari.awt.event.ActionAdapter;
+import vars.DAO;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveSet;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.PersistenceController;
+import vars.annotation.ui.ToolBelt;
 
 /**
  * <p>Action that sets the format code in the <code>VideoArchiveSet</code></p>
@@ -29,16 +31,16 @@ import vars.annotation.ui.PersistenceController;
 public class ChangeAnnotationModeAction extends ActionAdapter {
 
     private char formatCode;
-    private final PersistenceController persistenceController;
+    private final ToolBelt toolBelt;
 
     /**
      *
      *
      * @param persistenceController
      */
-    public ChangeAnnotationModeAction(PersistenceController persistenceController) {
+    public ChangeAnnotationModeAction(ToolBelt toolBelt) {
         super();
-        this.persistenceController = persistenceController;
+        this.toolBelt = toolBelt;
     }
 
     /**
@@ -48,14 +50,16 @@ public class ChangeAnnotationModeAction extends ActionAdapter {
      * @see org.mbari.vars.annotation.ui.actions.IAction#doAction()
      */
     public void doAction() {
-        final VideoArchive va = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
-        if (va != null) {
-            final VideoArchiveSet vas = va.getVideoArchiveSet();
-            if (vas != null) {
-            	// TODO this will fail if the VideoArchiveSet is modified concurrently elsewhere
-                vas.setFormatCode(formatCode);
-                persistenceController.updateVideoArchiveSet(vas);
-            }
+        VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+        if (videoArchive != null) {
+
+            // DAOTX
+            DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
+            dao.startTransaction();
+            videoArchive = dao.find(videoArchive);
+            videoArchive.getVideoArchiveSet().setFormatCode(formatCode);
+            dao.endTransaction();
+            toolBelt.getPersistenceController().updateUI(videoArchive);
         }
     }
 

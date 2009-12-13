@@ -42,7 +42,6 @@ public class UDPVideoControlService extends AbstractVideoControlService {
     public void connect(Object... args) {
         disconnect();
 
-        IVCR vcr = getVcr();
 
         if ((args.length == 2) && !(args[0] instanceof String)) {
             throw new IllegalArgumentException(
@@ -55,15 +54,15 @@ public class UDPVideoControlService extends AbstractVideoControlService {
 
         try {
             final IVCR vcrUdp = new VCR(host, port);
-            vcr = new AnnotationMonitoringVCR(vcrUdp);
+            setVcr(new AnnotationMonitoringVCR(vcrUdp));
+            setVideoControlInformation(new VideoControlInformationImpl(host + ":" + port, VideoControlStatus.CONNECTED));
         }
         catch (Exception ex) {
             setVcr(null);
             setVideoControlInformation(new VideoControlInformationImpl(host + ":" + port, VideoControlStatus.ERROR));
             throw new VARSException("Failed to connect to " + port, ex);
         }
-
-        setVideoControlInformation(new VideoControlInformationImpl(host + ":" + port, VideoControlStatus.CONNECTED));
+        
     }
 
     /**

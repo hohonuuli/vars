@@ -75,6 +75,13 @@ public class JXObservationTable extends JXTable implements ObservationTable {
     }
 
     /**
+     * Essentially, this replaces the observation with the matchin primary key in the model
+     * with the one you provided.
+     */
+    public void updateObservation(Observation observation) {
+    	((ObservationTableModel) getModel()).updateObservation(observation);
+    }
+    /**
      *
      * @param columnClass
      * @return

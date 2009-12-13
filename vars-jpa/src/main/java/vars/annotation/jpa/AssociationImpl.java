@@ -245,4 +245,8 @@ public class AssociationImpl implements Serializable, Association, JPAEntity {
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(listener);
     }
+    
+    public Object getPrimaryKey() {
+    	return getId();
+    }
 }

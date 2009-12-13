@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)ActionPanel.java   2009.12.10 at 10:01:13 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
- * (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,9 +12,9 @@
  */
 
 
-package vars.old.annotation.ui;
 
-import vars.annotation.ui.ToolBelt;
+package vars.annotation.ui;
+
 import java.awt.FlowLayout;
 import java.util.Enumeration;
 import java.util.Map;
@@ -28,15 +25,14 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
-
 import org.mbari.awt.layout.WrappingFlowLayout;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import vars.annotation.ui.buttons.CopyObservationButton;
+import vars.annotation.ui.buttons.DeepCopyObservationsButton;
 import vars.annotation.ui.buttons.DeleteSelectedObservationsButton;
 import vars.annotation.ui.buttons.FrameCaptureButton;
+import vars.annotation.ui.buttons.DuplicateObservationButton;
 import vars.annotation.ui.buttons.NewObservationButton;
-import vars.annotation.ui.buttons.NewVideoFrameButton;
 
 /**
  * <p> This panel contains buttons for actions that can modify the contents of the
@@ -47,35 +43,26 @@ import vars.annotation.ui.buttons.NewVideoFrameButton;
  */
 public class ActionPanel extends JPanel {
 
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(ActionPanel.class);
+	private final Logger log = LoggerFactory.getLogger(getClass());
 
-
+	FlowLayout flowLayout = new WrappingFlowLayout();
     JButton btnDeepCopy;
-
-  
     JButton btnDelete;
-
-
-    JButton btnNew;
-
-
-    JButton btnShallowCopy;
-
- 
     JButton btnFramegrab;
-
-
-    FlowLayout flowLayout = new WrappingFlowLayout();
+    JButton btnNew;
+    JButton btnShallowCopy;
 
     /**
      *  Constructor for the ActionPanel object
+     *
+     * @param toolBelt
      */
     public ActionPanel(ToolBelt toolBelt) {
         super();
-        btnDeepCopy = new CopyObservationButton(toolBelt);
+        btnDeepCopy = new DeepCopyObservationsButton(toolBelt);
         btnDelete = new DeleteSelectedObservationsButton(toolBelt);
-        btnNew = new NewVideoFrameButton(toolBelt);
-        btnShallowCopy = new NewObservationButton(toolBelt);
+        btnNew = new NewObservationButton(toolBelt);
+        btnShallowCopy = new DuplicateObservationButton(toolBelt);
         btnFramegrab = new FrameCaptureButton(toolBelt);
         initialize();
         registerHotKeys();
@@ -84,19 +71,17 @@ public class ActionPanel extends JPanel {
     void initialize() {
         setLayout(flowLayout);
         flowLayout.setAlignment(FlowLayout.LEFT);
-
-        // setBounds(new java.awt.Rectangle(0, 0, 405, 80));
         add(btnNew, null);
         add(btnShallowCopy, null);
         add(btnDeepCopy, null);
         add(btnFramegrab, null);
 
         /*
-         * The majority of buttons are read from the vars-annotation property
-         * file and insantiated at runtime. This allows location specifc 
+         * The majority of buttons are read from the annotation-app property
+         * file and instantiated at runtime. This allows location specific
          * customization with requiring the agency to rebuild VARS from scratch.
          */
-        ResourceBundle bundle = ResourceBundle.getBundle("vars-annotation");
+        ResourceBundle bundle = ResourceBundle.getBundle("annotation-app");
         Enumeration<String> enumeration = bundle.getKeys();
         Map<String, JButton> map = new TreeMap<String, JButton>();
         while (enumeration.hasMoreElements()) {
@@ -106,8 +91,8 @@ public class ActionPanel extends JPanel {
                     map.put(element, (JButton) Class.forName(bundle.getString(element)).newInstance());
                 }
                 catch (Exception ex) {
-                    log.warn("Unable to add button class specified by '" + element + 
-                            "' in vars-annotation.properties", ex);
+                    log.warn("Unable to add button class specified by '" + element + "' in vars-annotation.properties",
+                             ex);
                 }
             }
         }

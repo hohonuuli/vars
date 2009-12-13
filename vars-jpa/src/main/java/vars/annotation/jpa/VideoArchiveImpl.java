@@ -186,5 +186,9 @@ public class VideoArchiveImpl implements Serializable, VideoArchive, JPAEntity {
     void setVideoArchiveSet(VideoArchiveSet videoArchiveSet) {
         this.videoArchiveSet = videoArchiveSet;
     }
+    
+    public Object getPrimaryKey() {
+    	return getId();
+    }
 
 }

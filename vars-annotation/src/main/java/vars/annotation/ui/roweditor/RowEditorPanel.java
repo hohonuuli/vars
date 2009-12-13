@@ -1,5 +1,5 @@
 /*
- * @(#)RowEditorPanel.java   2009.11.18 at 04:23:49 PST
+ * @(#)RowEditorPanel.java   2009.12.12 at 10:21:04 PST
  *
  * Copyright 2009 MBARI
  *
@@ -13,8 +13,10 @@
 
 
 
-package vars.old.annotation.ui;
+package vars.annotation.ui.roweditor;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
@@ -32,7 +34,11 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
+import java.util.Vector;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JComboBox;
@@ -52,14 +58,15 @@ import org.slf4j.LoggerFactory;
 import vars.CacheClearedEvent;
 import vars.CacheClearedListener;
 import vars.UserAccount;
-import vars.annotation.AnnotationPersistenceService;
 import vars.annotation.Observation;
+import vars.annotation.ObservationDAO;
+import vars.annotation.ui.Lookup;
+import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.table.ObservationTable;
 import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptName;
-import vars.annotation.ui.ToolBelt;
 import vars.shared.ui.AllConceptNamesComboBox;
-import vars.annotation.ui.Lookup;
 
 /**
  * <p>THis panel is explcitly desinged for editing Observations in the
@@ -70,20 +77,11 @@ import vars.annotation.ui.Lookup;
  */
 public class RowEditorPanel extends JPanel {
 
-    private static final Set shifttab = new HashSet(1);
+    /** Listens for forward tabs in JTextArea */
+    private static final Set<KeyStroke> tab = ImmutableSet.of(KeyStroke.getKeyStroke("TAB"));
 
-    // The keys which will be listened for in the JTextArea for a change in
-    // focus
-    private static final Set tab = new HashSet(1);
-
-    static {
-        tab.add(KeyStroke.getKeyStroke("TAB"));
-    }
-
-    static {
-        shifttab.add(KeyStroke.getKeyStroke("shift TAB"));
-    }
-
+    /** Listens for reverse (shift) tabs in JTextArea */
+    private static final Set<KeyStroke> shifttab = ImmutableSet.of(KeyStroke.getKeyStroke("shift TAB"));
     private final Logger log = LoggerFactory.getLogger(getClass());
 
     /**
@@ -96,7 +94,6 @@ public class RowEditorPanel extends JPanel {
         }
     };
     protected Action prevFocusAction = new AbstractAction("Move Focus Backwards") {
-
 
         public void actionPerformed(ActionEvent evt) {
             ((Component) evt.getSource()).transferFocusBackward();
@@ -134,11 +131,12 @@ public class RowEditorPanel extends JPanel {
         super();
         this.observationTable = observationTable;
         this.toolBelt = toolBelt;
-        ((JTable) observationTable).setFocusable(false);
         initialize();
 
         /**
          * Listen for changes in the observation
+         *
+         * TODO - Editor should allow editing of concept name of multiple rows?
          */
         Lookup.getSelectedObservationsDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
 
@@ -157,8 +155,7 @@ public class RowEditorPanel extends JPanel {
         toolBelt.getPersistenceCache().addCacheClearedListener(new CacheClearedListener() {
 
             public void afterClear(final CacheClearedEvent evt) {
-
-                // DO nothing
+                ((AllConceptNamesComboBox) getConceptComboBox()).updateConceptNames();
             }
 
             public void beforeClear(final CacheClearedEvent evt) {
@@ -184,11 +181,14 @@ public class RowEditorPanel extends JPanel {
                      *  changes the observers name.
                      */
                     if (e.getStateChange() == ItemEvent.SELECTED) {
+
                         final String conceptName = (String) conceptComboBox.getSelectedItem();
                         getNotesArea().setEditable(!getNotableConceptNames().contains(conceptName));
 
                         if ((selectedObservation != null) &&
                                 !selectedObservation.getConceptName().equals(conceptName)) {
+
+                            // DAOTX
                             selectedObservation.setConceptName(conceptName);
                             final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher()
                                 .getValueObject();
@@ -244,9 +244,12 @@ public class RowEditorPanel extends JPanel {
                         conceptComboBox.setEnabled(false);
 
                         try {
-                            final AnnotationPersistenceService specialAnnotationDAO = toolBelt
-                                .getAnnotationPersistenceService();
-                            concept = specialAnnotationDAO.findConceptByName(selectedName);
+
+                            // DAOTX
+                            final ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
+                            conceptDAO.startTransaction();
+                            concept = conceptDAO.findByName(selectedName);
+                            conceptDAO.endTransaction();
                             primaryName = concept.getPrimaryConceptName().getName();
                         }
                         catch (final Exception e1) {
@@ -457,6 +460,7 @@ public class RowEditorPanel extends JPanel {
 
     private void setObservation(final Observation observation) {
 
+
         this.selectedObservation = observation;
         final boolean isNull = (observation == null);
         setEnabled(!isNull);
@@ -464,8 +468,10 @@ public class RowEditorPanel extends JPanel {
 
         if (isNull) {
             try {
-                Concept rootConcept = toolBelt.getAnnotationPersistenceService().findRootConcept();
-
+                ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
+                conceptDAO.startTransaction();
+                Concept rootConcept = conceptDAO.findRoot();
+                conceptDAO.endTransaction();
                 getConceptComboBox().setSelectedItem(rootConcept.getPrimaryConceptName().getName());
             }
             catch (final Exception e) {
@@ -487,4 +493,6 @@ public class RowEditorPanel extends JPanel {
 
         getConceptComboBox().requestFocus();
     }
+
+
 }

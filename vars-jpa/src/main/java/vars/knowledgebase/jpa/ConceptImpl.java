@@ -371,6 +371,10 @@ public class ConceptImpl implements Serializable, Concept, JPAEntity {
     public void setStructureType(String structureType) {
         this.structureType = structureType;
     }
+    
+    public Object getPrimaryKey() {
+    	return getId();
+    }
 
     @Override
     public String toString() {

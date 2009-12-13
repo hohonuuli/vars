@@ -18,6 +18,7 @@
  */
 package vars.old.annotation.ui;
 
+import vars.annotation.ui.StatusPanel;
 import vars.annotation.ui.ToolBelt;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -242,7 +243,7 @@ public class AnnotationFrame extends JFrame {
 
     private JPanel getQuickControlsPanel() {
         if (quickControlsPanel == null) {
-            quickControlsPanel = new QuickControlsPanel(toolbelt.getPersistenceController());
+            quickControlsPanel = new QuickControlsPanel(toolbelt);
         }
 
         return quickControlsPanel;

@@ -19,10 +19,13 @@ import java.awt.Component;
 import javax.swing.JTabbedPane;
 import javax.swing.JTree;
 import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
 import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.EventTopicSubscriber;
 import org.jdesktop.swingx.JXTree;
 import org.mbari.swing.SearchableTreePanel;
+import vars.CacheClearedEvent;
+import vars.CacheClearedListener;
 
 import vars.shared.ui.UIDecorator;
 import vars.shared.ui.tree.ConceptTreeCellRenderer;
@@ -34,6 +37,8 @@ import vars.annotation.ui.ppanel.PCameraDataPanel;
 import vars.annotation.ui.ppanel.PObservationPanel;
 import vars.annotation.ui.ppanel.PPhysicalDataPanel;
 import vars.annotation.ui.ppanel.PVideoArchivePanel;
+import vars.knowledgebase.Concept;
+import vars.shared.ui.tree.ConceptTreeNode;
 
 /**
  * <p>JPanel that contains various tabbed panes used in the annotation
@@ -82,6 +87,26 @@ public class MiscTabsPanel extends javax.swing.JPanel {
                 }
 
             };
+
+            // Refresh the tree if the cache is cleared
+            toolbelt.getPersistenceCache().addCacheClearedListener(new CacheClearedListener() {
+
+                public void afterClear(CacheClearedEvent evt) {
+                    TreePath treePath = tree.getSelectionPath();
+                    if (treePath != null) {
+                        ConceptTreeNode node = (ConceptTreeNode) treePath.getLastPathComponent();
+                        Concept concept = (Concept) node.getUserObject();
+                        ((ConceptTreePanel) treePanel).refreshAndOpenNode(concept);
+                    }
+                    else {
+                        ((ConceptTreePanel) treePanel).refresh();
+                    }
+                }
+
+                public void beforeClear(CacheClearedEvent evt) {
+                    // Do Nothing
+                }
+            });
 
             /*
              * Listen to messages to select a concept in the tree

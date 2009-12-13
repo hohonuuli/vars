@@ -59,7 +59,6 @@ import vars.shared.ui.tree.ConceptTreePanel;
 
 /**
  *
- * @version    $Id: KnowledgebaseFrame.java 295 2006-07-06 23:47:31Z hohonuuli $
  * @author     <a href="http://www.mbari.org">Monterey Bay Aquarium Research Institute</a>
  */
 public class KnowledgebaseFrame extends JFrame {

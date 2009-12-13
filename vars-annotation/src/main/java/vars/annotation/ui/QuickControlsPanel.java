@@ -45,9 +45,9 @@ public class QuickControlsPanel extends JPanel {
     /**
      * Constructs ...
      */
-    public QuickControlsPanel(PersistenceController persistenceController) {
+    public QuickControlsPanel(ToolBelt toolBelt) {
         super();
-        action = new ChangeAnnotationModeAction(persistenceController);
+        action = new ChangeAnnotationModeAction(toolBelt);
         initialize();
     }
 

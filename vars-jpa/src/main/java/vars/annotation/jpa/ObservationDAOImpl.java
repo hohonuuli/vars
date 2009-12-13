@@ -86,6 +86,30 @@ public class ObservationDAOImpl extends DAO implements ObservationDAO {
 
         return observations;
     }
+    
+    /**
+     * Updates the fields of an observation in the database. This is used by the
+     * annotation UI since we don't know when the observation was last modified
+     * in the database so it's a workaround for concurrent modifications. 
+     * 
+     * @param observation
+     * @return
+     */
+    public Observation updateFields(Observation observation) {
+        Observation original = observation;
+        if (observation != null) {
+            original = find(observation);
+            if (original != null) {
+                original.setConceptName(observation.getConceptName());
+                original.setNotes(observation.getNotes());
+                original.setObservationDate(observation.getObservationDate());
+                original.setObserver(observation.getObserver());
+                original.setX(observation.getX());
+                original.setY(observation.getY());
+            }
+        }
+    	return original;
+    }
 
     /**
      * This should be called within a JPA transaction

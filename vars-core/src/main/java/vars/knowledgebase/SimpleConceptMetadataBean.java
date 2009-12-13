@@ -103,5 +103,9 @@ public class SimpleConceptMetadataBean implements ConceptMetadata {
     public boolean isPendingApproval() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+    
+    public Object getPrimaryKey() {
+    	return null;
+    }
 
 }

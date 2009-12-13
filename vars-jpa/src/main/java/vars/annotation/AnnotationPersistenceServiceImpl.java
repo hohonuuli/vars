@@ -186,6 +186,7 @@ public class AnnotationPersistenceServiceImpl extends QueryableImpl implements A
      * concept names used by the {@link Observation}s and their child {@link Association}
      * @param observations
      * @return
+     * @deprecated
      */
     public Collection<Observation> updateAndValidate(Collection<Observation> observations) {
         Collection<Observation> updatedObservations = new ArrayList<Observation>(observations.size());

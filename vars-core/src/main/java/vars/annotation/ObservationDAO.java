@@ -37,5 +37,17 @@ public interface ObservationDAO extends DAO, ConceptNameValidator<Observation> {
      * @return Set of Strings
      */
     List<String> findAllConceptNamesUsedInAnnotations();
+    
+    /**
+     * Updates the fields of an observation in the database. This is used by the
+     * annotation UI since we don't know when the observation was last modified
+     * in the database so it's a workaround for concurrent modifications. NOTE:
+     * it does not modify the parent {@link VideoFrame} or the child 
+     * {@link Association}s; only the fields of the observation.
+     * 
+     * @param observation
+     * @return
+     */
+    Observation updateFields(Observation observation);
 
 }

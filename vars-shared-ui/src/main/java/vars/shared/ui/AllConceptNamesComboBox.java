@@ -57,15 +57,15 @@ public class AllConceptNamesComboBox extends ConceptNameComboBox {
      *
      */
     private final Logger log = LoggerFactory.getLogger(getClass());
-    private final QueryPersistenceService queryDAO;
+    private final QueryPersistenceService queryPersistenceService;
     /**
      *
      *
      * @param conceptNameDAO
      */
-    public AllConceptNamesComboBox(QueryPersistenceService queryDAO) {
+    public AllConceptNamesComboBox(QueryPersistenceService queryPersistenceSerice) {
         super();
-        this.queryDAO = queryDAO;
+        this.queryPersistenceService = queryPersistenceSerice;
         updateConceptNames();
 
         /*
@@ -95,7 +95,7 @@ public class AllConceptNamesComboBox extends ConceptNameComboBox {
 
         // Get ALL concept names (not just primary names). This is a FAST
         // lookup.
-        List<String> conceptNameList = queryDAO.findAllConceptNamesAsStrings();
+        List<String> conceptNameList = queryPersistenceService.findAllConceptNamesAsStrings();
         String[] conceptNames = conceptNameList.toArray(new String[conceptNameList.size()]);
         return conceptNames;
     }

@@ -195,4 +195,8 @@ public class CameraDeploymentImpl implements Serializable, CameraDeployment, JPA
     void setVideoArchiveSet(VideoArchiveSet videoArchiveSet) {
         this.videoArchiveSet = videoArchiveSet;
     }
+    
+    public Object getPrimaryKey() {
+    	return getId();
+    }
 }

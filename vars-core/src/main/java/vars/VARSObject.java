@@ -8,6 +8,8 @@ package vars;
  * To change this template use File | Settings | File Templates.
  */
 public interface VARSObject {
+	
+	Object getPrimaryKey();
     
 
 }

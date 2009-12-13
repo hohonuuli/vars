@@ -57,5 +57,9 @@ public class SimpleConceptNameBean implements ConceptName {
     public String stringValue() {
         return name;
     }
+    
+    public Object getPrimaryKey() {
+    	return null;
+    }
 
 }

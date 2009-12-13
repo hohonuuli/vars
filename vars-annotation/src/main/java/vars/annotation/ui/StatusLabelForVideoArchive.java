@@ -1,5 +1,5 @@
 /*
- * @(#)StatusLabelForVideoArchive.java   2009.11.17 at 09:35:07 PST
+ * @(#)StatusLabelForVideoArchive.java   2009.12.10 at 09:33:48 PST
  *
  * Copyright 2009 MBARI
  *
@@ -15,17 +15,17 @@
 
 package vars.annotation.ui;
 
+import java.awt.Frame;
+import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.JDialog;
+import javax.swing.SwingUtilities;
 import org.mbari.swing.SwingUtils;
 import org.mbari.util.Dispatcher;
-
-import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.VideoArchive;
-import vars.annotation.ui.actions.ShowOpenVideoArchiveDialogAction;
 import vars.old.annotation.ui.StatusLabel;
 
 /**
@@ -37,15 +37,22 @@ import vars.old.annotation.ui.StatusLabel;
  */
 public class StatusLabelForVideoArchive extends StatusLabel {
 
-    private ShowOpenVideoArchiveDialogAction action;
-    private final AnnotationDAOFactory annotationDAOFactory;
+    private final JDialog dialog;
 
     /**
      * Constructor for the StatusLabelForVideoArchive object
+     *
+     * @param persistenceController
      */
-    public StatusLabelForVideoArchive(AnnotationDAOFactory annotationDAOFactory) {
+    public StatusLabelForVideoArchive(PersistenceController persistenceController) {
         super();
-        this.annotationDAOFactory = annotationDAOFactory;
+        Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
+        this.dialog = new OpenVideoArchiveDialog(frame, persistenceController);
+
+        /*
+         * Listen for changes in the VideoArchive being annotated. When it changes update
+         * the label text
+         */
         Dispatcher dispatcher = Lookup.getVideoArchiveDispatcher();
         dispatcher.addPropertyChangeListener(new PropertyChangeListener() {
 
@@ -56,32 +63,34 @@ public class StatusLabelForVideoArchive extends StatusLabel {
         });
         update((VideoArchive) dispatcher.getValueObject());
 
+
         /*
-         * On click show a dialog allowing a user to open a VideoArchive
+         * When the user clicks this label a dialog should pop up allowing them
+         * to open the VCR.
          */
         addMouseListener(new MouseAdapter() {
+
+            Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
 
             @Override
             public void mouseClicked(final MouseEvent me) {
                 SwingUtils.flashJComponent(StatusLabelForVideoArchive.this, 2);
-                final JDialog dialog = getAction().getDialog();
 
-                /*
-                 * Centers the dialog on screen
-                 */
-                dialog.setLocationRelativeTo(null);
-                getAction().doAction();
+                final Point mousePosition = me.getPoint();
+
+                SwingUtilities.convertPointToScreen(mousePosition, StatusLabelForVideoArchive.this);
+
+                final int x = mousePosition.x;
+                final int y = mousePosition.y - dialog.getHeight();
+
+                dialog.setLocation(x, y);
+                dialog.setVisible(true);
+
             }
 
+
         });
-    }
 
-    private ShowOpenVideoArchiveDialogAction getAction() {
-        if (action == null) {
-            action = new ShowOpenVideoArchiveDialogAction(annotationDAOFactory);
-        }
-
-        return action;
     }
 
     /**

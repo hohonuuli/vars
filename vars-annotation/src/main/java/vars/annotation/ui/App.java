@@ -1,5 +1,5 @@
 /*
- * @(#)App.java   2009.12.05 at 10:45:49 PST
+ * @(#)App.java   2009.12.12 at 09:26:17 PST
  *
  * Copyright 2009 MBARI
  *
@@ -15,18 +15,15 @@
 
 package vars.annotation.ui;
 
+import com.google.inject.Injector;
 import java.util.Vector;
-
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.EventTopicSubscriber;
 import org.mbari.util.SystemUtilities;
 import org.slf4j.LoggerFactory;
-
-import com.google.inject.Injector;
-import javax.swing.SwingUtilities;
-import org.bushe.swing.event.EventBus;
-
 import vars.annotation.Observation;
 import vars.shared.ui.GlobalLookup;
 import vars.shared.ui.event.ExitTopicSubscriber;
@@ -40,17 +37,33 @@ import vars.shared.ui.event.WarningSubscriber;
  */
 public class App {
 
+    private AnnotationFrame annotationFrame;
+    private final EventTopicSubscriber exitSubscriber;
     private final EventTopicSubscriber<Exception> fatalErrorSubscriber;
     private final EventTopicSubscriber nonFatalErrorSubscriber;
-    private final EventTopicSubscriber exitSubscriber;
-    private final EventTopicSubscriber<String> warningSubscriber;
-    private AnnotationFrame annotationFrame;
     private final ToolBelt toolBelt;
+    private final EventTopicSubscriber<String> warningSubscriber;
 
+    /**
+     * Constructs ...
+     */
     public App() {
-    	final Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
-    	toolBelt = injector.getInstance(ToolBelt.class);
-    	Lookup.getSelectedObservationsDispatcher().setValueObject(new Vector<Observation>());
+        final Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
+        toolBelt = injector.getInstance(ToolBelt.class);
+
+        /*
+         *  Verify that the database connection is working. If it's not, show
+         *  a dialog. Without this check database errors fail silently and to
+         *  the user it looks like the application just won't start at all.
+         */
+        try {
+            toolBelt.getMiscDAOFactory().newUserAccountDAO().findAll();
+        }
+        catch (Exception e) {
+            (new FatalExceptionSubscriber(null)).onEvent(Lookup.TOPIC_FATAL_ERROR, e);
+        }
+
+        Lookup.getSelectedObservationsDispatcher().setValueObject(new Vector<Observation>());
         fatalErrorSubscriber = new FatalExceptionSubscriber(getAnnotationFrame());
         nonFatalErrorSubscriber = new NonFatalErrorSubscriber(getAnnotationFrame());
         warningSubscriber = new WarningSubscriber(getAnnotationFrame());
@@ -66,10 +79,14 @@ public class App {
         frame.setVisible(true);
     }
 
+    /**
+     * @return
+     */
     public AnnotationFrame getAnnotationFrame() {
         if (annotationFrame == null) {
             annotationFrame = new AnnotationFrame(toolBelt);
         }
+
         return annotationFrame;
     }
 
@@ -97,6 +114,7 @@ public class App {
         GlobalLookup.getSettingsDirectory();
 
         try {
+
             // Set System L&F
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         }
@@ -106,9 +124,11 @@ public class App {
 
         try {
             SwingUtilities.invokeLater(new Runnable() {
+
                 public void run() {
                     new App();
                 }
+
             });
         }
         catch (Throwable e) {

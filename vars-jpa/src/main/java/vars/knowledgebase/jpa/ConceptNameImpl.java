@@ -160,6 +160,10 @@ public class ConceptNameImpl implements Serializable, ConceptName, JPAEntity {
     public String getNameType() {
         return nameType;
     }
+    
+    public Object getPrimaryKey() {
+    	return getId();
+    }
 
     @Override
     public int hashCode() {

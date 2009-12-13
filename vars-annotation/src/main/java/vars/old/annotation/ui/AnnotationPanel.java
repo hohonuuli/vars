@@ -15,7 +15,9 @@
 
 package vars.old.annotation.ui;
 
+import vars.annotation.ui.roweditor.RowEditorPanel;
 import vars.annotation.ui.video.VideoControlPanel;
+import vars.annotation.ui.ActionPanel;
 import vars.annotation.ui.ToolBelt;
 import java.awt.BorderLayout;
 import java.awt.Dimension;

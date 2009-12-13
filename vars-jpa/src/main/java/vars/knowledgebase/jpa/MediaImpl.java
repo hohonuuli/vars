@@ -139,6 +139,10 @@ public class MediaImpl implements Serializable, Media, JPAEntity {
     public String getUrl() {
         return url;
     }
+    
+    public Object getPrimaryKey() {
+    	return getId();
+    }
 
     @Override
     public int hashCode() {

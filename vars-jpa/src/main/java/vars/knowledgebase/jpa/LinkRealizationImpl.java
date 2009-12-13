@@ -151,6 +151,10 @@ public class LinkRealizationImpl implements Serializable, LinkRealization, JPAEn
     public String getToConcept() {
         return toConcept;
     }
+    
+    public Object getPrimaryKey() {
+    	return getId();
+    }
 
     public void setId(Long id) {
     	this.id = id;

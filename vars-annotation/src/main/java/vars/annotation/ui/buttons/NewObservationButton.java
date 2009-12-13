@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)NewVideoFrameButton.java   2009.11.15 at 08:33:19 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
- * (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,58 +12,87 @@
  */
 
 
+
 package vars.annotation.ui.buttons;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Collection;
 
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
 import org.mbari.swing.JFancyButton;
 import org.mbari.swing.SwingUtils;
+import org.mbari.util.Dispatcher;
 
-import vars.UserAccount;
-import vars.annotation.Observation;
 import vars.annotation.ui.actions.NewObservationAction;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.Lookup;
 
+
 /**
- * <p>Create a new observation using the current time-code from the VCR</p>
+ * <p>A button that calls the <code>NewVideoFrameAction</code> </p>
  *
  * @author  <a href="http://www.mbari.org">MBARI</a>
  */
 public class NewObservationButton extends JFancyButton {
 
-
+    private final Action action;
+    private boolean hasPerson;
+    private boolean hasVcr;
+    private boolean hasVideoArchive;
 
     /**
-     * Constructor for the NewObservationButton object
+     * Constructor for the NewVideoFrameButton object
      */
     public NewObservationButton(ToolBelt toolBelt) {
         super();
-        setAction(new NewObservationAction(toolBelt));
-        setToolTipText("Create an Observation using the selected timecode [" +
-                       SwingUtils.getKeyString((KeyStroke) getAction().getValue(Action.ACCELERATOR_KEY)) + "]");
-        setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/obs_copytc.png")));
-        setEnabled(false);
-        setText("");
+        action = new NewObservationAction(toolBelt);
+        setAction(action);
+        setToolTipText("Create an Observation with a new timecode [" +
+                       SwingUtils.getKeyString((KeyStroke) action.getValue(Action.ACCELERATOR_KEY)) + "]");
+        setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/obs_new.png")));
+        action.setEnabled(false);
 
-        /* 
-         * Enable this button if someone is logged in AND the Observation
-         * in the ObservationDispather is not null and the VCR is enabled.
-         */
-        Lookup.getSelectedObservationsDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
+        final Dispatcher videoArchiveDispatcher = Lookup.getVideoArchiveDispatcher();
+        hasVideoArchive = videoArchiveDispatcher.getValueObject()!= null;
+        videoArchiveDispatcher.addPropertyChangeListener(new PropertyChangeListener() {
             
             public void propertyChange(PropertyChangeEvent evt) {
-                final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
-                final Collection<Observation> observations = (Collection<Observation>) evt.getNewValue();
-                setEnabled ((userAccount != null) && (observations.size() > 0));
-                
+                hasVideoArchive = (evt.getNewValue() != null);
+                checkEnable();
+            }
+        });
+        
+        final Dispatcher userAccountDispatcher = Lookup.getUserAccountDispatcher();
+        hasPerson = userAccountDispatcher.getValueObject() != null;
+        userAccountDispatcher.addPropertyChangeListener(new PropertyChangeListener() {
+            
+            public void propertyChange(PropertyChangeEvent evt) {
+                hasPerson = (evt.getNewValue() != null);
+                checkEnable();
             }
         });
 
+        final Dispatcher videoServiceDispatcher = Lookup.getVideoControlServiceDispatcher();
+        hasVcr = videoServiceDispatcher.getValueObject() != null;
+        videoServiceDispatcher.addPropertyChangeListener(new PropertyChangeListener() {
+            
+            public void propertyChange(PropertyChangeEvent evt) {
+                hasVcr = (evt.getNewValue() != null);
+                checkEnable();
+            }
+        });
+
+        setText("");
+
+    }
+
+    /**
+     * <p>Enable this button if someone is logged in AND a videoarchvie set is
+     * open and the VCR exists.</p>
+     */
+    private void checkEnable() {
+        action.setEnabled(hasVcr && hasPerson && hasVideoArchive);
     }
 }

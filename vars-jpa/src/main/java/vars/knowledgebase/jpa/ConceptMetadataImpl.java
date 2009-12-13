@@ -244,6 +244,10 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
     public Usage getUsage() {
         return usage;
     }
+    
+    public Object getPrimaryKey() {
+    	return getId();
+    }
 
     public boolean hasPrimaryImage() {
         return (getPrimaryImage() != null);

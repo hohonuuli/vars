@@ -13,7 +13,7 @@
 
 
 
-package vars.old.annotation.ui;
+package vars.annotation.ui.roweditor;
 
 import java.awt.Component;
 import java.awt.Dimension;

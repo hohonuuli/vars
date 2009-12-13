@@ -97,5 +97,7 @@ public interface ObservationTableModel {
      * @param  obs The observation to be removed.
      */
      void removeObservation(final Observation obs);
+     
+     void updateObservation(Observation observation);
 
 }

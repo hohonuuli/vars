@@ -169,5 +169,9 @@ public class SimpleConceptBean implements Concept {
     public String getTaxonomyType() {
         return "NOT IMPLEMENTED";
     }
+    
+    public Object getPrimaryKey() {
+    	return null;
+    }
 
 }

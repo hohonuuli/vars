@@ -135,6 +135,10 @@ public class UsageImpl implements Serializable, Usage, JPAEntity {
     public String getSpecification() {
         return specification;
     }
+    
+    public Object getPrimaryKey() {
+    	return getId();
+    }
 
     @Override
     public int hashCode() {

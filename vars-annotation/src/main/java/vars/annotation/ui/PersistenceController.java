@@ -1,5 +1,5 @@
 /*
- * @(#)PersistenceService.java   2009.11.16 at 11:07:33 PST
+ * @(#)PersistenceController.java   2009.12.12 at 09:31:16 PST
  *
  * Copyright 2009 MBARI
  *
@@ -10,13 +10,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+
+
 package vars.annotation.ui;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Vector;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.DAO;
@@ -29,6 +35,7 @@ import vars.annotation.AssociationDAO;
 import vars.annotation.Observation;
 import vars.annotation.ObservationDAO;
 import vars.annotation.VideoArchive;
+import vars.annotation.VideoArchiveDAO;
 import vars.annotation.VideoArchiveSet;
 import vars.annotation.VideoFrame;
 import vars.annotation.ui.table.ObservationTable;
@@ -45,10 +52,10 @@ public class PersistenceController {
 
     private static final NumberFormat f0123 = new DecimalFormat("0000");
     private static final NumberFormat f01 = new DecimalFormat("00");
+    private final Logger log = LoggerFactory.getLogger(getClass());
     private final AnnotationDAOFactory annotationDAOFactory;
     private final AnnotationFactory annotationFactory;
     private final ToolBelt toolBelt;
-    private final Logger log = LoggerFactory.getLogger(getClass());
 
     /**
      * Constructs ...
@@ -62,13 +69,138 @@ public class PersistenceController {
         this.annotationFactory = toolBelt.getAnnotationFactory();
     }
 
-    public VideoArchiveSet updateVideoArchiveSet(VideoArchiveSet videoArchiveSet) {
-        DAO dao = annotationDAOFactory.newDAO();
+    /**
+     *
+     * @param observations
+     * @return
+     */
+    public Collection<Observation> deleteAllAssociationsFrom(Collection<Observation> observations) {
+        Collection<Observation> updateObservations = new ArrayList<Observation>();
+        DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
         dao.startTransaction();
-        videoArchiveSet = dao.merge(videoArchiveSet);
+
+        for (Observation observation : observations) {
+            observation = dao.find(observation);
+
+            if (observation != null) {
+
+                for (Association association : new ArrayList<Association>(observation.getAssociations())) {
+                    observation.removeAssociation(association);
+                    dao.remove(association);
+                }
+
+                updateObservations.add(observation);
+            }
+        }
+
+        updateUI();
+        return updateObservations;
+    }
+
+    /**
+     *
+     * @param associations
+     */
+    public void deleteAssociations(Collection<Association> associations) {
+        final DAO dao = annotationDAOFactory.newDAO();
+        Collection<Observation> modifiedObservations = new ArrayList<Observation>();
+        dao.startTransaction();
+
+        for (Association association : associations) {
+            association = dao.find(association);
+
+            if (association != null) {
+                final Observation observation = association.getObservation();
+                observation.removeAssociation(association);
+                dao.remove(association);
+
+                if (!modifiedObservations.contains(observation)) {
+                    modifiedObservations.add(observation);
+                }
+            }
+        }
+
         dao.endTransaction();
-        //updateUI(videoArchiveSet);
-        return videoArchiveSet;
+        updateUI(modifiedObservations);
+    }
+
+    /**
+     *
+     * @param videoArchive
+     * @return
+     */
+    public VideoArchive deleteEmptyVideoFramesFrom(VideoArchive videoArchive) {
+        final DAO dao = annotationDAOFactory.newDAO();
+        dao.startTransaction();
+        videoArchive = dao.find(videoArchive);
+        Collection<VideoFrame> videoFrames = new ArrayList<VideoFrame>(videoArchive.getEmptyVideoFrames());
+        for (VideoFrame videoFrame : videoFrames) {
+            videoArchive.removeVideoFrame(videoFrame);
+            dao.remove(videoFrame);
+        }
+
+        dao.endTransaction();
+        return videoArchive;
+    }
+
+    /**
+     *
+     * @param observations
+     */
+    public void deleteObservations(Collection<Observation> observations) {
+        final DAO dao = annotationDAOFactory.newDAO();
+        dao.startTransaction();
+
+        for (Observation observation : observations) {
+            observation = dao.find(observation);
+
+            if (observation != null) {
+                VideoFrame videoFrame = observation.getVideoFrame();
+                videoFrame.removeObservation(observation);
+                dao.remove(observation);
+
+                if (videoFrame.getObservations().size() == 0) {
+                    VideoArchive videoArchive = videoFrame.getVideoArchive();
+                    videoArchive.removeVideoFrame(videoFrame);
+                    dao.remove(videoFrame);
+                }
+            }
+
+        }
+
+        dao.endTransaction();
+        updateUI();
+    }
+
+    /**
+     *
+     * @param observations
+     * @param associationTemplate
+     * @return
+     */
+    public Collection<Association> insertAssociations(Collection<Observation> observations, ILink associationTemplate) {
+        final Collection<Association> associations = new ArrayList<Association>(observations.size());
+        final Collection<Observation> uiObservations = new ArrayList<Observation>();
+        final AssociationDAO dao = annotationDAOFactory.newAssociationDAO();
+        dao.startTransaction();
+
+        for (Observation observation : observations) {
+            observation = dao.find(observation);
+
+            if (observation != null) {
+                uiObservations.add(observation);
+                Association ass = annotationFactory.newAssociation(associationTemplate.getLinkName(),
+                    associationTemplate.getToConcept(), associationTemplate.getLinkValue());
+                observation.addAssociation(ass);
+                dao.persist(ass);
+                dao.validateName(ass);
+                associations.add(ass);
+            }
+        }
+
+        dao.endTransaction();
+        updateUI(uiObservations);    // update view
+        return associations;
     }
 
     /**
@@ -79,15 +211,42 @@ public class PersistenceController {
      */
     public Observation insertObservation(VideoFrame videoFrame, Observation observation) {
         ObservationDAO dao = annotationDAOFactory.newObservationDAO();
+        Collection<Observation> newObservations = new ArrayList<Observation>();
         dao.startTransaction();
-        videoFrame = dao.merge(videoFrame);
-        videoFrame.addObservation(observation);
-        dao.persist(observation);
-        dao.validateName(observation);
-        Collection<Observation> obs = new ArrayList<Observation>(videoFrame.getObservations());
+        videoFrame = dao.find(videoFrame);
+
+        if (videoFrame != null) {
+            videoFrame.addObservation(observation);
+            dao.persist(observation);
+            dao.validateName(observation);
+            newObservations.addAll(videoFrame.getObservations());
+        }
+
         dao.endTransaction();
-        updateUI(obs); // update view
+        updateUI(newObservations);    // update view
         return observation;
+    }
+
+    /**
+     *
+     * @param videoFrame
+     * @param observations
+     * @return
+     */
+    public Collection<Observation> insertObservations(VideoFrame videoFrame, Collection<Observation> observations) {
+        ObservationDAO dao = annotationDAOFactory.newObservationDAO();
+        dao.startTransaction();
+        videoFrame = dao.find(videoFrame);
+
+        for (Observation observation : observations) {
+            videoFrame.addObservation(observation);
+            dao.persist(observation);
+            dao.validateName(observation);
+        }
+
+        dao.endTransaction();
+        updateUI(observations);    // update view
+        return observations;
     }
 
     /**
@@ -99,229 +258,27 @@ public class PersistenceController {
     public VideoFrame insertVideoFrame(VideoArchive videoArchive, VideoFrame videoFrame) {
         DAO dao = annotationDAOFactory.newDAO();
         dao.startTransaction();
-        videoArchive = dao.merge(videoArchive);
+        videoArchive = dao.find(videoArchive);
         videoArchive.addVideoFrame(videoFrame);
         dao.persist(videoFrame);
         dao.endTransaction();
         return videoFrame;
     }
 
-    public VideoArchive updateVideoArchive(VideoArchive videoArchive) {
+    /**
+     * VideoFrames need to be loaded from the database. Call this method to fetch all
+     * of them for a particular {@link VideoArchive}. Be sre to grab the returned reference
+     * in order to access them.
+     * @param videoArchive
+     * @return
+     */
+    public VideoArchive loadVideoFramesFor(VideoArchive videoArchive) {
         DAO dao = annotationDAOFactory.newDAO();
         dao.startTransaction();
         videoArchive = dao.merge(videoArchive);
-        dao.endTransaction();
-        updateUI();
-        return videoArchive;
-    }
-
-    /**
-     *
-     * @param observations
-     * @return
-     */
-    public Collection<Observation> updateObservations(Collection<Observation> observations) {
-        AnnotationPersistenceService service = toolBelt.getAnnotationPersistenceService();
-        Collection<Observation> updatedObservations = service.updateAndValidate(observations);
-        updateUI(updatedObservations); // update view
-        return updatedObservations;
-    }
-
-    /**
-     *
-     * @param videoFrame
-     * @return
-     */
-    public Collection<VideoFrame> updateVideoFrames(Collection<VideoFrame> videoFrames) {
-        ObservationDAO dao = annotationDAOFactory.newObservationDAO();
-        final Collection<VideoFrame> updatedVideoFrames = new ArrayList<VideoFrame>(videoFrames.size());
-        final Collection<Observation> observations = new ArrayList<Observation>();
-        dao.startTransaction();
-        for (VideoFrame vf : videoFrames) {
-            VideoFrame updatedVideoFrame = dao.merge(vf);
-            updatedVideoFrames.add(updatedVideoFrame);
-            observations.addAll(updatedVideoFrame.getObservations());
-        }
-        for (Observation observation : observations) {
-            dao.validateName(observation);
-        }
-        dao.endTransaction();
-        updateUI(observations); // update view
-        return updatedVideoFrames;
-    }
-
-    public Collection<Association> insertAssociations(Collection<Observation> observations, ILink associationTemplate) {
-        final Collection<Association> associations = new ArrayList<Association>(observations.size());
-        final Collection<Observation> uiObservations = new ArrayList<Observation>();
-        final AssociationDAO dao = annotationDAOFactory.newAssociationDAO();
-        dao.startTransaction();
-        for (Observation observation : observations) {
-            observation = dao.merge(observation);
-            uiObservations.add(observation);
-            Association ass = annotationFactory.newAssociation(associationTemplate.getLinkName(),
-                    associationTemplate.getToConcept(), associationTemplate.getLinkValue());
-            observation.addAssociation(ass);
-            dao.persist(ass);
-            dao.validateName(ass);
-            associations.add(ass);
-        }
-        dao.endTransaction();
-        updateUI(uiObservations); // update view
-        return associations;
-    }
-
-    public Collection<Association> updateAssociations(Collection<Association> associations) {
-        final AssociationDAO dao = annotationDAOFactory.newAssociationDAO();
-        Collection<Association> updatedAssociations = new ArrayList<Association>(associations.size());
-        Collection<Observation> uiObservations = new ArrayList<Observation>();
-        dao.startTransaction();
-        for (Association association : associations) {
-            association = dao.merge(association);
-            dao.validateName(association);
-            updatedAssociations.add(association);
-            uiObservations.add(association.getObservation());
-        }
-        dao.endTransaction();
-        updateUI(uiObservations);
-        return updatedAssociations;
-    }
-
-    public void deleteAssociations(Collection<Association> associations) {
-        final DAO dao = annotationDAOFactory.newDAO();
-        Collection<Observation> modifiedObservations = new ArrayList<Observation>();
-        dao.startTransaction();
-        for (Association association : associations) {
-            association = dao.merge(association);
-            final Observation observation = association.getObservation();
-            observation.removeAssociation(association);
-            dao.remove(association);
-            if (!modifiedObservations.contains(observation)) {
-                modifiedObservations.add(observation);
-            }
-        }
-        dao.endTransaction();
-        updateUI(modifiedObservations);
-    }
-
-    public VideoArchive deleteEmptyVideoFramesFrom(VideoArchive videoArchive) {
-        final DAO dao = annotationDAOFactory.newDAO();
-        dao.startTransaction();
-        videoArchive = dao.merge(videoArchive);
-        Collection<VideoFrame> videoFrames = new ArrayList<VideoFrame>(videoArchive.getVideoFrames());
-        for (VideoFrame videoFrame : videoFrames) {
-            if (videoFrame.getObservations().size() == 0) {
-                videoArchive.removeVideoFrame(videoFrame);
-                dao.remove(videoFrame);
-            }
-        }
+        @SuppressWarnings("unused") Collection<VideoFrame> videoFrames = videoArchive.getVideoFrames();
         dao.endTransaction();
         return videoArchive;
-    }
-
-    public void deleteObservations(Collection<Observation> observations) {
-        final DAO dao = annotationDAOFactory.newDAO();
-        dao.startTransaction();
-        for (Observation observation : observations) {
-            VideoFrame videoFrame = observation.getVideoFrame();
-            videoFrame.removeObservation(observation);
-            dao.remove(observation);
-            if (videoFrame.getObservations().size() == 0) {
-                VideoArchive videoArchive = videoFrame.getVideoArchive();
-                videoArchive.removeVideoFrame(videoFrame);
-                dao.remove(videoFrame);
-            }
-
-        }
-        dao.endTransaction();
-        updateUI();
-    }
-
-    public void moveObservationsTo(VideoArchive videoArchive, Collection<Observation> observations) {
-        Collection<Observation> updateObservations = new ArrayList<Observation>();
-        DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
-        dao.startTransaction();
-        videoArchive = dao.find(videoArchive);
-        for (Observation observation : updateObservations) {
-            observation = dao.find(observation);
-            throw new UnsupportedOperationException("Implementation isn't finished yet");
-        }
-    }
-
-    public Collection<Observation> deleteAllAssociationsFrom(Collection<Observation> observations) {
-        Collection<Observation> updateObservations = new ArrayList<Observation>();
-        DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
-        dao.startTransaction();
-        for (Observation observation : observations) {
-            observation = dao.merge(observation);
-            for (Association association : new ArrayList<Association>(observation.getAssociations())) {
-                observation.removeAssociation(association);
-                dao.remove(association);
-            }
-            updateObservations.add(observation);
-        }
-        updateUI();
-        return updateObservations;
-    }
-
-    public void updateUI(Collection<Observation> observations) {
-
-        // Get the TableModel
-        final ObservationTable observationTable = (ObservationTable) Lookup.getObservationTableDispatcher().getValueObject();
-        if (observationTable == null) {
-            log.info("No UI is available to update");
-            return;
-        }
-        final ObservationTableModel model = (ObservationTableModel) ((JTable) observationTable).getModel();
-        for (Observation observation : observations) {
-            int row = model.getObservationRow(observation);
-            if (row > -1 && row < model.getRowCount()) {
-            	observationTable.redrawRow(row);
-            }
-            else {
-            	observationTable.addObservation(observation);
-            	row = model.getObservationRow(observation);
-            	if (row > -1 && row < model.getRowCount()) {
-            		observationTable.scrollToVisible(row, 0);
-            	}
-            }
-        }
-    }
-
-    public void updateUI(VideoArchive videoArchive) {
-
-        // Get the TableModel
-        final ObservationTable observationTable = (ObservationTable) Lookup.getObservationTableDispatcher().getValueObject();
-        if (observationTable == null) {
-            log.info("No UI is available to update");
-            return;
-        }
-
-        final ObservationTableModel model = (ObservationTableModel) ((JTable) observationTable).getModel();
-        // Remove the current contents
-        model.clear();
-
-        // Repopulate it with the contents of the new VideoArchive
-        if (videoArchive != null) {
-
-            // DAOTX - Needed to deal with lazy loading
-            DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
-            dao.startTransaction();
-            videoArchive = dao.merge(videoArchive);
-
-            final Collection<VideoFrame> videoFrames = videoArchive.getVideoFrames();
-            for (VideoFrame videoFrame : videoFrames) {
-                final Collection<Observation> observations = videoFrame.getObservations();
-                for (Observation observation : observations) {
-                    model.addObservation(observation);
-                }
-            }
-            dao.endTransaction();
-        }
-    }
-
-    public void updateUI() {
-        VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
-        updateUI(videoArchive);
     }
 
     /**
@@ -358,19 +315,274 @@ public class PersistenceController {
     }
 
     /**
-     * VideoFrames need to be loaded from the database. Call this method to fetch all
-     * of them for a particular {@link VideoArchive}. Be sre to grab the returned reference
-     * in order to access them.
+     *
+     * @param videoArchive
+     * @param observations
+     */
+    public void moveObservationsTo(VideoArchive videoArchive, Collection<Observation> observations) {
+        Collection<Observation> updateObservations = new ArrayList<Observation>();
+        DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
+        dao.startTransaction();
+        videoArchive = dao.find(videoArchive);
+
+        for (Observation observation : updateObservations) {
+            observation = dao.find(observation);
+            throw new UnsupportedOperationException("Implementation isn't finished yet");
+        }
+    }
+
+    /**
+     *
+     * @param platform
+     * @param sequenceNumber
+     * @param videoArchiveName
+     * @return
+     */
+    public VideoArchive openVideoArchive(String platform, int sequenceNumber, String videoArchiveName) {
+        VideoArchiveDAO dao = toolBelt.getAnnotationDAOFactory().newVideoArchiveDAO();
+        dao.startTransaction();
+        VideoArchive videoArchive = dao.findOrCreateByParameters(platform, sequenceNumber, videoArchiveName);
+        @SuppressWarnings("unused") Collection<VideoFrame> videoFrames = videoArchive.getVideoFrames();    // Load the videoFrames
+        dao.endTransaction();
+        Lookup.getVideoArchiveDispatcher().setValueObject(videoArchive);
+
+        // TODO Do we need to call updateUI here?
+        return videoArchive;
+    }
+
+    /**
+     * Thread-safe. Updates changes made to the observations in the database. Validates the
+     * concept names used by the {@link Observation}s and their child {@link Association}
+     * @param observations
+     * @return
+     */
+    public Collection<Observation> updateAndValidate(Collection<Observation> observations) {
+        Collection<Observation> updatedObservations = new Vector<Observation>(observations.size());
+        ObservationDAO dao = toolBelt.getAnnotationDAOFactory().newObservationDAO();
+        AssociationDAO aDao = toolBelt.getAnnotationDAOFactory().newAssociationDAO(dao.getEntityManager());
+        dao.startTransaction();
+
+        for (Observation observation : observations) {
+            observation = dao.updateFields(observation);
+            if (observation != null) {
+                updatedObservations.add(observation);
+                dao.validateName(observation);
+                for (Association association : new ArrayList<Association>(observation.getAssociations())) {
+                    aDao.validateName(association);
+                }
+            }
+        }
+
+        dao.endTransaction();
+        return updatedObservations;
+    }
+
+    /**
+     *
+     * @param associations
+     * @return
+     */
+    public Collection<Association> updateAssociations(Collection<Association> associations) {
+        final AssociationDAO dao = annotationDAOFactory.newAssociationDAO();
+        Collection<Association> updatedAssociations = new ArrayList<Association>(associations.size());
+        Collection<Observation> uiObservations = new ArrayList<Observation>();
+        dao.startTransaction();
+
+        for (Association association : associations) {
+            association = dao.merge(association);
+            dao.validateName(association);
+            updatedAssociations.add(association);
+            uiObservations.add(association.getObservation());
+        }
+
+        dao.endTransaction();
+        updateUI(uiObservations);
+        return updatedAssociations;
+    }
+
+    /**
+     *
+     * @param observations
+     * @return
+     */
+    public Collection<Observation> updateObservations(Collection<Observation> observations) {
+        Collection<Observation> updatedObservations = updateAndValidate(observations);
+        updateUI(updatedObservations);    // update view
+        return updatedObservations;
+    }
+
+    /**
+     *
+     * @param observations
+     */
+    public void updateUI(final Collection<Observation> observations) {
+        updateUI(observations, true);
+    }
+
+    /**
+     * Updates the observations in the UI. Uses a flag to indicate if the
+     * selected rows should be adjusted.
+     * 
+     * @param observations
+     * @param updateSelection true = reselect rows, false = don't make any adjustments
+     *  to selections (useful when you know none of the rows were selected)
+     */
+    public void updateUI(final Collection<Observation> observations, final boolean updateSelection) {
+        SwingUtilities.invokeLater(new Runnable() {
+
+            public void run() {
+
+                // Get the TableModel
+                final ObservationTable observationTable = (ObservationTable) Lookup.getObservationTableDispatcher().getValueObject();
+                final JTable table = (JTable) observationTable;
+                if (observationTable == null) {
+                    log.info("No UI is available to update");
+                    return;
+                }
+
+                final ObservationTableModel model = (ObservationTableModel) table.getModel();
+                
+                for (Observation observation : observations) {
+                    int row = model.getObservationRow(observation);
+                    if ((row > -1) && (row < model.getRowCount())) {
+                        observationTable.updateObservation(observation);
+                    }
+                    else {
+                        observationTable.addObservation(observation);
+                        row = model.getObservationRow(observation);
+
+                        if ((row > -1) && (row < model.getRowCount())) {
+                            observationTable.scrollToVisible(row, 0);
+                        }
+                    }
+                }
+
+                if (updateSelection) {
+                    Collection<Observation> selectedObservations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+                    selectedObservations = new ArrayList<Observation>(selectedObservations);    // Copy to avoid thread issues
+
+                    /*
+                     * If we just added one select it in the table
+                     */
+                    if (observations.size() == 1) {
+                        final Observation observation = observations.iterator().next();
+                        observationTable.setSelectedObservation(observation);
+                    }
+                    else {
+                        ListSelectionModel lsm = table.getSelectionModel();
+                        lsm.clearSelection();
+
+                        for (Observation observation : selectedObservations) {
+                            int row = model.getObservationRow(observation);
+                            lsm.addSelectionInterval(row, row);
+                        }
+
+                    }
+                }
+
+            }
+        });
+    }
+
+    /**
+     *
+     * @param videoArchive
+     */
+    public void updateUI(VideoArchive videoArchive) {
+
+        // Get the TableModel
+        final ObservationTable observationTable = (ObservationTable) Lookup.getObservationTableDispatcher().getValueObject();
+        if (observationTable == null) {
+            log.info("No UI is available to update");
+            return;
+        }
+
+        final ObservationTableModel model = (ObservationTableModel) ((JTable) observationTable).getModel();
+
+        // Remove the current contents
+        model.clear();
+
+        Collection<Observation> observations = new ArrayList<Observation>();
+
+        // Repopulate it with the contents of the new VideoArchive
+        if (videoArchive != null) {
+
+            // DAOTX - Needed to deal with lazy loading
+            DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
+            dao.startTransaction();
+            videoArchive = dao.find(videoArchive);
+
+            final Collection<VideoFrame> videoFrames = videoArchive.getVideoFrames();
+            for (VideoFrame videoFrame : videoFrames) {
+                observations.addAll(videoFrame.getObservations());
+            }
+
+            dao.endTransaction();
+
+            updateUI(observations);
+        }
+    }
+
+    /**
+     */
+    public void updateUI() {
+        VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+        updateUI(videoArchive);
+    }
+
+    /**
+     *
      * @param videoArchive
      * @return
      */
-    public VideoArchive loadVideoFramesFor(VideoArchive videoArchive) {
+    public VideoArchive updateVideoArchive(VideoArchive videoArchive) {
         DAO dao = annotationDAOFactory.newDAO();
         dao.startTransaction();
         videoArchive = dao.merge(videoArchive);
-        @SuppressWarnings("unused")
-        Collection<VideoFrame> videoFrames = videoArchive.getVideoFrames();
         dao.endTransaction();
+        updateUI();
         return videoArchive;
+    }
+
+    /**
+     *
+     * @param videoArchiveSet
+     * @return
+     */
+    public VideoArchiveSet updateVideoArchiveSet(VideoArchiveSet videoArchiveSet) {
+        DAO dao = annotationDAOFactory.newDAO();
+        dao.startTransaction();
+        videoArchiveSet = dao.merge(videoArchiveSet);
+        dao.endTransaction();
+
+        //updateUI(videoArchiveSet);
+        return videoArchiveSet;
+    }
+
+    /**
+     *
+     *
+     * @param videoFrames
+     * @return
+     */
+    public Collection<VideoFrame> updateVideoFrames(Collection<VideoFrame> videoFrames) {
+        ObservationDAO dao = annotationDAOFactory.newObservationDAO();
+        final Collection<VideoFrame> updatedVideoFrames = new ArrayList<VideoFrame>(videoFrames.size());
+        final Collection<Observation> observations = new ArrayList<Observation>();
+        dao.startTransaction();
+
+        for (VideoFrame vf : videoFrames) {
+            VideoFrame updatedVideoFrame = dao.merge(vf);
+            updatedVideoFrames.add(updatedVideoFrame);
+            observations.addAll(updatedVideoFrame.getObservations());
+        }
+
+        for (Observation observation : observations) {
+            dao.validateName(observation);
+        }
+
+        dao.endTransaction();
+        updateUI(observations);    // update view
+        return updatedVideoFrames;
     }
 }

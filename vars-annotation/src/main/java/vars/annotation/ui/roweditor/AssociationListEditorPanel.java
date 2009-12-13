@@ -13,7 +13,7 @@
 
 
 
-package vars.old.annotation.ui;
+package vars.annotation.ui.roweditor;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -48,9 +48,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.Association;
 import vars.annotation.Observation;
-import vars.old.annotation.ui.AssociationList;
-import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.Lookup;
+import vars.annotation.ui.ToolBelt;
 
 /**
  * <p>

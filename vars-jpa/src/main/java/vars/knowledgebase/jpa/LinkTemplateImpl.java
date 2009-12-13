@@ -130,6 +130,10 @@ public class LinkTemplateImpl implements Serializable, LinkTemplate, JPAEntity {
     public String getToConcept() {
         return toConcept;
     }
+    
+    public Object getPrimaryKey() {
+    	return getId();
+    }
 
     public void setId(Long id) {
         this.id = id;

@@ -55,7 +55,7 @@ import vars.annotation.VideoFrame;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.VARSProperties;
-import vars.annotation.ui.actions.NewVideoFrameAction;
+import vars.annotation.ui.actions.NewObservationAction;
 
 /**
  * <p>Action for capturing a frame an performing related activities on it.</p>
@@ -245,7 +245,7 @@ public class ImageCaptureAction extends ActionAdapter {
      */
     private class FrameCaptureHelper {
 
-        private final NewVideoFrameAction action = new NewVideoFrameAction(toolBelt);
+        private final NewObservationAction action = new NewObservationAction(toolBelt);
         private File jpg;
         private SnapTime snapTime;
         private IVCR vcr;

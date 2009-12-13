@@ -250,4 +250,8 @@ public class PhysicalDataImpl implements Serializable, PhysicalData, JPAEntity {
     void setVideoFrame(VideoFrame videoFrame) {
         this.videoFrame = videoFrame;
     }
+    
+    public Object getPrimaryKey() {
+    	return getId();
+    }
 }

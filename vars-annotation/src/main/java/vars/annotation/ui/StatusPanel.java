@@ -13,7 +13,7 @@
 
 
 
-package vars.old.annotation.ui;
+package vars.annotation.ui;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -27,6 +27,7 @@ import vars.annotation.ui.Lookup;
 import vars.annotation.ui.StatusLabelForPerson;
 import vars.annotation.ui.StatusLabelForVcr;
 import vars.annotation.ui.StatusLabelForVideoArchive;
+import vars.old.annotation.ui.StatusLabelForVarsDb;
 
 /**
  */
@@ -47,7 +48,7 @@ public class StatusPanel extends JPanel {
     public StatusPanel(ToolBelt toolBelt) {
         super();
         personLabel = new StatusLabelForPerson(toolBelt);
-        videoArchiveLabel = new StatusLabelForVideoArchive(toolBelt.getAnnotationDAOFactory());
+        videoArchiveLabel = new StatusLabelForVideoArchive(toolBelt.getPersistenceController());
         initialize();
     }
 

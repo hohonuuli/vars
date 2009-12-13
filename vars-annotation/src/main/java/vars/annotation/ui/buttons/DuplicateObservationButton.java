@@ -26,32 +26,31 @@ import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
 import org.mbari.swing.JFancyButton;
 import org.mbari.swing.SwingUtils;
-import org.mbari.vcr.IVCR;
 
 import vars.UserAccount;
 import vars.annotation.Observation;
-import vars.annotation.ui.actions.CopyObservationAction;
+import vars.annotation.ui.actions.DuplicateObservationAction;
 import vars.annotation.ui.ToolBelt;
-import vars.annotation.ui.video.VideoControlService;
 import vars.annotation.ui.Lookup;
 
 /**
- * <p>Performs a deep copy of an selected observation to a new time code.</p>
+ * <p>Create a new observation using the current time-code from the VCR</p>
  *
  * @author  <a href="http://www.mbari.org">MBARI</a>
  */
-public class CopyObservationButton extends JFancyButton {
+public class DuplicateObservationButton extends JFancyButton {
+
 
 
     /**
-     * Constructor
+     * Constructor for the NewObservationButton object
      */
-    public CopyObservationButton(ToolBelt toolBelt) {
+    public DuplicateObservationButton(ToolBelt toolBelt) {
         super();
-        setAction(new CopyObservationAction(toolBelt));
-        setToolTipText("Copy an observation to a new timecode [" +
+        setAction(new DuplicateObservationAction(toolBelt));
+        setToolTipText("Create an Observation using the selected timecode [" +
                        SwingUtils.getKeyString((KeyStroke) getAction().getValue(Action.ACCELERATOR_KEY)) + "]");
-        setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/obs_copyanno.png")));
+        setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/obs_copytc.png")));
         setEnabled(false);
         setText("");
 
@@ -62,21 +61,12 @@ public class CopyObservationButton extends JFancyButton {
         Lookup.getSelectedObservationsDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
             
             public void propertyChange(PropertyChangeEvent evt) {
-                
-                Collection<Observation> obs = (Collection<Observation>) evt.getNewValue();
-                
-                final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher();
-                final VideoControlService videoService = (VideoControlService) Lookup.getVideoControlServiceDispatcher();
-                final IVCR vcr = videoService;
-                if ((userAccount != null) && (obs.size() == 1) && (vcr != null)) {
-                    setEnabled(true);
-                }
-                else {
-                    setEnabled(false);
-                }
+                final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+                final Collection<Observation> observations = (Collection<Observation>) evt.getNewValue();
+                setEnabled ((userAccount != null) && (observations.size() > 0));
                 
             }
         });
-        
+
     }
 }

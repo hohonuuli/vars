@@ -29,7 +29,7 @@ import vars.annotation.ui.ToolBelt;
 public class NewObservationUsingConceptNameAction extends ActionAdapter {
 
 
-    NewVideoFrameAction action1;
+    NewObservationAction action1;
 
 
     private String conceptName;
@@ -41,7 +41,7 @@ public class NewObservationUsingConceptNameAction extends ActionAdapter {
     public NewObservationUsingConceptNameAction(ToolBelt toolBelt, final String conceptName) {
         super();
         this.conceptName = conceptName;
-        action1 = new NewVideoFrameAction(toolBelt);
+        action1 = new NewObservationAction(toolBelt);
 
     }
 
