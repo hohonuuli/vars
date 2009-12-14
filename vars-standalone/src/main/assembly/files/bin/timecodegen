@@ -17,7 +17,6 @@ while(true) {
     def c = new GregorianCalendar()
     def f = c.get(Calendar.MILLISECOND) / 1000.0 * 29.97;
     String reply = String.format('%tT:%02d', c, Math.round(f))
-    //println("Sending: ${reply}")
     outgoing = new DatagramPacket(reply.bytes, reply.size(),
             incoming.address, incoming.port);
     socket.send(outgoing)
