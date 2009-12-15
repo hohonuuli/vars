@@ -15,6 +15,8 @@
 
 package vars.annotation;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
@@ -22,22 +24,27 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.Vector;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import org.mbari.text.IgnoreCaseToStringComparator;
 import vars.CacheClearedEvent;
 import vars.CacheClearedListener;
 import vars.DAO;
 import vars.PersistenceCache;
 import vars.QueryableImpl;
-import vars.annotation.jpa.AssociationDAOImpl;
-import vars.annotation.jpa.ObservationDAOImpl;
 import vars.annotation.jpa.VideoArchiveDAOImpl;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
+import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.LinkTemplate;
 import vars.knowledgebase.LinkTemplateDAO;
 import vars.knowledgebase.jpa.ConceptDAOImpl;
@@ -69,6 +76,7 @@ public class AnnotationPersistenceServiceImpl extends QueryableImpl implements A
     private final EntityManagerFactory entityManagerFactory;
     private final PersistenceCache persistenceCache;
 
+    private final Map<Concept, List<String>> descendantNameCache = Collections.synchronizedMap(new HashMap<Concept, List<String>>());
     /**
      * Constructs ...
      *
@@ -82,6 +90,28 @@ public class AnnotationPersistenceServiceImpl extends QueryableImpl implements A
         this.entityManagerFactory = entityManagerFactory;
         this.persistenceCache = persistenceCache;
 
+    }
+
+    public List<String> findDescendantNamesFor(Concept concept) {
+        List<String> desendantNames = descendantNameCache.get(concept);
+        if (desendantNames == null && concept != null) {
+            Collection<ConceptName> names = getReadOnlyConceptDAO().findDescendentNames(concept);
+            Collection<String> namesAsStrings = Collections2.transform(names, new Function<ConceptName, String>() {
+                public String apply(ConceptName from) {
+                    return from.getName();
+                }
+            });
+            List<String> namesInList = new ArrayList<String>(namesAsStrings);
+            Collections.sort(namesInList, new IgnoreCaseToStringComparator());
+            descendantNameCache.put(concept, namesInList);
+        }
+
+        // Don't return null. Alwasy return at least an empty list
+        if (desendantNames == null) {
+            desendantNames = new ArrayList<String>();
+        }
+        
+        return desendantNames;
     }
 
     /**
@@ -180,39 +210,11 @@ public class AnnotationPersistenceServiceImpl extends QueryableImpl implements A
 
         return entityManager;
     }
-
-    /**
-     * Thread-safe. Updates changes made to the observations in the database. Validates the
-     * concept names used by the {@link Observation}s and their child {@link Association}
-     * @param observations
-     * @return
-     * @deprecated
-     */
-    public Collection<Observation> updateAndValidate(Collection<Observation> observations) {
-        Collection<Observation> updatedObservations = new ArrayList<Observation>(observations.size());
-        EntityManager entityManager = getEntityManager();
-        ObservationDAO dao = new ObservationDAOImpl(entityManager);
-        AssociationDAO aDao = new AssociationDAOImpl(entityManager);
-        dao.startTransaction();
-        for (Observation observation : observations) {
-            observation = dao.merge(observation);
-            updatedObservations.add(observation);
-            dao.validateName(observation);
-            for (Association association : new ArrayList<Association>(observation.getAssociations())) {
-                aDao.validateName(association);
-            }
-        }
-        dao.endTransaction();
-        return updatedObservations;
-    }
-    
     
     public Collection<LinkTemplate> findLinkTemplatesFor(Concept concept) {
         LinkTemplateDAO dao = new LinkTemplateDAOImpl(getReadOnlyEntityManager());
-        dao.startTransaction();
         concept = dao.find(concept);
         Collection<LinkTemplate> linkTemplates = dao.findAllApplicableToConcept(concept);
-        dao.endTransaction();
         return linkTemplates;
     }
     
@@ -266,7 +268,8 @@ public class AnnotationPersistenceServiceImpl extends QueryableImpl implements A
          * @param evt
          */
         public void beforeClear(CacheClearedEvent evt) {
-            dao.endTransaction();    // Close the transaction 
+            dao.endTransaction();    // Close the transaction
+            descendantNameCache.clear();
         }
     }
 

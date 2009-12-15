@@ -15,17 +15,26 @@
 
 package vars.shared.ui;
 
+import foxtrot.Job;
+import foxtrot.Task;
+import foxtrot.Worker;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.mbari.swing.SortedComboBoxModel;
+import org.mbari.swing.SpinningDialWaitIndicator;
+import org.mbari.swing.WaitIndicator;
+import org.slf4j.LoggerFactory;
 import vars.annotation.AnnotationPersistenceService;
 import vars.knowledgebase.Concept;
-import vars.knowledgebase.ConceptName;
 
 /**
  * <p>Displays the Concept and all it's children in the drop-down list. Names are stored internally as Strings</p>
@@ -37,6 +46,8 @@ public class HierachicalConceptNameComboBox extends ConceptNameComboBox {
 
     private final AnnotationPersistenceService annotationPersistenceService;
     private Concept concept;
+    private final Map<Concept, List<String>> cache = Collections.synchronizedMap(new HashMap<Concept, List<String>>());
+    private final org.slf4j.Logger log = LoggerFactory.getLogger(getClass());
 
     /**
      * Constructs ...
@@ -103,17 +114,29 @@ public class HierachicalConceptNameComboBox extends ConceptNameComboBox {
      *
      * @param concept
      */
-    public void setConcept(Concept concept) {
+    public void setConcept(final Concept concept) {
         this.concept = concept;
 
         if (concept != null) {
-            Collection<ConceptName> conceptNames = annotationPersistenceService.getReadOnlyConceptDAO().findDescendentNames(concept);
-            List<String> namesAsStrings = new ArrayList<String>(conceptNames.size());
+            WaitIndicator waitIndicator = new SpinningDialWaitIndicator(this);
+            List<String> namesAsStrings;
+            try {
+                namesAsStrings = (List<String>) Worker.post(new Task() {
 
-            for (ConceptName cn : conceptNames) {
-                namesAsStrings.add(cn.getName());
+                    @Override
+                    public Object run() {
+                        return annotationPersistenceService.findDescendantNamesFor(concept);
+
+                    }
+                });
             }
-
+            catch (Exception e) {
+                log.error("An error occurred while looking up descendant names for " + concept, e);
+                namesAsStrings = new Vector<String>();
+            }
+            finally {
+                waitIndicator.dispose();
+            }
             ((SortedComboBoxModel) getModel()).setItems(namesAsStrings);
         }
         else {

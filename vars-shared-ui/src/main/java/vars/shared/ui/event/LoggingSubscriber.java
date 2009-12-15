@@ -37,7 +37,12 @@ public class LoggingSubscriber implements EventTopicSubscriber {
      */
     public void onEvent(String topic, Object data) {
         if (log.isDebugEnabled()) {
-            log.debug("Event Published:\n\tTOPIC: " + topic + "\n\tDATA: " + data);
+            if (data instanceof Throwable) {
+                log.debug("Event Published:\n\tTOPIC: " + topic + " (Exception Stacktrace below) ", data);
+            }
+            else {
+                log.debug("Event Published:\n\tTOPIC: " + topic + "\n\tDATA: " + data);
+            }
         }
     }
 }

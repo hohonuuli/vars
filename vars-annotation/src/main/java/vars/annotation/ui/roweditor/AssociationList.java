@@ -8,6 +8,7 @@ import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Vector;
 import javax.swing.ListModel;
 import org.mbari.swing.ListListModel;
 
@@ -41,9 +42,10 @@ import vars.annotation.Observation;
  *
  * @author <a href="mailto:brian@mbari.org">Brian Schlining</a>
  */
-public class AssociationList extends ArrayList<Association> {
+public class AssociationList extends Vector<Association> {
     
-    public static final String PROP_OBSERVATION = "observations";
+    public static final String PROP_OBSERVATION = "observation";
+    public static final String PROP_ASSOCIATIONS = "associations";
 
 
     /**
@@ -85,6 +87,7 @@ public class AssociationList extends ArrayList<Association> {
      */
     private void addAssociation(Association assoc) {
         add(assoc);
+        pcs.firePropertyChange(PROP_ASSOCIATIONS, null, this);
     }
 
     /**

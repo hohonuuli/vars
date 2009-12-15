@@ -52,6 +52,7 @@ import org.slf4j.LoggerFactory;
 import vars.CacheClearedEvent;
 import vars.CacheClearedListener;
 import vars.ILink;
+import vars.LinkUtilities;
 import vars.annotation.AnnotationPersistenceService;
 import vars.annotation.Association;
 import vars.annotation.AssociationDAO;
@@ -200,7 +201,7 @@ public class AssociationEditorPanel extends JPanel {
 
                 // If there is no toConcept, get all the linkTemplates
                 Concept rootConcept = service.findRootConcept();
-                linkTemplates = toolBelt.getAnnotationPersistenceService().findLinkTemplatesFor(rootConcept);
+                linkTemplates = service.findLinkTemplatesFor(rootConcept);
             }
 
             // Convert the link templates to their string representations
@@ -341,6 +342,7 @@ public class AssociationEditorPanel extends JPanel {
             cbToConcept.setToolTipText("To Concept");
             cbToConcept.addFocusListener(new FocusAdapter() {
 
+                @Override
                 public void focusGained(final FocusEvent e) {
                     cbToConcept.getEditor().selectAll();
                 }
@@ -375,6 +377,7 @@ public class AssociationEditorPanel extends JPanel {
             tfLinkName.setToolTipText("Link Name");
             tfLinkName.addFocusListener(new FocusAdapter() {
 
+                @Override
                 public void focusGained(final FocusEvent fe) {
                     tfLinkName.setSelectionStart(0);
                     tfLinkName.setSelectionEnd(tfLinkName.getText().length());
@@ -392,6 +395,7 @@ public class AssociationEditorPanel extends JPanel {
             tfLinkValue.setToolTipText("Link Value");
             tfLinkValue.addFocusListener(new FocusAdapter() {
 
+                @Override
                 public void focusGained(final FocusEvent fe) {
                     tfLinkValue.setSelectionStart(0);
                     tfLinkValue.setSelectionEnd(tfLinkValue.getText().length());
@@ -451,6 +455,7 @@ public class AssociationEditorPanel extends JPanel {
             });
             tfSearch.addFocusListener(new FocusAdapter() {
 
+                @Override
                 public void focusGained(final FocusEvent fe) {
                     tfSearch.setSelectionStart(0);
                     tfSearch.setSelectionEnd(tfSearch.getText().length());
@@ -528,6 +533,7 @@ public class AssociationEditorPanel extends JPanel {
         changeFromConcept(ILink.VALUE_NIL);
         addComponentListener(new ComponentAdapter() {
 
+            @Override
             public void componentShown(final ComponentEvent e) {
                 setEnterBehavior();
                 getTfSearch().requestFocus();
@@ -574,6 +580,7 @@ public class AssociationEditorPanel extends JPanel {
      *
      * @param  isEnabled The new enabled value
      */
+    @Override
     public void setEnabled(final boolean isEnabled) {
         getBtnCancel().setEnabled(isEnabled);
         getBtnAdd().setEnabled(isEnabled);
@@ -755,8 +762,7 @@ public class AssociationEditorPanel extends JPanel {
 
             if (association != null) {
                 defaultFromConcept = association.getFromConcept();
-                defaultLink = association.getLinkName() + " | " + association.getToConcept() + " | " +
-                              association.getLinkValue();
+                defaultLink = LinkUtilities.formatAsString(association);
                 getBtnAdd().setToolTipText("Accept Edits");
             }
             else {

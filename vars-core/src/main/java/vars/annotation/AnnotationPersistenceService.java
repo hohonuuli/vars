@@ -6,6 +6,7 @@
 package vars.annotation;
 
 import java.util.Collection;
+import java.util.List;
 
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
@@ -42,9 +43,14 @@ public interface AnnotationPersistenceService {
     
     Collection<LinkTemplate> findLinkTemplatesFor(Concept concept);
     
-    Collection<Observation> updateAndValidate(Collection<Observation> observations);
-    
     Collection<Integer> findAllReferenceNumbers(VideoArchiveSet videoArchiveSet, Concept concept);
+
+    /**
+     * Find Descendant Names as a sorted List of Strings
+     * @param concept
+     * @return
+     */
+    List<String> findDescendantNamesFor(Concept concept);
     
 
 }

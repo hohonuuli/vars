@@ -135,7 +135,7 @@ public class ObservationImpl implements Serializable, Observation, JPAEntity {
             ((AssociationImpl) association).setObservation(this);
         }
 
-        propertyChangeSupport.firePropertyChange(PROP_ASSOCIATIONS, null, associations);    // This method is added by @Bindable
+        propertyChangeSupport.firePropertyChange(PROP_ASSOCIATIONS, null, associations);  
     }
 
     /**

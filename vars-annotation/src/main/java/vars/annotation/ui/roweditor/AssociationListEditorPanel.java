@@ -26,6 +26,9 @@ import java.awt.image.ImageObserver;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Vector;
+
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -46,6 +49,8 @@ import org.mbari.swing.JFancyButton;
 import org.mbari.swing.ListListModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import vars.DAO;
 import vars.annotation.Association;
 import vars.annotation.Observation;
 import vars.annotation.ui.Lookup;
@@ -226,8 +231,17 @@ public class AssociationListEditorPanel extends JPanel {
             changeListener = new PropertyChangeListener() {
 
                 public void propertyChange(final PropertyChangeEvent evt) {
+                	
+                	// DAOTX 
+                	DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
+                	dao.startTransaction();
+                	Observation obs = dao.find(observation);
+                	dao.endTransaction();
+                	setObservation(obs);
+                	
                     final ListListModel listModel = (ListListModel) getJList().getModel();
                     listModel.refreshView();
+                    // TODO need to fetch Observation from the database and reset it here
                 }
             };
         }
@@ -351,20 +365,14 @@ public class AssociationListEditorPanel extends JPanel {
                             return;
                         }
 
-
                         // Remove references to the selected association from
                         // the parent and the listModel
                         listModel.remove(j.getSelectedIndex());
 
-
                         try {
-                            toolBelt.getPersistenceController().deleteAssociations(new ArrayList<Association>() {
-
-                                {
+                            toolBelt.getPersistenceController().deleteAssociations(new ArrayList<Association>() {{
                                     add(association);
-                                }
-
-                            });
+                                }});
                         }
                         catch (final Exception ex) {
                             EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, ex);
@@ -387,7 +395,6 @@ public class AssociationListEditorPanel extends JPanel {
             @Override
             public void focusGained(final FocusEvent e) {
 
-                // System.out.println("focus gained");
                 if (getJList().getModel().getSize() == 0) {
                     getAddAction().doAction();
                 }
@@ -425,13 +432,14 @@ public class AssociationListEditorPanel extends JPanel {
      *
      * @param  value             The <code>AssociationList</code> to be edited
      */
-    void setAssociationList(final AssociationList value) {
-        final ListModel listModel = new ListListModel(value);
+    void setAssociationList(final Collection<Association> value) {
+        final ListModel listModel = new ListListModel(new Vector<Association>(value));
         getJList().setModel(listModel);
 
-        // this change in jList will not be deteced by the
-        // listSelectionListeners,
-        // so make a manual call to enableButtons
+        /* 
+         * This change in jList will not be detected by the listSelectionListeners,
+         * so make a manual call to enableButtons
+         */
         enableButtons();
         setEditingAssociation(false);
     }
@@ -497,18 +505,14 @@ public class AssociationListEditorPanel extends JPanel {
      */
     public void setObservation(final Observation newObs) {
 
-        // Remvoe listeners from existing
+        // Remove listeners from existing
         if (observation != null) {
-            AssociationList associationList = new AssociationList(observation);
-            associationList.removePropertyChangeListener(getChangeListener());
-            observation.removePropertyChangeListener(Observation.PROP_CONCEPT_NAME, getChangeListener());
+            observation.removePropertyChangeListener(getChangeListener());
         }
 
         if (newObs != null) {
-            final AssociationList a = new AssociationList(newObs);
-            a.addPropertyChangeListener(getChangeListener());
-            newObs.addPropertyChangeListener(Observation.PROP_CONCEPT_NAME, getChangeListener());
-            setAssociationList(a);
+            newObs.addPropertyChangeListener(getChangeListener());
+            setAssociationList(newObs.getAssociations());
         }
 
         observation = newObs;

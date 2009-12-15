@@ -57,6 +57,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.CacheClearedEvent;
 import vars.CacheClearedListener;
+import vars.DAO;
 import vars.UserAccount;
 import vars.annotation.Observation;
 import vars.annotation.ObservationDAO;
@@ -83,6 +84,7 @@ public class RowEditorPanel extends JPanel {
     /** Listens for reverse (shift) tabs in JTextArea */
     private static final Set<KeyStroke> shifttab = ImmutableSet.of(KeyStroke.getKeyStroke("shift TAB"));
     private final Logger log = LoggerFactory.getLogger(getClass());
+    private PropertyChangeListener changeListener;
 
     /**
      *     The actions for changing the focus behavior of a JTextArea
@@ -460,7 +462,12 @@ public class RowEditorPanel extends JPanel {
 
     private void setObservation(final Observation observation) {
 
-
+    	// Add property change listener. When observation is updated just reset it here
+    	Observation oldObservation = this.selectedObservation;
+    	if (oldObservation != null) {
+    		oldObservation.removePropertyChangeListener(getChangeListener());
+    	}
+    	
         this.selectedObservation = observation;
         final boolean isNull = (observation == null);
         setEnabled(!isNull);
@@ -486,12 +493,39 @@ public class RowEditorPanel extends JPanel {
             getNotesArea().setEnabled(false);
         }
         else {
+        	observation.addPropertyChangeListener(getChangeListener());
             getConceptComboBox().setSelectedItem(observation.getConceptName());
             getNotesArea().setText(observation.getNotes());
             getNotesArea().setEnabled(!getNotableConceptNames().contains(observation.getConceptName()));
         }
 
         getConceptComboBox().requestFocus();
+    }
+    
+    /**
+     *     This change listener can be added to any object whose state change requires the JList to repaint.
+     *     @return
+     */
+    PropertyChangeListener getChangeListener() {
+        if (changeListener == null) {
+            changeListener = new PropertyChangeListener() {
+
+                public void propertyChange(final PropertyChangeEvent evt) {
+                	
+                	if (selectedObservation != null) {
+                		// DAOTX 
+                    	DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
+                    	dao.startTransaction();
+                    	Observation obs = dao.find(selectedObservation);
+                    	dao.endTransaction();
+                    	setObservation(obs);
+                	}
+                	
+                }
+            };
+        }
+
+        return changeListener;
     }
 
 
