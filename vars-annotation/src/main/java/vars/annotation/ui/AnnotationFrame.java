@@ -17,16 +17,23 @@ package vars.annotation.ui;
 
 import java.awt.BorderLayout;
 import java.awt.HeadlessException;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 import java.util.Vector;
+
+import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.mbari.util.Dispatcher;
@@ -159,6 +166,38 @@ public class AnnotationFrame extends JFrame {
         if (table == null) {
             table = new JXObservationTable();
             table.setFocusable(false);    // The row editor panel should get focus NOT the table
+            
+            // Map Mask+UP-ARROW Key Stroke
+            String upTable = "up-table";
+            table.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
+			            upTable);
+            table.getActionMap().put(upTable, new AbstractAction() {
+    			
+    			public void actionPerformed(final ActionEvent e) {
+    			   final int numRows = table.getRowCount();
+    			   final int currentRow = table.getSelectionModel().getLeadSelectionIndex();
+    			   final int nextRow = (currentRow - 1 < 0) ? numRows - 1 : currentRow - 1;
+    			   table.getSelectionModel().setSelectionInterval(nextRow, nextRow);
+    			   table.scrollToVisible(nextRow, 0);
+    			}
+    			
+    		});
+            
+           // Map Mask+DOWN-ARROW Key Stroke
+            String downTable = "down-table";
+            table.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), 
+            		downTable);
+			table.getActionMap().put(downTable, new AbstractAction() {
+			
+				public void actionPerformed(final ActionEvent e) {
+				   final int numRows = table.getRowCount();
+				   final int currentRow = table.getSelectionModel().getLeadSelectionIndex();
+				   final int nextRow = (currentRow + 1 >= numRows) ? 0 : currentRow + 1;
+				   table.getSelectionModel().setSelectionInterval(nextRow, nextRow);
+				   table.scrollToVisible(nextRow, 0);
+				}
+			
+			});
 
             /*
              * Watch the selected rows and notify the world when the selected rows

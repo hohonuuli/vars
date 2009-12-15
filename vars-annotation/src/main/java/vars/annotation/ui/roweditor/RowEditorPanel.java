@@ -15,15 +15,12 @@
 
 package vars.annotation.ui.roweditor;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
@@ -34,40 +31,39 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
-import java.util.Vector;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
+
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JComboBox;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.LayoutFocusTraversalPolicy;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+
 import org.bushe.swing.event.EventBus;
+import org.bushe.swing.event.EventTopicSubscriber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import vars.CacheClearedEvent;
 import vars.CacheClearedListener;
-import vars.DAO;
 import vars.UserAccount;
 import vars.annotation.Observation;
-import vars.annotation.ObservationDAO;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
-import vars.annotation.ui.table.ObservationTable;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptName;
 import vars.shared.ui.AllConceptNamesComboBox;
+
+import com.google.common.collect.ImmutableSet;
+import vars.shared.ui.event.LoggingSubscriber;
 
 /**
  * <p>THis panel is explcitly desinged for editing Observations in the
@@ -84,7 +80,8 @@ public class RowEditorPanel extends JPanel {
     /** Listens for reverse (shift) tabs in JTextArea */
     private static final Set<KeyStroke> shifttab = ImmutableSet.of(KeyStroke.getKeyStroke("shift TAB"));
     private final Logger log = LoggerFactory.getLogger(getClass());
-    private PropertyChangeListener changeListener;
+    private final EventTopicSubscriber<Observation> observationChangedSubscriber = new ObservationChangedSubscriber();
+    private final EventTopicSubscriber loggingSubscriber = new LoggingSubscriber();
 
     /**
      *     The actions for changing the focus behavior of a JTextArea
@@ -110,18 +107,10 @@ public class RowEditorPanel extends JPanel {
      */
     private Collection<String> notableConceptNames;
     private JTextArea notesArea;
-    private final ObservationTable observationTable;
-    private Observation selectedObservation;
+    private Observation observation;
     private final ToolBelt toolBelt;
+    public static final String TOPIC_OBSERVATION_CHANGED = "vars.annotation.ui.roweditor.RowEditorPanel-ObservationChanged";
 
-    /**
-     * Constructor for the RowEditorPanel object
-     *
-     * @param toolBelt
-     */
-    public RowEditorPanel(ToolBelt toolBelt) {
-        this((ObservationTable) Lookup.getObservationTableDispatcher().getValueObject(), toolBelt);
-    }
 
     /**
      * Constructor for the RowEditorPanel object
@@ -129,16 +118,16 @@ public class RowEditorPanel extends JPanel {
      * @param  observationTable Description of the Parameter
      * @param toolBelt
      */
-    public RowEditorPanel(final ObservationTable observationTable, ToolBelt toolBelt) {
+    public RowEditorPanel(ToolBelt toolBelt) {
         super();
-        this.observationTable = observationTable;
         this.toolBelt = toolBelt;
+        EventBus.subscribe(TOPIC_OBSERVATION_CHANGED, observationChangedSubscriber);
+        EventBus.subscribe(TOPIC_OBSERVATION_CHANGED, loggingSubscriber);
         initialize();
 
         /**
          * Listen for changes in the observation
          *
-         * TODO - Editor should allow editing of concept name of multiple rows?
          */
         Lookup.getSelectedObservationsDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
 
@@ -165,7 +154,8 @@ public class RowEditorPanel extends JPanel {
             }
 
         });
-
+        
+        
 
     }
 
@@ -187,15 +177,13 @@ public class RowEditorPanel extends JPanel {
                         final String conceptName = (String) conceptComboBox.getSelectedItem();
                         getNotesArea().setEditable(!getNotableConceptNames().contains(conceptName));
 
-                        if ((selectedObservation != null) &&
-                                !selectedObservation.getConceptName().equals(conceptName)) {
+                        if ((observation != null) && !observation.getConceptName().equals(conceptName)) {
 
                             // DAOTX
-                            selectedObservation.setConceptName(conceptName);
-                            final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher()
-                                .getValueObject();
-                            selectedObservation.setObserver(userAccount.getUserName());
-                            selectedObservation.setObservationDate(new Date());
+                            observation.setConceptName(conceptName);
+                            final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+                            observation.setObserver(userAccount.getUserName());
+                            observation.setObservationDate(new Date());
 
                             if (log.isDebugEnabled()) {
                                 log.debug("Observation changed to " + conceptName + " by " + userAccount.getUserName());
@@ -246,12 +234,8 @@ public class RowEditorPanel extends JPanel {
                         conceptComboBox.setEnabled(false);
 
                         try {
-
                             // DAOTX
-                            final ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
-                            conceptDAO.startTransaction();
-                            concept = conceptDAO.findByName(selectedName);
-                            conceptDAO.endTransaction();
+                        	concept = toolBelt.getAnnotationPersistenceService().findConceptByName(selectedName);
                             primaryName = concept.getPrimaryConceptName().getName();
                         }
                         catch (final Exception e1) {
@@ -353,8 +337,8 @@ public class RowEditorPanel extends JPanel {
                 }
 
                 void update() {
-                    if (selectedObservation != null) {
-                        selectedObservation.setNotes(getNotesArea().getText());
+                    if (observation != null) {
+                        observation.setNotes(getNotesArea().getText());
                     }
                 }
 
@@ -374,20 +358,16 @@ public class RowEditorPanel extends JPanel {
         add(getJPanel(), BorderLayout.NORTH);
         add(getListPanel(), BorderLayout.CENTER);
         setEnabled(false);
-
-        //      Add actions
-        mapKeys();
         setFocusCycleRoot(true);
 
         //FocusTraversalPolicy policy = getFocusTraversalPolicy();
         setFocusTraversalPolicy(new LayoutFocusTraversalPolicy() {
 
-
-            // TODO Warning, when a component should not be focused, I
-            // recursively
-            // call getComponentAfter, if all components should not be focused,
-            // this
-            // could lead to an infinite loop.
+            /*
+             *  Warning, when a component should not be focused, I 
+             *  recursively call getComponentAfter, if all components should not be focused,
+             * this could lead to an infinite loop.
+             */
             @Override
             public Component getComponentAfter(final Container focusCycleRoot, final Component aComponent) {
                 Component retval = super.getComponentAfter(focusCycleRoot, aComponent);
@@ -406,46 +386,6 @@ public class RowEditorPanel extends JPanel {
         });
     }
 
-    /**
-     * Setup key-mappings for the panel. This currently consists of a mapping
-     * for moving which observation is selected up and down in the table. Up
-     * and down wraps at the top and bottom of the table.
-     */
-    private void mapKeys() {
-
-        final JTable jTable = observationTable.getJTable();
-        this.getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.CTRL_DOWN_MASK),
-                         "up-table");
-        this.getActionMap().put("down-table", new AbstractAction() {
-
-
-            public void actionPerformed(final ActionEvent e) {
-
-
-                final int numRows = jTable.getRowCount();
-                final int currentRow = jTable.getSelectionModel().getLeadSelectionIndex();
-                final int nextRow = (currentRow + 1 >= numRows) ? 0 : currentRow + 1;
-                jTable.getSelectionModel().setSelectionInterval(nextRow, nextRow);
-                observationTable.scrollToVisible(nextRow, 0);
-            }
-
-        });
-        this.getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN,
-                InputEvent.CTRL_DOWN_MASK), "down-table");
-        this.getActionMap().put("up-table", new AbstractAction() {
-
-
-            public void actionPerformed(final ActionEvent e) {
-
-                final int numRows = jTable.getRowCount();
-                final int currentRow = jTable.getSelectionModel().getLeadSelectionIndex();
-                final int nextRow = (currentRow - 1 < 0) ? numRows - 1 : currentRow - 1;
-                jTable.getSelectionModel().setSelectionInterval(nextRow, nextRow);
-                observationTable.scrollToVisible(nextRow, 0);
-            }
-
-        });
-    }
 
     /**
      * Set this component to an enabled/disabled state.
@@ -461,14 +401,8 @@ public class RowEditorPanel extends JPanel {
     }
 
     private void setObservation(final Observation observation) {
-
-    	// Add property change listener. When observation is updated just reset it here
-    	Observation oldObservation = this.selectedObservation;
-    	if (oldObservation != null) {
-    		oldObservation.removePropertyChangeListener(getChangeListener());
-    	}
     	
-        this.selectedObservation = observation;
+        this.observation = observation;
         final boolean isNull = (observation == null);
         setEnabled(!isNull);
         getListPanel().setObservation(observation);
@@ -493,7 +427,6 @@ public class RowEditorPanel extends JPanel {
             getNotesArea().setEnabled(false);
         }
         else {
-        	observation.addPropertyChangeListener(getChangeListener());
             getConceptComboBox().setSelectedItem(observation.getConceptName());
             getNotesArea().setText(observation.getNotes());
             getNotesArea().setEnabled(!getNotableConceptNames().contains(observation.getConceptName()));
@@ -502,30 +435,13 @@ public class RowEditorPanel extends JPanel {
         getConceptComboBox().requestFocus();
     }
     
-    /**
-     *     This change listener can be added to any object whose state change requires the JList to repaint.
-     *     @return
-     */
-    PropertyChangeListener getChangeListener() {
-        if (changeListener == null) {
-            changeListener = new PropertyChangeListener() {
 
-                public void propertyChange(final PropertyChangeEvent evt) {
-                	
-                	if (selectedObservation != null) {
-                		// DAOTX 
-                    	DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
-                    	dao.startTransaction();
-                    	Observation obs = dao.find(selectedObservation);
-                    	dao.endTransaction();
-                    	setObservation(obs);
-                	}
-                	
-                }
-            };
-        }
+    private class ObservationChangedSubscriber implements EventTopicSubscriber<Observation> {
 
-        return changeListener;
+		public void onEvent(String topic, Observation data) {
+			setObservation(observation);
+		}
+    	
     }
 
 

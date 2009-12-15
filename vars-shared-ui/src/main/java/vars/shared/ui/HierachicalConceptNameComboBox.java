@@ -15,7 +15,6 @@
 
 package vars.shared.ui;
 
-import foxtrot.Job;
 import foxtrot.Task;
 import foxtrot.Worker;
 import java.awt.event.FocusAdapter;
@@ -27,8 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.mbari.swing.SortedComboBoxModel;
 import org.mbari.swing.SpinningDialWaitIndicator;
 import org.mbari.swing.WaitIndicator;

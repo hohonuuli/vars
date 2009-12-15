@@ -36,6 +36,7 @@ public class LinkListCellRenderer extends DefaultListCellRenderer {
      * @param cellHasFocus
      * @return
      */
+    @Override
     public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
             boolean cellHasFocus) {
 

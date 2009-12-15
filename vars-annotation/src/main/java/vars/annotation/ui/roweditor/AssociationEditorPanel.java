@@ -51,6 +51,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.CacheClearedEvent;
 import vars.CacheClearedListener;
+import vars.DAO;
 import vars.ILink;
 import vars.LinkUtilities;
 import vars.annotation.AnnotationPersistenceService;
@@ -126,7 +127,7 @@ public class AssociationEditorPanel extends JPanel {
      *
      * @param  parent The feature to be added to the Association attribute
      */
-    public void addAssociation(final Observation parent) {
+    public void addAssociation(Observation parent) {
 
         // Gather the parts of the Link from the GUI
         final String linkName = getTfLinkName().getText();
@@ -134,9 +135,9 @@ public class AssociationEditorPanel extends JPanel {
         final String linkValue = getTfLinkValue().getText();
         Association a = null;
 
-        // If the current Association is being edited rather than created
-        // update its particulars
+        
         if (association != null) {
+        	// If the current Association is being edited rather than created update its particulars
 
             /*
              *  DAOTX Remove reference to old parent
@@ -159,13 +160,22 @@ public class AssociationEditorPanel extends JPanel {
             toolBelt.getPersistenceController().updateObservations(changedObservations);
 
         }
-
-        // here a new Association is being created
         else {
+        	// here a new Association is being created
             a = toolBelt.getAnnotationFactory().newAssociation(linkName, toConcept, linkValue);
             Collection<Observation> obs = ImmutableList.of(parent);
             toolBelt.getPersistenceController().insertAssociations(obs, a);
         }
+        
+        /*
+         *  DAOTX - The parent has now been modified in the database. We need to 
+         *  lookup it up to get it's lasted version and publish it so that the
+         *  other row editor components are aware of it
+         */
+        DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
+        parent = dao.find(parent);
+        dao.endTransaction();
+        EventBus.publish(RowEditorPanel.TOPIC_OBSERVATION_CHANGED, parent);
     }
 
     /**
