@@ -42,6 +42,7 @@ public class OpenVideoArchiveDialog extends StandardDialog {
 		this.persistenceController = persistenceController;
 		this.controller = new Controller();
 		initialize();
+                getRootPane().setDefaultButton(getOkayButton());
 		pack();
 	}
 	

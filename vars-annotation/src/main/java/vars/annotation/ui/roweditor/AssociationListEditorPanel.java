@@ -442,6 +442,7 @@ public class AssociationListEditorPanel extends JPanel {
          */
         enableButtons();
         setEditingAssociation(false);
+        repaint();
     }
 
     /**

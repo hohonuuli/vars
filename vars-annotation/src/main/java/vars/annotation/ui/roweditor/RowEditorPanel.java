@@ -1,5 +1,5 @@
 /*
- * @(#)RowEditorPanel.java   2009.12.12 at 10:21:04 PST
+ * @(#)RowEditorPanel.java   2009.12.16 at 02:49:54 PST
  *
  * Copyright 2009 MBARI
  *
@@ -15,6 +15,7 @@
 
 package vars.annotation.ui.roweditor;
 
+import com.google.common.collect.ImmutableSet;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
@@ -32,7 +33,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JComboBox;
@@ -45,12 +45,10 @@ import javax.swing.KeyStroke;
 import javax.swing.LayoutFocusTraversalPolicy;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-
 import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.EventTopicSubscriber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import vars.CacheClearedEvent;
 import vars.CacheClearedListener;
 import vars.UserAccount;
@@ -61,8 +59,6 @@ import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptName;
 import vars.shared.ui.AllConceptNamesComboBox;
-
-import com.google.common.collect.ImmutableSet;
 import vars.shared.ui.event.LoggingSubscriber;
 
 /**
@@ -74,6 +70,9 @@ import vars.shared.ui.event.LoggingSubscriber;
  */
 public class RowEditorPanel extends JPanel {
 
+    /**  */
+    public static final String TOPIC_OBSERVATION_CHANGED = "vars.annotation.ui.roweditor.RowEditorPanel-ObservationChanged";
+
     /** Listens for forward tabs in JTextArea */
     private static final Set<KeyStroke> tab = ImmutableSet.of(KeyStroke.getKeyStroke("TAB"));
 
@@ -81,7 +80,6 @@ public class RowEditorPanel extends JPanel {
     private static final Set<KeyStroke> shifttab = ImmutableSet.of(KeyStroke.getKeyStroke("shift TAB"));
     private final Logger log = LoggerFactory.getLogger(getClass());
     private final EventTopicSubscriber<Observation> observationChangedSubscriber = new ObservationChangedSubscriber();
-    private final EventTopicSubscriber loggingSubscriber = new LoggingSubscriber();
 
     /**
      *     The actions for changing the focus behavior of a JTextArea
@@ -92,6 +90,7 @@ public class RowEditorPanel extends JPanel {
             ((Component) evt.getSource()).transferFocus();
         }
     };
+    private final EventTopicSubscriber loggingSubscriber = new LoggingSubscriber();
     protected Action prevFocusAction = new AbstractAction("Move Focus Backwards") {
 
         public void actionPerformed(ActionEvent evt) {
@@ -109,13 +108,10 @@ public class RowEditorPanel extends JPanel {
     private JTextArea notesArea;
     private Observation observation;
     private final ToolBelt toolBelt;
-    public static final String TOPIC_OBSERVATION_CHANGED = "vars.annotation.ui.roweditor.RowEditorPanel-ObservationChanged";
-
 
     /**
      * Constructor for the RowEditorPanel object
      *
-     * @param  observationTable Description of the Parameter
      * @param toolBelt
      */
     public RowEditorPanel(ToolBelt toolBelt) {
@@ -154,8 +150,7 @@ public class RowEditorPanel extends JPanel {
             }
 
         });
-        
-        
+
 
     }
 
@@ -181,7 +176,8 @@ public class RowEditorPanel extends JPanel {
 
                             // DAOTX
                             observation.setConceptName(conceptName);
-                            final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+                            final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher()
+                                .getValueObject();
                             observation.setObserver(userAccount.getUserName());
                             observation.setObservationDate(new Date());
 
@@ -234,8 +230,9 @@ public class RowEditorPanel extends JPanel {
                         conceptComboBox.setEnabled(false);
 
                         try {
+
                             // DAOTX
-                        	concept = toolBelt.getAnnotationPersistenceService().findConceptByName(selectedName);
+                            concept = toolBelt.getAnnotationPersistenceService().findConceptByName(selectedName);
                             primaryName = concept.getPrimaryConceptName().getName();
                         }
                         catch (final Exception e1) {
@@ -364,7 +361,7 @@ public class RowEditorPanel extends JPanel {
         setFocusTraversalPolicy(new LayoutFocusTraversalPolicy() {
 
             /*
-             *  Warning, when a component should not be focused, I 
+             *  Warning, when a component should not be focused, I
              *  recursively call getComponentAfter, if all components should not be focused,
              * this could lead to an infinite loop.
              */
@@ -386,7 +383,6 @@ public class RowEditorPanel extends JPanel {
         });
     }
 
-
     /**
      * Set this component to an enabled/disabled state.
      *
@@ -401,7 +397,7 @@ public class RowEditorPanel extends JPanel {
     }
 
     private void setObservation(final Observation observation) {
-    	
+
         this.observation = observation;
         final boolean isNull = (observation == null);
         setEnabled(!isNull);
@@ -434,15 +430,17 @@ public class RowEditorPanel extends JPanel {
 
         getConceptComboBox().requestFocus();
     }
-    
 
     private class ObservationChangedSubscriber implements EventTopicSubscriber<Observation> {
 
-		public void onEvent(String topic, Observation data) {
-			setObservation(observation);
-		}
-    	
+        /**
+         *
+         * @param topic
+         * @param data
+         */
+        public void onEvent(String topic, Observation data) {
+            log.info("Setting observation to " + observation);
+            setObservation(observation);
+        }
     }
-
-
 }

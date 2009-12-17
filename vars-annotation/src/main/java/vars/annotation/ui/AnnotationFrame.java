@@ -1,5 +1,5 @@
 /*
- * @(#)AnnotationFrame.java   2009.12.12 at 09:42:18 PST
+ * @(#)AnnotationFrame.java   2009.12.16 at 02:51:33 PST
  *
  * Copyright 2009 MBARI
  *
@@ -24,7 +24,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 import java.util.Vector;
-
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
@@ -61,11 +60,11 @@ public class AnnotationFrame extends JFrame {
     private JPanel miscTabsPanel;
     private JSplitPane outerSplitPane;
     private QuickControlsPanel quickControlsPanel;
+    private JPanel rowEditorPanel;
     private JXObservationTable table;
     private JScrollPane tableScrollPane;
     private JToolBar toolBar;
     private final ToolBelt toolBelt;
-    private JPanel rowEditorPanel;
 
     /**
      * Constructs ...
@@ -159,6 +158,7 @@ public class AnnotationFrame extends JFrame {
         if (rowEditorPanel == null) {
             rowEditorPanel = new RowEditorPanel(toolBelt);
         }
+
         return rowEditorPanel;
     }
 
@@ -166,38 +166,38 @@ public class AnnotationFrame extends JFrame {
         if (table == null) {
             table = new JXObservationTable();
             table.setFocusable(false);    // The row editor panel should get focus NOT the table
-            
+
             // Map Mask+UP-ARROW Key Stroke
             String upTable = "up-table";
-            table.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
-			            upTable);
+            table.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN,
+                    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), upTable);
             table.getActionMap().put(upTable, new AbstractAction() {
-    			
-    			public void actionPerformed(final ActionEvent e) {
-    			   final int numRows = table.getRowCount();
-    			   final int currentRow = table.getSelectionModel().getLeadSelectionIndex();
-    			   final int nextRow = (currentRow - 1 < 0) ? numRows - 1 : currentRow - 1;
-    			   table.getSelectionModel().setSelectionInterval(nextRow, nextRow);
-    			   table.scrollToVisible(nextRow, 0);
-    			}
-    			
-    		});
-            
-           // Map Mask+DOWN-ARROW Key Stroke
+
+                public void actionPerformed(final ActionEvent e) {
+                    final int numRows = table.getRowCount();
+                    final int currentRow = table.getSelectionModel().getLeadSelectionIndex();
+                    final int nextRow = (currentRow - 1 < 0) ? numRows - 1 : currentRow - 1;
+                    table.getSelectionModel().setSelectionInterval(nextRow, nextRow);
+                    table.scrollToVisible(nextRow, 0);
+                }
+
+            });
+
+            // Map Mask+DOWN-ARROW Key Stroke
             String downTable = "down-table";
-            table.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), 
-            		downTable);
-			table.getActionMap().put(downTable, new AbstractAction() {
-			
-				public void actionPerformed(final ActionEvent e) {
-				   final int numRows = table.getRowCount();
-				   final int currentRow = table.getSelectionModel().getLeadSelectionIndex();
-				   final int nextRow = (currentRow + 1 >= numRows) ? 0 : currentRow + 1;
-				   table.getSelectionModel().setSelectionInterval(nextRow, nextRow);
-				   table.scrollToVisible(nextRow, 0);
-				}
-			
-			});
+            table.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN,
+                    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), downTable);
+            table.getActionMap().put(downTable, new AbstractAction() {
+
+                public void actionPerformed(final ActionEvent e) {
+                    final int numRows = table.getRowCount();
+                    final int currentRow = table.getSelectionModel().getLeadSelectionIndex();
+                    final int nextRow = (currentRow + 1 >= numRows) ? 0 : currentRow + 1;
+                    table.getSelectionModel().setSelectionInterval(nextRow, nextRow);
+                    table.scrollToVisible(nextRow, 0);
+                }
+
+            });
 
             /*
              * Watch the selected rows and notify the world when the selected rows

@@ -1,5 +1,5 @@
 /*
- * @(#)ConceptNameComboBox.java   2009.12.02 at 10:40:04 PST
+ * @(#)ConceptNameComboBox.java   2009.12.16 at 10:57:55 PST
  *
  * Copyright 2009 MBARI
  *
@@ -15,14 +15,10 @@
 
 package vars.shared.ui;
 
-import java.awt.Component;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusListener;
 import java.util.Arrays;
 import java.util.Collection;
-
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.JList;
 
 import org.mbari.swing.FancyComboBox;
 import org.mbari.swing.SortedComboBoxModel;
@@ -68,7 +64,6 @@ public class ConceptNameComboBox extends FancyComboBox implements ConceptChangeL
         ((SortedComboBoxModel) getModel()).addElement(item.getName());
     }
 
-
     /**
      *  Description of the Method
      *
@@ -81,8 +76,6 @@ public class ConceptNameComboBox extends FancyComboBox implements ConceptChangeL
             addItem(cn);
         }
     }
-
-    // Impl for ConceptChangeListener
 
     /**
      *  Description of the Method
@@ -121,8 +114,6 @@ public class ConceptNameComboBox extends FancyComboBox implements ConceptChangeL
     public void removeItem(ConceptName item) {
         ((SortedComboBoxModel) getModel()).removeElement(item.getName());
     }
-
-    // Impl for ConceptChangeListener
 
     /**
      *  Description of the Method

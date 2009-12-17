@@ -21,14 +21,12 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Vector;
 import org.mbari.swing.SortedComboBoxModel;
 import org.mbari.swing.SpinningDialWaitIndicator;
 import org.mbari.swing.WaitIndicator;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.AnnotationPersistenceService;
 import vars.knowledgebase.Concept;
@@ -43,8 +41,7 @@ public class HierachicalConceptNameComboBox extends ConceptNameComboBox {
 
     private final AnnotationPersistenceService annotationPersistenceService;
     private Concept concept;
-    private final Map<Concept, List<String>> cache = Collections.synchronizedMap(new HashMap<Concept, List<String>>());
-    private final org.slf4j.Logger log = LoggerFactory.getLogger(getClass());
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     /**
      * Constructs ...
@@ -139,5 +136,8 @@ public class HierachicalConceptNameComboBox extends ConceptNameComboBox {
         else {
             removeAllItems();
         }
+
+        repaint();
+
     }
 }

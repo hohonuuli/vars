@@ -86,8 +86,6 @@ public class AllConceptNamesComboBox extends ConceptNameComboBox {
     }
 
     /**
-     * <p><!-- Method description --></p>
-     *
      *
      * @return All Concept-names found in the knowledgebase as strings
      */
