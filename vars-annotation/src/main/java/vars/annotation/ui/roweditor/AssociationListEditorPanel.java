@@ -1,5 +1,5 @@
 /*
- * @(#)AssociationListEditorPanel.java   2009.11.18 at 04:22:38 PST
+ * @(#)AssociationListEditorPanel.java   2009.12.16 at 04:21:21 PST
  *
  * Copyright 2009 MBARI
  *
@@ -22,13 +22,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.awt.image.ImageObserver;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Vector;
-
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -49,7 +48,6 @@ import org.mbari.swing.JFancyButton;
 import org.mbari.swing.ListListModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import vars.DAO;
 import vars.annotation.Association;
 import vars.annotation.Observation;
@@ -84,12 +82,6 @@ public class AssociationListEditorPanel extends JPanel {
     private JButton buttonEdit = null;
     private JButton buttonRemove = null;
     private final Logger log = LoggerFactory.getLogger(getClass());
-
-    /**  */
-    public final int WIDTH = ImageObserver.WIDTH;
-
-    /**  */
-    public final int HEIGHT = ImageObserver.HEIGHT;
     VerticalFlowLayout verticalFlowLayout1 = new VerticalFlowLayout();
     JPanel listEditorPanel = new JPanel();
     private ActionAdapter addAction;
@@ -114,6 +106,7 @@ public class AssociationListEditorPanel extends JPanel {
     }
 
     private void enableButtons() {
+
         getButtonAdd().setEnabled(true);
 
         if ((getJList().getSelectedIndex() == -1) || (jList.getModel().getSize() == 0)) {
@@ -231,17 +224,19 @@ public class AssociationListEditorPanel extends JPanel {
             changeListener = new PropertyChangeListener() {
 
                 public void propertyChange(final PropertyChangeEvent evt) {
-                	
-                	// DAOTX 
-                	DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
-                	dao.startTransaction();
-                	Observation obs = dao.find(observation);
-                	dao.endTransaction();
-                	setObservation(obs);
-                	
+
+                    log.debug("PropertyChange: " + evt);
+
+                    // DAOTX
+                    DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
+                    dao.startTransaction();
+                    Observation obs = dao.find(observation);
+                    dao.endTransaction();
+                    setObservation(obs);
+
                     final ListListModel listModel = (ListListModel) getJList().getModel();
                     listModel.refreshView();
-                    // TODO need to fetch Observation from the database and reset it here
+
                 }
             };
         }
@@ -370,9 +365,13 @@ public class AssociationListEditorPanel extends JPanel {
                         listModel.remove(j.getSelectedIndex());
 
                         try {
-                            toolBelt.getPersistenceController().deleteAssociations(new ArrayList<Association>() {{
+                            toolBelt.getPersistenceController().deleteAssociations(new ArrayList<Association>() {
+
+                                {
                                     add(association);
-                                }});
+                                }
+
+                            });
                         }
                         catch (final Exception ex) {
                             EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, ex);
@@ -423,27 +422,6 @@ public class AssociationListEditorPanel extends JPanel {
         add(getButtonPanel(), BorderLayout.SOUTH);
     }
 
-    /**
-     * Sets the <code>AssociationList</code> object that is to be edited. This
-     * method wraps the <code>AssociationList</code> in a
-     * <code>ListListModel</code> object that can be used by
-     * <code>JList</code>.
-     *
-     *
-     * @param  value             The <code>AssociationList</code> to be edited
-     */
-    void setAssociationList(final Collection<Association> value) {
-        final ListModel listModel = new ListListModel(new Vector<Association>(value));
-        getJList().setModel(listModel);
-
-        /* 
-         * This change in jList will not be detected by the listSelectionListeners,
-         * so make a manual call to enableButtons
-         */
-        enableButtons();
-        setEditingAssociation(false);
-        repaint();
-    }
 
     /**
      *     Toggles which panel is visible. If true, the AssociationEditorPanel is visible. If false, the AssociationListEditorPanel is visible.
@@ -506,15 +484,22 @@ public class AssociationListEditorPanel extends JPanel {
      */
     public void setObservation(final Observation newObs) {
 
-        // Remove listeners from existing
-        if (observation != null) {
-            observation.removePropertyChangeListener(getChangeListener());
+        List<Association> associations = new Vector<Association>();
+        if (newObs != null) {
+            associations.addAll(newObs.getAssociations());
         }
 
-        if (newObs != null) {
-            newObs.addPropertyChangeListener(getChangeListener());
-            setAssociationList(newObs.getAssociations());
-        }
+        final ListModel listModel = new ListListModel(associations);
+        getJList().setModel(listModel);
+        getJList().repaint();
+
+        /*
+         * This change in jList will not be detected by the listSelectionListeners,
+         * so make a manual call to enableButtons
+         */
+        enableButtons();
+        setEditingAssociation(false);
+        repaint();
 
         observation = newObs;
     }
@@ -528,6 +513,7 @@ public class AssociationListEditorPanel extends JPanel {
     public void setVisible(boolean b) {
         getButtonEdit().setEnabled(false);
         getButtonRemove().setEnabled(false);
+        getButtonAdd().setEnabled(false);
         super.setVisible(b);
 
     }

@@ -25,6 +25,7 @@ import java.beans.PropertyChangeListener;
 import java.util.List;
 import java.util.Vector;
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -169,9 +170,7 @@ public class AnnotationFrame extends JFrame {
 
             // Map Mask+UP-ARROW Key Stroke
             String upTable = "up-table";
-            table.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN,
-                    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), upTable);
-            table.getActionMap().put(upTable, new AbstractAction() {
+            Action upAction = new AbstractAction() {
 
                 public void actionPerformed(final ActionEvent e) {
                     final int numRows = table.getRowCount();
@@ -180,14 +179,18 @@ public class AnnotationFrame extends JFrame {
                     table.getSelectionModel().setSelectionInterval(nextRow, nextRow);
                     table.scrollToVisible(nextRow, 0);
                 }
+            };
 
-            });
+            table.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_UP,
+                    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), upTable);
+            table.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP,
+                    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), upTable);
+            table.getActionMap().put(upTable, upAction);
+
 
             // Map Mask+DOWN-ARROW Key Stroke
             String downTable = "down-table";
-            table.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN,
-                    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), downTable);
-            table.getActionMap().put(downTable, new AbstractAction() {
+            Action downAction = new AbstractAction() {
 
                 public void actionPerformed(final ActionEvent e) {
                     final int numRows = table.getRowCount();
@@ -197,7 +200,12 @@ public class AnnotationFrame extends JFrame {
                     table.scrollToVisible(nextRow, 0);
                 }
 
-            });
+            };
+            table.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN,
+                    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), downTable);
+            table.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN,
+                    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), downTable);
+            table.getActionMap().put(downTable, downAction);
 
             /*
              * Watch the selected rows and notify the world when the selected rows
