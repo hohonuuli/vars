@@ -35,7 +35,6 @@ import org.slf4j.LoggerFactory;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveSet;
 import vars.annotation.VideoFrame;
-import vars.annotation.Observation;
 import vars.annotation.CameraDeployment;
 import vars.annotation.Observation;
 import vars.annotation.ui.actions.ChangeVideoArchiveNameAction;
@@ -171,6 +170,7 @@ public class PVideoArchivePanel extends PropertiesPanel {
                 /**
                  *  @see org.mbari.vars.annotation.ui.dialogs.OpenVideoArchiveSetUsingParamsDialog#getOkButtonAction()
                  */
+                @Override
                 public ActionAdapter getOkButtonAction() {
                     if (okButtonAction == null) {
                         okButtonAction = new ActionAdapter() {

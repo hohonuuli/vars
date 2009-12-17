@@ -59,11 +59,7 @@ import vars.annotation.Observation;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
 import vars.knowledgebase.Concept;
-import vars.knowledgebase.ConceptName;
-import vars.knowledgebase.ConceptNameTypes;
 import vars.knowledgebase.LinkTemplate;
-import vars.knowledgebase.SimpleConceptNameBean;
-import vars.shared.ui.ConceptNameComboBox;
 import vars.shared.ui.HierachicalConceptNameComboBox;
 import vars.shared.ui.LinkListCellRenderer;
 

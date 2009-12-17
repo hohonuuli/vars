@@ -440,7 +440,7 @@ public class RowEditorPanel extends JPanel {
          */
         public void onEvent(String topic, Observation data) {
             log.info("Setting observation to " + observation);
-            setObservation(observation);
+            setObservation(data);
         }
     }
 }

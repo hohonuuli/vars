@@ -180,7 +180,6 @@ public abstract class PropertiesPanel extends javax.swing.JPanel implements IObs
                     if (log.isWarnEnabled()) {
                         log.warn("Problem setting properties", e);
                     }
-                    ;
 
                     value = missingValue;
                 }

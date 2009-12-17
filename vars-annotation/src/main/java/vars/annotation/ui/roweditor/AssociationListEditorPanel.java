@@ -25,17 +25,14 @@ import java.awt.event.FocusEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Vector;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.ToolTipManager;
@@ -45,7 +42,6 @@ import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.awt.layout.VerticalFlowLayout;
 import org.mbari.swing.JFancyButton;
-import org.mbari.swing.ListListModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.DAO;
@@ -215,34 +211,6 @@ public class AssociationListEditorPanel extends JPanel {
         return buttonRemove;
     }
 
-    /**
-     *     This change listener can be added to any object whose state change requires the JList to repaint.
-     *     @return
-     */
-    PropertyChangeListener getChangeListener() {
-        if (changeListener == null) {
-            changeListener = new PropertyChangeListener() {
-
-                public void propertyChange(final PropertyChangeEvent evt) {
-
-                    log.debug("PropertyChange: " + evt);
-
-                    // DAOTX
-                    DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
-                    dao.startTransaction();
-                    Observation obs = dao.find(observation);
-                    dao.endTransaction();
-                    setObservation(obs);
-
-                    final ListListModel listModel = (ListListModel) getJList().getModel();
-                    listModel.refreshView();
-
-                }
-            };
-        }
-
-        return changeListener;
-    }
 
     ActionAdapter getEditAction() {
         if (editAction == null) {
@@ -267,7 +235,7 @@ public class AssociationListEditorPanel extends JPanel {
 
     private JList getJList() {
         if (jList == null) {
-            jList = new JList();
+            jList = new JList(new DefaultListModel());
             jList.addFocusListener(new FocusAdapter() {
 
                 @Override
@@ -350,7 +318,7 @@ public class AssociationListEditorPanel extends JPanel {
                     if (j.getSelectedIndex() > -1) {
 
                         // Get the association object from the listModel
-                        final ListListModel listModel = (ListListModel) j.getModel();
+                        final DefaultListModel listModel = (DefaultListModel) j.getModel();
                         final Association association = (Association) j.getSelectedValue();
 
                         // If for some reason a null value gets in the list
@@ -480,18 +448,18 @@ public class AssociationListEditorPanel extends JPanel {
     /**
      *     Sets the observation whos associations are to be edited.
      *
-     * @param newObs
+     * @param newObservation
      */
-    public void setObservation(final Observation newObs) {
+    public void setObservation(final Observation newObservation) {
 
-        List<Association> associations = new Vector<Association>();
-        if (newObs != null) {
-            associations.addAll(newObs.getAssociations());
+        log.debug("Setting observation to " + observation);
+
+
+        final DefaultListModel listModel = (DefaultListModel) getJList().getModel();
+        listModel.clear();
+        for (Association association : newObservation.getAssociations()) {
+            listModel.addElement(association);
         }
-
-        final ListModel listModel = new ListListModel(associations);
-        getJList().setModel(listModel);
-        getJList().repaint();
 
         /*
          * This change in jList will not be detected by the listSelectionListeners,
@@ -501,7 +469,7 @@ public class AssociationListEditorPanel extends JPanel {
         setEditingAssociation(false);
         repaint();
 
-        observation = newObs;
+        observation = newObservation;
     }
 
     /**
