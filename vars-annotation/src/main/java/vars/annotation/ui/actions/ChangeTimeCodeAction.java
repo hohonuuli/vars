@@ -86,7 +86,7 @@ public class ChangeTimeCodeAction extends ActionAdapter {
         dao.startTransaction();
 
         for (Observation observation : observations) {
-            observation = dao.merge(observation);
+            observation = dao.find(observation);
 
             VideoFrame sourceVideoFrame = observation.getVideoFrame();
             VideoArchive videoArchive = sourceVideoFrame.getVideoArchive();

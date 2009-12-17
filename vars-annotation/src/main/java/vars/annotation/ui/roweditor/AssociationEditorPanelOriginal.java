@@ -175,7 +175,6 @@ public class AssociationEditorPanelOriginal extends JPanel {
         DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
         parent = dao.find(parent);
         dao.endTransaction();
-        EventBus.publish(RowEditorPanel.TOPIC_OBSERVATION_CHANGED, parent);
     }
 
     /**

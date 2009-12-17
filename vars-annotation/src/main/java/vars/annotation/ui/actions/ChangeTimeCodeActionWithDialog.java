@@ -25,7 +25,7 @@ import javax.swing.JFrame;
 import org.mbari.awt.event.ActionAdapter;
 
 import vars.annotation.Observation;
-import vars.old.annotation.ui.ChangeTimeCodeFrame;
+import vars.annotation.ui.ChangeTimeCodeFrame;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.Lookup;
 

@@ -16,9 +16,9 @@ import vars.annotation.ui.ToolBelt;
  */
 public class PLargeSizeButton extends PropButton {
 
-    public PLargeSizeButton(ToolBelt toolBelt) {
+    public PLargeSizeButton() {
         super();
-        setAction(new AddLargeSizePropAction(toolBelt));
+        setAction(new AddLargeSizePropAction(getToolBelt()));
         setToolTipText("relatively large size");
         setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/largebutton.png")));
         setEnabled(false);

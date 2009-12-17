@@ -22,6 +22,7 @@ import vars.ILink;
 import vars.annotation.Association;
 import vars.annotation.AssociationDAO;
 import vars.annotation.Observation;
+import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
 
 /**
@@ -97,7 +98,7 @@ public class AssociationEditorPanelController {
 
             Collection<Observation> changedObservations = ImmutableList.of(newAssociation.getObservation());
             toolBelt.getPersistenceController().updateUI(changedObservations);
-            EventBus.publish(RowEditorPanel.TOPIC_OBSERVATION_CHANGED, newAssociation.getObservation());
+            //EventBus.publish(Lookup.TOPIC_OBSERVATION_CHANGED, newAssociation.getObservation());
         }
         observation = null;
         association = null;
@@ -117,7 +118,7 @@ public class AssociationEditorPanelController {
 
             Collection<Observation> changedObservations = ImmutableList.of(association.getObservation());
             toolBelt.getPersistenceController().updateUI(changedObservations);
-            EventBus.publish(RowEditorPanel.TOPIC_OBSERVATION_CHANGED, association.getObservation());
+            //EventBus.publish(Lookup.TOPIC_OBSERVATION_CHANGED, association.getObservation());
         }
         observation = null;
         association = null;

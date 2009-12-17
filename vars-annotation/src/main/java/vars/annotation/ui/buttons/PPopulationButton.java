@@ -35,9 +35,9 @@ public class PPopulationButton extends PropButton {
     /**
      *      Constructor
      */
-    public PPopulationButton(ToolBelt toolBelt) {
+    public PPopulationButton() {
         super();
-        setAction(new AddPopulationPropAction(toolBelt));
+        setAction(new AddPopulationPropAction(getToolBelt()));
         setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/nbutton.png")));
         setToolTipText("population, 2 or more");
         setEnabled(false);

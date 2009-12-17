@@ -16,9 +16,9 @@ import vars.annotation.ui.ToolBelt;
  */
 public class PJuvenileLifeStageButton extends PropButton {
 
-    public PJuvenileLifeStageButton(ToolBelt toolBelt) {
+    public PJuvenileLifeStageButton() {
         super();
-        setAction(new AddJuvenileLifeStagePropAction(toolBelt));
+        setAction(new AddJuvenileLifeStagePropAction(getToolBelt()));
         setToolTipText("juvenile life-stage");
         setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/juvenilebutton.png")));
         setEnabled(false);

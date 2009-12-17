@@ -35,9 +35,9 @@ public class PGoodImageButton extends PropButton {
     /**
      *      Constructor
      */
-    public PGoodImageButton(ToolBelt toolBelt) {
+    public PGoodImageButton() {
         super();
-        setAction(new AddGoodImagePropAction(toolBelt));
+        setAction(new AddGoodImagePropAction(getToolBelt()));
         setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/gimage.png")));
         setToolTipText("good image quality");
         setEnabled(false);

@@ -24,9 +24,9 @@ public class PSurfaceButton extends PropButton {
     private AddPropertyAction addPropertyAction;
     private final ToolBelt toolBelt;
 
-    public PSurfaceButton(ToolBelt toolBelt) {
+    public PSurfaceButton() {
         super();
-        this.toolBelt = toolBelt;
+        this.toolBelt = getToolBelt();
         setAction(getShowDialogAction());
         setToolTipText("upon");
         setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/surfacebutton.png")));

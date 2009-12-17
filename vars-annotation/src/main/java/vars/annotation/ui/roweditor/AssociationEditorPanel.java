@@ -1,5 +1,5 @@
 /*
- * @(#)AssociationEditorPanelLite.java   2009.12.15 at 02:11:16 PST
+ * @(#)AssociationEditorPanel.java   2009.12.17 at 11:37:50 PST
  *
  * Copyright 2009 MBARI
  *
@@ -41,6 +41,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.SwingUtilities;
 import org.bushe.swing.event.EventBus;
 import org.mbari.swing.JFancyButton;
 import org.mbari.swing.LabeledSpinningDialWaitIndicator;
@@ -71,6 +72,8 @@ import vars.shared.ui.LinkListCellRenderer;
  */
 public class AssociationEditorPanel extends JPanel {
 
+    private final ILink nil = new LinkBean(ILink.VALUE_NIL, ILink.VALUE_NIL, ILink.VALUE_NIL);
+    private final Logger log = LoggerFactory.getLogger(getClass());
     private JButton cancelButton;
     private final AssociationEditorPanelController controller;
     private JLabel lblLinkName;
@@ -79,12 +82,10 @@ public class AssociationEditorPanel extends JPanel {
     private JLabel lblValue;
     private JTextField linkNameTextField;
     private JTextField linkValueTextField;
-    private JButton okButton;
     private JComboBox linksComboBox;
+    private JButton okButton;
     private JTextField searchTextField;
     private HierachicalConceptNameComboBox toConceptComboBox;
-    private final ILink nil = new LinkBean(ILink.VALUE_NIL, ILink.VALUE_NIL, ILink.VALUE_NIL);
-    private final Logger log = LoggerFactory.getLogger(getClass());
 
     /**
      * Constructs ...
@@ -96,6 +97,17 @@ public class AssociationEditorPanel extends JPanel {
         initialize();
     }
 
+    /**
+     * Adds an <code>ActionListener</code>. The listener will receive an
+     * action event the user finishes making a selection.
+     *
+     * @param  l the <code>ActionListener</code> that is to be notified
+     */
+    public void addActionListener(final ActionListener l) {
+        getOkButton().addActionListener(l);
+        getCancelButton().addActionListener(l);
+    }
+
     private JButton getCancelButton() {
         if (cancelButton == null) {
             cancelButton = new JFancyButton();
@@ -103,9 +115,11 @@ public class AssociationEditorPanel extends JPanel {
             cancelButton.setToolTipText("Cancel");
             cancelButton.setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/stop.png")));
             cancelButton.addActionListener(new ActionListener() {
+
                 public void actionPerformed(ActionEvent e) {
                     resetDisplay();
                 }
+
             });
         }
 
@@ -183,33 +197,17 @@ public class AssociationEditorPanel extends JPanel {
         return linkValueTextField;
     }
 
-    private JButton getOkButton() {
-        if (okButton == null) {
-            okButton = new JFancyButton();
-            okButton.setPreferredSize(new Dimension(30, 23));
-            okButton.setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/add.png")));
-            okButton.addActionListener(new ActionListener() {
-
-                public void actionPerformed(ActionEvent e) {
-                    ILink link = new LinkBean(getLinkNameTextField().getText(),
-                            (String) getToConceptComboBox().getSelectedItem(),
-                            getLinkValueTextField().getText());
-                    controller.doOkay(link);
-                }
-            });
-        }
-
-        return okButton;
-    }
-
     protected JComboBox getLinksComboBox() {
         if (linksComboBox == null) {
             linksComboBox = new JComboBox();
             linksComboBox.setRenderer(new LinkListCellRenderer());
-            linksComboBox.setModel(new SearchableComboBoxModel<ILink>(new LinkComparator(), new ObjectToStringConverter<ILink>() {
+            linksComboBox.setModel(new SearchableComboBoxModel<ILink>(new LinkComparator(),
+                    new ObjectToStringConverter<ILink>() {
+
                 public String convert(ILink object) {
                     return LinkUtilities.formatAsString(object);
                 }
+
             }));
 
             linksComboBox.setToolTipText("Links in Knowledgebase");
@@ -225,6 +223,25 @@ public class AssociationEditorPanel extends JPanel {
         }
 
         return linksComboBox;
+    }
+
+    private JButton getOkButton() {
+        if (okButton == null) {
+            okButton = new JFancyButton();
+            okButton.setPreferredSize(new Dimension(30, 23));
+            okButton.setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/add.png")));
+            okButton.addActionListener(new ActionListener() {
+
+                public void actionPerformed(ActionEvent e) {
+                    ILink link = new LinkBean(getLinkNameTextField().getText(),
+                                              (String) getToConceptComboBox().getSelectedItem(),
+                                              getLinkValueTextField().getText());
+                    controller.doOkay(link);
+                }
+            });
+        }
+
+        return okButton;
     }
 
     private JTextField getSearchTextField() {
@@ -253,15 +270,19 @@ public class AssociationEditorPanel extends JPanel {
 
                     int index = model.searchForItemContaining(searchTextField.getText(), startIndex);
                     if (index > -1) {
+
                         // Match was found
                         comboBox.setSelectedIndex(index);
                         comboBox.hidePopup();
                     }
                     else {
+
                         // No match was found. Try again from the top of the list
                         if (startIndex > 0) {
                             index = model.searchForItemContaining(searchTextField.getText());
+
                             if (index > -1) {
+
                                 // Match found
                                 comboBox.setSelectedIndex(index);
                                 comboBox.hidePopup();
@@ -278,7 +299,8 @@ public class AssociationEditorPanel extends JPanel {
 
     private HierachicalConceptNameComboBox getToConceptComboBox() {
         if (toConceptComboBox == null) {
-            toConceptComboBox = new HierachicalConceptNameComboBox(controller.getToolBelt().getAnnotationPersistenceService());
+            toConceptComboBox = new HierachicalConceptNameComboBox(
+                controller.getToolBelt().getAnnotationPersistenceService());
             toConceptComboBox.setToolTipText("To Concept");
             toConceptComboBox.addFocusListener(new FocusAdapter() {
 
@@ -292,7 +314,6 @@ public class AssociationEditorPanel extends JPanel {
 
         return toConceptComboBox;
     }
-
 
     private void initialize() {
         GroupLayout groupLayout = new GroupLayout(this);
@@ -365,8 +386,8 @@ public class AssociationEditorPanel extends JPanel {
 
                 if (aComponent == getCancelButton()) {
                     setFocusCycleRoot(false);
-                    componentAfter = getFocusCycleRootAncestor().getFocusTraversalPolicy().getComponentAfter(
-                            getFocusCycleRootAncestor(), AssociationEditorPanel.this);
+                    componentAfter = getFocusCycleRootAncestor().getFocusTraversalPolicy()
+                        .getComponentAfter(getFocusCycleRootAncestor(), AssociationEditorPanel.this);
                     setFocusCycleRoot(true);
                 }
 
@@ -376,13 +397,13 @@ public class AssociationEditorPanel extends JPanel {
 
             @Override
             public Component getComponentBefore(Container aContainer, Component aComponent) {
-                
+
                 Component componentBefore = getSearchTextField();
-                
+
                 if (aComponent == getSearchTextField()) {
                     setFocusCycleRoot(false);
-                    componentBefore = getFocusCycleRootAncestor().getFocusTraversalPolicy().getComponentBefore(
-                            getFocusCycleRootAncestor(), AssociationEditorPanel.this);
+                    componentBefore = getFocusCycleRootAncestor().getFocusTraversalPolicy()
+                        .getComponentBefore(getFocusCycleRootAncestor(), AssociationEditorPanel.this);
                     setFocusCycleRoot(true);
                 }
 
@@ -421,11 +442,17 @@ public class AssociationEditorPanel extends JPanel {
         resetDisplay();
     }
 
+    /**
+     */
     public void resetDisplay() {
         getSearchTextField().setText("");
         setLink(nil);
     }
 
+    /**
+     *
+     * @param enabled
+     */
     @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
@@ -437,76 +464,9 @@ public class AssociationEditorPanel extends JPanel {
         getLinksComboBox().setEnabled(enabled);
     }
 
-
-
-    public void setTarget(Observation observation , Association association) {
-        controller.setTarget(observation, association);
-        ILink defaultLink = nil;
-
-        /*
-         * ---- Step 1:
-         * If an association is set we're editing it. If not we're adding it.
-         *
-         * Here we figure out what the intial link and conceptName should be.
-         */
-        if (observation != null) {
-
-            if (association != null) {
-                defaultLink = association;
-                getOkButton().setToolTipText("Accept Edits");
-            }
-            else {
-                getOkButton().setToolTipText("Add Association");
-            }
-        }
-
-        JComboBox comboBox = getLinksComboBox();
-        SearchableComboBoxModel<ILink> model = (SearchableComboBoxModel<ILink>) comboBox.getModel();
-
-        /*
-         * ---- Step 2:
-         * Update the available LinkTemplates in the UI
-         */
-        model.clear();
-        model.addElement(nil);
-        AnnotationPersistenceService service = controller.getToolBelt().getAnnotationPersistenceService();
-
-        try {
-
-            Concept concept = service.findConceptByName(observation.getConceptName());
-            if (concept == null) {
-                log.warn("A concept named" + observation.getConceptName() + " was not found in the knowledgebase");
-                concept = service.findRootConcept();
-            }
-
-            Collection<ILink> linkTemplates = Collections2.transform(service.findLinkTemplatesFor(concept),
-                    new Function<LinkTemplate, ILink>() {
-                public ILink apply(LinkTemplate from) {
-                    return (ILink) from;
-                }
-            });
-
-            model.addAll(linkTemplates);
-        }
-        catch (Exception e) {
-            EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
-        }
-
-        /*
-         * Set the selected link in the combobox. It should be the one that
-         * matches the association or 'nil' if no association was provided.
-         */
-        
-        if (!model.contains(defaultLink)) {
-            model.addElement(defaultLink);
-        }
-        comboBox.setSelectedItem(defaultLink);
-        setLink(defaultLink);
-
-    }
-
     private void setLink(final ILink link) {
-        WaitIndicator waitIndicator = new LabeledSpinningDialWaitIndicator(this, "Loading " + link.getToConcept() + " ...");
+        WaitIndicator waitIndicator = new LabeledSpinningDialWaitIndicator(this,
+            "Loading " + link.getToConcept() + " ...");
         getLinkNameTextField().setText(link.getLinkName());
         getLinkValueTextField().setText(link.getLinkValue());
         final HierachicalConceptNameComboBox comboBox = getToConceptComboBox();
@@ -515,16 +475,21 @@ public class AssociationEditorPanel extends JPanel {
         String conceptName = link.getToConcept();
 
         if (link.getToConcept().equals(ILink.VALUE_NIL) || link.getToConcept().equals(ILink.VALUE_SELF)) {
+
             // Do nothing
         }
         else {
+
             // Retrieve the child concepts and add to gui
             try {
                 final Concept c = (Concept) Worker.post(new Task() {
+
                     @Override
                     public Object run() throws Exception {
-                        return controller.getToolBelt().getAnnotationPersistenceService().findConceptByName(link.getToConcept());
+                        return controller.getToolBelt().getAnnotationPersistenceService().findConceptByName(
+                            link.getToConcept());
                     }
+
                 });
                 comboBox.setConcept(c);
                 conceptName = c.getPrimaryConceptName().getName();
@@ -535,19 +500,94 @@ public class AssociationEditorPanel extends JPanel {
                 comboBox.addItem(conceptName);
             }
         }
+
         comboBox.setSelectedItem(conceptName);
         waitIndicator.dispose();
         repaint();
     }
 
     /**
-     * Adds an <code>ActionListener</code>. The listener will receive an
-     * action event the user finishes making a selection.
      *
-     * @param  l the <code>ActionListener</code> that is to be notified
+     * @param observation
+     * @param association
      */
-    public void addActionListener(final ActionListener l) {
-        getOkButton().addActionListener(l);
-        getCancelButton().addActionListener(l);
+    public void setTarget(final Observation observation, final Association association) {
+        SwingUtilities.invokeLater(new Runnable() {
+
+            public void run() {
+
+
+                controller.setTarget(observation, association);
+                ILink defaultLink = nil;
+
+                /*
+                 * ---- Step 1:
+                 * If an association is set we're editing it. If not we're adding it.
+                 *
+                 * Here we figure out what the intial link and conceptName should be.
+                 */
+                if (observation != null) {
+
+                    if (association != null) {
+                        defaultLink = association;
+                        getOkButton().setToolTipText("Accept Edits");
+                    }
+                    else {
+                        getOkButton().setToolTipText("Add Association");
+                    }
+                }
+
+                JComboBox comboBox = getLinksComboBox();
+                SearchableComboBoxModel<ILink> model = (SearchableComboBoxModel<ILink>) comboBox.getModel();
+
+                /*
+                 * ---- Step 2:
+                 * Update the available LinkTemplates in the UI
+                 */
+                model.clear();
+                model.addElement(nil);
+                AnnotationPersistenceService service = controller.getToolBelt().getAnnotationPersistenceService();
+
+                try {
+
+                    Concept concept = service.findConceptByName(observation.getConceptName());
+                    if (concept == null) {
+                        log.warn("A concept named" + observation.getConceptName() +
+                                 " was not found in the knowledgebase");
+                        concept = service.findRootConcept();
+                    }
+
+                    Collection<ILink> linkTemplates = Collections2.transform(service.findLinkTemplatesFor(concept),
+                        new Function<LinkTemplate, ILink>() {
+
+                        public ILink apply(LinkTemplate from) {
+                            return (ILink) from;
+                        }
+
+                    });
+
+                    model.addAll(linkTemplates);
+                }
+                catch (Exception e) {
+                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+                }
+
+                /*
+                 * Set the selected link in the combobox. It should be the one that
+                 * matches the association or 'nil' if no association was provided.
+                 */
+
+                if (!model.contains(defaultLink)) {
+                    model.addElement(defaultLink);
+                }
+
+                comboBox.setSelectedItem(defaultLink);
+                setLink(defaultLink);
+
+
+            }
+        });
+
+
     }
 }

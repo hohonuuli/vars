@@ -58,9 +58,9 @@ public class PNewRefNumButton extends PropButton implements IPopup {
     /**
      *  Constructor
      */
-    public PNewRefNumButton(final ToolBelt toolBelt) {
+    public PNewRefNumButton() {
         super();
-        this.toolBelt = toolBelt;
+        this.toolBelt = getToolBelt();
         setAction(getRefNumAction());
         initialize();
     }

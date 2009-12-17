@@ -13,7 +13,7 @@
 
 
 
-package vars.old.annotation.ui;
+package vars.annotation.ui;
 
 import vars.annotation.ui.ToolBelt;
 import java.awt.event.ActionEvent;
@@ -71,18 +71,15 @@ public class ChangeTimeCodeFrame extends TimeCodeSelectionFrame {
             okActionListener = new ActionListener() {
 
                 public void actionPerformed(final ActionEvent e) {
-                    final Dispatcher dispatcher = Lookup.getObservationTableDispatcher();
+                    final Dispatcher dispatcher = Lookup.getSelectedObservationsDispatcher();
                     final Collection<Observation> observations = (Collection<Observation>) dispatcher.getValueObject();
                     if (observations.size() == 1) {
                         final VideoFrame vf = observations.iterator().next().getVideoFrame();
-                        synchronized (vf) {
-                            action.setTimeCode(getTimePanel().getTimeAsString());
-                            action.doAction();
-                        }
+                        action.setTimeCode(getTimePanel().getTimeAsString());
+                        action.doAction();
                     }
 
                     setVisible(false);
-                    dispatcher.setValueObject(observations);
                 }
                 private final ChangeTimeCodeAction action = new ChangeTimeCodeAction(toolBelt);
             };

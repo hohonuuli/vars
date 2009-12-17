@@ -32,6 +32,7 @@ import org.mbari.swing.JFancyButton;
 import vars.UserAccount;
 import vars.annotation.Observation;
 import vars.annotation.ui.Lookup;
+import vars.annotation.ui.ToolBelt;
 
 
 /**
@@ -42,6 +43,12 @@ import vars.annotation.ui.Lookup;
  * @author <a href="http://www.mbari.org">MBARI</a>
  */
 public class PropButton extends JFancyButton {
+
+    /**
+     * I hate to use a static reference BUT, I need no arg constructors for
+     * the prop buttons and they need a toolBelt to work with.
+     */
+    private static ToolBelt toolBelt;
 
 
 
@@ -72,5 +79,14 @@ public class PropButton extends JFancyButton {
         setEnabled(false);
         
     }
+
+    public static ToolBelt getToolBelt() {
+        return toolBelt;
+    }
+
+    public static void setToolBelt(ToolBelt toolBelt) {
+        PropButton.toolBelt = toolBelt;
+    }
+
     
 }

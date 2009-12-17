@@ -35,9 +35,9 @@ public class PQuestionableIdButton extends PropButton {
     /**
      *
      */
-    public PQuestionableIdButton(ToolBelt toolBelt) {
+    public PQuestionableIdButton() {
         super();
-        setAction(new AddQuestionableIdPropAction(toolBelt));
+        setAction(new AddQuestionableIdPropAction(getToolBelt()));
         setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/question.png")));
         setToolTipText("identity in question");
         setEnabled(false);

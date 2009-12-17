@@ -32,9 +32,9 @@ public class PCloseUpButton extends PropButton {
     /**
      * Constructor.
      */
-    public PCloseUpButton(ToolBelt toolBelt) {
+    public PCloseUpButton() {
         super();
-        setAction(new AddCloseUpPropAction(toolBelt));
+        setAction(new AddCloseUpPropAction(getToolBelt()));
         setToolTipText("close-up");
         setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/ccbutton.png")));
         setEnabled(false);

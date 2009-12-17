@@ -32,8 +32,8 @@ import vars.annotation.ui.table.ObservationTable;
 import vars.annotation.ui.video.ImageCaptureService;
 import vars.annotation.ui.video.VideoControlService;
 import vars.jpa.VarsUserPreferencesFactory;
-import vars.old.annotation.ui.AnnotationApp;
-import vars.old.annotation.ui.AnnotationFrame;
+import vars.annotation.ui.App;
+import vars.annotation.ui.AnnotationFrame;
 import vars.shared.InjectorModule;
 import vars.shared.ui.GlobalLookup;
 
@@ -92,15 +92,15 @@ public class Lookup extends GlobalLookup {
     protected static final Object KEY_DISPATCHER_VIDEOARCHIVE = VideoArchive.class;
     protected static final Object KEY_DISPATCHER_SELECTED_OBSERVATIONS = Observation.class;
     protected static final Object KEY_DISPATCHER_APPLICATION_FRAME = AnnotationFrame.class;
-    protected static final Object KEY_DISPATCHER_APPLICATION = AnnotationApp.class;
+    protected static final Object KEY_DISPATCHER_APPLICATION = App.class;
 
     static {
         getApplicationDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
-                if ((evt.getNewValue() != null) && !(evt.getNewValue() instanceof AnnotationApp)) {
+                if ((evt.getNewValue() != null) && !(evt.getNewValue() instanceof App)) {
                     throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
-                                                       ", EXPECTED: " + AnnotationApp.class.getName());
+                                                       ", EXPECTED: " + App.class.getName());
                 }
             }
 

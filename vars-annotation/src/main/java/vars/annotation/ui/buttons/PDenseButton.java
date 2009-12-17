@@ -36,9 +36,9 @@ public class PDenseButton extends PropButton {
     /**
      *      Constructor
      */
-    public PDenseButton(ToolBelt toolBelt) {
+    public PDenseButton() {
         super();
-        setAction(new AddDensePropAction(toolBelt));
+        setAction(new AddDensePropAction(getToolBelt()));
         setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/dbutton.png")));
         setToolTipText("dense population");
         setEnabled(false);

@@ -452,13 +452,13 @@ public class AssociationListEditorPanel extends JPanel {
      */
     public void setObservation(final Observation newObservation) {
 
-        log.debug("Setting observation to " + observation);
-
-
         final DefaultListModel listModel = (DefaultListModel) getJList().getModel();
         listModel.clear();
-        for (Association association : newObservation.getAssociations()) {
-            listModel.addElement(association);
+
+        if (newObservation != null) {
+            for (Association association : newObservation.getAssociations()) {
+                listModel.addElement(association);
+            }
         }
 
         /*

@@ -20,7 +20,6 @@ package vars.annotation.ui.buttons;
 import javax.swing.ImageIcon;
 
 import vars.annotation.ui.actions.AddOldRefNumPropWithDialogAction;
-import vars.annotation.ui.ToolBelt;
 
 /**
  * <p>
@@ -35,9 +34,9 @@ public class POldRefNumButton extends PropButton {
     /**
      * Constructor for the OldRefNumPropButton object
      */
-    public POldRefNumButton(ToolBelt toolBelt) {
+    public POldRefNumButton() {
         super();
-        setAction(new AddOldRefNumPropWithDialogAction(toolBelt));
+        setAction(new AddOldRefNumPropWithDialogAction(getToolBelt()));
         setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/oldnum.png")));
         setToolTipText("choose from existing reference numbers");
         setEnabled(false);

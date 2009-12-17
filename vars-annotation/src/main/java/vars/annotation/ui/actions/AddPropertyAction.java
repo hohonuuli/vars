@@ -80,6 +80,7 @@ public class AddPropertyAction extends ActionAdapter {
         Association associationTemplate = toolBelt.getAnnotationFactory().newAssociation(linkName, toConcept, linkValue);
         // Pass a copy of the observation collection to the persistence controller to avoid threading issues
         toolBelt.getPersistenceController().insertAssociations(new ArrayList<Observation>(observations), associationTemplate);
+
     }
 
     /**

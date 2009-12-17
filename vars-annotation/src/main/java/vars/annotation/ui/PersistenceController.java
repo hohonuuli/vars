@@ -23,6 +23,7 @@ import java.util.Vector;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
+import org.bushe.swing.event.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.DAO;
@@ -38,6 +39,7 @@ import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveDAO;
 import vars.annotation.VideoArchiveSet;
 import vars.annotation.VideoFrame;
+import vars.annotation.ui.roweditor.RowEditorPanel;
 import vars.annotation.ui.table.ObservationTable;
 import vars.annotation.ui.table.ObservationTableModel;
 
@@ -456,6 +458,27 @@ public class PersistenceController {
                         }
                     }
                 }
+
+
+                /*
+                 * We need to keep the RowEditorPanel in sync. Doing this
+                 * explicitly is probably best to avoid weird unintended UI
+                 * side-effects.
+                 */
+                AnnotationFrame annotationFrame = (AnnotationFrame) Lookup.getApplicationFrameDispatcher().getValueObject();
+                RowEditorPanel rowEditorPanel = annotationFrame.getRowEditorPanel();
+                Observation reObservation = rowEditorPanel.getObservation();
+                if (reObservation != null) {
+                    DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
+                    for (Observation obs : observations) {
+                        if (dao.equalInDatastore(reObservation, obs)) {
+                            rowEditorPanel.setObservation(obs);
+                            break;
+                        }
+                    }
+                }
+
+
 
                 if (updateSelection) {
                     Collection<Observation> selectedObservations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();

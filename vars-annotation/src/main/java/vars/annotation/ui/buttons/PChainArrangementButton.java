@@ -16,9 +16,9 @@ import vars.annotation.ui.ToolBelt;
  */
 public class PChainArrangementButton extends PropButton {
 
-    public PChainArrangementButton(ToolBelt toolBelt) {
+    public PChainArrangementButton() {
         super();
-        setAction(new AddChainArrangementPropAction(toolBelt));
+        setAction(new AddChainArrangementPropAction(getToolBelt()));
         setToolTipText("chain arrangement");
         setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/chainbutton.png")));
         setEnabled(false);

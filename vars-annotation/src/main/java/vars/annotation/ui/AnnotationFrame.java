@@ -16,6 +16,7 @@
 package vars.annotation.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -37,6 +38,7 @@ import javax.swing.KeyStroke;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.mbari.util.Dispatcher;
+import org.mbari.vcr.IVCR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.Observation;
@@ -44,6 +46,7 @@ import vars.annotation.VideoArchive;
 import vars.annotation.ui.cbpanel.ConceptButtonPanel;
 import vars.annotation.ui.roweditor.RowEditorPanel;
 import vars.annotation.ui.table.JXObservationTable;
+import vars.annotation.ui.video.VideoControlPanel;
 
 /**
  *
@@ -57,15 +60,17 @@ public class AnnotationFrame extends JFrame {
     private final AnnotationFrameController controller;
     private JPanel controlsPanel;
     private JSplitPane innerSplitPane;
-    private JPanel lowerPanel;
     private JPanel miscTabsPanel;
     private JSplitPane outerSplitPane;
     private QuickControlsPanel quickControlsPanel;
-    private JPanel rowEditorPanel;
+    private RowEditorPanel rowEditorPanel;
     private JXObservationTable table;
     private JScrollPane tableScrollPane;
     private JToolBar toolBar;
     private final ToolBelt toolBelt;
+    private VideoControlPanel videoControlPanel;
+    private JSplitPane controlsPanelSplitPane;
+    private JSplitPane allControlsSplitPane;
 
     /**
      * Constructs ...
@@ -83,9 +88,19 @@ public class AnnotationFrame extends JFrame {
     private JPanel getActionPanel() {
         if (actionPanel == null) {
             actionPanel = new ActionPanel(toolBelt);
+            actionPanel.setMinimumSize(new Dimension(350, 100));
         }
 
         return actionPanel;
+    }
+
+    private JSplitPane getAllControlsSplitPane() {
+        if (allControlsSplitPane == null) {
+            allControlsSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+            allControlsSplitPane.setLeftComponent(getControlsPanelSplitPane());
+            allControlsSplitPane.setRightComponent(getConceptButtonPanel());
+        }
+        return allControlsSplitPane;
     }
 
     private JPanel getConceptButtonPanel() {
@@ -100,11 +115,21 @@ public class AnnotationFrame extends JFrame {
         if (controlsPanel == null) {
             controlsPanel = new JPanel();
             controlsPanel.setLayout(new BoxLayout(controlsPanel, BoxLayout.X_AXIS));
-            controlsPanel.add(getRowEditorPanel());
             controlsPanel.add(getActionPanel());
+            controlsPanel.add(getVideoControlPanel());
         }
 
         return controlsPanel;
+    }
+
+    private JSplitPane getControlsPanelSplitPane() {
+        if (controlsPanelSplitPane == null) {
+            controlsPanelSplitPane = new JSplitPane();
+            controlsPanelSplitPane.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
+            controlsPanelSplitPane.setLeftComponent(getRowEditorPanel());
+            controlsPanelSplitPane.setRightComponent(getControlsPanel());
+        }
+        return controlsPanelSplitPane;
     }
 
     private JSplitPane getInnerSplitPane() {
@@ -117,16 +142,6 @@ public class AnnotationFrame extends JFrame {
         return innerSplitPane;
     }
 
-    private JPanel getLowerPanel() {
-        if (lowerPanel == null) {
-            lowerPanel = new JPanel();
-            lowerPanel.setLayout(new BoxLayout(lowerPanel, BoxLayout.Y_AXIS));
-            lowerPanel.add(getControlsPanel());
-            lowerPanel.add(getConceptButtonPanel());
-        }
-
-        return lowerPanel;
-    }
 
     private JPanel getMiscTabsPanel() {
         if (miscTabsPanel == null) {
@@ -141,7 +156,7 @@ public class AnnotationFrame extends JFrame {
             outerSplitPane = new JSplitPane();
             outerSplitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
             outerSplitPane.setLeftComponent(getInnerSplitPane());
-            outerSplitPane.setRightComponent(getLowerPanel());
+            outerSplitPane.setRightComponent(getAllControlsSplitPane());
         }
 
         return outerSplitPane;
@@ -155,9 +170,10 @@ public class AnnotationFrame extends JFrame {
         return quickControlsPanel;
     }
 
-    private JPanel getRowEditorPanel() {
+    public RowEditorPanel getRowEditorPanel() {
         if (rowEditorPanel == null) {
             rowEditorPanel = new RowEditorPanel(toolBelt);
+            rowEditorPanel.setPreferredSize(new Dimension(600, 250));
         }
 
         return rowEditorPanel;
@@ -270,6 +286,19 @@ public class AnnotationFrame extends JFrame {
         }
 
         return toolBar;
+    }
+
+    private VideoControlPanel getVideoControlPanel() {
+        if (videoControlPanel == null) {
+            videoControlPanel = new VideoControlPanel();
+            Lookup.getVideoControlServiceDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
+
+                public void propertyChange(PropertyChangeEvent evt) {
+                    videoControlPanel.setVcr((IVCR) evt.getNewValue());
+                }
+            });
+        }
+        return videoControlPanel;
     }
 
     private void initialize() {

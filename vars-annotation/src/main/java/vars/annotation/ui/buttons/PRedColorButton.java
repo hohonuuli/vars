@@ -17,9 +17,9 @@ import vars.annotation.ui.ToolBelt;
  */
 public class PRedColorButton extends PropButton {
 
-    public PRedColorButton(ToolBelt toolBelt) {
+    public PRedColorButton() {
         super();
-        setAction(new AddRedSurfaceColorPropAction(toolBelt));
+        setAction(new AddRedSurfaceColorPropAction(getToolBelt()));
         setToolTipText("red surface color");
         setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/redbutton.png")));
         setEnabled(false);

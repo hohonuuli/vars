@@ -70,8 +70,6 @@ import vars.shared.ui.event.LoggingSubscriber;
  */
 public class RowEditorPanel extends JPanel {
 
-    /**  */
-    public static final String TOPIC_OBSERVATION_CHANGED = "vars.annotation.ui.roweditor.RowEditorPanel-ObservationChanged";
 
     /** Listens for forward tabs in JTextArea */
     private static final Set<KeyStroke> tab = ImmutableSet.of(KeyStroke.getKeyStroke("TAB"));
@@ -79,7 +77,6 @@ public class RowEditorPanel extends JPanel {
     /** Listens for reverse (shift) tabs in JTextArea */
     private static final Set<KeyStroke> shifttab = ImmutableSet.of(KeyStroke.getKeyStroke("shift TAB"));
     private final Logger log = LoggerFactory.getLogger(getClass());
-    private final EventTopicSubscriber<Observation> observationChangedSubscriber = new ObservationChangedSubscriber();
 
     /**
      *     The actions for changing the focus behavior of a JTextArea
@@ -117,8 +114,6 @@ public class RowEditorPanel extends JPanel {
     public RowEditorPanel(ToolBelt toolBelt) {
         super();
         this.toolBelt = toolBelt;
-        EventBus.subscribe(TOPIC_OBSERVATION_CHANGED, observationChangedSubscriber);
-        EventBus.subscribe(TOPIC_OBSERVATION_CHANGED, loggingSubscriber);
         initialize();
 
         /**
@@ -346,6 +341,10 @@ public class RowEditorPanel extends JPanel {
         return notesArea;
     }
 
+    public Observation getObservation() {
+        return observation;
+    }
+
     /**
      * <p><!-- Method description --></p>
      *
@@ -396,7 +395,7 @@ public class RowEditorPanel extends JPanel {
         getConceptComboBox().setEnabled(shouldEnable);
     }
 
-    private void setObservation(final Observation observation) {
+    public void setObservation(final Observation observation) {
 
         this.observation = observation;
         final boolean isNull = (observation == null);
@@ -431,16 +430,5 @@ public class RowEditorPanel extends JPanel {
         getConceptComboBox().requestFocus();
     }
 
-    private class ObservationChangedSubscriber implements EventTopicSubscriber<Observation> {
 
-        /**
-         *
-         * @param topic
-         * @param data
-         */
-        public void onEvent(String topic, Observation data) {
-            log.info("Setting observation to " + observation);
-            setObservation(data);
-        }
-    }
 }

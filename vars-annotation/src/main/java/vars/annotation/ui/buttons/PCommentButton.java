@@ -11,7 +11,6 @@ import org.mbari.awt.event.ActionAdapter;
 import vars.annotation.ui.dialogs.AddCommentAssociationDialog;
 
 import vars.annotation.ui.actions.AddPropertyAction;
-import vars.annotation.ui.ToolBelt;
 
 /**
  *
@@ -22,9 +21,9 @@ public class PCommentButton extends PropButton {
     private ActionAdapter showDialogAction;
     private AddPropertyAction addPropertyAction;
 
-    public PCommentButton(ToolBelt toolBelt) {
+    public PCommentButton() {
         super();
-        addPropertyAction = new AddPropertyAction(toolBelt, "comment", "self", "");
+        addPropertyAction = new AddPropertyAction(getToolBelt(), "comment", "self", "");
         setAction(getShowDialogAction());
         setToolTipText("add comment");
         setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/commentbutton.png")));

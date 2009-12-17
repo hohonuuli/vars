@@ -1,5 +1,5 @@
 /*
- * @(#)ActionPanel.java   2009.12.10 at 10:01:13 PST
+ * @(#)ActionPanel.java   2009.12.17 at 10:14:36 PST
  *
  * Copyright 2009 MBARI
  *
@@ -30,9 +30,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.ui.buttons.DeepCopyObservationsButton;
 import vars.annotation.ui.buttons.DeleteSelectedObservationsButton;
-import vars.annotation.ui.buttons.FrameCaptureButton;
 import vars.annotation.ui.buttons.DuplicateObservationButton;
+import vars.annotation.ui.buttons.FrameCaptureButton;
 import vars.annotation.ui.buttons.NewObservationButton;
+import vars.annotation.ui.buttons.PropButton;
 
 /**
  * <p> This panel contains buttons for actions that can modify the contents of the
@@ -43,9 +44,8 @@ import vars.annotation.ui.buttons.NewObservationButton;
  */
 public class ActionPanel extends JPanel {
 
-	private final Logger log = LoggerFactory.getLogger(getClass());
-
-	FlowLayout flowLayout = new WrappingFlowLayout();
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    FlowLayout flowLayout = new WrappingFlowLayout();
     JButton btnDeepCopy;
     JButton btnDelete;
     JButton btnFramegrab;
@@ -59,6 +59,15 @@ public class ActionPanel extends JPanel {
      */
     public ActionPanel(ToolBelt toolBelt) {
         super();
+
+        /*
+         * HACK! Make toobelt available to PropButtons. PropButtons need no arg
+         * constructors to be intialized BUT they all need access to the
+         * toolbelt.
+         *
+         * This must be set BEFORE intializing any PropButtons
+         */
+        PropButton.setToolBelt(toolBelt);
         btnDeepCopy = new DeepCopyObservationsButton(toolBelt);
         btnDelete = new DeleteSelectedObservationsButton(toolBelt);
         btnNew = new NewObservationButton(toolBelt);
@@ -81,7 +90,7 @@ public class ActionPanel extends JPanel {
          * file and instantiated at runtime. This allows location specific
          * customization with requiring the agency to rebuild VARS from scratch.
          */
-        ResourceBundle bundle = ResourceBundle.getBundle("annotation-app");
+        ResourceBundle bundle = ResourceBundle.getBundle(Lookup.RESOURCE_BUNDLE);
         Enumeration<String> enumeration = bundle.getKeys();
         Map<String, JButton> map = new TreeMap<String, JButton>();
         while (enumeration.hasMoreElements()) {

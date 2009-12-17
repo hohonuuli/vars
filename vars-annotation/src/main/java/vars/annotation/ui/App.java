@@ -16,6 +16,8 @@
 package vars.annotation.ui;
 
 import com.google.inject.Injector;
+import foxtrot.Job;
+import foxtrot.Worker;
 import java.util.Vector;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
@@ -23,8 +25,11 @@ import javax.swing.UIManager;
 import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.EventTopicSubscriber;
 import org.mbari.util.SystemUtilities;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.annotation.AnnotationPersistenceService;
 import vars.annotation.Observation;
+import vars.knowledgebase.Concept;
 import vars.shared.ui.GlobalLookup;
 import vars.shared.ui.event.ExitTopicSubscriber;
 import vars.shared.ui.event.FatalExceptionSubscriber;
@@ -51,6 +56,8 @@ public class App {
         final Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
         toolBelt = injector.getInstance(ToolBelt.class);
 
+        // TODO we need a splash screen to show progress
+
         /*
          *  Verify that the database connection is working. If it's not, show
          *  a dialog. Without this check database errors fail silently and to
@@ -62,6 +69,23 @@ public class App {
         catch (Exception e) {
             (new FatalExceptionSubscriber(null)).onEvent(Lookup.TOPIC_FATAL_ERROR, e);
         }
+        Lookup.getApplicationDispatcher().setValueObject(this);
+
+        /*
+         * Preload the knowledgebase in the Foxtrot worker thread!!
+         */
+        Worker.post(new Job() {
+
+            @Override
+            public Object run() {
+                Logger log = LoggerFactory.getLogger(getClass());
+                log.info("Preloading knowledgebase ... be patient");
+                AnnotationPersistenceService service = toolBelt.getAnnotationPersistenceService();
+                Concept root = service.findRootConcept();
+                service.findDescendantNamesFor(root);
+                return null;
+            }
+        });
 
         Lookup.getSelectedObservationsDispatcher().setValueObject(new Vector<Observation>());
         fatalErrorSubscriber = new FatalExceptionSubscriber(getAnnotationFrame());
@@ -75,6 +99,7 @@ public class App {
         EventBus.subscribe(Lookup.TOPIC_EXIT, exitSubscriber);
 
         JFrame frame = getAnnotationFrame();
+        Lookup.getApplicationFrameDispatcher().setValueObject(frame);
         frame.pack();
         frame.setVisible(true);
     }

@@ -35,9 +35,9 @@ public class PSampleButton extends PropButton {
      *
      * @param toolBelt
      */
-    public PSampleButton(ToolBelt toolBelt) {
+    public PSampleButton() {
         super();
-        setAction(new AddSamplePropWithDialogAction(toolBelt));
+        setAction(new AddSamplePropWithDialogAction(getToolBelt()));
         setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/sbutton.png")));
         setToolTipText("sample");
         setEnabled(false);
