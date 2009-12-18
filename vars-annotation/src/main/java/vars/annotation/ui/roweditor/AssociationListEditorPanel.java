@@ -22,9 +22,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
@@ -44,7 +45,7 @@ import org.mbari.awt.layout.VerticalFlowLayout;
 import org.mbari.swing.JFancyButton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.DAO;
+import vars.LinkComparator;
 import vars.annotation.Association;
 import vars.annotation.Observation;
 import vars.annotation.ui.Lookup;
@@ -456,7 +457,10 @@ public class AssociationListEditorPanel extends JPanel {
         listModel.clear();
 
         if (newObservation != null) {
-            for (Association association : newObservation.getAssociations()) {
+            // Sort them before adding
+            List<Association> associations = new ArrayList<Association>(newObservation.getAssociations());
+            Collections.sort(associations, new LinkComparator());
+            for (Association association : associations) {
                 listModel.addElement(association);
             }
         }

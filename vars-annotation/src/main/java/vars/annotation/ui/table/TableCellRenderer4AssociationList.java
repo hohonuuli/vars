@@ -20,6 +20,7 @@ package vars.annotation.ui.table;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.util.Collections;
 import java.util.List;
 import javax.swing.JLabel;
 import javax.swing.JTable;
@@ -27,6 +28,7 @@ import javax.swing.ListModel;
 import javax.swing.ToolTipManager;
 import org.mbari.swing.ListListModel;
 import org.mbari.swing.table.ListTableCellRenderer;
+import vars.LinkComparator;
 import vars.annotation.Association;
 
 /**
@@ -143,7 +145,10 @@ public class TableCellRenderer4AssociationList extends ListTableCellRenderer {
      */
     @Override
     protected void setValue(final Object value) {
-        final ListModel listModel = new ListListModel((List<Association>) value);
+        // Sort them in the view
+        final List<Association> associations = (List<Association>) value;
+        Collections.sort(associations, new LinkComparator());
+        final ListModel listModel = new ListListModel(associations);
         this.setModel(listModel);
     }
 }
