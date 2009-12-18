@@ -70,7 +70,6 @@ public class AnnotationPersistenceServiceImpl extends QueryableImpl implements A
     }
 
     /** JPA is not thread safe, so once DAO per thread */
-    private final ThreadLocal<EntityManager> readWriteEntityManagers = new ThreadLocal<EntityManager>();
     private final ThreadLocal<EntityManager> readOnlyEntityManagers = new ThreadLocal<EntityManager>();
     private final EntityManagerFactory entityManagerFactory;
     private final PersistenceCache persistenceCache;
@@ -100,9 +99,9 @@ public class AnnotationPersistenceServiceImpl extends QueryableImpl implements A
                     return from.getName();
                 }
             });
-            List<String> namesInList = new ArrayList<String>(namesAsStrings);
-            Collections.sort(namesInList, new IgnoreCaseToStringComparator());
-            descendantNameCache.put(concept, namesInList);
+            desendantNames = new ArrayList<String>(namesAsStrings);
+            Collections.sort(desendantNames, new IgnoreCaseToStringComparator());
+            descendantNameCache.put(concept, desendantNames);
         }
 
         // Don't return null. Alwasy return at least an empty list
@@ -181,15 +180,6 @@ public class AnnotationPersistenceServiceImpl extends QueryableImpl implements A
         return new ConceptDAOImpl(entityManager);
     }
 
-    private EntityManager getEntityManager() {
-        EntityManager entityManager = readWriteEntityManagers.get();
-        if (entityManager == null || !entityManager.isOpen()) {
-            entityManager = entityManagerFactory.createEntityManager();
-            readWriteEntityManagers.set(entityManager);
-        }
-
-        return entityManager;
-    }
     
     /**
      * These entitymanagers are never closed (until garbage collected) They are for

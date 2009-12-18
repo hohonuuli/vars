@@ -57,13 +57,7 @@ public class AnnotationFrameController {
             }
 
             public void beforeClear(CacheClearedEvent evt) {
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    public void run() {
-                        waitIndicator = new LabeledSpinningDialWaitIndicator(AnnotationFrameController.this.annotationFrame, "Refreshing");
-                    }
-                });
-                
+                waitIndicator = new LabeledSpinningDialWaitIndicator(AnnotationFrameController.this.annotationFrame, "Refreshing");
             }
         });
 

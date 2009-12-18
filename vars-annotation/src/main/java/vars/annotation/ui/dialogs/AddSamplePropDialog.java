@@ -1,5 +1,5 @@
 /*
- * @(#)AddSamplePropDialog.java   2009.11.18 at 04:32:38 PST
+ * @(#)AddSamplePropDialog.java   2009.12.17 at 04:51:53 PST
  *
  * Copyright 2009 MBARI
  *
@@ -15,9 +15,19 @@
 
 package vars.annotation.ui.dialogs;
 
-import java.awt.Frame;
+import foxtrot.Task;
+import foxtrot.Worker;
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.actions.AddPropertyAction;
 import vars.annotation.ui.actions.AddSamplePropAction;
 import vars.knowledgebase.Concept;
@@ -25,215 +35,184 @@ import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.ConceptNameTypes;
 import vars.knowledgebase.SimpleConceptBean;
 import vars.knowledgebase.SimpleConceptNameBean;
-import vars.annotation.ui.ToolBelt;
 import vars.shared.ui.HierachicalConceptNameComboBox;
-import vars.annotation.ui.Lookup;
+import vars.shared.ui.dialogs.StandardDialog;
 
 /**
- * <p>A dialog that prompts the user for the sampler device and sample number.
- * When the OK button is pressed, 2 properties are added to the Observation
- * selected in the table. THese properties are 'sampled-by' and
- * 'sample-reference'</p>
  *
- * @author  <a href="http://www.mbari.org">MBARI</a>
- * @see vars.annotation.ui.actions.AddSamplePropAction
- * @see vars.annotation.ui.actions.AddPropertyAction
+ *
+ * @version        Enter version here..., 2009.12.17 at 04:51:53 PST
+ * @author         Brian Schlining [brian@mbari.org]
  */
-public class AddSamplePropDialog extends JDialog {
+public class AddSamplePropDialog extends StandardDialog {
 
-    private javax.swing.JButton btnCancel = null;
-    private javax.swing.JButton btnOk = null;
-    private javax.swing.JComboBox cbSampler = null;
-    private javax.swing.JPanel jContentPane = null;
-    private javax.swing.JLabel jLabel = null;
-    private javax.swing.JLabel jLabel1 = null;
-    private javax.swing.JPanel jPanel = null;
-    private javax.swing.JPanel jPanel1 = null;
-    private javax.swing.JPanel jPanel2 = null;
-    private javax.swing.JTextField tfSampleRefNum = null;
+    private JComboBox comboBox;
+    private JLabel lblSampleId;
+    private JLabel lblSampledBy;
+    private JPanel panel;
+    private JTextField textField;
     private final ToolBelt toolBelt;
 
     /**
-     * This is the default constructor
+     * Constructs ...
      *
      * @param toolBelt
      */
     public AddSamplePropDialog(ToolBelt toolBelt) {
-        super((Frame) Lookup.getApplicationFrameDispatcher().getValueObject(), true);
         this.toolBelt = toolBelt;
         initialize();
     }
 
-    private javax.swing.JButton getBtnCancel() {
-        if (btnCancel == null) {
-            btnCancel = new javax.swing.JButton();
-            btnCancel.setText("Cancel");
-            btnCancel.addActionListener(new java.awt.event.ActionListener() {
+    private JComboBox getComboBox() {
+        if (comboBox == null) {
+            Concept concept;
 
-                public void actionPerformed(final java.awt.event.ActionEvent e) {
-                    dispose();
-                }
-            });
-            btnCancel.setFocusable(true);
-            btnCancel.setRequestFocusEnabled(true);
-        }
-
-        return btnCancel;
-    }
-
-    private javax.swing.JButton getBtnOk() {
-        if (btnOk == null) {
-            btnOk = new javax.swing.JButton();
-            btnOk.setText("OK");
-            btnOk.addActionListener(new java.awt.event.ActionListener() {
-
-                public void actionPerformed(final java.awt.event.ActionEvent e) {
-
-                    // Add the sampled-by association
-                    action1.setToConcept((String) getCbSampler().getSelectedItem());
-                    action1.doAction();
-
-                    // Add the sample reference association.
-                    final String text = getTfSampleRefNum().getText();
-                    if (!text.equals("")) {
-                        action2.setLinkValue(getTfSampleRefNum().getText());
-                        action2.doAction();
-                    }
-
-                    // reset the state of the ui for the next use.
-                    getTfSampleRefNum().setText("");
-                    getCbSampler().getEditor().selectAll();
-                    dispose();
-                }
-                AddPropertyAction action1 = new AddSamplePropAction(toolBelt);
-                AddPropertyAction action2 = new AddPropertyAction(toolBelt, "sample-reference", "self", "0");
-
-            });
-            btnOk.setFocusable(true);
-            btnOk.setRequestFocusEnabled(true);
-        }
-
-        return btnOk;
-    }
-
-    private javax.swing.JComboBox getCbSampler() {
-        if (cbSampler == null) {
-            Concept c;
+            // Do lookup
             try {
+                concept = (Concept) Worker.post(new Task() {
 
-                // TODO This is hard coded. It should be moved out to a properties file
-                c = toolBelt.getAnnotationPersistenceService().findConceptByName("equipment");
+                    @Override
+                    public Object run() throws Exception {
 
-                if (c == null) {
-                    c = toolBelt.getAnnotationPersistenceService().findRootConcept();
-                }
+                        // TODO This is hard coded. It should be moved out to a properties file
+                        Concept c = toolBelt.getAnnotationPersistenceService().findConceptByName("equipment");
+
+                        if (c == null) {
+                            c = toolBelt.getAnnotationPersistenceService().findRootConcept();
+                        }
+
+                        return c;
+                    }
+                });
+
             }
-            catch (final Exception e) {
+            catch (Exception e) {
                 final ConceptName cn = new SimpleConceptNameBean(ConceptName.NAME_DEFAULT,
                     ConceptNameTypes.PRIMARY.getName());
-                c = new SimpleConceptBean(cn);
+                concept = new SimpleConceptBean(cn);
             }
 
-            cbSampler = new HierachicalConceptNameComboBox(c, toolBelt.getAnnotationPersistenceService());
-            cbSampler.setFocusable(true);
-            cbSampler.setRequestFocusEnabled(true);
+            comboBox = new HierachicalConceptNameComboBox(concept, toolBelt.getAnnotationPersistenceService());
+            comboBox.setFocusable(true);
+            comboBox.setRequestFocusEnabled(true);
         }
 
-        return cbSampler;
+        return comboBox;
     }
 
-    private javax.swing.JPanel getJContentPane() {
-        if (jContentPane == null) {
-            jContentPane = new javax.swing.JPanel();
-            jContentPane.setLayout(new javax.swing.BoxLayout(jContentPane, javax.swing.BoxLayout.Y_AXIS));
-            jContentPane.add(getJPanel(), null);
-            jContentPane.add(getJPanel1(), null);
-            jContentPane.add(getJPanel2(), null);
+    private JLabel getLblSampleId() {
+        if (lblSampleId == null) {
+            lblSampleId = new JLabel("Sample ID");
         }
 
-        return jContentPane;
+        return lblSampleId;
     }
 
-    private javax.swing.JLabel getJLabel() {
-        if (jLabel == null) {
-            jLabel = new javax.swing.JLabel();
-            jLabel.setText("  Sampled by:  ");
+    private JLabel getLblSampledBy() {
+        if (lblSampledBy == null) {
+            lblSampledBy = new JLabel("Sampled By");
         }
 
-        return jLabel;
+        return lblSampledBy;
     }
 
-    private javax.swing.JLabel getJLabel1() {
-        if (jLabel1 == null) {
-            jLabel1 = new javax.swing.JLabel();
-            jLabel1.setText("  Sample Reference Number:  ");
-        }
-
-        return jLabel1;
+    private JPanel getPanel() {
+            if (panel == null) {
+                    panel = new JPanel();
+                    GroupLayout groupLayout = new GroupLayout(panel);
+                    groupLayout.setHorizontalGroup(
+                            groupLayout.createParallelGroup(Alignment.LEADING)
+                                    .addGroup(groupLayout.createSequentialGroup()
+                                            .addContainerGap()
+                                            .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+                                                    .addComponent(getLblSampledBy())
+                                                    .addComponent(getLblSampleId()))
+                                            .addPreferredGap(ComponentPlacement.RELATED)
+                                            .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+                                                    .addComponent(getTextField(), GroupLayout.DEFAULT_SIZE, 361, Short.MAX_VALUE)
+                                                    .addComponent(getComboBox(), 0, 361, Short.MAX_VALUE))
+                                            .addContainerGap())
+                    );
+                    groupLayout.setVerticalGroup(
+                            groupLayout.createParallelGroup(Alignment.LEADING)
+                                    .addGroup(groupLayout.createSequentialGroup()
+                                            .addContainerGap()
+                                            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+                                                    .addComponent(getLblSampledBy())
+                                                    .addComponent(getComboBox(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                            .addPreferredGap(ComponentPlacement.RELATED)
+                                            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+                                                    .addComponent(getLblSampleId())
+                                                    .addComponent(getTextField(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                            .addContainerGap(171, Short.MAX_VALUE))
+                    );
+                    panel.setLayout(groupLayout);
+                    panel.setSize(400, 120);
+            }
+            return panel;
     }
 
-    private javax.swing.JPanel getJPanel() {
-        if (jPanel == null) {
-            jPanel = new javax.swing.JPanel();
-            jPanel.setLayout(new javax.swing.BoxLayout(jPanel, javax.swing.BoxLayout.X_AXIS));
-            jPanel.add(getJLabel(), null);
-            jPanel.add(getCbSampler(), null);
-            jPanel.setPreferredSize(new java.awt.Dimension(107, 25));
+    private JTextField getTextField() {
+        if (textField == null) {
+            textField = new JTextField();
+            textField.setColumns(10);
         }
 
-        return jPanel;
-    }
-
-    private javax.swing.JPanel getJPanel1() {
-        if (jPanel1 == null) {
-            jPanel1 = new javax.swing.JPanel();
-            jPanel1.setLayout(new javax.swing.BoxLayout(jPanel1, javax.swing.BoxLayout.X_AXIS));
-            jPanel1.add(getJLabel1(), null);
-            jPanel1.add(getTfSampleRefNum(), null);
-        }
-
-        return jPanel1;
-    }
-
-    private javax.swing.JPanel getJPanel2() {
-        if (jPanel2 == null) {
-            jPanel2 = new javax.swing.JPanel();
-            jPanel2.setLayout(new javax.swing.BoxLayout(jPanel2, javax.swing.BoxLayout.X_AXIS));
-            jPanel2.add(getBtnOk(), null);
-            jPanel2.add(getBtnCancel(), null);
-            jPanel2.setPreferredSize(new java.awt.Dimension(124, 30));
-        }
-
-        return jPanel2;
-    }
-
-    private javax.swing.JTextField getTfSampleRefNum() {
-        if (tfSampleRefNum == null) {
-            tfSampleRefNum = new javax.swing.JTextField();
-            tfSampleRefNum.setFocusable(true);
-            tfSampleRefNum.setRequestFocusEnabled(true);
-        }
-
-        return tfSampleRefNum;
+        return textField;
     }
 
     private void initialize() {
-        this.setSize(350, 103);
-        this.setContentPane(getJContentPane());
-        this.setTitle("VARS - Add Sample Reference");
+
+        setTitle("VARS - Add Sample Reference");
         this.setResizable(false);
-        this.setLocationRelativeTo(null);
+        getContentPane().add(getPanel(), BorderLayout.CENTER);
+        setLocationRelativeTo(null);
+        getOkayButton().addActionListener(new ActionListener() {
+
+            AddPropertyAction action1 = new AddSamplePropAction(toolBelt);
+            AddPropertyAction action2 = new AddPropertyAction(toolBelt, "sample-reference", "self", "0");
+
+            public void actionPerformed(ActionEvent e) {
+
+                // Add the sampled-by association
+                action1.setToConcept((String) getComboBox().getSelectedItem());
+                action1.doAction();
+
+                // Add the sample reference association.
+                final String text = getTextField().getText();
+                if (!text.equals("")) {
+                    action2.setLinkValue(text);
+                    action2.doAction();
+                }
+
+                // reset the state of the ui for the next use.
+                getTextField().setText("");
+                getComboBox().getEditor().selectAll();
+                dispose();
+            }
+
+
+        });
+
+        getCancelButton().addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+            }
+        });
+        pack();
     }
 
     /**
-     *  Overridden method. Transfers focus to the cbSampler component when set
-     * to true.
-     *
-     * @param  b The new visible value
-     */
+ *  Overridden method. Transfers focus to the cbSampler component when set
+ * to true.
+ *
+ * @param  b The new visible value
+ */
+    @Override
     public void setVisible(final boolean b) {
         if (b) {
-            final JComboBox cb = getCbSampler();
+            final JComboBox cb = getComboBox();
             cb.requestFocus();
             cb.getEditor().selectAll();
         }

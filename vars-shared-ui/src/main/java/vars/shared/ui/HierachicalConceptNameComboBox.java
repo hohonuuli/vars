@@ -1,5 +1,5 @@
 /*
- * @(#)HierachicalConceptNameComboBox.java   2009.12.02 at 10:38:27 PST
+ * @(#)HierachicalConceptNameComboBox.java   2009.12.17 at 04:30:13 PST
  *
  * Copyright 2009 MBARI
  *
@@ -21,8 +21,13 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.Collection;
 import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.ExecutionException;
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
+import org.bushe.swing.event.EventBus;
 import org.mbari.swing.SortedComboBoxModel;
 import org.mbari.swing.SpinningDialWaitIndicator;
 import org.mbari.swing.WaitIndicator;
@@ -39,9 +44,9 @@ import vars.knowledgebase.Concept;
  */
 public class HierachicalConceptNameComboBox extends ConceptNameComboBox {
 
+    private final Logger log = LoggerFactory.getLogger(getClass());
     private final AnnotationPersistenceService annotationPersistenceService;
     private Concept concept;
-    private final Logger log = LoggerFactory.getLogger(getClass());
 
     /**
      * Constructs ...
@@ -108,36 +113,60 @@ public class HierachicalConceptNameComboBox extends ConceptNameComboBox {
      *
      * @param concept
      */
+    @SuppressWarnings("unchecked")
     public void setConcept(final Concept concept) {
+
         this.concept = concept;
+        removeAllItems();
 
-        if (concept != null) {
-            WaitIndicator waitIndicator = new SpinningDialWaitIndicator(this);
-            List<String> namesAsStrings;
-            try {
-                namesAsStrings = (List<String>) Worker.post(new Task() {
-
-                    @Override
-                    public Object run() {
-                        return annotationPersistenceService.findDescendantNamesFor(concept);
-
-                    }
-                });
-            }
-            catch (Exception e) {
-                log.error("An error occurred while looking up descendant names for " + concept, e);
-                namesAsStrings = new Vector<String>();
-            }
-            finally {
-                waitIndicator.dispose();
-            }
-            ((SortedComboBoxModel) getModel()).setItems(namesAsStrings);
+        if (concept == null) {
+            // Do nothing
         }
         else {
-            removeAllItems();
-        }
 
-        repaint();
+            final String primaryName = concept.getPrimaryConceptName().getName();
+            final SortedComboBoxModel<String> model =  (SortedComboBoxModel<String>) getModel();
+            model.addElement(primaryName); // Gets removed at setItems call, but makes the comboBox look prettier in the interm
+
+            SwingUtilities.invokeLater(new Runnable() {
+
+                public void run() {
+
+                    final WaitIndicator waitIndicator = new SpinningDialWaitIndicator( HierachicalConceptNameComboBox.this);
+
+                    SwingWorker worker = new SwingWorker<Collection<String>, Void>() {
+
+                        @Override
+                        protected Collection<String> doInBackground() throws Exception {
+                            return annotationPersistenceService.findDescendantNamesFor(concept);
+                        }
+
+                        @Override
+                        protected void done() {
+                            try {
+                                model.setItems(new Vector<String>(get()));
+                            }
+                            catch (Exception e) {
+                                log.warn("Failed to lookup " + concept, e);
+                            }
+                            finally {
+                                waitIndicator.dispose();
+                            }
+
+                            if (!model.contains(primaryName)) {
+                                model.addElement(primaryName);
+                            }
+                        }
+                    };
+
+                    worker.execute();
+
+
+                }
+            });
+
+            
+        }
 
     }
 }

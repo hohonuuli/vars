@@ -39,7 +39,8 @@ public class ConceptNameComboBox extends FancyComboBox implements ConceptChangeL
      * Constructor for the ConceptNameComboBox object
      */
     public ConceptNameComboBox() {
-        super(new IgnoreCaseToStringComparator());
+        super();
+        setModel(new SortedComboBoxModel<String>(new IgnoreCaseToStringComparator()));
         setToolTipText("Select Concept by name");
     }
 
@@ -61,7 +62,7 @@ public class ConceptNameComboBox extends FancyComboBox implements ConceptChangeL
      * @param  item   The item to add to the model.
      */
     public void addItem(ConceptName item) {
-        ((SortedComboBoxModel) getModel()).addElement(item.getName());
+        ((SortedComboBoxModel<String>) getModel()).addElement(item.getName());
     }
 
     /**
@@ -112,7 +113,7 @@ public class ConceptNameComboBox extends FancyComboBox implements ConceptChangeL
      * @param  item   The item to remove from the model.
      */
     public void removeItem(ConceptName item) {
-        ((SortedComboBoxModel) getModel()).removeElement(item.getName());
+        ((SortedComboBoxModel<String>) getModel()).removeElement(item.getName());
     }
 
     /**
@@ -156,6 +157,6 @@ public class ConceptNameComboBox extends FancyComboBox implements ConceptChangeL
      *  <code>ConceptNameComboBox</code>.
      */
     public void updateModel(String[] items) {
-        ((SortedComboBoxModel) getModel()).setItems(Arrays.asList(items));
+        ((SortedComboBoxModel<String>) getModel()).setItems(Arrays.asList(items));
     }
 }
