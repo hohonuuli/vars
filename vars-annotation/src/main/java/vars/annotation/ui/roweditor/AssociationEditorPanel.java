@@ -46,6 +46,7 @@ import org.bushe.swing.event.EventBus;
 import org.mbari.swing.JFancyButton;
 import org.mbari.swing.LabeledSpinningDialWaitIndicator;
 import org.mbari.swing.SearchableComboBoxModel;
+import org.mbari.swing.SortedComboBoxModel;
 import org.mbari.swing.WaitIndicator;
 import org.mbari.text.ObjectToStringConverter;
 import org.slf4j.Logger;
@@ -466,7 +467,7 @@ public class AssociationEditorPanel extends JPanel {
 
     private void setLink(final ILink link) {
         WaitIndicator waitIndicator = new LabeledSpinningDialWaitIndicator(this,
-            "Loading " + link.getToConcept() + " ...");
+                "Loading " + link.getToConcept() + " ...");
         getLinkNameTextField().setText(link.getLinkName());
         getLinkValueTextField().setText(link.getLinkValue());
         final HierachicalConceptNameComboBox comboBox = getToConceptComboBox();
@@ -474,9 +475,10 @@ public class AssociationEditorPanel extends JPanel {
         getLinksComboBox().hidePopup();
         String conceptName = link.getToConcept();
 
-        if (link.getToConcept().equals(ILink.VALUE_NIL) || link.getToConcept().equals(ILink.VALUE_SELF)) {
-
-            // Do nothing
+        if (conceptName.equals(ILink.VALUE_NIL) || conceptName.equals(ILink.VALUE_SELF)) {
+            SortedComboBoxModel<String> model = (SortedComboBoxModel<String>) comboBox.getModel();
+            model.clear();
+            model.addElement(conceptName);
         }
         else {
 
