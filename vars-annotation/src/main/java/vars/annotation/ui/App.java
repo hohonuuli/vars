@@ -18,12 +18,17 @@ package vars.annotation.ui;
 import com.google.inject.Injector;
 import foxtrot.Job;
 import foxtrot.Worker;
+import java.awt.SplashScreen;
+import java.awt.Toolkit;
 import java.util.Vector;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.EventTopicSubscriber;
+import org.mbari.awt.WaitCursorEventQueue;
+import org.mbari.swing.SplashFrame;
 import org.mbari.util.SystemUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,16 +58,23 @@ public class App {
      * Constructs ...
      */
     public App() {
+
+        final ImageIcon mbariLogo =
+            new ImageIcon(getClass().getResource("/annotation-splash.png"));
+        final SplashFrame splashFrame = new SplashFrame(mbariLogo);
+        splashFrame.setMessage(" Initializing configuration ...");
+        splashFrame.setVisible(true);
+
         final Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
         toolBelt = injector.getInstance(ToolBelt.class);
 
-        // TODO we need a splash screen to show progress
 
         /*
          *  Verify that the database connection is working. If it's not, show
          *  a dialog. Without this check database errors fail silently and to
          *  the user it looks like the application just won't start at all.
          */
+        splashFrame.setMessage(" Loading authentication policies ...");
         try {
             toolBelt.getMiscDAOFactory().newUserAccountDAO().findAll();
         }
@@ -74,12 +86,12 @@ public class App {
         /*
          * Preload the knowledgebase in the Foxtrot worker thread!!
          */
+        splashFrame.setMessage(" Preloading knowledgebase ... be patient");
         Worker.post(new Job() {
 
             @Override
             public Object run() {
                 Logger log = LoggerFactory.getLogger(getClass());
-                log.info("Preloading knowledgebase ... be patient");
                 AnnotationPersistenceService service = toolBelt.getAnnotationPersistenceService();
                 Concept root = service.findRootConcept();
                 service.findDescendantNamesFor(root);
@@ -87,6 +99,7 @@ public class App {
             }
         });
 
+        splashFrame.setMessage("Assembling the user interface ...");
         Lookup.getSelectedObservationsDispatcher().setValueObject(new Vector<Observation>());
         fatalErrorSubscriber = new FatalExceptionSubscriber(getAnnotationFrame());
         nonFatalErrorSubscriber = new NonFatalErrorSubscriber(getAnnotationFrame());
@@ -98,9 +111,15 @@ public class App {
         EventBus.subscribe(Lookup.TOPIC_WARNING, warningSubscriber);
         EventBus.subscribe(Lookup.TOPIC_EXIT, exitSubscriber);
 
+        /*
+         * Add a special eventQueue that toggles the cursor if the application is busy
+         */
+        Toolkit.getDefaultToolkit().getSystemEventQueue().push(new WaitCursorEventQueue(500));
+
         JFrame frame = getAnnotationFrame();
         Lookup.getApplicationFrameDispatcher().setValueObject(frame);
         frame.pack();
+        splashFrame.dispose();
         frame.setVisible(true);
     }
 

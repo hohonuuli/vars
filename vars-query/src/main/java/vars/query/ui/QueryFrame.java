@@ -97,7 +97,7 @@ public class QueryFrame extends JFrame {
             actionMap = new ActionMap();
 
             Dispatcher dispatcher = Lookup.getApplicationDispatcher();
-            QueryApp queryApp = (QueryApp) dispatcher.getValueObject();
+            App queryApp = (App) dispatcher.getValueObject();
 
             if (queryApp != null) {
                 actionMap.setParent(queryApp.getActionMap());

@@ -13,6 +13,7 @@
 
 package vars.jpa;
 
+import vars.VarsUserPreferencesFactory;
 import java.util.prefs.Preferences;
 
 import javax.persistence.EntityManagerFactory;

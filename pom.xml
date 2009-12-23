@@ -88,7 +88,6 @@
             </plugin>
             <!-- Create source jars when deploying -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <executions>
                     <execution>
@@ -100,10 +99,11 @@
             </plugin>
             <!-- Add Manifest information -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
                     <archive>
+                        <addMavenDescriptor>true</addMavenDescriptor>
+                        <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
                         <manifest>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
@@ -120,15 +120,6 @@
                 <artifactId>maven-resources-plugin</artifactId>
                 <configuration>
                     <encoding>UTF-8</encoding>
-                </configuration>
-            </plugin>
-            <!-- Generate a manifest so we can write OSGI info into it -->
-            <plugin>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
-                    </archive>
                 </configuration>
             </plugin>
             <!-- Write OSGI info to manifest -->
@@ -161,30 +152,6 @@
                     <exclude>**/*.properties</exclude>
                 </excludes>
             </resource>
-            <!--<resource>
-                <directory>src/main/resources</directory>
-                <filtering>false</filtering>
-                <excludes>
-                    <exclude>**/*.dll</exclude>
-                    <exclude>**/*.jnilib</exclude>
-                    <exclude>**/*.so</exclude>
-                    <exclude>**/*.gif</exclude>
-                    <exclude>**/*.jpg</exclude>
-                    <exclude>**/*.png</exclude>
-                </excludes>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>false</filtering>
-                <includes>
-                    <include>**/*.dll</include>
-                    <include>**/*.jnilib</include>
-                    <include>**/*.so</include>
-                    <include>**/*.gif</include>
-                    <include>**/*.jpg</include>
-                    <include>**/*.png</include>
-                </includes>
-            </resource>-->
         </resources>
     </build>
     <repositories>

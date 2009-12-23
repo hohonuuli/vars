@@ -66,9 +66,9 @@ public class PSurfaceButton extends PropButton {
             if (dialog == null) {
                 dialog = new ToConceptSelectionDialog(toolBelt.getAnnotationPersistenceService());
                 dialog.setLocationRelativeTo(PSurfaceButton.this);
-                dialog.getOkButton().addActionListener(new ActionListener() {
+                dialog.getOkayButton().addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        getAddPropertyAction().setLinkValue(dialog.getSelectedConcept().getPrimaryConceptName().getName());
+                        getAddPropertyAction().setToConcept(dialog.getSelectedConcept().getPrimaryConceptName().getName());
                         dialog.setVisible(false);
                         getAddPropertyAction().doAction();
                     }

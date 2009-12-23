@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package vars.jpa;
+package vars;
 
 import java.util.prefs.Preferences;
 import java.util.prefs.PreferencesFactory;

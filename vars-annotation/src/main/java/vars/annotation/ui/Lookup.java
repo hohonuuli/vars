@@ -31,7 +31,7 @@ import vars.annotation.VideoArchive;
 import vars.annotation.ui.table.ObservationTable;
 import vars.annotation.ui.video.ImageCaptureService;
 import vars.annotation.ui.video.VideoControlService;
-import vars.jpa.VarsUserPreferencesFactory;
+import vars.VarsUserPreferencesFactory;
 import vars.annotation.ui.App;
 import vars.annotation.ui.AnnotationFrame;
 import vars.shared.InjectorModule;
@@ -49,6 +49,7 @@ public class Lookup extends GlobalLookup {
     protected static final Object KEY_DISPATCHER_OBSERVATION_TABLE = "vars.annotation.ui.Lookup-ObservationTable";
     protected static final Object KEY_DISPATCHER_PREFERENCES = "vars.annotation.ui.Lookup-Preferences";
     protected static final Object KEY_DISPATCHER_VIDEOSERVICE = "vars.annotation.ui.Lookup-VideoService";
+    protected static final Object KEY_DISPATCHER_LOGINCREDENTIAL = "vars.annotation.ui.Lookup-LoginCredential";
 
     /**  */
     public static final String RESOURCE_BUNDLE = "annotation-app";

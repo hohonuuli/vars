@@ -49,7 +49,7 @@ import vars.knowledgebase.ui.actions.PopulateDatabaseAction;
  *
  * @author     <a href="http://www.mbari.org">Monterey Bay Aquarium Research Institute</a>
  */
-public class KnowledgebaseApp {
+public class App {
 
     private static Logger log;
     private KnowledgebaseFrame knowledgebaseFrame;
@@ -161,11 +161,10 @@ public class KnowledgebaseApp {
      * Constructs ...
      *
      */
-    public KnowledgebaseApp() {
+    public App() {
         super();
 
         Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
-        Lookup.getGuiceInjectorDispatcher().setValueObject(injector);
         toolBelt = injector.getInstance(ToolBelt.class);
         approveHistorySubscriber = new ApproveHistorySubscriber(toolBelt.getApproveHistoryTask());
 
@@ -224,7 +223,7 @@ public class KnowledgebaseApp {
      */
     private static Logger getLog() {
         if (log == null) {
-            log = LoggerFactory.getLogger(KnowledgebaseApp.class);
+            log = LoggerFactory.getLogger(App.class);
         }
 
         return log;
@@ -370,7 +369,7 @@ public class KnowledgebaseApp {
         SwingUtilities.invokeLater(new Runnable() {
 
             public void run() {
-                new KnowledgebaseApp();
+                new App();
             }
 
         });

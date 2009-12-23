@@ -122,7 +122,7 @@ public class DateValuePanel extends ValuePanel {
             c.selectionClickCount = 1;
             minEntryField.setConstraints(c);
             minEntryField.setShowTodayButton(true, true);
-            minEntryField.setValue(QueryApp.MIN_RECORDED_DATE);
+            minEntryField.setValue(App.MIN_RECORDED_DATE);
 
             /*
              * Turn on the contrain box if a value is selected

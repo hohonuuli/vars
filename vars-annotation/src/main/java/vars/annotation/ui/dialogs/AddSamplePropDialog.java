@@ -20,6 +20,8 @@ import foxtrot.Worker;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JComboBox;
@@ -95,6 +97,7 @@ public class AddSamplePropDialog extends StandardDialog {
             comboBox = new HierachicalConceptNameComboBox(concept, toolBelt.getAnnotationPersistenceService());
             comboBox.setFocusable(true);
             comboBox.setRequestFocusEnabled(true);
+            comboBox.setSelectedItem("equipment");
         }
 
         return comboBox;
@@ -144,10 +147,9 @@ public class AddSamplePropDialog extends StandardDialog {
                                             .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
                                                     .addComponent(getLblSampleId())
                                                     .addComponent(getTextField(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                                            .addContainerGap(171, Short.MAX_VALUE))
+                                            .addContainerGap(0, Short.MAX_VALUE))
                     );
                     panel.setLayout(groupLayout);
-                    panel.setSize(400, 120);
             }
             return panel;
     }
@@ -156,6 +158,16 @@ public class AddSamplePropDialog extends StandardDialog {
         if (textField == null) {
             textField = new JTextField();
             textField.setColumns(10);
+            textField.addKeyListener(new KeyAdapter() {
+
+                @Override
+                public void keyReleased(KeyEvent e) {
+                    if (KeyEvent.VK_ENTER == e.getKeyCode()) {
+                        getOkayButton().doClick();
+                    }
+                }
+
+            });
         }
 
         return textField;

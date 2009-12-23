@@ -56,7 +56,7 @@ public class VarsUserPreferences extends AbstractPreferences {
         this.entityManagerFactory = entityManagerFactory;
     }
 
-        /**
+    /**`
      * This method puts the give key/value association into this preference node (and persists it to the database)
      *
      * @param  key This is the key that will be used to insert and extract the associated value
@@ -70,6 +70,7 @@ public class VarsUserPreferences extends AbstractPreferences {
          * we update it with the new value. If not we insert a record.
          */
         try {
+
             PreferenceNode node = findByKey(key);
             if (node == null) {
                 node = new PreferenceNode();
@@ -118,6 +119,9 @@ public class VarsUserPreferences extends AbstractPreferences {
         entityTransaction.commit();
         entityManager.close();
     }
+
+
+
 
     /**
      * Executes a named query using a map of named parameters
@@ -305,12 +309,13 @@ public class VarsUserPreferences extends AbstractPreferences {
         return new VarsUserPreferences(entityManagerFactory, this, name);
     }
 
-    protected void syncSpi() {
+    protected void syncSpi() throws BackingStoreException{
         // Do nothing
     }
 
-    protected void flushSpi() {
+    protected void flushSpi() throws BackingStoreException {
         // No implementation
+
     }
 
     /**

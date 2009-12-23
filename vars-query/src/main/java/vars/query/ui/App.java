@@ -57,7 +57,7 @@ import vars.shared.ui.event.WarningSubscriber;
  * @author Brian Schlining
  * @version $Id: QueryApp.java 466 2007-01-20 00:59:58Z hohonuuli $
  */
-public class QueryApp {
+public class App {
 
 
     /**
@@ -80,7 +80,7 @@ public class QueryApp {
      * @param knowledgebaseDAOFactory
      */
     @Inject
-    public QueryApp(KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
+    public App(KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
         super();
         this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
 
@@ -134,7 +134,7 @@ public class QueryApp {
      */
     private static Logger getLog() {
         if (log == null) {
-            log = LoggerFactory.getLogger(QueryApp.class);
+            log = LoggerFactory.getLogger(App.class);
         }
 
         return log;
@@ -276,7 +276,7 @@ public class QueryApp {
 
             public void run() {
                 try {
-                    final QueryApp queryApp = injector.getInstance(QueryApp.class);
+                    final App queryApp = injector.getInstance(App.class);
                 }
                 catch (Exception e) {
                     FatalExceptionSubscriber subscriber = new FatalExceptionSubscriber(null);

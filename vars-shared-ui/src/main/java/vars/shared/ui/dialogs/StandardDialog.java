@@ -32,7 +32,8 @@ import org.mbari.swing.JFancyButton;
 import javax.swing.border.EmptyBorder;
 
 /**
- *
+ * Standard dialog. The ContentPane is laid-out using BorderLayout with the
+ * Ok and cancel buttons in the Sout part of the panel.
  *
  * @version        Enter version here..., 2009.12.09 at 09:46:46 PST
  * @author         Brian Schlining [brian@mbari.org]

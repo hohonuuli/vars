@@ -5,6 +5,7 @@
 
 package vars.jpa;
 
+import vars.VarsUserPreferencesFactory;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import java.util.logging.Level;

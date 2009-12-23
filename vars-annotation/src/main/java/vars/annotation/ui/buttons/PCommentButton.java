@@ -1,16 +1,26 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * @(#)PCommentButton.java   2009.12.23 at 09:02:03 PST
+ *
+ * Copyright 2009 MBARI
+ *
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
+
+
 package vars.annotation.ui.buttons;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.ImageIcon;
 import org.mbari.awt.event.ActionAdapter;
-import vars.annotation.ui.dialogs.AddCommentAssociationDialog;
-
 import vars.annotation.ui.actions.AddPropertyAction;
+import vars.annotation.ui.dialogs.AddCommentAssociationDialog;
 
 /**
  *
@@ -18,9 +28,12 @@ import vars.annotation.ui.actions.AddPropertyAction;
  */
 public class PCommentButton extends PropButton {
 
-    private ActionAdapter showDialogAction;
     private AddPropertyAction addPropertyAction;
+    private ActionAdapter showDialogAction;
 
+    /**
+     * Constructs ...
+     */
     public PCommentButton() {
         super();
         addPropertyAction = new AddPropertyAction(getToolBelt(), "comment", "self", "");
@@ -46,6 +59,7 @@ public class PCommentButton extends PropButton {
         if (showDialogAction == null) {
             showDialogAction = new ShowDialogAction();
         }
+
         return showDialogAction;
     }
 
@@ -56,26 +70,31 @@ public class PCommentButton extends PropButton {
 
         private AddCommentAssociationDialog dialog;
 
-        protected AddCommentAssociationDialog getDialog() {
-            if (dialog == null) {
-                dialog = new AddCommentAssociationDialog();
-                dialog.setLocationRelativeTo(PCommentButton.this);
-                dialog.getOkButton().addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        getAddPropertyAction().setLinkValue(dialog.getComment());
-                        dialog.setVisible(false);
-                        getAddPropertyAction().doAction();
-                    }
-                });
-            }
-            return dialog;
-        }
-
+        /**
+         */
         @Override
         public void doAction() {
             final AddCommentAssociationDialog d = getDialog();
             d.setComment("");
             d.setVisible(true);
+        }
+
+        protected AddCommentAssociationDialog getDialog() {
+            if (dialog == null) {
+                dialog = new AddCommentAssociationDialog();
+                dialog.setLocationRelativeTo(PCommentButton.this);
+                dialog.getOkayButton().addActionListener(new ActionListener() {
+
+                    public void actionPerformed(ActionEvent e) {
+                        getAddPropertyAction().setLinkValue(dialog.getComment());
+                        dialog.setVisible(false);
+                        getAddPropertyAction().doAction();
+                    }
+
+                });
+            }
+
+            return dialog;
         }
     }
 }

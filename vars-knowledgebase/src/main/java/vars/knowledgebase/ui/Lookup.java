@@ -49,7 +49,7 @@ import vars.shared.ui.GlobalLookup;
 public class Lookup extends GlobalLookup {
 
     protected static final Object KEY_DISPATCHER_APPLICATION_FRAME = KnowledgebaseFrame.class;
-    protected static final Object KEY_DISPATCHER_APPLICATION = KnowledgebaseApp.class;
+    protected static final Object KEY_DISPATCHER_APPLICATION = App.class;
     protected static final Object KEY_DISPATCHER_CONCEPT_TREE = JTree.class;
     protected static final Object KEY_DISPATCHER_SELECTED_CONCEPT = Concept.class;
     public static final String RESOURCE_BUNDLE = "knowledgebase-app";
@@ -76,9 +76,9 @@ public class Lookup extends GlobalLookup {
     static {
         getApplicationDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
-                if (evt.getNewValue() != null && !(evt.getNewValue() instanceof KnowledgebaseApp)) {
+                if (evt.getNewValue() != null && !(evt.getNewValue() instanceof App)) {
                     throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
-                            ", EXPECTED: " + KnowledgebaseApp.class.getName());
+                            ", EXPECTED: " + App.class.getName());
                 }
             }
         });

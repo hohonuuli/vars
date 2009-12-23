@@ -14,6 +14,7 @@
 
 package vars.jpa;
 
+import vars.VarsUserPreferencesFactory;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.Scopes;

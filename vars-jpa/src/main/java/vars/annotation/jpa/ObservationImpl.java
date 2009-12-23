@@ -19,6 +19,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -275,7 +276,15 @@ public class ObservationImpl implements Serializable, Observation, JPAEntity {
      * @return
      */
     public boolean hasSample() {
-        return false;    // TODO implement this.
+        // TODO this contains a hard coded reference. Needs to be moved to properties file
+        boolean b = false;
+        for (Association association : new ArrayList<Association>(getAssociations())) {
+            if ("sample-reference".equals(association.getLinkName())) {
+                b = true;
+                break;
+            }
+        }
+        return b;
     }
 
     /**

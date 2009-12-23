@@ -140,7 +140,7 @@ public class QueryActionUI {
          *
          */
         QueryActionDialog() {
-            super(((QueryApp) Dispatcher.getDispatcher(QueryApp.class).getValueObject()).getQueryFrame());
+            super(((App) Dispatcher.getDispatcher(App.class).getValueObject()).getQueryFrame());
             initialize();
             timer.start();
         }

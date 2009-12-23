@@ -404,7 +404,7 @@ public class JXObservationTableColumnModel extends DefaultTableColumnModelExt {
     public class ObserverColumn extends ValueColumn {
 
 
-        public final static int COLUMN_INDEX = 3;
+        public final static int COLUMN_INDEX = 4;
 
         public final static String ID = "Observer";
 

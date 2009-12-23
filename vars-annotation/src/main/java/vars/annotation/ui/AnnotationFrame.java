@@ -23,8 +23,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Vector;
+import java.util.prefs.Preferences;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BoxLayout;
@@ -41,6 +44,7 @@ import org.mbari.util.Dispatcher;
 import org.mbari.vcr.IVCR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.VARSException;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.cbpanel.ConceptButtonPanel;
@@ -128,6 +132,8 @@ public class AnnotationFrame extends JFrame {
             controlsPanelSplitPane.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
             controlsPanelSplitPane.setLeftComponent(getRowEditorPanel());
             controlsPanelSplitPane.setRightComponent(getControlsPanel());
+            Dimension size = controlsPanelSplitPane.getPreferredSize();
+            controlsPanelSplitPane.setPreferredSize(new Dimension(size.width, 200));
         }
         return controlsPanelSplitPane;
     }
@@ -137,6 +143,7 @@ public class AnnotationFrame extends JFrame {
             innerSplitPane = new JSplitPane();
             innerSplitPane.setLeftComponent(getTableScrollPane());
             innerSplitPane.setRightComponent(getMiscTabsPanel());
+            innerSplitPane.setOneTouchExpandable(true);
         }
 
         return innerSplitPane;
@@ -305,5 +312,9 @@ public class AnnotationFrame extends JFrame {
         getContentPane().add(getOuterSplitPane(), BorderLayout.CENTER);
         getContentPane().add(getQuickControlPanel(), BorderLayout.SOUTH);
         getContentPane().add(getToolBar(), BorderLayout.NORTH);
+
+
+
+
     }
 }

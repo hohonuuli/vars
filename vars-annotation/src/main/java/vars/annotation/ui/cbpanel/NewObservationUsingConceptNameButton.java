@@ -146,6 +146,7 @@ public class NewObservationUsingConceptNameButton extends JFancyButton
             public void propertyChange(PropertyChangeEvent evt) {
                 VideoControlService videoService = (VideoControlService) evt.getNewValue();
                 hasVcr = (videoService != null && videoService.isConnected());
+                checkEnable();
             }
         });
 

@@ -19,7 +19,7 @@ public class Lookup extends GlobalLookup {
 
     protected static final Object KEY_DISPATCHER_APPLICATION_FRAME = QueryFrame.class;
 
-    protected static final Object KEY_DISPATCHER_APPLICATION = QueryApp.class;
+    protected static final Object KEY_DISPATCHER_APPLICATION = App.class;
 
     public static final String RESOURCE_BUNDLE = "query-app";
 

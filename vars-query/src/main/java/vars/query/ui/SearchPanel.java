@@ -506,8 +506,8 @@ public class SearchPanel extends JPanel {
          * Share the action Maps
          */
         ActionMap actionMap = getActionMap();
-        Dispatcher dispatcher = Dispatcher.getDispatcher(QueryApp.class);
-        QueryApp queryApp = (QueryApp) dispatcher.getValueObject();
+        Dispatcher dispatcher = Dispatcher.getDispatcher(App.class);
+        App queryApp = (App) dispatcher.getValueObject();
         if (queryApp != null) {
             actionMap.setParent(queryApp.getActionMap());
         }

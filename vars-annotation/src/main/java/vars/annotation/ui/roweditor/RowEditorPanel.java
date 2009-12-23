@@ -355,6 +355,9 @@ public class RowEditorPanel extends JPanel {
         add(getListPanel(), BorderLayout.CENTER);
         setEnabled(false);
         setFocusCycleRoot(true);
+        Dimension size = getPreferredSize();
+        Dimension preferredSize = new Dimension(size.height, 200);
+        setPreferredSize(preferredSize);
 
         //FocusTraversalPolicy policy = getFocusTraversalPolicy();
         setFocusTraversalPolicy(new LayoutFocusTraversalPolicy() {
