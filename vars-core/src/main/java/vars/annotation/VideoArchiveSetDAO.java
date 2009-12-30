@@ -67,4 +67,6 @@ public interface VideoArchiveSetDAO extends DAO {
      */
     Collection<VideoArchiveSet> findAllWithoutDates();
 
+    VideoArchiveSet findByPrimaryKey(Object primaryKey);
+
 }

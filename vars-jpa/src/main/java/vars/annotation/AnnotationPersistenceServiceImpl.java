@@ -15,6 +15,8 @@
 
 package vars.annotation;
 
+import org.mbari.sql.QueryableImpl;
+import org.mbari.sql.QueryFunction;
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.google.inject.Inject;
@@ -35,11 +37,7 @@ import java.util.TreeSet;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import org.mbari.text.IgnoreCaseToStringComparator;
-import vars.CacheClearedEvent;
-import vars.CacheClearedListener;
-import vars.DAO;
-import vars.PersistenceCache;
-import vars.QueryableImpl;
+import vars.*;
 import vars.annotation.jpa.VideoArchiveDAOImpl;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
@@ -121,9 +119,9 @@ public class AnnotationPersistenceServiceImpl extends QueryableImpl implements A
 
         String sql = "SELECT count(*) FROM ConceptName WHERE ConceptName = '" + conceptname + "'";
 
-        final QueryFunction queryFunction = new QueryFunction() {
+        final QueryFunction<Boolean> queryFunction = new QueryFunction<Boolean>() {
 
-            public Object apply(ResultSet resultSet) throws SQLException {
+            public Boolean apply(ResultSet resultSet) throws SQLException {
                 Integer n = 0;
 
                 while (resultSet.next()) {
@@ -134,7 +132,7 @@ public class AnnotationPersistenceServiceImpl extends QueryableImpl implements A
             }
         };
 
-        return ((Boolean) executeQueryFunction(sql, queryFunction)).booleanValue();
+        return executeQueryFunction(sql, queryFunction).booleanValue();
     }
 
     /**

@@ -5,7 +5,7 @@ import java.util.ResourceBundle;
 import java.util.Collection;
 import java.util.ArrayList;
 
-import vars.QueryableImpl;
+import org.mbari.sql.QueryableImpl;
 import vars.annotation.Association;
 import vars.annotation.Observation;
 

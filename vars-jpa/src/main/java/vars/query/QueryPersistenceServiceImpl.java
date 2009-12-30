@@ -27,7 +27,8 @@ import java.util.ResourceBundle;
 import java.util.TreeMap;
 import vars.ILink;
 import vars.LinkBean;
-import vars.QueryableImpl;
+import org.mbari.sql.QueryFunction;
+import org.mbari.sql.QueryableImpl;
 
 /**
  * DAO for use by the query app. This drops out of hibernate and uses a lot of
@@ -73,9 +74,9 @@ public class QueryPersistenceServiceImpl extends QueryableImpl implements QueryP
         sb.append("SELECT DISTINCT linkName, toConcept, linkValue ");
         sb.append("FROM LinkTemplate");
 
-        final QueryFunction queryFunction = new QueryFunction() {
+        final QueryFunction<Collection<ILink>> queryFunction = new QueryFunction<Collection<ILink>>() {
 
-            public Object apply(ResultSet resultSet) throws SQLException {
+            public Collection<ILink> apply(ResultSet resultSet) throws SQLException {
                 Collection<ILink> associationBeans = new ArrayList<ILink>();
                 while (resultSet.next()) {
                     LinkBean bean = new LinkBean();
@@ -89,7 +90,7 @@ public class QueryPersistenceServiceImpl extends QueryableImpl implements QueryP
             }
         };
 
-        return (Collection<ILink>) executeQueryFunction(sb.toString(), queryFunction);
+        return executeQueryFunction(sb.toString(), queryFunction);
     }
 
     /**

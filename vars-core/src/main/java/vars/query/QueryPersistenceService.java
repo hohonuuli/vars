@@ -5,6 +5,7 @@
 
 package vars.query;
 
+import org.mbari.sql.IQueryable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;

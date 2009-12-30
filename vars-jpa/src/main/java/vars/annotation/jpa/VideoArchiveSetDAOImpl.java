@@ -132,4 +132,10 @@ public class VideoArchiveSetDAOImpl extends DAO implements VideoArchiveSetDAO {
     public Collection<VideoArchiveSet> findAllWithoutDates() {
         return null;  // TODO implement this method.
     }
+
+    public VideoArchiveSet findByPrimaryKey(final Object primaryKey) {
+        final Map<String, Object> params = new HashMap<String, Object>() {{ put("id", primaryKey); }};
+        final List<VideoArchiveSet> vas =  findByNamedQuery("VideoArchiveSet.findById", params);
+        return vas.size() > 0 ? vas.get(0) : null;
+    }
 }

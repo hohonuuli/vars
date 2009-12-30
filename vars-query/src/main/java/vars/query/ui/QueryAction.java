@@ -14,7 +14,7 @@
 
 package vars.query.ui;
 
-import vars.query.IQueryable;
+import org.mbari.sql.IQueryable;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ResourceBundle;

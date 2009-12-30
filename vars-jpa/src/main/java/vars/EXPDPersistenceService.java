@@ -12,6 +12,8 @@
 
 package vars;
 
+import org.mbari.sql.QueryableImpl;
+import org.mbari.sql.QueryFunction;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import java.math.BigDecimal;
@@ -41,7 +43,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author brian
  */
-public class EXPDPersistenceService implements ExternalDataPersistenceService {
+public class EXPDPersistenceService extends QueryableImpl implements ExternalDataPersistenceService {
 
     public static final int SAMPLERATE_MILLSEC = 15 * 1000;
     private static final Calendar CALENDAR = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
@@ -76,18 +78,15 @@ public class EXPDPersistenceService implements ExternalDataPersistenceService {
     };
     
     private final ThreadLocal<Connection> connections = new ThreadLocal<Connection>();
-    private final String jdbcPassword;
-    private final String jdbcUrl;
-    private final String jdbcUsername;
+
+    private static final ResourceBundle bundle = ResourceBundle.getBundle("annotation-jdbc");
 
     /**
      * Constructs ...
      */
     public EXPDPersistenceService() {
-        ResourceBundle bundle = ResourceBundle.getBundle("external-jdbc");
-        jdbcUrl = bundle.getString("jdbc.url");
-        jdbcUsername = bundle.getString("jdbc.username");
-        jdbcPassword = bundle.getString("jdbc.password");
+        super(bundle.getString("jdbc.url"), bundle.getString("jdbc.username"),
+                bundle.getString("jdbc.password"), bundle.getString("jdbc.driver"));
         try {
             Class.forName(bundle.getString("jdbc.driver"));
         } catch (ClassNotFoundException ex) {
@@ -130,73 +129,38 @@ public class EXPDPersistenceService implements ExternalDataPersistenceService {
          * Retrive HDTimecode and GMT from the EXPD Database and store in a
          * map for us to work with later.
          */
-        List<VideoMoment> dateTimecodes = new ArrayList<VideoMoment>();
-        String table = platform + "CamlogData";    // TODO map platforms to table names
+        QueryFunction<List<VideoMoment>> queryFunction = new QueryFunction<List<VideoMoment>>() {
+            public List<VideoMoment> apply(ResultSet resultSet) throws SQLException {
+                List<VideoMoment> dateTimecodes = new ArrayList<VideoMoment>();
+                while (resultSet.next()) {
+                    Date rovDate = resultSet.getTimestamp(1, CALENDAR);
+                    String timecode = resultSet.getString(2);
+                    String alternateTimecode = resultSet.getString(3);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Found record: " +
+                                "\n\tUTC Date:           " + dateFormatUTC.format(rovDate) +
+                                "\n\tTimecode:           " + timecode +
+                                "\n\tAlternate Timecode: " + alternateTimecode);
+                    }
+
+                    dateTimecodes.add(new VideoMomentBean(rovDate, timecode, alternateTimecode));
+                }
+                return dateTimecodes;
+            }
+        };
+
+        String table = platform + "CamlogData";
         Date startDate = new Date(date.getTime() - millisecTolerance);
         Date endDate = new Date(date.getTime() + millisecTolerance);
 
         String sql = "SELECT DateTimeGMT, betaTimecode, hdTimecode  " + "FROM " + table + " " +
                      "WHERE DateTimeGMT BETWEEN '" + dateFormatUTC.format(startDate) + "' AND '" +
                      dateFormatUTC.format(endDate) + "' ORDER BY DateTimeGMT";
-        Connection connection = null;
-        try {
-            connection = getConnection();
-            Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-            if (log.isDebugEnabled()) {
-                log.debug("Executing query: " + sql);
-            }
 
-            ResultSet resultSet = statement.executeQuery(sql);
-            while (resultSet.next()) {
-                Date rovDate = resultSet.getTimestamp(1, CALENDAR);
-                String timecode = resultSet.getString(2);
-                String alternateTimecode = resultSet.getString(3);
-                if (log.isDebugEnabled()) {
-                    log.debug("Found record: " + "\n\tUTC Date:           " + dateFormatUTC.format(rovDate) +
-                              "\n\tTimecode:           " + timecode + "\n\tAlternate Timecode: " + alternateTimecode);
-                }
-
-                dateTimecodes.add(new VideoMomentBean(rovDate, timecode, alternateTimecode));
-            }
-
-            resultSet.close();
-            statement.close();
-        }
-        catch (SQLException e) {
-            if (connection != null) {
-                log.error("Failed to execute the following SQL on EXPD:\n" + sql, e);
-
-                try {
-                    connection.close();
-                }
-                catch (SQLException ex) {
-                    log.error("Failed to close database connection", ex);
-                }
-            }
-
-            throw new VARSException("Failed to execute the following SQL on EXPD: " + sql, e);
-        }
-
-        return dateTimecodes;
+        return executeQueryFunction(sql, queryFunction);
 
     }
 
-    /**
-     * @return A {@link Connection} to the EXPD database. The connection should
-     *      be closed when you're done with it.
-     */
-    private Connection getConnection() throws SQLException {
-        Connection connection = connections.get();
-        if ((connection == null) || connection.isClosed()) {
-            if (log.isDebugEnabled()) {
-                log.debug("Opening JDBC connection:" + jdbcUsername + " @ " + jdbcUrl);
-            }
-            connection = DriverManager.getConnection(jdbcUrl, jdbcUsername, jdbcPassword);
-            connections.set(connection);
-        }
-
-        return connection;
-    }
 
     /**
      * Interpolates a given date to a timecode from data stored in the
