@@ -133,7 +133,7 @@ public class MiscTabsPanel extends javax.swing.JPanel {
     }
 
     private void initTabs() {
-        tabbedPane.add("Frame-grab", new FrameGrabPanel());
+        tabbedPane.add("Frame-grab", new FrameGrabPanel(toolbelt));
         tabbedPane.add("Knowledge Base", getTreePanel());
         tabbedPane.add("Observation", new PObservationPanel(toolbelt));
         tabbedPane.add("Video Archive", new PVideoArchivePanel(toolbelt));

@@ -7,7 +7,6 @@ package vars.annotation.ui.imagepanel;
 
 import java.net.URL;
 import javax.swing.JFrame;
-import org.mbari.swing.SimpleImageFrame;
 
 /**
  *
@@ -16,12 +15,11 @@ import org.mbari.swing.SimpleImageFrame;
 public class ImageFrameDemo {
 
     public static void main(String[] args) {
-        ImageFrame frame = new ImageFrame();
-        //SimpleImageFrame frame = new SimpleImageFrame();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        URL url = frame.getClass().getResource("/images/BrianSchlining.jpg");
-        frame.setImageUrl(url);
-        frame.setVisible(true);
+//        ImageFrame frame = new ImageFrame();
+//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//        URL url = frame.getClass().getResource("/images/BrianSchlining.jpg");
+//        frame.setImageUrl(url);
+//        frame.setVisible(true);
     }
 
 }

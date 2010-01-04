@@ -47,15 +47,15 @@ public class JXObservationTable extends JXTable implements ObservationTable {
         super();
         final TableColumnModel tableColumnModel = new JXObservationTableColumnModel();
         final TableModel model = new JXObservationTableModel(tableColumnModel);
-        final JTableHeader tableHeader = new JXTableHeader(tableColumnModel);
+        final JTableHeader aTableHeader = new JXTableHeader(tableColumnModel);
 
         setModel(model);
         setColumnModel(tableColumnModel);
         setAutoCreateColumnsFromModel(true);
         setSortable(true);
         setAutoscrolls(true);
-        tableHeader.setTable(this);
-        setTableHeader(tableHeader);
+        aTableHeader.setTable(this);
+        setTableHeader(aTableHeader);
         
 
         super.setHighlighters(new Highlighter[] { HighlighterFactory.createAlternateStriping() });

@@ -22,7 +22,6 @@ import java.awt.image.BufferedImage;
 import java.net.URL;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
@@ -30,25 +29,46 @@ import javax.swing.SwingWorker;
 import org.jdesktop.jxlayer.JXLayer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.annotation.VideoFrame;
+import vars.annotation.ui.ToolBelt;
 
 /**
  *
  * @author brian
  */
-public class ImageFrame extends JFrame {
+public class ImageAnnotationFrame extends JFrame {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
     private BufferedImage image;
     private URL imageUrl;
-    private JLabel label;
+    private JLabel label = new JLabel("");
     private JXLayer<JLabel> layer;
+    private final AnnotationLayerUI<JLabel> layerUI;
 
     /**
      * Create the frame
      */
-    public ImageFrame() {
+    public ImageAnnotationFrame(ToolBelt toolBelt) {
         super();
+        layerUI = new AnnotationLayerUI<JLabel>(toolBelt);
         initialize();
+    }
+
+    public VideoFrame getVideoFrame() {
+        return layerUI.getVideoFrame();
+    }
+
+    public void setVideoFrame(VideoFrame videoFrame) {
+        layerUI.setVideoFrame(videoFrame);
+        URL url = null;
+        try {
+            url = new URL(videoFrame.getCameraData().getImageReference());
+            
+        }
+        catch (Exception e){
+            // Do nothing
+        }
+        setImageUrl(url);
     }
 
     /**
@@ -63,28 +83,18 @@ public class ImageFrame extends JFrame {
     /**
      * @return the imageUrl
      */
-    public URL getImageUrl() {
+    private URL getImageUrl() {
         return imageUrl;
     }
 
-    /**
-     * @return
-     */
-    public JLabel getLabel() {
-        if (label == null) {
-            label = new JLabel("");
-        }
-
-        return label;
-    }
 
     /**
      * @return
      */
     public JXLayer<JLabel> getLayer() {
         if (layer == null) {
-            layer = new JXLayer<JLabel>(getLabel());
-            layer.setUI(new CrossHairLayerUI<JLabel>());
+            layer = new JXLayer<JLabel>(label);
+            layer.setUI(layerUI);
         }
 
         return layer;
@@ -119,28 +129,13 @@ public class ImageFrame extends JFrame {
      *
      * @param imageUrl the imageUrl to set
      */
-    public void setImageUrl(URL imageUrl) {
+    private void setImageUrl(URL imageUrl) {
+        URL oldUrl = this.imageUrl;
         this.imageUrl = imageUrl;
         log.debug("setImageUrl( " + imageUrl + " )");
 
-        if (imageUrl != null) {
-
-            /*
-             * Use swingutilities to invoke changes on the EventDisplatch thread.
-             *
-             * Remove label from view and add progress bar
-             */
-            SwingUtilities.invokeLater(new Runnable() {
-
-                public void run() {
-                    setResizable(true);
-                    setTitle(getImageUrl().toExternalForm());
-                    (new ImageLoader(getImageUrl())).execute();
-                }
-            });
-
-        }
-        else {
+        // Don't reload the same image
+        if (imageUrl == null) {
 
             /*
              *  Clear out data if no value is set
@@ -158,6 +153,24 @@ public class ImageFrame extends JFrame {
                 }
             });
         }
+        else if (!imageUrl.equals(oldUrl)) {
+
+            /*
+             * Use swingutilities to invoke changes on the EventDisplatch thread.
+             *
+             * Remove label from view and add progress bar
+             */
+            SwingUtilities.invokeLater(new Runnable() {
+
+                public void run() {
+                    setResizable(true);
+                    setTitle(getImageUrl().toExternalForm());
+                    (new ImageLoader(getImageUrl())).execute();
+                }
+            });
+
+        }
+        
     }
 
     /**

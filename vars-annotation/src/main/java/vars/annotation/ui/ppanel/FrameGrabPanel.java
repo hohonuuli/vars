@@ -18,6 +18,8 @@ Created on October 30, 2003, 2:20 PM
  */
 package vars.annotation.ui.ppanel;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ComponentAdapter;
@@ -29,8 +31,10 @@ import java.beans.PropertyChangeListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import javax.swing.JFrame;
 import javax.swing.border.TitledBorder;
-import org.mbari.swing.ImageFrame;
 import org.mbari.swing.SwingWorker;
 import org.mbari.util.ImageCanvas;
 import org.slf4j.Logger;
@@ -39,6 +43,8 @@ import vars.annotation.CameraData;
 import vars.annotation.Observation;
 import vars.annotation.VideoFrame;
 import vars.annotation.ui.Lookup;
+import vars.annotation.ui.ToolBelt;
+import vars.annotation.ui.imagepanel.ImageAnnotationFrame;
 
 /**
  * <p>
@@ -66,11 +72,14 @@ public class FrameGrabPanel extends javax.swing.JPanel implements PropertyChange
     private ImageCanvas defaultImageCanvas;
     private ImageCanvas imageCanvas;
     private VideoFrame videoFrame;
+    private final ImageAnnotationFrame imageFrame;
 
     /**
      * Creates new form FrameGrabPanel
      */
-    public FrameGrabPanel() {
+    public FrameGrabPanel(ToolBelt toolBelt) {
+        this.imageFrame = new ImageAnnotationFrame(toolBelt);
+        imageFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         initialize();
 
         // Register for notifications when the Selected Observations changes
@@ -116,6 +125,7 @@ public class FrameGrabPanel extends javax.swing.JPanel implements PropertyChange
          */
         addMouseListener(new MouseAdapter() {
 
+
             @Override
             public void mouseClicked(final MouseEvent event) {
 
@@ -124,14 +134,9 @@ public class FrameGrabPanel extends javax.swing.JPanel implements PropertyChange
                     return;
                 }
 
-                if (imageFrame == null) {
-                    imageFrame = new ImageFrame();
-                }
-
                 imageFrame.setVisible(true);
-                imageFrame.setImageUrl(imageCanvas.getUrl());
             }
-            private ImageFrame imageFrame;
+            
 
         });
     }
@@ -147,11 +152,15 @@ public class FrameGrabPanel extends javax.swing.JPanel implements PropertyChange
 
             // If one observation is found show it's image
             final Collection<Observation> observations = (Collection<Observation>) object;
+            Set<VideoFrame> videoFrames = new HashSet<VideoFrame>(Collections2.transform(observations,
+                    new Function<Observation, VideoFrame>() {
+                public VideoFrame apply(Observation from) {
+                    return from.getVideoFrame();
+                }
+            }));
 
-            if (observations.size() == 1) {
-                final Observation obs = observations.iterator().next();
-
-                vf = obs.getVideoFrame();
+            if (videoFrames.size() == 1) {
+                vf = videoFrames.iterator().next();
             }
         }
 
@@ -189,6 +198,7 @@ public class FrameGrabPanel extends javax.swing.JPanel implements PropertyChange
      */
     public void setVideoFrame(final VideoFrame videoFrame) {
         this.videoFrame = videoFrame;
+        imageFrame.setVideoFrame(videoFrame);
 
         /*
          *  Don't hang the GUI waiting for the image to load. Load the
