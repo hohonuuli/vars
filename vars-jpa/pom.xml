@@ -96,6 +96,19 @@
     -->
     <profiles>
         <profile>
+            <id>coolpix</id>
+            <properties>
+                <environment>coolpix</environment>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>net.sourceforge.jtds</groupId>
+                    <artifactId>jtds</artifactId>
+                    <version>1.2.3</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
             <id>dev</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
