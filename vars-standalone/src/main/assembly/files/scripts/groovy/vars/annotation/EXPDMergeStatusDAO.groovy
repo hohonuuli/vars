@@ -2,7 +2,8 @@ package vars.annotation
 
 import java.text.SimpleDateFormat
 import org.slf4j.LoggerFactory
-import vars.QueryFunction
+import org.mbari.sql.QueryFunction
+
 
 class EXPDMergeStatusDAO {
 
