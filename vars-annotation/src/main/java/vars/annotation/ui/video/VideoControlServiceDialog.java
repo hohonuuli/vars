@@ -1,5 +1,5 @@
 /*
- * @(#)VideoControlServiceDialog.java   2009.12.09 at 10:43:55 PST
+ * @(#)VideoControlServiceDialog.java   2010.01.12 at 10:34:08 PST
  *
  * Copyright 2009 MBARI
  *
@@ -16,6 +16,7 @@
 package vars.annotation.ui.video;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -23,12 +24,11 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
 import vars.annotation.ui.Lookup;
 import vars.shared.ui.dialogs.StandardDialog;
-import java.awt.Dimension;
-import javax.swing.JLabel;
-import javax.swing.border.EmptyBorder;
 
 /**
  *
@@ -38,12 +38,12 @@ import javax.swing.border.EmptyBorder;
  */
 public class VideoControlServiceDialog extends StandardDialog {
 
+    private JPanel aPanel;
     private JComboBox comboBox;
+    private JLabel lblSelectTimecodeSource;
     private JPanel panel;
     private JPanel rs422Panel;
     private JPanel udpPanel;
-    private JPanel aPanel;
-    private JLabel lblSelectTimecodeSource;
 
     private enum Sources { RS422, UDP; }
 
@@ -58,6 +58,18 @@ public class VideoControlServiceDialog extends StandardDialog {
         pack();
     }
 
+    private JPanel getAPanel() {
+        if (aPanel == null) {
+            aPanel = new JPanel();
+            aPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+            aPanel.setLayout(new BoxLayout(aPanel, BoxLayout.X_AXIS));
+            aPanel.add(getLblSelectTimecodeSource());
+            aPanel.add(getComboBox());
+        }
+
+        return aPanel;
+    }
+
     /**
      * @return
      */
@@ -65,9 +77,16 @@ public class VideoControlServiceDialog extends StandardDialog {
         if (comboBox == null) {
             comboBox = new JComboBox();
 
+            /*
+             * FIXME: I commented out the RS422 source for now. When I've
+             * fixed the native deployment of RXTX (refer to JNA's
+             * Native and Platform classes
+             */
             for (Sources source : Sources.values()) {
                 comboBox.addItem(source);
             }
+            //comboBox.addItem(Sources.UDP);
+
 
             comboBox.addItemListener(new ItemListener() {
 
@@ -87,7 +106,7 @@ public class VideoControlServiceDialog extends StandardDialog {
 
                 }
             });
-            
+
             comboBox.setSelectedItem(Sources.RS422);
             getUdpPanel().setEnabled(false);
             getRs422Panel().setEnabled(true);
@@ -96,6 +115,14 @@ public class VideoControlServiceDialog extends StandardDialog {
         }
 
         return comboBox;
+    }
+
+    private JLabel getLblSelectTimecodeSource() {
+        if (lblSelectTimecodeSource == null) {
+            lblSelectTimecodeSource = new JLabel("Select Timecode Source: ");
+        }
+
+        return lblSelectTimecodeSource;
     }
 
     private JPanel getPanel() {
@@ -127,15 +154,18 @@ public class VideoControlServiceDialog extends StandardDialog {
     }
 
     private void initialize() {
-    	setPreferredSize(new Dimension(450, 302));
+        setPreferredSize(new Dimension(450, 302));
         getContentPane().add(getPanel(), BorderLayout.CENTER);
         getCancelButton().addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 dispose();
             }
+
         });
 
         getOkayButton().addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 Sources source = (Sources) getComboBox().getSelectedItem();
                 VideoControlService videoControlService = null;
@@ -152,29 +182,16 @@ public class VideoControlServiceDialog extends StandardDialog {
                     connectionParameters = (ConnectionParameters) getUdpPanel();
                     break;
                 }
+
                 dispose();
 
                 videoControlService.connect(connectionParameters.getConnectionParameters());
                 Lookup.getVideoControlServiceDispatcher().setValueObject(videoControlService);
 
             }
+
         });
+
         //pack();
     }
-	private JPanel getAPanel() {
-		if (aPanel == null) {
-			aPanel = new JPanel();
-			aPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
-			aPanel.setLayout(new BoxLayout(aPanel, BoxLayout.X_AXIS));
-			aPanel.add(getLblSelectTimecodeSource());
-			aPanel.add(getComboBox());
-		}
-		return aPanel;
-	}
-	private JLabel getLblSelectTimecodeSource() {
-		if (lblSelectTimecodeSource == null) {
-			lblSelectTimecodeSource = new JLabel("Select Timecode Source: ");
-		}
-		return lblSelectTimecodeSource;
-	}
 }

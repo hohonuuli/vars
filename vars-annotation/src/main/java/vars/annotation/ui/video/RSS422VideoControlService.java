@@ -21,15 +21,14 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import javax.swing.JDialog;
 import org.mbari.comm.CommUtil;
 import org.mbari.movie.Timecode;
-import org.mbari.util.LibPathHacker;
+import org.mbari.nativelib.Native;
 import org.mbari.util.NumberUtilities;
 import org.mbari.util.IOUtilities;
+import org.mbari.util.LibPathHacker;
 import org.mbari.vcr.IVCR;
 import org.mbari.vcr.IVCRTimecode;
 import org.mbari.vcr.IVCRUserbits;
@@ -46,16 +45,22 @@ import vars.annotation.ui.Lookup;
  */
 public class RSS422VideoControlService extends AbstractVideoControlService {
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
+    private static final Logger log = LoggerFactory.getLogger(RSS422VideoControlService.class);
     private double frameRate;
+    private static final String LIBRARY_NAME = "rxtxSerial";
 
-    //private RS422VideoControlServiceDialog connectionDialog;
 
     /**
      * Constructs ...
      */
     public RSS422VideoControlService() {
+        try {
+            System.loadLibrary(LIBRARY_NAME);
+            log.info(LIBRARY_NAME + " was found on the java.library.path and loaded");
+        }
+        catch (UnsatisfiedLinkError e) {
             extractAndLoadNativeLibraries();
+        }
     }
 
     /**
@@ -103,25 +108,12 @@ public class RSS422VideoControlService extends AbstractVideoControlService {
 
     private void extractAndLoadNativeLibraries() {
 
-
-        // Map the operating system to the correct library
-        Map<String, String> libraryNames = new HashMap<String, String>() {
-
-            {
-                put("Win", "rxtxSerial.dll");
-                put("Lin", "librxtxSerial.so");
-                put("Mac", "librxtxSerial.jnilib");
-            }
-        };
-
-
-        String os = System.getProperty("os.name");
-
-        String libraryName = libraryNames.get(os.substring(0, 3));
+       String libraryName = System.mapLibraryName("rxtxSerial");
+       String os = System.getProperty("os.name");
 
         if (libraryName != null) {
 
-            // Location to extract the native libraries into $HOME/.simpa/native/Mac
+            // Location to extract the native libraries into $HOME/.vars/native/Mac
             File libraryHome = new File(new File(Lookup.getSettingsDirectory(), "native"), os.substring(0, 3));
             if (!libraryHome.exists()) {
                 libraryHome.mkdirs();
@@ -132,67 +124,14 @@ public class RSS422VideoControlService extends AbstractVideoControlService {
                                         ". Verify that you have write access to that directory");
             }
 
-            // Full path to where we want the native library to be
-            File libraryFile = new File(libraryHome, libraryName);
-            libraryFile.deleteOnExit();
+            // This finds the native library, extracts it and hacks the java.library.path if needed
+            new Native(LIBRARY_NAME, libraryHome, getClass().getClassLoader());
 
-            /*
-             * Copy the library to a location where we can use it.
-             *
-             * TODO: What's the best way to update the existing library? I only
-             * want to do that if needed.
-             */
-            if (libraryFile.exists()) {
-                log.info("The native RXTX library " + libraryFile.getAbsolutePath() +
-                         " already exists. Skipping extraction");
-            }
-            else {
-                try {
-
-                    URL url = getClass().getResource("/native/" + libraryName);
-                    log.info("Copying RXTX native library from " + url.toExternalForm() + " to " + libraryFile);
-                    FileOutputStream out = new FileOutputStream(libraryFile);
-                    InputStream in = getClass().getResourceAsStream("/native/" + libraryName);
-                    IOUtilities.copy(in, out);
-                    in.close();
-                    out.close();
-                }
-                catch (Exception e) {
-                    throw new VARSException("Failed to extract RXTX native library to " +
-                                            libraryFile.getAbsolutePath(), e);
-                }
-            }
-
-            /*
-             * HACK ALERT!! This will only work on Sun's JVM. We're hacking the
-             * java.library.path variable so that we can modify it at runtime.
-             */
-            try {
-                LibPathHacker.addDir(libraryHome.getAbsolutePath());
-            }
-            catch (Exception e) {
-                log.warn("Unable to hack the java.library.path property. This " +
-                         "may have occured if you aren't running on Sun's JVM. " +
-                         "VARS may be unable to access the RXTX native libraries");
-            }
-
-            try {
-
-                /*
-                 * We'll run into problems if we try to load the library more
-                 * than once into the JVM. I think the catch statement will trap
-                 * that issue though.
-                 */
-                System.load(libraryFile.getAbsolutePath());
-            }
-            catch (Exception e) {
-                log.warn("Failed to load the native library '" + libraryFile.getAbsolutePath());
-            }
 
         }
         else {
-            log.error(
-                "A native RXTX library for your platform is not available. You will not be able to control your VCR");
+            log.error( "A native RXTX library for your platform is not available. " +
+                    "You will not be able to control your VCR");
         }
 
     }
@@ -200,7 +139,7 @@ public class RSS422VideoControlService extends AbstractVideoControlService {
     /**
      * @return
      */
-    public Set<CommPortIdentifier> findAvailableCommPorts() {
+    public synchronized Set<CommPortIdentifier> findAvailableCommPorts() {
         return CommUtil.getAvailableSerialPorts();
     }
 
