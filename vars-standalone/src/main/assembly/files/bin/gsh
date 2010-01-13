@@ -19,7 +19,7 @@ if [ -z $1 ]; then
          -Duser.timezone="UTC" \
          -Dfile.encoding=UTF8 \
          -classpath "$GSH_CLASSPATH" \
-         groovy.ui.GroovyMain "$VARS_HOME/scripts/groovy/openshell.groovy"
+         org.codehaus.groovy.tools.shell.Main "$@"
 else
     ${JAVACMD:=java} -Xms16m -Xmx512m \
          -Duser.timezone="UTC" \

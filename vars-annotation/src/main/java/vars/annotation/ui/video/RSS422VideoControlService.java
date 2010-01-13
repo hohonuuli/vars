@@ -17,9 +17,6 @@ package vars.annotation.ui.video;
 
 import gnu.io.CommPortIdentifier;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.Date;
 import java.util.Set;
 import javax.swing.JDialog;
@@ -27,8 +24,6 @@ import org.mbari.comm.CommUtil;
 import org.mbari.movie.Timecode;
 import org.mbari.nativelib.Native;
 import org.mbari.util.NumberUtilities;
-import org.mbari.util.IOUtilities;
-import org.mbari.util.LibPathHacker;
 import org.mbari.vcr.IVCR;
 import org.mbari.vcr.IVCRTimecode;
 import org.mbari.vcr.IVCRUserbits;
@@ -125,7 +120,7 @@ public class RSS422VideoControlService extends AbstractVideoControlService {
             }
 
             // This finds the native library, extracts it and hacks the java.library.path if needed
-            new Native(LIBRARY_NAME, libraryHome, getClass().getClassLoader());
+            new Native(LIBRARY_NAME, "native", libraryHome, getClass().getClassLoader());
 
 
         }
