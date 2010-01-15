@@ -68,7 +68,7 @@ class EXPDMergeStatusDAO {
         return annotationPersistenceService.executeQueryFunction(sql, handler)
     }
 
-    /*
+    /**
     * Find any merge status messages containing the given string.
     * Use % for wild cards; for example findByStatusMessage('%CONSERVATIVE%')
     *

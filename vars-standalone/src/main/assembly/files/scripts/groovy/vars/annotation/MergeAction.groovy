@@ -1,10 +1,5 @@
-package org.mbari.vars.annotation
+package vars.annotation
 
-import org.mbari.expd.Constants
-import org.mbari.expd.EXPDDatum
-import org.mbari.expd.EXPDDAO
-import org.mbari.util.Logger
-import org.mbari.util.PropertyCategory
 
 /**
  * Merges VARS annotation data with SHip EXPD data based on the 

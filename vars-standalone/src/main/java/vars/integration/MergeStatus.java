@@ -1,4 +1,4 @@
-package vars;
+package vars.integration;
 
 import java.util.Date;
 

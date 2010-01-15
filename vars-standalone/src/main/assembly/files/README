@@ -5,3 +5,9 @@ import vars.knowledgebase.ui.ToolBelt
 injector = Lookup.guiceInjectorDispatcher.valueObject
 toolBelt = injector.getInstance(ToolBelt.class)                           
 dao = toolBelt.knowledgebaseDAOFactory.newDAO()
+
+-- Example for testing expd code in Groovy shell
+import org.mbari.expd.*; import org.mbari.expd.jdbc.*; import com.google.inject.Guice 
+inj = Guice.createInjector(new ExpdModule());ddao = inj.getInstance(DiveDAO.class);dao = inj.getInstance(UberDatumDAO.class);
+d = ddao.findByPlatformAndDiveNumber('Ventana', 2000); ud = dao.fetchData(d, false, 7.5) 
+ud.each { println("${it.cameraDatum} --- ${it.ctdDatum} --- ${it.navigationDatum}") } 

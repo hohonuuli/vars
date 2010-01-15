@@ -13,19 +13,16 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>vars-query</artifactId>
             <version>${project.version}</version>
-            <scope>runtime</scope>
         </dependency>
         <dependency> 
             <groupId>${project.groupId}</groupId>
             <artifactId>vars-annotation</artifactId>
             <version>${project.version}</version>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>vars-knowledgebase</artifactId>
             <version>${project.version}</version>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
@@ -64,6 +61,11 @@
             <artifactId>sanselan</artifactId>
             <version>0.97</version>
         </dependency>
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+            <version>2.0</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -88,4 +90,5 @@
         </plugins>
     </build>
 </project>
+
 

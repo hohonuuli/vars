@@ -32,8 +32,6 @@ import vars.annotation.ui.table.ObservationTable;
 import vars.annotation.ui.video.ImageCaptureService;
 import vars.annotation.ui.video.VideoControlService;
 import vars.VarsUserPreferencesFactory;
-import vars.annotation.ui.App;
-import vars.annotation.ui.AnnotationFrame;
 import vars.shared.InjectorModule;
 import vars.shared.ui.GlobalLookup;
 
