@@ -151,7 +151,6 @@ public class VideoSourcePanelTape extends javax.swing.JPanel implements IVideoSo
     }
     
     
-    // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox cameraPlatformComboBox;
     private javax.swing.JTextField diveNumberTextField;
     private javax.swing.JCheckBox hdCheckBox;
@@ -159,7 +158,6 @@ public class VideoSourcePanelTape extends javax.swing.JPanel implements IVideoSo
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JTextField tapeNumberTextField;
-    // End of variables declaration//GEN-END:variables
     
     /**
      * KeyAdapter that only allows entry of digit characters. Revalidates 

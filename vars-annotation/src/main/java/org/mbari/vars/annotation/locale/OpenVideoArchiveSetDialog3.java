@@ -1,5 +1,5 @@
 /*
- * @(#)OpenVideoArchiveSetDialog3.java   2009.12.09 at 01:58:27 PST
+ * @(#)OpenVideoArchiveSetDialog3.java   2010.01.19 at 02:04:29 PST
  *
  * Copyright 2009 MBARI
  *
@@ -23,7 +23,6 @@ import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.dialogs.VideoSourceSelectionPanel;
@@ -49,14 +48,14 @@ public class OpenVideoArchiveSetDialog3 extends StandardDialog {
         initialize();
         addKeyListener(new KeyAdapter() {
 
-			@Override
-			public void keyReleased(KeyEvent e) {
-				if(e.getKeyCode() == KeyEvent.VK_ENTER) {
-					okButtonAction();
-				}
-			}
-        	
-		});
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    okButtonAction();
+                }
+            }
+
+        });
     }
 
     private VideoSourceSelectionPanel getSelectionPanel() {
