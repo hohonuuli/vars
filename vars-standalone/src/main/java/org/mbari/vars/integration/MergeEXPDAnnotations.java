@@ -16,9 +16,12 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.mbari.expd.CameraDatum;
+import org.mbari.expd.CtdDatum;
 import org.mbari.expd.DAOFactory;
 import org.mbari.expd.Dive;
 import org.mbari.expd.DiveDAO;
+import org.mbari.expd.NavigationDatum;
 import org.mbari.expd.UberDatum;
 import org.mbari.expd.UberDatumDAO;
 import org.mbari.expd.actions.CoallateByAlternateTimecodeFunction;
@@ -31,6 +34,8 @@ import vars.integration.MergeStatusDAO;
 import vars.integration.MergeFunction;
 import vars.integration.MergeFunction.MergeType;
 import vars.annotation.AnnotationDAOFactory;
+import vars.annotation.CameraData;
+import vars.annotation.PhysicalData;
 import vars.annotation.VideoArchiveSet;
 import vars.annotation.VideoArchiveSetDAO;
 import vars.annotation.VideoFrame;
@@ -98,47 +103,77 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
 
         // Modify data
         int fixedDateCount = 0;
-        switch (mergeType) {
-            case CONSERVATIVE:
-                // Do nothing
-                mergeStatus.setDateSource("VARS");
-                break;
-            case OPTIMISTIC:
-                mergeStatus.setDateSource("VARS");
-                // Do nothing
-                break;
+        
+
+        for (VideoFrame videoFrame : data.keySet()) {
+            UberDatum uberDatum = data.get(videoFrame);
+            videoFrame = dao.find(videoFrame);
+            Date recordedDate = videoFrame.getRecordedDate();
+
+            // ---- Update cameradata
+            CameraData cameraData = videoFrame.getCameraData();
+            CameraDatum cameraDatum = uberDatum.getCameraDatum();
+            cameraData.setFocus(cameraDatum.getFocus() == null ? null : Math.round(cameraDatum.getFocus()));
+            cameraData.setLogDate(cameraDatum.getDate());
+            videoFrame.setAlternateTimecode(cameraDatum.getAlternativeTimecode());
+            cameraData.setZoom(cameraDatum.getZoom() == null ? null : Math.round(cameraDatum.getZoom()));
+            cameraData.setIris(cameraDatum.getIris() == null ? null : Math.round(cameraDatum.getIris()));
+
+            // ---- Update physicaldata
+            PhysicalData physicalData = videoFrame.getPhysicalData();
+            CtdDatum ctdDatum = uberDatum.getCtdDatum();
+            physicalData.setLight(ctdDatum.getLightTransmission());
+            physicalData.setOxygen(ctdDatum.getOxygen());
+            physicalData.setSalinity(ctdDatum.getSalinity());
+            physicalData.setTemperature(ctdDatum.getTemperature());
+
+            NavigationDatum navigationDatum = uberDatum.getNavigationDatum();
+            physicalData.setDepth(navigationDatum.getDepth());
+            physicalData.setLatitude(navigationDatum.getLatitude());
+            physicalData.setLogDate(navigationDatum.getDate());
+            physicalData.setLongitude(navigationDatum.getLongitude());
+
+
+            // ---- Update date 
+            switch (mergeType) {
             case PESSIMISTIC:
                 mergeStatus.setDateSource("EXPD");
 
                 // Change dates to ones found in EXPD
-                for (VideoFrame videoFrame : data.keySet()) {
-                    videoFrame = dao.find(videoFrame);
-                    videoFrame.setRecordedDate(data.get(videoFrame).getCameraDatum().getDate());
+                if (recordedDate != null && recordedDate.equals(cameraDatum.getDate())) {
+                    videoFrame.setRecordedDate(cameraDatum.getDate());
                     fixedDateCount++;
                 }
-
-                // Change unmerged dates to null
-                Collection<VideoFrame> unmerged = new ArrayList<VideoFrame>(videoFrames);
-                unmerged.removeAll(data.keySet());
-                for (VideoFrame videoFrame : unmerged) {
-                    videoFrame = dao.find(videoFrame);
-                    videoFrame.setRecordedDate(null);
-                }
-
                 break;
             case PRAGMATIC:
-                for (VideoFrame videoFrame : data.keySet()) {
-                    Date recordedDate = videoFrame.getRecordedDate();
-                    if (videoFrame.getRecordedDate() == null ||
-                            recordedDate.before(dive.getStartDate()) ||
-                            recordedDate.after(dive.getEndDate())) {
-                        videoFrame = dao.find(videoFrame);
-                        UberDatum uberDatum = data.get(videoFrame);
-                        videoFrame.setRecordedDate(uberDatum.getCameraDatum().getDate());
-                        fixedDateCount++;
-                    }
+                if (videoFrame.getRecordedDate() == null ||
+                        recordedDate.before(dive.getStartDate()) ||
+                        recordedDate.after(dive.getEndDate())) {
+                    videoFrame.setRecordedDate(cameraDatum.getDate());
+                    fixedDateCount++;
                 }
                 break;
+            }
+
+        }
+        
+        // ---- Change unmerged dates to null
+        if (MergeType.PESSIMISTIC == mergeType) {
+            Collection<VideoFrame> unmerged = new ArrayList<VideoFrame>(videoFrames);
+            unmerged.removeAll(data.keySet());
+            for (VideoFrame videoFrame : unmerged) {
+                videoFrame = dao.find(videoFrame);
+                videoFrame.setRecordedDate(null);
+            }
+        }
+
+        // ---- Specify the source of the data information
+        switch (mergeType) {
+            case PESSIMISTIC:
+                mergeStatus.setDateSource("EXPD");
+                break;
+            default:
+                mergeStatus.setDateSource("VARS");
         }
 
         mergeStatus.setMerged(fixedDateCount);
@@ -149,6 +184,19 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
         }
 
         dao.endTransaction();
+
+
+        // ---- Set the navigationedited flag
+        Collection<UberDatum> rawNavRecords = Collections2.filter(data.values(), new Predicate<UberDatum>() {
+            public boolean apply(UberDatum input) {
+                return input.getNavigationDatum().isEdited() == Boolean.FALSE;
+            }
+        });
+
+        mergeStatus.setNavigationEdited(rawNavRecords.size() == 0 ? 1 : 0);
+
+        // Set merged flat
+        mergeStatus.setMerged(data.size() > 0 ? 1 : 0);
 
         DAOFactory daoFactory = new DAOFactoryImpl();
         DiveDAO diveDAO = daoFactory.newDiveDAO();

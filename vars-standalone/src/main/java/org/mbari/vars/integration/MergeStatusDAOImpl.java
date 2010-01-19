@@ -96,7 +96,7 @@ public class MergeStatusDAOImpl extends QueryableImpl implements MergeStatusDAO 
      *
      * @param id
      */
-    public MergeStatus find(Long id) {
+    public MergeStatus find(final Long id) {
         MergeStatus mergeStatus = null;
         if (id != null) {
             String sql = "SELECT ms.MergeDate, ms.IsNavigationEdited, ms.StatusMessage, " +
@@ -108,6 +108,7 @@ public class MergeStatusDAOImpl extends QueryableImpl implements MergeStatusDAO 
                     MergeStatus mergeStatus = null;
                     if (resultSet.next()) {
                         mergeStatus = new MergeStatus();
+                        mergeStatus.setVideoArchiveSetID(id);
                         mergeStatus.setMergeDate(resultSet.getTimestamp(1, CALENDAR));
                         mergeStatus.setNavigationEdited(resultSet.getInt(2));
                         mergeStatus.setStatusMessage(resultSet.getString(3));

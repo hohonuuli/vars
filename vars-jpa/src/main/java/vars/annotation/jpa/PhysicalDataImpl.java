@@ -68,7 +68,7 @@ public class PhysicalDataImpl implements Serializable, PhysicalData, JPAEntity {
     )
     Long id;
 
-    Float latitude;
+    Double latitude;
 
     Float light;
 
@@ -76,7 +76,7 @@ public class PhysicalDataImpl implements Serializable, PhysicalData, JPAEntity {
     @Temporal(value = TemporalType.TIMESTAMP)
     Date logDate;
 
-    Float longitude;
+    Double longitude;
 
     Float oxygen;
 
@@ -154,7 +154,7 @@ public class PhysicalDataImpl implements Serializable, PhysicalData, JPAEntity {
         return id;
     }
 
-    public Float getLatitude() {
+    public Double getLatitude() {
         return latitude;
     }
 
@@ -166,7 +166,7 @@ public class PhysicalDataImpl implements Serializable, PhysicalData, JPAEntity {
         return logDate;
     }
 
-    public Float getLongitude() {
+    public Double getLongitude() {
         return longitude;
     }
 
@@ -209,7 +209,7 @@ public class PhysicalDataImpl implements Serializable, PhysicalData, JPAEntity {
     	this.id = id;
     }
 
-    public void setLatitude(Float latitude) {
+    public void setLatitude(Double latitude) {
         this.latitude = latitude;
     }
 
@@ -221,7 +221,7 @@ public class PhysicalDataImpl implements Serializable, PhysicalData, JPAEntity {
         this.logDate = logDate;
     }
 
-    public void setLongitude(Float longitude) {
+    public void setLongitude(Double longitude) {
         this.longitude = longitude;
     }
 

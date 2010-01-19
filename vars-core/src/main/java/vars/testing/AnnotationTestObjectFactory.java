@@ -100,8 +100,8 @@ public class AnnotationTestObjectFactory {
         // Populate the physicalData
         PhysicalData physicalData = videoFrame.getPhysicalData();
         physicalData.setDepth(new Float(randomNumber(0, 90000) / 100F));
-        physicalData.setLatitude(new Float(randomNumber(0, 9000) / 100F));
-        physicalData.setLongitude(new Float(randomNumber(0, -18000) / 100F));
+        physicalData.setLatitude(new Double(randomNumber(0, 9000) / 100F));
+        physicalData.setLongitude(new Double(randomNumber(0, -18000) / 100F));
         physicalData.setLight(new Float(randomNumber(0, 10000) / 100F));
         physicalData.setOxygen(new Float(randomNumber(0, 1000) / 100F));
         physicalData.setSalinity(new Float(randomNumber(320000, 360000) / 10000F));

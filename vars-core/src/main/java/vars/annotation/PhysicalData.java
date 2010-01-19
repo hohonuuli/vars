@@ -55,7 +55,7 @@ public interface PhysicalData extends AnnotationObject {
      * @return  Decimal latitude
      * @uml.property  name="latitude"
      */
-    Float getLatitude();
+    Double getLatitude();
 
     /**
      * Get Light Beam Transmission PerCentage
@@ -71,7 +71,7 @@ public interface PhysicalData extends AnnotationObject {
      * @return  Decimal longitude
      * @uml.property  name="longitude"
      */
-    Float getLongitude();
+    Double getLongitude();
 
     /**
      * Get Oxygen
@@ -113,7 +113,7 @@ public interface PhysicalData extends AnnotationObject {
      * @param  latitude
      * @uml.property  name="latitude"
      */
-    void setLatitude(Float latitude);
+    void setLatitude(Double latitude);
 
     /**
      * Set Oxygen from a float
@@ -127,7 +127,7 @@ public interface PhysicalData extends AnnotationObject {
      * @param  longitude
      * @uml.property  name="longitude"
      */
-    void setLongitude(Float longitude);
+    void setLongitude(Double longitude);
 
     /**
      * Set the date that the physical data was logged.

@@ -77,6 +77,12 @@
     -->
     <profiles>
         <profile>
+            <id>coolpix</id>
+            <properties>
+                <environment>coolpix</environment>
+            </properties>
+        </profile>
+        <profile>
             <id>dev</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
