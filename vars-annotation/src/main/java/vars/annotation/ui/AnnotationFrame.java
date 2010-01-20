@@ -287,7 +287,7 @@ public class AnnotationFrame extends JFrame {
             toolBar.add(new RefreshButton(toolBelt));
             toolBar.add(new StatusLabelForPerson(toolBelt));
             toolBar.add(new StatusLabelForVcr());
-            toolBar.add(new StatusLabelForVideoArchive(toolBelt.getPersistenceController()));
+            toolBar.add(new StatusLabelForVideoArchive(toolBelt));
 
 
         }

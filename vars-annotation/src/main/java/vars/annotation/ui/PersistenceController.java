@@ -23,14 +23,12 @@ import java.util.Vector;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
-import org.bushe.swing.event.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.DAO;
 import vars.ILink;
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.AnnotationFactory;
-import vars.annotation.AnnotationPersistenceService;
 import vars.annotation.Association;
 import vars.annotation.AssociationDAO;
 import vars.annotation.Observation;
@@ -351,6 +349,7 @@ public class PersistenceController {
         // TODO Do we need to call updateUI here?
         return videoArchive;
     }
+
 
     /**
      * Thread-safe. Updates changes made to the observations in the database. Validates the

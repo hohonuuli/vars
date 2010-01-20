@@ -227,6 +227,21 @@ public class AnnotationPersistenceServiceImpl extends QueryableImpl implements A
         }
         return referenceNumbers;
     }
+
+    public List<String> findAllVideoArchiveNames() {
+        String sql = "SELECT VideoArchiveName FROM VideoArchive ORDER BY VideoArchiveName";
+        QueryFunction<List<String>> queryFunction = new QueryFunction<List<String>>() {
+            public List<String> apply(ResultSet resultSet) throws SQLException {
+                List<String> names = new ArrayList<String>();
+                while (resultSet.next()) {
+                    names.add(resultSet.getString(1));
+                }
+                return names;
+            }
+        };
+
+        return executeQueryFunction(sql, queryFunction);
+    }
     
 
     private class MyCacheClearedListener implements CacheClearedListener {

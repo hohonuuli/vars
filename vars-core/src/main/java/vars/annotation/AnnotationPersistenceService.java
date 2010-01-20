@@ -51,6 +51,8 @@ public interface AnnotationPersistenceService {
      * @return
      */
     List<String> findDescendantNamesFor(Concept concept);
+
+    List<String> findAllVideoArchiveNames();
     
 
 }

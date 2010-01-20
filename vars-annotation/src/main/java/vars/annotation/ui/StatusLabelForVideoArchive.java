@@ -44,10 +44,10 @@ public class StatusLabelForVideoArchive extends StatusLabel {
      *
      * @param persistenceController
      */
-    public StatusLabelForVideoArchive(PersistenceController persistenceController) {
+    public StatusLabelForVideoArchive(ToolBelt toolBelt) {
         super();
         Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
-        this.dialog = new OpenVideoArchiveDialog(frame, persistenceController);
+        this.dialog = new vars.annotation.ui.dialogs.OpenVideoArchiveDialog(frame, toolBelt);
 
         /*
          * Listen for changes in the VideoArchive being annotated. When it changes update
