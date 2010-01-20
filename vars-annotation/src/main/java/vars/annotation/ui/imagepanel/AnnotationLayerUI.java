@@ -18,6 +18,8 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Vector;
@@ -94,7 +96,8 @@ public class AnnotationLayerUI<T extends JComponent> extends CrossHairLayerUI<T>
         if (videoFrame != null) {
 
             for (Observation observation : videoFrame.getObservations()) {
-                MarkerStyle markerStyle = selectedObservations.contains(observation) ? MarkerStyle.SELECTED : MarkerStyle.NOTSELECTED;
+                Collection<Observation> rowSelectedObservations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+                MarkerStyle markerStyle = rowSelectedObservations.contains(observation) ? MarkerStyle.SELECTED : MarkerStyle.NOTSELECTED;
                 if (observation.getX() != null && observation.getY() != null) {
                     int x = (int) Math.round(observation.getX().doubleValue());
                     int y = (int) Math.round(observation.getY().doubleValue());
@@ -243,11 +246,12 @@ public class AnnotationLayerUI<T extends JComponent> extends CrossHairLayerUI<T>
         }
 
         void sendSelectionNotification() {
+            Collection<Observation> obs = new ArrayList<Observation>(selectedObservations);
             ObservationTable table = (ObservationTable) Lookup.getObservationTableDispatcher().getValueObject();
             ObservationTableModel model = (ObservationTableModel) ((JTable) table).getModel();
             ListSelectionModel selectionModel = ((JTable) table).getSelectionModel();
             selectionModel.clearSelection();
-            for (Observation observation : selectedObservations) {
+            for (Observation observation : obs) {
                 int row = model.getObservationRow(observation);
                 selectionModel.addSelectionInterval(row, row);
             }

@@ -219,7 +219,7 @@ public class PersistenceController {
             videoFrame.addObservation(observation);
             dao.persist(observation);
             dao.validateName(observation);
-            newObservations.addAll(videoFrame.getObservations());
+            newObservations.add(observation);
         }
 
         dao.endTransaction();

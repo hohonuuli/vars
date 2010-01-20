@@ -12,7 +12,6 @@
  */
 package vars.old.annotation.ui;
 
-import java.awt.Color;
 import java.beans.PropertyChangeListener;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -41,8 +40,6 @@ public abstract class StatusLabel extends JLabel implements PropertyChangeListen
         onIcon = getImageIcon("/images/vars/annotation/check.png");
         setOk(false);
         setBorder(BorderFactory.createEmptyBorder(2, 10, 2, 10));
-//        setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY, 1),
-//                BorderFactory.createEmptyBorder(1, 2, 1, 2)));
     }
 
     private ImageIcon getImageIcon(final String relativePath) {

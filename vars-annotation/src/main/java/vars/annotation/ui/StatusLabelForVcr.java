@@ -57,28 +57,29 @@ public class StatusLabelForVcr extends StatusLabel {
          * When the user clicks this label a dialog should pop up allowing them
          * to open the VCR.
          */
-        addMouseListener(new MouseAdapter() {
-
-            Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
-            private final JDialog videoDialog = new VideoControlServiceDialog(frame);
-
-            @Override
-            public void mouseClicked(final MouseEvent me) {
-                SwingUtils.flashJComponent(StatusLabelForVcr.this, 2);
-
-                final Point mousePosition = me.getPoint();
-
-                SwingUtilities.convertPointToScreen(mousePosition, StatusLabelForVcr.this);
-
-                final int x = mousePosition.x;
-                final int y = mousePosition.y - videoDialog.getHeight();
-
-                videoDialog.setLocation(x, y);
-                videoDialog.setVisible(true);
-            }
-
-
-        });
+        // FIXME: The RXTX 
+//        addMouseListener(new MouseAdapter() {
+//
+//            Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
+//            private final JDialog videoDialog = new VideoControlServiceDialog(frame);
+//
+//            @Override
+//            public void mouseClicked(final MouseEvent me) {
+//                SwingUtils.flashJComponent(StatusLabelForVcr.this, 2);
+//
+//                final Point mousePosition = me.getPoint();
+//
+//                SwingUtilities.convertPointToScreen(mousePosition, StatusLabelForVcr.this);
+//
+//                final int x = mousePosition.x;
+//                final int y = mousePosition.y - videoDialog.getHeight();
+//
+//                videoDialog.setLocation(x, y);
+//                videoDialog.setVisible(true);
+//            }
+//
+//
+//        });
 
         /*
          * Need to do this in order have the label display the correct VCR if
