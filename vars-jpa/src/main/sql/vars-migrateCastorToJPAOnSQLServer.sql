@@ -44,6 +44,18 @@ ALTER TABLE CameraData
     ADD HEADING FLOAT
 GO
 
+ALTER TABLE CameraData
+    ADD VIEWHEIGHT FLOAT
+GO
+
+ALTER TABLE CameraData
+    ADD VIEWWIDTH FLOAT
+GO
+
+ALTER TABLE CameraData
+    ADD VIEWUNITS FLOAT
+GO
+
 -- Enforce the 1:1 relationship between VideoFrame and CameraData tables: TODO Duplicate keys already exist
 ALTER TABLE CameraData
     ADD CONSTRAINT uc_VideoFrameID_FK UNIQUE (VideoFrameID_FK)

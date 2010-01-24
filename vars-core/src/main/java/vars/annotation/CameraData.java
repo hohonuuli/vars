@@ -1,5 +1,5 @@
 /*
- * @(#)CameraData.java   2009.11.15 at 02:33:32 PST
+ * @(#)CameraData.java   2010.01.20 at 04:13:04 PST
  *
  * Copyright 2009 MBARI
  *
@@ -26,19 +26,22 @@ public interface CameraData extends AnnotationObject {
     String PROP_DIRECTION = "direction";
     String PROP_FIELD_WIDTH = "fieldWidth";
     String PROP_FOCUS = "focus";
+    String PROP_HEADING = "heading";
     String PROP_IMAGE_REFERENCE = "imageReference";
     String PROP_IRIS = "iris";
     String PROP_NAME = "name";
-    String PROP_VIDEO_FRAME = "videoFrame";
-    String PROP_ZOOM = "zoom";
-    String PROP_X = "x";
-    String PROP_Y = "y";
-    String PROP_X_Y_UNITS = "xyUnits";
-    String PROP_Z = "z";
-    String PROP_Z_UNITS = "zUnits";
     String PROP_PITCH = "pitch";
     String PROP_ROLL = "roll";
-    String PROP_HEADING = "heading";
+    String PROP_VIDEO_FRAME = "videoFrame";
+    String PROP_VIEW_HEIGHT = "viewHeight";
+    String PROP_VIEW_UNITS = "viewUnits";
+    String PROP_VIEW_WIDTH = "viewWidth";
+    String PROP_X = "x";
+    String PROP_X_Y_UNITS = "xyUnits";
+    String PROP_Y = "y";
+    String PROP_Z = "z";
+    String PROP_ZOOM = "zoom";
+    String PROP_Z_UNITS = "zUnits";
 
     /**
      * Check to verfiy that a cameradata object contains data.
@@ -100,6 +103,12 @@ public interface CameraData extends AnnotationObject {
      * @return
      */
     VideoFrame getVideoFrame();
+
+    Float getViewHeight();
+
+    String getViewUnits();
+
+    Float getViewWidth();
 
     Float getX();
 
@@ -163,6 +172,12 @@ public interface CameraData extends AnnotationObject {
     void setPitch(Float pitch);
 
     void setRoll(Float roll);
+
+    void setViewHeight(Float height);
+
+    void setViewUnits(String units);
+
+    void setViewWidth(Float width);
 
     void setX(Float x);
 

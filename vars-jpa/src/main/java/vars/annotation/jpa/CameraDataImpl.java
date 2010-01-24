@@ -1,5 +1,5 @@
 /*
- * @(#)CameraDataImpl.java   2009.11.15 at 02:23:43 PST
+ * @(#)CameraDataImpl.java   2010.01.20 at 04:15:29 PST
  *
  * Copyright 2009 MBARI
  *
@@ -111,6 +111,12 @@ public class CameraDataImpl implements Serializable, CameraData, JPAEntity {
     @JoinColumn(name = "VideoFrameID_FK", nullable = false)
     VideoFrame videoFrame;
 
+    Float viewHeight;
+
+    String viewUnits;
+
+    Float viewWidth;
+
     Float x;
 
     String xyUnits;
@@ -120,7 +126,7 @@ public class CameraDataImpl implements Serializable, CameraData, JPAEntity {
     Float z;
 
     String zUnits;
-
+    
     Integer zoom;
 
     /**
@@ -204,6 +210,13 @@ public class CameraDataImpl implements Serializable, CameraData, JPAEntity {
     /**
      * @return
      */
+    public Object getPrimaryKey() {
+        return getId();
+    }
+
+    /**
+     * @return
+     */
     public Float getRoll() {
         return roll;
     }
@@ -213,6 +226,27 @@ public class CameraDataImpl implements Serializable, CameraData, JPAEntity {
      */
     public VideoFrame getVideoFrame() {
         return videoFrame;
+    }
+
+    /**
+     * @return
+     */
+    public Float getViewHeight() {
+        return viewHeight;
+    }
+
+    /**
+     * @return
+     */
+    public String getViewUnits() {
+        return viewUnits;
+    }
+
+    /**
+     * @return
+     */
+    public Float getViewWidth() {
+        return viewWidth;
     }
 
     /**
@@ -351,6 +385,30 @@ public class CameraDataImpl implements Serializable, CameraData, JPAEntity {
 
     /**
      *
+     * @param height
+     */
+    public void setViewHeight(Float height) {
+        this.viewHeight = height;
+    }
+
+    /**
+     *
+     * @param units
+     */
+    public void setViewUnits(String units) {
+        this.viewUnits = units;
+    }
+
+    /**
+     *
+     * @param width
+     */
+    public void setViewWidth(Float width) {
+        this.viewWidth = width;
+    }
+
+    /**
+     *
      * @param x
      */
     public void setX(Float x) {
@@ -395,9 +453,5 @@ public class CameraDataImpl implements Serializable, CameraData, JPAEntity {
      */
     public void setZoom(Integer zoom) {
         this.zoom = zoom;
-    }
-    
-    public Object getPrimaryKey() {
-    	return getId();
     }
 }
