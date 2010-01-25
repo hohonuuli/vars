@@ -7,7 +7,6 @@ package vars.annotation.ui.imagepanel;
 
 import java.awt.BorderLayout;
 import java.net.URL;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import org.jdesktop.jxlayer.JXLayer;
 import org.mbari.util.ImageCanvas;
