@@ -1,7 +1,8 @@
 /*
- * @(#)QueryDAOImpl.java   2009.09.23 at 01:36:42 PDT
+ * @(#)QueryPersistenceServiceImpl.java   2010.01.26 at 03:22:56 PST
  *
  * Copyright 2009 MBARI
+ *
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,17 +21,15 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.TreeMap;
-import org.mbari.sql.IQueryable;
-import vars.ILink;
-import vars.LinkBean;
 import org.mbari.sql.QueryFunction;
 import org.mbari.sql.QueryableImpl;
+import vars.ILink;
+import vars.LinkBean;
 
 /**
  * DAO for use by the query app. This drops out of hibernate and uses a lot of
@@ -39,11 +38,9 @@ import org.mbari.sql.QueryableImpl;
  */
 public class QueryPersistenceServiceImpl implements QueryPersistenceService {
 
-
-    private final QueryableImpl kbQueryable;
     private final QueryableImpl annoQueryable;
+    private final QueryableImpl kbQueryable;
     private final String url;
-
 
     /**
      * Constructs ...
@@ -66,6 +63,26 @@ public class QueryPersistenceServiceImpl implements QueryPersistenceService {
 
     }
 
+    /**
+     * @return
+     */
+    public List<String> findAllConceptNamesAsStrings() {
+        final QueryFunction queryFunction = new QueryFunction() {
+
+            public Object apply(ResultSet resultSet) throws SQLException {
+                List<String> conceptNamesAsStrings = new ArrayList<String>();
+                while (resultSet.next()) {
+                    conceptNamesAsStrings.add(resultSet.getString(1));
+                }
+
+                return conceptNamesAsStrings;
+            }
+        };
+
+        String query = "SELECT ConceptName FROM ConceptName ORDER BY ConceptName";
+
+        return (List<String>) kbQueryable.executeQueryFunction(query, queryFunction);
+    }
 
     /**
      * Similar to findByConceptNames. However, this looksup all LinkTemplates rather
@@ -193,25 +210,6 @@ public class QueryPersistenceServiceImpl implements QueryPersistenceService {
         return (Collection<ILink>) annoQueryable.executeQueryFunction(sb.toString(), queryFunction);
     }
 
-    public List<String> findAllConceptNamesAsStrings() {
-        final QueryFunction queryFunction = new QueryFunction() {
-
-            public Object apply(ResultSet resultSet) throws SQLException {
-                List<String> conceptNamesAsStrings = new ArrayList<String>();
-                while (resultSet.next()) {
-                    conceptNamesAsStrings.add(resultSet.getString(1));
-                }
-                return conceptNamesAsStrings;
-            }
-        };
-
-        String query = "SELECT ConceptName FROM ConceptName ORDER BY ConceptName";
-
-        return (List<String>) kbQueryable.executeQueryFunction(query, queryFunction);
-    }
-
-
-
     /**
      * Returns the count of unique columns found in the table for a given column
      * @param columnName
@@ -266,6 +264,12 @@ public class QueryPersistenceServiceImpl implements QueryPersistenceService {
         return (Map<String, String>) annoQueryable.executeQueryFunction(query, queryFunction);
     }
 
+    /**
+     * @return
+     */
+    public String getURL() {
+        return url;
+    }
 
     /**
      *
@@ -294,10 +298,4 @@ public class QueryPersistenceServiceImpl implements QueryPersistenceService {
 
 
     }
-
-    public String getURL() {
-        return url;
-    }
-
-
 }
