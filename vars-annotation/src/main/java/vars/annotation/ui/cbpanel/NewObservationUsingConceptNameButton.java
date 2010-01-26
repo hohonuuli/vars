@@ -55,6 +55,7 @@ import vars.annotation.ui.actions.NewObservationUsingConceptNameAction;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.video.VideoControlService;
 import vars.annotation.ui.Lookup;
+import vars.knowledgebase.KnowledgebasePersistenceService;
 
 /**
  * <p>Creates a new Observation and changes its fromConcept to one specified
@@ -173,9 +174,9 @@ public class NewObservationUsingConceptNameButton extends JFancyButton
 
             // Check that the name is in the knowledgebase
             try {
-                AnnotationPersistenceService annotationDAO = toolbelt.getAnnotationPersistenceService();
+                KnowledgebasePersistenceService kbPersistenceService = toolbelt.getKnowledgebasePersistenceService();
 
-                enable = annotationDAO.doesConceptNameExist(conceptName);
+                enable = kbPersistenceService.doesConceptNameExist(conceptName);
             }
             catch (final Exception e) {
                 log.error("Failed to lookup '" + conceptName + "' from the database", e);

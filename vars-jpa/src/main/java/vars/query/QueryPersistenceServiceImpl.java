@@ -19,12 +19,14 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.TreeMap;
+import org.mbari.sql.IQueryable;
 import vars.ILink;
 import vars.LinkBean;
 import org.mbari.sql.QueryFunction;
@@ -35,26 +37,33 @@ import org.mbari.sql.QueryableImpl;
  * SQL internally for speed reasons.
  * @author brian
  */
-public class QueryPersistenceServiceImpl extends QueryableImpl implements QueryPersistenceService {
+public class QueryPersistenceServiceImpl implements QueryPersistenceService {
 
-    private static final String jdbcPassword;
-    private static final String jdbcUrl;
-    private static final String jdbcUsername;
-    private static final String jdbcDriver;
 
-    static {
-        ResourceBundle bundle = ResourceBundle.getBundle("query-jdbc");
-        jdbcUrl = bundle.getString("jdbc.url");
-        jdbcUsername = bundle.getString("jdbc.username");
-        jdbcPassword = bundle.getString("jdbc.password");
-        jdbcDriver = bundle.getString("jdbc.driver");
-    }
+    private final QueryableImpl kbQueryable;
+    private final QueryableImpl annoQueryable;
+    private final String url;
+
 
     /**
      * Constructs ...
      */
     public QueryPersistenceServiceImpl() {
-        super(jdbcUrl, jdbcUsername, jdbcPassword, jdbcDriver);
+        ResourceBundle bundle = ResourceBundle.getBundle("annotation-jdbc");
+        String jdbcUrl = bundle.getString("jdbc.url");
+        url = jdbcUrl;
+        String jdbcUsername = bundle.getString("jdbc.username");
+        String jdbcPassword = bundle.getString("jdbc.password");
+        String jdbcDriver = bundle.getString("jdbc.driver");
+        annoQueryable = new QueryableImpl(jdbcUrl, jdbcUsername, jdbcPassword, jdbcDriver);
+
+        bundle = ResourceBundle.getBundle("knowledgebase-jdbc");
+        jdbcUrl = bundle.getString("jdbc.url");
+        jdbcUsername = bundle.getString("jdbc.username");
+        jdbcPassword = bundle.getString("jdbc.password");
+        jdbcDriver = bundle.getString("jdbc.driver");
+        kbQueryable = new QueryableImpl(jdbcUrl, jdbcUsername, jdbcPassword, jdbcDriver);
+
     }
 
 
@@ -90,7 +99,7 @@ public class QueryPersistenceServiceImpl extends QueryableImpl implements QueryP
             }
         };
 
-        return executeQueryFunction(sb.toString(), queryFunction);
+        return kbQueryable.executeQueryFunction(sb.toString(), queryFunction);
     }
 
     /**
@@ -104,23 +113,33 @@ public class QueryPersistenceServiceImpl extends QueryableImpl implements QueryP
      */
     public Collection<String> findAllNamesUsedInAnnotations() {
 
+        // All the conceptnames will be stored here
+        final List<String> allNames = new ArrayList<String>();
+
         final QueryFunction queryFunction = new QueryFunction() {
 
             public Object apply(ResultSet resultSet) throws SQLException {
-                Collection<String> names = new HashSet<String>();
                 while (resultSet.next()) {
-                    names.add(resultSet.getString(1));
+                    allNames.add(resultSet.getString(1));
                 }
 
-                return names;
+                return allNames;
             }
         };
 
-        String query = "SELECT DISTINCT ConceptName FROM Observation WHERE ConceptName IS NOT NULL" +
-                       " UNION SELECT DISTINCT ToConcept FROM Association WHERE ToConcept IS NOT NULL" +
-                       " UNION SELECT DISTINCT ConceptName From ConceptName WHERE ConceptName IS NOT NULL";
+        // Fetch all conceptnames from Knowledgebase
+        String sql = "SELECT DISTINCT ConceptName From ConceptName WHERE ConceptName IS NOT NULL";
+        kbQueryable.executeQueryFunction(sql, queryFunction);
 
-        return (Collection<String>) executeQueryFunction(query, queryFunction);
+        // Fetch all conceptnames from annotations
+        String query = "SELECT DISTINCT ConceptName FROM Observation WHERE ConceptName IS NOT NULL" +
+                       " UNION SELECT DISTINCT ToConcept FROM Association WHERE ToConcept IS NOT NULL";
+        annoQueryable.executeQueryFunction(query, queryFunction);
+
+        // Sort in place
+        Collections.sort(allNames);
+
+        return allNames;
     }
 
     /**
@@ -171,7 +190,7 @@ public class QueryPersistenceServiceImpl extends QueryableImpl implements QueryP
 
         sb.append(" ORDER BY LinkName, toConcept, linkValue");
 
-        return (Collection<ILink>) executeQueryFunction(sb.toString(), queryFunction);
+        return (Collection<ILink>) annoQueryable.executeQueryFunction(sb.toString(), queryFunction);
     }
 
     public List<String> findAllConceptNamesAsStrings() {
@@ -188,7 +207,7 @@ public class QueryPersistenceServiceImpl extends QueryableImpl implements QueryP
 
         String query = "SELECT ConceptName FROM ConceptName ORDER BY ConceptName";
 
-        return (List<String>) executeQueryFunction(query, queryFunction);
+        return (List<String>) kbQueryable.executeQueryFunction(query, queryFunction);
     }
 
 
@@ -214,7 +233,7 @@ public class QueryPersistenceServiceImpl extends QueryableImpl implements QueryP
 
         String query = "SELECT DISTINCT " + columnName + " FROM Annotations";
 
-        return (Integer) executeQueryFunction(query, queryFunction);
+        return (Integer) annoQueryable.executeQueryFunction(query, queryFunction);
 
     }
 
@@ -244,12 +263,9 @@ public class QueryPersistenceServiceImpl extends QueryableImpl implements QueryP
 
         String query = "SELECT * FROM Annotations WHERE ObservationID_FK = 0";
 
-        return (Map<String, String>) executeQueryFunction(query, queryFunction);
+        return (Map<String, String>) annoQueryable.executeQueryFunction(query, queryFunction);
     }
 
-    public String getURL() {
-        return jdbcUrl;
-    }
 
     /**
      *
@@ -274,9 +290,13 @@ public class QueryPersistenceServiceImpl extends QueryableImpl implements QueryP
             }
         };
 
-        return (Collection) executeQueryFunction(query, queryFunction);
+        return (Collection) annoQueryable.executeQueryFunction(query, queryFunction);
 
 
+    }
+
+    public String getURL() {
+        return url;
     }
 
 

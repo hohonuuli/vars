@@ -80,7 +80,7 @@ public class AnnotationPersistenceServiceImpl extends QueryableImpl implements A
      * @param persistenceCache
      */
     @Inject
-    public AnnotationPersistenceServiceImpl(@Named("annotationPersistenceUnit") EntityManagerFactory entityManagerFactory,
+    public AnnotationPersistenceServiceImpl(@Named("knowledgebasePersistenceUnit") EntityManagerFactory entityManagerFactory,
             PersistenceCache persistenceCache) {
         super(jdbcUrl, jdbcUsername, jdbcPassword, jdbcDriver);
         this.entityManagerFactory = entityManagerFactory;
@@ -110,30 +110,6 @@ public class AnnotationPersistenceServiceImpl extends QueryableImpl implements A
         return desendantNames;
     }
 
-    /**
-     *
-     * @param conceptname
-     * @return
-     */
-    public boolean doesConceptNameExist(String conceptname) {
-
-        String sql = "SELECT count(*) FROM ConceptName WHERE ConceptName = '" + conceptname + "'";
-
-        final QueryFunction<Boolean> queryFunction = new QueryFunction<Boolean>() {
-
-            public Boolean apply(ResultSet resultSet) throws SQLException {
-                Integer n = 0;
-
-                while (resultSet.next()) {
-                    n = resultSet.getInt(1);
-                }
-
-                return new Boolean(n > 0);
-            }
-        };
-
-        return executeQueryFunction(sql, queryFunction).booleanValue();
-    }
 
     /**
      * Yes this duplicates functionality in {@link ConceptDAO}. But this version keeps
@@ -241,6 +217,41 @@ public class AnnotationPersistenceServiceImpl extends QueryableImpl implements A
         };
 
         return executeQueryFunction(sql, queryFunction);
+    }
+
+    /**
+     * Updates all {@link Observation}s, {@link Association}s, and {@link LinkTemplate}s
+     * in the database so that any that use a non-primary name for the given
+     * concept are changed so that they use the primary name.
+     *
+     * @param concept
+     */
+    public void updateConceptNameUsedByAnnotations(Concept concept) {
+
+        String primaryName = concept.getPrimaryConceptName().getName();
+
+        /*
+         * Update the Observation table
+         */
+        Collection<ConceptName> conceptNames = new ArrayList<ConceptName>(concept.getConceptNames());
+        conceptNames.remove(concept.getPrimaryConceptName());
+
+        for (ConceptName conceptName : conceptNames) {
+
+            // Update Observations
+            String sql = "UPDATE Observation SET ConceptName = '" +
+                primaryName + "' WHERE ConceptName = '" +
+                conceptName.getName() + "'";
+            executeUpdate(sql);
+
+            // Update Associations
+            sql = "UPDATE Association SET ToConcept = '" +
+                primaryName + "' WHERE ToConcept = '" +
+                conceptName.getName() + "'";
+            executeUpdate(sql);
+
+        }
+
     }
     
 

@@ -7,6 +7,8 @@ import org.mbari.sql.IQueryable;
  */
 public interface KnowledgebasePersistenceService extends IQueryable {
 
-    void updateConceptNameUsedByAnnotations(Concept concept);
+    boolean doesConceptNameExist(String conceptName);
+
+    void updateConceptNameUsedByLinkTemplates(Concept concept);
 
 }

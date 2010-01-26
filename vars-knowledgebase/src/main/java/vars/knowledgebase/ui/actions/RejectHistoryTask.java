@@ -262,8 +262,9 @@ public class RejectHistoryTask extends AbstractHistoryTask {
 
                         public void run() {
                             try {
-                                toolBelt.getKnowledgebasePersistenceService().updateConceptNameUsedByAnnotations(
+                                toolBelt.getKnowledgebasePersistenceService().updateConceptNameUsedByLinkTemplates(
                                     thisConcept);
+                                toolBelt.getAnnotationPersistenceService().updateConceptNameUsedByAnnotations(thisConcept);
                             }
                             catch (Exception e) {
                                 EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
@@ -367,7 +368,7 @@ public class RejectHistoryTask extends AbstractHistoryTask {
              */
             ObservationDAO observationDAO = toolBelt.getAnnotationDAOFactory().newObservationDAO(
                 dao.getEntityManager());
-            Collection<Observation> observations = observationDAO.findAllByConcept(rejectedConcept, true);
+            Collection<Observation> observations = observationDAO.findAllByConcept(rejectedConcept, true, conceptDAO);
             final String newName = parentConcept.getPrimaryConceptName().getName();
             final String msg = observations.size() + " Observations were found using '" + rejectedName +
                                "' or one of it's \nchildren. Do you want to update the names to '" + newName +
@@ -647,8 +648,9 @@ public class RejectHistoryTask extends AbstractHistoryTask {
 
                             public void run() {
                                 try {
-                                    toolBelt.getKnowledgebasePersistenceService().updateConceptNameUsedByAnnotations(
+                                    toolBelt.getKnowledgebasePersistenceService().updateConceptNameUsedByLinkTemplates(
                                         concept);
+                                    toolBelt.getAnnotationPersistenceService().updateConceptNameUsedByAnnotations(concept);
                                 }
                                 catch (Exception e) {
                                     EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);

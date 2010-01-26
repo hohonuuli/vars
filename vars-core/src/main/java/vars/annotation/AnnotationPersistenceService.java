@@ -19,8 +19,6 @@ import vars.knowledgebase.LinkTemplate;
  */
 public interface AnnotationPersistenceService {
 
-    boolean doesConceptNameExist(String conceptname);
-    
     
     /**
      * Provides a quick lookup of a concept by name. This is an optimized
@@ -53,6 +51,8 @@ public interface AnnotationPersistenceService {
     List<String> findDescendantNamesFor(Concept concept);
 
     List<String> findAllVideoArchiveNames();
+
+    void updateConceptNameUsedByAnnotations(Concept concept);
     
 
 }

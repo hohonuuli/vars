@@ -1,4 +1,6 @@
-package vars;
+package vars.annotation;
+
+import vars.knowledgebase.ConceptDAO;
 
 /**
  * Tag interface for DAO objects that can validate concept names used by
@@ -7,6 +9,6 @@ package vars;
  */
 public interface ConceptNameValidator<T> {
 
-    void validateName(T object);
+    void validateName(T object, ConceptDAO conceptDAO);
 
 }

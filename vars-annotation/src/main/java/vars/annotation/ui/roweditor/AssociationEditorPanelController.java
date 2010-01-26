@@ -24,6 +24,7 @@ import vars.annotation.AssociationDAO;
 import vars.annotation.Observation;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
+import vars.knowledgebase.ConceptDAO;
 
 /**
  *
@@ -89,11 +90,12 @@ public class AssociationEditorPanelController {
                     link.getToConcept(), link.getLinkValue());
             // DAOTX
             AssociationDAO dao = toolBelt.getAnnotationDAOFactory().newAssociationDAO();
+            final ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
             dao.startTransaction();
             observation = dao.find(observation);
             observation.addAssociation(newAssociation);
             dao.persist(newAssociation);
-            dao.validateName(newAssociation);
+            dao.validateName(newAssociation, conceptDAO);
             dao.endTransaction();
 
             Collection<Observation> changedObservations = ImmutableList.of(newAssociation.getObservation());
@@ -107,13 +109,14 @@ public class AssociationEditorPanelController {
     private void updateAssociation(ILink link) {
         if (association != null) {
             AssociationDAO  associationDAO = toolBelt.getAnnotationDAOFactory().newAssociationDAO();
+            final ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
             // DAOTX
             associationDAO.startTransaction();
             association = associationDAO.find(association);
             association.setLinkName(link.getLinkName());
             association.setLinkValue(link.getLinkValue());
             association.setToConcept(link.getToConcept());
-            associationDAO.validateName(association);
+            associationDAO.validateName(association, conceptDAO);
             associationDAO.endTransaction();
 
             Collection<Observation> changedObservations = ImmutableList.of(association.getObservation());

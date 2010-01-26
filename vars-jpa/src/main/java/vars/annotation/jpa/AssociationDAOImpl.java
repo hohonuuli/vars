@@ -18,15 +18,14 @@ import vars.knowledgebase.jpa.ConceptDAOImpl;
  */
 public class AssociationDAOImpl extends DAO implements AssociationDAO {
 
-    private final ConceptDAO conceptDAO;
 
     @Inject
     public AssociationDAOImpl(EntityManager entityManager) {
         super(entityManager);
-        this.conceptDAO = new ConceptDAOImpl(entityManager);
+
     }
 
-    public void validateName(Association ass) {
+    public void validateName(Association ass, ConceptDAO conceptDAO) {
         Concept concept = conceptDAO.findByName(ass.getToConcept());
         if (concept != null) {
             ass.setToConcept(concept.getPrimaryConceptName().getName());

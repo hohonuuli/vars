@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.DAO;
 import vars.UserAccount;
+import vars.annotation.AnnotationPersistenceService;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptMetadata;
@@ -116,7 +117,8 @@ class NamesEditorPanelController {
         boolean okToProceed = true;
 
         ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
-        KnowledgebasePersistenceService knowledgebaseDAO = toolBelt.getKnowledgebasePersistenceService();
+        KnowledgebasePersistenceService kbPersistenceService = toolBelt.getKnowledgebasePersistenceService();
+        AnnotationPersistenceService annoPersistenceService = toolBelt.getAnnotationPersistenceService();
         KnowledgebaseFactory knowledgebaseFactory = toolBelt.getKnowledgebaseFactory();
 
 
@@ -216,7 +218,8 @@ class NamesEditorPanelController {
               if (log.isDebugEnabled()) {
                   log.debug("Changing all Observations that use '" + oldName + "' to use '" + newName + "'");
               }
-                knowledgebaseDAO.updateConceptNameUsedByAnnotations(concept);
+                kbPersistenceService.updateConceptNameUsedByLinkTemplates(concept);
+                annoPersistenceService.updateConceptNameUsedByAnnotations(concept);
             }
             catch (Exception e) {
                 String msg = "Failed to change primary names of annotations from '" + oldName + "' to '" +

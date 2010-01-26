@@ -21,7 +21,6 @@ import javax.persistence.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import vars.knowledgebase.jpa.ConceptDAOImpl;
 
 /**
  * Created by IntelliJ IDEA.
@@ -32,7 +31,6 @@ import vars.knowledgebase.jpa.ConceptDAOImpl;
  */
 public class ObservationDAOImpl extends DAO implements ObservationDAO {
 
-    private final ConceptDAO conceptDAO;
     private final Logger log = LoggerFactory.getLogger(getClass());
     
 
@@ -40,11 +38,7 @@ public class ObservationDAOImpl extends DAO implements ObservationDAO {
     public ObservationDAOImpl(EntityManager entityManager) {
         super(entityManager);
         
-        /* 
-         * TODO This won't work if we move the Knowledgebase to a separate persistence unit.
-         * If that happens the KB lookups would need to be done in a separate transaction
-         */
-        this.conceptDAO = new ConceptDAOImpl(entityManager);
+
     }
 
     public List<Observation> findAllByConceptName(String conceptName) {
@@ -59,7 +53,7 @@ public class ObservationDAOImpl extends DAO implements ObservationDAO {
      * @param cascade
      * @return
      */
-    public List<Observation> findAllByConcept(final Concept concept, final boolean cascade) {
+    public List<Observation> findAllByConcept(final Concept concept, final boolean cascade, ConceptDAO conceptDAO) {
 
         Collection<ConceptName> conceptNames = null;
         if (cascade) {
@@ -133,7 +127,7 @@ public class ObservationDAOImpl extends DAO implements ObservationDAO {
         return conceptNames; 
     }
 
-    public void validateName(Observation object) {
+    public void validateName(Observation object, ConceptDAO conceptDAO) {
         Concept concept = conceptDAO.findByName(object.getConceptName());
         if (concept != null) {
             object.setConceptName(concept.getPrimaryConceptName().getName());

@@ -40,6 +40,7 @@ import vars.annotation.VideoFrame;
 import vars.annotation.ui.roweditor.RowEditorPanel;
 import vars.annotation.ui.table.ObservationTable;
 import vars.annotation.ui.table.ObservationTableModel;
+import vars.knowledgebase.ConceptDAO;
 
 /**
  * PersistenceService manages database transactions for the user-interface. It will keep the
@@ -181,6 +182,7 @@ public class PersistenceController {
     public Collection<Association> insertAssociations(Collection<Observation> observations, ILink associationTemplate) {
         final Collection<Association> associations = new ArrayList<Association>(observations.size());
         final Collection<Observation> uiObservations = new ArrayList<Observation>();
+        final ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
         final AssociationDAO dao = annotationDAOFactory.newAssociationDAO();
         dao.startTransaction();
 
@@ -193,7 +195,7 @@ public class PersistenceController {
                     associationTemplate.getToConcept(), associationTemplate.getLinkValue());
                 observation.addAssociation(ass);
                 dao.persist(ass);
-                dao.validateName(ass);
+                dao.validateName(ass, conceptDAO);
                 associations.add(ass);
             }
         }
@@ -211,6 +213,7 @@ public class PersistenceController {
      */
     public Observation insertObservation(VideoFrame videoFrame, Observation observation) {
         ObservationDAO dao = annotationDAOFactory.newObservationDAO();
+        final ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
         Collection<Observation> newObservations = new ArrayList<Observation>();
         dao.startTransaction();
         videoFrame = dao.find(videoFrame);
@@ -218,7 +221,7 @@ public class PersistenceController {
         if (videoFrame != null) {
             videoFrame.addObservation(observation);
             dao.persist(observation);
-            dao.validateName(observation);
+            dao.validateName(observation, conceptDAO);
             newObservations.add(observation);
         }
 
@@ -235,13 +238,14 @@ public class PersistenceController {
      */
     public Collection<Observation> insertObservations(VideoFrame videoFrame, Collection<Observation> observations) {
         ObservationDAO dao = annotationDAOFactory.newObservationDAO();
+        final ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
         dao.startTransaction();
         videoFrame = dao.find(videoFrame);
 
         for (Observation observation : observations) {
             videoFrame.addObservation(observation);
             dao.persist(observation);
-            dao.validateName(observation);
+            dao.validateName(observation, conceptDAO);
         }
 
         dao.endTransaction();
@@ -361,15 +365,16 @@ public class PersistenceController {
         Collection<Observation> updatedObservations = new Vector<Observation>(observations.size());
         ObservationDAO dao = toolBelt.getAnnotationDAOFactory().newObservationDAO();
         AssociationDAO aDao = toolBelt.getAnnotationDAOFactory().newAssociationDAO(dao.getEntityManager());
+        final ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
         dao.startTransaction();
 
         for (Observation observation : observations) {
             observation = dao.updateFields(observation);
             if (observation != null) {
                 updatedObservations.add(observation);
-                dao.validateName(observation);
+                dao.validateName(observation, conceptDAO);
                 for (Association association : new ArrayList<Association>(observation.getAssociations())) {
-                    aDao.validateName(association);
+                    aDao.validateName(association, conceptDAO);
                 }
             }
         }
@@ -385,13 +390,14 @@ public class PersistenceController {
      */
     public Collection<Association> updateAssociations(Collection<Association> associations) {
         final AssociationDAO dao = annotationDAOFactory.newAssociationDAO();
+        final ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
         Collection<Association> updatedAssociations = new ArrayList<Association>(associations.size());
         Collection<Observation> uiObservations = new ArrayList<Observation>();
         dao.startTransaction();
 
         for (Association association : associations) {
             association = dao.merge(association);
-            dao.validateName(association);
+            dao.validateName(association, conceptDAO);
             updatedAssociations.add(association);
             uiObservations.add(association.getObservation());
         }
@@ -589,6 +595,7 @@ public class PersistenceController {
      */
     public Collection<VideoFrame> updateVideoFrames(Collection<VideoFrame> videoFrames) {
         ObservationDAO dao = annotationDAOFactory.newObservationDAO();
+        final ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
         final Collection<VideoFrame> updatedVideoFrames = new ArrayList<VideoFrame>(videoFrames.size());
         final Collection<Observation> observations = new ArrayList<Observation>();
         dao.startTransaction();
@@ -600,7 +607,7 @@ public class PersistenceController {
         }
 
         for (Observation observation : observations) {
-            dao.validateName(observation);
+            dao.validateName(observation, conceptDAO);
         }
 
         dao.endTransaction();

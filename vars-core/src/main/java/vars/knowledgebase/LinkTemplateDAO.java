@@ -1,7 +1,6 @@
 package vars.knowledgebase;
 
 import vars.DAO;
-import vars.ConceptNameValidator;
 
 import java.util.Collection;
 

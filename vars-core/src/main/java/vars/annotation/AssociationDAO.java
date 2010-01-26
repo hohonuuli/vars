@@ -1,6 +1,5 @@
 package vars.annotation;
 
-import vars.ConceptNameValidator;
 import vars.DAO;
 
 /**

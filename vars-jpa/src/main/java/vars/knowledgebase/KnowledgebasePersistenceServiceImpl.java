@@ -1,9 +1,12 @@
 package vars.knowledgebase;
 
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ResourceBundle;
 import java.util.Collection;
 import java.util.ArrayList;
+import org.mbari.sql.QueryFunction;
 
 import org.mbari.sql.QueryableImpl;
 import vars.annotation.Association;
@@ -45,7 +48,7 @@ public class KnowledgebasePersistenceServiceImpl extends QueryableImpl implement
      *
      * @param concept
      */
-    public void updateConceptNameUsedByAnnotations(Concept concept) {
+    public void updateConceptNameUsedByLinkTemplates(Concept concept) {
 
         String primaryName = concept.getPrimaryConceptName().getName();
 
@@ -57,27 +60,39 @@ public class KnowledgebasePersistenceServiceImpl extends QueryableImpl implement
 
         for (ConceptName conceptName : conceptNames) {
 
-            // Update Observations
-            String sql = "UPDATE Observation SET ConceptName = '" +
-                primaryName + "' WHERE ConceptName = '" +
-                conceptName.getName() + "'";
-            executeUpdate(sql);
-
-            // Update Associations
-            sql = "UPDATE Association SET ToConcept = '" +
-                primaryName + "' WHERE ToConcept = '" +
-                conceptName.getName() + "'";
-            executeUpdate(sql);
-
-
             // Update LinkTemplates
-            sql = "UPDATE LinkTemplate SET ToConcept = '" +
+            String sql = "UPDATE LinkTemplate SET ToConcept = '" +
                 primaryName + "' WHERE ToConcept = '" +
                 conceptName.getName() + "'";
             executeUpdate(sql);
 
         }
 
+    }
+
+    /**
+     *
+     * @param conceptname
+     * @return
+     */
+    public boolean doesConceptNameExist(String conceptname) {
+
+        String sql = "SELECT count(*) FROM ConceptName WHERE ConceptName = '" + conceptname + "'";
+
+        final QueryFunction<Boolean> queryFunction = new QueryFunction<Boolean>() {
+
+            public Boolean apply(ResultSet resultSet) throws SQLException {
+                Integer n = 0;
+
+                while (resultSet.next()) {
+                    n = resultSet.getInt(1);
+                }
+
+                return new Boolean(n > 0);
+            }
+        };
+
+        return executeQueryFunction(sql, queryFunction).booleanValue();
     }
 
 

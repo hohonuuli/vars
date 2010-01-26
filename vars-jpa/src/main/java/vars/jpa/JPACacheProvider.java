@@ -24,32 +24,20 @@ import com.google.inject.name.Named;
  */
 public class JPACacheProvider implements PersistenceCacheProvider {
 
-    private final EntityManagerFactory entityManagerFactory;
+    private final EntityManagerFactory kbEmf;
+    private final EntityManagerFactory annoEmf;
+    private final EntityManagerFactory miscEmf;
 
-//    private final Set<?> persistentClasses = ImmutableSet.of(
-//            GUserAccount.class,
-//            GAssociation.class,
-//            GCameraData.class,
-//            GCameraDeployment.class,
-//            GObservation.class,
-//            GPhysicalData.class,
-//            GVideoArchive.class,
-//            GVideoArchiveSet.class,
-//            GVideoFrame.class,
-//            ConceptImpl.class,
-//            ConceptMetadataImpl.class,
-//            GConceptName.class,
-//            GHistory.class,
-//            GLinkRealization.class,
-//            LinkTemplateImpl.class,
-//            GMedia.class,
-//            GUsage.class);
+
 
     @Inject
-    public JPACacheProvider(@Named("knowledgebasePersistenceUnit") EntityManagerFactory entityManagerFactory) {
-        // TODO this is hardcoded to the kb pu. Have to think about how to deal with things if 
-        // I separate out the kb from the anno persistence.
-        this.entityManagerFactory = entityManagerFactory;
+    public JPACacheProvider(@Named("annotationPersistenceUnit") EntityManagerFactory annoEmf,
+            @Named("knowledgebasePersistenceUnit") EntityManagerFactory kbEmf,
+            @Named("miscPersistenceUnit") EntityManagerFactory miscEmf) {
+
+        this.kbEmf = kbEmf;
+        this.annoEmf = annoEmf;
+        this.miscEmf = miscEmf;
     }
 
     /**
@@ -58,8 +46,16 @@ public class JPACacheProvider implements PersistenceCacheProvider {
     public void clear() {
         
         // TODO Hack until JPA 2.0 is finalized
-        EntityManagerFactoryImpl emf = (EntityManagerFactoryImpl) entityManagerFactory;
+        EntityManagerFactoryImpl emf = (EntityManagerFactoryImpl) kbEmf;
         Cache cache = emf.getCache();
+        cache.evictAll();
+
+        emf = (EntityManagerFactoryImpl) annoEmf;
+        cache = emf.getCache();
+        cache.evictAll();
+
+        emf = (EntityManagerFactoryImpl) miscEmf;
+        cache = emf.getCache();
         cache.evictAll();
         
     }

@@ -235,7 +235,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
              */
             ObservationDAO observationDAO = toolBelt.getAnnotationDAOFactory().newObservationDAO();
             observationDAO.startTransaction();
-            Collection<Observation> observations = observationDAO.findAllByConcept(concept, true);
+            Collection<Observation> observations = observationDAO.findAllByConcept(concept, true, conceptDAO);
 
             if (observations.size() > 0) {
                 final String newName = parentConcept.getPrimaryConceptName().getName();
@@ -325,7 +325,8 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
 
                 public void run() {
                     try {
-                        toolBelt.getKnowledgebasePersistenceService().updateConceptNameUsedByAnnotations(concept);
+                        toolBelt.getKnowledgebasePersistenceService().updateConceptNameUsedByLinkTemplates(concept);
+                        toolBelt.getAnnotationPersistenceService().updateConceptNameUsedByAnnotations(concept);
                     }
                     catch (Exception e) {
                         EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);

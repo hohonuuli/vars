@@ -61,6 +61,7 @@ import vars.annotation.Observation;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
 import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.ConceptNameTypes;
 import vars.knowledgebase.LinkTemplate;
@@ -143,6 +144,7 @@ public class AssociationEditorPanelOriginal extends JPanel {
              *  DAOTX Remove reference to old parent
              */
             AssociationDAO associationDAO = toolBelt.getAnnotationDAOFactory().newAssociationDAO();
+            final ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
             associationDAO.startTransaction();
             association = associationDAO.merge(association);
             final Observation oldParent = association.getObservation();
@@ -153,7 +155,7 @@ public class AssociationEditorPanelOriginal extends JPanel {
             association.setLinkName(linkName);
             association.setToConcept(toConcept);
             association.setLinkValue(linkValue);
-            associationDAO.validateName(association);
+            associationDAO.validateName(association, conceptDAO);
             associationDAO.endTransaction();
 
             Collection<Observation> changedObservations = ImmutableList.of(oldParent, parent);
