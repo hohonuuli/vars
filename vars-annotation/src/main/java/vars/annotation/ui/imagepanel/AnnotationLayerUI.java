@@ -23,11 +23,12 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Vector;
-import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import org.jdesktop.jxlayer.JXLayer;
+import org.mbari.awt.AwtUtilities;
+import org.mbari.util.ImageCanvas;
 import vars.UserAccount;
 import vars.annotation.Observation;
 import vars.annotation.VideoFrame;
@@ -41,7 +42,7 @@ import vars.knowledgebase.Concept;
  *
  * @author brian
  */
-public class AnnotationLayerUI<T extends JComponent> extends CrossHairLayerUI<T> {
+public class AnnotationLayerUI<T extends ImageCanvas> extends CrossHairLayerUI<T> {
 
     private enum MarkerStyle {
         SELECTED(new Color(0, 255, 0, 180), new Font("Sans Serif", Font.PLAIN, 10), 14, new BasicStroke(3)),
@@ -99,23 +100,30 @@ public class AnnotationLayerUI<T extends JComponent> extends CrossHairLayerUI<T>
                 Collection<Observation> rowSelectedObservations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
                 MarkerStyle markerStyle = rowSelectedObservations.contains(observation) ? MarkerStyle.SELECTED : MarkerStyle.NOTSELECTED;
                 if (observation.getX() != null && observation.getY() != null) {
-                    int x = (int) Math.round(observation.getX().doubleValue());
-                    int y = (int) Math.round(observation.getY().doubleValue());
+                    
 
-                    g2.setStroke(markerStyle.stroke);
-                    g2.setPaint(markerStyle.color);
-                    // Write the concept name
-                    g2.setFont(markerStyle.font);
-                    g2.drawString(observation.getConceptName(), x + 5, y);
+                    Point2D imagePoint = new Point2D.Double(observation.getX(), observation.getY());
+                    Point2D componentPoint2D = jxl.getView().convertToComponent(imagePoint);
+                    if (componentPoint2D != null) {
+                        Point componentPoint = AwtUtilities.toPoint(componentPoint2D);
+                        int x = componentPoint.x;
+                        int y = componentPoint.y;
 
-                    // Draw the annotation
-                    int armLength = markerStyle.armLength;
-                    GeneralPath gp = new GeneralPath();
-                    gp.moveTo(x - armLength, y - armLength);
-                    gp.lineTo(x + armLength, y + armLength);
-                    gp.moveTo(x + armLength, y - armLength);
-                    gp.lineTo(x - armLength, y + armLength);
-                    g2.draw(gp);
+                        g2.setStroke(markerStyle.stroke);
+                        g2.setPaint(markerStyle.color);
+                        // Write the concept name
+                        g2.setFont(markerStyle.font);
+                        g2.drawString(observation.getConceptName(), x + 5, y);
+
+                        // Draw the annotation
+                        int armLength = markerStyle.armLength;
+                        GeneralPath gp = new GeneralPath();
+                        gp.moveTo(x - armLength, y - armLength);
+                        gp.lineTo(x + armLength, y + armLength);
+                        gp.moveTo(x + armLength, y - armLength);
+                        gp.lineTo(x - armLength, y + armLength);
+                        g2.draw(gp);
+                    }
 
                 }
             }
@@ -166,16 +174,19 @@ public class AnnotationLayerUI<T extends JComponent> extends CrossHairLayerUI<T>
             case MouseEvent.MOUSE_RELEASED:
                 if (me.getButton() != MouseEvent.BUTTON1) {
                     selectedObservations.clear();
-                    //selectedAnnotationSupport.notifyListeners(new SelectionEvent());
                     setDirty(true);
                 }
                 else {
                     selectedObservations.clear();
                     if (boundingBox == null) {
                         /*
-                         * If the mouse is NOT being dragged then create a new Observation
+                         * If the mouse is NOT being dragged then create a new Observation.
+                         * The point coordinates should be in the images
+                         * coordinate system NOT the coordiates of the view displaying
+                         * the image.
                          */
-                        controller.newObservation(point);
+                        Point2D imagePoint = jxl.getView().convertToImage(point);
+                        controller.newObservation(imagePoint);
 
                     }
                     else {
@@ -183,7 +194,9 @@ public class AnnotationLayerUI<T extends JComponent> extends CrossHairLayerUI<T>
                         boundingBox = null;
 
                         for (Observation observation : observations) {
-                            if (r.contains(observation.getX(), observation.getY())) {
+                            Point2D imagePoint = jxl.getView().convertToComponent(new Point2D.Double(observation.getX(),
+                                    observation.getY()));
+                            if (r.contains(imagePoint)) {
                                 selectedObservations.add(observation);
                             }
                         }
@@ -230,7 +243,7 @@ public class AnnotationLayerUI<T extends JComponent> extends CrossHairLayerUI<T>
 
     private class Controller {
 
-        void newObservation(Point point) {
+        void newObservation(Point2D point) {
             UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
             if (userAccount != null && videoFrame != null) {
                 Observation observation = toolBelt.getAnnotationFactory().newObservation();

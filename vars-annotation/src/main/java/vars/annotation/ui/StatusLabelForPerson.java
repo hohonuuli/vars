@@ -31,7 +31,6 @@ import org.mbari.swing.SwingUtils;
 import org.mbari.util.Dispatcher;
 
 import vars.UserAccount;
-import vars.old.annotation.ui.StatusLabel;
 import vars.shared.ui.dialogs.LoginAction;
 
 /**

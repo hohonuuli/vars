@@ -80,6 +80,7 @@ public class FrameGrabPanel extends javax.swing.JPanel implements PropertyChange
     public FrameGrabPanel(ToolBelt toolBelt) {
         this.imageFrame = new ImageAnnotationFrame(toolBelt);
         imageFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+        imageFrame.pack();
         initialize();
 
         // Register for notifications when the Selected Observations changes

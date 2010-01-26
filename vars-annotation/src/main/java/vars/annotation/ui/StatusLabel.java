@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package vars.old.annotation.ui;
+package vars.annotation.ui;
 
 import java.beans.PropertyChangeListener;
 import javax.swing.BorderFactory;

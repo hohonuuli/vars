@@ -26,7 +26,6 @@ import javax.swing.SwingUtilities;
 import org.mbari.swing.SwingUtils;
 import org.mbari.util.Dispatcher;
 import vars.annotation.VideoArchive;
-import vars.old.annotation.ui.StatusLabel;
 
 /**
  * <p>Indicates which {@link VideoArchive} the annotator is editing. Clicking on the

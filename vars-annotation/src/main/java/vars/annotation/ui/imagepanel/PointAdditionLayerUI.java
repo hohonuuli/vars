@@ -5,6 +5,7 @@
 
 package vars.annotation.ui.imagepanel;
 
+import com.sun.awt.AWTUtilities;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
@@ -12,10 +13,12 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.geom.GeneralPath;
+import java.awt.geom.Point2D;
 import java.util.Collection;
 import java.util.Vector;
 import javax.swing.SwingUtilities;
 import org.jdesktop.jxlayer.JXLayer;
+import org.mbari.awt.AwtUtilities;
 import org.mbari.util.ImageCanvas;
 
 /**
@@ -45,7 +48,7 @@ public class PointAdditionLayerUI <T extends ImageCanvas> extends CrossHairLayer
         g2.setStroke(new BasicStroke(3));
         ImageCanvas imageCanvas = jxl.getView();
         for (Point point : sourcePoints) {
-            point = imageCanvas.convertToComponent(point);
+            point = AwtUtilities.toPoint(imageCanvas.convertToComponent(point));
             int x = point.x;
             int y = point.y;
             // Draw the annotation
@@ -72,8 +75,8 @@ public class PointAdditionLayerUI <T extends ImageCanvas> extends CrossHairLayer
             ImageCanvas imageCanvas = jxl.getView();
 
             if (imageCanvas.getImageRectangle().contains(point)) {
-                Point imagePoint = imageCanvas.convertToImage(point);
-                Point componentPoint = imageCanvas.convertToComponent(imagePoint);
+                Point imagePoint = AwtUtilities.toPoint(imageCanvas.convertToImage(point));
+                Point componentPoint = AwtUtilities.toPoint(imageCanvas.convertToComponent(imagePoint));
                 coordinateString = "(SRC[" + point.x + ", " + point.y +
                         "] Image[" + imagePoint.x + ", " + imagePoint.y +
                         "] DST[" + componentPoint.x + ", " + componentPoint.y + "])";
@@ -97,7 +100,7 @@ public class PointAdditionLayerUI <T extends ImageCanvas> extends CrossHairLayer
         if (me.getID() == MouseEvent.MOUSE_RELEASED) {
                 Point point = SwingUtilities.convertPoint(me.getComponent(), me.getPoint(), jxl);
             ImageCanvas imageCanvas = jxl.getView();
-                Point imagePoint = imageCanvas.convertToImage(point);
+            Point imagePoint = AwtUtilities.toPoint(imageCanvas.convertToImage(point));
             sourcePoints.add(imagePoint);
             setDirty(true);
         }

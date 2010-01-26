@@ -18,15 +18,15 @@ package vars.annotation.ui.imagepanel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Insets;
+import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.net.URL;
 import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import org.jdesktop.jxlayer.JXLayer;
+import org.mbari.util.ImageCanvas;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.VideoFrame;
@@ -41,16 +41,16 @@ public class ImageAnnotationFrame extends JFrame {
     private final Logger log = LoggerFactory.getLogger(getClass());
     private BufferedImage image;
     private URL imageUrl;
-    private JLabel label = new JLabel("");
-    private JXLayer<JLabel> layer;
-    private final AnnotationLayerUI<JLabel> layerUI;
+    private ImageCanvas imageCanvas = new ImageCanvas();
+    private JXLayer<ImageCanvas> layer;
+    private final AnnotationLayerUI layerUI;
 
     /**
      * Create the frame
      */
     public ImageAnnotationFrame(ToolBelt toolBelt) {
         super();
-        layerUI = new AnnotationLayerUI<JLabel>(toolBelt);
+        layerUI = new AnnotationLayerUI<ImageCanvas>(toolBelt);
         initialize();
     }
 
@@ -91,9 +91,9 @@ public class ImageAnnotationFrame extends JFrame {
     /**
      * @return
      */
-    public JXLayer<JLabel> getLayer() {
+    public JXLayer<ImageCanvas> getLayer() {
         if (layer == null) {
-            layer = new JXLayer<JLabel>(label);
+            layer = new JXLayer<ImageCanvas>(imageCanvas);
             layer.setUI(layerUI);
         }
 
@@ -103,23 +103,11 @@ public class ImageAnnotationFrame extends JFrame {
     private void initialize() {
         setLayout(new BorderLayout());
         add(getLayer(), BorderLayout.CENTER);
+        setPreferredSize(new Dimension(640, 480));
         setImageUrl(null);
     }
 
-    /**
-     * We're managing the layout ourselves since we're using abolute layout.
-     * We're doing this because calls to <i>pack</i> is causing clipping
-     * problems when the image is larger than the computers screen
-     *
-     * @param component The component displayed in the frame. We're only using
-     * 1 at a time. If you try to add other componenets you'll mess everything up.
-     */
-    private void layoutFrame() {
-        Dimension dimension = getLayer().getPreferredSize();
-        Insets insets = getInsets();
-        getLayer().setBounds(insets.left, insets.top, dimension.width, dimension.height);
-        setSize(dimension.width + insets.left + insets.right, dimension.height + insets.top + insets.bottom);
-    }
+
 
     /**
      * Sets the URL of the image to display. The images is fetched from the
@@ -143,13 +131,8 @@ public class ImageAnnotationFrame extends JFrame {
             SwingUtilities.invokeLater(new Runnable() {
 
                 public void run() {
-                    setResizable(true);
                     setTitle("");
-                    image = null;
-                    label.setText("No image available");
-                    label.setIcon(null);
-                    layoutFrame();
-                    setResizable(false);
+                    imageCanvas.setImage(null);
                 }
             });
         }
@@ -163,7 +146,6 @@ public class ImageAnnotationFrame extends JFrame {
             SwingUtilities.invokeLater(new Runnable() {
 
                 public void run() {
-                    setResizable(true);
                     setTitle(getImageUrl().toExternalForm());
                     (new ImageLoader(getImageUrl())).execute();
                 }
@@ -203,17 +185,13 @@ public class ImageAnnotationFrame extends JFrame {
                 image = get();
                 log.debug("Image " + url + " [" + image.getWidth() + " x " + image.getHeight() +
                           " pixels] has been loaded");
-                label.setText(null);
-                label.setIcon(new ImageIcon(image));
+                imageCanvas.setImage(image);
             }
             catch (Exception e) {
                 log.debug("Failed to read image", e);
-                label.setText("Failed to fetch image from " + url.toExternalForm());
-                label.setIcon(null);
+                imageCanvas.setImage(null);
             }
 
-            layoutFrame();
-            setResizable(false);
         }
     }
 }

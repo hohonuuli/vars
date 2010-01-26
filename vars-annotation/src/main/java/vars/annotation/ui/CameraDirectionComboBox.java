@@ -15,7 +15,7 @@
  */
 
 
-package vars.old.annotation.ui;
+package vars.annotation.ui;
 
 import javax.swing.JComboBox;
 import vars.annotation.CameraDirections;
