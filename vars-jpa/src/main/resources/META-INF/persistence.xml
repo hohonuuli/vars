@@ -3,7 +3,27 @@
              xmlns="http://java.sun.com/xml/ns/persistence"
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd">
-    <persistence-unit name="vars-jpa-production" transaction-type="RESOURCE_LOCAL">
+    <persistence-unit name="vars-jpa-knowledgebase" transaction-type="RESOURCE_LOCAL">
+        <description>VARS Data Model</description>
+        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+        <class>vars.knowledgebase.jpa.ConceptImpl</class>
+        <class>vars.knowledgebase.jpa.ConceptMetadataImpl</class>
+        <class>vars.knowledgebase.jpa.ConceptNameImpl</class>
+        <class>vars.knowledgebase.jpa.HistoryImpl</class>
+        <class>vars.knowledgebase.jpa.LinkRealizationImpl</class>
+        <class>vars.knowledgebase.jpa.LinkTemplateImpl</class>
+        <class>vars.knowledgebase.jpa.MediaImpl</class>
+        <class>vars.knowledgebase.jpa.UsageImpl</class>
+        <properties>
+            <property name="javax.persistence.jdbc.url" value="${KNOWLEDGEBASE_JDBC_URL}"/>
+            <property name="javax.persistence.jdbc.user" value="${KNOWLEDGEBASE_JDBC_USERNAME}"/>
+            <property name="javax.persistence.jdbc.driver" value="${KNOWLEDGEBASE_JDBC_DRIVER}"/>
+            <property name="javax.persistence.jdbc.password" value="${KNOWLEDGEBASE_JDBC_PASSWORD}"/>
+            <property name="eclipselink.logging.level" value="CONFIG"/>
+        </properties>
+    </persistence-unit>
+
+     <persistence-unit name="vars-jpa-annotation" transaction-type="RESOURCE_LOCAL">
         <description>VARS Data Model</description>
         <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
         <class>vars.annotation.jpa.VideoArchiveSetImpl</class>
@@ -14,54 +34,26 @@
         <class>vars.annotation.jpa.CameraDataImpl</class>
         <class>vars.annotation.jpa.ObservationImpl</class>
         <class>vars.annotation.jpa.AssociationImpl</class>
-        <class>vars.knowledgebase.jpa.ConceptImpl</class>
-        <class>vars.knowledgebase.jpa.ConceptMetadataImpl</class>
-        <class>vars.knowledgebase.jpa.ConceptNameImpl</class>
-        <class>vars.knowledgebase.jpa.HistoryImpl</class>
-        <class>vars.knowledgebase.jpa.LinkRealizationImpl</class>
-        <class>vars.knowledgebase.jpa.LinkTemplateImpl</class>
-        <class>vars.knowledgebase.jpa.MediaImpl</class>
-        <class>vars.knowledgebase.jpa.UsageImpl</class>
-        <class>vars.jpa.UserAccountImpl</class>
-        <class>vars.jpa.PreferenceNode</class>
         <properties>
-            <property name="javax.persistence.jdbc.url" value="${PRODUCTION_JDBC_URL}"/>
-            <property name="javax.persistence.jdbc.user" value="${PRODUCTION_JDBC_USERNAME}"/>
-            <property name="javax.persistence.jdbc.driver" value="${PRODUCTION_JDBC_DRIVER}"/>
-            <property name="javax.persistence.jdbc.password" value="${PRODUCTION_JDBC_PASSWORD}"/>
+            <property name="javax.persistence.jdbc.url" value="${ANNOTATION_JDBC_URL}"/>
+            <property name="javax.persistence.jdbc.user" value="${ANNOTATION_JDBC_USERNAME}"/>
+            <property name="javax.persistence.jdbc.driver" value="${ANNOTATION_JDBC_DRIVER}"/>
+            <property name="javax.persistence.jdbc.password" value="${ANNOTATION_JDBC_PASSWORD}"/>
             <property name="eclipselink.logging.level" value="CONFIG"/>
-            <property name="eclipselink.ddl-generation" value="create-tables"/>
         </properties>
     </persistence-unit>
-
-     <persistence-unit name="vars-jpa-development" transaction-type="RESOURCE_LOCAL">
+    
+    <persistence-unit name="vars-jpa-misc" transaction-type="RESOURCE_LOCAL">
         <description>VARS Data Model</description>
         <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-         <class>vars.annotation.jpa.VideoArchiveSetImpl</class>
-        <class>vars.annotation.jpa.CameraDeploymentImpl</class>
-        <class>vars.annotation.jpa.VideoArchiveImpl</class>
-        <class>vars.annotation.jpa.VideoFrameImpl</class>
-        <class>vars.annotation.jpa.PhysicalDataImpl</class>
-        <class>vars.annotation.jpa.CameraDataImpl</class>
-        <class>vars.annotation.jpa.ObservationImpl</class>
-        <class>vars.annotation.jpa.AssociationImpl</class>
-        <class>vars.knowledgebase.jpa.ConceptImpl</class>
-        <class>vars.knowledgebase.jpa.ConceptMetadataImpl</class>
-        <class>vars.knowledgebase.jpa.ConceptNameImpl</class>
-        <class>vars.knowledgebase.jpa.HistoryImpl</class>
-        <class>vars.knowledgebase.jpa.LinkRealizationImpl</class>
-        <class>vars.knowledgebase.jpa.LinkTemplateImpl</class>
-        <class>vars.knowledgebase.jpa.MediaImpl</class>
-        <class>vars.knowledgebase.jpa.UsageImpl</class>
         <class>vars.jpa.UserAccountImpl</class>
         <class>vars.jpa.PreferenceNode</class>
         <properties>
-            <property name="javax.persistence.jdbc.url" value="${DEVELOPMENT_JDBC_URL}"/>
-            <property name="javax.persistence.jdbc.user" value="${DEVELOPMENT_JDBC_USERNAME}"/>
-            <property name="javax.persistence.jdbc.driver" value="${DEVELOPMENT_JDBC_DRIVER}"/>
-            <property name="javax.persistence.jdbc.password" value="${DEVELOPMENT_JDBC_PASSWORD}"/>
+            <property name="javax.persistence.jdbc.url" value="${MISC_JDBC_URL}"/>
+            <property name="javax.persistence.jdbc.user" value="${MISC_JDBC_USERNAME}"/>
+            <property name="javax.persistence.jdbc.driver" value="${MISC_JDBC_DRIVER}"/>
+            <property name="javax.persistence.jdbc.password" value="${MISC_JDBC_PASSWORD}"/>
             <property name="eclipselink.logging.level" value="CONFIG"/>
-           <!--  <property name="eclipselink.ddl-generation" value="create-tables"/> -->
         </properties>
     </persistence-unit>
 

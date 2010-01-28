@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.TreeMap;
 import org.mbari.sql.QueryFunction;
+import org.mbari.sql.QueryResults;
 import org.mbari.sql.QueryableImpl;
 import vars.ILink;
 import vars.LinkBean;
@@ -297,5 +298,9 @@ public class QueryPersistenceServiceImpl implements QueryPersistenceService {
         return (Collection) annoQueryable.executeQueryFunction(query, queryFunction);
 
 
+    }
+
+    public QueryResults executeQuery(String query) throws Exception {
+        return annoQueryable.executeQuery(query);
     }
 }

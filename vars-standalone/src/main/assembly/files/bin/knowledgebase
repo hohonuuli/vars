@@ -6,4 +6,4 @@ ${JAVACMD:=java} -Xms16m -Xmx512m \
          -Duser.timezone="UTC" \
          -Dfile.encoding=UTF8 \
          -classpath "$VARS_CLASSPATH" \
-         vars.knowledgebase.ui.KnowledgebaseApp "$@"
+         vars.knowledgebase.ui.App "$@"

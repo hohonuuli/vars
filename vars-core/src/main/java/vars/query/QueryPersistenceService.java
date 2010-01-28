@@ -8,12 +8,13 @@ package vars.query;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import org.mbari.sql.IQueryable;
 import vars.ILink;
 
 /**
  * DAO used by the Query Application for special operations
  */
-public interface QueryPersistenceService {
+public interface QueryPersistenceService extends IQueryable {
 
     Integer getCountOfUniqueValuesByColumn(String columnName);
 

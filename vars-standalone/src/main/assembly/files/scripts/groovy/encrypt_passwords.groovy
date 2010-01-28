@@ -1,13 +1,13 @@
 import org.jasypt.util.password.BasicPasswordEncryptor
-import org.mbari.vars.QueryFunction
+import org.mbari.sql.QueryFunction
 import vars.ToolBox;
 
 def toolBox = new ToolBox()
-def dao = toolBox.toolBelt.annotationPersistenceService
+def dao = toolBox.toolBelt.knowledgebasePersistenceService
 def sql = "SELECT id, Password FROM UserAccount"
 def ua = dao.executeQueryFunction(sql, {rs ->
             def userAccounts = [:]
-            while (rs.hasNext()) {
+            while (rs.next()) {
                 userAccounts[rs.getLong(1)] = rs.getString(2)
             }
             return userAccounts
@@ -19,7 +19,7 @@ ua.each { id, password ->
 UPDATE 
     UserAccount 
 SET 
-    Password = '${encryptor.encryptPassword(password)'
+    Password = '${encryptor.encryptPassword(password)}'
 WHERE
 id = ${id}""" as String)
 }

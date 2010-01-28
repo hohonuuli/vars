@@ -17,8 +17,6 @@ package vars.annotation.ui.imagepanel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Insets;
-import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.net.URL;
 import javax.imageio.ImageIO;
@@ -117,7 +115,7 @@ public class ImageAnnotationFrame extends JFrame {
      *
      * @param imageUrl the imageUrl to set
      */
-    private void setImageUrl(URL imageUrl) {
+    private void setImageUrl(final URL imageUrl) {
         URL oldUrl = this.imageUrl;
         this.imageUrl = imageUrl;
         log.debug("setImageUrl( " + imageUrl + " )");
@@ -147,7 +145,7 @@ public class ImageAnnotationFrame extends JFrame {
 
                 public void run() {
                     setTitle(getImageUrl().toExternalForm());
-                    (new ImageLoader(getImageUrl())).execute();
+                    (new ImageLoader(imageUrl)).execute();
                 }
             });
 

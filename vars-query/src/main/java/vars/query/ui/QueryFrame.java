@@ -38,7 +38,6 @@ import org.mbari.awt.event.ActionAdapter;
 import org.mbari.util.Dispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.query.QueryPersistenceService;
 
@@ -64,22 +63,22 @@ public class QueryFrame extends JFrame {
     private SearchPanel searchPanel = null;
     private JTabbedPane tabbedPane = null;
     private ActionMap actionMap = new ActionMap();
-    private final QueryPersistenceService queryDAO;
+    private final QueryPersistenceService queryPersistenceService;
     private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
 
     /**
      *
      *
      * @param knowledgebaseDAOFactory
-     * @param queryDAO
+     * @param queryPersistenceService
      * @throws HeadlessException
      */
     @Inject
-    public QueryFrame(KnowledgebaseDAOFactory knowledgebaseDAOFactory, QueryPersistenceService queryDAO)
+    public QueryFrame(KnowledgebaseDAOFactory knowledgebaseDAOFactory, QueryPersistenceService queryPersistenceService)
             throws HeadlessException {
         super();
         this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
-        this.queryDAO = queryDAO;
+        this.queryPersistenceService = queryPersistenceService;
         initialize();
     }
 
@@ -172,7 +171,7 @@ public class QueryFrame extends JFrame {
 
     private RefineSearchPanel getRefineSearchPanel() {
         if (refineSearchPanel == null) {
-            refineSearchPanel = new RefineSearchPanel(queryDAO);
+            refineSearchPanel = new RefineSearchPanel(queryPersistenceService);
         }
 
         return refineSearchPanel;
@@ -232,7 +231,7 @@ public class QueryFrame extends JFrame {
                     /*
                      * Create a QueryAction
                      */
-                    QueryAction queryAction = new QueryAction(query, queryDAO, knowledgebaseDAOFactory,
+                    QueryAction queryAction = new QueryAction(query, queryPersistenceService, knowledgebaseDAOFactory,
                         getSearchPanel().getCbHierarchy().isSelected(), getSearchPanel().getCbPhylogeny().isSelected(),
                         getSearchPanel().getCbFullPhylogeny().isSelected());
 
@@ -241,7 +240,7 @@ public class QueryFrame extends JFrame {
                      * as a cancel dialog, a results frame and a dialog to
                      * display any errors that might occur.
                      */
-                    new QueryActionUI(queryAction, queryDAO.getURL());
+                    new QueryActionUI(queryAction, queryPersistenceService.getURL());
 
                     /*
                      * Execute the query
