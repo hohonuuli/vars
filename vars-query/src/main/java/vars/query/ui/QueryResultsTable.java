@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)QueryResultsTable.java   2010.01.28 at 10:59:36 PST
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1 
- * (the "License"); you may not use this file except in compliance 
- * with the License. You may obtain a copy of the License at
+ * Copyright 2009 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,6 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 
 
 package vars.query.ui;
@@ -27,12 +25,11 @@ import javax.swing.JFrame;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.mbari.sql.QueryResults;
 import org.mbari.swing.ImageFrame;
 import org.mbari.swing.table.TableSorter;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -40,12 +37,8 @@ import org.mbari.swing.table.TableSorter;
  */
 public class QueryResultsTable extends JTable {
 
-
     private static final Logger log = LoggerFactory.getLogger(QueryResultsTable.class);
-
-
     private MouseListener urlMouseListener;
-
 
     /**
      * Constructs ...
@@ -61,22 +54,25 @@ public class QueryResultsTable extends JTable {
         /*
          * Add the ability to sort by columns
          */
-        TableSorter tableSorter = new TableSorter(
-            new QueryResultsTableModel(queryResults));
+        TableSorter tableSorter = new TableSorter(new QueryResultsTableModel(queryResults));
         setModel(tableSorter);
         tableSorter.setTableHeader(getTableHeader());
         setColumnWidths();
         addMouseListener(getUrlMouseListener());
     }
 
-
     /**
-	 * Creates a mouselistener that listens for double clicks. If a double click occurs in a cell starting with 'http', it attempts to display it in an <code>ImageFrame</code.
-	 * @return  A MouseListener that displays image URLs when double clicked.
-	 */
+         * Creates a mouselistener that listens for double clicks. If a double click occurs in a cell starting with 'http', it attempts to display it in an <code>ImageFrame</code.
+         * @return  A MouseListener that displays image URLs when double clicked.
+         */
     private MouseListener getUrlMouseListener() {
+
+
+
         if (urlMouseListener == null) {
             urlMouseListener = new MouseAdapter() {
+
+                ImageFrame imageFrame;
 
                 @Override
                 public void mouseClicked(MouseEvent e) {
@@ -108,10 +104,9 @@ public class QueryResultsTable extends JTable {
                             URL url = null;
                             try {
                                 url = new URL(stringValue);
-                            } catch (MalformedURLException e1) {
-                                log.warn(
-                                        "The URL, " + url +
-                                        ", is not valid. Unable to display it");
+                            }
+                            catch (MalformedURLException e1) {
+                                log.warn("The URL, " + url + ", is not valid. Unable to display it");
                             }
 
                             getImageFrame().setImageUrl(url);
@@ -122,19 +117,18 @@ public class QueryResultsTable extends JTable {
                 ImageFrame getImageFrame() {
                     if (imageFrame == null) {
                         imageFrame = new ImageFrame();
-                        imageFrame.setDefaultCloseOperation(
-                                JFrame.HIDE_ON_CLOSE);
+                        imageFrame.setSize(400, 300);
+                        imageFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
                     }
 
                     return imageFrame;
                 }
-                ImageFrame imageFrame;
+
             };
         }
 
         return urlMouseListener;
     }
-
 
     /**
      * Process all the values in the tables to set the column width so that all
@@ -164,13 +158,11 @@ public class QueryResultsTable extends JTable {
         }
     }
 
-
     /**
      * <p>Generates a non-editable TableModel based on the contents of a queryResult.</p>
      *
      */
     class QueryResultsTableModel extends DefaultTableModel {
-
 
         /**
          *
@@ -179,7 +171,7 @@ public class QueryResultsTable extends JTable {
          */
         QueryResultsTableModel(QueryResults queryResults) {
             super(queryResults.getDataArray(),
-                    (String[]) queryResults.getColumnNames().toArray(new String[queryResults.getColumnNames().size()]));
+                  (String[]) queryResults.getColumnNames().toArray(new String[queryResults.getColumnNames().size()]));
         }
 
         /*
