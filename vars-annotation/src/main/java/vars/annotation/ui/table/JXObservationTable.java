@@ -160,26 +160,28 @@ public class JXObservationTable extends JXTable implements ObservationTable {
      * @param vColIndex
      */
     public void scrollToVisible(final int rowIndex, final int vColIndex) {
-        if (!(getParent() instanceof JViewport)) {
-            return;
-        }
+        scrollCellToVisible(rowIndex, vColIndex);
+//        if (!(getParent() instanceof JViewport)) {
+//            return;
+//        }
+//
+//        final JViewport viewport = (JViewport) getParent();
+//
+//        // This rectangle is relative to the table where the
+//        // northwest corner of cell (0,0) is always (0,0).
+//        final Rectangle rect = getCellRect(rowIndex, vColIndex, true);
+//
+//        // The location of the viewport relative to the table
+//        final Point pt = viewport.getViewPosition();
+//
+//        // Translate the cell location so that it is relative
+//        // to the view, assuming the northwest corner of the
+//        // view is (0,0)
+//        rect.setLocation(rect.x - pt.x, rect.y - pt.y);
+//
+//        // Scroll the area into view
+//        viewport.scrollRectToVisible(rect);
 
-        final JViewport viewport = (JViewport) getParent();
-
-        // This rectangle is relative to the table where the
-        // northwest corner of cell (0,0) is always (0,0).
-        final Rectangle rect = getCellRect(rowIndex, vColIndex, true);
-
-        // The location of the viewport relative to the table
-        final Point pt = viewport.getViewPosition();
-
-        // Translate the cell location so that it is relative
-        // to the view, assuming the northwest corner of the
-        // view is (0,0)
-        rect.setLocation(rect.x - pt.x, rect.y - pt.y);
-
-        // Scroll the area into view
-        viewport.scrollRectToVisible(rect);
     }
 
     /**

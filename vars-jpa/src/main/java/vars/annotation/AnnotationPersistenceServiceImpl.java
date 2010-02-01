@@ -69,21 +69,24 @@ public class AnnotationPersistenceServiceImpl extends QueryableImpl implements A
 
     /** JPA is not thread safe, so once DAO per thread */
     private final ThreadLocal<EntityManager> readOnlyEntityManagers = new ThreadLocal<EntityManager>();
-    private final EntityManagerFactory entityManagerFactory;
+    private final EntityManagerFactory kbEntityManagerFactory;
+    private final AnnotationDAOFactory annotationDAOFactory;
     private final PersistenceCache persistenceCache;
 
     private final Map<Concept, List<String>> descendantNameCache = Collections.synchronizedMap(new HashMap<Concept, List<String>>());
     /**
      * Constructs ...
      *
-     * @param entityManagerFactory
+     * @param kbEntityManagerFactory
      * @param persistenceCache
      */
     @Inject
-    public AnnotationPersistenceServiceImpl(@Named("knowledgebasePersistenceUnit") EntityManagerFactory entityManagerFactory,
+    public AnnotationPersistenceServiceImpl(AnnotationDAOFactory annotationDAOFactory,
+            @Named("knowledgebasePersistenceUnit") EntityManagerFactory kbEntityManagerFactory,
             PersistenceCache persistenceCache) {
         super(jdbcUrl, jdbcUsername, jdbcPassword, jdbcDriver);
-        this.entityManagerFactory = entityManagerFactory;
+        this.annotationDAOFactory = annotationDAOFactory;
+        this.kbEntityManagerFactory = kbEntityManagerFactory;
         this.persistenceCache = persistenceCache;
 
     }
@@ -164,7 +167,7 @@ public class AnnotationPersistenceServiceImpl extends QueryableImpl implements A
     private EntityManager getReadOnlyEntityManager() {
         EntityManager entityManager = readOnlyEntityManagers.get();
         if (entityManager == null || !entityManager.isOpen()) {
-            entityManager = entityManagerFactory.createEntityManager();
+            entityManager = kbEntityManagerFactory.createEntityManager();
             DAO dao = new vars.jpa.DAO(entityManager);
             dao.startTransaction();
             persistenceCache.addCacheClearedListener(new MyCacheClearedListener(dao));
@@ -186,7 +189,7 @@ public class AnnotationPersistenceServiceImpl extends QueryableImpl implements A
      * These are used to tag an annotation as the same creature that's been seen before.
      */
     public Collection<Integer> findAllReferenceNumbers(VideoArchiveSet videoArchiveSet, Concept concept) {
-        VideoArchiveDAO dao = new VideoArchiveDAOImpl(getReadOnlyEntityManager(), null);
+        VideoArchiveDAO dao = annotationDAOFactory.newVideoArchiveDAO();
         Collection<Integer> referenceNumbers = new TreeSet<Integer>();
         for (VideoArchive videoArchive : new ArrayList<VideoArchive>(videoArchiveSet.getVideoArchives())) {
             // TODO identity-reference is hard coded. It should be pulled out into a properties file

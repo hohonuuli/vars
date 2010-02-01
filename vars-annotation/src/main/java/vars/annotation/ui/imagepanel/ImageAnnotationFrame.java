@@ -144,7 +144,7 @@ public class ImageAnnotationFrame extends JFrame {
             SwingUtilities.invokeLater(new Runnable() {
 
                 public void run() {
-                    setTitle(getImageUrl().toExternalForm());
+                    setTitle(imageUrl.toExternalForm());
                     (new ImageLoader(imageUrl)).execute();
                 }
             });

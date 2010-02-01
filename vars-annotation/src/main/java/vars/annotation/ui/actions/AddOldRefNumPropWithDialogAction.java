@@ -73,8 +73,8 @@ public class AddOldRefNumPropWithDialogAction extends ActionAdapter {
             return;
         }
 
-        final Collection<Observation> observations = (Collection<Observation>) Lookup
-            .getSelectedObservationsDispatcher().getValueObject();
+        final Collection<Observation> observations = (Collection<Observation>)
+                Lookup.getSelectedObservationsDispatcher().getValueObject();
         if (observations.size() == 0) {
             return;
         }
@@ -84,9 +84,8 @@ public class AddOldRefNumPropWithDialogAction extends ActionAdapter {
             if (!observation.getConceptName().equals(conceptName)) {
                 EventBus.publish(Lookup.TOPIC_WARNING,
                                  "The selected observations must all contain the same conceptname");
+                return;
             }
-
-            return;
         }
 
         final VideoArchiveSet vas = videoArchive.getVideoArchiveSet();
@@ -110,8 +109,8 @@ public class AddOldRefNumPropWithDialogAction extends ActionAdapter {
          */
         if (refNums.size() == 0) {
             EventBus.publish(Lookup.TOPIC_WARNING,
-                             "<html><body>This Video Archive does not have " +
-                             "any reference numbers assigned. Use 'New #' instead.</body></html>");
+                             "<html><body>No reference numbers for " + conceptName +
+                             "were found. Use 'New #' instead.</body></html>");
         }
         else {
 

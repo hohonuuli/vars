@@ -55,8 +55,7 @@ public class VideoArchiveDAOImpl extends DAO implements VideoArchiveDAO {
     public Set<String> findAllLinkValues(VideoArchive videoArchive, String linkName, Concept concept) {
 
         // Due to lazy loading we want to iterate through all objects in a collection
-
-        videoArchive = findByPrimaryKey(VideoArchive.class, ((JPAEntity) videoArchive).getId()); // merge
+        videoArchive = find(videoArchive);
         Collection<? extends VideoFrame> videoFrames = videoArchive.getVideoArchiveSet().getVideoFrames();
         Set<String> linkValues = new HashSet<String>();
         for (VideoFrame videoFrame : videoFrames) {
