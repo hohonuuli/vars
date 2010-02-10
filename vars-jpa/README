@@ -1,3 +1,5 @@
+vars-jpa is an implementation of vars-core interfaces
+
 About DAO: 
 	As currently implemented. The makePersistent/makeTransient/update/findByPrimaryKey methods
 are exactly the same for all the DAO's so any DAO will work with any Entity object. However,
@@ -30,7 +32,7 @@ To delete from the database:
 	
 Creating your database:
 
-JPA can auto-generate your database tables. However, you may need to intialize your UniqueId table with the following:
+JPA can auto-generate your database tables. However, you may need to initialize your UniqueId table with the following:
 
 INSERT INTO UNIQUEID (tablename, nextid) VALUES ('CameraPlatformDeployment', 100);
 INSERT INTO UNIQUEID (tablename, nextid) VALUES ('VideoArchiveSet', 100);

@@ -44,7 +44,7 @@ import vars.integration.MergeStatus;
 import vars.jpa.JPAEntity;
 
 /**
- *
+ * Implementation of the merge function
  * @author brian
  */
 public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberDatum>> {

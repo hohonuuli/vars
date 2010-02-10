@@ -49,10 +49,21 @@
             <artifactId>guice</artifactId>
             <version>2.0</version>
         </dependency>
+        <!--
+        This throws a java.lang.ClassFormatError with EclipseLink. Using EclipseLinks
+        version of the API instead
+
         <dependency>
-            <groupId>javax.persistence</groupId>
-            <artifactId>persistence-api</artifactId>
-            <version>1.0.2</version>
+            <groupId>javax</groupId>
+            <artifactId>javaee-web-api</artifactId>
+            <version>6.0</version>
+            <scope>compile</scope>
+        </dependency> -->
+        <!-- JPA 2.0 Jar API from EclipseLink. Analagous to javaee-web-api above -->
+        <dependency>
+            <groupId>org.eclipse.persistence</groupId>
+            <artifactId>javax.persistence</artifactId>
+            <version>2.0.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

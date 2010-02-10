@@ -56,7 +56,6 @@ public class JXObservationTable extends JXTable implements ObservationTable {
         setAutoscrolls(true);
         aTableHeader.setTable(this);
         setTableHeader(aTableHeader);
-        
 
         super.setHighlighters(new Highlighter[] { HighlighterFactory.createAlternateStriping() });
         setRowHeightEnabled(true);
