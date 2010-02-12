@@ -12,6 +12,8 @@ import java.util.Arrays
 import java.util.Date
 import java.util.List
 import java.util.TimeZone
+import org.mbari.framegrab.VideoChannelGrabber
+import org.mbari.framegrab.GrabUtil
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import vars.ToolBox
@@ -20,18 +22,20 @@ import org.mbari.expd.actions.CoallateByDateFunction
 import org.mbari.vcr.rs422.VCR
 import org.mbari.vcr.VCRUtil
 import org.mbari.movie.Timecode
+import org.mbari.movie.VideoTimeBean
 import vars.annotation.CameraData
 
 class SimpaLoader {
 
-    private final toolBox;
-    private final dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private final offsetSecs = 7.5D;
-    private final coallateFunction = new CoallateByDateFunction()
-    private final targetRootDirectory
-    private final targetRootUrl
-    private final vcr
-    private final log = LoggerFactory.getLogger(getClass())
+    private toolBox = new ToolBox();
+    private dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private offsetSecs = 7.5D;
+    private coallateFunction = new CoallateByDateFunction()
+    private targetRootDirectory
+    private targetRootUrl
+    private vcr
+    private log = LoggerFactory.getLogger("SimpaLoader")
+	private frameGrabber = new VideoChannelGrabber()
 
     /**
      * @param targetDir is the root of the directory to write images into
@@ -41,12 +45,16 @@ class SimpaLoader {
         targetRootDirectory = new File(targetDir)
         targetRootUrl = new URL(targetUrl);
         vcr = new VCR(commport);
-
         dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        toolBox = new ToolBox()
     }
 
-    def read(URL url) {
+    def close() {
+		vcr.disconnect()
+		frameGrabber.dispose()
+    }
+
+    List<SimpaDatum> read(URL url) {
+		log.info("Reading data from ${url.toExternalForm()}")
         def reader = new BufferedReader(new InputStreamReader(url.openStream()));
         def lineCount = 0
         def line = null
@@ -54,25 +62,33 @@ class SimpaLoader {
 
         while((line = reader.readLine())) {
             data << parse(line)
+            lineCount++
         }
 
         reader.close()
+		log.info("Read ${lineCount} records")
         return data
     }
 
-    def load(List<SimpaDatum> simpaData, String platform, Integer sequenceNumber) {
+   def load(List<SimpaDatum> simpaData, String platform, Integer sequenceNumber, String startTimecodeS, String endTimecodeS, int tapeNumber) {
 
+		log.info("Loading records into VARS for ${platform} #${sequenceNumber}")
+		def startTimecode = new Timecode(startTimecodeS)
+		def endTimecode = new Timecode(endTimecodeS)
+ 
         // Need the dates for simpaData
         def simpaDates = simpaData.collect { it.date }
 
         // Fetch CTD data to get timecode
         def dive = toolBox.daoFactory.newDiveDAO().findByPlatformAndDiveNumber(platform, sequenceNumber)
         def uberData = toolBox.daoFactory.newUberDatumDAO().fetchData(dive, true, offsetSecs)
-        def dataMap = coallateFunction.apply(simpaDates, uberData, offsetSecs * 1000)
+        def dataMap = coallateFunction.apply(simpaDates, uberData, Math.round(offsetSecs * 1000) as Long)
+		dataMap.each { key, value -> println("${dateFormat.format(key)} - ${dateFormat.format(value.cameraDatum.date)} ${value.cameraDatum.timecode} ${value.cameraDatum.alternativeTimecode}")}
 
         def annotationFactory = toolBox.toolBelt.annotationFactory
-        def videoArchiveName = PersistenceController.makeVideoArchiveName(platform, sequenceNumber, 1, "-coolpix")
+        def videoArchiveName = PersistenceController.makeVideoArchiveName(platform, sequenceNumber, tapeNumber, "-simpa")
         try {
+			
             def cameraDataDAO = toolBox.daoFactory.newCameraDatumDAO()
             def conceptDAO = toolBox.toolBelt.knowledgebaseDAOFactory.newConceptDAO()
             conceptDAO.startTransaction()
@@ -82,90 +98,107 @@ class SimpaLoader {
 
             def videoArchive = videoArchiveDAO.findOrCreateByParameters(platform, sequenceNumber, videoArchiveName)
             def parentDir = new File("${targetRootDirectory.getAbsolutePath()}/${platform}/images/${sequenceNumber}/")
-            def parentUrlString = "${targetRootUrl.toExternalForm()}/${platform}/images/${sequenceNumber}/"
+            def parentUrlString = "${targetRootUrl.toExternalForm()}${platform}/images/${sequenceNumber}/"
             parentDir.mkdirs()
 
             simpaData.each { simpaDatum ->
+				log.info("Examining SIMPA data at ${dateFormat.format(simpaDatum.date)}")
                 def uberDatum = dataMap[simpaDatum.date]
                 def cameraDatum = uberDatum?.cameraDatum
                 if (cameraDatum) {
-                    def videoFrame = videoArchive.findVideoFrameByTimeCode(cameraDatum.timecode)
-                    def videoTime = cameraDataDAO.interpolateTimecodeToDate(platform, simpaDatum.date, offsetSecs * 1000, 29.97)
+					log.info("Processing SIMPA data at ${dateFormat.format(simpaDatum.date)}")
+                    def videoFrame = videoArchive.findVideoFrameByTimeCode(cameraDatum.alternativeTimecode)
+                    //def videoTime = cameraDataDAO.interpolateTimecodeToDate(platform, simpaDatum.date, offsetSecs * 1000 as Integer, 29.97 as Double)
+					def videoTime = new VideoTimeBean(uberDatum.cameraDatum.date, uberDatum.cameraDatum.alternativeTimecode)
+					def videoTimecode = new Timecode(videoTime.timecode)
+					if (videoTimecode.frames >= startTimecode.frames && videoTimecode.frames <= endTimecode.frames) {
 
-                    // Create a VideoFrame if needed
-                    if (!videoFrame) {
-                        if (videoTime) {
-                            videoFrame = annotationFactory.newVideoFrame()
-                            videoFrame.timecode = videoTime.timecode
-                            videoFrame.recordedDate = simpaDatum.date
-                            videoArchive.addVideoFrame(videoFrame)
-                            videoArchiveDAO.persist(videoFrame)
-                        }
-                    }
+						log.info("Processing SIMPA data at ${videoTime.timecode} / ${dateFormat.format(simpaDatum.date)}")	
 
-                    // Create an observation if needed
-                    if (videoFrame.observations.size() == 0) {
-                        def observation = annotationFactory.newObservation()
-                        observation.conceptName = conceptNameAsString
-                        observation.observer = getClass().simpleName
-                        observation.observationDate = new Date()
-                        videoFrame.addObservation(observation)
-                        videoArchiveDAO.persist(observation)
-                    }
+	                    // Create a VideoFrame if needed
+	                    if (!videoFrame) {
+	                        if (videoTime) {
+	                            videoFrame = annotationFactory.newVideoFrame()
+	                            videoFrame.timecode = videoTime.timecode
+	                            videoFrame.recordedDate = simpaDatum.date
+	                            videoArchive.addVideoFrame(videoFrame)
+	                            videoArchiveDAO.persist(videoFrame)
+	                        }
+	                    }
 
-                    // Make sure that there is an image associated with the videoframe
-                    if (videoFrame.cameraData.imageReference) {
-                        log.warn("${videoFrame} already exists and contains an image reference. Not modifying it")
-                    }
-                    else {
-                        def imageName = "${videoTime.timecode.replace(":", "_")}.png"
-                        def targetFile = new File(parentDir, imageName)
-                        if (captureFrame(videoTime.timecode, targetFile)) {
-                            def targetUrl = new URL("${parentUrlString}${targetFile}")
-                            CameraData cameraData = videoFrame.cameraData
+	                    // Create an observation if needed
+	                    if (videoFrame.observations.size() == 0) {
+	                        def observation = annotationFactory.newObservation()
+	                        observation.conceptName = conceptNameAsString
+	                        observation.observer = getClass().simpleName
+	                        observation.observationDate = new Date()
+	                        videoFrame.addObservation(observation)
+	                        videoArchiveDAO.persist(observation)
+	                    }
 
-                            // et videoFrame and cameraData fields
-                            cameraData.imageReference = targetUrl.toExternalForm()
-                            cameraData.x = simpaDatum.x
-                            cameraData.y = simpaDatum.y
-                            cameraData.setXYUnits("meters from origin")
-                            cameraData.z = simpaDatum.z
-                            cameraData.setZUnits("meters from origin")
-                            cameraData.viewHeight = simpaDatum.height
-                            cameraData.viewWidth = simpaDatum.width
-                            cameraData.viewUnits = "meters"
+	                    // Make sure that there is an image associated with the videoframe
+	                    if (videoFrame.cameraData.imageReference) {
+	                        log.warn("${videoFrame} already exists and contains an image reference. Not modifying it")
+	                    }
+	                    else {
+						
 
-                            // The following are in radians
-                            cameraData.roll = simpaDatum.roll
-                            cameraData.pitch = simpaDatum.pitch
-                            cameraData.heading = simpaDatum.heading
+	                        def imageName = "${videoTime.timecode.replace(":", "_")}.png"
+	                        def targetFile = new File(parentDir, imageName)
+							def gotImage = targetFile.exists()
+							if (!gotImage) {
+								gotImage = captureFrame(videoTime.timecode, targetFile)
+							}
+	                        if (gotImage) {
+	                            def targetUrl = new URL("${parentUrlString}${imageName}")
+	                            CameraData cameraData = videoFrame.cameraData
 
-                        }
-                    }
+	                            // et videoFrame and cameraData fields
+	                            cameraData.imageReference = targetUrl.toExternalForm()
+	                            cameraData.x = simpaDatum.x
+	                            cameraData.y = simpaDatum.y
+	                            cameraData.setXYUnits("meters from origin")
+	                            cameraData.z = simpaDatum.z
+	                            cameraData.setZUnits("meters from origin")
+	                            cameraData.viewHeight = simpaDatum.height
+	                            cameraData.viewWidth = simpaDatum.width
+	                            cameraData.viewUnits = "meters"
+
+	                            // The following are in radians
+	                            cameraData.roll = simpaDatum.roll
+	                            cameraData.pitch = simpaDatum.pitch
+	                            cameraData.heading = simpaDatum.heading
+
+	                        }
+	                    }
+					}
+					else {
+						log.info("${videoTime.timecode} is not between ${startTimecode} and ${endTimecode}. Skipping it")
+					}
                 }
             }
 
             videoArchiveDAO.endTransaction()
         }
         catch (Exception e) {
-
+			log.error("Load failed", e)
         }
 
-    }
+    } 
 
     private boolean captureFrame(String timecode, File target) {
         def captured = false
         def targetTimecode = new Timecode(timecode)
         def toleranceInFrames = 2
         def count = 0
-        def maxCount = 480 // 2 minutes (or 480 iterations at 250 ms per iteration).
+        def maxCount = 120 // 30 seconds
 
         // Use RXTX to seek to the correct timecode
         vcr.seekTimecode(VCRUtil.timecodeToTime(targetTimecode))
         while(true) {
             Thread.sleep(250)
             vcr.requestStatus()
-            if (vcr.vcrState.isStopped) {
+            if (vcr.vcrState.isStopped()) {
                 vcr.requestTimeCode()
                 def currentTimecode = vcr.vcrTimecode.timecode
                 if (Math.abs(targetTimecode.diffFrames(currentTimecode)) <= toleranceInFrames) {
@@ -173,8 +206,9 @@ class SimpaLoader {
                     log.debug("Saving image to ${target.absolutePath}")
 
                     // TODO Use Imagesnap to grab the image from the video capture card
-                    def snapCommand = "imagesnap -d videocard ${target.absolutePath}" as String
-                    snapCommand.execute()
+                    //def snapCommand = "imagesnap -d videocard ${target.absolutePath}" as String
+                    //snapCommand.execute()
+					GrabUtil.capture(frameGrabber, target)
                     captured = true
                 }
                 else {
@@ -194,7 +228,7 @@ class SimpaLoader {
         return captured
     }
 
-    def parse(String line) {
+    private parse(String line) {
         /*
          * Split the line by white space. Drop the empty spaces in
          * the resulting array.
@@ -220,26 +254,7 @@ class SimpaLoader {
     }
 
 
-    private class SimpaDatum {
-        int tileIndex
-        Date date
-        double x, y, z, roll, pitch, heading, width, height
 
-        def SimpaDatum() { }
-
-        def SimpaDatum(tileIndex, date, x, y, z, roll, pitch, heading, width, height) {
-            this.x = x
-            this.y = y
-            this.z = z
-            this.roll = roll
-            this.pitch = pitch
-            this.heading = heading
-            this.width = width
-            this.height = height
-        }
-
-
-    }
 
 }
 

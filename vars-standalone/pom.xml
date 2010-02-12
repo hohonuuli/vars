@@ -71,6 +71,12 @@
             <artifactId>slf4j-api</artifactId>
             <version>1.5.7</version>
         </dependency>
+        <!-- Need for loading SIMPA -->
+        <dependency>
+            <groupId>org.mbari</groupId>
+            <artifactId>qtx4j</artifactId>
+            <version>0.13-SNAPSHOT</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

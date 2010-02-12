@@ -16,12 +16,14 @@ GSH_CLASSPATH=$GSH_CLASSPATH:${VARS_HOME}/scripts/groovy:$VARS_CLASSPATH
 if [ -z $1 ]; then
     echo $FNAME " Starting Groovy shell"
     ${JAVACMD:=java} -Xms16m -Xmx512m \
+		 -Djava.library.path="${VARS_HOME}/native" \
          -Duser.timezone="UTC" \
          -Dfile.encoding=UTF8 \
          -classpath "$GSH_CLASSPATH" \
          org.codehaus.groovy.tools.shell.Main "$@"
 else
     ${JAVACMD:=java} -Xms16m -Xmx512m \
+         -Djava.library.path="${VARS_HOME}/native" \
          -Duser.timezone="UTC" \
          -Dfile.encoding=UTF8 \
          -classpath "$GSH_CLASSPATH" \

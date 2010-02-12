@@ -8,8 +8,8 @@
         </layout>
     </appender>
 
-    <logger name="org.hibernate">
-        <level value="warn" />
+    <logger name="org.mbari.vcr">
+        <level value="error" />
     </logger>
 
     <root>
