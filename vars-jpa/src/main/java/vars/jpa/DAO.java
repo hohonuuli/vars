@@ -1,7 +1,8 @@
 /*
- * @(#)DAO.java   2009.11.06 at 08:00:14 PST
+ * @(#)DAO.java   2010.02.17 at 03:00:10 PST
  *
  * Copyright 2009 MBARI
+ *
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -41,12 +42,6 @@ public class DAO implements vars.DAO, EntityManagerAspect {
     protected final Logger log = LoggerFactory.getLogger(getClass());
     private final EntityManager entityManager;
 
-    public boolean equalInDatastore(Object thisObj, Object thatObj) {
-        final JPAEntity thisEntity = (JPAEntity) thisObj;
-        final JPAEntity thatEntity = (JPAEntity) thatObj;
-        return thisEntity.getId().equals(thatEntity.getId());
-    }
-
     /**
      *
      */
@@ -65,6 +60,8 @@ public class DAO implements vars.DAO, EntityManagerAspect {
         this.entityManager = entityManager;
     }
 
+    /**
+     */
     public void commit() {
         if (entityManager.getTransaction().isActive()) {
             entityManager.getTransaction().commit();
@@ -72,8 +69,8 @@ public class DAO implements vars.DAO, EntityManagerAspect {
     }
 
     /**
- * Close any open transaction used on the current thread.
- */
+     * Close any open transaction used on the current thread.
+     */
     public void endTransaction() {
         EntityTransaction entityTransaction = entityManager.getTransaction();
         if (entityTransaction.isActive()) {
@@ -98,14 +95,42 @@ public class DAO implements vars.DAO, EntityManagerAspect {
         }
     }
 
+    /**
+     *
+     * @param thisObj
+     * @param thatObj
+     * @return
+     */
+    public boolean equalInDatastore(Object thisObj, Object thatObj) {
+        final JPAEntity thisEntity = (JPAEntity) thisObj;
+        final JPAEntity thatEntity = (JPAEntity) thatObj;
+        return thisEntity.getId().equals(thatEntity.getId());
+    }
+
+    /**
+     * Retrieves the object from the datastore. This ignores all state changes
+     * in the provided object and returns the copy as found in the data store.
+     *
+     * @param object
+     * @param <T>
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T find(T object) {
+        log.debug("Executing FIND on {}", object);
+        final JPAEntity jpaEntity = (JPAEntity) object;
+        return (T) entityManager.find(jpaEntity.getClass(), jpaEntity.getId());
+    }
+
     @Override
     protected void finalize() throws Throwable {
         if ((entityManager != null) && entityManager.isOpen()) {
-            if (log.isDebugEnabled()) {
-                log.debug("Closing " + entityManager);
+            if (log.isWarnEnabled()) {
+                log.warn("Disposing of DAO that references an open entitymanager  [" +
+                        entityManager + "]. Did you forget to call endTransaction?");
             }
 
-            entityManager.close();
+            //entityManager.close();
         }
 
         super.finalize();
@@ -119,8 +144,6 @@ public class DAO implements vars.DAO, EntityManagerAspect {
     * @param namedParameters
     *            A Map<String, Object> of the 'named' parameters to assign in
     *            the query
-    * @param endTransaction if true the transaction wll be ended when the method exits. If
-    *     false then the transaction will be kept open and can be reused by the current thread.
     * @return A list of objects returned by the query.
     */
     public List findByNamedQuery(String name, Map<String, Object> namedParameters) {
@@ -150,15 +173,25 @@ public class DAO implements vars.DAO, EntityManagerAspect {
         return resultList;
     }
 
+    /**
+     *
+     * @param clazz
+     * @param primaryKey
+     * @param <T>
+     * @return
+     */
     public <T> T findByPrimaryKey(Class<T> clazz, Object primaryKey) {
         T value = null;
         log.debug("Executing FIND for {} using primary key = {}", clazz, primaryKey);
-        
+
         value = entityManager.find(clazz, primaryKey);
 
         return value;
     }
 
+    /**
+     * @return
+     */
     public EntityManager getEntityManager() {
         return entityManager;
     }
@@ -194,6 +227,8 @@ public class DAO implements vars.DAO, EntityManagerAspect {
      * @param entity
      *            The entity object whos fields are being updated in the
      *            database.
+     * @param <T>
+     * @return
      */
     public <T> T merge(T entity) {
         log.debug("Executing {} on {}", TransactionType.MERGE, entity);
@@ -211,8 +246,12 @@ public class DAO implements vars.DAO, EntityManagerAspect {
         entityManager.persist(entity);
     }
 
+    /**
+     *
+     * @param entity
+     */
     public void remove(Object entity) {
-    	log.debug("Executing {} on {}", TransactionType.REMOVE, entity);
+        log.debug("Executing {} on {}", TransactionType.REMOVE, entity);
         entityManager.remove(entity);
     }
 
@@ -220,11 +259,6 @@ public class DAO implements vars.DAO, EntityManagerAspect {
      * Start a database transaction. Also initializes the EntityManager and
      * returns an instance of it.
      *
-     * @return An EntityManager for interacting with the database. DO NOT close
-     *         this as it may be shared by other methods on the same thread. If
-     *         you need to force commit your changes to the database use
-     *         <i>entityManager.flush()</i> <b>NOT</b>
-     *         <i>entityManager.close()</i>
      */
     public void startTransaction() {
         EntityTransaction entityTransaction = entityManager.getTransaction();
@@ -233,20 +267,4 @@ public class DAO implements vars.DAO, EntityManagerAspect {
             log.debug("JPA Transaction Started");
         }
     }
-
-
-    /**
-     * Retrieves the object from the datastore. This ignores all state changes
-     * in the provided object and returns the copy as found in the data store.
-     */
-	@SuppressWarnings("unchecked")
-	public <T> T find(T object) {
-		log.debug("Executing FIND on {}", object);
-		final JPAEntity jpaEntity = (JPAEntity) object;
-		return (T) entityManager.find(jpaEntity.getClass(), jpaEntity.getId());
-	}
-    
-    
-    
-    
 }

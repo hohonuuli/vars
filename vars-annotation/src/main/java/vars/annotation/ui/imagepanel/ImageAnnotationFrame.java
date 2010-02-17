@@ -17,10 +17,13 @@ package vars.annotation.ui.imagepanel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
 import java.net.URL;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
+import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import org.jdesktop.jxlayer.JXLayer;
@@ -29,6 +32,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.VideoFrame;
 import vars.annotation.ui.ToolBelt;
+import vars.knowledgebase.Concept;
+import vars.shared.ui.AllConceptNamesComboBox;
+import vars.shared.ui.ConceptNameComboBox;
 
 /**
  *
@@ -42,13 +48,30 @@ public class ImageAnnotationFrame extends JFrame {
     private ImageCanvas imageCanvas = new ImageCanvas();
     private JXLayer<ImageCanvas> layer;
     private final AnnotationLayerUI layerUI;
+    private JToolBar toolBar;
 
+
+    private ConceptNameComboBox comboBox;
     /**
      * Create the frame
      */
-    public ImageAnnotationFrame(ToolBelt toolBelt) {
+    public ImageAnnotationFrame(final ToolBelt toolBelt) {
         super();
         layerUI = new AnnotationLayerUI<ImageCanvas>(toolBelt);
+        comboBox = new AllConceptNamesComboBox(toolBelt.getQueryPersistenceService());
+
+        /*
+         * When combo box changes, change the default concept used for point and
+         * click annotations
+         */
+        comboBox.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    Concept concept = toolBelt.getAnnotationPersistenceService().findConceptByName((String) comboBox.getSelectedItem());
+                    layerUI.setConcept(concept);
+                }
+            }
+        });
         initialize();
     }
 
@@ -98,9 +121,22 @@ public class ImageAnnotationFrame extends JFrame {
         return layer;
     }
 
+    public JToolBar getToolBar() {
+        if (toolBar == null) {
+            toolBar = new JToolBar();
+            toolBar.add(comboBox);
+        }
+        return toolBar;
+    }
+
+
+
+
+
     private void initialize() {
         setLayout(new BorderLayout());
         add(getLayer(), BorderLayout.CENTER);
+        add(getToolBar(), BorderLayout.SOUTH);
         setPreferredSize(new Dimension(640, 480));
         setImageUrl(null);
     }

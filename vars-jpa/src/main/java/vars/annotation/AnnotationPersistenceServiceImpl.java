@@ -38,7 +38,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import org.mbari.text.IgnoreCaseToStringComparator;
 import vars.*;
-import vars.annotation.jpa.VideoArchiveDAOImpl;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptName;
@@ -168,7 +167,9 @@ public class AnnotationPersistenceServiceImpl extends QueryableImpl implements A
         EntityManager entityManager = readOnlyEntityManagers.get();
         if (entityManager == null || !entityManager.isOpen()) {
             entityManager = kbEntityManagerFactory.createEntityManager();
+
             DAO dao = new vars.jpa.DAO(entityManager);
+
             dao.startTransaction();
             persistenceCache.addCacheClearedListener(new MyCacheClearedListener(dao));
             readOnlyEntityManagers.set(entityManager);

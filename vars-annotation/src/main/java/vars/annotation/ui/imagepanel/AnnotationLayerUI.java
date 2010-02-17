@@ -1,7 +1,17 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * @(#)AnnotationLayerUI.java   2010.02.17 at 02:07:49 PST
+ *
+ * Copyright 2009 MBARI
+ *
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
+
 
 package vars.annotation.ui.imagepanel;
 
@@ -41,16 +51,53 @@ import vars.knowledgebase.Concept;
 /**
  *
  * @author brian
+ *
+ * @param <T>
  */
 public class AnnotationLayerUI<T extends ImageCanvas> extends CrossHairLayerUI<T> {
+
+    /**
+     * This font is used to draw the concept name of concepts.
+     */
+    private final Controller controller = new Controller();
+
+    /** A list of all observations within the bounds of the current tile */
+    private List<Observation> observations = new Vector<Observation>();
+
+    /** A list of observations that were selected using the boundingbox */
+    private List<Observation> selectedObservations = new Vector<Observation>();
+
+    /**
+     * Record of the location of the most recent mousePress event. Used for
+     * drawing the boundingBox
+     */
+    private Point2D clickPoint = new Point2D.Double();
+
+    /**
+     * Bounding box is used in the UI to select annotation
+     */
+    private Rectangle2D boundingBox;
+    /** The concept to use for creating new observations **/
+    private Concept concept;
+    private final ToolBelt toolBelt;
+    private VideoFrame videoFrame;
+
+    /**
+     * Constructs ...
+     *
+     * @param toolBelt
+     */
+    public AnnotationLayerUI(ToolBelt toolBelt) {
+        this.toolBelt = toolBelt;
+    }
 
     private enum MarkerStyle {
         SELECTED(new Color(0, 255, 0, 180), new Font("Sans Serif", Font.PLAIN, 10), 14, new BasicStroke(3)),
         NOTSELECTED(new Color(255, 0, 0, 180), new Font("Sans Serif", Font.PLAIN, 8), 7, new BasicStroke(3));
 
+        private final int armLength;
         private final Color color;
         private final Font font;
-        private final int armLength;
         private final Stroke stroke;
 
         private MarkerStyle(Color color, Font font, int armLength, Stroke stroke) {
@@ -59,48 +106,40 @@ public class AnnotationLayerUI<T extends ImageCanvas> extends CrossHairLayerUI<T
             this.armLength = armLength;
             this.stroke = stroke;
         }
-
     }
 
     /**
-     * This font is used to draw the concept name of concepts.
+     * @return
      */
-    private final Controller controller = new Controller();
-    private final ToolBelt toolBelt;
-    private VideoFrame videoFrame;
+    public Concept getConcept() {
+        if (concept == null) {
+            concept = toolBelt.getAnnotationPersistenceService().findRootConcept();
+        }
 
+        return concept;
+    }
 
-    /** A list of all observations within the bounds of the current tile */
-    private List<Observation> observations = new Vector<Observation>();
-    /** A list of observations that were selected using the boundingbox */
-    private List<Observation> selectedObservations = new Vector<Observation>();
-    
     /**
-     * Record of the location of the most recent mousePress event. Used for
-     * drawing the boundingBox
+     * @return
      */
-    private Point2D clickPoint = new Point2D.Double();
-    /**
-     * Bounding box is used in the UI to select annotation
-     */
-    private Rectangle2D boundingBox;
-
-    public AnnotationLayerUI(ToolBelt toolBelt) {
-        this.toolBelt = toolBelt;
+    public VideoFrame getVideoFrame() {
+        return videoFrame;
     }
 
     @Override
     protected void paintLayer(Graphics2D g2, JXLayer<? extends T> jxl) {
         super.paintLayer(g2, jxl);
-        g2.setPaintMode();           // Make sure XOR is turned off
-        
+        g2.setPaintMode();    // Make sure XOR is turned off
+
         if (videoFrame != null) {
 
             for (Observation observation : videoFrame.getObservations()) {
-                Collection<Observation> rowSelectedObservations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
-                MarkerStyle markerStyle = rowSelectedObservations.contains(observation) ? MarkerStyle.SELECTED : MarkerStyle.NOTSELECTED;
-                if (observation.getX() != null && observation.getY() != null) {
-                    
+                Collection<Observation> rowSelectedObservations = (Collection<Observation>) Lookup
+                    .getSelectedObservationsDispatcher().getValueObject();
+                MarkerStyle markerStyle = rowSelectedObservations.contains(observation)
+                                          ? MarkerStyle.SELECTED : MarkerStyle.NOTSELECTED;
+                if ((observation.getX() != null) && (observation.getY() != null)) {
+
 
                     Point2D imagePoint = new Point2D.Double(observation.getX(), observation.getY());
                     Point2D componentPoint2D = jxl.getView().convertToComponent(imagePoint);
@@ -111,6 +150,7 @@ public class AnnotationLayerUI<T extends ImageCanvas> extends CrossHairLayerUI<T
 
                         g2.setStroke(markerStyle.stroke);
                         g2.setPaint(markerStyle.color);
+
                         // Write the concept name
                         g2.setFont(markerStyle.font);
                         g2.drawString(observation.getConceptName(), x + 5, y);
@@ -132,34 +172,11 @@ public class AnnotationLayerUI<T extends ImageCanvas> extends CrossHairLayerUI<T
 
                 // Draw the bounding box
                 g2.setXORMode(Color.WHITE);
-                g2.setStroke(new BasicStroke(3, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 0, new float[] { 2, 2 }, 2));
+                g2.setStroke(new BasicStroke(3, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 0, new float[] { 2, 2 },
+                                             2));
                 g2.draw(boundingBox);
                 g2.setPaintMode();
             }
-        }
-    }
-
-    public VideoFrame getVideoFrame() {
-        return videoFrame;
-    }
-
-    public void setVideoFrame(VideoFrame videoFrame_) {
-        /*
-         * We have to look up the videoframe from the database since the reference
-         * passed may be stale
-         */
-        videoFrame = videoFrame_ == null ? null :toolBelt.getAnnotationDAOFactory().newDAO().find(videoFrame_);
-        observations.clear();
-        selectedObservations.clear();
-        boundingBox = null;
-        setDirty(true);
-        if (videoFrame != null) {
-            observations.addAll(Collections2.filter(videoFrame.getObservations(), new Predicate<Observation>() {
-                public boolean apply(Observation input) {
-                    return input.getX() != null && input.getY() != null;
-                }
-            }));
-            setDirty(true);
         }
     }
 
@@ -168,91 +185,136 @@ public class AnnotationLayerUI<T extends ImageCanvas> extends CrossHairLayerUI<T
         super.processMouseEvent(me, jxl);
         Point point = SwingUtilities.convertPoint(me.getComponent(), me.getPoint(), jxl);
         switch (me.getID()) {
-            case MouseEvent.MOUSE_PRESSED:
-                clickPoint.setLocation( (int) Math.round(point.getX()), (int) Math.round(point.getY()));
-                break;
-            case MouseEvent.MOUSE_RELEASED:
-                if (me.getButton() != MouseEvent.BUTTON1) {
-                    selectedObservations.clear();
-                    setDirty(true);
+        case MouseEvent.MOUSE_PRESSED:
+            clickPoint.setLocation((int) Math.round(point.getX()), (int) Math.round(point.getY()));
+            break;
+        case MouseEvent.MOUSE_RELEASED:
+            if (me.getButton() != MouseEvent.BUTTON1) {
+                selectedObservations.clear();
+                setDirty(true);
+            }
+            else {
+                selectedObservations.clear();
+
+                if (boundingBox == null) {
+
+                    /*
+                     * If the mouse is NOT being dragged then create a new Observation.
+                     * The point coordinates should be in the images
+                     * coordinate system NOT the coordiates of the view displaying
+                     * the image.
+                     */
+                    Point2D imagePoint = jxl.getView().convertToImage(point);
+                    controller.newObservation(imagePoint);
+
                 }
                 else {
-                    selectedObservations.clear();
-                    if (boundingBox == null) {
-                        /*
-                         * If the mouse is NOT being dragged then create a new Observation.
-                         * The point coordinates should be in the images
-                         * coordinate system NOT the coordiates of the view displaying
-                         * the image.
-                         */
-                        Point2D imagePoint = jxl.getView().convertToImage(point);
-                        controller.newObservation(imagePoint);
+                    Rectangle r = boundingBox.getBounds();
+                    boundingBox = null;
 
-                    }
-                    else {
-                        Rectangle r = boundingBox.getBounds();
-                        boundingBox = null;
-
-                        for (Observation observation : observations) {
-                            Point2D imagePoint = jxl.getView().convertToComponent(new Point2D.Double(observation.getX(),
-                                    observation.getY()));
-                            if (r.contains(imagePoint)) {
-                                selectedObservations.add(observation);
-                            }
+                    for (Observation observation : observations) {
+                        Point2D imagePoint = jxl.getView().convertToComponent(new Point2D.Double(observation.getX(),
+                            observation.getY()));
+                        if (imagePoint != null && r.contains(imagePoint)) {
+                            selectedObservations.add(observation);
                         }
-                        controller.sendSelectionNotification();
                     }
+
+                    controller.sendSelectionNotification();
                 }
-                break;
-            default:
-                // Do nothing
+            }
+
+            break;
+        default:
+
+        // Do nothing
         }
     }
 
     @Override
     protected void processMouseMotionEvent(MouseEvent me, JXLayer<? extends T> jxl) {
         super.processMouseMotionEvent(me, jxl);
-        switch (me.getID()) {
-            case MouseEvent.MOUSE_DRAGGED:
-                // Draw bounding box
-                Point point = SwingUtilities.convertPoint(me.getComponent(), me.getPoint(), jxl);
-                int x1 = (int) Math.round(point.getX());
-                int y1 = (int) Math.round(point.getY());
-                int x0 = (int) clickPoint.getX();
-                int y0 = (int) clickPoint.getY();
-                int w = Math.abs(x1 - x0);
-                int h = Math.abs(y1 - y0);
 
-                int x = Math.min(x0, x1);
-                int y = Math.min(y0, y1);
-                if (boundingBox == null) {
-                    boundingBox = new Rectangle2D.Double(x, y, w, h);
-                }
-                else {
-                    // Minimize he redraw area
-                    boundingBox.setRect(x, y, w, h);
-                }
-                setDirty(true);
-                break;
-            default:
-                // Do nothing
+        switch (me.getID()) {
+        case MouseEvent.MOUSE_DRAGGED:
+
+            // Draw bounding box
+            Point point = SwingUtilities.convertPoint(me.getComponent(), me.getPoint(), jxl);
+            int x1 = (int) Math.round(point.getX());
+            int y1 = (int) Math.round(point.getY());
+            int x0 = (int) clickPoint.getX();
+            int y0 = (int) clickPoint.getY();
+            int w = Math.abs(x1 - x0);
+            int h = Math.abs(y1 - y0);
+
+            int x = Math.min(x0, x1);
+            int y = Math.min(y0, y1);
+            if (boundingBox == null) {
+                boundingBox = new Rectangle2D.Double(x, y, w, h);
+            }
+            else {
+
+                // Minimize he redraw area
+                boundingBox.setRect(x, y, w, h);
+            }
+
+            setDirty(true);
+            break;
+        default:
+
+        // Do nothing
 
         }
     }
 
+    /**
+     *
+     * @param concept
+     */
+    public void setConcept(Concept concept) {
+        this.concept = concept;
+    }
+
+    /**
+     *
+     * @param videoFrame_
+     */
+    public void setVideoFrame(VideoFrame videoFrame_) {
+
+        /*
+         * We have to look up the videoframe from the database since the reference
+         * passed may be stale
+         */
+        videoFrame = (videoFrame_ == null) ? null : toolBelt.getAnnotationDAOFactory().newDAO().find(videoFrame_);
+        observations.clear();
+        selectedObservations.clear();
+        boundingBox = null;
+        setDirty(true);
+
+        if (videoFrame != null) {
+            observations.addAll(Collections2.filter(videoFrame.getObservations(), new Predicate<Observation>() {
+
+                public boolean apply(Observation input) {
+                    return (input.getX() != null) && (input.getY() != null);
+                }
+
+            }));
+            setDirty(true);
+        }
+    }
 
     private class Controller {
 
         void newObservation(Point2D point) {
             UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
-            if (userAccount != null && videoFrame != null) {
+            if ((userAccount != null) && (videoFrame != null)) {
                 Observation observation = toolBelt.getAnnotationFactory().newObservation();
-                Concept root = toolBelt.getAnnotationPersistenceService().findRootConcept();
-                observation.setConceptName(root.getPrimaryConceptName().getName());
+                observation.setConceptName(getConcept().getPrimaryConceptName().getName());
                 observation.setObservationDate(new Date());
                 observation.setObserver(userAccount.getUserName());
                 observation.setX(point.getX());
                 observation.setY(point.getY());
+
                 // The persistence controller will trigger an update to setVideoFrame on this class
                 toolBelt.getPersistenceController().insertObservation(videoFrame, observation);
             }
@@ -264,12 +326,11 @@ public class AnnotationLayerUI<T extends ImageCanvas> extends CrossHairLayerUI<T
             ObservationTableModel model = (ObservationTableModel) ((JTable) table).getModel();
             ListSelectionModel selectionModel = ((JTable) table).getSelectionModel();
             selectionModel.clearSelection();
+
             for (Observation observation : obs) {
                 int row = model.getObservationRow(observation);
                 selectionModel.addSelectionInterval(row, row);
             }
         }
-
     }
-
 }
