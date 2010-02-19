@@ -31,7 +31,7 @@ import vars.annotation.ui.PersistenceController;
 /**
  *
  */
-public class ToolBelt extends vars.shared.ui.ToolBelt {
+public class ToolBelt extends vars.ToolBelt {
 
     private final PersistenceController persistenceController;
 

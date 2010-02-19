@@ -303,4 +303,8 @@ public class QueryPersistenceServiceImpl implements QueryPersistenceService {
     public QueryResults executeQuery(String query) throws Exception {
         return annoQueryable.executeQuery(query);
     }
+
+    public <T> T executeQueryFunction(String query, QueryFunction<T> queryFunction) {
+        return annoQueryable.executeQueryFunction(query, queryFunction);
+    }
 }

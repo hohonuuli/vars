@@ -13,7 +13,7 @@ import vars.query.QueryPersistenceService;
 
 import com.google.inject.Inject;
 
-public class ToolBelt extends vars.shared.ui.ToolBelt {
+public class ToolBelt extends vars.ToolBelt {
 
 	@Inject
 	public ToolBelt(AnnotationDAOFactory annotationDAOFactory,

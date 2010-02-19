@@ -1,4 +1,4 @@
-package vars.shared.ui;
+package vars;
 
 /*
  * @(#)Toolbelt.java   2009.11.15 at 07:47:13 PST

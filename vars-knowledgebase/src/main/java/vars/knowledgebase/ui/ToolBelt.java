@@ -34,7 +34,7 @@ import vars.query.QueryPersistenceService;
  * Container that holds on to a ton of shared objects that need to be widely
  * used across this application
  */
-public class ToolBelt extends vars.shared.ui.ToolBelt {
+public class ToolBelt extends vars.ToolBelt {
 
     private final ApproveHistoryTask approveHistoryTask;
     private final HistoryFactory historyFactory;
