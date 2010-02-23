@@ -57,7 +57,7 @@ Steps to migrating existing VARS databases:
   1. Create a copy of your original database tables
   2. Copy KB from original to new
   3. Run VARS-REDUX schema upgrade script on the new databas
-  4. Increment all values in UniqueID table by 1 @done(2010-01-05)
+  4. Increment all values in UniqueID table by 1
   5. Set LAST_UPDATE_TIME values to some date (instead of null)
   6. remove all rowguid columns and there associated index
   7. Modify annotation view by dropping reference to Association_Child_Parent table @done

@@ -191,4 +191,8 @@ public class VideoArchiveImpl implements Serializable, VideoArchive, JPAEntity {
     	return getId();
     }
 
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "([id=" + id + "] name=" + name + ")";
+    }
 }

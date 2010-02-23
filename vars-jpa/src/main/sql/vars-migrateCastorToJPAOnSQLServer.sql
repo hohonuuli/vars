@@ -53,7 +53,7 @@ ALTER TABLE CameraData
 GO
 
 ALTER TABLE CameraData
-    ADD VIEWUNITS FLOAT
+    ADD VIEWUNITS VARCHAR(50)
 GO
 
 -- Enforce the 1:1 relationship between VideoFrame and CameraData tables: TODO Duplicate keys already exist

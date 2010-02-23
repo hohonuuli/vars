@@ -44,8 +44,6 @@ public interface DAO {
      * @param namedParameters
      *            A Map<String, Object> of the 'named' parameters to assign in
      *            the query
-     * @param endTransaction if true the transaction wll be ended when the method exits. If
-     *     false then the transaction will be kept open and can be reused by the current thread.
      * @return A list of objects returned by the query.
      */
     List findByNamedQuery(String name, Map<String, Object> namedParameters);
