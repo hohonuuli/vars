@@ -180,7 +180,6 @@ public class VideoArchiveImpl implements Serializable, VideoArchive, JPAEntity {
         public boolean apply(VideoFrame input) {
             return  input.getObservations().size() == 0;
         }
-
     }
 
     void setVideoArchiveSet(VideoArchiveSet videoArchiveSet) {
@@ -195,4 +194,21 @@ public class VideoArchiveImpl implements Serializable, VideoArchive, JPAEntity {
     public String toString() {
         return getClass().getSimpleName() + "([id=" + id + "] name=" + name + ")";
     }
+
+//    @Override
+//    public boolean equals(Object o) {
+//        if (this == o) return true;
+//        if (o == null || getClass() != o.getClass()) return false;
+//
+//        VideoArchiveImpl that = (VideoArchiveImpl) o;
+//
+//        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+//
+//        return true;
+//    }
+//
+//    @Override
+//    public int hashCode() {
+//        return name != null ? name.hashCode() : 0;
+//    }
 }

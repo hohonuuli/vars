@@ -1,9 +1,13 @@
-package vars.annotation
+package vars.migrations
 
 import org.mbari.sql.QueryFunction
 import org.slf4j.LoggerFactory
 import vars.ToolBox
 import vars.annotation.jpa.VideoArchiveImpl
+import vars.annotation.jpa.VideoFrameDAOImpl
+import vars.annotation.VideoArchive
+import vars.annotation.VideoFrameDAO
+import vars.annotation.VideoFrame
 
 /**
  * Combines duplicate VideoArchiveNames. This is really a one-off script for migrating from
@@ -39,7 +43,7 @@ class CombineDuplicatesFunction {
         } as QueryFunction
 
         return toolBox.toolBelt.annotationPersistenceService.executeQueryFunction("""
- SELECT
+SELECT
     videoArchiveName, count(*) as counter
 FROM
     VideoArchive
@@ -63,7 +67,7 @@ HAVING COUNT(*) > 1
 
         // Get the ID (Primary Key) of all videoarchives with the given name
         def queryable = toolBox.toolBelt.annotationPersistenceService
-        def ids = queryable.executeQueryFunction("SELECT id FROM VideoArchive WHERE videoArchiveName = '${name}' ORDER BY id" as String, handler)
+        def ids = queryable.executeQueryFunction("SELECT DISTINCT id FROM VideoArchive WHERE videoArchiveName = '${name}' ORDER BY id" as String, handler)
         if (ids.size() == 1) {
             log.debug("Only 1 VideoArchive named '${name}' was found. No merging needed!")
             return
@@ -76,50 +80,20 @@ HAVING COUNT(*) > 1
         // We'll use the first videoarchiveset we find a the 'master'. Data from the others
         // will be moved into the master.
         def videoArchiveDAO = toolBox.toolBelt.annotationDAOFactory.newVideoArchiveDAO()
+        def videoFrameDAO = new VideoFrameDAOImpl(videoArchiveDAO.entityManager)
         videoArchiveDAO.startTransaction()
-        def targetVas = videoArchiveDAO.findByPrimaryKey(VideoArchiveImpl.class, ids[0]).videoArchiveSet
-        log.debug("Using ${targetVas} as the master VideoArchiveSet")
+        def targetVa = videoArchiveDAO.findByPrimaryKey(VideoArchiveImpl.class, ids[0])
 
         ids[1..-1].each { id ->
-            VideoArchiveSet sourceVas = videoArchiveDAO.findByPrimaryKey(VideoArchiveImpl.class, id).videoArchiveSet
-            log.debug("---- Examining ${sourceVas}")
-            if (sourceVas.id != targetVas.id) {
-                targetVas.videoArchives.each { VideoArchive targetVa ->
-                    log.debug("Looking for a match to ${targetVa.name}")
-                    def duplicateVa = sourceVas.getVideoArchiveByName(targetVa.name)
-                    if (duplicateVa) {
-                        log.debug("Found duplicate VideoArchive named '${duplicateVa.name}'")
-                        mergeVideoArchive(duplicateVa, targetVa)
-
-                        // Delete the now-empty videoArchive
-                        sourceVas.removeVideoArchive(duplicateVa)
-                        videoArchiveDAO.remove(duplicateVa)
-                    }
-                }
-
-                // Move leftover videoarchives from sourceVas to targetVas
-                sourceVas.videoArchives.each { VideoArchive va ->
-                    log.debug("Moving ${va.name} from ${sourceVas} to ${targetVas}")
-                    sourceVas.removeVideoArchive(va)
-                    targetVas.addVideoArchive(va)
-                }
-
-
+            VideoArchive sourceVa = videoArchiveDAO.findByPrimaryKey(VideoArchiveImpl.class, id)
+            log.debug("Merging duplicate ${sourceVa} into ${targetVa}")
+            mergeVideoArchive(sourceVa, targetVa, videoFrameDAO)
+            def sourceVas = sourceVa.videoArchiveSet
+            sourceVas.removeVideoArchive(sourceVa)
+            videoArchiveDAO.remove(sourceVa)
+            if (sourceVas.videoArchives.size() == 0) {
+                videoArchiveDAO.remove(sourceVas)
             }
-            else {
-                def vaList = targetVas.videoArchives
-                targetVas.videoArchives.each { VideoArchive targetVa ->
-                    // TODO use for loop and break out if match is found or filter!
-                    vaList.each { VideoArchive duplicateVa ->
-                        if (targetVa.name.equals(duplicateVa.name) && targetVa.id != duplicateVa.id ) {
-                            mergeVideoArchive(duplicateVa, targetVa)
-
-                        }
-                    }
-                }
-
-            }
-
         }
 
         videoArchiveDAO.endTransaction()
@@ -129,12 +103,16 @@ HAVING COUNT(*) > 1
     /**
      * This needs to be called within a DAO transaction
      */
-    private mergeVideoArchive(VideoArchive source, VideoArchive target) {
-        source.videoFrames.each { VideoFrame sourceVf ->
-            VideoFrame targetVf = target.findVideoFrameByTimeCode(sourceVf.timecode)
+    private mergeVideoArchive(VideoArchive source, VideoArchive target, VideoFrameDAO videoFrameDAO) {
+        log.debug("Processing ${source.videoFrames.size()} VideoFrames")
+        def sourceVideoFrames = videoFrameDAO.findAllByVideoArchivePrimaryKey(source.id)
+        def targetVideoFrames = videoFrameDAO.findAllByVideoArchivePrimaryKey(target.id)
+        sourceVideoFrames.each { VideoFrame sourceVf ->
+            VideoFrame targetVf = targetVideoFrames.find { it.timecode.equals(sourceVf.timecode) }
             // If the timecode exists in the target, move the observations from the source to the target
             if (targetVf) {
                 def observations = sourceVf.observations
+                log.debug("Moving ${observations.size()} observations from ${sourceVf} to ${targetVf}")
                 observations.each { obs ->
                     sourceVf.removeObservation(obs)
                     targetVf.addObservation(obs)
@@ -143,8 +121,13 @@ HAVING COUNT(*) > 1
                 if (!targetVf.hasImageReference() && sourceVf.hasImageReference()) {
                     targetVf.cameraData.imageReference = sourceVf.cameraData.imageReference
                 }
+
+                if (sourceVf.observations.size() == 0) {
+                    videoFrameDAO.remove(sourceVf)
+                }
             }
             else {
+                log.debug("Moving ${sourceVf}} from ${source} to ${target}")
                 source.removeVideoFrame(sourceVf)
                 target.addVideoFrame(sourceVf)
             }
