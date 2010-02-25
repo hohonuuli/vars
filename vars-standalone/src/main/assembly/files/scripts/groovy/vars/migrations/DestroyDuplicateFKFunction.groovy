@@ -30,25 +30,21 @@ class DestroyDuplicateFKFunction {
 
     private final toolBox = new vars.ToolBox()
 
-    private final dataMap = [(VideoArchiveImpl.class): new KeyMapper("VideoArchive", "VideoArchiveSetID_FK"),
-            (VideoFrameImpl.class): new KeyMapper("VideoFrame", "VideoArchiveID_FK"),
-            (ObservationImpl.class): new KeyMapper("Observation", "VideoFrameID_FK"),
-            (AssociationImpl.class): new KeyMapper("Association", "ObservationID_FK"),
-            (CameraDataImpl.class): new KeyMapper("CameraData", "VideoFrameID_FK"),
-            (PhysicalDataImpl.class): new KeyMapper("PhysicalData", "VideoFrameID_FK"),
-            (CameraDeploymentImpl.class): new KeyMapper("CameraPlatformDeployment", "VideoArchiveSetID_FK")
+    private final dataMap = [
+            (CameraDataImpl.class): new TableColumn("CameraData", "VideoFrameID_FK"),
+            (PhysicalDataImpl.class): new TableColumn("PhysicalData", "VideoFrameID_FK")
     ]
 
     void apply() {
         def dao = toolBox.toolBelt.annotationDAOFactory.newDAO()
         dao.startTransaction()
-        dataMap.each { clazz, keyMapper ->
-            def duplicateFKs = findDuplicateForeignKeys(keyMapper)
-            log.info("Found ${duplicateFKs.size()} duplicated foreign keys for ${keyMapper.table}.${keyMapper.column}")
+        dataMap.each { clazz, tableColumn ->
+            def duplicateFKs = findDuplicateForeignKeys(tableColumn)
+            log.info("Found ${duplicateFKs.size()} duplicated foreign keys for ${tableColumn.table}.${tableColumn.column}")
             def n = 0
             duplicateFKs.each { fk ->
 
-                def ids = findPrimaryKeysForForeignKey(keyMapper, fk)
+                def ids = findPrimaryKeysForForeignKey(tableColumn, fk)
 
                 if (ids.size() > 1) {
                     ids[1..-1].each { id ->
@@ -71,15 +67,15 @@ class DestroyDuplicateFKFunction {
      *
      * @return A List of duplicate names
      */
-    def findDuplicateForeignKeys(keyMapper) {
+    def findDuplicateForeignKeys(tableColumn) {
 
         return toolBox.toolBelt.annotationPersistenceService.executeQueryFunction("""
 SELECT
-    ${keyMapper.column}, count(*) as counter
+    ${tableColumn.column}, count(*) as counter
 FROM
-    ${keyMapper.table}
+    ${tableColumn.table}
 GROUP BY
-    ${keyMapper.column}
+    ${tableColumn.column}
 HAVING COUNT(*) > 1
         """, handler)
     }
@@ -88,29 +84,17 @@ HAVING COUNT(*) > 1
     /**
      * Find all the id's for the given foreign key 
      */
-    def findPrimaryKeysForForeignKey(keyMapper, fk) {
+    def findPrimaryKeysForForeignKey(tableColumn, fk) {
         return toolBox.toolBelt.annotationPersistenceService.executeQueryFunction("""
 SELECT
     id
 FROM
-    ${keyMapper.table}
+    ${tableColumn.table}
 WHERE
-    ${keyMapper.column} = ${fk}
+    ${tableColumn.column} = ${fk}
 ORDER BY
     id
      """, handler)
     }
 
-    /**
-     * for holding values need to search for duplicate foreign keys
-     */
-    private class KeyMapper {
-        def table
-        def column
-
-        def KeyMapper(table, column) {
-            this.table = table
-            this.column = column
-        }
-    }
 }
