@@ -31,8 +31,7 @@ class DestroyDuplicateFKFunction {
 
     private final toolBox = new vars.ToolBox()
 
-
-    private final kmList = [(VideoArchiveImpl.class): new KeyMapper("VideoArchive", "VideoArchiveSetID_FK"),
+    private final dataMap = [(VideoArchiveImpl.class): new KeyMapper("VideoArchive", "VideoArchiveSetID_FK"),
             (VideoFrameImpl.class): new KeyMapper("VideoFrame", "VideoArchiveID_FK"),
             (ObservationImpl.class): new KeyMapper("Observation", "VideoFrameID_FK"),
             (AssociationImpl.class): new KeyMapper("Association", "ObservationID_FK"),
@@ -41,15 +40,10 @@ class DestroyDuplicateFKFunction {
             (CameraDeploymentImpl.class): new KeyMapper("CameraPlatformDeployment", "VideoArchiveSetID_FK")
     ]
 
-    private final
-
-
-
-
-
     void apply() {
         def dao = toolBox.toolBelt.annotationDAOFactory.newDAO()
-        kmList.each { clazz, keyMapper ->
+        dao.startTransaction()
+        dataMap.each { clazz, keyMapper ->
             def duplicateFKs = findDuplicateForeignKeys(keyMapper)
             duplicateFKs.each { fk ->
 
@@ -63,6 +57,7 @@ class DestroyDuplicateFKFunction {
                 }
             }
         }
+        dao.endTransaction()
     }
 
     /**
@@ -83,7 +78,6 @@ GROUP BY
 HAVING COUNT(*) > 1
         """, handler)
     }
-
 
 
     /**
