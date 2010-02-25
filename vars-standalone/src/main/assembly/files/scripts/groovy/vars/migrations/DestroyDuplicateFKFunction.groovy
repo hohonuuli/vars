@@ -8,24 +8,23 @@ import vars.annotation.jpa.AssociationImpl
 import vars.annotation.jpa.CameraDataImpl
 import vars.annotation.jpa.PhysicalDataImpl
 import vars.annotation.jpa.CameraDeploymentImpl
+import org.slf4j.LoggerFactory
 
 /**
- * Created by IntelliJ IDEA.
- * User: brian
- * Date: Feb 24, 2010
- * Time: 3:45:31 PM
- * To change this template use File | Settings | File Templates.
+ * Code for removing table rows that contain duplicate foreign keys in a 1-1 relationship.
+ * The earliest row (determined by the lowest id (primary key)) is kept, the others are
+ * deleted.
  */
 class DestroyDuplicateFKFunction {
 
-
+    final log = LoggerFactory.getLogger(getClass())
 
     private final handler = {rs ->
-        def dups = []
+        def values = []
         while(rs.next()) {
-            dups << rs.getLong(1)
+            values << rs.getLong(1)
         }
-        return dups
+        return values
     } as QueryFunction
 
 
@@ -45,6 +44,8 @@ class DestroyDuplicateFKFunction {
         dao.startTransaction()
         dataMap.each { clazz, keyMapper ->
             def duplicateFKs = findDuplicateForeignKeys(keyMapper)
+            log.info("Found ${duplicateFKs.size()} duplicated foreign keys for ${keyMapper.table}.${keyMapper.column}")
+            def n = 0
             duplicateFKs.each { fk ->
 
                 def ids = findPrimaryKeysForForeignKey(keyMapper, fk)
@@ -53,11 +54,15 @@ class DestroyDuplicateFKFunction {
                     ids[1..-1].each { id ->
                         def obj = dao.findByPrimaryKey(clazz, id as Long)
                         dao.remove(obj)
+                        n++
                     }
                 }
             }
+
+            log.info("Deleted ${n} ${clazz} objects")
         }
         dao.endTransaction()
+
     }
 
     /**
