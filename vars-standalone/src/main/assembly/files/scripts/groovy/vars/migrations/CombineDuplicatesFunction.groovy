@@ -111,7 +111,7 @@ HAVING COUNT(*) > 1
             VideoFrame targetVf = targetVideoFrames.find { it.timecode.equals(sourceVf.timecode) }
             // If the timecode exists in the target, move the observations from the source to the target
             if (targetVf) {
-                def observations = sourceVf.observations
+                def observations = new ArrayList(sourceVf.observations)
                 log.debug("Moving ${observations.size()} observations from ${sourceVf} to ${targetVf}")
                 observations.each { obs ->
                     sourceVf.removeObservation(obs)

@@ -36,29 +36,17 @@ class DestroyDuplicateFKFunction {
     ]
 
     void apply() {
-        def dao = toolBox.toolBelt.annotationDAOFactory.newDAO()
-        dao.startTransaction()
         dataMap.each { clazz, tableColumn ->
             def duplicateFKs = findDuplicateForeignKeys(tableColumn)
             log.info("Found ${duplicateFKs.size()} duplicated foreign keys for ${tableColumn.table}.${tableColumn.column}")
-            def n = 0
             duplicateFKs.each { fk ->
-
                 def ids = findPrimaryKeysForForeignKey(tableColumn, fk)
-
                 if (ids.size() > 1) {
-                    ids[1..-1].each { id ->
-                        def obj = dao.findByPrimaryKey(clazz, id as Long)
-                        dao.remove(obj)
-                        n++
-                    }
+                    def sql = "DELETE FROM ${tableColumn.table} WHERE id IN (${ids[1..-1].join(", ")})"
+                    toolBox.toolBelt.annotationPersistenceService.executeUpdate(sql)
                 }
             }
-
-            log.info("Deleted ${n} ${clazz} objects")
         }
-        dao.endTransaction()
-
     }
 
     /**
@@ -82,7 +70,7 @@ HAVING COUNT(*) > 1
 
 
     /**
-     * Find all the id's for the given foreign key 
+     * Find all the id's for the given foreign key
      */
     def findPrimaryKeysForForeignKey(tableColumn, fk) {
         return toolBox.toolBelt.annotationPersistenceService.executeQueryFunction("""
