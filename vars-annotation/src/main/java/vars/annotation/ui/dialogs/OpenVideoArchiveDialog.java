@@ -46,14 +46,25 @@ import org.mbari.swing.WaitIndicator;
 import org.mbari.text.IgnoreCaseToStringComparator;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveDAO;
-import vars.annotation.ui.Lookup;
+import vars.annotation.VideoFrame;
 import vars.annotation.ui.PersistenceController;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.VARSProperties;
 import vars.shared.ui.dialogs.StandardDialog;
 
 /**
- *
+ * Dialog used for opening a VideoArchive. Typical usage is:
+ * {@code
+ * Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
+ * OpenVideoArchiveDialog dialog = new OpenVideoArchiveDialog(frame, toolBelt);
+ * dialog.getOkayButton().addActionListener(new ActionListener() {
+ *     public void actionPerformed(ActionEvent e) {
+ *         dialog.setVisible(false);
+ *         VideoArchive videoArchive = dialog.openVideoArchive();
+ *         // Do something with the VideoArchive
+ *     }
+ * });
+ * }
  *
  * @version        Enter version here..., 2010.01.19 at 03:23:56 PST
  * @author         Brian Schlining [brian@mbari.org]
@@ -299,8 +310,6 @@ public class OpenVideoArchiveDialog extends StandardDialog {
                     buttonGroup.add(getOpenExistingRB());
                     buttonGroup.setSelected(getOpenByPlatformRB().getModel(), true);
 
-                    getOkayButton().addActionListener(new OpenActionListener());
-
             }
             return panel;
     }
@@ -342,8 +351,6 @@ public class OpenVideoArchiveDialog extends StandardDialog {
             }
         });
 
-        getOkayButton().addActionListener(new OpenActionListener());
-
         getCancelButton().addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
@@ -361,65 +368,68 @@ public class OpenVideoArchiveDialog extends StandardDialog {
         return cp;
     }
 
+    /**
+     * This method call opens/creates a videoArchive based on the parameters
+     * a user has set in this Dialog. This method is intended to be called from
+     * an ActionListener to retrieve the VideoArchiveSet.
+     * @return
+     */
+    public VideoArchive openVideoArchive() {
+        VideoArchive videoArchive = null;
 
-
-    class OpenActionListener implements ActionListener {
-
-        /**
-         *
-         * @param ev
-         */
-        public void actionPerformed(ActionEvent ev) {
-
-            OpenVideoArchiveDialog.this.setVisible(false);
-
-            Enumeration<AbstractButton> e = buttonGroup.getElements();
-            OpenType openType = null;
-            while (e.hasMoreElements()) {
-                AbstractButton b = e.nextElement();
-                if (b.isSelected()) {
-                    openType = OpenType.valueOf(b.getName());
-                    break;
-                }
-            }
-
-            switch (openType) {
-            case BY_NAME:
-            {
-                String name = getNameTextField().getText();
-                VideoArchiveDAO dao = toolBelt.getAnnotationDAOFactory().newVideoArchiveDAO();
-                dao.startTransaction();
-                VideoArchive videoArchive = dao.findByName(name);
-                Lookup.getVideoArchiveDispatcher().setValueObject(videoArchive);
-            }
+        Enumeration<AbstractButton> e = buttonGroup.getElements();
+        OpenType openType = null;
+        while (e.hasMoreElements()) {
+            AbstractButton b = e.nextElement();
+            if (b.isSelected()) {
+                openType = OpenType.valueOf(b.getName());
                 break;
-            case BY_PARAMS:
-            {
-                int seqNumber = Integer.parseInt(getSequenceNumberTextField().getText());
-                String platform = (String) getCameraPlatformComboBox().getSelectedItem();
-                int tapeNumber = Integer.parseInt(getTapeNumberTextField().getText());
-                final String postfix = getHdCheckBox().isSelected() ? "HD" : null;
-                String name = PersistenceController.makeVideoArchiveName(platform,
-                    seqNumber, tapeNumber, postfix);
-                toolBelt.getPersistenceController().openVideoArchive(platform, seqNumber, name);
             }
-                break;
-            case EXISTING:
-            {
-                String name = (String) getExistingNamesConceptBox().getSelectedItem();
-                VideoArchiveDAO dao = toolBelt.getAnnotationDAOFactory().newVideoArchiveDAO();
-                dao.startTransaction();
-                VideoArchive videoArchive = dao.findByName(name);
-                Lookup.getVideoArchiveDispatcher().setValueObject(videoArchive);
-            }
-                break;
-            default:
-            }
-
         }
 
+        VideoArchiveDAO dao = toolBelt.getAnnotationDAOFactory().newVideoArchiveDAO();
+        dao.startTransaction();
 
+        switch (openType) {
+        case BY_NAME:
+        {
+            String name = getNameTextField().getText();
+            videoArchive = dao.findByName(name);
+        }
+            break;
+        case BY_PARAMS:
+        {
+            int sequenceNumber = Integer.parseInt(getSequenceNumberTextField().getText());
+            String platform = (String) getCameraPlatformComboBox().getSelectedItem();
+            int tapeNumber = Integer.parseInt(getTapeNumberTextField().getText());
+            final String postfix = getHdCheckBox().isSelected() ? "HD" : null;
+            String videoArchiveName = PersistenceController.makeVideoArchiveName(platform,
+                sequenceNumber, tapeNumber, postfix);
+            videoArchive = dao.findOrCreateByParameters(platform, sequenceNumber, videoArchiveName);
+        }
+            break;
+        case EXISTING:
+        {
+            String name = (String) getExistingNamesConceptBox().getSelectedItem();
+            videoArchive = dao.findByName(name);
+        }
+            break;
+        default:
+        }
+
+        // Load the videoFrames within the transaction
+        if (videoArchive != null) {
+            @SuppressWarnings("unused")
+            Collection<VideoFrame> videoFrames = videoArchive.getVideoFrames();
+            for (VideoFrame videoFrame : videoFrames) {
+                videoFrame.getCameraData().getImageReference();
+            }
+        }
+
+        dao.endTransaction();
+        return videoArchive;
     }
+
 
     /**
      *

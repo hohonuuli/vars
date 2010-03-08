@@ -147,7 +147,7 @@ public class LinkEditorDialog extends JDialog implements ILockableEditor {
     private OkCancelButtonPanel getButtonPanel() {
         if (buttonPanel == null) {
             buttonPanel = new OkCancelButtonPanel();
-            JButton okButton = buttonPanel.getOkButton();
+            JButton okButton = buttonPanel.getOkayButton();
 
             /*
              * Handle an OK click

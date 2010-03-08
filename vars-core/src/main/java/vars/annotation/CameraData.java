@@ -144,6 +144,10 @@ public interface CameraData extends AnnotationObject {
      */
     void setFocus(Integer focus);
 
+    /**
+     *
+     * @param tilt in Radians
+     */
     void setHeading(Float tilt);
 
     /**
@@ -169,8 +173,16 @@ public interface CameraData extends AnnotationObject {
      */
     void setName(String name);
 
+    /**
+     *
+     * @param pitch in Radians
+     */
     void setPitch(Float pitch);
 
+    /**
+     *
+     * @param roll in Radians
+     */
     void setRoll(Float roll);
 
     void setViewHeight(Float height);

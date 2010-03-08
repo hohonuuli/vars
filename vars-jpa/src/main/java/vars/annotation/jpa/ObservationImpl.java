@@ -50,7 +50,6 @@ import vars.jpa.KeyNullifier;
 import vars.jpa.TransactionLogger;
 
 /**
- *
  * @author brian
  */
 
@@ -186,6 +185,14 @@ public class ObservationImpl implements Serializable, Observation, JPAEntity {
             return false;
         }
 
+        if ((this.x == null) ? (other.x != null) : !this.x.equals(other.x)) {
+            return false;
+        }
+
+        if ((this.y == null) ? (other.y != null) : !this.y.equals(other.y)) {
+            return false;
+        }
+
         return true;
     }
 
@@ -297,6 +304,8 @@ public class ObservationImpl implements Serializable, Observation, JPAEntity {
         hash = 59 * hash + ((this.observationDate != null) ? this.observationDate.hashCode() : 0);
         hash = 59 * hash + ((this.observer != null) ? this.observer.hashCode() : 0);
         hash = 59 * hash + ((this.conceptName != null) ? this.conceptName.hashCode() : 0);
+        hash = 59 * hash + ((this.x != null) ? this.x.hashCode() : 0);
+        hash = 59 * hash + ((this.y != null) ? this.y.hashCode() : 0);
 
         return hash;
     }

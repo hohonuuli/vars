@@ -70,7 +70,7 @@ public class VideoSetViewer extends JFrame {
     private JButton moveVideoFramesButton;
     private JMenuBar myMenuBar;
     private JXObservationTable table;
-    private final ToolBelt toolBelt;
+    private ToolBelt toolBelt;
     private JPanel toolPanel;
     private VideoArchiveSet videoArchiveSet;
 
@@ -84,7 +84,27 @@ public class VideoSetViewer extends JFrame {
         changes = new PropertyChangeSupport(this);
         final Dispatcher dispatcher = Lookup.getVideoArchiveDispatcher();
         dispatcher.addPropertyChangeListener(new PropertyChangeListener() {
+            public void propertyChange(final PropertyChangeEvent evt) {
+                setVideoArchive((VideoArchive) evt.getNewValue());
+            }
+        });
 
+        // Need to grab the dispatcher when constructing a new instance
+        VideoArchive videoArchive = (VideoArchive) dispatcher.getValueObject();
+        setVideoArchive(videoArchive);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        SwingUtils.smartSetBounds(this);
+        getContentPane().setLayout(new BorderLayout());
+        final JScrollPane scrollPane = new JScrollPane(getTable());
+        getContentPane().add(scrollPane, BorderLayout.CENTER);
+        getContentPane().add(getToolBar(), BorderLayout.NORTH);
+        setJMenuBar(getMyMenuBar());
+    }
+    
+    public VideoSetViewer() {
+    	changes = new PropertyChangeSupport(this);
+        final Dispatcher dispatcher = Lookup.getVideoArchiveDispatcher();
+        dispatcher.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(final PropertyChangeEvent evt) {
                 setVideoArchive((VideoArchive) evt.getNewValue());
             }

@@ -84,7 +84,7 @@ public class HistoryEditorPanel extends EditorPanel implements ILockableEditor {
      * @return javax.swing.JButton
      */
     private JButton getAcceptButton() {
-        return ((OkCancelButtonPanel) getButtonPanel()).getOkButton();
+        return ((OkCancelButtonPanel) getButtonPanel()).getOkayButton();
     }
 
     private OkCancelButtonPanel getButtonPanel() {
@@ -94,7 +94,7 @@ public class HistoryEditorPanel extends EditorPanel implements ILockableEditor {
             /*
              * Set up the OK button
              */
-            final JButton okButton = p.getOkButton();
+            final JButton okButton = p.getOkayButton();
 
             okButton.setText("Accept");
             okButton.addActionListener(new ActionListener() {
@@ -190,7 +190,7 @@ public class HistoryEditorPanel extends EditorPanel implements ILockableEditor {
                     if (!isLocked() && getUserAccount().isAdministrator()) {
                         final OkCancelButtonPanel panel = getButtonPanel();
 
-                        panel.getOkButton().setEnabled((history != null) && !history.isProcessed());
+                        panel.getOkayButton().setEnabled((history != null) && !history.isProcessed());
                         panel.getCancelButton().setEnabled((history != null) && !history.isProcessed());
                     }
 
@@ -309,7 +309,7 @@ public class HistoryEditorPanel extends EditorPanel implements ILockableEditor {
     @Override
     public void setLocked(final boolean locked) {
         super.setLocked(locked);
-        getButtonPanel().getOkButton().setEnabled(!locked);
+        getButtonPanel().getOkayButton().setEnabled(!locked);
         getButtonPanel().getCancelButton().setEnabled(!locked);
         setUserAccount(userAccount);
     }

@@ -1,11 +1,16 @@
 package vars.shared.ui;
 
 
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+
 import org.mbari.swing.JFancyButton;
 
 public class OkCancelButtonPanel extends JPanel {
@@ -13,7 +18,7 @@ public class OkCancelButtonPanel extends JPanel {
 
     private JButton cancelButton = null;
 
-    private JButton okButton = null;
+    private JButton okayButton = null;
 
     /**
      * This is the default constructor
@@ -29,38 +34,54 @@ public class OkCancelButtonPanel extends JPanel {
      * @return void
      */
     private void initialize() {
-        this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-        this.add(Box.createHorizontalGlue());
-        this.add(getOkButton(), null);
-        this.add(Box.createHorizontalStrut(10));
-        this.add(getCancelButton(), null);
-        this.add(Box.createHorizontalStrut(20));
+    	setBorder(new EmptyBorder(10, 10, 10, 10));
+        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+        add(Box.createHorizontalGlue());
+        add(getCancelButton());
+        add(Box.createHorizontalStrut(10));
+        add(getOkayButton());
     } 
 
+
+    
     /**
-	 * This method initializes cancelButton	
-	 * @return  javax.swing.JButton
-	 */
+     * @return
+     */
     public JButton getCancelButton() {
         if (cancelButton == null) {
-            cancelButton = new JFancyButton();
-            cancelButton.setText("Cancel");
-            cancelButton.setIcon(new ImageIcon(getClass().getResource("/images/vars/knowledgebase/delete2.png")));
+            cancelButton = new JFancyButton("Cancel");
+            cancelButton.setIcon(new ImageIcon(getClass().getResource("/vars/images/24/delete2.png")));
+            cancelButton.addKeyListener(new KeyAdapter() {
+                @Override
+                public void keyReleased(KeyEvent e) {
+                    if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                        cancelButton.doClick();
+                    }
+                }
+            });
         }
+
         return cancelButton;
     }
 
     /**
-	 * This method initializes okButton	
-	 * @return  javax.swing.JButton
-	 */
-    public JButton getOkButton() {
-        if (okButton == null) {
-            okButton = new JFancyButton();
-            okButton.setText("OK");
-            okButton.setIcon(new ImageIcon(getClass().getResource("/images/vars/knowledgebase/check2.png")));
+     * @return
+     */
+    public JButton getOkayButton() {
+        if (okayButton == null) {
+            okayButton = new JFancyButton("OK");
+            okayButton.setIcon(new ImageIcon(getClass().getResource("/vars/images/24/check2.png")));
+            okayButton.addKeyListener(new KeyAdapter() {
+                @Override
+                public void keyReleased(KeyEvent e) {
+                    if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                        okayButton.doClick();
+                    }
+                }
+            });
         }
-        return okButton;
+
+        return okayButton;
     }
     
 

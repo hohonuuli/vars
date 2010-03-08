@@ -1,5 +1,5 @@
 /*
- * @(#)MoveVideoFrameAction.java   2009.11.19 at 11:13:56 PST
+ * @(#)MoveVideoFrameAction.java   2010.03.04 at 07:55:57 PST
  *
  * Copyright 2009 MBARI
  *
@@ -17,12 +17,9 @@ package vars.annotation.ui.actions;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import org.mbari.awt.event.ActionAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.DAO;
-import vars.annotation.CameraData;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoFrame;
@@ -39,6 +36,7 @@ public class MoveVideoFrameAction extends ActionAdapter implements IVideoArchive
     public static final String ACTION_NAME = "Move Video Frames";
     private final Logger log = LoggerFactory.getLogger(getClass());
     private final ToolBelt toolBelt;
+    private final MoveVideoFramesFunction function;
 
     /**
      *     This is where we want to move the videoframes to
@@ -58,6 +56,7 @@ public class MoveVideoFrameAction extends ActionAdapter implements IVideoArchive
     public MoveVideoFrameAction(ToolBelt toolBelt) {
         super(ACTION_NAME);
         this.toolBelt = toolBelt;
+        function = new MoveVideoFramesFunction(toolBelt.getAnnotationDAOFactory());
     }
 
     /**
@@ -66,48 +65,14 @@ public class MoveVideoFrameAction extends ActionAdapter implements IVideoArchive
      */
     public void doAction() {
         if ((videoArchive != null) && (videoFrames != null)) {
-        	
-        	Collection<Observation> observations = new ArrayList<Observation>();
 
 
-            // DAOTX
-            DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
-            dao.startTransaction();
-
-            for (VideoFrame sourceFrame : videoFrames) {
-                sourceFrame = dao.merge(sourceFrame);
-                VideoArchive sourceArchive = sourceFrame.getVideoArchive();
-                if ((sourceArchive != null) && !sourceArchive.equals(videoArchive)) {
-                    if (log.isInfoEnabled()) {
-                        log.info("Moving " + sourceFrame + " from " + sourceArchive + " to " + videoArchive);
-                    }
-                    
-                    observations.addAll(sourceFrame.getObservations());
-
-                    /*
-                     * Remove the VideoFrame from it's original VideoArchive
-                     */
-                    sourceArchive.removeVideoFrame(sourceFrame);
-
-                    /*
-                     * Check to see if the target VideoArchive already has a
-                     * VideoFrame with that timecode.
-                     */
-                    VideoFrame targetFrame = videoArchive.findVideoFrameByTimeCode(sourceFrame.getTimecode());
-                    if (targetFrame != null) {
-                        mergeFrames(sourceFrame, targetFrame);
-                        dao.remove(sourceFrame);
-                    }
-                    else {
-                        sourceArchive.removeVideoFrame(sourceFrame);
-                        videoArchive.addVideoFrame(sourceFrame);
-                    }
-
-
-                }
+            Collection<Observation> observations = new ArrayList<Observation>();
+            Collection<VideoFrame> modifiedVideoFrames = function.apply(videoArchive, videoFrames);
+            for (VideoFrame videoFrame : modifiedVideoFrames) {
+                observations.addAll(videoFrame.getObservations());
             }
 
-            dao.endTransaction();
             toolBelt.getPersistenceController().updateUI(observations);
 
         }
@@ -127,43 +92,6 @@ public class MoveVideoFrameAction extends ActionAdapter implements IVideoArchive
      */
     public Collection<VideoFrame> getVideoFrames() {
         return videoFrames;
-    }
-
-    /**
-     * Merges the information contained in 2 different videoFrames. <strong>This should be called within
-     * a persistence transaction!!!</strong>
-     * @param sourceFrame The VideoFrame whose contents will be moved to the target
-     *  VideoFrame
-     * @param targetFrame The destination for the information from the source
-     *  VideoFrame
-     */
-    private void mergeFrames(final VideoFrame sourceFrame, final VideoFrame targetFrame) {
-
-        /*
-         * If a VideoFrame with the same timecode was found in the
-         * target(and if you reached this point, one was found) copy the
-         * observations to the new videoFrame
-         */
-        final Collection<Observation> observations = new ArrayList<Observation>(sourceFrame.getObservations());
-        for (final Iterator<Observation> j = observations.iterator(); j.hasNext(); ) {
-            final Observation observation = j.next();
-            sourceFrame.removeObservation(observation);
-            targetFrame.addObservation(observation);
-        }
-
-        /*
-         * If the target does not have an image, but the source does, copy the image
-         * to the target.
-         */
-        final CameraData srcCameraData = sourceFrame.getCameraData();
-        if (srcCameraData != null) {
-            final String sourceImage = srcCameraData.getImageReference();
-            final CameraData targetCamData = targetFrame.getCameraData();
-            final String targetImage = targetCamData.getImageReference();
-            if ((sourceImage != null) && (targetImage == null)) {
-                targetCamData.setImageReference(sourceImage);
-            }
-        }
     }
 
     /**

@@ -17,15 +17,17 @@ package vars.annotation.ui;
 
 import java.awt.Frame;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
 import org.mbari.swing.SwingUtils;
 import org.mbari.util.Dispatcher;
 import vars.annotation.VideoArchive;
+import vars.annotation.ui.dialogs.OpenVideoArchiveDialog;
 
 /**
  * <p>Indicates which {@link VideoArchive} the annotator is editing. Clicking on the
@@ -36,7 +38,7 @@ import vars.annotation.VideoArchive;
  */
 public class StatusLabelForVideoArchive extends StatusLabel {
 
-    private final JDialog dialog;
+    private final OpenVideoArchiveDialog dialog;
 
     /**
      * Constructor for the StatusLabelForVideoArchive object
@@ -46,7 +48,15 @@ public class StatusLabelForVideoArchive extends StatusLabel {
     public StatusLabelForVideoArchive(ToolBelt toolBelt) {
         super();
         Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
-        this.dialog = new vars.annotation.ui.dialogs.OpenVideoArchiveDialog(frame, toolBelt);
+        dialog = new OpenVideoArchiveDialog(frame, toolBelt);
+        dialog.getOkayButton().addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                dialog.setVisible(false);
+                VideoArchive videoArchive = dialog.openVideoArchive();
+                Lookup.getVideoArchiveDispatcher().setValueObject(videoArchive);
+            }
+        });
+
 
         /*
          * Listen for changes in the VideoArchive being annotated. When it changes update

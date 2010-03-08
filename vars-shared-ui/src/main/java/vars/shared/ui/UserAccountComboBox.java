@@ -44,8 +44,7 @@ import vars.UserAccountDAO;
 public class UserAccountComboBox extends FancyComboBox {
 
     private static final Comparator comparator = new IgnoreCaseToStringComparator();
-    private static final Comparator userAccountComparator = new Comparator<UserAccount>() {
-
+    private static final Comparator<UserAccount> userAccountComparator = new Comparator<UserAccount>() {
         public int compare(UserAccount user1, UserAccount user2) {
             return comparator.compare(user1.getUserName(), user2.getUserName());
         }

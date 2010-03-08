@@ -156,7 +156,7 @@ public class ModifyUserDialog extends JDialog implements ILockableEditor {
     private OkCancelButtonPanel getButtonPanel() {
         if (buttonPanel == null) {
             buttonPanel = new OkCancelButtonPanel();
-            buttonPanel.getOkButton().addActionListener(new ActionListener() {
+            buttonPanel.getOkayButton().addActionListener(new ActionListener() {
 
                 public void actionPerformed(ActionEvent e) {
                     doOk();

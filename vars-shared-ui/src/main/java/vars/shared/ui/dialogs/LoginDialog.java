@@ -62,7 +62,7 @@ public class LoginDialog extends JDialog {
     public LoginDialog(java.awt.Frame parent, boolean modal, MiscDAOFactory miscDAOFactory, MiscFactory miscFactory) {
         super(parent, modal);
         this.miscDAOFactory = miscDAOFactory;
-        newUserDialog = new NewUserDialog(parent, true, miscDAOFactory, miscFactory);
+        newUserDialog = new CreateNewUserDialog(parent, true, miscDAOFactory, miscFactory);
         initComponents();
         setLocationRelativeTo(parent);
         pack();

@@ -20,16 +20,11 @@ import java.awt.Dialog;
 import java.awt.Frame;
 import java.awt.GraphicsConfiguration;
 import java.awt.Window;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
+
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JPanel;
-import org.mbari.swing.JFancyButton;
-import javax.swing.border.EmptyBorder;
+
+import vars.shared.ui.OkCancelButtonPanel;
 
 /**
  * Standard dialog. The ContentPane is laid-out using BorderLayout with the
@@ -40,9 +35,7 @@ import javax.swing.border.EmptyBorder;
  */
 public class StandardDialog extends JDialog {
 
-    private JButton cancelButton;
-    private JButton okayButton;
-    private JPanel panel;
+    private OkCancelButtonPanel panel;
 
     /**
      * Constructs ...
@@ -228,53 +221,20 @@ public class StandardDialog extends JDialog {
      * @return
      */
     public JButton getCancelButton() {
-        if (cancelButton == null) {
-            cancelButton = new JFancyButton("Cancel");
-            cancelButton.setIcon(new ImageIcon(getClass().getResource("/vars/images/24/delete2.png")));
-            cancelButton.addKeyListener(new KeyAdapter() {
-                @Override
-                public void keyReleased(KeyEvent e) {
-                    if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                        cancelButton.doClick();
-                    }
-                }
-            });
-        }
-
-        return cancelButton;
+        return getPanel().getCancelButton();
     }
 
     /**
      * @return
      */
     public JButton getOkayButton() {
-        if (okayButton == null) {
-            okayButton = new JFancyButton("OK");
-            okayButton.setIcon(new ImageIcon(getClass().getResource("/vars/images/24/check2.png")));
-            okayButton.addKeyListener(new KeyAdapter() {
-                @Override
-                public void keyReleased(KeyEvent e) {
-                    if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                        okayButton.doClick();
-                    }
-                }
-            });
-        }
-
-        return okayButton;
+        return getPanel().getOkayButton();
     }
 
 
-
-    private JPanel getPanel() {
+    private OkCancelButtonPanel getPanel() {
         if (panel == null) {
-            panel = new JPanel();
-            panel.setBorder(new EmptyBorder(10, 10, 10, 10));
-            panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-            panel.add(Box.createHorizontalGlue());
-            panel.add(getCancelButton());
-            panel.add(Box.createHorizontalStrut(10));
-            panel.add(getOkayButton());
+            panel = new OkCancelButtonPanel();
         }
 
         return panel;

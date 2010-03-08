@@ -5,7 +5,6 @@
 
 package vars.annotation.ui.imagepanel;
 
-import com.sun.awt.AWTUtilities;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;

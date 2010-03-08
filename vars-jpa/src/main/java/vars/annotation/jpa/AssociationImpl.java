@@ -40,7 +40,6 @@ import vars.jpa.KeyNullifier;
 import vars.jpa.TransactionLogger;
 
 /**
- * Class description
  *
  *
  * @version        $date$, 2009.11.10 at 12:28:19 PST

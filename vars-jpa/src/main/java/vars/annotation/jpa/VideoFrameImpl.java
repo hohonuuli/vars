@@ -50,7 +50,6 @@ import vars.jpa.KeyNullifier;
 import vars.jpa.TransactionLogger;
 
 /**
- *
  * @author brian
  */
 

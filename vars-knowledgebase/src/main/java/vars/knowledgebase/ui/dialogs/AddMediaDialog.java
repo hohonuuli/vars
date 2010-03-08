@@ -85,7 +85,7 @@ public class AddMediaDialog extends JDialog {
     private OkCancelButtonPanel getButtonPanel() {
         if (buttonPanel == null) {
             buttonPanel = new OkCancelButtonPanel();
-            buttonPanel.getOkButton().addActionListener(new OkActionListener());
+            buttonPanel.getOkayButton().addActionListener(new OkActionListener());
             buttonPanel.getCancelButton().addActionListener(new ActionListener() {
 
                 public void actionPerformed(ActionEvent e) {
@@ -149,7 +149,7 @@ public class AddMediaDialog extends JDialog {
                 void update() {
                     String text = mediaViewPanel.getUrlField().getText();
 
-                    getButtonPanel().getOkButton().setEnabled((getConcept() != null) && (text != null) &&
+                    getButtonPanel().getOkayButton().setEnabled((getConcept() != null) && (text != null) &&
                             (text.length() > 5));
                 }
 
@@ -183,7 +183,7 @@ public class AddMediaDialog extends JDialog {
         final boolean locked = (concept == null);
 
         p.setLocked(locked);
-        getButtonPanel().getOkButton().setEnabled(concept != null);
+        getButtonPanel().getOkayButton().setEnabled(concept != null);
         this.concept = concept;
     }
 
