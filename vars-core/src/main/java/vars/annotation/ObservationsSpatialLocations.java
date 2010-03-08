@@ -82,15 +82,15 @@ public class ObservationsSpatialLocations {
             */
             throw new VARSException("Missing the size of a dimension (in pixels) for " + observation);
         }
-        final int u = (int) Math.round(observation.getX());                // X position of annotation within image in pixels
-        final int v = (int) Math.round(observation.getY());                // Y position of annotation within image in pixels
+        final int u = (int) Math.round(observation.getX()); // X position of annotation within image in pixels
+        final int v = (int) Math.round(observation.getY()); // Y position of annotation within image in pixels
 
         // Spatial coordinates
         final CameraData cameraData = videoFrame.getCameraData();
         final double w = cameraData.getViewWidth();         // Width of image in meters
         final double h = cameraData.getViewHeight();        // Height of image in meters
-        final double x = cameraData.getX();             // X Center of image in meters relative to origin tile
-        final double y = cameraData.getY();             // Y Center of image in meters relative to origin tile
+        final double x = cameraData.getX();                 // X Center of image in meters relative to origin tile
+        final double y = cameraData.getY();                 // Y Center of image in meters relative to origin tile
 
         final double m0 = m / 2D;                           // X pixel at center of image
         final double n0 = n / 2D;                           // Y pixel at center of image
@@ -105,8 +105,8 @@ public class ObservationsSpatialLocations {
         final double theta = phi - cameraData.getHeading(); // Math angle, in radians, from center of tile, relative to initial heading of origin tile to annotation
         final double r = Math.sqrt((dx1 * dx1) + (dy1 * dy1));  // Meters from annotation to center of source image
 
-        final double xInMeters = x + r * Math.cos(theta);                // X meters from annotation to origin tile center
-        final double yInMeters = y + r * Math.sin(theta);                // Y meters from annotation to origin tile center
+        final double xInMeters = x + r * Math.cos(theta);   // X meters from annotation to origin tile center
+        final double yInMeters = y + r * Math.sin(theta);   // Y meters from annotation to origin tile center
 
         if (log.isDebugEnabled()) {
             log.debug("SpatialLocation: " + this + "\n\t" +
