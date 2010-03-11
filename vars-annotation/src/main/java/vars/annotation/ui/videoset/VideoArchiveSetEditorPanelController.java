@@ -30,7 +30,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import javax.swing.JOptionPane;
 import org.mbari.swing.LabeledSpinningDialWaitIndicator;
-import org.mbari.swing.SpinningDialWaitIndicator;
 import org.mbari.swing.WaitIndicator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -117,6 +116,10 @@ public class VideoArchiveSetEditorPanelController {
         toolBelt.getPersistenceController().updateUI();
     }
 
+    /**
+     * Selects the rows in the table for the observations provided.
+     * @param observations
+     */
     protected void selectObservations(Collection<Observation> observations) {
         JXObservationTable myTable = panel.getTable();
         ObservationTableModel tableModel = (ObservationTableModel) myTable.getModel();
