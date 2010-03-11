@@ -1,5 +1,5 @@
 /*
- * @(#)VideoArchiveSetEditorPanelController.java   2010.03.04 at 07:22:03 PST
+ * @(#)VideoArchiveSetEditorPanelController.java   2010.03.11 at 11:49:16 PST
  *
  * Copyright 2009 MBARI
  *
@@ -35,6 +35,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.DAO;
 import vars.ILink;
+import vars.LinkUtilities;
+import vars.annotation.AnnotationFactory;
 import vars.annotation.Association;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchiveSet;
@@ -45,6 +47,9 @@ import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.actions.MoveVideoFrameWithDialogAction;
 import vars.annotation.ui.table.JXObservationTable;
 import vars.annotation.ui.table.ObservationTableModel;
+import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptDAO;
+import vars.knowledgebase.LinkTemplateDAO;
 import vars.shared.ui.LinkSelectionPanel;
 import vars.shared.ui.dialogs.StandardDialog;
 
@@ -58,11 +63,12 @@ import vars.shared.ui.dialogs.StandardDialog;
 public class VideoArchiveSetEditorPanelController {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
-    private final VideoArchiveSetEditorPanel panel;
-    private final ToolBelt toolBelt;
+    private AssociationSelectionDialog addAssociationDialog;
     private final MoveVideoFrameWithDialogAction moveAction;
-    private AssociationSelectionDialog associationSelectionDialog;
+    private final VideoArchiveSetEditorPanel panel;
     private AssociationSelectionDialog removeAssociationsDialog;
+    private AssociationSelectionDialog renameAssociationsDialog;
+    private final ToolBelt toolBelt;
 
     /**
      * Constructs ...
@@ -75,12 +81,43 @@ public class VideoArchiveSetEditorPanelController {
         this.toolBelt = toolBelt;
         Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
         this.moveAction = new MoveVideoFrameWithDialogAction(frame, toolBelt);
-        this.associationSelectionDialog = new AssociationSelectionDialog();
     }
 
-    protected void addAssociation() {}
+    protected void addAssociation() {
+        Collection<Observation> observations = getObservations(true);
+        Collection<ILink> linkTemplates = new HashSet<ILink>();
 
-    protected void delete() {
+        // The 2 DAO's share the same entityManger and thus the same transaction
+        LinkTemplateDAO linkTemplateDAO = toolBelt.getKnowledgebaseDAOFactory().newLinkTemplateDAO();
+        ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO(linkTemplateDAO.getEntityManager());
+        linkTemplateDAO.startTransaction();
+
+        // Aggregate the link templates that can be applied to the selected concepts
+        for (Observation observation : observations) {
+            Concept concept = conceptDAO.findByName(observation.getConceptName());
+            if (concept != null) {
+
+                // Search for the link templates that can be used by each concept
+                // in the annotations. We'll limit the selection to these. NOTE
+                // this isn't perfect since it allows applying linktemplates
+                // to concepts they don't belong to.
+                linkTemplates.addAll(linkTemplateDAO.findAllApplicableToConcept(concept));
+            }
+            else {
+                log.debug("Unable to find Concept named '" + observation.getConceptName() + "' in the knowledgebase");
+            }
+        }
+
+        linkTemplateDAO.endTransaction();
+
+
+        // Show dialog with links to all associations in selected rows.
+        AssociationSelectionDialog dialog = getAddAssociationDialog();
+        dialog.setLinks(linkTemplates);
+        dialog.setVisible(true);
+    }
+
+    protected void deleteObservations() {
 
         Collection<Observation> observations = getObservations(true);
         final int count = observations.size();
@@ -90,142 +127,68 @@ public class VideoArchiveSetEditorPanelController {
         }
 
         final Object[] options = { "OK", "CANCEL" };
-        final int confirm = JOptionPane.showOptionDialog((Frame) Lookup.getApplicationFrameDispatcher().getValueObject(),
-                                "Do you want to delete " + count + " observation(s)?", "VARS - Confirm Delete",
-                                JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+        final int confirm = JOptionPane.showOptionDialog(
+            (Frame) Lookup.getApplicationFrameDispatcher().getValueObject(),
+            "Do you want to delete " + count + " observation(s)?", "VARS - Confirm Delete", JOptionPane.DEFAULT_OPTION,
+            JOptionPane.WARNING_MESSAGE, null, options, options[0]);
         if (confirm == JOptionPane.YES_OPTION) {
             DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
             dao.startTransaction();
+
             for (Observation observation : observations) {
                 observation = dao.find(observation);
                 observation.getVideoFrame().removeObservation(observation);
                 dao.remove(observation);
             }
+
             dao.endTransaction();
             refresh();
-            toolBelt.getPersistenceController().updateUI();
         }
 
     }
 
-    protected void moveObservations() {
-        Collection<VideoFrame> videoFrames = getVideoFrames(true);
-        moveAction.setVideoFrames(videoFrames);
-        moveAction.doAction();
-        refresh();
-        toolBelt.getPersistenceController().updateUI();
-    }
+    private AssociationSelectionDialog getAddAssociationDialog() {
+        if (addAssociationDialog == null) {
+            addAssociationDialog = new AssociationSelectionDialog();
+            addAssociationDialog.setTitle("VARS - Add an Association");
+            addAssociationDialog.getCancelButton().addActionListener(new ActionListener() {
 
-    /**
-     * Selects the rows in the table for the observations provided.
-     * @param observations
-     */
-    protected void selectObservations(Collection<Observation> observations) {
-        JXObservationTable myTable = panel.getTable();
-        ObservationTableModel tableModel = (ObservationTableModel) myTable.getModel();
-        Collection<Observation> allObservations = getObservations(false);
-        allObservations.retainAll(observations);
-        myTable.setSelectedObservations(allObservations);
-    }
-
-    /**
-     *
-     */
-    protected void refresh() {
-
-        /*
-         * All observations that get added to the table, or that are currently
-         * in the table get added to this set and removed from the
-         * observationsInTable set. Then, observations left in the
-         * observationsInTable set are removed from the table and the
-         * observationsInTable variable is set to reference the new
-         * observationsStillInTable set. (this is the most efficient thing I
-         * could think of).
-         */
-        Collection<Observation> selectedObservations = getObservations(true);
-        VideoArchiveSet videoArchiveSet = panel.getVideoArchiveSet();
-
-        JXObservationTable myTable = panel.getTable();
-        ObservationTableModel tableModel = (ObservationTableModel) myTable.getModel();
-        tableModel.clear();
-
-        VideoArchiveSetDAO dao = toolBelt.getAnnotationDAOFactory().newVideoArchiveSetDAO();
-
-        if (videoArchiveSet != null) {
-            if (log.isDebugEnabled()) {
-                log.debug("Retrieving all video frames for " + videoArchiveSet);
-            }
-
-            // DAOTX - Delete associations
-            dao.startTransaction();
-            videoArchiveSet = dao.find(videoArchiveSet);    // Bring it into the transaction
-            final Collection<VideoFrame> videoFrames = ImmutableList.copyOf(videoArchiveSet.getVideoFrames());
-            for (VideoFrame videoFrame : videoFrames) {
-                final Collection<Observation> observations = ImmutableList.copyOf(videoFrame.getObservations());
-                for (Observation observation : observations) {
-                    myTable.addObservation(observation);
+                public void actionPerformed(ActionEvent e) {
+                    addAssociationDialog.dispose();
                 }
-            }
-            dao.endTransaction();
 
+            });
+            addAssociationDialog.getOkayButton().addActionListener(new ActionListener() {
+
+                public void actionPerformed(ActionEvent e) {
+
+                    ILink link = addAssociationDialog.getLink();
+                    Collection<Observation> observations = getObservations(true);
+                    AnnotationFactory annotationFactory = toolBelt.getAnnotationFactory();
+                    DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
+                    dao.startTransaction();
+
+                    for (Observation observation : observations) {
+                        observation = dao.find(observation);
+
+                        if (observation != null) {
+                            Association association = annotationFactory.newAssociation(link.getLinkName(),
+                                link.getToConcept(), link.getLinkValue());
+                            observation.addAssociation(association);
+                            dao.persist(association);
+                        }
+                    }
+
+                    dao.endTransaction();
+                    addAssociationDialog.dispose();
+                    refresh();
+
+                }
+
+            });
         }
 
-        myTable.setSelectedObservations(selectedObservations);
-
-    }
-
-    protected void removeAssociations() {
-        // Show dialog with links to all associations in selected rows.
-        Collection<Observation> observations = getObservations(true);
-        Collection<Association> associations = new HashSet<Association>();
-        for (Observation observation : observations) {
-            associations.addAll(observation.getAssociations());
-        }
-        Collection<ILink> links = Collections2.transform(associations, new Function<Association, ILink>(){
-            public ILink apply(Association from) {
-                return (ILink) from;
-            }
-        });
-
-        AssociationSelectionDialog dialog = getRemoveAssociationsDialog();
-        dialog.setLinks(links);
-        dialog.setVisible(true);
-    }
-
-    protected void renameAssociations() {
-        
-
-    }
-
-    protected void search() {}
-
-    protected Collection<Observation> getObservations(boolean useSelectedOnly) {
-        Collection<Observation> observations = new ArrayList<Observation>();
-
-        JXObservationTable myTable = panel.getTable();
-        ObservationTableModel model = (ObservationTableModel) myTable.getModel();
-        if (useSelectedOnly) {
-            int[] rows = myTable.getSelectedRows();
-            for (int i : rows) {
-                observations.add(model.getObservationAt(i));
-            }
-        }
-        else {
-            int n = model.getNumberOfObservations();
-            for(int i = 0; i < n; i++) {
-                observations.add(model.getObservationAt(i));
-            }
-        }
-        return observations;
-
-    }
-
-    protected Collection<VideoFrame> getVideoFrames(boolean useSelectedOnly) {
-        Collection<VideoFrame> videoFrames = new HashSet<VideoFrame>();
-        for (Observation observation : getObservations(useSelectedOnly)) {
-            videoFrames.add(observation.getVideoFrame());
-        }
-        return videoFrames;
+        return addAssociationDialog;
     }
 
     /**
@@ -239,6 +202,7 @@ public class VideoArchiveSetEditorPanelController {
         for (Observation observation : getObservations(useSelectedOnly)) {
             associations.addAll(observation.getAssociations());
         }
+
         return associations;
     }
 
@@ -275,6 +239,28 @@ public class VideoArchiveSetEditorPanelController {
         });
     }
 
+    protected Collection<Observation> getObservations(boolean useSelectedOnly) {
+        Collection<Observation> observations = new ArrayList<Observation>();
+
+        JXObservationTable myTable = panel.getTable();
+        ObservationTableModel model = (ObservationTableModel) myTable.getModel();
+        if (useSelectedOnly) {
+            int[] rows = myTable.getSelectedRows();
+            for (int i : rows) {
+                observations.add(model.getObservationAt(i));
+            }
+        }
+        else {
+            int n = model.getNumberOfObservations();
+            for (int i = 0; i < n; i++) {
+                observations.add(model.getObservationAt(i));
+            }
+        }
+
+        return observations;
+
+    }
+
     private AssociationSelectionDialog getRemoveAssociationsDialog() {
         if (removeAssociationsDialog == null) {
             removeAssociationsDialog = new AssociationSelectionDialog();
@@ -287,80 +273,253 @@ public class VideoArchiveSetEditorPanelController {
              * 3)
              */
             removeAssociationsDialog.getOkayButton().addActionListener(new ActionListener() {
+
                 public void actionPerformed(ActionEvent e) {
                     ILink link = removeAssociationsDialog.getLink();
                     final Collection<Association> associations = getFilteredAssocations(true, link);
 
                     final Object[] options = { "OK", "CANCEL" };
                     final int confirm = JOptionPane.showOptionDialog(
-                            (Frame) Lookup.getApplicationFrameDispatcher().getValueObject(),
-                            "Do you want to delete " + associations.size() + " association(s)?",
-                            "VARS - Confirm Delete",
-                             JOptionPane.DEFAULT_OPTION,
-                             JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+                        (Frame) Lookup.getApplicationFrameDispatcher().getValueObject(),
+                        "Do you want to delete " + associations.size() + " association(s)?", "VARS - Confirm Delete",
+                        JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
 
                     if (confirm == JOptionPane.YES_OPTION) {
-                        WaitIndicator waitIndicator = new LabeledSpinningDialWaitIndicator(panel, "Deleting Associations ...");
+                        WaitIndicator waitIndicator = new LabeledSpinningDialWaitIndicator(panel,
+                            "Deleting Associations ...");
                         Worker.post(new Job() {
+
                             @Override
                             public Object run() {
                                 DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
                                 dao.startTransaction();
+
                                 for (Association association : associations) {
                                     association = dao.find(association);
+
                                     if (association != null) {
                                         association.getObservation().removeAssociation(association);
                                         dao.remove(association);
                                     }
                                 }
+
                                 dao.endTransaction();
                                 return null;
                             }
+
                         });
                         waitIndicator.dispose();
                     }
 
-
                     removeAssociationsDialog.dispose();
+                    refresh();
                 }
+
             });
             removeAssociationsDialog.getCancelButton().addActionListener(new ActionListener() {
+
                 public void actionPerformed(ActionEvent e) {
                     removeAssociationsDialog.dispose();
                 }
+
             });
         }
+
         return removeAssociationsDialog;
     }
 
+    protected Collection<VideoFrame> getVideoFrames(boolean useSelectedOnly) {
+        Collection<VideoFrame> videoFrames = new HashSet<VideoFrame>();
+        for (Observation observation : getObservations(useSelectedOnly)) {
+            videoFrames.add(observation.getVideoFrame());
+        }
+
+        return videoFrames;
+    }
+
+    protected void moveObservations() {
+        Collection<VideoFrame> videoFrames = getVideoFrames(true);
+        moveAction.setVideoFrames(videoFrames);
+        moveAction.doAction();
+        refresh();
+    }
+
+    /**
+     *
+     */
+    protected void refresh() {
+
+        /*
+         * All observations that get added to the table, or that are currently
+         * in the table get added to this set and removed from the
+         * observationsInTable set. Then, observations left in the
+         * observationsInTable set are removed from the table and the
+         * observationsInTable variable is set to reference the new
+         * observationsStillInTable set. (this is the most efficient thing I
+         * could think of).
+         */
+        WaitIndicator waitIndicator = new LabeledSpinningDialWaitIndicator(panel, "Refreshing ...");
+        Collection<Observation> selectedObservations = getObservations(true);
+        VideoArchiveSet videoArchiveSet = panel.getVideoArchiveSet();
+
+        JXObservationTable myTable = panel.getTable();
+        ObservationTableModel tableModel = (ObservationTableModel) myTable.getModel();
+        tableModel.clear();
+
+        VideoArchiveSetDAO dao = toolBelt.getAnnotationDAOFactory().newVideoArchiveSetDAO();
+
+        if (videoArchiveSet != null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Retrieving all video frames for " + videoArchiveSet);
+            }
+
+            // DAOTX - Delete associations
+            dao.startTransaction();
+            videoArchiveSet = dao.find(videoArchiveSet);    // Bring it into the transaction
+            final Collection<VideoFrame> videoFrames = ImmutableList.copyOf(videoArchiveSet.getVideoFrames());
+            for (VideoFrame videoFrame : videoFrames) {
+                final Collection<Observation> observations = ImmutableList.copyOf(videoFrame.getObservations());
+                for (Observation observation : observations) {
+                    myTable.addObservation(observation);
+                }
+            }
+
+            dao.endTransaction();
+
+        }
+
+        myTable.setSelectedObservations(selectedObservations);
+        waitIndicator.dispose();
+        toolBelt.getPersistenceController().updateUI();
+
+    }
+
+    /**
+     * Grabs all associations from the selected rows and adds them to a dialog.
+     * The user selects the association to remove from the available list
+     */
+    protected void removeAssociations() {
 
 
+        Collection<Observation> observations = getObservations(true);
+        Collection<Association> associations = new HashSet<Association>();
+        for (Observation observation : observations) {
+            associations.addAll(observation.getAssociations());
+        }
 
+        Collection<ILink> links = Collections2.transform(associations, new Function<Association, ILink>() {
+
+            public ILink apply(Association from) {
+                return (ILink) from;
+            }
+
+        });
+
+        // Show dialog with links to all associations in selected rows.
+        AssociationSelectionDialog dialog = getRemoveAssociationsDialog();
+        dialog.setLinks(links);
+        dialog.setVisible(true);
+    }
+
+    protected void renameAssociations() {
+
+        Collection<ILink> linkTemplates = new HashSet<ILink>();
+        Collection<Observation> observations = getObservations(true);
+
+        // The 2 DAO's share the same entityManger and thus the same transaction
+        LinkTemplateDAO linkTemplateDAO = toolBelt.getKnowledgebaseDAOFactory().newLinkTemplateDAO();
+        ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO(linkTemplateDAO.getEntityManager());
+        linkTemplateDAO.startTransaction();
+
+        // Aggregate the link templates that can be applied to the selected concepts
+        for (Observation observation : observations) {
+            Concept concept = conceptDAO.findByName(observation.getConceptName());
+            if (concept != null) {
+
+                // Search for the link templates that can be used by each concept
+                // in the annotations. We'll limit the selection to these. NOTE
+                // this isn't perfect since it allows applying linktemplates
+                // to concepts they don't belong to.
+                linkTemplates.addAll(linkTemplateDAO.findAllApplicableToConcept(concept));
+            }
+            else {
+                log.debug("Unable to find Concept named '" + observation.getConceptName() + "' in the knowledgebase");
+            }
+        }
+        linkTemplateDAO.endTransaction();
+        
+        // Build dialog
+        ILink link  = (ILink) panel.getAssociationComboBox().getSelectedItem();
+        AssociationSelectionDialog dialog = getRenameAssociationsDialog();
+        dialog.setTitle("VARS - Replace " + LinkUtilities.formatAsString(link));
+        dialog.setLinks(linkTemplates);
+
+        // TODO finish implementation
+
+    }
+
+    private AssociationSelectionDialog getRenameAssociationsDialog() {
+        if (renameAssociationsDialog == null) {
+            ILink link  = (ILink) panel.getAssociationComboBox().getSelectedItem();
+            renameAssociationsDialog = new AssociationSelectionDialog();
+            // TODO finish implementation
+        }
+        return renameAssociationsDialog;
+    }
+
+    protected void search() {}
+
+
+    /**
+     * Selects the rows in the table for the observations provided.
+     * @param observations
+     */
+    protected void selectObservations(Collection<Observation> observations) {
+        JXObservationTable myTable = panel.getTable();
+        ObservationTableModel tableModel = (ObservationTableModel) myTable.getModel();
+        Collection<Observation> allObservations = getObservations(false);
+        allObservations.retainAll(observations);
+        myTable.setSelectedObservations(allObservations);
+    }
+
+    /**
+     * Internal Dialog for working selecting Associations
+     */
     private class AssociationSelectionDialog extends StandardDialog {
 
         private LinkSelectionPanel panel;
 
+        /**
+         * Constructs ...
+         */
         public AssociationSelectionDialog() {
-            super((Frame) Lookup.getApplicationFrameDispatcher().getValueObject(),
-                    "VARS - Select Association", false);
+            super((Frame) Lookup.getApplicationFrameDispatcher().getValueObject(), "VARS - Select Association", false);
             panel = new LinkSelectionPanel(toolBelt.getAnnotationPersistenceService());
             add(panel, BorderLayout.CENTER);
         }
 
+        /**
+         *
+         * @param b
+         */
         public void allowEditing(boolean b) {
-            panel.getLinkNameTextField().setEditable(b);
             panel.getLinkValueTextField().setEditable(b);
             panel.getToConceptComboBox().setEnabled(b);
         }
 
-
-        public void setLinks(Collection<ILink> links) {
-            panel.setLinks(links);
-        }
-
+        /**
+         * @return
+         */
         public ILink getLink() {
             return panel.getLink();
         }
-    }
 
+        /**
+         *
+         * @param links
+         */
+        public void setLinks(Collection<ILink> links) {
+            panel.setLinks(links);
+        }
+    }
 }

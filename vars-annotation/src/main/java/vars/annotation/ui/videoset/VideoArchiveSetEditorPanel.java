@@ -33,12 +33,18 @@ import javax.swing.JToolBar;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingUtilities;
 import org.mbari.swing.LabeledSpinningDialWaitIndicator;
+import org.mbari.swing.SearchableComboBoxModel;
 import org.mbari.swing.WaitIndicator;
+import org.mbari.text.ObjectToStringConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.ILink;
+import vars.LinkComparator;
+import vars.LinkUtilities;
 import vars.annotation.VideoArchiveSet;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.table.JXObservationTable;
+import vars.shared.ui.LinkListCellRenderer;
 
 /**
  *
@@ -89,9 +95,18 @@ public class VideoArchiveSetEditorPanel extends JPanel {
         return actionPanel;
     }
 
-    private JComboBox getAssociationComboBox() {
+    public JComboBox getAssociationComboBox() {
         if (associationComboBox == null) {
             associationComboBox = new JComboBox();
+            associationComboBox.setRenderer(new LinkListCellRenderer());
+            associationComboBox.setModel(new SearchableComboBoxModel<ILink>(new LinkComparator(),
+                    new ObjectToStringConverter<ILink>() {
+
+                public String convert(ILink object) {
+                    return LinkUtilities.formatAsString(object);
+                }
+
+            }));
         }
 
         return associationComboBox;
@@ -110,7 +125,7 @@ public class VideoArchiveSetEditorPanel extends JPanel {
             btnDelete = new JButton("Delete");
             btnDelete.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    controller.delete();
+                    controller.deleteObservations();
                 }
             });
         }
