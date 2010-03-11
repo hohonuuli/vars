@@ -16,11 +16,9 @@
 package vars.annotation.ui.table;
 
 import java.awt.Component;
-import java.awt.Point;
-import java.awt.Rectangle;
+import java.util.Collection;
 
 import javax.swing.JTable;
-import javax.swing.JViewport;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
@@ -184,7 +182,7 @@ public class JXObservationTable extends JXTable implements ObservationTable {
     }
 
     /**
-     *
+     * Selects the row containing the observation
      * @param obs
      */
     public void setSelectedObservation(final Observation obs) {
@@ -196,6 +194,23 @@ public class JXObservationTable extends JXTable implements ObservationTable {
 
         getSelectionModel().setSelectionInterval(row, row);
         scrollCellToVisible(row, 0);
+    }
+
+    /**
+     * Selects the rows containing the provided observation
+     * @param observations
+     */
+    public void setSelectedObservations(final Collection<Observation> observations) {
+        JXObservationTableModel model = (JXObservationTableModel) getModel();
+        for (Observation observation : observations) {
+            final int row = convertRowIndexToView(model.getObservationRow(observation));
+            getSelectionModel().addSelectionInterval(row, row);
+        }
+
+        int[] i = getSelectedRows();
+        if (i != null && i.length > 0) {
+            scrollCellToVisible(i[0], 0);
+        }
     }
 
     public JTable getJTable() {

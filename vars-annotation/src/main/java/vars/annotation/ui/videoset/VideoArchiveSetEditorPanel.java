@@ -326,6 +326,7 @@ public class VideoArchiveSetEditorPanel extends JPanel {
         SwingUtilities.invokeLater(new Runnable() {
 
             public void run() {
+                getTable().setSelectedObservation(null);
                 populateTable();
             }
 
