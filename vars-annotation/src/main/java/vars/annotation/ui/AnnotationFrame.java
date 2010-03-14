@@ -1,5 +1,5 @@
 /*
- * @(#)AnnotationFrame.java   2009.12.16 at 02:51:33 PST
+ * @(#)AnnotationFrame.java   2010.03.12 at 09:28:23 PST
  *
  * Copyright 2009 MBARI
  *
@@ -23,11 +23,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Vector;
-import java.util.prefs.Preferences;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BoxLayout;
@@ -44,13 +41,13 @@ import org.mbari.util.Dispatcher;
 import org.mbari.vcr.IVCR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.VARSException;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.cbpanel.ConceptButtonPanel;
 import vars.annotation.ui.roweditor.RowEditorPanel;
 import vars.annotation.ui.table.JXObservationTable;
 import vars.annotation.ui.video.VideoControlPanel;
+import vars.annotation.ui.videoset.VideoArchiveSetEditorButton;
 
 /**
  *
@@ -60,9 +57,11 @@ public class AnnotationFrame extends JFrame {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
     private JPanel actionPanel;
+    private JSplitPane allControlsSplitPane;
     private JPanel conceptButtonPanel;
     private final AnnotationFrameController controller;
     private JPanel controlsPanel;
+    private JSplitPane controlsPanelSplitPane;
     private JSplitPane innerSplitPane;
     private JPanel miscTabsPanel;
     private JSplitPane outerSplitPane;
@@ -73,8 +72,6 @@ public class AnnotationFrame extends JFrame {
     private JToolBar toolBar;
     private final ToolBelt toolBelt;
     private VideoControlPanel videoControlPanel;
-    private JSplitPane controlsPanelSplitPane;
-    private JSplitPane allControlsSplitPane;
 
     /**
      * Constructs ...
@@ -104,6 +101,7 @@ public class AnnotationFrame extends JFrame {
             allControlsSplitPane.setLeftComponent(getControlsPanelSplitPane());
             allControlsSplitPane.setRightComponent(getConceptButtonPanel());
         }
+
         return allControlsSplitPane;
     }
 
@@ -135,6 +133,7 @@ public class AnnotationFrame extends JFrame {
             Dimension size = controlsPanelSplitPane.getPreferredSize();
             controlsPanelSplitPane.setPreferredSize(new Dimension(size.width, 200));
         }
+
         return controlsPanelSplitPane;
     }
 
@@ -148,7 +147,6 @@ public class AnnotationFrame extends JFrame {
 
         return innerSplitPane;
     }
-
 
     private JPanel getMiscTabsPanel() {
         if (miscTabsPanel == null) {
@@ -177,6 +175,9 @@ public class AnnotationFrame extends JFrame {
         return quickControlsPanel;
     }
 
+    /**
+     * @return
+     */
     public RowEditorPanel getRowEditorPanel() {
         if (rowEditorPanel == null) {
             rowEditorPanel = new RowEditorPanel(toolBelt);
@@ -285,6 +286,7 @@ public class AnnotationFrame extends JFrame {
         if (toolBar == null) {
             toolBar = new JToolBar();
             toolBar.add(new RefreshButton(toolBelt));
+            toolBar.add(new VideoArchiveSetEditorButton(toolBelt));
             toolBar.add(new StatusLabelForPerson(toolBelt));
             toolBar.add(new StatusLabelForVcr());
             toolBar.add(new StatusLabelForVideoArchive(toolBelt));
@@ -305,6 +307,7 @@ public class AnnotationFrame extends JFrame {
                 }
             });
         }
+
         return videoControlPanel;
     }
 
@@ -312,9 +315,6 @@ public class AnnotationFrame extends JFrame {
         getContentPane().add(getOuterSplitPane(), BorderLayout.CENTER);
         getContentPane().add(getQuickControlPanel(), BorderLayout.SOUTH);
         getContentPane().add(getToolBar(), BorderLayout.NORTH);
-
-
-
 
     }
 }

@@ -15,9 +15,6 @@
 
 package vars.annotation.ui.actions;
 
-import foxtrot.Job;
-import foxtrot.Task;
-import foxtrot.Worker;
 import java.util.Collection;
 import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;

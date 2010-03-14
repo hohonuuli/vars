@@ -1,5 +1,7 @@
 package vars.shared.ui.dialogs;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import java.awt.BorderLayout;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
@@ -18,9 +20,11 @@ import org.slf4j.LoggerFactory;
 
 import vars.MiscDAOFactory;
 import vars.MiscFactory;
+import vars.ToolBelt;
 import vars.UserAccount;
 import vars.UserAccountDAO;
 import vars.UserAccountRoles;
+import vars.jpa.VarsJpaModule;
 
 public class CreateNewUserDialog extends StandardDialog {
 	
@@ -57,11 +61,12 @@ public class CreateNewUserDialog extends StandardDialog {
 		super(parent, modal);
 		this.miscDAOFactory = miscDAOFactory;
 		this.miscFactory = miscFactory;
+                initialize();
 	}
 	
 	private void initialize() {
-		getContentPane().add(getMessageLabel(), BorderLayout.NORTH);
-		getContentPane().add(getPanel(), BorderLayout.CENTER);
+		add(getMessageLabel(), BorderLayout.NORTH);
+		add(getPanel(), BorderLayout.CENTER);
 		getOkayButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				controller.doOkay();
@@ -316,4 +321,14 @@ public class CreateNewUserDialog extends StandardDialog {
 			CreateNewUserDialog.this.dispose();
 		}
 	}
+
+       public static void main(String[] args) {
+
+           Injector injector = Guice.createInjector(new VarsJpaModule("vars-jpa-annotation", "vars-jpa-knowledgebase", "vars-jpa-misc"));
+           ToolBelt toolBelt = injector.getInstance(ToolBelt.class);
+           UserAccount admin = CreateNewUserDialog.showDialog(null, true,
+                        "VARS - Create Administrator Account", 
+                        toolBelt.getMiscDAOFactory(), toolBelt.getMiscFactory());
+
+    }
 }

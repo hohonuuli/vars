@@ -1,5 +1,5 @@
 /*
- * @(#)VideoArchiveSetEditorPanelController.java   2010.03.11 at 11:49:16 PST
+ * @(#)VideoArchiveSetEditorPanelController.java   2010.03.11 at 04:16:47 PST
  *
  * Copyright 2009 MBARI
  *
@@ -84,32 +84,7 @@ public class VideoArchiveSetEditorPanelController {
     }
 
     protected void addAssociation() {
-        Collection<Observation> observations = getObservations(true);
-        Collection<ILink> linkTemplates = new HashSet<ILink>();
-
-        // The 2 DAO's share the same entityManger and thus the same transaction
-        LinkTemplateDAO linkTemplateDAO = toolBelt.getKnowledgebaseDAOFactory().newLinkTemplateDAO();
-        ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO(linkTemplateDAO.getEntityManager());
-        linkTemplateDAO.startTransaction();
-
-        // Aggregate the link templates that can be applied to the selected concepts
-        for (Observation observation : observations) {
-            Concept concept = conceptDAO.findByName(observation.getConceptName());
-            if (concept != null) {
-
-                // Search for the link templates that can be used by each concept
-                // in the annotations. We'll limit the selection to these. NOTE
-                // this isn't perfect since it allows applying linktemplates
-                // to concepts they don't belong to.
-                linkTemplates.addAll(linkTemplateDAO.findAllApplicableToConcept(concept));
-            }
-            else {
-                log.debug("Unable to find Concept named '" + observation.getConceptName() + "' in the knowledgebase");
-            }
-        }
-
-        linkTemplateDAO.endTransaction();
-
+        Collection<ILink> linkTemplates = findLinkTemplatesForObservations(getObservations(true));
 
         // Show dialog with links to all associations in selected rows.
         AssociationSelectionDialog dialog = getAddAssociationDialog();
@@ -145,6 +120,47 @@ public class VideoArchiveSetEditorPanelController {
             refresh();
         }
 
+    }
+
+    /**
+     * Fetches a collection of [@link LinkTemplate}s from the database that
+     * can be applied to the observations in the collection you provide.
+     * @param observations
+     * @return
+     */
+    private Collection<ILink> findLinkTemplatesForObservations(Collection<Observation> observations) {
+        Collection<ILink> linkTemplates = new HashSet<ILink>();
+        Collection<String> conceptNames = new ArrayList<String>();
+
+        // The 2 DAO's share the same entityManger and thus the same transaction
+        LinkTemplateDAO linkTemplateDAO = toolBelt.getKnowledgebaseDAOFactory().newLinkTemplateDAO();
+        ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO(linkTemplateDAO.getEntityManager());
+        linkTemplateDAO.startTransaction();
+
+        // Aggregate the link templates that can be applied to the selected concepts
+        for (Observation observation : observations) {
+            if (!conceptNames.contains(observation.getConceptName())) {
+                Concept concept = conceptDAO.findByName(observation.getConceptName());
+                if (concept != null) {
+
+                    // Search for the link templates that can be used by each concept
+                    // in the annotations. We'll limit the selection to these. NOTE
+                    // this isn't perfect since it allows applying linktemplates
+                    // to concepts they don't belong to.
+                    linkTemplates.addAll(linkTemplateDAO.findAllApplicableToConcept(concept));
+                }
+                else {
+                    log.debug("Unable to find Concept named '" + observation.getConceptName() +
+                              "' in the knowledgebase");
+                }
+
+                conceptNames.add(observation.getConceptName());
+            }
+        }
+
+        linkTemplateDAO.endTransaction();
+
+        return linkTemplates;
     }
 
     private AssociationSelectionDialog getAddAssociationDialog() {
@@ -328,6 +344,55 @@ public class VideoArchiveSetEditorPanelController {
         return removeAssociationsDialog;
     }
 
+    private AssociationSelectionDialog getRenameAssociationsDialog() {
+        if (renameAssociationsDialog == null) {
+            ILink link = (ILink) panel.getAssociationComboBox().getSelectedItem();
+            renameAssociationsDialog = new AssociationSelectionDialog();
+            renameAssociationsDialog.getCancelButton().addActionListener(new ActionListener() {
+
+                public void actionPerformed(ActionEvent e) {
+                    renameAssociationsDialog.dispose();
+                }
+
+            });
+            renameAssociationsDialog.getOkayButton().addActionListener(new ActionListener() {
+
+                public void actionPerformed(ActionEvent e) {
+
+                    // Get associations that match the one used for searching
+                    ILink match = (ILink) panel.getAssociationComboBox().getSelectedItem();
+                    final Collection<Association> associations = getFilteredAssocations(true, match);
+
+                    // Update the values for each association in background thread
+                    final ILink newLink = renameAssociationsDialog.getLink();
+                    Worker.post(new Job() {
+
+                        @Override
+                        public Object run() {
+                            DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
+                            dao.startTransaction();
+
+                            for (Association association : associations) {
+                                association = dao.find(association);
+                                association.setLinkName(newLink.getLinkName());
+                                association.setToConcept(newLink.getToConcept());
+                                association.setLinkValue(newLink.getLinkValue());
+                            }
+
+                            dao.endTransaction();
+                            return null;
+                        }
+                    });
+
+                    refresh();
+                }
+
+            });
+        }
+
+        return renameAssociationsDialog;
+    }
+
     protected Collection<VideoFrame> getVideoFrames(boolean useSelectedOnly) {
         Collection<VideoFrame> videoFrames = new HashSet<VideoFrame>();
         for (Observation observation : getObservations(useSelectedOnly)) {
@@ -417,58 +482,23 @@ public class VideoArchiveSetEditorPanelController {
 
         // Show dialog with links to all associations in selected rows.
         AssociationSelectionDialog dialog = getRemoveAssociationsDialog();
+        dialog.setTitle("VARS - Select association to delete");
         dialog.setLinks(links);
         dialog.setVisible(true);
     }
 
     protected void renameAssociations() {
+        Collection<ILink> linkTemplates = findLinkTemplatesForObservations(getObservations(true));
 
-        Collection<ILink> linkTemplates = new HashSet<ILink>();
-        Collection<Observation> observations = getObservations(true);
-
-        // The 2 DAO's share the same entityManger and thus the same transaction
-        LinkTemplateDAO linkTemplateDAO = toolBelt.getKnowledgebaseDAOFactory().newLinkTemplateDAO();
-        ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO(linkTemplateDAO.getEntityManager());
-        linkTemplateDAO.startTransaction();
-
-        // Aggregate the link templates that can be applied to the selected concepts
-        for (Observation observation : observations) {
-            Concept concept = conceptDAO.findByName(observation.getConceptName());
-            if (concept != null) {
-
-                // Search for the link templates that can be used by each concept
-                // in the annotations. We'll limit the selection to these. NOTE
-                // this isn't perfect since it allows applying linktemplates
-                // to concepts they don't belong to.
-                linkTemplates.addAll(linkTemplateDAO.findAllApplicableToConcept(concept));
-            }
-            else {
-                log.debug("Unable to find Concept named '" + observation.getConceptName() + "' in the knowledgebase");
-            }
-        }
-        linkTemplateDAO.endTransaction();
-        
         // Build dialog
-        ILink link  = (ILink) panel.getAssociationComboBox().getSelectedItem();
+        ILink link = (ILink) panel.getAssociationComboBox().getSelectedItem();
         AssociationSelectionDialog dialog = getRenameAssociationsDialog();
-        dialog.setTitle("VARS - Replace " + LinkUtilities.formatAsString(link));
+        dialog.setTitle("VARS - Replace " + LinkUtilities.formatAsString(link) + " with:");
         dialog.setLinks(linkTemplates);
-
-        // TODO finish implementation
-
-    }
-
-    private AssociationSelectionDialog getRenameAssociationsDialog() {
-        if (renameAssociationsDialog == null) {
-            ILink link  = (ILink) panel.getAssociationComboBox().getSelectedItem();
-            renameAssociationsDialog = new AssociationSelectionDialog();
-            // TODO finish implementation
-        }
-        return renameAssociationsDialog;
+        dialog.setVisible(true);
     }
 
     protected void search() {}
-
 
     /**
      * Selects the rows in the table for the observations provided.

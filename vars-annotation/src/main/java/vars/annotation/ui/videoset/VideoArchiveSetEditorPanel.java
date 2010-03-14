@@ -75,13 +75,12 @@ public class VideoArchiveSetEditorPanel extends JPanel {
     private JPanel searchPanel;
     private JXObservationTable table;
     private JToolBar toolBar;
-    private ToolBelt toolBelt;
     private volatile VideoArchiveSet videoArchiveSet;
 
     /**
      * Create the frame.
      */
-    public VideoArchiveSetEditorPanel() {
+    public VideoArchiveSetEditorPanel(ToolBelt toolBelt) {
         initialize();
         controller = new VideoArchiveSetEditorPanelController(this, toolBelt);
     }
@@ -149,6 +148,11 @@ public class VideoArchiveSetEditorPanel extends JPanel {
     private JButton getBtnRefresh() {
         if (btnRefresh == null) {
             btnRefresh = new JButton("Refresh");
+            btnRefresh.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    controller.refresh();
+                }
+            });
         }
 
         return btnRefresh;
@@ -157,6 +161,11 @@ public class VideoArchiveSetEditorPanel extends JPanel {
     private JButton getBtnRemoveAssociations() {
         if (btnRemoveAssociations == null) {
             btnRemoveAssociations = new JButton("Remove Associations");
+            btnRemoveAssociations.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    controller.removeAssociations();
+                }
+            });
         }
 
         return btnRemoveAssociations;
@@ -173,6 +182,11 @@ public class VideoArchiveSetEditorPanel extends JPanel {
     private JButton getBtnReplaceAssociations() {
         if (btnReplaceAssociations == null) {
             btnReplaceAssociations = new JButton("Replace Association");
+            btnReplaceAssociations.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+
+                }
+            });
         }
 
         return btnReplaceAssociations;
