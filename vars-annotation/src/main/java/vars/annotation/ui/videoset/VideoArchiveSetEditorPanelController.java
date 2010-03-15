@@ -28,6 +28,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import org.mbari.swing.LabeledSpinningDialWaitIndicator;
 import org.mbari.swing.WaitIndicator;
@@ -35,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.DAO;
 import vars.ILink;
+import vars.LinkComparator;
 import vars.LinkUtilities;
 import vars.annotation.AnnotationFactory;
 import vars.annotation.Association;
@@ -51,6 +53,7 @@ import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.LinkTemplateDAO;
 import vars.shared.ui.LinkSelectionPanel;
+import vars.shared.ui.dialogs.ConceptNameSelectionDialog;
 import vars.shared.ui.dialogs.StandardDialog;
 
 /**
@@ -68,6 +71,7 @@ public class VideoArchiveSetEditorPanelController {
     private final VideoArchiveSetEditorPanel panel;
     private AssociationSelectionDialog removeAssociationsDialog;
     private AssociationSelectionDialog renameAssociationsDialog;
+    private ConceptNameSelectionDialog renameObservationsDialog;
     private final ToolBelt toolBelt;
 
     /**
@@ -346,7 +350,6 @@ public class VideoArchiveSetEditorPanelController {
 
     private AssociationSelectionDialog getRenameAssociationsDialog() {
         if (renameAssociationsDialog == null) {
-            ILink link = (ILink) panel.getAssociationComboBox().getSelectedItem();
             renameAssociationsDialog = new AssociationSelectionDialog();
             renameAssociationsDialog.getCancelButton().addActionListener(new ActionListener() {
 
@@ -393,6 +396,44 @@ public class VideoArchiveSetEditorPanelController {
         return renameAssociationsDialog;
     }
 
+    private ConceptNameSelectionDialog getRenameObservationsDialog() {
+        if (renameObservationsDialog == null) {
+            renameObservationsDialog = new ConceptNameSelectionDialog();
+            renameObservationsDialog.getCancelButton().addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    renameObservationsDialog.dispose();
+                }
+            });
+            renameObservationsDialog.getOkayButton().addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    renameObservationsDialog.dispose();
+                    final String name = renameObservationsDialog.getSelectedItem();
+                    final Collection<Observation> observations = getObservations(true);
+                    Worker.post(new Job() {
+
+                        @Override
+                        public Object run() {
+                            DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
+                            dao.startTransaction();
+                            for (Observation observation : observations) {
+                                observation = dao.find(observation);
+                                if (observation != null) {
+                                    observation.setConceptName(name);
+                                }
+                            }
+                            dao.endTransaction();
+                            return null;
+                        }
+                    });
+
+                    refresh();
+                }
+            });
+            renameObservationsDialog.setItems(toolBelt.getQueryPersistenceService().findAllConceptNamesAsStrings());
+        }
+        return renameObservationsDialog;
+    }
+
     protected Collection<VideoFrame> getVideoFrames(boolean useSelectedOnly) {
         Collection<VideoFrame> videoFrames = new HashSet<VideoFrame>();
         for (Observation observation : getObservations(useSelectedOnly)) {
@@ -407,6 +448,11 @@ public class VideoArchiveSetEditorPanelController {
         moveAction.setVideoFrames(videoFrames);
         moveAction.doAction();
         refresh();
+    }
+
+    protected void renameObservations() {
+        JDialog dialog = getRenameObservationsDialog();
+        dialog.setVisible(true);
     }
 
     /**
@@ -498,7 +544,38 @@ public class VideoArchiveSetEditorPanelController {
         dialog.setVisible(true);
     }
 
-    protected void search() {}
+    protected void search() {
+        Collection<Observation> observations = getObservations(false);
+
+        // Filter by concept
+        if (panel.getChckbxConcept().isSelected()) {
+            final String conceptName = (String) panel.getConceptComboBox().getSelectedItem();
+            observations = Collections2.filter(observations, new Predicate<Observation>() {
+                public boolean apply(Observation input) {
+                    return input.getConceptName().equals(conceptName);
+                }
+            });
+        }
+
+        if (panel.getChckbxAssociation().isSelected()) {
+            final ILink link = (ILink) panel.getAssociationComboBox().getSelectedItem();
+            observations = Collections2.filter(observations, new Predicate<Observation>() {
+                LinkComparator linkComparator = new LinkComparator();
+                public boolean apply(Observation input) {
+                    boolean ok = false;
+                    for (Association association : input.getAssociations()) {
+                        if (linkComparator.compare(link, association) == 0) {
+                            ok = true;
+                            break;
+                        }
+                    }
+                    return ok;
+                }
+
+            });
+        }
+
+    }
 
     /**
      * Selects the rows in the table for the observations provided.
@@ -506,7 +583,6 @@ public class VideoArchiveSetEditorPanelController {
      */
     protected void selectObservations(Collection<Observation> observations) {
         JXObservationTable myTable = panel.getTable();
-        ObservationTableModel tableModel = (ObservationTableModel) myTable.getModel();
         Collection<Observation> allObservations = getObservations(false);
         allObservations.retainAll(observations);
         myTable.setSelectedObservations(allObservations);

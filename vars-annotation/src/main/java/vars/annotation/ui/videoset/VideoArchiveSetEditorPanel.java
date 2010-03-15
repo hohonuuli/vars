@@ -21,9 +21,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.util.Collection;
+import java.util.HashSet;
 import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -39,11 +42,14 @@ import org.mbari.text.ObjectToStringConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.ILink;
+import vars.LinkBean;
 import vars.LinkComparator;
 import vars.LinkUtilities;
+import vars.annotation.Observation;
 import vars.annotation.VideoArchiveSet;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.table.JXObservationTable;
+import vars.shared.ui.ConceptNameComboBox;
 import vars.shared.ui.LinkListCellRenderer;
 
 /**
@@ -67,7 +73,7 @@ public class VideoArchiveSetEditorPanel extends JPanel {
     private JButton btnSearch;
     private JCheckBox chckbxAssociation;
     private JCheckBox chckbxConcept;
-    private JComboBox conceptComboBox;
+    private ConceptNameComboBox conceptComboBox;
     private final VideoArchiveSetEditorPanelController controller;
     private JPanel controlsPanel;
     private JPanel innerPanel;
@@ -98,14 +104,18 @@ public class VideoArchiveSetEditorPanel extends JPanel {
         if (associationComboBox == null) {
             associationComboBox = new JComboBox();
             associationComboBox.setRenderer(new LinkListCellRenderer());
-            associationComboBox.setModel(new SearchableComboBoxModel<ILink>(new LinkComparator(),
+            SearchableComboBoxModel<ILink> model = new SearchableComboBoxModel<ILink>(new LinkComparator(),
                     new ObjectToStringConverter<ILink>() {
 
                 public String convert(ILink object) {
                     return LinkUtilities.formatAsString(object);
                 }
 
-            }));
+            });
+            associationComboBox.setModel(model);
+            ILink link = new LinkBean(ILink.VALUE_NIL, ILink.VALUE_NIL, ILink.VALUE_NIL);
+            model.addElement(link);
+            associationComboBox.setSelectedItem(link);
         }
 
         return associationComboBox;
@@ -113,7 +123,14 @@ public class VideoArchiveSetEditorPanel extends JPanel {
 
     private JButton getBtnAddAssociation() {
         if (btnAddAssociation == null) {
-            btnAddAssociation = new JButton("Add Association");
+            btnAddAssociation = new JButton("");
+            btnAddAssociation.setToolTipText("Add Association");
+            btnAddAssociation.setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/branch_add.png")));
+            btnAddAssociation.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    controller.addAssociation();
+                }
+            });
         }
 
         return btnAddAssociation;
@@ -121,7 +138,9 @@ public class VideoArchiveSetEditorPanel extends JPanel {
 
     private JButton getBtnDelete() {
         if (btnDelete == null) {
-            btnDelete = new JButton("Delete");
+            btnDelete = new JButton("");
+            btnDelete.setToolTipText("Delete Observations");
+            btnDelete.setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/row_delete.png")));
             btnDelete.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     controller.deleteObservations();
@@ -134,7 +153,9 @@ public class VideoArchiveSetEditorPanel extends JPanel {
 
     private JButton getBtnMoveFrames() {
         if (btnMoveFrames == null) {
-            btnMoveFrames = new JButton("Move Frames");
+            btnMoveFrames = new JButton("");
+            btnMoveFrames.setToolTipText("Move Frames");
+            btnMoveFrames.setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/row_replace.png")));
             btnMoveFrames.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     controller.moveObservations();
@@ -147,7 +168,9 @@ public class VideoArchiveSetEditorPanel extends JPanel {
 
     private JButton getBtnRefresh() {
         if (btnRefresh == null) {
-            btnRefresh = new JButton("Refresh");
+            btnRefresh = new JButton("");
+            btnRefresh.setToolTipText("Refresh");
+            btnRefresh.setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/refresh.png")));
             btnRefresh.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     controller.refresh();
@@ -160,7 +183,9 @@ public class VideoArchiveSetEditorPanel extends JPanel {
 
     private JButton getBtnRemoveAssociations() {
         if (btnRemoveAssociations == null) {
-            btnRemoveAssociations = new JButton("Remove Associations");
+            btnRemoveAssociations = new JButton("");
+            btnRemoveAssociations.setToolTipText("Remove Associations");
+            btnRemoveAssociations.setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/branch_delete.png")));
             btnRemoveAssociations.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     controller.removeAssociations();
@@ -173,7 +198,15 @@ public class VideoArchiveSetEditorPanel extends JPanel {
 
     private JButton getBtnRenameConcepts() {
         if (btnRenameConcepts == null) {
-            btnRenameConcepts = new JButton("Rename Concepts");
+            btnRenameConcepts = new JButton("");
+            btnRenameConcepts.setToolTipText("Rename Observations");
+            btnRenameConcepts.setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/row_edit.png")));
+            btnRenameConcepts.addActionListener(new ActionListener() {
+
+                public void actionPerformed(ActionEvent e) {
+                    controller.renameObservations();
+                }
+            });
         }
 
         return btnRenameConcepts;
@@ -181,10 +214,12 @@ public class VideoArchiveSetEditorPanel extends JPanel {
 
     private JButton getBtnReplaceAssociations() {
         if (btnReplaceAssociations == null) {
-            btnReplaceAssociations = new JButton("Replace Association");
+            btnReplaceAssociations = new JButton("");
+            btnReplaceAssociations.setToolTipText("Replace Associations");
+            btnReplaceAssociations.setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/branch_edit.png")));
             btnReplaceAssociations.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-
+                    controller.renameAssociations();
                 }
             });
         }
@@ -195,12 +230,17 @@ public class VideoArchiveSetEditorPanel extends JPanel {
     private JButton getBtnSearch() {
         if (btnSearch == null) {
             btnSearch = new JButton("Search");
+            btnSearch.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    controller.search();
+                }
+            });
         }
 
         return btnSearch;
     }
 
-    private JCheckBox getChckbxAssociation() {
+    protected JCheckBox getChckbxAssociation() {
         if (chckbxAssociation == null) {
             chckbxAssociation = new JCheckBox("Association");
         }
@@ -208,7 +248,7 @@ public class VideoArchiveSetEditorPanel extends JPanel {
         return chckbxAssociation;
     }
 
-    private JCheckBox getChckbxConcept() {
+    protected JCheckBox getChckbxConcept() {
         if (chckbxConcept == null) {
             chckbxConcept = new JCheckBox("Concept");
         }
@@ -216,9 +256,9 @@ public class VideoArchiveSetEditorPanel extends JPanel {
         return chckbxConcept;
     }
 
-    private JComboBox getConceptComboBox() {
+    protected ConceptNameComboBox getConceptComboBox() {
         if (conceptComboBox == null) {
-            conceptComboBox = new JComboBox();
+            conceptComboBox = new ConceptNameComboBox();
         }
 
         return conceptComboBox;
@@ -306,12 +346,12 @@ public class VideoArchiveSetEditorPanel extends JPanel {
         if (toolBar == null) {
             toolBar = new JToolBar();
             toolBar.add(getBtnRefresh());
-            toolBar.add(getBtnDelete());
             toolBar.add(getBtnMoveFrames());
             toolBar.add(getBtnRenameConcepts());
+            toolBar.add(getBtnDelete());
             toolBar.add(getBtnAddAssociation());
-            toolBar.add(getBtnRemoveAssociations());
             toolBar.add(getBtnReplaceAssociations());
+            toolBar.add(getBtnRemoveAssociations());
         }
 
         return toolBar;
@@ -357,6 +397,25 @@ public class VideoArchiveSetEditorPanel extends JPanel {
             public void run() {
                 getTable().setSelectedObservation(null);
                 populateTable();
+
+                // Populate teh ConceptCombobox
+                Collection<Observation> observations = controller.getObservations(false);
+                Collection<String> names = new HashSet<String>();
+                for (Observation observation : observations) {
+                    names.add(observation.getConceptName());
+                }
+                String[] namesArray = new String[names.size()];
+                names.toArray(namesArray);
+                getConceptComboBox().updateModel(namesArray);
+
+                // Populate the Association combobox
+                Collection<ILink> associations = new HashSet<ILink>();
+                for (Observation observation : observations) {
+                    associations.addAll(observation.getAssociations());
+                }
+                SearchableComboBoxModel<ILink> model = (SearchableComboBoxModel<ILink>) getAssociationComboBox().getModel();
+                model.clear();
+                model.addAll(associations);
             }
 
         });

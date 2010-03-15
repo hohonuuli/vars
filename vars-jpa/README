@@ -50,7 +50,7 @@ INSERT INTO UNIQUEID (tablename, nextid) VALUES ('History', 100)
 INSERT INTO UNIQUEID (tablename, nextid) VALUES ('SectionInfo', 100)
 INSERT INTO UNIQUEID (tablename, nextid) VALUES ('Media', 100)
 INSERT INTO UNIQUEID (tablename, nextid) VALUES ('LinkRealization', 100)
-INSERT INTO UNIQUEID (tablename, nextid) VALUES ('UserName', 100)
+INSERT INTO UNIQUEID (TABLENAME, NEXTID) VALUES ('UserName', 100)
 
 
 Steps to migrating existing VARS databases:

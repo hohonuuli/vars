@@ -16,11 +16,12 @@ package vars.shared.ui;
 import java.awt.Component;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
+import javax.swing.ListCellRenderer;
 import vars.ILink;
 import vars.LinkUtilities;
 
 /**
- *
+ * {@link ListCellRenderer} for displaying {@link ILink} objects.
  *
  * @version        Enter version here..., 2009.12.02 at 01:55:30 PST
  * @author         Brian Schlining [brian@mbari.org]    
