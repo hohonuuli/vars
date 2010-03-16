@@ -65,8 +65,14 @@ public class StatusLabelForPerson extends StatusLabel {
                 final JDialog userDialog = action.getDialog();
                 final Point mousePosition = me.getPoint();
                 SwingUtilities.convertPointToScreen(mousePosition, StatusLabelForPerson.this);
-                final int x = mousePosition.x;
-                final int y = mousePosition.y - userDialog.getHeight();
+                int x = mousePosition.x;
+                int y = mousePosition.y - userDialog.getHeight();
+                if (x < 1) {
+                    x = 1;
+                }
+                if (y < 1) {
+                    y = 1;
+                }
                 userDialog.setLocation(x, y);
                 SwingUtils.flashJComponent(StatusLabelForPerson.this, 2);
                 action.doAction();

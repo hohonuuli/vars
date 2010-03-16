@@ -30,7 +30,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import org.mbari.awt.AwtUtilities;
 import org.mbari.swing.LabeledSpinningDialWaitIndicator;
+import org.mbari.swing.SearchableComboBoxModel;
 import org.mbari.swing.WaitIndicator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,8 +85,7 @@ public class VideoArchiveSetEditorPanelController {
     public VideoArchiveSetEditorPanelController(VideoArchiveSetEditorPanel panel, ToolBelt toolBelt) {
         this.panel = panel;
         this.toolBelt = toolBelt;
-        Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
-        this.moveAction = new MoveVideoFrameWithDialogAction(frame, toolBelt);
+        this.moveAction = new MoveVideoFrameWithDialogAction(AwtUtilities.getFrame(panel), toolBelt);
     }
 
     protected void addAssociation() {
@@ -477,31 +478,55 @@ public class VideoArchiveSetEditorPanelController {
         ObservationTableModel tableModel = (ObservationTableModel) myTable.getModel();
         tableModel.clear();
 
-        VideoArchiveSetDAO dao = toolBelt.getAnnotationDAOFactory().newVideoArchiveSetDAO();
-
         if (videoArchiveSet != null) {
             if (log.isDebugEnabled()) {
                 log.debug("Retrieving all video frames for " + videoArchiveSet);
             }
 
-            // DAOTX - Delete associations
-            dao.startTransaction();
-            videoArchiveSet = dao.find(videoArchiveSet);    // Bring it into the transaction
-            final Collection<VideoFrame> videoFrames = ImmutableList.copyOf(videoArchiveSet.getVideoFrames());
+
+            // Fetch data in background thread
+            final VideoArchiveSet vas = videoArchiveSet;
+            Collection<VideoFrame> videoFrames = (Collection<VideoFrame>) Worker.post(new Job() {
+
+                @Override
+                public Object run() {
+                    VideoArchiveSetDAO dao = toolBelt.getAnnotationDAOFactory().newVideoArchiveSetDAO();
+                    dao.startTransaction();
+                    VideoArchiveSet foundVas = dao.find(vas);    // Bring it into the transaction
+                    final Collection<VideoFrame> videoFrames = ImmutableList.copyOf(foundVas.getVideoFrames());
+                    dao.endTransaction();
+                    return videoFrames;
+                }
+            });
+
+
+            // repopulate the table and pull out parts need to set other UI components
+            Collection<String> names = new HashSet<String>(); // for ConceptComboBox
+            Collection<ILink> associations = new HashSet<ILink>(); // for associationComboBox
             for (VideoFrame videoFrame : videoFrames) {
                 final Collection<Observation> observations = ImmutableList.copyOf(videoFrame.getObservations());
                 for (Observation observation : observations) {
                     myTable.addObservation(observation);
+                    names.add(observation.getConceptName());
+                    associations.addAll(observation.getAssociations());
                 }
             }
 
-            dao.endTransaction();
+            // Update the conceptComboBox
+            String[] namesArray = new String[names.size()];
+            names.toArray(namesArray);
+            panel.getConceptComboBox().updateModel(namesArray);
 
+            // Populate the Association combobox
+            SearchableComboBoxModel<ILink> model = (SearchableComboBoxModel<ILink>) panel.getAssociationComboBox().getModel();
+            model.clear();
+            model.addAll(associations);
         }
 
         myTable.setSelectedObservations(selectedObservations);
-        waitIndicator.dispose();
+
         toolBelt.getPersistenceController().updateUI();
+        waitIndicator.dispose();
 
     }
 
@@ -574,6 +599,7 @@ public class VideoArchiveSetEditorPanelController {
 
             });
         }
+        selectObservations(observations);
 
     }
 
@@ -593,15 +619,16 @@ public class VideoArchiveSetEditorPanelController {
      */
     private class AssociationSelectionDialog extends StandardDialog {
 
-        private LinkSelectionPanel panel;
+        private LinkSelectionPanel linkSelectionPanel;
 
         /**
          * Constructs ...
          */
         public AssociationSelectionDialog() {
-            super((Frame) Lookup.getApplicationFrameDispatcher().getValueObject(), "VARS - Select Association", false);
-            panel = new LinkSelectionPanel(toolBelt.getAnnotationPersistenceService());
-            add(panel, BorderLayout.CENTER);
+            super(AwtUtilities.getFrame(panel), "VARS - Select Association", true);
+            linkSelectionPanel = new LinkSelectionPanel(toolBelt.getAnnotationPersistenceService());
+            add(linkSelectionPanel, BorderLayout.CENTER);
+            pack();
         }
 
         /**
@@ -609,15 +636,15 @@ public class VideoArchiveSetEditorPanelController {
          * @param b
          */
         public void allowEditing(boolean b) {
-            panel.getLinkValueTextField().setEditable(b);
-            panel.getToConceptComboBox().setEnabled(b);
+            linkSelectionPanel.getLinkValueTextField().setEditable(b);
+            linkSelectionPanel.getToConceptComboBox().setEnabled(b);
         }
 
         /**
          * @return
          */
         public ILink getLink() {
-            return panel.getLink();
+            return linkSelectionPanel.getLink();
         }
 
         /**
@@ -625,7 +652,8 @@ public class VideoArchiveSetEditorPanelController {
          * @param links
          */
         public void setLinks(Collection<ILink> links) {
-            panel.setLinks(links);
+            linkSelectionPanel.setLinks(links);
         }
     }
+
 }

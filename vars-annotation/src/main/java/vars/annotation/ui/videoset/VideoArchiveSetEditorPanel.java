@@ -17,6 +17,7 @@ package vars.annotation.ui.videoset;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -365,26 +366,11 @@ public class VideoArchiveSetEditorPanel extends JPanel {
     }
 
     private void initialize() {
-        addFocusListener(new FocusAdapter() {
-
-            @Override
-            public void focusGained(FocusEvent e) {
-                populateTable();
-            }
-
-        });
         setLayout(new BorderLayout(0, 0));
         add(getInnerPanel(), BorderLayout.CENTER);
         add(getToolBar(), BorderLayout.NORTH);
     }
 
-    private void populateTable() {
-        WaitIndicator waitIndicator = new LabeledSpinningDialWaitIndicator(this, "Refreshing ...");
-        synchronized (this) {
-            controller.refresh();
-        }
-        waitIndicator.dispose();
-    }
 
     /**
      *
@@ -393,33 +379,10 @@ public class VideoArchiveSetEditorPanel extends JPanel {
     public synchronized void setVideoArchiveSet(VideoArchiveSet videoArchiveSet) {
         this.videoArchiveSet = videoArchiveSet;
         SwingUtilities.invokeLater(new Runnable() {
-
             public void run() {
-                getTable().setSelectedObservation(null);
-                populateTable();
-
-                // Populate teh ConceptCombobox
-                Collection<Observation> observations = controller.getObservations(false);
-                Collection<String> names = new HashSet<String>();
-                for (Observation observation : observations) {
-                    names.add(observation.getConceptName());
-                }
-                String[] namesArray = new String[names.size()];
-                names.toArray(namesArray);
-                getConceptComboBox().updateModel(namesArray);
-
-                // Populate the Association combobox
-                Collection<ILink> associations = new HashSet<ILink>();
-                for (Observation observation : observations) {
-                    associations.addAll(observation.getAssociations());
-                }
-                SearchableComboBoxModel<ILink> model = (SearchableComboBoxModel<ILink>) getAssociationComboBox().getModel();
-                model.clear();
-                model.addAll(associations);
+                controller.refresh();
             }
-
         });
     }
-
 
 }

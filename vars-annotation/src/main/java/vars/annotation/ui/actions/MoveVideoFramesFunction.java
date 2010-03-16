@@ -37,6 +37,7 @@ public class MoveVideoFramesFunction {
 
         DAO dao = annotationDAOFactory.newDAO();
         dao.startTransaction();
+        targetVideoArchive = dao.find(targetVideoArchive);
         for (VideoFrame videoFrame : videoFrames) {
             videoFrame = dao.find(videoFrame); // Pull existing copy from db and bring into transation
             VideoArchive sourceVideoArchive = videoFrame.getVideoArchive();

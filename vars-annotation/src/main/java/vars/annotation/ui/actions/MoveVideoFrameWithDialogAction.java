@@ -65,17 +65,9 @@ public class MoveVideoFrameWithDialogAction extends ActionAdapter {
         dialog = new OpenVideoArchiveDialog(owner, toolBelt);
         dialog.getOkayButton().addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                dialog.setVisible(false);
-                WaitIndicator waitIndicator = new LabeledSpinningDialWaitIndicator((JFrame) owner, "Moving ...");
-                Worker.post(new Job() {
-                    @Override
-                    public Object run() {
-                        VideoArchive videoArchive = dialog.openVideoArchive();
-                        return function.apply(videoArchive, videoFrames);
-                    }
-                    
-                });
-                waitIndicator.dispose();
+                VideoArchive videoArchive = dialog.openVideoArchive();
+                dialog.dispose();
+                function.apply(videoArchive, videoFrames);
             }
         });
     }
@@ -92,8 +84,8 @@ public class MoveVideoFrameWithDialogAction extends ActionAdapter {
      * @param videoFrames
      */
     public void setVideoFrames(final Collection<VideoFrame> videoFrames) {
-        videoFrames.clear();
-        videoFrames.addAll(videoFrames);
+        this.videoFrames.clear();
+        this.videoFrames.addAll(videoFrames);
     }
 
 }

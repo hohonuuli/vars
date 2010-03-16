@@ -19,6 +19,7 @@ import java.awt.Component;
 import java.util.Collection;
 
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
@@ -201,10 +202,20 @@ public class JXObservationTable extends JXTable implements ObservationTable {
      * @param observations
      */
     public void setSelectedObservations(final Collection<Observation> observations) {
+        ListSelectionModel mySelectionModel = getSelectionModel();
+        mySelectionModel.clearSelection();
+
         JXObservationTableModel model = (JXObservationTableModel) getModel();
+        getSelectionModel().clearSelection();
         for (Observation observation : observations) {
-            final int row = convertRowIndexToView(model.getObservationRow(observation));
-            getSelectionModel().addSelectionInterval(row, row);
+            try {
+                final int row = convertRowIndexToView(model.getObservationRow(observation));
+                mySelectionModel.addSelectionInterval(row, row);
+            }
+            catch (IndexOutOfBoundsException e) {
+                // This occurs if an observation is no longer in the table.
+                // We can safely ignore the exception
+            }
         }
 
         int[] i = getSelectedRows();
