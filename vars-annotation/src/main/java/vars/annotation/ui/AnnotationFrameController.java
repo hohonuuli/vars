@@ -26,7 +26,7 @@ import vars.CacheClearedEvent;
 import vars.CacheClearedListener;
 import vars.VARSException;
 import vars.annotation.Observation;
-import vars.shared.ui.PreferenceUpdater;
+import vars.shared.preferences.PreferenceUpdater;
 
 /**
  *

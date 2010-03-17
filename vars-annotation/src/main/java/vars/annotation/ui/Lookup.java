@@ -1,5 +1,5 @@
 /*
- * @(#)Lookup.java   2009.12.09 at 09:08:38 PST
+ * @(#)Lookup.java   2010.03.17 at 04:22:48 PDT
  *
  * Copyright 2009 MBARI
  *
@@ -20,18 +20,19 @@ import com.google.inject.Injector;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.prefs.Preferences;
+import java.util.prefs.PreferencesFactory;
 import org.bushe.swing.event.EventBus;
 import org.mbari.util.Dispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.UserAccount;
+import vars.VarsUserPreferencesFactory;
 import vars.annotation.CameraDirections;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.table.ObservationTable;
 import vars.annotation.ui.video.ImageCaptureService;
 import vars.annotation.ui.video.VideoControlService;
-import vars.VarsUserPreferencesFactory;
 import vars.shared.InjectorModule;
 import vars.shared.ui.GlobalLookup;
 
@@ -44,10 +45,10 @@ public class Lookup extends GlobalLookup {
     protected static final Object KEY_DISPATCHER_CAMERA_DIRECTION = "vars.annotation.ui.Lookup-CameraDirection";
     protected static final Object KEY_DISPATCHER_GUICE_INJECTOR = "vars.annotation.ui.Lookup-Injector";
     protected static final Object KEY_DISPATCHER_IMAGECAPTURESERVICE = "vars.annotation.ui.Lookup-ImageCaptureService";
+    protected static final Object KEY_DISPATCHER_LOGINCREDENTIAL = "vars.annotation.ui.Lookup-LoginCredential";
     protected static final Object KEY_DISPATCHER_OBSERVATION_TABLE = "vars.annotation.ui.Lookup-ObservationTable";
     protected static final Object KEY_DISPATCHER_PREFERENCES = "vars.annotation.ui.Lookup-Preferences";
     protected static final Object KEY_DISPATCHER_VIDEOSERVICE = "vars.annotation.ui.Lookup-VideoService";
-    protected static final Object KEY_DISPATCHER_LOGINCREDENTIAL = "vars.annotation.ui.Lookup-LoginCredential";
 
     /**  */
     public static final String RESOURCE_BUNDLE = "annotation-app";
@@ -92,8 +93,11 @@ public class Lookup extends GlobalLookup {
     protected static final Object KEY_DISPATCHER_SELECTED_OBSERVATIONS = Observation.class;
     protected static final Object KEY_DISPATCHER_APPLICATION_FRAME = AnnotationFrame.class;
     protected static final Object KEY_DISPATCHER_APPLICATION = App.class;
+    private static final PreferencesFactory PREFERENCES_FACTORY;
 
     static {
+
+
         getApplicationDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
@@ -227,6 +231,9 @@ public class Lookup extends GlobalLookup {
         EventBus.subscribe(TOPIC_REFRESH, LOGGING_SUBSCRIBER);
         EventBus.subscribe(TOPIC_DATABASE_STATUS, LOGGING_SUBSCRIBER);
 
+        Injector injector = (Injector) getGuiceInjectorDispatcher().getValueObject();
+        PREFERENCES_FACTORY = injector.getInstance(PreferencesFactory.class);
+
     }
 
     /**
@@ -288,6 +295,15 @@ public class Lookup extends GlobalLookup {
      */
     public static Dispatcher getPreferencesDispatcher() {
         return Dispatcher.getDispatcher(KEY_DISPATCHER_PREFERENCES);
+    }
+
+    /**
+     * @return The {@link PreferencesFactory} object used to fetch preferences.
+     * The PreferencesFactory object should be configured in your Guice
+     * injector Module
+     */
+    public static PreferencesFactory getPreferencesFactory() {
+        return PREFERENCES_FACTORY;
     }
 
     /**

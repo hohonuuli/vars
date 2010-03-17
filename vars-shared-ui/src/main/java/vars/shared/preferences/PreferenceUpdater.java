@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package vars.shared.ui;
+package vars.shared.preferences;
 
 /**
  *

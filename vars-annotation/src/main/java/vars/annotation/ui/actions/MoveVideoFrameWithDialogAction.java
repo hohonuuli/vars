@@ -15,17 +15,12 @@
 
 package vars.annotation.ui.actions;
 
-import foxtrot.Job;
-import foxtrot.Worker;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
-import javax.swing.JFrame;
 import org.mbari.awt.event.ActionAdapter;
-import org.mbari.swing.LabeledSpinningDialWaitIndicator;
-import org.mbari.swing.WaitIndicator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.VideoArchive;

@@ -16,10 +16,6 @@ package vars;
 
 
 import com.google.inject.Inject;
-import vars.MiscDAOFactory;
-import vars.MiscFactory;
-import vars.PersistenceCache;
-import vars.PersistenceCacheProvider;
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.AnnotationFactory;
 import vars.annotation.AnnotationPersistenceService;

@@ -375,7 +375,7 @@ public class LinkSelectionPanel extends JPanel {
      */
     public ILink getLink() {
         String linkName = getLinkNameTextField().getText();
-        String toConcept = (String) getLinksComboBox().getSelectedItem();
+        String toConcept = (String) getToConceptComboBox().getSelectedItem();
         String linkValue = getLinkValueTextField().getText();
         return new LinkBean(linkName, toConcept, linkValue);
     }

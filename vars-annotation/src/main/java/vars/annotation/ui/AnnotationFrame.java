@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.cbpanel.ConceptButtonPanel;
+import vars.annotation.ui.preferences.PreferenceFrameButton;
 import vars.annotation.ui.roweditor.RowEditorPanel;
 import vars.annotation.ui.table.JXObservationTable;
 import vars.annotation.ui.video.VideoControlPanel;
@@ -287,6 +288,7 @@ public class AnnotationFrame extends JFrame {
             toolBar = new JToolBar();
             toolBar.add(new RefreshButton(toolBelt));
             toolBar.add(new VideoArchiveSetEditorButton(toolBelt));
+            toolBar.add(new PreferenceFrameButton());
             toolBar.add(new StatusLabelForPerson(toolBelt));
             toolBar.add(new StatusLabelForVcr());
             toolBar.add(new StatusLabelForVideoArchive(toolBelt));

@@ -16,15 +16,20 @@ package vars.jpa;
 
 import vars.VarsUserPreferencesFactory;
 import com.google.inject.Binder;
+import com.google.inject.Inject;
 import com.google.inject.Module;
+import com.google.inject.Provider;
 import com.google.inject.Scopes;
 import com.google.inject.name.Names;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
+import java.util.prefs.PreferencesFactory;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import vars.ExternalDataPersistenceService;
 import vars.EXPDPersistenceService;
@@ -58,6 +63,7 @@ public class VarsJpaModule implements Module {
     private final String annotationPersistenceUnit;
     private final String knowledgebasePersistenceUnit;
     private final String miscPersistenceUnit;
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     /**
      * Constructs ...
@@ -89,7 +95,7 @@ public class VarsJpaModule implements Module {
         binder.bind(EntityManagerFactory.class).annotatedWith(Names.named("miscPersistenceUnit")).toInstance(Persistence.createEntityManagerFactory(miscPersistenceUnit));
 
         // Bind annotation object and DAO factories
-        binder.bind(AnnotationDAOFactory.class).to(AnnotationDAOFactoryImpl.class).in(Scopes.SINGLETON);;
+        binder.bind(AnnotationDAOFactory.class).to(AnnotationDAOFactoryImpl.class).in(Scopes.SINGLETON);
         binder.bind(AnnotationFactory.class).to(AnnotationFactoryImpl.class);
         binder.bind(AnnotationPersistenceService.class).to(AnnotationPersistenceServiceImpl.class).in(Scopes.SINGLETON);
         binder.bind(ExternalDataPersistenceService.class).to(EXPDPersistenceService.class);
@@ -101,6 +107,26 @@ public class VarsJpaModule implements Module {
         binder.bind(PersistenceCacheProvider.class).to(JPACacheProvider.class);
         binder.bind(QueryPersistenceService.class).to(QueryPersistenceServiceImpl.class);
         binder.bind(VarsUserPreferencesFactory.class).to(VarsUserPreferencesFactoryImpl.class).in(Scopes.SINGLETON);
+        binder.bind(PreferencesFactory.class).toProvider(PreferenceFactoryProvider.class);
+
+    }
+
+    /**
+     * This allows us to bind a single VarsUserPreferenceFactory object to
+     * several different bindings.
+     */
+    private static class PreferenceFactoryProvider implements Provider<VarsUserPreferencesFactory> {
+
+        private final VarsUserPreferencesFactory preferencesFactory;
+
+        @Inject
+        public PreferenceFactoryProvider(VarsUserPreferencesFactory preferencesFactory) {
+            this.preferencesFactory = preferencesFactory;
+        }
+
+        public VarsUserPreferencesFactory get() {
+            return preferencesFactory;
+        }
 
     }
 }

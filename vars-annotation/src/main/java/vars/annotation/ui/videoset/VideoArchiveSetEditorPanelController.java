@@ -369,6 +369,7 @@ public class VideoArchiveSetEditorPanelController {
 
                     // Update the values for each association in background thread
                     final ILink newLink = renameAssociationsDialog.getLink();
+                    renameAssociationsDialog.dispose();
                     Worker.post(new Job() {
 
                         @Override
@@ -407,8 +408,8 @@ public class VideoArchiveSetEditorPanelController {
             });
             renameObservationsDialog.getOkayButton().addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    renameObservationsDialog.dispose();
                     final String name = renameObservationsDialog.getSelectedItem();
+                    renameObservationsDialog.dispose();
                     final Collection<Observation> observations = getObservations(true);
                     Worker.post(new Job() {
 
@@ -493,7 +494,7 @@ public class VideoArchiveSetEditorPanelController {
                     VideoArchiveSetDAO dao = toolBelt.getAnnotationDAOFactory().newVideoArchiveSetDAO();
                     dao.startTransaction();
                     VideoArchiveSet foundVas = dao.find(vas);    // Bring it into the transaction
-                    final Collection<VideoFrame> videoFrames = ImmutableList.copyOf(foundVas.getVideoFrames());
+                    final Collection<VideoFrame> videoFrames = (foundVas == null) ? new ArrayList<VideoFrame>() : ImmutableList.copyOf(foundVas.getVideoFrames());
                     dao.endTransaction();
                     return videoFrames;
                 }

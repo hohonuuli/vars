@@ -6,22 +6,13 @@
 package vars.annotation.ui.videoset;
 
 import java.awt.BorderLayout;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowFocusListener;
-import java.awt.event.WindowListener;
-import java.awt.event.WindowStateListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JToggleButton;
-import org.mbari.swing.LabeledSpinningDialWaitIndicator;
-import org.mbari.swing.WaitIndicator;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
@@ -79,27 +70,21 @@ public class VideoArchiveSetEditorButton extends JToggleButton {
 
             // When window loses focus make it look different. When it gains
             // focus reload the observations from the database
-            frame.addWindowFocusListener(new WindowFocusListener() {
-
-                WaitIndicator waitIndicator;
-
-                public void windowGainedFocus(WindowEvent e) {
-                    if (waitIndicator != null) {
-                        waitIndicator.dispose();
-                    }
-                    VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
-                    if (videoArchive != null) {
-                        panel.setVideoArchiveSet(videoArchive.getVideoArchiveSet());
-                    }
-                    else {
-                        panel.setVideoArchiveSet(null);
-                    }
-                }
-
-                public void windowLostFocus(WindowEvent e) {
-                    waitIndicator = new WaitIndicator(frame);
-                }
-            });
+//            frame.addWindowFocusListener(new WindowFocusListener() {
+//
+//                WaitIndicator waitIndicator;
+//
+//                public void windowGainedFocus(WindowEvent e) {
+//                    if (waitIndicator != null) {
+//                        waitIndicator.dispose();
+//                    }
+//                    refresh();
+//                }
+//
+//                public void windowLostFocus(WindowEvent e) {
+//                    waitIndicator = new WaitIndicator(frame);
+//                }
+//            });
 
             frame.addWindowListener(new WindowAdapter() {
 

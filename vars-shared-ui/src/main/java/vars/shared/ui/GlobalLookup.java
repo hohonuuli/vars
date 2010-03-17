@@ -5,6 +5,7 @@
 
 package vars.shared.ui;
 
+import com.google.inject.Injector;
 import java.awt.Frame;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -67,6 +68,7 @@ public class GlobalLookup {
      */
     static {
 
+
         DATE_FORMAT_UTC.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         getSelectedFrameDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
@@ -121,6 +123,7 @@ public class GlobalLookup {
         EventBus.subscribe(TOPIC_FATAL_ERROR, LOGGING_SUBSCRIBER);
         EventBus.subscribe(TOPIC_WARNING, LOGGING_SUBSCRIBER);
         EventBus.subscribe(TOPIC_NONFATAL_ERROR, LOGGING_SUBSCRIBER);
+
     }
 
     /**
@@ -139,7 +142,11 @@ public class GlobalLookup {
     public static Dispatcher getUserAccountDispatcher() {
         return Dispatcher.getDispatcher(KEY_DISPATCHER_USERACCOUNT);
     }
-    
+
+    /**
+     * The local directory used for storing preferences (e.g. ~/.vars)
+     * @return
+     */
     public static File getSettingsDirectory() {
     	return settingsDirectory;
     }
