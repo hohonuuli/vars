@@ -17,7 +17,7 @@ public class RefreshButton extends JFancyButton {
 
     public RefreshButton(final ToolBelt toolBelt) {
         addActionListener(new ClearDatabaseCacheAction(toolBelt));
-        setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/16px/refresh.png")));
+        setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/24px/refresh.png")));
         setText("");
         setToolTipText("Refresh Database");
     }

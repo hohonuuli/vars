@@ -10,7 +10,8 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.prefs.PreferencesFactory;
-import javax.swing.JButton;
+import javax.swing.ImageIcon;
+import org.mbari.swing.JFancyButton;
 import vars.UserAccount;
 import vars.annotation.ui.Lookup;
 
@@ -18,7 +19,7 @@ import vars.annotation.ui.Lookup;
  *
  * @author brian
  */
-public class PreferenceFrameButton extends JButton {
+public class PreferenceFrameButton extends JFancyButton {
     
     private PreferencesFrame preferencesFrame;
     private final PreferencesFactory preferencesFactory;
@@ -30,9 +31,19 @@ public class PreferenceFrameButton extends JButton {
     }
 
     private void initialize() {
+        setEnabled(false);
+        setToolTipText("Edit Preferences");
+        setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/24px/preferences.png")));
         addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 getPreferencesFrame().setVisible(true);
+            }
+        });
+
+        // Turn button off if no UserAccount is open
+        Lookup.getUserAccountDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                setEnabled(evt.getNewValue() != null);
             }
         });
     }
