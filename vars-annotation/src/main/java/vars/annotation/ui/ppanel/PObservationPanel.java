@@ -58,7 +58,7 @@ public class PObservationPanel extends PropertiesPanel {
         super();
         this.toolBelt = toolBelt;
         annotation = new Annotation();
-        setPropertyNames(new String[] { "TimeCode", "Concept", "RecordedDate", "ObservationDate", "Observer" });
+        setPropertyNames(new String[] { "TimeCode", "Concept", "RecordedDate", "ObservationDate", "Observer", "X", "Y" });
         addListeners();
         addToolTip("Concept");
 
@@ -93,6 +93,7 @@ public class PObservationPanel extends PropertiesPanel {
         if (timeCodeAction == null) {
             timeCodeAction = new ChangeTimeCodeActionWithDialog(toolBelt) {
 
+                @Override
                 public void doAction() {
                     super.doAction();
 
@@ -190,6 +191,14 @@ public class PObservationPanel extends PropertiesPanel {
             else {
                 observation = obs;
             }
+        }
+
+        public double getX() {
+            return observation.getX();
+        }
+
+        public double getY() {
+            return observation.getY();
         }
     }
 }
