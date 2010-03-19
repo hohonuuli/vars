@@ -1,5 +1,5 @@
 /*
- * @(#)ImageFrame.java   2009.12.29 at 05:01:47 PST
+ * @(#)ImageAnnotationFrame.java   2010.03.19 at 11:40:26 PDT
  *
  * Copyright 2009 MBARI
  *
@@ -21,13 +21,10 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
 import java.net.URL;
-import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JToolBar;
-import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
 import org.jdesktop.jxlayer.JXLayer;
-import org.mbari.util.ImageCanvas;
+import org.mbari.swing.JImageCanvas2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.VideoFrame;
@@ -43,21 +40,22 @@ import vars.shared.ui.ConceptNameComboBox;
 public class ImageAnnotationFrame extends JFrame {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
+    private JImageCanvas2 imageCanvas = new JImageCanvas2();
+    private ConceptNameComboBox comboBox;
     private BufferedImage image;
     private URL imageUrl;
-    private ImageCanvas imageCanvas = new ImageCanvas();
-    private JXLayer<ImageCanvas> layer;
+    private JXLayer<JImageCanvas2> layer;
     private final AnnotationLayerUI layerUI;
     private JToolBar toolBar;
 
-
-    private ConceptNameComboBox comboBox;
     /**
      * Create the frame
+     *
+     * @param toolBelt
      */
     public ImageAnnotationFrame(final ToolBelt toolBelt) {
         super();
-        layerUI = new AnnotationLayerUI<ImageCanvas>(toolBelt);
+        layerUI = new AnnotationLayerUI<JImageCanvas2>(toolBelt);
         comboBox = new AllConceptNamesComboBox(toolBelt.getQueryPersistenceService());
 
         /*
@@ -65,31 +63,17 @@ public class ImageAnnotationFrame extends JFrame {
          * click annotations
          */
         comboBox.addItemListener(new ItemListener() {
+
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
-                    Concept concept = toolBelt.getAnnotationPersistenceService().findConceptByName((String) comboBox.getSelectedItem());
+                    Concept concept = toolBelt.getAnnotationPersistenceService().findConceptByName(
+                        (String) comboBox.getSelectedItem());
                     layerUI.setConcept(concept);
                 }
             }
+
         });
         initialize();
-    }
-
-    public VideoFrame getVideoFrame() {
-        return layerUI.getVideoFrame();
-    }
-
-    public void setVideoFrame(VideoFrame videoFrame) {
-        layerUI.setVideoFrame(videoFrame);
-        URL url = null;
-        try {
-            url = new URL(videoFrame.getCameraData().getImageReference());
-            
-        }
-        catch (Exception e){
-            // Do nothing
-        }
-        setImageUrl(url);
     }
 
     /**
@@ -102,36 +86,35 @@ public class ImageAnnotationFrame extends JFrame {
     }
 
     /**
-     * @return the imageUrl
-     */
-    private URL getImageUrl() {
-        return imageUrl;
-    }
-
-
-    /**
      * @return
      */
-    public JXLayer<ImageCanvas> getLayer() {
+    public JXLayer<JImageCanvas2> getLayer() {
         if (layer == null) {
-            layer = new JXLayer<ImageCanvas>(imageCanvas);
+            layer = new JXLayer<JImageCanvas2>(imageCanvas);
             layer.setUI(layerUI);
         }
 
         return layer;
     }
 
+    /**
+     * @return
+     */
     public JToolBar getToolBar() {
         if (toolBar == null) {
             toolBar = new JToolBar();
             toolBar.add(comboBox);
         }
+
         return toolBar;
     }
 
-
-
-
+    /**
+     * @return
+     */
+    public VideoFrame getVideoFrame() {
+        return layerUI.getVideoFrame();
+    }
 
     private void initialize() {
         setLayout(new BorderLayout());
@@ -140,8 +123,6 @@ public class ImageAnnotationFrame extends JFrame {
         setPreferredSize(new Dimension(640, 480));
         setImageUrl(null);
     }
-
-
 
     /**
      * Sets the URL of the image to display. The images is fetched from the
@@ -155,77 +136,34 @@ public class ImageAnnotationFrame extends JFrame {
         URL oldUrl = this.imageUrl;
         this.imageUrl = imageUrl;
         log.debug("setImageUrl( " + imageUrl + " )");
-
-        // Don't reload the same image
-        if (imageUrl == null) {
-
-            /*
-             *  Clear out data if no value is set
-             */
-            SwingUtilities.invokeLater(new Runnable() {
-
-                public void run() {
-                    setTitle("");
-                    imageCanvas.setImage(null);
-                }
-            });
+        String title = (imageUrl == null) ? "" : imageUrl.toExternalForm();
+        setTitle(title);
+        if (imageUrl == null || !imageUrl.equals(oldUrl)) {
+            imageCanvas.setUrl(imageUrl);
         }
-        else if (!imageUrl.equals(oldUrl)) {
 
-            /*
-             * Use swingutilities to invoke changes on the EventDisplatch thread.
-             *
-             * Remove label from view and add progress bar
-             */
-            SwingUtilities.invokeLater(new Runnable() {
-
-                public void run() {
-                    setTitle(imageUrl.toExternalForm());
-                    (new ImageLoader(imageUrl)).execute();
-                }
-            });
-
-        }
-        
     }
 
     /**
-     * @return
+     *
+     * @param videoFrame
      */
-    private class ImageLoader extends SwingWorker<BufferedImage, Object> {
-
-        final BufferedImage oldImage;
-        final URL url;
-
-        /**
-         * Constructs ...
-         *
-         * @param url
-         */
-        public ImageLoader(final URL url) {
-            this.url = url;
-            this.oldImage = getImage();
-        }
-
-        protected BufferedImage doInBackground() throws Exception {
-            log.debug("Reading image from " + url);
-            return ImageIO.read(url);
-        }
-
-        @Override
-        protected void done() {
-
-            try {
-                image = get();
-                log.debug("Image " + url + " [" + image.getWidth() + " x " + image.getHeight() +
-                          " pixels] has been loaded");
-                imageCanvas.setImage(image);
-            }
-            catch (Exception e) {
-                log.debug("Failed to read image", e);
-                imageCanvas.setImage(null);
-            }
+    public void setVideoFrame(VideoFrame videoFrame) {
+        layerUI.setVideoFrame(videoFrame);
+        URL url = null;
+        try {
+            url = new URL(videoFrame.getCameraData().getImageReference());
 
         }
+        catch (Exception e) {
+
+            // Do nothing
+        }
+
+        if (url == null || !url.equals(imageUrl)) {
+            setImageUrl(url);
+        }
+        repaint();
     }
+
 }

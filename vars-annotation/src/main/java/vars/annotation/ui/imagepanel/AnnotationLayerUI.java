@@ -38,7 +38,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import org.jdesktop.jxlayer.JXLayer;
 import org.mbari.awt.AwtUtilities;
-import org.mbari.util.ImageCanvas;
+import org.mbari.swing.JImageCanvas2;
 import vars.UserAccount;
 import vars.annotation.Observation;
 import vars.annotation.VideoFrame;
@@ -54,7 +54,7 @@ import vars.knowledgebase.Concept;
  *
  * @param <T>
  */
-public class AnnotationLayerUI<T extends ImageCanvas> extends CrossHairLayerUI<T> {
+public class AnnotationLayerUI<T extends JImageCanvas2> extends CrossHairLayerUI<T> {
 
     /**
      * This font is used to draw the concept name of concepts.

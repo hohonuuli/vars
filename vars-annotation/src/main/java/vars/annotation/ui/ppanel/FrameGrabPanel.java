@@ -1,5 +1,5 @@
 /*
- * @(#)FrameGrabPanel.java   2009.11.13 at 03:38:42 PST
+ * @(#)FrameGrabPanel.java   2010.03.19 at 11:38:44 PDT
  *
  * Copyright 2009 MBARI
  *
@@ -13,9 +13,6 @@
 
 
 
-/*
-Created on October 30, 2003, 2:20 PM
- */
 package vars.annotation.ui.ppanel;
 
 import com.google.common.base.Function;
@@ -28,18 +25,15 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import javax.swing.JFrame;
 import javax.swing.border.TitledBorder;
-import org.mbari.swing.SwingWorker;
-import org.mbari.util.ImageCanvas;
+import org.mbari.swing.JImageCanvas2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.annotation.CameraData;
 import vars.annotation.Observation;
 import vars.annotation.VideoFrame;
 import vars.annotation.ui.Lookup;
@@ -62,20 +56,21 @@ import vars.annotation.ui.imagepanel.ImageAnnotationFrame;
  * @author  Brian Schlining, <a href="http://www.mbari.org">MBARI</a>
  * @version  $Id: FrameGrabPanel.java 332 2006-08-01 18:38:46Z hohonuuli $
  */
-public class FrameGrabPanel extends javax.swing.JPanel implements PropertyChangeListener {
+public class FrameGrabPanel extends javax.swing.JPanel {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
     /**
      *     Displays a no-image icon when a framegrab is not present.
      */
-    private ImageCanvas defaultImageCanvas;
-    private ImageCanvas imageCanvas;
-    private VideoFrame videoFrame;
+    private JImageCanvas2 imageCanvas;
     private final ImageAnnotationFrame imageFrame;
+    private VideoFrame videoFrame;
 
     /**
      * Creates new form FrameGrabPanel
+     *
+     * @param toolBelt
      */
     public FrameGrabPanel(ToolBelt toolBelt) {
         this.imageFrame = new ImageAnnotationFrame(toolBelt);
@@ -84,15 +79,39 @@ public class FrameGrabPanel extends javax.swing.JPanel implements PropertyChange
         initialize();
 
         // Register for notifications when the Selected Observations changes
-        Lookup.getSelectedObservationsDispatcher().addPropertyChangeListener(this);
+        Lookup.getSelectedObservationsDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent evt) {
+                final Object object = evt.getNewValue();
+                VideoFrame vf = null;
+
+                if (object != null) {
+
+                    // If one observation is found show it's image
+                    final Collection<Observation> observations = (Collection<Observation>) object;
+                    Set<VideoFrame> videoFrames = new HashSet<VideoFrame>(Collections2.transform(observations,
+                        new Function<Observation, VideoFrame>() {
+
+                        public VideoFrame apply(Observation from) {
+                            return from.getVideoFrame();
+                        }
+
+                    }));
+
+                    if (videoFrames.size() == 1) {
+                        vf = videoFrames.iterator().next();
+                    }
+                }
+
+                setVideoFrame(vf);
+            }
+        });
 
     }
 
-
-    ImageCanvas getImageCanvas() {
+    JImageCanvas2 getImageCanvas() {
         if (imageCanvas == null) {
-            defaultImageCanvas = new ImageCanvas(getClass().getResource("/images/vars/annotation/no_image.jpg"));
-            imageCanvas = defaultImageCanvas;
+            imageCanvas = new JImageCanvas2(getClass().getResource("/images/vars/annotation/no_image.jpg"));
             imageCanvas.setSize(getSize());
         }
 
@@ -137,35 +156,9 @@ public class FrameGrabPanel extends javax.swing.JPanel implements PropertyChange
 
                 imageFrame.setVisible(true);
             }
-            
+
 
         });
-    }
-
-    /**
-     * @param evt
-     */
-    public void propertyChange(PropertyChangeEvent evt) {
-        final Object object = evt.getNewValue();
-        VideoFrame vf = null;
-
-        if (object != null) {
-
-            // If one observation is found show it's image
-            final Collection<Observation> observations = (Collection<Observation>) object;
-            Set<VideoFrame> videoFrames = new HashSet<VideoFrame>(Collections2.transform(observations,
-                    new Function<Observation, VideoFrame>() {
-                public VideoFrame apply(Observation from) {
-                    return from.getVideoFrame();
-                }
-            }));
-
-            if (videoFrames.size() == 1) {
-                vf = videoFrames.iterator().next();
-            }
-        }
-
-        setVideoFrame(vf);
     }
 
     /**
@@ -178,117 +171,20 @@ public class FrameGrabPanel extends javax.swing.JPanel implements PropertyChange
         imageCanvas.setSize(getSize());
     }
 
-    private void setImageCanvas(ImageCanvas newImageCanvas) {
-        if (newImageCanvas == null) {
-            newImageCanvas = defaultImageCanvas;
-        }
-
-        if (newImageCanvas != imageCanvas) {
-            newImageCanvas.setSize(imageCanvas.getSize());
-            remove(imageCanvas);
-            add(newImageCanvas, java.awt.BorderLayout.CENTER);
-            imageCanvas = newImageCanvas;
-            validate();
-        }
-
-        repaint();
-    }
-
     /**
      *     @param videoFrame              The videoFrame to set.
      */
     public void setVideoFrame(final VideoFrame videoFrame) {
+        VideoFrame oldVideoFrame = this.videoFrame;
         this.videoFrame = videoFrame;
-        imageFrame.setVideoFrame(videoFrame);
-
-        /*
-         *  Don't hang the GUI waiting for the image to load. Load the
-         *  image in the background.
-         */
-        final SwingWorker worker = new ImageWorker(videoFrame);
-
-        worker.start();
-    }
-
-
-    private class ImageWorker extends SwingWorker {
-
-        private VideoFrame myVideoFrame;
-        private ImageCanvas newImageCanvas;
-
-        ImageWorker(final VideoFrame videoFrame_) {
-            super();
-            this.myVideoFrame = videoFrame_;
-        }
-
-        public Object construct() {
-            boolean updateImage = false;
-            CameraData myCamera = null;
-
-            if (myVideoFrame != null) {
-                myCamera = videoFrame.getCameraData();
-            }
-
-            if ((myCamera != null) && myVideoFrame.hasImageReference()) {
-
-                /*
-                 *  Only update if the image url is different from the currently
-                 *  displayed image.
-                 */
-                final String newUrl = myCamera.getImageReference();
-
-                if (newUrl != null) {
-                    if (imageCanvas != null) {
-                        final String currentUrl = imageCanvas.getUrl().toExternalForm();
-
-                        if (newUrl.equals(currentUrl)) {
-                            newImageCanvas = imageCanvas;
-                        }
-                        else {
-                            updateImage = true;
-                        }
-                    }
-                    else {
-                        updateImage = true;
-                    }
-                }
-                else {
-                    newImageCanvas = defaultImageCanvas;
-                }
-
-                if (updateImage) {
-                    createImageCanvas();
-                }
-            }
-            else {
-                newImageCanvas = defaultImageCanvas;
-            }
-
-            return imageCanvas;
-        }
-
-        private void createImageCanvas() {
+        if (videoFrame == null || !videoFrame.equals(oldVideoFrame)) {
             try {
-                final URL frameGrabUrl = new URL(myVideoFrame.getCameraData().getImageReference());
-
-                newImageCanvas = new ImageCanvas(frameGrabUrl);
-            }
-            catch (final MalformedURLException e) {
-                log.warn(videoFrame + " references a malformed URL");
-                newImageCanvas = defaultImageCanvas;
-            }
-            catch (final Exception e) {
-                log.warn("Unable to add an image to the FrameGrabPanel.", e);
-                newImageCanvas = defaultImageCanvas;
+                getImageCanvas().setUrl(new URL(videoFrame.getCameraData().getImageReference()));
+            } catch (Exception ex) {
+                getImageCanvas().setUrl(null);
             }
         }
-
-        /**
-         *  Description of the Method
-         */
-        @Override
-        public void finished() {
-            setImageCanvas(newImageCanvas);
-        }
+        imageFrame.setVideoFrame(videoFrame);
     }
+
 }
