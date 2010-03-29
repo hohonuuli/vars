@@ -1,0 +1,16 @@
+The VARS applications use Google Guice for dependency injection. If you 
+write your own implementations, instead of using the vars-jpa module then 
+you will need to bind the following interfaces to their implementations:
+    AnnotationDAOFactory
+    AnnotationFactory
+    AnnotationPersistenceService
+    ExternalDataPersistenceService
+    KnowledgebaseDAOFactory
+    KnowledgebaseFactory
+    KnowledgebasePersistenceService
+    MiscDAOFactory
+    MiscFactory
+    PersistenceCacheProvider
+    QueryPersistenceService
+    VarsUserPreferencesFactory
+    PreferencesFactory
