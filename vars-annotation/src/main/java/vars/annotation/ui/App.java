@@ -20,6 +20,7 @@ import foxtrot.Job;
 import foxtrot.Worker;
 import java.awt.SplashScreen;
 import java.awt.Toolkit;
+import java.util.List;
 import java.util.Vector;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -48,11 +49,14 @@ import vars.shared.ui.event.WarningSubscriber;
 public class App {
 
     private AnnotationFrame annotationFrame;
-    private final EventTopicSubscriber exitSubscriber;
-    private final EventTopicSubscriber<Exception> fatalErrorSubscriber;
-    private final EventTopicSubscriber nonFatalErrorSubscriber;
     private final ToolBelt toolBelt;
-    private final EventTopicSubscriber<String> warningSubscriber;
+    
+    /**
+     * The App gets garbage collected shortly after startup. To
+     * hang on to the EventTopicSubscribers we store them in a static list. This
+     * is very important, otherwise they get gc'd too.
+     */
+    private static final List<EventTopicSubscriber> GC_PREVENTION = new Vector<EventTopicSubscriber>();
 
     /**
      * Constructs ...
@@ -101,10 +105,16 @@ public class App {
 
         splashFrame.setMessage("Assembling the user interface ...");
         Lookup.getSelectedObservationsDispatcher().setValueObject(new Vector<Observation>());
-        fatalErrorSubscriber = new FatalExceptionSubscriber(getAnnotationFrame());
-        nonFatalErrorSubscriber = new NonFatalErrorSubscriber(getAnnotationFrame());
-        warningSubscriber = new WarningSubscriber(getAnnotationFrame());
-        exitSubscriber = new ExitTopicSubscriber();
+        
+        // Configure EventBus
+        EventTopicSubscriber fatalErrorSubscriber = new FatalExceptionSubscriber(getAnnotationFrame());
+        EventTopicSubscriber nonFatalErrorSubscriber = new NonFatalErrorSubscriber(getAnnotationFrame());
+        EventTopicSubscriber warningSubscriber = new WarningSubscriber(getAnnotationFrame());
+        EventTopicSubscriber exitSubscriber = new ExitTopicSubscriber();
+        GC_PREVENTION.add(fatalErrorSubscriber);
+        GC_PREVENTION.add(nonFatalErrorSubscriber);
+        GC_PREVENTION.add(warningSubscriber);
+        GC_PREVENTION.add(exitSubscriber);
 
         EventBus.subscribe(Lookup.TOPIC_FATAL_ERROR, fatalErrorSubscriber);
         EventBus.subscribe(Lookup.TOPIC_NONFATAL_ERROR, nonFatalErrorSubscriber);

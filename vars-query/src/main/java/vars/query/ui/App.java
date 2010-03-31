@@ -15,15 +15,15 @@
 
 package vars.query.ui;
 
-import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import foxtrot.Task;
 import foxtrot.Worker;
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import java.io.File;
 import java.util.Date;
+import java.util.List;
+import java.util.Vector;
 import javax.swing.ActionMap;
 import javax.swing.ImageIcon;
 import javax.swing.InputMap;
@@ -34,12 +34,10 @@ import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.EventTopicSubscriber;
 import org.mbari.awt.WaitCursorEventQueue;
 import org.mbari.swing.SplashFrame;
-import org.mbari.util.Dispatcher;
 import org.mbari.util.SystemUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
-import vars.query.QueryModule;
 import vars.shared.ui.GlobalLookup;
 import vars.shared.ui.event.FatalExceptionSubscriber;
 import vars.shared.ui.event.NonFatalErrorSubscriber;
@@ -66,12 +64,16 @@ public class App {
     public static final Date MIN_RECORDED_DATE = new Date(378720000L * 1000L);
     private static Logger log;
     private ActionMap actionMap;
-    private final EventTopicSubscriber<Exception> fatalErrorSubscriber;
     private InputMap inputMap;
     private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
-    private final EventTopicSubscriber nonFatalErrorSubscriber;
-    private final EventTopicSubscriber<String> warningSubscriber;
     private QueryFrame queryFrame;
+
+    /**
+     * The App gets garbage collected shortly after startup. To
+     * hang on to the EventTopicSubscribers we store them in a static list. This
+     * is very important, otherwise they get gc'd too.
+     */
+    private static final List<EventTopicSubscriber> GC_PREVENTION = new Vector<EventTopicSubscriber>();
 
     /**
      * Constructs ...
@@ -90,18 +92,20 @@ public class App {
          */
         Lookup.getApplicationDispatcher().setValueObject(this);
 
-
         initialize();
-        fatalErrorSubscriber = new FatalExceptionSubscriber(getQueryFrame());
-        nonFatalErrorSubscriber = new NonFatalErrorSubscriber(getQueryFrame());
-        warningSubscriber = new WarningSubscriber(getQueryFrame());
 
         /*
          * Subscribe to all our favorite topics
          */
+        EventTopicSubscriber fatalErrorSubscriber = new FatalExceptionSubscriber(getQueryFrame());
+        EventTopicSubscriber nonFatalErrorSubscriber = new NonFatalErrorSubscriber(getQueryFrame());
+        EventTopicSubscriber warningSubscriber = new WarningSubscriber(getQueryFrame());
         EventBus.subscribe(Lookup.TOPIC_FATAL_ERROR, fatalErrorSubscriber);
         EventBus.subscribe(Lookup.TOPIC_NONFATAL_ERROR, nonFatalErrorSubscriber);
         EventBus.subscribe(Lookup.TOPIC_WARNING, warningSubscriber);
+        GC_PREVENTION.add(fatalErrorSubscriber);
+        GC_PREVENTION.add(nonFatalErrorSubscriber);
+        GC_PREVENTION.add(warningSubscriber);
 
     }
 
