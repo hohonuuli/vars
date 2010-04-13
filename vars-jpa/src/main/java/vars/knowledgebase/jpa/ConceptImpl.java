@@ -66,7 +66,8 @@ import vars.knowledgebase.ConceptNameTypes;
     @NamedQuery(name = "Concept.findByTaxonomyType",
                 query = "SELECT c FROM Concept c WHERE c.taxonomyType = :taxonomyType") ,
     @NamedQuery(name = "Concept.findRoot", query = "SELECT c FROM Concept c WHERE c.parentConcept IS NULL") ,
-    @NamedQuery(name = "Concept.findAll", query = "SELECT c FROM Concept c")
+    @NamedQuery(name = "Concept.findAll", query = "SELECT c FROM Concept c"),
+    @NamedQuery(name = "Concept.findByName", query = "SELECT c FROM Concept c, IN (c.conceptNames) AS n WHERE n.name = :name")
 })
 public class ConceptImpl implements Serializable, Concept, JPAEntity {
 

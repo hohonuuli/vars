@@ -45,15 +45,7 @@ import org.slf4j.LoggerFactory;
 import vars.jpa.JPAEntity;
 import vars.jpa.KeyNullifier;
 import vars.jpa.TransactionLogger;
-import vars.knowledgebase.Concept;
-import vars.knowledgebase.ConceptMetadata;
-import vars.knowledgebase.History;
-import vars.knowledgebase.HistoryCreationDateComparator;
-import vars.knowledgebase.LinkRealization;
-import vars.knowledgebase.LinkTemplate;
-import vars.knowledgebase.Media;
-import vars.knowledgebase.MediaTypes;
-import vars.knowledgebase.Usage;
+import vars.knowledgebase.*;
 
 /**
  * <pre>
@@ -134,6 +126,14 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
     )
     private List<Media> medias;
 
+    @OneToMany(
+        targetEntity = ArtifactImpl.class,
+        mappedBy = "conceptMetadata",
+        fetch = FetchType.EAGER,
+        cascade = CascadeType.ALL
+    )
+    private List<Artifact> artifacts;
+
     /** Optimistic lock to prevent concurrent overwrites */
     @SuppressWarnings("unused")
 	@Version
@@ -147,6 +147,12 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
         targetEntity = UsageImpl.class
     )
     private Usage usage;
+
+    public void addArtifact(Artifact artifact) {
+        if (getArtifacts().add(artifact)) {
+            ((ArtifactImpl) artifact).setConceptMetadata(this);
+        }
+    }
 
     public void addHistory(History history) {
         if (getHistories().add(history)) {
@@ -175,6 +181,13 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
 
     public Concept getConcept() {
         return concept;
+    }
+
+    public Collection<Artifact> getArtifacts() {
+        if (artifacts == null) {
+            artifacts = new ArrayList<Artifact>();
+        }
+        return artifacts;
     }
 
     public Collection<History> getHistories() {
@@ -268,6 +281,11 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
         return isPending;
     }
 
+    public void removeArtifact(Artifact artifact) {
+        if (getArtifacts().remove(artifact)) {
+            ((ArtifactImpl) artifact).setConceptMetadata(null);
+        }
+    }
 
     public void removeHistory(History history) {
         if (getHistories().remove(history)) {

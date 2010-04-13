@@ -1,3 +1,40 @@
+-- Artifact -----------------------------------------------------------
+CREATE TABLE [dbo].[Artifact]  ( 
+    [ConceptDelegateID_FK]	bigint NOT NULL,
+    [GroupId]             	varchar(64) NOT NULL,
+    [ArtifactId]          	varchar(256) NOT NULL,
+    [Version]             	varchar(64) NOT NULL,
+    [Classifier]          	varchar(64) NULL,
+    [Description]         	varchar(2048) NULL,
+    [MimeType]            	varchar(32) NULL,
+    [Caption]             	varchar(1024) NULL,
+    [Reference]           	varchar(1024) NOT NULL,
+    [Credit]              	varchar(1024) NULL,
+    [id]                  	bigint NOT NULL,
+    [LAST_UPDATED_TIME]   	datetime NOT NULL,
+    [CreationDate]        	datetime NULL,
+    CONSTRAINT [Artifact_PK] PRIMARY KEY([id])
+)
+ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[Artifact]
+    ADD CONSTRAINT [Artifact_FK1]
+	FOREIGN KEY([ConceptDelegateID_FK])
+	REFERENCES [dbo].[ConceptDelegate]([id])
+	ON DELETE NO ACTION 
+	ON UPDATE NO ACTION 
+GO
+CREATE INDEX [idx_Artifact_LUT]
+    ON [dbo].[Artifact]([LAST_UPDATED_TIME])
+GO
+CREATE UNIQUE INDEX [idx_Artifact_CK]
+    ON [dbo].[Artifact]([GroupId], [ArtifactId], [Version], [Classifier])
+GO
+CREATE INDEX [idx_Artifact_FK1]
+    ON [dbo].[Artifact]([ConceptDelegateID_FK])
+GO
+
+
 -- Association --------------------------------------------------------
 ALTER TABLE Association
 	ADD LAST_UPDATED_TIME DATETIME NULL

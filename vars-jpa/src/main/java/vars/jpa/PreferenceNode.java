@@ -47,6 +47,7 @@ public class PreferenceNode implements Serializable {
     @Id
     @AttributeOverrides({ @AttributeOverride(name = "nodeName", column = @Column(name = "NodeName")) ,
                           @AttributeOverride(name = "prefKey", column = @Column(name = "PrefKey")) })
+    
     @Column(
         name = "NodeName",
         nullable = false,

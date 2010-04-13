@@ -28,12 +28,10 @@ import javax.persistence.EntityManager;
  */
 public class ConceptDAOImpl extends DAO implements ConceptDAO {
 
-    private final ConceptNameDAO conceptNameDAO;
 
     @Inject
     public ConceptDAOImpl(EntityManager entityManager) {
         super(entityManager);
-        this.conceptNameDAO = new ConceptNameDAOImpl(entityManager);
     }
 
     public Concept findRoot() {
@@ -52,9 +50,9 @@ public class ConceptDAOImpl extends DAO implements ConceptDAO {
      * @param name
      * @return
      */
-    public Concept findByName(String name) {
-        ConceptName conceptName = conceptNameDAO.findByName(name);
-        return conceptName == null ? null : merge(conceptName.getConcept());
+    public Concept findByName(final String name) {
+        List<Concept> concepts =  findByNamedQuery("Concept.findByName", new HashMap<String, Object>() {{ put("name", name);}});
+        return concepts.size() == 0 ? null : concepts.get(0);
     }
 
     /**

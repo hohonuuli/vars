@@ -57,7 +57,7 @@ INSERT INTO UNIQUEID (TABLENAME, NEXTID) VALUES ('UserName
 Steps to migrating existing VARS databases:
   1. Create a copy of your original database tables
   2. Copy KB from original to new
-  3. Run VARS-REDUX schema upgrade script on the new databas
+  3. Run VARS-REDUX schema upgrade script on the new database
   4. Increment all values in UniqueID table by 1
   5. Set LAST_UPDATE_TIME values to some date (instead of null)
   6. remove all rowguid columns and there associated index

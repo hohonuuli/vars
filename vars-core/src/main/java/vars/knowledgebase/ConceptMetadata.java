@@ -57,7 +57,7 @@ public interface ConceptMetadata extends KnowledgebaseObject {
      *
      * @param  history              A <code>History</code> to be assigned to this <code>Concept</code>.
      * @return          Description of the Return Value
-     * @see             IHistory
+     * @see             History
      */
     void addHistory(History history);
 
@@ -69,7 +69,7 @@ public interface ConceptMetadata extends KnowledgebaseObject {
      * @param  linkRealization              A <code>LinkRealization</code> with information referring
      * to this <code>Concept</code>.
      * @return                  Description of the Return Value
-     * @see                     ILinkRealization
+     * @see                     LinkRealization
      */
     void addLinkRealization(LinkRealization linkRealization);
 
@@ -81,7 +81,7 @@ public interface ConceptMetadata extends KnowledgebaseObject {
      * @param  linkTemplate              A <code>LinkTemplate</code> to be assigned to this <code>Concept</code>
      * node.
      * @return               Description of the Return Value
-     * @see                  ILinkTemplate
+     * @see                  LinkTemplate
      */
     void addLinkTemplate(LinkTemplate linkTemplate);
 
@@ -91,9 +91,13 @@ public interface ConceptMetadata extends KnowledgebaseObject {
      *
      * @param  media              The feature to be added to the Media attribute
      * @return        Description of the Return Value
-     * @see           IMedia
+     * @see           Media
      */
     void addMedia(Media media);
+
+    void addArtifact(Artifact artifact);
+
+    void removeArtifact(Artifact artifact);
 
 
     /**
@@ -137,7 +141,7 @@ public interface ConceptMetadata extends KnowledgebaseObject {
      * @param  history              A <B>History </B> to remove from this <B>Concept </B>.
      * @return          <code>true</code> if the <code>History</code> object is
      * removed.
-     * @see             IHistory
+     * @see             History
      */
     void removeHistory(History history);
 
@@ -149,7 +153,7 @@ public interface ConceptMetadata extends KnowledgebaseObject {
      * </B>.
      * @return                  <code>true</code> if the <code>LinkRealization</code> is
      * removed.
-     * @see                     ILinkRealization
+     * @see                     LinkRealization
      */
     void removeLinkRealization(LinkRealization linkRealization);
 
@@ -160,7 +164,7 @@ public interface ConceptMetadata extends KnowledgebaseObject {
      * @param  linkTemplate              A <B>LinkTemplate </B> to remove from this <B>Concept </B>.
      * @return               <code>true</code> if the <code>LinkTemplate</code> is
      * removed.
-     * @see                  ILinkTemplate
+     * @see                  LinkTemplate
      */
     void removeLinkTemplate(LinkTemplate linkTemplate);
 
@@ -171,7 +175,7 @@ public interface ConceptMetadata extends KnowledgebaseObject {
      * @param  media              A <B>Media </B> to remove from this <B>Concept </B>.
      * @return        <code>true</code> if the <code>Media</code> object is
      * removed.
-     * @see           IMedia
+     * @see           Media
      */
     void removeMedia(Media media);
 
@@ -179,8 +183,7 @@ public interface ConceptMetadata extends KnowledgebaseObject {
     /**
      * Sets the <code>Usage</code> for this <code>Concept</code>.
      * @param usage               A <code>Usage</code> to be assigned to this <code>Concept</code>  node.
-     * @see  IUsage
-     * @uml.property  name="usage"
+     * @see  Usage
      */
     void setUsage(Usage usage);
 }

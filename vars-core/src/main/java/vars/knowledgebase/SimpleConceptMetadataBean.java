@@ -24,6 +24,7 @@ public class SimpleConceptMetadataBean implements ConceptMetadata {
     }
 
 
+
     public SimpleConceptMetadataBean(Concept concept) {
         this.concept = concept;
     }
@@ -38,6 +39,14 @@ public class SimpleConceptMetadataBean implements ConceptMetadata {
 
     public Media getPrimaryImage() {
         return null;
+    }
+
+    public void addArtifact(Artifact artifact) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void removeArtifact(Artifact artifact) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     public void addHistory(History history) {

@@ -6,6 +6,7 @@
     <persistence-unit name="vars-jpa-knowledgebase" transaction-type="RESOURCE_LOCAL">
         <description>VARS Data Model</description>
         <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+        <class>vars.knowledgebase.jpa.ArtifactImpl</class>
         <class>vars.knowledgebase.jpa.ConceptImpl</class>
         <class>vars.knowledgebase.jpa.ConceptMetadataImpl</class>
         <class>vars.knowledgebase.jpa.ConceptNameImpl</class>
@@ -68,6 +69,7 @@
         <class>vars.annotation.jpa.CameraDataImpl</class>
         <class>vars.annotation.jpa.ObservationImpl</class>
         <class>vars.annotation.jpa.AssociationImpl</class>
+        <class>vars.knowledgebase.jpa.ArtifactImpl</class>
         <class>vars.knowledgebase.jpa.ConceptImpl</class>
         <class>vars.knowledgebase.jpa.ConceptMetadataImpl</class>
         <class>vars.knowledgebase.jpa.ConceptNameImpl</class>
