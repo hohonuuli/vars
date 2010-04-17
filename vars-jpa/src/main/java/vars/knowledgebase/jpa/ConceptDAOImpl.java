@@ -55,6 +55,11 @@ public class ConceptDAOImpl extends DAO implements ConceptDAO {
         return concepts.size() == 0 ? null : concepts.get(0);
     }
 
+    public List<Concept> findAllByNameGlob(final String nameGlob) {
+        final String name = "%" + nameGlob + "%";
+        return findByNamedQuery("Concept.findAllByNameGlob", new HashMap<String, Object>() {{ put("name", name); }});
+    }
+
     /**
      * This should be called within a JPA tranaction
      * @param concept
@@ -111,13 +116,18 @@ public class ConceptDAOImpl extends DAO implements ConceptDAO {
         }
     }
 
+
     /**
      * This method will start and stop the transaction on it's own. 
      */
     public void cascadeRemove(Concept concept) {
+        if (((JPAEntity) concept).getId() == null) {
+            log.info("Attempted to cascade delete a non-mnaged entity");
+            return;
+        }
         // Bring ALL child concepts into the transaction first
         startTransaction();
-        concept = merge(concept);
+        concept = find(concept);
         Queue<Concept> queue = new LinkedList<Concept>(findDescendents(concept));
         endTransaction();
         while(queue.size() > 0) {

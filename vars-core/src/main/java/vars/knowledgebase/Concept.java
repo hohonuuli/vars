@@ -22,6 +22,7 @@ package vars.knowledgebase;
 
 import vars.ILazy;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -59,7 +60,7 @@ public interface Concept extends KnowledgebaseObject, ILazy {
      * @param conceptName
      * A <code>ConceptName</code> to associate with this <code>Concept</code>.
      * @return Description of the Return Value
-     * @see IConceptName
+     * @see ConceptName
      */
     void addConceptName(ConceptName conceptName);
 
@@ -73,7 +74,7 @@ public interface Concept extends KnowledgebaseObject, ILazy {
      * <code>Concept</code>.
      *
      */
-    Set<Concept> getChildConcepts();
+    List<Concept> getChildConcepts();
 
     /**
      * <p> <strong>This method should not be called directly by an application developer. </strong> </p> <p> In order to speed up database transactions most of the anxillary classes are now associated with a delegate rather than directly to a <code>Concept</code>. This delegate is lazy loaded using <code>IDAO</code> objects because castor does not support lazy loading. This <em>should</em> speed up transactions greatly. </p>
@@ -91,7 +92,7 @@ public interface Concept extends KnowledgebaseObject, ILazy {
      * @return The <code>ConceptName</code> object of the specified String
      * name; <code>null</code> if this <code>Concept</code> has no
      * such <code>ConceptName</code>.
-     * @see IConceptName
+     * @see ConceptName
      */
     ConceptName getConceptName(String name);
 
@@ -105,21 +106,18 @@ public interface Concept extends KnowledgebaseObject, ILazy {
     /**
      * Gets the nodcCode attribute of the Concept object
      * @return  The nodcCode value
-     * @uml.property  name="nodcCode"
      */
     String getNodcCode();
 
     /**
      * Gets the String name of the originator of the placement of this <code>Concept</code> in the Knowledge Base heirarchy. (i.e The name of the person who entered this concept into the Knowledge Base)
      * @return  The String name of the originator of the placement of this  <code>Concept</code> in the Knowledge Base heirarchy.
-     * @uml.property  name="originator"
      */
     String getOriginator();
 
     /**
      * Gets the parentConcept <code>Concept</code> of this <code>Concept</code>. <code>Concept</code> objects at the root of the <code>KnowledgeBase</code> hierarchy do not have a parentConcept <code>Concept</code>.
      * @return  The parentConcept <code>Concept</code> of this <code>Concept</code>.  null if no parent is found.
-     * @uml.property  name="parentConcept"
      */
     Concept getParentConcept();
 
@@ -127,7 +125,7 @@ public interface Concept extends KnowledgebaseObject, ILazy {
     /**
      * Gets the unique <code>ConceptName</code> object which represents the primary name of this <code>Concept</code>.
      * @return  The unique <code>ConceptName</code> object which represents  the primary name of this <code>Concept</code>.
-     * @see  IConceptName
+     * @see  ConceptName
      */
     ConceptName getPrimaryConceptName();
 
@@ -135,21 +133,18 @@ public interface Concept extends KnowledgebaseObject, ILazy {
     /**
      * Gets the rankLevel attribute of the Concept object
      * @return  The rankLevel value
-     * @uml.property  name="rankLevel"
      */
     String getRankLevel();
 
     /**
      * Gets the rankName attribute of the Concept object
      * @return  The rankName value
-     * @uml.property  name="rankName"
      */
     String getRankName();
 
     /**
      * Gets the reference attribute of the Concept object
      * @return  The reference value
-     * @uml.property  name="reference"
      */
     String getReference();
 
@@ -163,7 +158,6 @@ public interface Concept extends KnowledgebaseObject, ILazy {
     /**
      * Gets the structure type of this <code>Concept</code>.
      * @return  The structure type of this <code>Concept</code>.
-     * @uml.property  name="structureType"
      */
     String getStructureType();
 
@@ -213,7 +207,7 @@ public interface Concept extends KnowledgebaseObject, ILazy {
      * A <B>Concept </B> to remove from this <B>Concept </B>.
      * @return <code>true</code> if the child <code>Concept</code> is
      * removed.
-     * @see IConcept
+     * @see Concept
      */
     void removeChildConcept(Concept childConcept);
 
@@ -224,7 +218,7 @@ public interface Concept extends KnowledgebaseObject, ILazy {
      * The <B>ConceptName </B> to remove from this <B>Concept </B>.
      * @return
      * <code>true</code> if successfully removed.
-     * @see IConceptName
+     * @see ConceptName
      */
     void removeConceptName(ConceptName conceptName);
 
@@ -232,42 +226,36 @@ public interface Concept extends KnowledgebaseObject, ILazy {
     /**
      * Sets the nodcCode attribute of the Concept object
      * @param nodcCode  The new nodcCode value
-     * @uml.property  name="nodcCode"
      */
     void setNodcCode(String nodcCode);
 
     /**
      * Sets the originator attribute of the Concept object
      * @param originator  The new originator value
-     * @uml.property  name="originator"
      */
     void setOriginator(String originator);
 
     /**
      * Sets the rankLevel attribute of the Concept object
      * @param rankLevel  The new rankLevel value
-     * @uml.property  name="rankLevel"
      */
     void setRankLevel(String rankLevel);
 
     /**
      * Sets the rankName attribute of the Concept object
      * @param rankName  The new rankName value
-     * @uml.property  name="rankName"
      */
     void setRankName(String rankName);
 
     /**
      * Sets the reference attribute of the Concept object
      * @param reference  The new reference value
-     * @uml.property  name="reference"
      */
     void setReference(String reference);
 
     /**
      * Sets the structureType attribute of the Concept object. Valid values are Concept.TAXONOMY, Concept>LITHOLOGY
      * @param structureType  The new structureType value
-     * @uml.property  name="structureType"
      */
     void setStructureType(String structureType);
 

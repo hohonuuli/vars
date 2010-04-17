@@ -7,6 +7,8 @@ import vars.annotation.ObservationsSpatialLocations
 import vars.shared.ui.GlobalLookup
 import java.text.DecimalFormat
 import org.slf4j.LoggerFactory
+import java.text.DateFormat
+import java.text.SimpleDateFormat
 
 /**
  * Created by IntelliJ IDEA.
@@ -36,30 +38,41 @@ class SimpaExporter {
         nf.minimumFractionDigits = 3
         nf.maximumIntegerDigits = 3
 
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd")
+        dateFormat.timeZone = TimeZone.getTimeZone("UTC")
+        DateFormat timeFormat = new SimpleDateFormat("HH:mm:ss.SSS")
+        timeFormat.timeZone = TimeZone.getTimeZone("UTC")
+
+        def s = ","
+
         out << "# Created on ${new Date()} by ${getClass()}\n"
-        out << "# Date\tTimecode\tConcept\tTape\tHeadingRadians\txPixel\tyPixel\twidthPixels\theightPixels\txMeters\tyMeters\twidthMeters\theightMeters\txImageCenterMeters\tyImageCenterMeters\n"
+        out << "# Date${s}Time${s}Timecode${s}Concept${s}Tape${s}HeadingRadians${s}xPixel${s}yPixel${s}widthPixels${s}heightPixels${s}xMeters${s}yMeters${s}widthMeters${s}heightMeters${s}xImageCenterMeters${s}yImageCenterMeters\n"
         vas.videoFrames.sort({ it.recordedDate }).each { VideoFrame videoFrame ->
             log.info("Analyzing ${videoFrame}")
+            
+
 
             try {
                 def osl = new ObservationsSpatialLocations(videoFrame)
 
                 osl.spatialLocations.each { observation, point ->
                     def cameraData = videoFrame.cameraData
-                    out << "${GlobalLookup.DATE_FORMAT_UTC.format(videoFrame.recordedDate)}\t"
-                    out << "${videoFrame.timecode}\t"
-                    out << "${observation.conceptName}\t"
-                    out << "${videoFrame.videoArchive.name}\t"
-                    out << "${cameraData.heading}\t"
-                    out << "${Math.round(observation.x) as Integer}\t"
-                    out << "${Math.round(observation.y) as Integer}\t"
-                    out << "${osl.widthInPixels}\t"
-                    out << "${osl.heightInPixels}\t"
-                    out << "${nf.format(point.x)}\t"
-                    out << "${nf.format(point.y)}\t"
-                    out << "${nf.format(cameraData.viewWidth)}\t"
-                    out << "${nf.format(cameraData.viewHeight)}\t"
-                    out << "${nf.format(cameraData.x)}\t"
+                    out << "${dateFormat.format(videoFrame.recordedDate)}${s}"
+                    out << "${timeFormat.format(videoFrame.recordedDate)}${s}"
+                    //out << "${GlobalLookup.DATE_FORMAT_UTC.format(videoFrame.recordedDate)}${s}"
+                    out << "${videoFrame.timecode}${s}"
+                    out << "${observation.conceptName}${s}"
+                    out << "${videoFrame.videoArchive.name}${s}"
+                    out << "${cameraData.heading}${s}"
+                    out << "${Math.round(observation.x) as Integer}${s}"
+                    out << "${Math.round(observation.y) as Integer}${s}"
+                    out << "${osl.widthInPixels}${s}"
+                    out << "${osl.heightInPixels}${s}"
+                    out << "${nf.format(point.x)}${s}"
+                    out << "${nf.format(point.y)}${s}"
+                    out << "${nf.format(cameraData.viewWidth)}${s}"
+                    out << "${nf.format(cameraData.viewHeight)}${s}"
+                    out << "${nf.format(cameraData.x)}${s}"
                     out << "${nf.format(cameraData.y)}\n"
 
                 }

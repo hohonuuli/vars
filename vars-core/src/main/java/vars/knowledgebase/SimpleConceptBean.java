@@ -5,7 +5,9 @@
 
 package vars.knowledgebase;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import vars.knowledgebase.ConceptNameTypes;
 import vars.knowledgebase.Concept;
@@ -19,7 +21,7 @@ import vars.knowledgebase.ConceptName;
 public class SimpleConceptBean implements Concept {
 
     private Set<ConceptName> conceptNames = new HashSet<ConceptName>();
-    private Set<Concept> childConcepts = new HashSet<Concept>();
+    private List<Concept> childConcepts = new ArrayList<Concept>();
 
     private Concept parentConcept;
     private ConceptMetadata conceptMetadata = new SimpleConceptMetadataBean(this);
@@ -41,7 +43,7 @@ public class SimpleConceptBean implements Concept {
         conceptNames.add(conceptName);
     }
 
-    public Set<Concept> getChildConcepts() {
+    public List<Concept> getChildConcepts() {
         return childConcepts;
     }
 
@@ -126,7 +128,7 @@ public class SimpleConceptBean implements Concept {
     }
 
     public void removeConceptName(ConceptName conceptName) {
-        conceptNames.remove(conceptName);
+        conceptNames.remove(    conceptName);
         conceptName.setConcept(null);
     }
 

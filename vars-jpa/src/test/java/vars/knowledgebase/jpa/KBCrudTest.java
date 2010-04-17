@@ -20,10 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.jpa.DAO;
@@ -109,8 +106,6 @@ public class KBCrudTest {
         dao.endTransaction();
         Assert.assertNotNull("Whoops, couldn't get root", root);
 
-
-
         dao.cascadeRemove(root);
         dao.startTransaction();
         c = dao.findByPrimaryKey(c.getClass(), cId);
@@ -157,7 +152,6 @@ public class KBCrudTest {
             concept3AB.getPrimaryConceptName().setName("3AB");
             concept2A.addChildConcept(concept3AB);
             dao.persist(concept3AB);
-            //concept2A = dao.merge(concept2A);
             dao.endTransaction();
             log.info("BUILDING KNOWLEDGEBASE TREE:\n" + entityUtilities.buildTextTree(root));
 

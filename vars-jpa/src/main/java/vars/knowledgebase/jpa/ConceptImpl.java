@@ -39,6 +39,9 @@ import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 import javax.persistence.Transient;
 import javax.persistence.Version;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import vars.jpa.JPAEntity;
 import vars.jpa.KeyNullifier;
 import vars.jpa.TransactionLogger;
@@ -67,7 +70,8 @@ import vars.knowledgebase.ConceptNameTypes;
                 query = "SELECT c FROM Concept c WHERE c.taxonomyType = :taxonomyType") ,
     @NamedQuery(name = "Concept.findRoot", query = "SELECT c FROM Concept c WHERE c.parentConcept IS NULL") ,
     @NamedQuery(name = "Concept.findAll", query = "SELECT c FROM Concept c"),
-    @NamedQuery(name = "Concept.findByName", query = "SELECT c FROM Concept c, IN (c.conceptNames) AS n WHERE n.name = :name")
+    @NamedQuery(name = "Concept.findByName", query = "SELECT c FROM Concept c, IN (c.conceptNames) AS n WHERE n.name = :name"),
+        @NamedQuery(name = "Concept.findAllByNameGlob", query = "SELECT c FROM Concept c, IN (c.conceptNames) AS n WHERE n.name LIKE :name")
 })
 public class ConceptImpl implements Serializable, Concept, JPAEntity {
 
@@ -78,7 +82,7 @@ public class ConceptImpl implements Serializable, Concept, JPAEntity {
         fetch = FetchType.LAZY,
         cascade = { CascadeType.ALL }
     )
-    private Set<Concept> childConcepts;
+    private List<Concept> childConcepts;
 
     @OneToOne(
         mappedBy = "concept",
@@ -175,9 +179,9 @@ public class ConceptImpl implements Serializable, Concept, JPAEntity {
         conceptName.setConcept(this);
     }
 
-    public Set<Concept> getChildConcepts() {
+    public List<Concept> getChildConcepts() {
         if (childConcepts == null) {
-            childConcepts = new HashSet<Concept>();
+            childConcepts = new ArrayList <Concept>();
         }
 
         return childConcepts;
@@ -331,7 +335,7 @@ public class ConceptImpl implements Serializable, Concept, JPAEntity {
     public void removeChildConcept(Concept childConcept) {
         ConceptImpl ci = (ConceptImpl) childConcept;
         if (getChildConcepts().remove(childConcept)) {
-            ci.setParentConcept(this);
+            ci.setParentConcept(null);
         }
     }
 
@@ -379,9 +383,7 @@ public class ConceptImpl implements Serializable, Concept, JPAEntity {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(getClass().getSimpleName());
-        sb.append(" ([id=").append(id).append("])");
-        return sb.toString();
+        return getClass().getSimpleName() + " ([id=" + id + "])";
     }
 
     public void setTaxonomyType(String taxonomyType) {
