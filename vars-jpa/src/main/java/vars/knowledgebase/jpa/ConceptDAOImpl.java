@@ -5,7 +5,6 @@ import vars.jpa.JPAEntity;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptName;
-import vars.knowledgebase.ConceptNameDAO;
 import vars.VARSPersistenceException;
 import com.google.inject.Inject;
 
@@ -55,9 +54,20 @@ public class ConceptDAOImpl extends DAO implements ConceptDAO {
         return concepts.size() == 0 ? null : concepts.get(0);
     }
 
-    public List<Concept> findAllByNameGlob(final String nameGlob) {
+    public List<Concept> findAllByNameContaining(final String nameGlob) {
         final String name = "%" + nameGlob + "%";
-        return findByNamedQuery("Concept.findAllByNameGlob", new HashMap<String, Object>() {{ put("name", name); }});
+        return findByNamedQuery("Concept.findAllByNameGlob", new HashMap<String, Object>() {{ put("name", name.toLowerCase()); }});
+    }
+
+    public List<Concept> findAllByNameStartingWith(final String nameGlob) {
+        final String name = nameGlob + "%";
+        return findByNamedQuery("Concept.findAllByNameGlob", new HashMap<String, Object>() {{ put("name", name.toLowerCase()); }});
+
+    }
+
+    public List<Concept> findAllByNameEndingWith(final String nameGlob) {
+        final String name = '%' + nameGlob;
+        return findByNamedQuery("Concept.findAllByNameGlob", new HashMap<String, Object>() {{ put("name", name.toLowerCase()); }});
     }
 
     /**

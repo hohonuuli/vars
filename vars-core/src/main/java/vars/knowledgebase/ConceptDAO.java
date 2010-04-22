@@ -3,6 +3,7 @@ package vars.knowledgebase;
 import vars.DAO;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -31,12 +32,11 @@ public interface ConceptDAO extends DAO {
 
 
     /**
-     * Get a Set of {@link Concept} objects from the specifed name on down to the end of
+     * Get a Collection of {@link Concept} objects from the specifed name on down to the end of
      * the branches that starts at the concept with the specifiec name
      *
-     * @param name The name of the concept
+     * @param concept The name of the concept
      * @return A Set of {@link Concept} objects from the named one to the end of the branch.
-     * @throws DAOException
      */
     Collection<Concept> findDescendents(Concept concept);
     
@@ -46,5 +46,11 @@ public interface ConceptDAO extends DAO {
      * @param concept
      */
     void cascadeRemove(Concept concept);
+
+    List<Concept> findAllByNameContaining(final String nameGlob);
+
+    List<Concept> findAllByNameStartingWith(final String nameGlob);
+
+    List<Concept> findAllByNameEndingWith(final String nameGlob);
 
 }

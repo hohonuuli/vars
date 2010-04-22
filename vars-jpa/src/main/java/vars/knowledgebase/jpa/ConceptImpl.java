@@ -37,11 +37,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
-import javax.persistence.Transient;
 import javax.persistence.Version;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import vars.jpa.JPAEntity;
 import vars.jpa.KeyNullifier;
 import vars.jpa.TransactionLogger;
@@ -71,7 +68,7 @@ import vars.knowledgebase.ConceptNameTypes;
     @NamedQuery(name = "Concept.findRoot", query = "SELECT c FROM Concept c WHERE c.parentConcept IS NULL") ,
     @NamedQuery(name = "Concept.findAll", query = "SELECT c FROM Concept c"),
     @NamedQuery(name = "Concept.findByName", query = "SELECT c FROM Concept c, IN (c.conceptNames) AS n WHERE n.name = :name"),
-        @NamedQuery(name = "Concept.findAllByNameGlob", query = "SELECT c FROM Concept c, IN (c.conceptNames) AS n WHERE n.name LIKE :name")
+    @NamedQuery(name = "Concept.findAllByNameGlob", query = "SELECT DISTINCT c FROM Concept c, IN (c.conceptNames) AS n WHERE lower(n.name) LIKE :name ORDER BY n.name")
 })
 public class ConceptImpl implements Serializable, Concept, JPAEntity {
 

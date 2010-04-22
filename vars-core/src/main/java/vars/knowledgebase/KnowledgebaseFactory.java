@@ -1,7 +1,5 @@
 package vars.knowledgebase;
 
-import vars.UserAccount;
-
 /**
  * Created by IntelliJ IDEA.
  * User: brian
