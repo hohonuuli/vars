@@ -18,13 +18,13 @@ import java.util.Vector;
 import javax.swing.SwingUtilities;
 import org.jdesktop.jxlayer.JXLayer;
 import org.mbari.awt.AwtUtilities;
-import org.mbari.swing.JImageCanvas2;
+import org.mbari.swing.JImageUrlCanvas;
 
 /**
  * Class for testing out resizing images
  * @author brian
  */
-public class PointAdditionLayerUI <T extends JImageCanvas2> extends CrossHairLayerUI<T> {
+public class PointAdditionLayerUI <T extends JImageUrlCanvas> extends CrossHairLayerUI<T> {
 
     final Collection<Point> sourcePoints = new Vector<Point>();
     private String coordinateString = null;
@@ -45,7 +45,7 @@ public class PointAdditionLayerUI <T extends JImageCanvas2> extends CrossHairLay
         g2.setPaintMode();           // Make sure XOR is turned off
         g2.setPaint(new Color(255, 0, 0, 180));
         g2.setStroke(new BasicStroke(3));
-        JImageCanvas2 imageCanvas = jxl.getView();
+        JImageUrlCanvas imageCanvas = jxl.getView();
         for (Point point : sourcePoints) {
             point = AwtUtilities.toPoint(imageCanvas.convertToComponent(point));
             int x = point.x;
@@ -71,7 +71,7 @@ public class PointAdditionLayerUI <T extends JImageCanvas2> extends CrossHairLay
         if (me.getID() == MouseEvent.MOUSE_MOVED || me.getID() == MouseEvent.MOUSE_DRAGGED) {
             
             Point point = SwingUtilities.convertPoint(me.getComponent(), me.getPoint(), jxl);
-            JImageCanvas2 imageCanvas = jxl.getView();
+            JImageUrlCanvas imageCanvas = jxl.getView();
 
             if (imageCanvas.getImageRectangle().contains(point)) {
                 Point imagePoint = AwtUtilities.toPoint(imageCanvas.convertToImage(point));
@@ -98,7 +98,7 @@ public class PointAdditionLayerUI <T extends JImageCanvas2> extends CrossHairLay
         super.processMouseEvent(me, jxl);
         if (me.getID() == MouseEvent.MOUSE_RELEASED) {
                 Point point = SwingUtilities.convertPoint(me.getComponent(), me.getPoint(), jxl);
-            JImageCanvas2 imageCanvas = jxl.getView();
+            JImageUrlCanvas imageCanvas = jxl.getView();
             Point imagePoint = AwtUtilities.toPoint(imageCanvas.convertToImage(point));
             sourcePoints.add(imagePoint);
             setDirty(true);

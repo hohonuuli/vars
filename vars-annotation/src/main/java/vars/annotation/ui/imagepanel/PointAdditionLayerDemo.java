@@ -9,7 +9,7 @@ import java.awt.BorderLayout;
 import java.net.URL;
 import javax.swing.JFrame;
 import org.jdesktop.jxlayer.JXLayer;
-import org.mbari.swing.JImageCanvas2;
+import org.mbari.swing.JImageUrlCanvas;
 
 /**
  *
@@ -26,11 +26,11 @@ public class PointAdditionLayerDemo {
 
         // Load image
         URL url = frame.getClass().getResource("/images/BrianSchlining.jpg");
-        final JImageCanvas2 label = new JImageCanvas2(url);
+        final JImageUrlCanvas label = new JImageUrlCanvas(url);
 
         // Create JXLayer
-        PointAdditionLayerUI<JImageCanvas2> layerUI = new PointAdditionLayerUI<JImageCanvas2>();
-        JXLayer<JImageCanvas2> layer = new JXLayer<JImageCanvas2>(label);
+        PointAdditionLayerUI<JImageUrlCanvas> layerUI = new PointAdditionLayerUI<JImageUrlCanvas>();
+        JXLayer<JImageUrlCanvas> layer = new JXLayer<JImageUrlCanvas>(label);
         layer.setUI(layerUI);
 
 //        frame.addComponentListener(new ComponentAdapter() {

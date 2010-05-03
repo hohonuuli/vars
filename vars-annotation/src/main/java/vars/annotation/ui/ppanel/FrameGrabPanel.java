@@ -31,7 +31,7 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.swing.JFrame;
 import javax.swing.border.TitledBorder;
-import org.mbari.swing.JImageCanvas2;
+import org.mbari.swing.JImageUrlCanvas;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.Observation;
@@ -63,7 +63,7 @@ public class FrameGrabPanel extends javax.swing.JPanel {
     /**
      *     Displays a no-image icon when a framegrab is not present.
      */
-    private JImageCanvas2 imageCanvas;
+    private JImageUrlCanvas imageCanvas;
     private final ImageAnnotationFrame imageFrame;
     private VideoFrame videoFrame;
 
@@ -109,9 +109,9 @@ public class FrameGrabPanel extends javax.swing.JPanel {
 
     }
 
-    JImageCanvas2 getImageCanvas() {
+    JImageUrlCanvas getImageCanvas() {
         if (imageCanvas == null) {
-            imageCanvas = new JImageCanvas2(getClass().getResource("/images/vars/annotation/no_image.jpg"));
+            imageCanvas = new JImageUrlCanvas(getClass().getResource("/images/vars/annotation/no_image.jpg"));
             imageCanvas.setSize(getSize());
         }
 

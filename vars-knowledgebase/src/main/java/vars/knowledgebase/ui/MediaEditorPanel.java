@@ -1,7 +1,8 @@
 /*
- * @(#)MediaEditorPanel.java   2009.10.09 at 05:29:08 PDT
+ * @(#)MediaEditorPanel.java   2010.05.03 at 03:55:39 PDT
  *
  * Copyright 2009 MBARI
+ *
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,19 +15,15 @@
 
 package vars.knowledgebase.ui;
 
-import java.awt.Component;
-import vars.shared.ui.ILockableEditor;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Frame;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Vector;
-
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JLabel;
@@ -34,26 +31,24 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
-import org.mbari.swing.ImageFrame;
+import org.mbari.swing.JImageUrlFrame;
 import org.mbari.swing.ListListModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import vars.DAO;
 import vars.UserAccount;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.History;
 import vars.knowledgebase.Media;
-import vars.knowledgebase.MediaDAO;
 import vars.knowledgebase.MediaTypes;
 import vars.knowledgebase.ui.dialogs.AddMediaDialog;
+import vars.shared.ui.ILockableEditor;
 
 /**
  * Class description
@@ -93,7 +88,6 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
         return buttonPanel;
     }
 
-
     private JList getMediaList() {
         if (mediaList == null) {
             mediaList = new JList();
@@ -121,7 +115,7 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
              */
             mediaList.addMouseListener(new MouseAdapter() {
 
-                private ImageFrame imageFrame;
+                private JImageUrlFrame imageFrame;
 
                 @Override
                 public void mouseClicked(MouseEvent e) {
@@ -154,6 +148,7 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
                                     final URL url = new URL(media.getUrl());
                                     getImageFrame().setImageUrl(url);
                                     getImageFrame().setVisible(true);
+                                    getImageFrame().repaint();
                                 }
                                 catch (MalformedURLException e1) {
                                     EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR,
@@ -166,9 +161,9 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
 
                 }
 
-                private ImageFrame getImageFrame() {
+                private JImageUrlFrame getImageFrame() {
                     if (imageFrame == null) {
-                        imageFrame = new ImageFrame();
+                        imageFrame = new JImageUrlFrame();
                         final Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
                         imageFrame.setLocationRelativeTo(frame);
                     }
@@ -230,6 +225,10 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
         this.add(getMediaPanel(), BorderLayout.CENTER);
     }
 
+    /**
+     *
+     * @param concept
+     */
     @Override
     public void setConcept(final Concept concept) {
         final ListListModel model = (ListListModel) getMediaList().getModel();
@@ -242,6 +241,10 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
         super.setConcept(concept);
     }
 
+    /**
+     *
+     * @param locked
+     */
     @Override
     public void setLocked(final boolean locked) {
         getMediaViewPanel().setLocked(locked);
@@ -253,12 +256,14 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
 
     private class DeleteAction extends ActionAdapter {
 
+        /**
+         */
         public void doAction() {
             final Media media = (Media) getMediaList().getSelectedValue();
             final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
-            
+
             History history = getToolBelt().getHistoryFactory().delete(userAccount, media);
-            
+
             // DAOTX
             DAO dao = getToolBelt().getKnowledgebaseDAOFactory().newDAO();
             dao.startTransaction();
@@ -272,6 +277,29 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
     }
 
 
+    private class MediaListCellRenderer extends DefaultListCellRenderer {
+
+        /**
+         *
+         * @param list
+         * @param value
+         * @param index
+         * @param isSelected
+         * @param cellHasFocus
+         * @return
+         */
+        @Override
+        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
+                boolean cellHasFocus) {
+            JLabel c = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            final Media media = (Media) value;
+            final String text = (media == null) ? "" : media.getUrl();
+            c.setText(text);
+            return c;
+        }
+    }
+
+
     /**
      * @author  brian
      */
@@ -279,6 +307,8 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
 
         private AddMediaDialog dialog;
 
+        /**
+         */
         public void doAction() {
             getDialog().setConcept(getConcept());
             getDialog().setVisible(true);
@@ -303,6 +333,8 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
     private class UpdateAction extends ActionAdapter {
 
 
+        /**
+         */
         public void doAction() {
 
             // DAOTX
@@ -357,25 +389,11 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
                     oldPrimaryMedia.setPrimary(false);
                 }
             }
+
             dao.endTransaction();
 
             getMediaList().paintImmediately(getMediaList().getBounds());
 
         }
     }
-
-    private class MediaListCellRenderer extends DefaultListCellRenderer {
-
-        @Override
-        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-            JLabel c =  (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-            final Media media = (Media) value;
-            final String text = (media == null) ? "" : media.getUrl();
-            c.setText(text);
-            return c;
-        }
-
-    }
-
-}  
-
+}

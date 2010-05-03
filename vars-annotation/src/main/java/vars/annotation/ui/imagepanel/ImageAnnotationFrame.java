@@ -24,7 +24,7 @@ import java.net.URL;
 import javax.swing.JFrame;
 import javax.swing.JToolBar;
 import org.jdesktop.jxlayer.JXLayer;
-import org.mbari.swing.JImageCanvas2;
+import org.mbari.swing.JImageUrlCanvas;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.VideoFrame;
@@ -40,11 +40,11 @@ import vars.shared.ui.ConceptNameComboBox;
 public class ImageAnnotationFrame extends JFrame {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
-    private JImageCanvas2 imageCanvas = new JImageCanvas2();
+    private JImageUrlCanvas imageCanvas = new JImageUrlCanvas();
     private ConceptNameComboBox comboBox;
     private BufferedImage image;
     private URL imageUrl;
-    private JXLayer<JImageCanvas2> layer;
+    private JXLayer<JImageUrlCanvas> layer;
     private final AnnotationLayerUI layerUI;
     private JToolBar toolBar;
 
@@ -55,7 +55,7 @@ public class ImageAnnotationFrame extends JFrame {
      */
     public ImageAnnotationFrame(final ToolBelt toolBelt) {
         super();
-        layerUI = new AnnotationLayerUI<JImageCanvas2>(toolBelt);
+        layerUI = new AnnotationLayerUI<JImageUrlCanvas>(toolBelt);
         comboBox = new AllConceptNamesComboBox(toolBelt.getQueryPersistenceService());
 
         /*
@@ -88,9 +88,9 @@ public class ImageAnnotationFrame extends JFrame {
     /**
      * @return
      */
-    public JXLayer<JImageCanvas2> getLayer() {
+    public JXLayer<JImageUrlCanvas> getLayer() {
         if (layer == null) {
-            layer = new JXLayer<JImageCanvas2>(imageCanvas);
+            layer = new JXLayer<JImageUrlCanvas>(imageCanvas);
             layer.setUI(layerUI);
         }
 

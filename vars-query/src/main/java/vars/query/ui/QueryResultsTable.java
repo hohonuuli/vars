@@ -26,7 +26,7 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import org.mbari.sql.QueryResults;
-import org.mbari.swing.ImageFrame;
+import org.mbari.swing.JImageUrlFrame;
 import org.mbari.swing.table.TableSorter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,7 +72,7 @@ public class QueryResultsTable extends JTable {
         if (urlMouseListener == null) {
             urlMouseListener = new MouseAdapter() {
 
-                ImageFrame imageFrame;
+                JImageUrlFrame imageFrame;
 
                 @Override
                 public void mouseClicked(MouseEvent e) {
@@ -111,12 +111,13 @@ public class QueryResultsTable extends JTable {
 
                             getImageFrame().setImageUrl(url);
                             getImageFrame().setVisible(true);
+                            getImageFrame().repaint();
                         }
                     }
                 }
-                ImageFrame getImageFrame() {
+                JImageUrlFrame getImageFrame() {
                     if (imageFrame == null) {
-                        imageFrame = new ImageFrame();
+                        imageFrame = new JImageUrlFrame();
                         imageFrame.setSize(400, 300);
                         imageFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
                     }
