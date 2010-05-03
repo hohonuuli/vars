@@ -1,5 +1,5 @@
 /*
- * @(#)ImageCaptureAction.java   2009.12.09 at 11:25:21 PST
+ * @(#)ImageCaptureAction.java   2010.05.03 at 11:37:21 PDT
  *
  * Copyright 2009 MBARI
  *
@@ -19,8 +19,6 @@ import com.google.common.collect.ImmutableList;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -34,18 +32,16 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.TimeZone;
-import javax.imageio.ImageIO;
 import javax.swing.Action;
 import javax.swing.KeyStroke;
 import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.awt.image.ImageUtilities;
 import org.mbari.movie.Timecode;
-import org.mbari.util.Dispatcher;
-import org.mbari.util.IObserver;
-import org.mbari.vcr.IVCR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.DAO;
+import vars.UserAccount;
 import vars.annotation.CameraData;
 import vars.annotation.CameraDeployment;
 import vars.annotation.Observation;
@@ -56,6 +52,8 @@ import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.VARSProperties;
 import vars.annotation.ui.actions.NewObservationAction;
+import vars.shared.preferences.PreferencesService;
+import vars.shared.ui.video.ImageCaptureService;
 
 /**
  * <p>Action for capturing a frame an performing related activities on it.</p>
@@ -84,12 +82,12 @@ public class ImageCaptureAction extends ActionAdapter {
     /**
      * Provides information about where to save the images
      */
-    private final ImageDirectory imageDirectory = new ImageDirectory();
+    private final ImageDirectory imageDirectory;
+    private final FrameCaptureFunction frameCaptureFunction;
 
     /**
      * This class does all the heavy lifting.
      */
-    private FrameCaptureHelper helper;
     private final ToolBelt toolBelt;
 
     /**
@@ -100,8 +98,9 @@ public class ImageCaptureAction extends ActionAdapter {
     public ImageCaptureAction(ToolBelt toolBelt) {
         super();
         this.toolBelt = toolBelt;
+        this.imageDirectory = new ImageDirectory();
+        this.frameCaptureFunction = new FrameCaptureFunction();
         boolean ok = false;
-        helper = new FrameCaptureHelper();
         putValue(Action.NAME, "Frame Capture");
         putValue(Action.ACTION_COMMAND_KEY, "frame capture");
         putValue(Action.ACCELERATOR_KEY,
@@ -213,7 +212,7 @@ public class ImageCaptureAction extends ActionAdapter {
      */
     public void doAction() {
         if (isAvailable()) {
-            helper.capture();
+            frameCaptureFunction.capture();
         }
     }
 
@@ -243,13 +242,14 @@ public class ImageCaptureAction extends ActionAdapter {
      * Performs the frame-capture related tasks, then updates the VideoArchive object.
      * @author   brian
      */
-    private class FrameCaptureHelper {
+    private class FrameCaptureFunction {
 
         private final NewObservationAction action = new NewObservationAction(toolBelt);
-        private File jpg;
-        private SnapTime snapTime;
-        private IVCR vcr;
-        private VideoArchive videoArchive;
+
+        /**
+         * Constructs ...
+         */
+        public FrameCaptureFunction() {}
 
         /**
          *  Capture an image
@@ -257,52 +257,44 @@ public class ImageCaptureAction extends ActionAdapter {
          */
         public void capture() {
 
+            // Verify that we have the services needed to capture an image
             VideoControlService videoControlService = (VideoControlService) Lookup.getVideoControlServiceDispatcher()
                 .getValueObject();
-            ImageCaptureService imageCaptureService = (ImageCaptureService) Lookup.getImageCaptureServiceDispatcher()
-                .getValueObject();
-            if ((videoControlService == null) || (imageCaptureService == null)) {
-                EventBus.publish(Lookup.TOPIC_WARNING, "No Video Service is available or frame capure");
+            if (videoControlService == null) {
+                EventBus.publish(Lookup.TOPIC_WARNING, "You are not connected to the VCR. Unable to capture a frame.");
                 return;
             }
 
-            /*
-             *  Clear any previously set variables
-             */
-            jpg = null;
-            snapTime = null;
-            vcr = null;
-            videoArchive = null;
-            videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+            ImageCaptureService imageCaptureService = (ImageCaptureService) Lookup.getImageCaptureServiceDispatcher()
+                .getValueObject();
+            if (imageCaptureService == null) {
+                EventBus.publish(Lookup.TOPIC_WARNING, "No image capture service is available for frame capure");
+                return;
+            }
 
+            // Get the image archive we're adding to.
+            VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
             if (videoArchive == null) {
                 EventBus.publish(Lookup.TOPIC_WARNING,
                                  "No video-archive is open for annotating. Unable to capture an image.");
                 return;
             }
 
-            /*
-             *  This method grabs the timecode from the VCR.
-             */
-            vcr = videoControlService;
-
-            if (vcr == null) {
-                EventBus.publish(Lookup.TOPIC_WARNING, "You are not connected to the VCR. Unable to capture a frame.");
-                return;
-            }
-
-            final String timecode = vcr.getVcrTimecode().toString();
-            snapTime = new SnapTime(new Date(), timecode);
+            final String timecode = videoControlService.getVcrTimecode().toString();
+            final SnapTime snapTime = new SnapTime(new Date(), timecode);
             final String timecode_ = snapTime.getTimeCodeAsName();
 
             /*
              * Grab the image from the videoChannel.
              */
             File png = null;
+            BufferedImage bufferedImage = null;
             try {
                 png = new File(imageDirectory.getImageDirectory(), timecode_ + ".png");
-                Image image = imageCaptureService.capture(timecode);
-                ImageUtilities.saveImage(ImageUtilities.toBufferedImage(image), png);
+
+                // Captures image and writes a copy to disk in a seperate thread
+                Image image = ImageCaptureUtilities.capture(imageCaptureService, timecode, png);
+                bufferedImage = ImageUtilities.toBufferedImage(image);
             }
             catch (final Exception e) {
                 EventBus.publish(Lookup.TOPIC_WARNING,
@@ -326,11 +318,14 @@ public class ImageCaptureAction extends ActionAdapter {
             /*
              *  Create preview image with overlay
              */
-            BufferedImage image;
             try {
-                image = ImageIO.read(png);
-                jpg = new File(png.getAbsolutePath().replaceFirst(".png", ".jpg"));
-                ImageCaptureUtilities.createJpgWithOverlay(image, jpg, overlayText);
+                File jpg = new File(png.getAbsolutePath().replaceFirst(".png", ".jpg"));
+                ImageCaptureUtilities.createJpgWithOverlay(bufferedImage, jpg, overlayText);
+
+                /*
+                 *  Update the information in the database
+                 */
+                updateVideoArchive(snapTime, jpg);
             }
             catch (final Exception e) {
                 EventBus.publish(Lookup.TOPIC_WARNING,
@@ -341,19 +336,20 @@ public class ImageCaptureAction extends ActionAdapter {
                 return;
             }
 
-
-            /*
-             *  Update the information in the database
-             */
-            updateVideoArchive();
         }
 
         /**
          * Populate a videoFrame with the correct information
          */
-        private void updateVideoArchive() {
-            final Observation observation = action.doAction("physical object", snapTime.getTimeCodeAsString());
+        private void updateVideoArchive(SnapTime snapTime, File jpg) {
+
+            // FIXME physical object is hardcoded. Should be set in preferences
+            Observation observation = action.doAction("physical object", snapTime.getTimeCodeAsString());
             if (observation != null) {
+
+                DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
+                dao.startTransaction();
+                observation = dao.find(observation);
                 final VideoFrame videoFrame = observation.getVideoFrame();
                 CameraData cameraData = videoFrame.getCameraData();
 
@@ -365,6 +361,8 @@ public class ImageCaptureAction extends ActionAdapter {
                         log.error("Problem creating a URL.", e);
                     }
                 }
+
+                dao.endTransaction();
             }
 
             final Collection<Observation> selectedObservations = ImmutableList.of(observation);
@@ -383,16 +381,16 @@ public class ImageCaptureAction extends ActionAdapter {
      * @author  brian
      * @version
      */
-    private class ImageDirectory implements PropertyChangeListener {
+    private class ImageDirectory {
 
-        private File imageDir;
+        private final PreferencesService preferencesService;
 
         /**
          * Constructs ...
          *
          */
         ImageDirectory() {
-            Lookup.getVideoArchiveDispatcher().addPropertyChangeListener(this);
+            preferencesService = new PreferencesService(Lookup.getPreferencesFactory());
         }
 
         /**
@@ -404,75 +402,58 @@ public class ImageCaptureAction extends ActionAdapter {
          * @throws  IOException If unable to create or write to the image directory
          */
         File getImageDirectory() throws IOException {
-            if (imageDir == null) {
+            final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+            final String hostname = preferencesService.getHostname();
+            File imageTarget = preferencesService.findImageTarget(userAccount.getUserName(), hostname);
 
-                // Get users home directory
-                // TODO this should be specified in properties not hard coded
-                final String userHome = System.getProperty("user.home");
-                final File varsDir = new File(userHome, "VARS");
-                final File iDir = new File(varsDir, "data");
 
-                // Get the platform name. Defaults to unknown
-                final VideoArchive va = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
-                final VideoArchiveSet vas = va.getVideoArchiveSet();
-                String platform = UNKNOWN_PLATFORM;
-                if (vas != null) {
-                    platform = vas.getPlatformName();
+            // Get the platform name. Defaults to unknown
+            final VideoArchive va = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+            final VideoArchiveSet vas = va.getVideoArchiveSet();
+            String platform = UNKNOWN_PLATFORM;
+            if (vas != null) {
+                platform = vas.getPlatformName();
 
-                    if (platform == null) {
-                        platform = UNKNOWN_PLATFORM;
-                    }
+                if (platform == null) {
+                    platform = UNKNOWN_PLATFORM;
                 }
+            }
 
-                final File rovDir = new File(new File(iDir, platform), "images");
+            final File rovDir = new File(new File(imageTarget, platform), "images");
 
-                // Get the dive number. Defaults to 0000
-                final Collection<CameraDeployment> cpds = vas.getCameraDeployments();
-                String diveNumber = UNKNOWN_SEQNUMBER;
-                if (cpds.size() != 0) {
-                    final CameraDeployment cd = cpds.iterator().next();
-                    diveNumber = format4i.format(cd.getSequenceNumber());
-                }
+            // Get the dive number. Defaults to 0000
+            final Collection<CameraDeployment> cpds = vas.getCameraDeployments();
+            String diveNumber = UNKNOWN_SEQNUMBER;
+            if (cpds.size() != 0) {
+                final CameraDeployment cd = cpds.iterator().next();
+                diveNumber = format4i.format(cd.getSequenceNumber());
+            }
 
-                /*
-                 *  Create the directory. Throw exceptions if there is a problem
-                 */
-                imageDir = new File(rovDir, diveNumber);
+            /*
+             *  Create the directory. Throw exceptions if there is a problem
+             */
+            File imageDir = new File(rovDir, diveNumber);
 
-                if (!imageDir.exists()) {
-                    final boolean ok = imageDir.mkdirs();
-                    if (!ok) {
-                        final String msg = new StringBuffer().append("Unable to create the directory, ").append(
-                            imageDir.getAbsolutePath()).append(", needed to store the images").toString();
-                        imageDir = null;
-
-                        throw new IOException(msg);
-                    }
-                }
-                else if (!imageDir.canWrite()) {
-                    final String msg = new StringBuffer().append("Unable to write to the directory, ").append(
-                        imageDir.getAbsolutePath()).toString();
+            if (!imageDir.exists()) {
+                final boolean ok = imageDir.mkdirs();
+                if (!ok) {
+                    final String msg = new StringBuffer().append("Unable to create the directory, ").append(
+                        imageDir.getAbsolutePath()).append(", needed to store the images").toString();
                     imageDir = null;
 
                     throw new IOException(msg);
                 }
             }
+            else if (!imageDir.canWrite()) {
+                final String msg = new StringBuffer().append("Unable to write to the directory, ").append(
+                    imageDir.getAbsolutePath()).toString();
+                imageDir = null;
+
+                throw new IOException(msg);
+            }
+
 
             return imageDir;
-        }
-
-        /**
-         *
-         * @param evt
-         */
-        public void propertyChange(PropertyChangeEvent evt) {
-
-            /*
-             *  Setting the imageDir to null causes the next call to getImageDirectory
-             *  to regenerate a new path to the image directory. We do this to defer
-             *  the creation of the imageDir object until it's needed.
-             */
-            imageDir = null;
         }
     }
 

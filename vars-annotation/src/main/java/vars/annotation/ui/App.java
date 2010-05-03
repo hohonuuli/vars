@@ -41,6 +41,7 @@ import vars.shared.ui.event.ExitTopicSubscriber;
 import vars.shared.ui.event.FatalExceptionSubscriber;
 import vars.shared.ui.event.NonFatalErrorSubscriber;
 import vars.shared.ui.event.WarningSubscriber;
+import vars.shared.ui.video.ImageCaptureService;
 
 /**
  *
@@ -105,6 +106,9 @@ public class App {
 
         splashFrame.setMessage("Assembling the user interface ...");
         Lookup.getSelectedObservationsDispatcher().setValueObject(new Vector<Observation>());
+
+        // Connect to the ImageCaptureService
+        Lookup.getImageCaptureServiceDispatcher().setValueObject(injector.getInstance(ImageCaptureService.class));
         
         // Configure EventBus
         EventTopicSubscriber fatalErrorSubscriber = new FatalExceptionSubscriber(getAnnotationFrame());

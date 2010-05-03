@@ -23,7 +23,6 @@ import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.movie.Timecode;
 import org.mbari.util.NumberUtilities;
-import org.mbari.vcr.IVCR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.CacheClearedEvent;

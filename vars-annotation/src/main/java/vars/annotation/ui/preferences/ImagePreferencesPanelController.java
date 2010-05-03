@@ -16,9 +16,9 @@
 package vars.annotation.ui.preferences;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.logging.Level;
 import java.util.prefs.PreferencesFactory;
 import javax.swing.JTextField;
 import org.bushe.swing.event.EventBus;
@@ -59,26 +59,11 @@ public class ImagePreferencesPanelController implements PreferenceUpdater {
         final JTextField imageTargetMappingTextField = panel.getImageTargetMappingTextField();
 
         // Parse and set the imageTarget
-        URL imageTarget = null;
-        try {
-            // First try to parse as a URL
-            imageTarget = new URL(imageTargetTextField.getText());
-        }
-        catch (MalformedURLException ex) {
-
-            // If it's not a URL it might be a file.
-            File file = new File(imageTargetTextField.getText());
-            try {
-                imageTarget = file.toURI().toURL();
-            }
-            catch (MalformedURLException ex1) {
-                log.warn("The user specified and invalid URL as an imageTarget. The bogus URL is '" +
-                         imageTargetTextField.getText() + "'");
-                EventBus.publish(Lookup.TOPIC_WARNING,
+        File imageTarget = new File(imageTargetTextField.getText());
+        if (!imageTarget.exists() && !imageTarget.canWrite()) {
+            EventBus.publish(Lookup.TOPIC_WARNING,
                                  "The location, " + imageTargetTextField.getText() +
                                  ", that you specified is not valid");
-                return;
-            }
         }
 
         preferencesService.persistImageTarget(userAccount.getUserName(), preferencesService.getHostname(), imageTarget);
@@ -102,10 +87,14 @@ public class ImagePreferencesPanelController implements PreferenceUpdater {
     }
 
     protected void setUserAccount(UserAccount userAccount) {
-        URL imageTarget = preferencesService.findImageTarget(userAccount.getUserName(),
+        File imageTarget = preferencesService.findImageTarget(userAccount.getUserName(),
             preferencesService.getHostname());
         URL imageTargetMapping = preferencesService.findImageTargetMapping(userAccount.getUserName());
-        panel.getImageTargetTextField().setText(imageTarget.toExternalForm());
+        try {
+            panel.getImageTargetTextField().setText(imageTarget.getCanonicalPath());
+        } catch (IOException ex) {
+            panel.getImageTargetTextField().setText("");
+        }
         panel.getImageTargetMappingTextField().setText(imageTargetMapping.toExternalForm());
     }
 }

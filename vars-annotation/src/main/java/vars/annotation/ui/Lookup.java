@@ -31,10 +31,10 @@ import vars.annotation.CameraDirections;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.table.ObservationTable;
-import vars.annotation.ui.video.ImageCaptureService;
 import vars.annotation.ui.video.VideoControlService;
 import vars.shared.InjectorModule;
 import vars.shared.ui.GlobalLookup;
+import vars.shared.ui.video.ImageCaptureService;
 
 /**
  *
@@ -96,7 +96,6 @@ public class Lookup extends GlobalLookup {
     private static final PreferencesFactory PREFERENCES_FACTORY;
 
     static {
-
 
         getApplicationDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
 

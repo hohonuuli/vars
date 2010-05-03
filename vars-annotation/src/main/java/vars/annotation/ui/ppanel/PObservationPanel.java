@@ -194,11 +194,11 @@ public class PObservationPanel extends PropertiesPanel {
         }
 
         public double getX() {
-            return observation.getX();
+            return observation.getX() == null ? Double.NaN : observation.getX();
         }
 
         public double getY() {
-            return observation.getY();
+            return observation.getY() == null ? Double.NaN : observation.getY();
         }
     }
 }

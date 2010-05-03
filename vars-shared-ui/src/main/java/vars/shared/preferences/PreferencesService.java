@@ -17,6 +17,7 @@ package vars.shared.preferences;
 
 import com.google.inject.Inject;
 import java.io.File;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -36,7 +37,7 @@ public class PreferencesService {
 
     private static final String PROP_IMAGETARGET = "imageTarget";
     private static final String PROP_IMAGETARGETMAPPING = "imageTargetMapping";
-    private final URL DEFAULT_IMAGETARGET;
+    private final File DEFAULT_IMAGETARGET;
     private final PreferencesFactory preferencesFactory;
     /** The name of the computer */
     private final String hostname;
@@ -49,15 +50,7 @@ public class PreferencesService {
     @Inject
     public PreferencesService(PreferencesFactory preferencesFactory) {
         this.preferencesFactory = preferencesFactory;
-
-        try {
-            // Call toURI first to escape out illegal URL characters
-            DEFAULT_IMAGETARGET = (new File(GlobalLookup.getSettingsDirectory(), "images")).toURI().toURL();
-        }
-        catch (MalformedURLException ex) {
-            // This should never get thrown... ;-)
-            throw new VARSException("Failed to map default image target to a URL", ex);
-        }
+        DEFAULT_IMAGETARGET = new File(GlobalLookup.getSettingsDirectory(), "images");
 
         /*
          * Store the login information
@@ -78,15 +71,15 @@ public class PreferencesService {
      * @param hostname
      * @return The Base URL where images should be written into
      */
-    public URL findImageTarget(String username, String hostname) {
+    public File findImageTarget(String username, String hostname) {
         Preferences preferences = hostPrefs(username, hostname);
-        String value = preferences.get(PROP_IMAGETARGET, DEFAULT_IMAGETARGET.toExternalForm());
-        URL imageTarget = null;
+        File imageTarget = null;
         try {
-            imageTarget = new URL(value);
+            String value = preferences.get(PROP_IMAGETARGET, DEFAULT_IMAGETARGET.getCanonicalPath());
+            imageTarget = new File(value);
         }
-        catch (MalformedURLException ex) {
-            throw new VARSException("Failed to convert '" + value + "' to a URL", ex);
+        catch (IOException ex) {
+            throw new VARSException("Failed to lookup and resolve image target", ex);
         }
 
         return imageTarget;
@@ -101,13 +94,13 @@ public class PreferencesService {
      */
     public URL findImageTargetMapping(String username) {
         Preferences preferences = userPrefs(username);
-        String value = preferences.get(PROP_IMAGETARGETMAPPING, DEFAULT_IMAGETARGET.toExternalForm());
         URL imageTarget = null;
         try {
+            String value = preferences.get(PROP_IMAGETARGETMAPPING, DEFAULT_IMAGETARGET.toURI().toURL().toExternalForm());
             imageTarget = new URL(value);
         }
         catch (MalformedURLException ex) {
-            throw new VARSException("Failed to convert '" + value + "' to a URL", ex);
+            throw new VARSException("Failed to lookup and resolve image target mapping", ex);
         }
 
         return imageTarget;
@@ -134,9 +127,13 @@ public class PreferencesService {
      * @param hostname The current hostname of the platform that VARS is running on
      * @param targetURL The URL to write images to.
      */
-    public void persistImageTarget(String username, String hostname, URL targetURL) {
+    public void persistImageTarget(String username, String hostname, File targetDirectory) {
         Preferences preferences = hostPrefs(username, hostname);
-        preferences.put(PROP_IMAGETARGET, targetURL.toExternalForm());
+        try {
+            preferences.put(PROP_IMAGETARGET, targetDirectory.getCanonicalPath());
+        } catch (IOException ex) {
+            throw new VARSException("Failed to save image target to preferences");
+        }
     }
 
     /**
