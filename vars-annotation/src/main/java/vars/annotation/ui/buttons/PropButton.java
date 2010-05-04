@@ -27,12 +27,12 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
 
-import org.mbari.swing.JFancyButton;
 
 import vars.UserAccount;
 import vars.annotation.Observation;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
+import vars.shared.ui.FancyButton;
 
 
 /**
@@ -42,7 +42,7 @@ import vars.annotation.ui.ToolBelt;
  *
  * @author <a href="http://www.mbari.org">MBARI</a>
  */
-public class PropButton extends JFancyButton {
+public class PropButton extends FancyButton {
 
     /**
      * I hate to use a static reference BUT, I need no arg constructors for

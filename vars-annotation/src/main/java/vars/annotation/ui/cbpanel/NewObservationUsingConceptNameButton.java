@@ -42,20 +42,19 @@ import javax.swing.JPopupMenu;
 import javax.swing.border.Border;
 import org.bushe.swing.event.EventBus;
 import org.mbari.swing.IPopup;
-import org.mbari.swing.JFancyButton;
 import org.mbari.util.Dispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.CacheClearedEvent;
 import vars.CacheClearedListener;
 import vars.UserAccount;
-import vars.annotation.AnnotationPersistenceService;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.actions.NewObservationUsingConceptNameAction;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.video.VideoControlService;
 import vars.annotation.ui.Lookup;
 import vars.knowledgebase.KnowledgebasePersistenceService;
+import vars.shared.ui.FancyButton;
 
 /**
  * <p>Creates a new Observation and changes its fromConcept to one specified
@@ -65,7 +64,7 @@ import vars.knowledgebase.KnowledgebasePersistenceService;
  *
  * @author  <a href="http://www.mbari.org">MBARI</a>
  */
-public class NewObservationUsingConceptNameButton extends JFancyButton
+public class NewObservationUsingConceptNameButton extends FancyButton
         implements IPopup, Transferable, DragSourceListener, DragGestureListener {
 
     /**  */

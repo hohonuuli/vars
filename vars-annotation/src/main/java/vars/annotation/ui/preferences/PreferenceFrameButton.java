@@ -11,15 +11,15 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.prefs.PreferencesFactory;
 import javax.swing.ImageIcon;
-import org.mbari.swing.JFancyButton;
 import vars.UserAccount;
 import vars.annotation.ui.Lookup;
+import vars.shared.ui.FancyButton;
 
 /**
  *
  * @author brian
  */
-public class PreferenceFrameButton extends JFancyButton {
+public class PreferenceFrameButton extends FancyButton {
     
     private PreferencesFrame preferencesFrame;
     private final PreferencesFactory preferencesFactory;

@@ -21,7 +21,6 @@ import java.util.Collection;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
-import org.mbari.swing.JFancyButton;
 import org.mbari.swing.SwingUtils;
 import org.mbari.vcr.IVCR;
 import vars.UserAccount;
@@ -30,13 +29,14 @@ import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.actions.DeepCopyObservationsAction;
 import vars.annotation.ui.video.VideoControlService;
+import vars.shared.ui.FancyButton;
 
 /**
  * <p>Performs a deep copy of an selected observation to a new time code.</p>
  *
  * @author  <a href="http://www.mbari.org">MBARI</a>
  */
-public class DeepCopyObservationsButton extends JFancyButton {
+public class DeepCopyObservationsButton extends FancyButton {
 
 
     /**

@@ -27,14 +27,12 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import org.mbari.awt.event.ActionAdapter;
-import org.mbari.swing.JFancyButton;
 import org.mbari.util.Dispatcher;
 import vars.annotation.ui.dialogs.NewConceptButtonTabDialog;
 import org.slf4j.Logger;
@@ -44,6 +42,7 @@ import vars.UserAccount;
 import vars.jpa.VarsUserPreferences;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.Lookup;
+import vars.shared.ui.FancyButton;
 
 /**
  * Intended to replace ConceptButtonPanel. Still a work in progress.
@@ -81,7 +80,6 @@ public class ConceptButtonPanel extends JPanel {
     private JButton showOverviewButton = null;
     private Preferences userPreferences = null;
     private boolean showOverview = false;
-    private JCheckBox dragLockCb;
     private final ImageIcon hideIndexIcon;
     private final ImageIcon lockedIcon;
     private ActionAdapter newTabAction;
@@ -150,7 +148,7 @@ public class ConceptButtonPanel extends JPanel {
 
     protected JButton getLockButton() {
         if (lockButton == null) {
-            lockButton = new JFancyButton();
+            lockButton = new FancyButton();
             lockButton.setText("");
             lockButton.setToolTipText("Buttons on the tabs can not be reordered when locked");
             lockButton.setIcon(unlockedIcon);
@@ -216,7 +214,7 @@ public class ConceptButtonPanel extends JPanel {
 
     protected JButton getNewTabButton() {
         if (newTabButton == null) {
-            newTabButton = new JFancyButton(getNewTabAction());
+            newTabButton = new FancyButton(getNewTabAction());
             newTabButton.setText("");
             newTabButton.setToolTipText("Create New Tab");
             newTabButton.setMnemonic(KeyEvent.VK_UNDEFINED);
@@ -245,7 +243,7 @@ public class ConceptButtonPanel extends JPanel {
 
     protected JButton getRemoveTabButton() {
         if (removeTabButton == null) {
-            removeTabButton = new JFancyButton(getRemoveTabAction());
+            removeTabButton = new FancyButton(getRemoveTabAction());
             removeTabButton.setText("");
             removeTabButton.setToolTipText("Remove Tab");
             removeTabButton.setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/delete2-16.png")));
@@ -267,7 +265,7 @@ public class ConceptButtonPanel extends JPanel {
 
     protected JButton getRenameTabButton() {
         if (renameTabButton == null) {
-            renameTabButton = new JFancyButton(getRenameTabAction());
+            renameTabButton = new FancyButton(getRenameTabAction());
             renameTabButton.setText("");
             renameTabButton.setToolTipText("Rename Tab");
             renameTabButton.setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/replace2-16.png")));
@@ -279,7 +277,7 @@ public class ConceptButtonPanel extends JPanel {
 
     protected JButton getShowOverviewButton() {
         if (showOverviewButton == null) {
-            showOverviewButton = new JFancyButton();
+            showOverviewButton = new FancyButton();
             showOverviewButton.setText("");
             showOverviewButton.setIcon(showIndexIcon);
             showOverviewButton.setToolTipText("Show overview tab");

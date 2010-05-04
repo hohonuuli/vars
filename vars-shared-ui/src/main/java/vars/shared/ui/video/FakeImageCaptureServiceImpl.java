@@ -15,7 +15,10 @@
 
 package vars.shared.ui.video;
 
+import java.awt.Frame;
 import java.awt.Image;
+import javax.swing.JOptionPane;
+import vars.shared.ui.GlobalLookup;
 
 /**
  * Empty implementation of ImageGrabber, calls to grab() return null.
@@ -27,7 +30,6 @@ public class FakeImageCaptureServiceImpl implements ImageCaptureService {
     /**
      */
     public void dispose() {
-
         // Nothing to do
     }
 
@@ -39,4 +41,13 @@ public class FakeImageCaptureServiceImpl implements ImageCaptureService {
     public Image capture(String timecode) throws ImageCaptureException {
         return null;
     }
+
+    public void showSettingsDialog() {
+        // Do nothing
+        Frame frame = (Frame) GlobalLookup.getSelectedFrameDispatcher().getValueObject();
+        JOptionPane.showMessageDialog(frame, "No settings are available", "VARS - Video Settings",
+                JOptionPane.INFORMATION_MESSAGE);
+    }
+
+
 }

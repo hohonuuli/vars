@@ -89,8 +89,15 @@ public class StatusLabelForVideoArchive extends StatusLabel {
 
                 SwingUtilities.convertPointToScreen(mousePosition, StatusLabelForVideoArchive.this);
 
-                final int x = mousePosition.x;
-                final int y = mousePosition.y - dialog.getHeight();
+                int x = mousePosition.x;
+                if (x < 1) {
+                    x = 1;
+                }
+                int y = mousePosition.y - dialog.getHeight();
+                if (y < 1) {
+                    y = 1;
+                }
+
 
                 dialog.setLocation(x, y);
                 dialog.setVisible(true);

@@ -42,7 +42,6 @@ import javax.swing.event.ListSelectionListener;
 import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.awt.layout.VerticalFlowLayout;
-import org.mbari.swing.JFancyButton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.LinkComparator;
@@ -50,6 +49,7 @@ import vars.annotation.Association;
 import vars.annotation.Observation;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
+import vars.shared.ui.FancyButton;
 
 /**
  * <p>
@@ -104,16 +104,12 @@ public class AssociationListEditorPanel extends JPanel {
 
     private void enableButtons() {
 
-        getButtonAdd().setEnabled(true);
+        getButtonAdd().setEnabled(observation != null);
 
-        if ((getJList().getSelectedIndex() == -1) || (jList.getModel().getSize() == 0)) {
-            getButtonRemove().setEnabled(false);
-            getButtonEdit().setEnabled(false);
-        }
-        else {
-            getButtonRemove().setEnabled(true);
-            getButtonEdit().setEnabled(true);
-        }
+        boolean enable = !((getJList().getSelectedIndex() == -1) || (jList.getModel().getSize() == 0));
+        getButtonRemove().setEnabled(enable);
+        getButtonEdit().setEnabled(enable);
+
     }
 
     ActionAdapter getAddAction() {
@@ -160,7 +156,7 @@ public class AssociationListEditorPanel extends JPanel {
 
     private JButton getButtonAdd() {
         if (buttonAdd == null) {
-            buttonAdd = new JFancyButton();
+            buttonAdd = new FancyButton();
             buttonAdd.setOpaque(false);
             buttonAdd.setPreferredSize(new Dimension(32, 32));
             buttonAdd.setToolTipText("Add Association");
@@ -173,13 +169,13 @@ public class AssociationListEditorPanel extends JPanel {
 
     private JButton getButtonEdit() {
         if (buttonEdit == null) {
-            buttonEdit = new JFancyButton();
+            buttonEdit = new FancyButton();
             buttonEdit.addActionListener(getEditAction());
             buttonEdit.setOpaque(false);
             buttonEdit.setPreferredSize(new Dimension(32, 32));
             buttonEdit.setToolTipText("Edit Association");
             buttonEdit.setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/edit.png")));
-            buttonEdit.setEnabled(false);
+            //buttonEdit.setEnabled(false);
         }
 
         return buttonEdit;
@@ -200,7 +196,7 @@ public class AssociationListEditorPanel extends JPanel {
 
     private JButton getButtonRemove() {
         if (buttonRemove == null) {
-            buttonRemove = new JFancyButton();
+            buttonRemove = new FancyButton();
             buttonRemove.setOpaque(false);
             buttonRemove.setBackground(Color.red);
             buttonRemove.setPreferredSize(new Dimension(32, 32));
@@ -469,11 +465,12 @@ public class AssociationListEditorPanel extends JPanel {
          * This change in jList will not be detected by the listSelectionListeners,
          * so make a manual call to enableButtons
          */
+        observation = newObservation;
         enableButtons();
         setEditingAssociation(false);
         repaint();
 
-        observation = newObservation;
+        
     }
 
     /**

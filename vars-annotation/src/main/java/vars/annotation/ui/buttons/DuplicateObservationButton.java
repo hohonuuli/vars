@@ -24,7 +24,6 @@ import java.util.Collection;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
-import org.mbari.swing.JFancyButton;
 import org.mbari.swing.SwingUtils;
 
 import vars.UserAccount;
@@ -32,13 +31,14 @@ import vars.annotation.Observation;
 import vars.annotation.ui.actions.DuplicateObservationAction;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.Lookup;
+import vars.shared.ui.FancyButton;
 
 /**
  * <p>Create a new observation using the current time-code from the VCR</p>
  *
  * @author  <a href="http://www.mbari.org">MBARI</a>
  */
-public class DuplicateObservationButton extends JFancyButton {
+public class DuplicateObservationButton extends FancyButton {
 
 
 

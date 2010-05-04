@@ -5,12 +5,16 @@
 
 package vars.quicktime;
 
+import java.awt.Frame;
 import java.awt.Image;
+import java.lang.reflect.Method;
+import javax.swing.JOptionPane;
 import org.mbari.framegrab.FakeGrabber;
 import org.mbari.framegrab.GrabberException;
 import org.mbari.framegrab.IGrabber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.shared.ui.GlobalLookup;
 
 import vars.shared.ui.video.ImageCaptureService;
 import vars.shared.ui.video.ImageCaptureException;
@@ -52,5 +56,25 @@ public class QTImageCaptureServiceImpl implements ImageCaptureService {
     public void dispose() {
         grabber.dispose();
     }
+
+    public void showSettingsDialog() {
+            Class clazz = grabber.getClass();
+            try {
+                // Use reflection since not all IGrabbers will have a
+                // showSettingsDialog method.
+                Method method = clazz.getMethod("showSettingsDialog", new Class[0]);
+                method.invoke(grabber, new Object[0]);
+            }
+            catch (Throwable ex) {
+                // Do nothing
+                log.info("Unable to show dialog for " + clazz, ex);
+                Frame frame = (Frame) GlobalLookup.getSelectedFrameDispatcher().getValueObject();
+                JOptionPane.showMessageDialog(frame, "No settings are available", "VARS - Video Settings",
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
+
+    }
+
+
 
 }

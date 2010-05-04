@@ -19,11 +19,11 @@ import java.awt.Frame;
 import java.awt.event.KeyEvent;
 import javax.swing.JDialog;
 import javax.swing.JTextField;
-import org.mbari.swing.JFancyButton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.ui.actions.AddNewRefNumPropAction;
 import vars.annotation.ui.Lookup;
+import vars.shared.ui.FancyButton;
 
 /**
  * <p>This dialog is used to set the Reference Number property for the
@@ -63,7 +63,7 @@ public class NewRefNumPropDialog extends JDialog {
 
     private javax.swing.JButton getBtnCancel() {
         if (btnCancel == null) {
-            btnCancel = new JFancyButton();
+            btnCancel = new FancyButton();
             btnCancel.setText("Cancel");
             btnCancel.addActionListener(new java.awt.event.ActionListener() {
 
@@ -78,7 +78,7 @@ public class NewRefNumPropDialog extends JDialog {
 
     private javax.swing.JButton getBtnOk() {
         if (btnOk == null) {
-            btnOk = new JFancyButton();
+            btnOk = new FancyButton();
             btnOk.setText("OK");
             btnOk.addActionListener(new java.awt.event.ActionListener() {
 

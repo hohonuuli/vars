@@ -15,6 +15,7 @@
 
 package vars.annotation.ui.ppanel;
 
+import com.google.common.collect.ImmutableList;
 import java.awt.Frame;
 import java.util.Collection;
 import java.util.HashSet;
@@ -23,12 +24,14 @@ import javax.swing.JTextField;
 import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.swing.PropertyPanel;
+import vars.DAO;
 import vars.annotation.CameraData;
 import vars.annotation.CameraDirections;
 import vars.annotation.Observation;
 import vars.annotation.VideoFrame;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.PersistenceController;
+import vars.annotation.ui.ToolBelt;
 
 
 /**
@@ -41,14 +44,14 @@ import vars.annotation.ui.PersistenceController;
 public class PCameraDataPanel extends PropertiesPanel {
 
     private ActionAdapter directionAction;
-    private final PersistenceController persistenceService;
+    private final ToolBelt toolBelt;
 
     /**
      * Constructs ...
      */
-    public PCameraDataPanel(PersistenceController persistenceService) {
+    public PCameraDataPanel(ToolBelt toolBelt) {
         super();
-        this.persistenceService = persistenceService;
+        this.toolBelt = toolBelt;
         setPropertyNames(new String[] {
             "Direction", "Name", "Zoom", "Focus", "Iris", "FieldWidth", "ImageReference", "X", "Y"
         });
@@ -71,32 +74,31 @@ public class PCameraDataPanel extends PropertiesPanel {
                     final JTextField f1 = p.getValueField();
                     final String initialValue = f1.getText();
                     Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
-                    final String selectedValue = (String) JOptionPane.showInputDialog(frame,
+                    final CameraDirections selectedValue = (CameraDirections) JOptionPane.showInputDialog(frame,
                         "Select a camera direction.", "VARS - Camera Direction", JOptionPane.QUESTION_MESSAGE, null,
-                        CameraDirections.values(), initialValue);
+                        CameraDirections.values(), CameraDirections.findValue(initialValue));
                     if (selectedValue != null) {
                         final Collection<Observation> observations = (Collection<Observation>) Lookup
-                            .getSelectedObservationsDispatcher();
+                            .getSelectedObservationsDispatcher().getValueObject();
                         if (observations.size() == 1) {
-                            final Observation obs = observations.iterator().next();
-                            final VideoFrame vf = obs.getVideoFrame();
-                            final CameraData cd = vf.getCameraData();
-                            cd.setDirection(selectedValue);
 
                             try {
-                                persistenceService.updateObservations(new HashSet<Observation>() {
+                                DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
+                                dao.startTransaction();
+                                Observation obs = observations.iterator().next();
+                                obs = dao.find(obs);
+                                final VideoFrame vf = obs.getVideoFrame();
+                                final CameraData cd = vf.getCameraData();
+                                cd.setDirection(selectedValue.getDirection());
+                                dao.endTransaction();
+                                toolBelt.getPersistenceController().updateUI(ImmutableList.of(obs));
 
-                                    {
-                                        add(obs);
-                                    }
-
-                                });
                             }
                             catch (final Exception e1) {
                                 EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e1);
                             }
 
-                            f1.setText(selectedValue);
+                            f1.setText(selectedValue.toString());
 
                         }
                     }

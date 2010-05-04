@@ -20,13 +20,13 @@ import java.awt.event.KeyEvent;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import org.bushe.swing.event.EventBus;
-import org.mbari.swing.JFancyButton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.MiscDAOFactory;
 import vars.MiscFactory;
 import vars.UserAccount;
 import vars.UserAccountDAO;
+import vars.shared.ui.FancyButton;
 import vars.shared.ui.GlobalLookup;
 import vars.shared.ui.UserAccountComboBox;
 
@@ -104,9 +104,9 @@ public class LoginDialog extends JDialog {
         passwordField = new javax.swing.JPasswordField();
 
         //nameField = new javax.swing.JTextField();
-        cancelButton = new JFancyButton();
-        okButton = new JFancyButton();
-        newUserButton = new JFancyButton();
+        cancelButton = new FancyButton();
+        okButton = new FancyButton();
+        newUserButton = new FancyButton();
         jLabel1 = new javax.swing.JLabel();
         msgLabel = new javax.swing.JLabel();
 

@@ -347,14 +347,14 @@ public class OpenVideoArchiveDialog extends StandardDialog {
         setPreferredSize(new Dimension(475, 400));
         getOkayButton().addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                dispose();
+                setVisible(false);
             }
         });
 
         getCancelButton().addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
-                dispose();
+                setVisible(false);
             }
         });
         getContentPane().add(getPanel(), BorderLayout.CENTER);

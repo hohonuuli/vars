@@ -6,9 +6,11 @@
 
 package vars.knowledgebase.ui;
 
-import javax.swing.*;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import vars.shared.ui.FancyButton;
 
-import org.mbari.swing.JFancyButton;
 
 /**
  *
@@ -32,7 +34,7 @@ public class EditorButtonPanel extends javax.swing.JPanel {
 	 */
     public javax.swing.JButton getDeleteButton() {
         if (deleteButton == null) {
-            deleteButton = new JFancyButton();
+            deleteButton = new FancyButton();
             deleteButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/vars/knowledgebase/delete2.png")));
             deleteButton.setText("Delete");
         }
@@ -44,7 +46,7 @@ public class EditorButtonPanel extends javax.swing.JPanel {
 	 */
     public javax.swing.JButton getNewButton() {
         if (newButton == null) {
-            newButton = new JFancyButton();
+            newButton = new FancyButton();
             newButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/vars/knowledgebase/add2.png")));
             newButton.setText("New");
         }
@@ -56,7 +58,7 @@ public class EditorButtonPanel extends javax.swing.JPanel {
 	 */
     public javax.swing.JButton getUpdateButton() {
         if (updateButton == null) {
-            updateButton = new JFancyButton();
+            updateButton = new FancyButton();
             updateButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/vars/knowledgebase/replace2.png")));
             updateButton.setText("Update");
         }

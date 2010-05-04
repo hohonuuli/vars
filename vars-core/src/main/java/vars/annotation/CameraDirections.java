@@ -27,4 +27,23 @@ public enum CameraDirections {
     public String toString() {
         return direction;
     }
+
+    /**
+     * Simlair to valueOf method, but searches for a case insenstive match.
+     * Returns UNSPECIFIED if no match was found.
+     * @param d
+     * @return
+     */
+    public static CameraDirections findValue(String d) {
+        CameraDirections cd = UNSPECIFIED;
+        try {
+            cd = CameraDirections.valueOf(d.toUpperCase());
+        }
+        catch (Exception e) {
+            // DO NOTHING
+        }
+        return cd;
+    }
+
+
 }

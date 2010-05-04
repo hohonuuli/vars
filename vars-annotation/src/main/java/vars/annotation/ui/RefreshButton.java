@@ -6,14 +6,14 @@
 package vars.annotation.ui;
 
 import javax.swing.ImageIcon;
-import org.mbari.swing.JFancyButton;
 import vars.annotation.ui.actions.ClearDatabaseCacheAction;
+import vars.shared.ui.FancyButton;
 
 /**
  *
  * @author brian
  */
-public class RefreshButton extends JFancyButton {
+public class RefreshButton extends FancyButton {
 
     public RefreshButton(final ToolBelt toolBelt) {
         addActionListener(new ClearDatabaseCacheAction(toolBelt));

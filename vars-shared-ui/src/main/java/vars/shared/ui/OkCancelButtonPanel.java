@@ -11,7 +11,6 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import org.mbari.swing.JFancyButton;
 
 public class OkCancelButtonPanel extends JPanel {
 
@@ -49,7 +48,7 @@ public class OkCancelButtonPanel extends JPanel {
      */
     public JButton getCancelButton() {
         if (cancelButton == null) {
-            cancelButton = new JFancyButton("Cancel");
+            cancelButton = new FancyButton("Cancel");
             cancelButton.setIcon(new ImageIcon(getClass().getResource("/vars/images/24/delete2.png")));
             cancelButton.addKeyListener(new KeyAdapter() {
                 @Override
@@ -69,7 +68,7 @@ public class OkCancelButtonPanel extends JPanel {
      */
     public JButton getOkayButton() {
         if (okayButton == null) {
-            okayButton = new JFancyButton("OK");
+            okayButton = new FancyButton("OK");
             okayButton.setIcon(new ImageIcon(getClass().getResource("/vars/images/24/check2.png")));
             okayButton.addKeyListener(new KeyAdapter() {
                 @Override

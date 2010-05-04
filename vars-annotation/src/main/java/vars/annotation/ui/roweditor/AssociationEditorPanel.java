@@ -43,7 +43,6 @@ import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingUtilities;
 import org.bushe.swing.event.EventBus;
-import org.mbari.swing.JFancyButton;
 import org.mbari.swing.LabeledSpinningDialWaitIndicator;
 import org.mbari.swing.SearchableComboBoxModel;
 import org.mbari.swing.SortedComboBoxModel;
@@ -62,6 +61,7 @@ import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.LinkTemplate;
+import vars.shared.ui.FancyButton;
 import vars.shared.ui.HierachicalConceptNameComboBox;
 import vars.shared.ui.LinkListCellRenderer;
 
@@ -111,7 +111,7 @@ public class AssociationEditorPanel extends JPanel {
 
     private JButton getCancelButton() {
         if (cancelButton == null) {
-            cancelButton = new JFancyButton();
+            cancelButton = new FancyButton();
             cancelButton.setPreferredSize(new Dimension(30, 23));
             cancelButton.setToolTipText("Cancel");
             cancelButton.setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/stop.png")));
@@ -228,7 +228,7 @@ public class AssociationEditorPanel extends JPanel {
 
     private JButton getOkButton() {
         if (okButton == null) {
-            okButton = new JFancyButton();
+            okButton = new FancyButton();
             okButton.setPreferredSize(new Dimension(30, 23));
             okButton.setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/add.png")));
             okButton.addActionListener(new ActionListener() {

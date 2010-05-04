@@ -21,13 +21,16 @@ import java.beans.PropertyChangeListener;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
-import org.mbari.swing.JFancyButton;
 import org.mbari.swing.SwingUtils;
 import org.mbari.util.Dispatcher;
+import vars.UserAccount;
+import vars.annotation.VideoArchive;
 
 import vars.annotation.ui.actions.NewObservationAction;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.Lookup;
+import vars.annotation.ui.video.VideoControlService;
+import vars.shared.ui.FancyButton;
 
 
 /**
@@ -35,12 +38,10 @@ import vars.annotation.ui.Lookup;
  *
  * @author  <a href="http://www.mbari.org">MBARI</a>
  */
-public class NewObservationButton extends JFancyButton {
+public class NewObservationButton extends FancyButton {
 
     private final Action action;
-    private boolean hasPerson;
-    private boolean hasVcr;
-    private boolean hasVideoArchive;
+
 
     /**
      * Constructor for the NewVideoFrameButton object
@@ -52,37 +53,18 @@ public class NewObservationButton extends JFancyButton {
         setToolTipText("Create an Observation with a new timecode [" +
                        SwingUtils.getKeyString((KeyStroke) action.getValue(Action.ACCELERATOR_KEY)) + "]");
         setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/obs_new.png")));
-        action.setEnabled(false);
 
-        final Dispatcher videoArchiveDispatcher = Lookup.getVideoArchiveDispatcher();
-        hasVideoArchive = videoArchiveDispatcher.getValueObject()!= null;
-        videoArchiveDispatcher.addPropertyChangeListener(new PropertyChangeListener() {
-            
+        PropertyChangeListener listener = new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
-                hasVideoArchive = (evt.getNewValue() != null);
-                checkEnable();
+                setEnabled(checkEnable());
             }
-        });
-        
-        final Dispatcher userAccountDispatcher = Lookup.getUserAccountDispatcher();
-        hasPerson = userAccountDispatcher.getValueObject() != null;
-        userAccountDispatcher.addPropertyChangeListener(new PropertyChangeListener() {
-            
-            public void propertyChange(PropertyChangeEvent evt) {
-                hasPerson = (evt.getNewValue() != null);
-                checkEnable();
-            }
-        });
+        };
 
-        final Dispatcher videoServiceDispatcher = Lookup.getVideoControlServiceDispatcher();
-        hasVcr = videoServiceDispatcher.getValueObject() != null;
-        videoServiceDispatcher.addPropertyChangeListener(new PropertyChangeListener() {
-            
-            public void propertyChange(PropertyChangeEvent evt) {
-                hasVcr = (evt.getNewValue() != null);
-                checkEnable();
-            }
-        });
+        Lookup.getVideoControlServiceDispatcher().addPropertyChangeListener(listener);
+        Lookup.getVideoArchiveDispatcher().addPropertyChangeListener(listener);
+        Lookup.getUserAccountDispatcher().addPropertyChangeListener(listener);
+
+        setEnabled(checkEnable());
 
         setText("");
 
@@ -92,7 +74,10 @@ public class NewObservationButton extends JFancyButton {
      * <p>Enable this button if someone is logged in AND a videoarchvie set is
      * open and the VCR exists.</p>
      */
-    private void checkEnable() {
-        action.setEnabled(hasVcr && hasPerson && hasVideoArchive);
+    public boolean checkEnable() {
+        VideoControlService vcs = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
+        VideoArchive va = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+        UserAccount ua = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+        return vcs != null && va != null && ua != null;
     }
 }

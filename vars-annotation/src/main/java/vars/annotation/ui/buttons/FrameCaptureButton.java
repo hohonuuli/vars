@@ -19,16 +19,24 @@ package vars.annotation.ui.buttons;
 
 import foxtrot.Job;
 import foxtrot.Worker;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
-import org.mbari.swing.JFancyButton;
 import org.mbari.swing.SwingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.UserAccount;
+import vars.annotation.VideoArchive;
+import vars.annotation.ui.Lookup;
 
 import vars.annotation.ui.video.ImageCaptureAction;
 import vars.annotation.ui.ToolBelt;
+import vars.annotation.ui.video.VideoControlService;
+import vars.shared.ui.FancyButton;
+import vars.shared.ui.video.FakeImageCaptureServiceImpl;
+import vars.shared.ui.video.ImageCaptureService;
 
 /**
  * <p>
@@ -40,7 +48,7 @@ import vars.annotation.ui.ToolBelt;
  *
  * @author  : $Author: hohonuuli $
  */
-public class FrameCaptureButton extends JFancyButton {
+public class FrameCaptureButton extends FancyButton {
 
 
     private static final Logger log = LoggerFactory.getLogger(FrameCaptureButton.class);
@@ -63,6 +71,27 @@ public class FrameCaptureButton extends JFancyButton {
         setToolTipText("Grab an image from the video-stream [" +
                        SwingUtils.getKeyString((KeyStroke) getAction().getValue(Action.ACCELERATOR_KEY)) + "]");
         setText("");
+
+        PropertyChangeListener listener = new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                setEnabled(checkEnable());
+            }
+        };
+
+        Lookup.getImageCaptureServiceDispatcher().addPropertyChangeListener(listener);
+        Lookup.getVideoArchiveDispatcher().addPropertyChangeListener(listener);
+        Lookup.getUserAccountDispatcher().addPropertyChangeListener(listener);
+        Lookup.getVideoControlServiceDispatcher().addPropertyChangeListener(listener);
+
+        setEnabled(checkEnable());
+    }
+
+    public boolean checkEnable() {
+        ImageCaptureService ics = (ImageCaptureService) Lookup.getImageCaptureServiceDispatcher().getValueObject();
+        VideoArchive va = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+        UserAccount ua = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+        VideoControlService vcs = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
+        return ics != null && va != null && ua != null && vcs != null;
     }
 
     /**
@@ -80,18 +109,15 @@ public class FrameCaptureButton extends JFancyButton {
          * Method description
          *
          */
+        @Override
         public void doAction() {
             Worker.post(new Job() {
                 public Object run() {
-                    doActionInThread();
+                    WorkerAction.super.doAction();
                     return null;
                 }
 
             });
-        }
-
-        private void doActionInThread() {
-            super.doAction();
         }
     }
 }

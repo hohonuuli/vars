@@ -49,7 +49,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import org.bushe.swing.event.EventBus;
-import org.mbari.swing.JFancyButton;
 import org.mbari.swing.ListListModel;
 import org.mbari.swing.SearchableComboBoxModel;
 import org.mbari.swing.SortedComboBoxModel;
@@ -67,6 +66,7 @@ import vars.knowledgebase.LinkTemplate;
 import vars.annotation.ui.ToolBelt;
 import vars.shared.ui.ConceptNameComboBox;
 import vars.annotation.ui.Lookup;
+import vars.shared.ui.FancyButton;
 
 /**
  * <p>More or less a copy and paste job reproducing the functionality of
@@ -269,7 +269,7 @@ public class MultiAssociationEditorPanel extends JPanel {
      */
     public javax.swing.JButton getAddAssociationButton() {
         if (addAssociationButton == null) {
-            addAssociationButton = new JFancyButton();
+            addAssociationButton = new FancyButton();
             addAssociationButton.setPreferredSize(new Dimension(30, 23));
             addAssociationButton.setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/add.png")));
             addAssociationButton.addActionListener(new ActionListener() {
@@ -293,7 +293,7 @@ public class MultiAssociationEditorPanel extends JPanel {
      */
     public javax.swing.JButton getCancelAssociationButton() {
         if (cancelAssociationButton == null) {
-            cancelAssociationButton = new JFancyButton();
+            cancelAssociationButton = new FancyButton();
             cancelAssociationButton.setPreferredSize(new Dimension(30, 23));
             cancelAssociationButton.setToolTipText("Cancel");
             cancelAssociationButton.setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/stop.png")));

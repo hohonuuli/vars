@@ -15,8 +15,6 @@
 package vars.knowledgebase.ui.dialogs;
 
 import com.google.inject.Inject;
-import foxtrot.Job;
-import foxtrot.Worker;
 import java.awt.Frame;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
@@ -26,7 +24,6 @@ import java.util.List;
 
 import javax.swing.ImageIcon;
 import org.bushe.swing.event.EventBus;
-import org.mbari.swing.JFancyButton;
 import org.mbari.util.Dispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,11 +36,10 @@ import vars.knowledgebase.ConceptNameTypes;
 import vars.knowledgebase.History;
 import vars.knowledgebase.HistoryFactory;
 import vars.knowledgebase.KnowledgebaseFactory;
-import vars.knowledgebase.ui.KnowledgebaseFrame;
 import vars.knowledgebase.ui.Lookup;
 import vars.knowledgebase.ui.ToolBelt;
-import vars.knowledgebase.ui.actions.ApproveHistoryTask;
 import vars.shared.ui.AllConceptNamesComboBox;
+import vars.shared.ui.FancyButton;
 import vars.shared.ui.GlobalLookup;
 
 /**
@@ -125,8 +121,8 @@ public class AddConceptDialog extends javax.swing.JDialog {
         nameField = new javax.swing.JTextField();
         parentLabel = new javax.swing.JLabel();
         conceptComboBox = new AllConceptNamesComboBox(toolBelt.getQueryPersistenceService());
-        cancelButton = new JFancyButton();
-        okButton = new JFancyButton();
+        cancelButton = new FancyButton();
+        okButton = new FancyButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         titleText = new javax.swing.JTextArea();
         jLabel1 = new javax.swing.JLabel();

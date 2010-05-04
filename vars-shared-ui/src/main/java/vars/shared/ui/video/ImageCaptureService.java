@@ -24,4 +24,6 @@ public interface ImageCaptureService {
      * Cleanup resources
      */
     void dispose();
+
+    void showSettingsDialog();
 }

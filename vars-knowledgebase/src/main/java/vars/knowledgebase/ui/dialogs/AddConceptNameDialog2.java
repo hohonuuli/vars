@@ -22,7 +22,6 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.bushe.swing.event.EventBus;
-import org.mbari.swing.JFancyButton;
 import org.mbari.swing.SpinningDialWaitIndicator;
 import org.mbari.swing.WaitIndicator;
 import org.slf4j.Logger;
@@ -41,6 +40,7 @@ import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.ui.Lookup;
 import vars.knowledgebase.ui.ToolBelt;
 import vars.knowledgebase.ui.actions.ApproveHistoryTask;
+import vars.shared.ui.FancyButton;
 
 /**
  *
@@ -118,8 +118,8 @@ private void initComponents() {
         authorField = new javax.swing.JTextField();
         commonRb = new javax.swing.JRadioButton();
         synonymRb = new javax.swing.JRadioButton();
-        cancelButton = new JFancyButton();
-        okButton = new JFancyButton();
+        cancelButton = new FancyButton();
+        okButton = new FancyButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
         msgLabel = new javax.swing.JLabel();

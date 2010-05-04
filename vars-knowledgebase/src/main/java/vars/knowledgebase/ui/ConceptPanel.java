@@ -24,7 +24,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import vars.knowledgebase.Concept;
 import vars.UserAccount;
-import org.mbari.swing.JFancyButton;
+import vars.shared.ui.FancyButton;
 
 
 /**
@@ -260,7 +260,7 @@ public class ConceptPanel extends JPanel {
      */
     public JButton getLockButton() {
         if (lockButton == null) {
-            lockButton = new JFancyButton();
+            lockButton = new FancyButton();
             lockButton.setIcon(new ImageIcon(getClass().getResource("/images/vars/knowledgebase/lock.png")));
         }
         return lockButton;

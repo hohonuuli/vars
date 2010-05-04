@@ -18,7 +18,6 @@ package vars.annotation.ui;
 import com.google.inject.Injector;
 import foxtrot.Job;
 import foxtrot.Worker;
-import java.awt.SplashScreen;
 import java.awt.Toolkit;
 import java.util.List;
 import java.util.Vector;
@@ -35,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.AnnotationPersistenceService;
 import vars.annotation.Observation;
+import vars.annotation.ui.video.VideoControlService;
 import vars.knowledgebase.Concept;
 import vars.shared.ui.GlobalLookup;
 import vars.shared.ui.event.ExitTopicSubscriber;
@@ -96,7 +96,6 @@ public class App {
 
             @Override
             public Object run() {
-                Logger log = LoggerFactory.getLogger(getClass());
                 AnnotationPersistenceService service = toolBelt.getAnnotationPersistenceService();
                 Concept root = service.findRootConcept();
                 service.findDescendantNamesFor(root);
@@ -113,8 +112,34 @@ public class App {
         // Configure EventBus
         EventTopicSubscriber fatalErrorSubscriber = new FatalExceptionSubscriber(getAnnotationFrame());
         EventTopicSubscriber nonFatalErrorSubscriber = new NonFatalErrorSubscriber(getAnnotationFrame());
-        EventTopicSubscriber warningSubscriber = new WarningSubscriber(getAnnotationFrame());
-        EventTopicSubscriber exitSubscriber = new ExitTopicSubscriber();
+        EventTopicSubscriber warningSubscriber = new WarningSubscriber(getAnnotationFrame());       
+        EventTopicSubscriber exitSubscriber = new ExitTopicSubscriber() {
+
+            private final Logger log = LoggerFactory.getLogger(getClass());
+
+            @Override
+            public void onEvent(String topic, Object data) {
+                // Clean up NATIVE resources when we exit
+                try {
+                    ImageCaptureService imageCaptureService = (ImageCaptureService) Lookup.getImageCaptureServiceDispatcher().getValueObject();
+                    imageCaptureService.dispose();
+                }
+                catch (Throwable e) {
+                    log.warn("An error occurred while closing the image capture services", e);
+                }
+
+                try {
+                    VideoControlService videoControlService = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
+                    videoControlService.disconnect();
+                }
+                catch (Exception e) {
+                     log.warn("An error occurred while closing the video control services", e);
+                }
+
+                super.onEvent(topic, data);
+            }
+
+        };
         GC_PREVENTION.add(fatalErrorSubscriber);
         GC_PREVENTION.add(nonFatalErrorSubscriber);
         GC_PREVENTION.add(warningSubscriber);

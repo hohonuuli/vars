@@ -15,8 +15,6 @@
 
 package vars.annotation.ui.buttons;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 
 import javax.swing.Action;
 import javax.swing.ImageIcon;
@@ -24,12 +22,12 @@ import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import org.mbari.swing.JFancyButton;
 import org.mbari.swing.SwingUtils;
 import vars.UserAccount;
 import vars.annotation.ui.actions.DeleteSelectedObservationsWithConfirmAction;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.Lookup;
+import vars.shared.ui.FancyButton;
 
 /**
  * <p>Deletes the observations selected in the Table. This button will bring
@@ -37,7 +35,7 @@ import vars.annotation.ui.Lookup;
  *
  * @author  <a href="http://www.mbari.org">MBARI</a>
  */
-public class DeleteSelectedObservationsButton extends JFancyButton {
+public class DeleteSelectedObservationsButton extends FancyButton {
 
 
     /**

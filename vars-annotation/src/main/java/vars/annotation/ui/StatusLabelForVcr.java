@@ -70,8 +70,14 @@ public class StatusLabelForVcr extends StatusLabel {
 
                 SwingUtilities.convertPointToScreen(mousePosition, StatusLabelForVcr.this);
 
-                final int x = mousePosition.x;
-                final int y = mousePosition.y - videoDialog.getHeight();
+                int x = mousePosition.x;
+                if (x < 1) {
+                    x = 1;
+                }
+                int y = mousePosition.y - videoDialog.getHeight();
+                if (y < 1) {
+                    y = 1;
+                }
 
                 videoDialog.setLocation(x, y);
                 videoDialog.setVisible(true);
