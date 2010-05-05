@@ -1,5 +1,5 @@
 /*
- * @(#)ApproveHistorySubscriber.java   2009.12.02 at 10:00:44 PST
+ * @(#)ApproveHistoriesSubscriber.java   2010.05.05 at 10:53:45 PDT
  *
  * Copyright 2009 MBARI
  *
@@ -15,18 +15,19 @@
 
 package vars.knowledgebase.ui;
 
+import java.util.Collection;
 import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.EventTopicSubscriber;
 import vars.UserAccount;
+import vars.knowledgebase.Concept;
 import vars.knowledgebase.History;
 import vars.knowledgebase.ui.actions.ApproveHistoryTask;
 
 /**
  *
- * @version        $date$, 2009.10.29 at 12:49:38 PDT
- * @author         Brian Schlining [brian@mbari.org]
+ * @author brian
  */
-public class ApproveHistorySubscriber implements EventTopicSubscriber<History> {
+public class ApproveHistoriesSubscriber implements EventTopicSubscriber<Collection<? extends History>> {
 
     private final ApproveHistoryTask approveHistoryTask;
 
@@ -35,7 +36,7 @@ public class ApproveHistorySubscriber implements EventTopicSubscriber<History> {
      *
      * @param approveHistoryTask
      */
-    public ApproveHistorySubscriber(ApproveHistoryTask approveHistoryTask) {
+    public ApproveHistoriesSubscriber(ApproveHistoryTask approveHistoryTask) {
         super();
         this.approveHistoryTask = approveHistoryTask;
     }
@@ -43,23 +44,30 @@ public class ApproveHistorySubscriber implements EventTopicSubscriber<History> {
     /**
      *
      * @param topic
-     * @param history
+     * @param histories
      */
-    public void onEvent(String topic, History history) {
-        if (Lookup.TOPIC_APPROVE_HISTORY.equals(topic)) {
+    public void onEvent(String topic, Collection<? extends History> histories) {
+        if (Lookup.TOPIC_APPROVE_HISTORIES.equals(topic)) {
             final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
 
             try {
-                if ((userAccount != null) && (userAccount.isAdministrator()) && (!history.isProcessed())) {
-                    approveHistoryTask.doTask(userAccount, history);
+                if ((userAccount != null) && (userAccount.isAdministrator())) {
+                    approveHistoryTask.doTask(userAccount, histories);
                 }
             }
             catch (Exception e) {
                 EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
             }
             finally {
-                EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE,
-                                 history.getConceptMetadata().getConcept().getPrimaryConceptName().getName());
+
+                // Refresh KB to the first concept we find in the histories
+                if (histories.size() > 0) {
+                    Concept concept = histories.iterator().next().getConceptMetadata().getConcept();
+                    if (concept != null) {
+                        EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, concept.getPrimaryConceptName().getName());
+                    }
+                }
+
             }
         }
     }

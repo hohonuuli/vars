@@ -111,9 +111,12 @@ public class FatalExceptionSubscriber implements EventTopicSubscriber<Exception>
                 add("To have no errors\nWould be life without meaning\nNo struggle, no joy");
                 add("Error messages\ncannot completely convey.\nWe now know shared loss.");
                 add("The code was willing,\nIt considered your request,\nBut the chips were weak.");
-                add("wind catches lily\nscatt'ring petals to the wind:\napplication dies");
+                add("Wind catches lily\nScatt'ring petals to the wind:\nApplication dies");
                 add("Three things are certain:\nDeath, taxes and lost data.\nGuess which has occurred.");
-                add("Rather than a beep\nOr a rude error message,These words: \"Restart now.\"");
+                add("Rather than a beep\nOr a rude error message,\nThese words: \"Restart now.\"");
+                add("ABORTED effort:\nClose all that you have.\nYou ask way too much.");
+                add("The knowledgebase crashed.\nI am the Blue Screen of Death.\nNo one hears your screams.");
+                add("No-one can tell\nwhat God or Heaven will do\nIf you divide by zero.");
             }
         };
 

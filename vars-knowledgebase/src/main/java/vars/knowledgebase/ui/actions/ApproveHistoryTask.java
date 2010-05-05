@@ -166,6 +166,34 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
         }
     }
 
+    /**
+     * Approve multiple histories. Most will get done in a single transaction, but
+     * some, such as deleting a branch of concepts, requires multiple transactions
+     * @param userAccount
+     * @param histories
+     */
+    public void doTask(final UserAccount userAccount, Collection<? extends History> histories) {
+        DAO dao = toolBelt.getKnowledgebaseDAOFactory().newDAO();
+        for (History history : histories) {
+
+            // Skip histories that have already been accepted or rejected
+            if (history.isProcessed()) {
+                continue;
+            }
+
+            try {
+                dao.startTransaction();
+                // Bring History into transaction
+                history = dao.find(history);
+                approve(userAccount, history, dao);
+            }
+            catch (Exception e) {
+                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+            }
+        }
+        dao.endTransaction();
+    }
+
     private class ADeleteChildConceptTask extends GenericApproveTask {
 
 
@@ -175,6 +203,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
          * @param history Should already be part of the dao's transaction
          * @param dao
          */
+        @Override
         public void approve(final UserAccount userAccount, History history, DAO dao) {
 
             /*
@@ -210,7 +239,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
              */
             ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO(dao.getEntityManager());
 
-            concept = conceptDAO.merge(concept);
+            concept = conceptDAO.find(concept);
 
             Collection<Concept> conceptsToBeDeleted = conceptDAO.findDescendents(concept);
 

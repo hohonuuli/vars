@@ -21,6 +21,7 @@ public abstract class AbstractHistoryTask {
      * @return
      */
     public abstract void doTask(final UserAccount userAccount, final History history);
+
     
     /**
      * Called when an error occurs where the history is void. Gets rid of the 

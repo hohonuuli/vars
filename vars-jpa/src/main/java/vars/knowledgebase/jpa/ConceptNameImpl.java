@@ -68,7 +68,7 @@ import vars.knowledgebase.ConceptName;
     @NamedQuery(name = "ConceptName.findByNameType",
                 query = "SELECT c FROM ConceptName c WHERE c.nameType = :nameType") ,
     @NamedQuery(name = "ConceptName.findAll", query = "SELECT c FROM ConceptName c") ,
-    @NamedQuery(name = "ConceptName.findByNameLike", query = "SELECT c FROM ConceptName c WHERE c.name LIKE :name")
+    @NamedQuery(name = "ConceptName.findByNameLike", query = "SELECT c FROM ConceptName c WHERE lower(c.name) LIKE :name ORDER BY c.name")
 
 })
 public class ConceptNameImpl implements Serializable, ConceptName, JPAEntity {

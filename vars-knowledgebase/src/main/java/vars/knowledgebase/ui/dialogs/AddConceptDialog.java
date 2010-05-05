@@ -1,7 +1,8 @@
 /*
- * @(#)AddConceptDialog.java   2009.10.02 at 04:53:59 PDT
+ * @(#)AddConceptDialog.java   2010.05.05 at 09:34:40 PDT
  *
  * Copyright 2009 MBARI
+ *
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,7 +22,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.swing.ImageIcon;
 import org.bushe.swing.event.EventBus;
 import org.mbari.util.Dispatcher;
@@ -49,14 +49,12 @@ public class AddConceptDialog extends javax.swing.JDialog {
 
     private static final long serialVersionUID = 6993327643414741677L;
     private static final Logger log = LoggerFactory.getLogger(AddConceptDialog.class);
-    private final AddConceptDialogController controller;
-    final ToolBelt toolBelt;
- 
     private javax.swing.JTextField authorField;
     private javax.swing.JLabel authorLabel;
     private javax.swing.JButton cancelButton;
     private Concept concept;
     private javax.swing.JComboBox conceptComboBox;
+    private final AddConceptDialogController controller;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -72,22 +70,22 @@ public class AddConceptDialog extends javax.swing.JDialog {
     private javax.swing.JComboBox rankNameComboBox;
     private javax.swing.JTextArea referenceText;
     private javax.swing.JTextArea titleText;
-
+    final ToolBelt toolBelt;
 
     /**
      * Creates new form AddConceptDialog
      *
-     * @param approveHistoryTask
-     * @param knowledgebaseDAOFactory
-     * @param knowledgebaseFactory
-     * @param queryDAO
+     *
+     * @param toolBelt
      */
     @Inject
     public AddConceptDialog(ToolBelt toolBelt) {
         super((Frame) Lookup.getApplicationFrameDispatcher().getValueObject(), true);
+
         if (toolBelt == null) {
             throw new IllegalArgumentException("ToolBelt argument can not be null");
         }
+
         this.toolBelt = toolBelt;
         controller = new AddConceptDialogController(toolBelt);
         initComponents();
@@ -96,16 +94,16 @@ public class AddConceptDialog extends javax.swing.JDialog {
         pack();
     }
 
-    private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {    
+    private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {
         setVisible(false);
         setConcept(null);
-    }                                                                     
+    }
 
-    private void cancelButtonKeyReleased(java.awt.event.KeyEvent evt) {    
+    private void cancelButtonKeyReleased(java.awt.event.KeyEvent evt) {
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
             cancelButtonActionPerformed(null);
         }
-    }    
+    }
 
     /**
      * @return  the conceptComboBox
@@ -114,7 +112,7 @@ public class AddConceptDialog extends javax.swing.JDialog {
         return conceptComboBox;
     }
 
-     private void initComponents() {
+    private void initComponents() {
         nameLabel = new javax.swing.JLabel();
         authorLabel = new javax.swing.JLabel();
         authorField = new javax.swing.JTextField();
@@ -140,7 +138,8 @@ public class AddConceptDialog extends javax.swing.JDialog {
 
         authorLabel.setText("Parent:");
 
-        authorField.setToolTipText("(OPTIONAL) The author is the person who first described this species in the scientific literature");
+        authorField.setToolTipText(
+            "(OPTIONAL) The author is the person who first described this species in the scientific literature");
 
         nameField.setToolTipText("The primary name to be used for this concept.");
 
@@ -154,29 +153,37 @@ public class AddConceptDialog extends javax.swing.JDialog {
         cancelButton.setIcon(new ImageIcon(getClass().getResource("/images/vars/knowledgebase/delete2.png")));
 
         cancelButton.addActionListener(new java.awt.event.ActionListener() {
+
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cancelButtonActionPerformed(evt);
             }
+
         });
         cancelButton.addKeyListener(new java.awt.event.KeyAdapter() {
+
             @Override
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 cancelButtonKeyReleased(evt);
             }
+
         });
 
         okButton.setText("OK");
         okButton.setIcon(new ImageIcon(getClass().getResource("/images/vars/knowledgebase/check2.png")));
         okButton.addActionListener(new java.awt.event.ActionListener() {
+
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 okButtonActionPerformed(evt);
             }
+
         });
         okButton.addKeyListener(new java.awt.event.KeyAdapter() {
+
             @Override
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 okButtonKeyReleased(evt);
             }
+
         });
 
         jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -186,13 +193,15 @@ public class AddConceptDialog extends javax.swing.JDialog {
         titleText.setLineWrap(true);
         titleText.setEditable(false);
         titleText.setRows(5);
-        titleText.setText("Create/edit a concept. You must provide a name and select the parent concept. All other fields are optional.");
+        titleText.setText(
+            "Create/edit a concept. You must provide a name and select the parent concept. All other fields are optional.");
         titleText.setFocusable(false);
         jScrollPane1.setViewportView(titleText);
 
         jLabel1.setText("Nodc Code:");
 
-        nodcField.setToolTipText("(OPTIONAL) The nodc code is also called the Taxonomic Serial Number. More information can be found at http://www.itis.usda.gov");
+        nodcField.setToolTipText(
+            "(OPTIONAL) The nodc code is also called the Taxonomic Serial Number. More information can be found at http://www.itis.usda.gov");
 
         jLabel2.setText("Rank Name:");
 
@@ -202,10 +211,13 @@ public class AddConceptDialog extends javax.swing.JDialog {
 
         referenceText.setColumns(20);
         referenceText.setRows(5);
-        referenceText.setToolTipText("(OPTIONAL) A reference to literature that contains a description of this concept.");
+        referenceText.setToolTipText(
+            "(OPTIONAL) A reference to literature that contains a description of this concept.");
         jScrollPane2.setViewportView(referenceText);
 
-        rankNameComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "", "kingdom", "phylum", "class", "order", "family", "genus", "species" }));
+        rankNameComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] {
+            "", "kingdom", "phylum", "class", "order", "family", "genus", "species"
+        }));
         rankNameComboBox.setToolTipText("(OPTIONAL) The taxonomic rank");
 
         rankLevelComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "", "infra", "sub", "super" }));
@@ -285,7 +297,7 @@ public class AddConceptDialog extends javax.swing.JDialog {
                 .addContainerGap())
         );
         pack();
-    }// </editor-fold>//GEN-END:initComponents
+    }    // </editor-fold>//GEN-END:initComponents
 
     private void initModel() {
 
@@ -333,10 +345,10 @@ public class AddConceptDialog extends javax.swing.JDialog {
         setVisible(false);
 
         try {
-        	if (concept == null) {
+            if (concept == null) {
                 concept = controller.createConcept();
             }
-        	else {
+            else {
                 controller.updateConcept(concept);
             }
         }
@@ -347,14 +359,18 @@ public class AddConceptDialog extends javax.swing.JDialog {
 
         setConcept(null);
 
-    }                                                                  
+    }
 
-    private void okButtonKeyReleased(java.awt.event.KeyEvent evt) {    
+    private void okButtonKeyReleased(java.awt.event.KeyEvent evt) {
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
             okButtonActionPerformed(null);
         }
-    }    
+    }
 
+    /**
+     *
+     * @param concept
+     */
     public void setConcept(Concept concept) {
         this.concept = concept;
 
@@ -382,6 +398,10 @@ public class AddConceptDialog extends javax.swing.JDialog {
 
     }
 
+    /**
+     *
+     * @param b
+     */
     @Override
     public void setVisible(boolean b) {
         if (b) {
@@ -397,25 +417,31 @@ public class AddConceptDialog extends javax.swing.JDialog {
 
         /**
          * Constructs ...
+         *
+         * @param toolBelt
          */
         public AddConceptDialogController(ToolBelt toolBelt) {
             this.toolBelt = toolBelt;
 
         }
 
+        /**
+         * @return
+         */
         public Concept createConcept() {
 
             /*
              * Get the parent concept
              */
             Concept concept = null;
-            
+
             // DAOTX
             ConceptDAO dao = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
             dao.startTransaction();
             Concept parentConcept = dao.findByName((String) getConceptComboBox().getSelectedItem());
 
             if (parentConcept == null) {
+
                 // TODO brian: Make sure that there are no existing root concepts
                 throw new VARSException("No parent Concept was specified. You MUST Specify a parent Concept");
             }
@@ -426,7 +452,7 @@ public class AddConceptDialog extends javax.swing.JDialog {
             UserAccount userAccount = (UserAccount) GlobalLookup.getUserAccountDispatcher().getValueObject();
 
             String primaryName = nameField.getText();
-            if (userAccount != null && primaryName != null) {
+            if ((userAccount != null) && (primaryName != null)) {
 
                 // Do not add a concept with a name that already exists in the database
                 Concept existingConcept = dao.findByName(primaryName);
@@ -442,7 +468,7 @@ public class AddConceptDialog extends javax.swing.JDialog {
                     conceptName.setNameType(ConceptNameTypes.PRIMARY.toString());
                     concept.addConceptName(conceptName);
                     concept.setOriginator(userAccount.getUserName());
-                    
+
                     parentConcept.addChildConcept(concept);
                     dao.persist(concept);
 
@@ -450,12 +476,13 @@ public class AddConceptDialog extends javax.swing.JDialog {
                     History history = toolBelt.getHistoryFactory().add(userAccount, concept);
                     parentConcept.getConceptMetadata().addHistory(history);
                     dao.persist(history);
-                    
+
                     EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
-                    
+
                 }
                 else {
-                	EventBus.publish(Lookup.TOPIC_WARNING, "The name '" + primaryName + "' already exists in the database.");
+                    EventBus.publish(Lookup.TOPIC_WARNING,
+                                     "The name '" + primaryName + "' already exists in the database.");
                 }
 
             }
@@ -475,12 +502,12 @@ public class AddConceptDialog extends javax.swing.JDialog {
              */
             ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
             conceptDAO.startTransaction();
-            concept = conceptDAO.merge(concept);
+            concept = conceptDAO.find(concept);
             Concept oldParentConcept = concept.getParentConcept();
-            
+
             final Concept newParentConcept = conceptDAO.findByName(parentName);
             boolean hasDescendent = concept.hasDescendent(parentName);
- 
+
             /*
              * Make sure that you didn't tyr to add it to a descendant
              */
@@ -500,8 +527,6 @@ public class AddConceptDialog extends javax.swing.JDialog {
                 History history1 = historyFactory.replaceParentConcept(userAccount, oldParentConcept, newParentConcept);
                 concept.getConceptMetadata().addHistory(history1);
                 conceptDAO.persist(history1);
-                conceptDAO.endTransaction();
-
                 histories.add(history1);
             }
 
@@ -515,7 +540,8 @@ public class AddConceptDialog extends javax.swing.JDialog {
                 concept.getConceptMetadata().addHistory(history2);
                 conceptDAO.persist(history2);
                 concept.setNodcCode(nodcCode);
-                //histories.add(history2);
+
+                histories.add(history2);
             }
 
             final String oldRankName = concept.getRankName();
@@ -528,7 +554,8 @@ public class AddConceptDialog extends javax.swing.JDialog {
                 concept.getConceptMetadata().addHistory(history3);
                 concept.setRankName(rankName);
                 conceptDAO.persist(history3);
-                //histories.add(history3);
+
+                histories.add(history3);
             }
 
             final String oldRankLevel = concept.getRankLevel();
@@ -542,7 +569,7 @@ public class AddConceptDialog extends javax.swing.JDialog {
                 concept.setRankLevel(rankLevel);
                 conceptDAO.persist(history4);
 
-                //histories.add(history4);
+                histories.add(history4);
             }
 
             final String oldReference = concept.getReference();
@@ -553,7 +580,8 @@ public class AddConceptDialog extends javax.swing.JDialog {
                 concept.getConceptMetadata().addHistory(history5);
                 concept.setReference(reference);
                 conceptDAO.persist(history5);
-                //histories.add(history5);
+
+                histories.add(history5);
             }
 
             final String author = authorField.getText();
@@ -564,16 +592,25 @@ public class AddConceptDialog extends javax.swing.JDialog {
             else {
                 primaryName.setAuthor(null);
             }
+
             conceptDAO.endTransaction();
-            
+
+            EventBus.publish(Lookup.TOPIC_APPROVE_HISTORIES, histories);
+
             /*
-             *  TODO We aren't automatically approving all histories. This sometimes causes a 
+             *  TODO We aren't automatically approving all histories. This sometimes causes a
              *  concurrent modification exception in the knowledbase. So we add all the histories
              *  but only approve any change in parents.
              */
-            for (History history : histories) {
-                EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
-            }
+//            for (History history : histories) {
+//                EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
+//            }
+//
+//            // Adding the change parent history triggers a refresh. But if we
+//            // make other changes we need to trigger a refresh manually
+//            if (histories.size() == 0) {
+//                EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, primaryName.getName());
+//            }
 
         }
     }

@@ -22,20 +22,13 @@ import java.awt.Toolkit;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.EventTopicSubscriber;
-import org.jdesktop.swingx.JXErrorPane;
-import org.jdesktop.swingx.error.ErrorInfo;
-import org.jdesktop.swingx.error.ErrorLevel;
 import org.mbari.awt.WaitCursorEventQueue;
 import org.mbari.swing.SplashFrame;
 import org.mbari.util.Dispatcher;
@@ -44,6 +37,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ui.actions.PopulateDatabaseAction;
+import vars.shared.ui.event.ExitTopicSubscriber;
+import vars.shared.ui.event.FatalExceptionSubscriber;
+import vars.shared.ui.event.NonFatalErrorSubscriber;
 
 /**
  *
@@ -55,107 +51,28 @@ public class App {
     private KnowledgebaseFrame knowledgebaseFrame;
     private final ToolBelt toolBelt;
     private final EventTopicSubscriber approveHistorySubscriber;
+    private final EventTopicSubscriber approveHistoriesSubscriber;
 
-        /**
+    /**
      * To loosely couple our components, I'm using an event bus to
      * monitor for shutdown messages. We need to hang on to the reference
      * to the EventTopicSubscriber so that it doesn't get garbage collected.
      *
      * This subscriber handles shutdown.
      */
-    private final EventTopicSubscriber exitSubscriber = new EventTopicSubscriber() {
-
-        public void onEvent(String topic, Object data) {
-            System.exit(0);
-        }
-    };
+    private final EventTopicSubscriber exitSubscriber = new ExitTopicSubscriber();
 
 
     /**
      * This subscriber displays and logs non-fatal errors
      */
-    private final EventTopicSubscriber nonFatalErrorSubscriber = new EventTopicSubscriber() {
-
-        public void onEvent(String topic, Object error) {
-
-            String msg = "An error occurred. Refer to details for more information.";
-            String details = null;
-            Throwable data = null;
-            if (error instanceof Throwable) {
-                data = (Throwable) error;
-                details = formatStackTraceForDialogs(data, true);
-            }
-            else {
-                details = error.toString();
-            }
-
-            /*
-             * Create an error pane to display the error stuff
-             */
-            JXErrorPane errorPane = new JXErrorPane();
-            Icon errorIcon = new ImageIcon(getClass().getResource("/images/yellow-smile.jpg"));
-            ErrorInfo errorInfo = new ErrorInfo("VARS - Something exceptional occured (and we don't like that)", msg, details, null, data, ErrorLevel.WARNING, null);
-            errorPane.setIcon(errorIcon);
-            errorPane.setErrorInfo(errorInfo);
-            JXErrorPane.showDialog((JFrame) Lookup.getApplicationFrameDispatcher().getValueObject(), errorPane);
-        }
-    };
+    private final EventTopicSubscriber nonFatalErrorSubscriber;
 
     /**
      * This subscriber should display a warning message on a fatal error. When
      * the OK button is clicked a notification to the EXIT_TOPIC should be sent
      */
-    private final EventTopicSubscriber fatalErrorSubscriber = new EventTopicSubscriber() {
-
-        public void onEvent(String topic, Object error) {
-
-            String msg = randomHaiku();
-            String details = null;
-            Throwable data = null;
-            if (error instanceof Throwable) {
-                data = (Throwable) error;
-                details = formatStackTraceForDialogs(data, true);
-            }
-            else {
-                details = error.toString();
-            }
-
-            /*
-             * Create an error pane to display the error stuff
-             */
-            JXErrorPane errorPane = new JXErrorPane();
-            Icon errorIcon = new ImageIcon(getClass().getResource("/images/red-frown_small.png"));
-            ErrorInfo errorInfo = new ErrorInfo("VARS - Fatal Error", msg, details, null, data, ErrorLevel.FATAL, null);
-            errorPane.setIcon(errorIcon);
-            errorPane.setErrorInfo(errorInfo);
-            JXErrorPane.showDialog((JFrame) Lookup.getApplicationFrameDispatcher().getValueObject(), errorPane);
-
-        }
-
-
-
-        String randomHaiku() {
-            final List<String> haikus = new ArrayList<String>() {{
-                add("Chaos reigns within.\nReflect, repent, and restart.\nOrder shall return.");
-                add("Errors have occurred.\nWe won't tell you where or why.\nLazy programmers.");
-                add("A crash reduces\nyour expensive computer\nto a simple stone.");
-                add("There is a chasm\nof carbon and silicon\nthe software can't bridge");
-                add("Yesterday it worked\nToday it is not working\nSoftware is like that");
-                add("To have no errors\nWould be life without meaning\nNo struggle, no joy");
-                add("Error messages\ncannot completely convey.\nWe now know shared loss.");
-                add("The code was willing,\nIt considered your request,\nBut the chips were weak.");
-                add("Wind catches lily\nScatt'ring petals to the wind:\nApplication dies");
-                add("Three things are certain:\nDeath, taxes and lost data.\nGuess which has occurred.");
-                add("Rather than a beep\nOr a rude error message,\nThese words: \"Restart now.\"");
-                add("ABORTED effort:\nClose all that you have.\nYou ask way too much.");
-                add("The knowledgebase crashed.\nI am the Blue Screen of Death.\nNo one hears your screams.");
-                add("No-one can tell\nwhat God or Heaven will do\nIf you divide by zero.");
-            }};
-
-            return haikus.get((int) Math.floor(Math.random() * haikus.size()));
-
-        }
-    };
+    private final EventTopicSubscriber fatalErrorSubscriber;
 
     /**
      * Constructs ...
@@ -167,16 +84,30 @@ public class App {
         Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
         toolBelt = injector.getInstance(ToolBelt.class);
         approveHistorySubscriber = new ApproveHistorySubscriber(toolBelt.getApproveHistoryTask());
-
+        approveHistoriesSubscriber = new ApproveHistoriesSubscriber(toolBelt.getApproveHistoryTask());
+        // Temporary subscribers to show any error messages that occur during startup
+        EventTopicSubscriber tempFatalErrorSubscriber  = new FatalExceptionSubscriber(null);
+        EventTopicSubscriber tempNonFatalErrorSubscriber = new NonFatalErrorSubscriber(null);
+        
         /*
          * Subscribe to all our favorite topics
          */
         EventBus.subscribe(Lookup.TOPIC_APPROVE_HISTORY, approveHistorySubscriber);
+        EventBus.subscribe(Lookup.TOPIC_APPROVE_HISTORIES, approveHistoriesSubscriber);
         EventBus.subscribe(Lookup.TOPIC_EXIT, exitSubscriber);
+        EventBus.subscribe(Lookup.TOPIC_FATAL_ERROR, tempFatalErrorSubscriber);
+        EventBus.subscribe(Lookup.TOPIC_NONFATAL_ERROR, tempNonFatalErrorSubscriber);
+        
+        initialize();
+
+        // After the app is intialiazed, remove the temporary error subscribers
+        // and add the permanant ones
+        EventBus.unsubscribe(Lookup.TOPIC_FATAL_ERROR, tempFatalErrorSubscriber);
+        EventBus.unsubscribe(Lookup.TOPIC_NONFATAL_ERROR, tempNonFatalErrorSubscriber);
+        fatalErrorSubscriber  = new FatalExceptionSubscriber(getKnowledgebaseFrame());
+        nonFatalErrorSubscriber = new NonFatalErrorSubscriber(getKnowledgebaseFrame());
         EventBus.subscribe(Lookup.TOPIC_FATAL_ERROR, fatalErrorSubscriber);
         EventBus.subscribe(Lookup.TOPIC_NONFATAL_ERROR, nonFatalErrorSubscriber);
-
-        initialize();
 
         
 
@@ -375,32 +306,4 @@ public class App {
         });
     }
 
-       /**
-         * Defines a custom format for the stack trace as String.
-         */
-        String formatStackTraceForDialogs(Throwable throwable, boolean isCause) {
-
-            //add the class name and any message passed to constructor
-            final StringBuilder result = new StringBuilder();
-            result.append("<h2>");
-            if (isCause) {
-                result.append("Caused by: ");
-            }
-
-            result.append(throwable.toString()).append("</h2>");
-            final String newLine = "<br/>";
-
-            //add each element of the stack trace
-            for (StackTraceElement element : throwable.getStackTrace()) {
-                result.append(element);
-                result.append(newLine);
-            }
-
-            final Throwable cause = throwable.getCause();
-            if (cause != null) {
-                result.append(formatStackTraceForDialogs(cause, true));
-            }
-
-            return result.toString();
-        }
 }

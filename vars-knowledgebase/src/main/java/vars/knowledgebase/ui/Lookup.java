@@ -63,6 +63,8 @@ public class Lookup extends GlobalLookup {
     /** The data object should be a  History  */
     public static final String TOPIC_APPROVE_HISTORY = "vars.knowledgebase.ui.Lookup-ApproveHistory";
 
+    /** The data object should be a Collection<History> */
+    public static final String TOPIC_APPROVE_HISTORIES = "vars.knowledgebase.ui.Lookup-ApproveHistories";
 
     /** The data object should be a Concept */
     public static final String TOPIC_UPDATE_OBSERVATIONS = "vars.knowledgebase.ui.Lookup-UpateObservations";
@@ -134,6 +136,7 @@ public class Lookup extends GlobalLookup {
 
 
         EventBus.subscribe(TOPIC_APPROVE_HISTORY, LOGGING_SUBSCRIBER);
+        EventBus.subscribe(TOPIC_APPROVE_HISTORIES, LOGGING_SUBSCRIBER);
         EventBus.subscribe(TOPIC_SELECTED_CONCEPT, LOGGING_SUBSCRIBER);
         EventBus.subscribe(TOPIC_UPDATE_OBSERVATIONS, LOGGING_SUBSCRIBER);
 

@@ -37,12 +37,12 @@ public class ConceptNameDAOImpl extends DAO implements ConceptNameDAO {
     }
 
     public Collection<ConceptName> findByNameContaining(final String substring) {
-        Map<String, Object> params = new HashMap<String, Object>() {{ put("name", "%" + substring + "%"); }};
+        Map<String, Object> params = new HashMap<String, Object>() {{ put("name", "%" + substring.toLowerCase() + "%"); }};
         return findByNamedQuery("ConceptName.findByNameLike", params);
     }
 
     public Collection<ConceptName> findByNameStartingWith(final String s) {
-        Map<String, Object> params = new HashMap<String, Object>() {{ put("name", s + "%"); }};
+        Map<String, Object> params = new HashMap<String, Object>() {{ put("name", s.toLowerCase() + "%"); }};
         return findByNamedQuery("ConceptName.findByNameLike", params);
     }
 }
