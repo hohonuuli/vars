@@ -29,11 +29,9 @@ import vars.UserAccount;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.History;
-import vars.knowledgebase.HistoryDAO;
 import vars.knowledgebase.HistoryFactory;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.LinkRealization;
-import vars.knowledgebase.LinkRealizationDAO;
 import vars.knowledgebase.ui.LinkEditorPanel;
 import vars.knowledgebase.ui.Lookup;
 import vars.knowledgebase.ui.ToolBelt;
@@ -196,7 +194,7 @@ public class AddLinkRealizationDialog extends JDialog {
 
                 DAO dao = knowledgebaseDAOFactory.newDAO();
                 dao.startTransaction();
-                c = dao.merge(c);
+                c = dao.find(c);
                 concept.getConceptMetadata().addLinkRealization(linkRealization);
                 dao.persist(linkRealization);
                 
@@ -210,9 +208,6 @@ public class AddLinkRealizationDialog extends JDialog {
 
                 EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
 
-                Dispatcher dispatcher = Lookup.getSelectedConceptDispatcher();
-                dispatcher.setValueObject(null);
-                dispatcher.setValueObject(c);
             }
             catch (Exception e) {
                 EventBus.publish(Lookup.TOPIC_WARNING, e);

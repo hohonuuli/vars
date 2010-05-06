@@ -255,21 +255,6 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
 
             });
 
-            /*
-             * If no items are selected in the list then we turn off the update
-             * and delete buttons
-             */
-            namesList.addListSelectionListener(new ListSelectionListener() {
-
-                public void valueChanged(ListSelectionEvent e) {
-                    boolean isItemSelected = (namesList.getSelectedIndex() > -1);
-                    if (!isItemSelected) {
-                        getUpdateButton().setEnabled(false);
-                        getDeleteButton().setEnabled(false);
-                    }
-                }
-
-            });
         }
 
         return namesList;
@@ -509,6 +494,8 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
     private void setSelectedConceptName(String name) {
         String author = "";
         String type = null;
+        boolean enableButtons = (name != null) && !isLocked();
+
         if (name == null) {
             name = "";
             type = ConceptNameTypes.SYNONYM.toString();
@@ -519,10 +506,12 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
             type = conceptName.getNameType();
         }
 
+        boolean isPrimaryName = type.equals(ConceptNameTypes.PRIMARY.toString());
+
         getNameField().setText(name);
         getAuthorField().setText(author);
 
-        if (type.equals(ConceptNameTypes.PRIMARY.toString())) {
+        if (isPrimaryName) {
             getPrimaryRb().setSelected(true);
         }
         else if (type.equals(ConceptNameTypes.COMMON.toString())) {
@@ -536,6 +525,8 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
          * We don't allow changing the authro here for primary names. If it's a
          * primary name the update action will try
          */
-        getAuthorField().setEditable(!type.equals(ConceptNameTypes.PRIMARY.toString()));
+        getAuthorField().setEditable(!isPrimaryName);
+        getUpdateButton().setEnabled(enableButtons);
+        getDeleteButton().setEnabled(enableButtons && !isPrimaryName);
     }
 }

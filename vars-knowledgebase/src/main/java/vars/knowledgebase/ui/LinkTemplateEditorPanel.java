@@ -340,10 +340,11 @@ public class LinkTemplateEditorPanel extends EditorPanel {
                                     }
                                 }
                             }
-
+                            EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, newFromConceptName);
                             return null;
                         }
                     });
+
                     waitIndicator.dispose();
 
                 }

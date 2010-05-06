@@ -120,6 +120,7 @@ public class KnowledgebaseFrame extends JFrame {
             final JButton lockButton = conceptPanel.getLockButton();
             lockButton.addActionListener(getLoginAction());
 
+
             /*
              * When an account is set the tooltip text shoudl tell us what user
              */
@@ -179,7 +180,7 @@ public class KnowledgebaseFrame extends JFrame {
     }
 
     /**
-     * The default LoginAction jsut logins in. For this application we want it
+     * The default LoginAction just logins in. For this application we want it
      * to toggle the state of the lock. i.e If the user is already logged in we
      * want it to log out.
      * @return  A subclass of LoginAction
@@ -194,6 +195,7 @@ public class KnowledgebaseFrame extends JFrame {
                         super.doAction();
                     }
                     else {
+                        lockAction.setLocked(true);
                         EventBus.publish(Lookup.TOPIC_USERACCOUNT, null);
                     }
                 }

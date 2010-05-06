@@ -304,10 +304,7 @@ public class ConceptPanel extends JPanel {
         /*
          * Toggle the icon as appropriate
          */
-        Icon lockIcon = lockedIcon;
-        if (!locked) {
-            lockIcon = unlockedIcon;
-        }
+        Icon lockIcon = locked ? lockedIcon : unlockedIcon;
         getLockButton().setIcon(lockIcon);
         
         String userText = "Not logged in";

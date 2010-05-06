@@ -35,7 +35,6 @@ import vars.annotation.ui.video.ImageCaptureAction;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.video.VideoControlService;
 import vars.shared.ui.FancyButton;
-import vars.shared.ui.video.FakeImageCaptureServiceImpl;
 import vars.shared.ui.video.ImageCaptureService;
 
 /**

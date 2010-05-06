@@ -21,6 +21,7 @@ import java.util.prefs.Preferences;
 
 /**
  * Class with convienience methods for reading and writing
+ * @deprecated 
  * @author brian
  */
 public class UserAccountService {

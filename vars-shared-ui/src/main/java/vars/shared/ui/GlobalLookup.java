@@ -63,6 +63,12 @@ public class GlobalLookup {
     
     private static File settingsDirectory;
     
+    private static final EventTopicSubscriber userAccountSubscriber = new EventTopicSubscriber<UserAccount>() {
+        public void onEvent(String topic, UserAccount data) {
+            getUserAccountDispatcher().setValueObject(data);
+        }
+    };
+
     /*
      * Throw an exception if the wrong parameter type is set
      */
@@ -84,7 +90,7 @@ public class GlobalLookup {
         getUserAccountDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 Object obj = evt.getNewValue();
-                if (!(obj instanceof UserAccount)) {
+                if (obj != null && !(obj instanceof UserAccount)) {
                     throw new IllegalArgumentException("Required: " +
                             UserAccount.class.getName() + ", Found: " + obj.getClass().getName());
                 }
@@ -95,12 +101,7 @@ public class GlobalLookup {
          * When a UserAccount is sent to this topic on event bus make sure it gets
          * relayed to the correct Dispatcher
          */
-        EventBus.subscribe(TOPIC_USERACCOUNT, new EventTopicSubscriber<UserAccount>() {
-            public void onEvent(String topic, UserAccount data) {
-                getUserAccountDispatcher().setValueObject(data);
-            }
-        });
-        
+        EventBus.subscribe(TOPIC_USERACCOUNT, userAccountSubscriber);
         
         /*
          * Create an application settings directory if needed and create the log directory

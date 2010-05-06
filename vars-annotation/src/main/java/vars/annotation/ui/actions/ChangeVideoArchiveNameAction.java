@@ -52,6 +52,7 @@ public class ChangeVideoArchiveNameAction extends OpenVideoArchiveUsingParamsAct
     /**
      *  Initiates the action.
      */
+    @Override
     public void doAction() {
         if (!verifyParams()) {
             return;

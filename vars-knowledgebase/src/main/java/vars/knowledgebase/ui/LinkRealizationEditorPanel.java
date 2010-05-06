@@ -1,7 +1,8 @@
 /*
- * @(#)LinkRealizationEditorPanel.java   2009.10.26 at 10:54:16 PDT
+ * @(#)LinkRealizationEditorPanel.java   2010.05.05 at 01:59:46 PDT
  *
  * Copyright 2009 MBARI
+ *
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,20 +18,15 @@ package vars.knowledgebase.ui;
 import foxtrot.Job;
 import foxtrot.Worker;
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
-
 import javax.swing.BorderFactory;
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -40,7 +36,6 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -54,13 +49,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.DAO;
 import vars.ILink;
-import vars.LinkBean;
-import vars.LinkUtilities;
 import vars.UserAccount;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptMetadata;
-import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.ConceptNameTypes;
 import vars.knowledgebase.History;
 import vars.knowledgebase.LinkRealization;
@@ -86,7 +78,6 @@ public class LinkRealizationEditorPanel extends EditorPanel {
     private static final Logger log = LoggerFactory.getLogger(LinkRealizationEditorPanel.class);
     private static final Concept SELF_CONCEPT = new SimpleConceptBean(new SimpleConceptNameBean(ILink.VALUE_SELF,
         ConceptNameTypes.PRIMARY.toString()));
-    private static final ILink NIL_LINKREALIZATION = new LinkBean(ILink.VALUE_NIL, ILink.VALUE_NIL, ILink.VALUE_NIL);
     private static final Concept NIL_CONCEPT = new SimpleConceptBean(new SimpleConceptNameBean(ILink.VALUE_NIL,
         ConceptNameTypes.PRIMARY.toString()));
     private EditorButtonPanel editorButtonPanel = null;
@@ -224,7 +215,6 @@ public class LinkRealizationEditorPanel extends EditorPanel {
         return linkEditorPanel;
     }
 
-
     private JTextField getLinkField() {
         if (linkField == null) {
             linkField = new JTextField();
@@ -262,13 +252,12 @@ public class LinkRealizationEditorPanel extends EditorPanel {
                     getEditorButtonPanel().getUpdateButton().setEnabled(enable);
                 }
             });
-            
+
             linkList.setCellRenderer(new LinkListCellRenderer());
         }
 
         return linkList;
     }
-
 
     private JScrollPane getLinkValueScrollPane() {
         if (linkValueScrollPane == null) {
@@ -279,7 +268,6 @@ public class LinkRealizationEditorPanel extends EditorPanel {
         return linkValueScrollPane;
     }
 
- 
     private JTextArea getLinkValueTextArea() {
         if (linkValueTextArea == null) {
             linkValueTextArea = new JTextArea();
@@ -354,6 +342,10 @@ public class LinkRealizationEditorPanel extends EditorPanel {
         this.add(getEditorButtonPanel(), BorderLayout.SOUTH);
     }
 
+    /**
+     *
+     * @param concept
+     */
     @Override
     public void setConcept(Concept concept) {
         getLinkList().clearSelection();
@@ -366,6 +358,10 @@ public class LinkRealizationEditorPanel extends EditorPanel {
         }
     }
 
+    /**
+     *
+     * @param locked
+     */
     @Override
     public void setLocked(boolean locked) {
         super.setLocked(locked);
@@ -421,12 +417,14 @@ public class LinkRealizationEditorPanel extends EditorPanel {
             /*
              * Find the LinkTemplate that the LinkRealization is based on.
              */
+
             // DAOTX
             LinkTemplateDAO linkTemplateDAO = getToolBelt().getKnowledgebaseDAOFactory().newLinkTemplateDAO();
             linkTemplateDAO.startTransaction();
             LinkRealization linkRealization = linkTemplateDAO.find(link);
             Concept toConcept = linkRealization.getConceptMetadata().getConcept();
-            Collection<LinkTemplate> matchingLinkTemplates = linkTemplateDAO.findAllByLinkName(link.getLinkName(), toConcept);
+            Collection<LinkTemplate> matchingLinkTemplates = linkTemplateDAO.findAllByLinkName(link.getLinkName(),
+                toConcept);
             linkTemplateDAO.endTransaction();
 
             /*
@@ -464,7 +462,8 @@ public class LinkRealizationEditorPanel extends EditorPanel {
                     }
                     else {
                         try {
-                        	// DAOTX
+
+                            // DAOTX
                             ConceptDAO conceptDAO = getToolBelt().getKnowledgebaseDAOFactory().newConceptDAO();
                             conceptDAO.startTransaction();
                             concept = conceptDAO.findByName(fToConceptAsString);
@@ -484,12 +483,14 @@ public class LinkRealizationEditorPanel extends EditorPanel {
 
                     final Concept fSelectedConcept = selectedConcept;
                     SwingUtilities.invokeLater(new Runnable() {
-						public void run() {
-							cb.setSelectedItem(fSelectedConcept.getPrimaryConceptName());
-							cb.repaint();
-						}
-					});
-                    
+
+                        public void run() {
+                            cb.setSelectedItem(fSelectedConcept.getPrimaryConceptName().getName());
+                            cb.repaint();
+                        }
+
+                    });
+
 
                     return null;    // TODO Verify this default implementation is correct
                 }
@@ -497,8 +498,8 @@ public class LinkRealizationEditorPanel extends EditorPanel {
             waitIndicator.dispose();
         }
 
-       log.debug("Update with {} is complete", link);
-        
+        log.debug("Update with {} is complete", link);
+
     }
 
     private class ANewAction extends ActionAdapter {
@@ -538,6 +539,8 @@ public class LinkRealizationEditorPanel extends EditorPanel {
                 this.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
             }
 
+            /**
+             */
             @Override
             public void onOkClick() {
 
@@ -550,7 +553,8 @@ public class LinkRealizationEditorPanel extends EditorPanel {
                 concept.getConceptMetadata().addLinkRealization(linkRealization);
 
                 try {
-                    LinkRealizationDAO linkRealizationDAO = getToolBelt().getKnowledgebaseDAOFactory().newLinkRealizationDAO();
+                    LinkRealizationDAO linkRealizationDAO = getToolBelt().getKnowledgebaseDAOFactory()
+                        .newLinkRealizationDAO();
                     linkRealizationDAO.persist(linkRealization);
                 }
                 catch (Exception e) {
@@ -566,6 +570,8 @@ public class LinkRealizationEditorPanel extends EditorPanel {
 
     private class DeleteAction extends ActionAdapter {
 
+        /**
+         */
         @Override
         public void doAction() {
             final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
@@ -585,13 +591,6 @@ public class LinkRealizationEditorPanel extends EditorPanel {
                     dao.endTransaction();
 
                     EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
-
-                    /*
-                     * Trigger a redraw
-                     */
-                    Dispatcher dispatcher = Dispatcher.getDispatcher(Concept.class);
-                    dispatcher.setValueObject(null);
-                    dispatcher.setValueObject(conceptDelegate.getConcept());
                 }
             }
         }
@@ -603,6 +602,8 @@ public class LinkRealizationEditorPanel extends EditorPanel {
         private final AddLinkRealizationDialog dialog = new AddLinkRealizationDialog(
             (Frame) Lookup.getApplicationFrameDispatcher().getValueObject(), getToolBelt());
 
+        /**
+         */
         public void doAction() {
             dialog.setConcept(getConcept());
             dialog.setVisible(true);
@@ -612,6 +613,8 @@ public class LinkRealizationEditorPanel extends EditorPanel {
 
     private class UpdateAction extends ActionAdapter {
 
+        /**
+         */
         @Override
         public void doAction() {
             final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
@@ -649,7 +652,7 @@ public class LinkRealizationEditorPanel extends EditorPanel {
                 //. Update the current linkRealization
                 DAO dao = getToolBelt().getKnowledgebaseDAOFactory().newDAO();
                 dao.startTransaction();
-                linkRealization = dao.merge(linkRealization);
+                linkRealization = dao.find(linkRealization);
                 linkRealization.setLinkName(getLinkField().getText());
                 linkRealization.setToConcept(name);
                 linkRealization.setLinkValue(getLinkValueTextArea().getText());
@@ -663,12 +666,6 @@ public class LinkRealizationEditorPanel extends EditorPanel {
 
                 EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
 
-                /*
-                 * Trigger a redraw
-                 */
-                Dispatcher dispatcher = Lookup.getSelectedConceptDispatcher();
-                dispatcher.setValueObject(null);
-                dispatcher.setValueObject(linkRealization.getConceptMetadata().getConcept());
             }
         }
     }

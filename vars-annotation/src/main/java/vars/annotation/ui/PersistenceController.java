@@ -15,6 +15,9 @@
 
 package vars.annotation.ui;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -31,6 +34,7 @@ import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.AnnotationFactory;
 import vars.annotation.Association;
 import vars.annotation.AssociationDAO;
+import vars.annotation.CameraData;
 import vars.annotation.Observation;
 import vars.annotation.ObservationDAO;
 import vars.annotation.VideoArchive;
@@ -416,6 +420,88 @@ public class PersistenceController {
         Collection<Observation> updatedObservations = updateAndValidate(observations);
         updateUI(updatedObservations);    // update view
         return updatedObservations;
+    }
+
+    /**
+     * Changes the CameraData URL's that match the currently set local directory to
+     * use ther URL (image mapping target) defined in the uses preferences.
+     *
+     * @param videoArchive
+     * @param imageTarget The string name of the directory where the frames are saved into
+     * @return A Collection of CameraData objects whose URL's have been updated
+     *  in the database. (Returns the udpated instance)
+     */
+    public Collection<CameraData> updateCameraDataUrls(VideoArchive videoArchive, String imageTarget, String imageTargetMapping) throws MalformedURLException {
+        Collection<CameraData> cameraDatas = new ArrayList<CameraData>();
+        DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
+        dao.startTransaction();
+        Collection<VideoFrame> videoFrames = videoArchive.getVideoFrames();
+        File imageTargetFile = new File(imageTarget);
+        URL imageTargetUrl = imageTargetFile.toURI().toURL();
+        String imageTargetExternalForm = imageTargetUrl.toExternalForm();
+        URL imageTargetMappingUrl = new URL(imageTargetMapping);
+        for (VideoFrame videoFrame : videoFrames) {
+            CameraData cameraData = videoFrame.getCameraData();
+            cameraData = dao.find(cameraData);
+            String imageReference = cameraData.getImageReference();
+            if (imageReference != null && imageReference.startsWith(imageTargetExternalForm)) {
+                URL newUrl = fileToUrl(new File(imageReference), imageTargetFile, imageTargetMappingUrl);
+                cameraData.setImageReference(newUrl.toExternalForm());
+                cameraDatas.add(cameraData);
+            }
+        }
+        dao.endTransaction();
+        return cameraDatas;
+    }
+
+    /**
+     * Creates a URL of [image.archive.url]/[platform]/images/[dive]/filename from
+     * a file of [image.archive.dir]/[platform]/images/[dive]/filename
+     *
+     * @param  targetFile The File where the image that an image was copied to.
+     * @return  The URL that corresponds to the File targetFile.
+     * @exception  IllegalArgumentException Description of the Exception
+     * @throws  MalformedURLException
+     */
+    URL fileToUrl(final File targetFile, final File imageTarget, final URL imageTargetMapping) throws IllegalArgumentException, MalformedURLException {
+
+        // ---- Ensure that the file provided is located under the image archive directory
+        String targetPath = targetFile.getAbsolutePath();
+        final String rootPath = imageTarget.getAbsolutePath();
+        if (!targetPath.startsWith(rootPath)) {
+            throw new IllegalArgumentException("The file, " + targetPath +
+                                               ", is not located in the expected location, " + rootPath);
+        }
+
+
+        String postfix = targetPath.substring(rootPath.length(), targetPath.length());
+        final String[] parts = postfix.split("[\\\\\\\\,/]");
+        StringBuffer dstUrl = new StringBuffer(imageTargetMapping.toExternalForm());
+        boolean b = false;
+        for (int i = 0; i < parts.length; i++) {
+            if (!"".equals(parts[i])) {
+                if (b) {
+                    dstUrl.append("/");
+                }
+
+                dstUrl.append(parts[i]);
+                b = true;
+            }
+        }
+
+        String dstUrlString = dstUrl.toString().replaceAll(" ", "%20");    // Space break things
+
+        URL out = null;
+        try {
+            out = new URL(dstUrlString);
+        }
+        catch (Exception e) {
+            if (log.isWarnEnabled()) {
+                log.warn("Strings in Java suck!!!", e);
+            }
+        }
+
+        return out;
     }
 
     /**

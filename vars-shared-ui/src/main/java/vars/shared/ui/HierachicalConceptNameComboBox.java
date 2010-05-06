@@ -15,19 +15,14 @@
 
 package vars.shared.ui;
 
-import foxtrot.Task;
-import foxtrot.Worker;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.Collection;
-import java.util.List;
 import java.util.Vector;
-import java.util.concurrent.ExecutionException;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
-import org.bushe.swing.event.EventBus;
 import org.mbari.swing.SortedComboBoxModel;
 import org.mbari.swing.SpinningDialWaitIndicator;
 import org.mbari.swing.WaitIndicator;

@@ -146,6 +146,7 @@ public class UploadStillImageAction extends org.mbari.vars.annotation.locale.Upl
     /**
      * Description of the Method
      */
+    @Override
     public void doAction() {
         if ((videoArchive == null) || !isEnabled() || (uploadLocation == null)) {
             if (log.isWarnEnabled()) {
@@ -254,6 +255,7 @@ public class UploadStillImageAction extends org.mbari.vars.annotation.locale.Upl
     /**
      * @param  videoArchive The videoArchive to set.
      */
+    @Override
     public void setVideoArchive(VideoArchive videoArchive) {
         this.videoArchive = videoArchive;
 
