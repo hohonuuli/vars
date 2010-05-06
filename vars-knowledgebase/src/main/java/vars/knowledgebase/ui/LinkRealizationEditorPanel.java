@@ -44,7 +44,6 @@ import org.mbari.awt.event.ActionAdapter;
 import org.mbari.swing.ListListModel;
 import org.mbari.swing.SpinningDialWaitIndicator;
 import org.mbari.swing.WaitIndicator;
-import org.mbari.util.Dispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.DAO;
@@ -261,12 +260,13 @@ public class LinkRealizationEditorPanel extends EditorPanel {
 
     private JScrollPane getLinkValueScrollPane() {
         if (linkValueScrollPane == null) {
-            linkValueScrollPane = new JScrollPane();
-            linkValueScrollPane.setViewportView(getLinkValueTextArea());
+            linkValueScrollPane = new JScrollPane(getLinkValueTextArea());
+            //linkValueScrollPane.setPreferredSize(getLinkValueTextArea().getPreferredScrollableViewportSize());
         }
 
         return linkValueScrollPane;
     }
+
 
     private JTextArea getLinkValueTextArea() {
         if (linkValueTextArea == null) {
