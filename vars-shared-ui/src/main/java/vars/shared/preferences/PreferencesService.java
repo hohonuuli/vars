@@ -37,6 +37,7 @@ public class PreferencesService {
 
     private static final String PROP_IMAGETARGET = "imageTarget";
     private static final String PROP_IMAGETARGETMAPPING = "imageTargetMapping";
+    private static final String PROP_VCR_URL = "vcrUrl";
     private final File DEFAULT_IMAGETARGET;
     private final PreferencesFactory preferencesFactory;
     /** The name of the computer */
@@ -107,6 +108,47 @@ public class PreferencesService {
     }
 
     /**
+     * Retreive the port number used to access a networked VCR
+     * @param username UserAccount.getUserName()
+     * @param hostname preferencesService.getHostname()
+     * @return
+     */
+    public String findVcrPort(String username, String hostname) {
+        String fullUrl = findFullVcrUrl(username, hostname);
+        String[] parts = fullUrl.split(":");
+        return (parts.length > 1) ? parts[1] : "9000";
+    }
+
+    /**
+     * Retreive the hostname used to access a networked VCR
+     * @param username UserAccount.getUserName()
+     * @param hostname preferencesService.getHostname()
+     * @return
+     */
+    public String findVcrHostname(String username, String hostname) {
+        String fullUrl = findFullVcrUrl(username, hostname);
+        String[] parts = fullUrl.split(":");
+        return (parts.length >= 1) ? parts[0] : getHostname();
+    }
+
+    private String findFullVcrUrl(String username, String hostname) {
+        Preferences preferences = hostPrefs(username, hostname);
+        return preferences.get(PROP_VCR_URL, getHostname() + ":9000");
+    }
+
+    /**
+     * Save the UDP VCR's information
+     * @param username
+     * @param hostname
+     * @param vcrhost
+     * @param vcrport
+     */
+    public void persistVcrUrl(String username, String hostname, String vcrhost, String vcrport) {
+        Preferences preferences = hostPrefs(username, hostname);
+        preferences.put(PROP_VCR_URL, vcrhost + ":" + vcrport);
+    }
+
+    /**
      * Looks up the node that contains the preferences for the UserLookupService
      * given a username and hostname. THe node key is something like:
      * /[username]/simpa/annotation/UserLookupService/[hostname]
@@ -166,4 +208,6 @@ public class PreferencesService {
     public String getHostname() {
         return hostname;
     }
+
+
 }

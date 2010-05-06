@@ -143,7 +143,6 @@ public class App {
                     getAnnotationFrame().getController().updateCameraData(videoArchive);
                 }
 
-
                 super.onEvent(topic, data);
             }
 

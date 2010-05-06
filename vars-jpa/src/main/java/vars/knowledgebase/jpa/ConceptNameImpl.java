@@ -106,7 +106,7 @@ public class ConceptNameImpl implements Serializable, ConceptName, JPAEntity {
     @Column(
         name = "ConceptName",
         nullable = false,
-        length = 64,
+        length = 128,
         unique = true
     )
     String name;

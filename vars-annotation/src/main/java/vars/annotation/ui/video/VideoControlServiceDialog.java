@@ -1,5 +1,5 @@
 /*
- * @(#)VideoControlServiceDialog.java   2010.01.12 at 10:34:08 PST
+ * @(#)VideoControlServiceDialog.java   2010.05.06 at 02:35:25 PDT
  *
  * Copyright 2009 MBARI
  *
@@ -43,7 +43,7 @@ public class VideoControlServiceDialog extends StandardDialog {
     private JLabel lblSelectTimecodeSource;
     private JPanel panel;
     private JPanel rs422Panel;
-    private JPanel udpPanel;
+    private UDPConnectionPanel udpPanel;
 
     private enum Sources { RS422, UDP; }
 
@@ -85,6 +85,7 @@ public class VideoControlServiceDialog extends StandardDialog {
             for (Sources source : Sources.values()) {
                 comboBox.addItem(source);
             }
+
             //comboBox.addItem(Sources.UDP);
 
 
@@ -145,7 +146,10 @@ public class VideoControlServiceDialog extends StandardDialog {
         return rs422Panel;
     }
 
-    private JPanel getUdpPanel() {
+    /**
+     * @return
+     */
+    public UDPConnectionPanel getUdpPanel() {
         if (udpPanel == null) {
             udpPanel = new UDPConnectionPanel();
         }
@@ -193,5 +197,14 @@ public class VideoControlServiceDialog extends StandardDialog {
         });
 
         //pack();
+    }
+
+    /**
+     *
+     * @param hostname
+     * @param port
+     */
+    public void setUDPConnectionParameters(String hostname, String port) {
+        getUdpPanel().setConnectionParameters(hostname, port);
     }
 }

@@ -123,8 +123,10 @@ public class AnnotationFrameController implements PreferenceUpdater {
             public void propertyChange(final PropertyChangeEvent evt) {
                 Runnable runnable = new Runnable() {
                     public void run() {
-                        VideoArchive videoArchive = (VideoArchive) evt.getNewValue();
-                        updateCameraData(videoArchive);
+                        VideoArchive videoArchive = (VideoArchive) evt.getOldValue();
+                        if (videoArchive != null) {
+                            updateCameraData(videoArchive);
+                        }
                     }
                 };
 

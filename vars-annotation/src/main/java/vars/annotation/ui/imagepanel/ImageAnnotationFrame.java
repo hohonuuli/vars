@@ -153,11 +153,10 @@ public class ImageAnnotationFrame extends JFrame {
         URL url = null;
         try {
             url = new URL(videoFrame.getCameraData().getImageReference());
-
         }
         catch (Exception e) {
 
-            // Do nothing
+            log.info("Failed to display " + url, e);
         }
 
         if (url == null || !url.equals(imageUrl)) {

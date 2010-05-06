@@ -48,12 +48,14 @@ public class StatusLabelForVideoArchive extends StatusLabel {
     public StatusLabelForVideoArchive(ToolBelt toolBelt) {
         super();
         Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
+        final Dispatcher videoArchiveDispatcher = Lookup.getVideoArchiveDispatcher();
+
         dialog = new OpenVideoArchiveDialog(frame, toolBelt);
         dialog.getOkayButton().addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 dialog.setVisible(false);
                 VideoArchive videoArchive = dialog.openVideoArchive();
-                Lookup.getVideoArchiveDispatcher().setValueObject(videoArchive);
+                videoArchiveDispatcher.setValueObject(videoArchive);
             }
         });
 
@@ -62,15 +64,12 @@ public class StatusLabelForVideoArchive extends StatusLabel {
          * Listen for changes in the VideoArchive being annotated. When it changes update
          * the label text
          */
-        Dispatcher dispatcher = Lookup.getVideoArchiveDispatcher();
-        dispatcher.addPropertyChangeListener(new PropertyChangeListener() {
-
+        videoArchiveDispatcher.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 update((VideoArchive) evt.getNewValue());
             }
-
         });
-        update((VideoArchive) dispatcher.getValueObject());
+        update((VideoArchive) videoArchiveDispatcher.getValueObject());
 
 
         /*

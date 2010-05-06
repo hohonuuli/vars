@@ -177,11 +177,13 @@ public class FrameGrabPanel extends javax.swing.JPanel {
     public void setVideoFrame(final VideoFrame videoFrame) {
         VideoFrame oldVideoFrame = this.videoFrame;
         this.videoFrame = videoFrame;
+        final JImageUrlCanvas icanvas = getImageCanvas();
         if (videoFrame == null || !videoFrame.equals(oldVideoFrame)) {
             try {
-                getImageCanvas().setUrl(new URL(videoFrame.getCameraData().getImageReference()));
+                final URL imageReference = new URL(videoFrame.getCameraData().getImageReference());
+                icanvas.setUrl(imageReference);
             } catch (Exception ex) {
-                getImageCanvas().setUrl(null);
+                icanvas.setUrl(null);
             }
         }
         imageFrame.setVideoFrame(videoFrame);

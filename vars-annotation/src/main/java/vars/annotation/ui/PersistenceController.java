@@ -16,6 +16,7 @@
 package vars.annotation.ui;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DecimalFormat;
@@ -23,9 +24,11 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Vector;
+import java.util.logging.Level;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
+import org.mbari.net.URLUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.DAO;
@@ -444,7 +447,9 @@ public class PersistenceController {
             cameraData = dao.find(cameraData);
             String imageReference = cameraData.getImageReference();
             if (imageReference != null && imageReference.startsWith(imageTargetExternalForm)) {
-                URL newUrl = fileToUrl(new File(imageReference), imageTarget, imageTargetMapping);
+                URL imageReferenceURL = new URL(imageReference);
+                File imageReferenceFile = URLUtilities.toFile(imageReferenceURL);
+                URL newUrl = fileToUrl(imageReferenceFile, imageTarget, imageTargetMapping);
                 cameraData.setImageReference(newUrl.toExternalForm());
                 cameraDatas.add(cameraData);
             }
@@ -472,11 +477,20 @@ public class PersistenceController {
                                                ", is not located in the expected location, " + rootPath);
         }
 
-
+        // Chop off the part of the path that matches the image target
+        // e.g. /Target/MyDir with an image of /Target/MyDir/images/Tiburon/foo.png
+        // would yield a postfix of /images/Tiburon/foo.png
         String postfix = targetPath.substring(rootPath.length(), targetPath.length());
         final String[] parts = postfix.split("[\\\\\\\\,/]");
         StringBuffer dstUrl = new StringBuffer(imageTargetMapping.toExternalForm());
-        boolean b = false;
+
+        // Make sure the URL ends with "/"
+        if (!dstUrl.toString().endsWith("/")) {
+            dstUrl.append("/");
+        }
+
+        // Chain the parts into a new URL
+        boolean b = false; // Don't add "/" on the first loop iteration. It's already in the URL
         for (int i = 0; i < parts.length; i++) {
             if (!"".equals(parts[i])) {
                 if (b) {
@@ -520,7 +534,8 @@ public class PersistenceController {
      *  to selections (useful when you know none of the rows were selected)
      */
     public void updateUI(final Collection<Observation> observations, final boolean updateSelection) {
-        SwingUtilities.invokeLater(new Runnable() {
+
+        Runnable runnable = new Runnable() {
 
             public void run() {
 
@@ -549,7 +564,6 @@ public class PersistenceController {
                     }
                 }
 
-
                 /*
                  * We need to keep the RowEditorPanel in sync. Doing this
                  * explicitly is probably best to avoid weird unintended UI
@@ -567,8 +581,6 @@ public class PersistenceController {
                         }
                     }
                 }
-
-
 
                 if (updateSelection) {
                     Collection<Observation> selectedObservations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
@@ -594,7 +606,22 @@ public class PersistenceController {
                 }
 
             }
-        });
+        };
+
+        /*
+         * Execute on the proper thread.
+         */
+        if (SwingUtilities.isEventDispatchThread()) {
+            runnable.run();
+        }
+        else {
+            try {
+                SwingUtilities.invokeAndWait(runnable);
+            } catch (Exception ex) {
+                log.warn("Failed to excecute updateUI() method on EDT", ex);
+            }
+        }
+
     }
 
     /**
@@ -610,10 +637,33 @@ public class PersistenceController {
             return;
         }
 
-        final ObservationTableModel model = (ObservationTableModel) ((JTable) observationTable).getModel();
+        Runnable runnable = new Runnable() {
 
-        // Remove the current contents
-        model.clear();
+            public void run() {
+                JTable table = observationTable.getJTable();
+                table.getSelectionModel().clearSelection();
+
+                // Remove the current contents of the table
+                final ObservationTableModel model = (ObservationTableModel) ((JTable) observationTable).getModel();
+                model.clear();
+
+            }
+        };
+
+        /*
+         * Clear the table on the proper thread
+         */
+        if (SwingUtilities.isEventDispatchThread()) {
+            runnable.run();
+        }
+        else {
+            try {
+                SwingUtilities.invokeAndWait(runnable);
+            } catch (Exception ex) {
+                log.warn("Failed to clear tabel model", ex);
+            }
+        }
+
 
         Collection<Observation> observations = new ArrayList<Observation>();
 
@@ -632,7 +682,7 @@ public class PersistenceController {
 
             dao.endTransaction();
 
-            updateUI(observations);
+            updateUI(observations, false);
         }
     }
 

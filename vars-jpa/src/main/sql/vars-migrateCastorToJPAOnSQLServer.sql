@@ -139,7 +139,7 @@ GO
 -- Allow case sensitive comparison. This is needed for the uc_ConceptName constraint to work correctly. 
 -- TODO need to drop any indices on this column first 
 ALTER TABLE ConceptName 
-    ALTER COLUMN ConceptName VARCHAR(50) COLLATE SQL_Latin1_General_CP1_CS_AS
+    ALTER COLUMN ConceptName VARCHAR(128) COLLATE SQL_Latin1_General_CP1_CS_AS
 GO
 
 ALTER TABLE ConceptName -- TODO fails unless case sensitive is added
