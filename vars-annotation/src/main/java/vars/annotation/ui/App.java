@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.AnnotationPersistenceService;
 import vars.annotation.Observation;
+import vars.annotation.VideoArchive;
 import vars.annotation.ui.video.VideoControlService;
 import vars.knowledgebase.Concept;
 import vars.shared.ui.GlobalLookup;
@@ -135,6 +136,13 @@ public class App {
                 catch (Exception e) {
                      log.warn("An error occurred while closing the video control services", e);
                 }
+
+                // Update local image URL's to http URL's before you exit
+                VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+                if (videoArchive != null) {
+                    getAnnotationFrame().getController().updateCameraData(videoArchive);
+                }
+
 
                 super.onEvent(topic, data);
             }

@@ -11,6 +11,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import java.util.Collection;
 import java.util.prefs.Preferences;
 import java.util.prefs.PreferencesFactory;
 import javax.swing.SwingUtilities;
+import org.bushe.swing.event.EventBus;
 import org.mbari.swing.LabeledSpinningDialWaitIndicator;
 import org.mbari.swing.WaitIndicator;
 import org.slf4j.Logger;
@@ -25,7 +27,6 @@ import org.slf4j.LoggerFactory;
 import vars.CacheClearedEvent;
 import vars.CacheClearedListener;
 import vars.UserAccount;
-import vars.UserAccountService;
 import vars.VARSException;
 import vars.VarsUserPreferencesFactory;
 import vars.annotation.Observation;
@@ -113,21 +114,21 @@ public class AnnotationFrameController implements PreferenceUpdater {
         });
 
 
+        /*
+         * This listener updates the URL's of he image you;ve captured in
+         * a background thread.
+         */
         Lookup.getVideoArchiveDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
 
-            public void propertyChange(PropertyChangeEvent evt) {
-                VideoArchive videoArchive = (VideoArchive) evt.getNewValue();
-                PreferencesFactory preferencesFactory = Lookup.getPreferencesFactory();
-                UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
-                if (videoArchive != null && 
-                        preferencesFactory instanceof VarsUserPreferencesFactory &&
-                        userAccount != null) {
-                    VarsUserPreferencesFactory vpf = (VarsUserPreferencesFactory) preferencesFactory;
-                    PreferencesService preferencesService = new PreferencesService(vpf);
-                    File imageTarget = preferencesService.findImageTarget(userAccount.getUserName(), preferencesService.getHostname());
-                    URL imageTargetMapping = preferencesService.findImageTargetMapping(userAccount.getUserName());
-                    toolBelt.getPersistenceController().updateCameraDataUrls(videoArchive, PREF_WIDTH, PREF_WIDTH)
-                }
+            public void propertyChange(final PropertyChangeEvent evt) {
+                Runnable runnable = new Runnable() {
+                    public void run() {
+                        VideoArchive videoArchive = (VideoArchive) evt.getNewValue();
+                        updateCameraData(videoArchive);
+                    }
+                };
+
+                new Thread(runnable).start();
 
             }
         });
@@ -186,6 +187,29 @@ public class AnnotationFrameController implements PreferenceUpdater {
             height = height <= screenSize.height ? height : screenSize.height;
             annotationFrame.setSize(width, height);
 
+        }
+    }
+
+    /**
+     * Updates the image URL's for all the CameraData objects in a VideoArchive
+     * so that local references are converted to http URL's
+     * @param videoArchive
+     */
+    public void updateCameraData(VideoArchive videoArchive) {
+        PreferencesFactory preferencesFactory = Lookup.getPreferencesFactory();
+        UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+        if (videoArchive != null &&
+                preferencesFactory instanceof VarsUserPreferencesFactory &&
+                userAccount != null) {
+            VarsUserPreferencesFactory vpf = (VarsUserPreferencesFactory) preferencesFactory;
+            PreferencesService preferencesService = new PreferencesService(vpf);
+            File imageTarget = preferencesService.findImageTarget(userAccount.getUserName(), preferencesService.getHostname());
+            URL imageTargetMapping = preferencesService.findImageTargetMapping(userAccount.getUserName());
+            try {
+                toolBelt.getPersistenceController().updateCameraDataUrls(videoArchive, imageTarget, imageTargetMapping);
+            } catch (MalformedURLException ex) {
+                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, ex);
+            }
         }
     }
 

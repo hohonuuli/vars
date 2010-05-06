@@ -427,25 +427,24 @@ public class PersistenceController {
      * use ther URL (image mapping target) defined in the uses preferences.
      *
      * @param videoArchive
-     * @param imageTarget The string name of the directory where the frames are saved into
+     * @param imageTarget The  directory where the frames are saved into
+     * @param imageTargetMapping The URL that maps imageTarget onto a web server
      * @return A Collection of CameraData objects whose URL's have been updated
      *  in the database. (Returns the udpated instance)
      */
-    public Collection<CameraData> updateCameraDataUrls(VideoArchive videoArchive, String imageTarget, String imageTargetMapping) throws MalformedURLException {
+    public Collection<CameraData> updateCameraDataUrls(VideoArchive videoArchive, File imageTarget, URL imageTargetMapping) throws MalformedURLException {
         Collection<CameraData> cameraDatas = new ArrayList<CameraData>();
         DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
         dao.startTransaction();
         Collection<VideoFrame> videoFrames = videoArchive.getVideoFrames();
-        File imageTargetFile = new File(imageTarget);
-        URL imageTargetUrl = imageTargetFile.toURI().toURL();
+        URL imageTargetUrl = imageTarget.toURI().toURL();
         String imageTargetExternalForm = imageTargetUrl.toExternalForm();
-        URL imageTargetMappingUrl = new URL(imageTargetMapping);
         for (VideoFrame videoFrame : videoFrames) {
             CameraData cameraData = videoFrame.getCameraData();
             cameraData = dao.find(cameraData);
             String imageReference = cameraData.getImageReference();
             if (imageReference != null && imageReference.startsWith(imageTargetExternalForm)) {
-                URL newUrl = fileToUrl(new File(imageReference), imageTargetFile, imageTargetMappingUrl);
+                URL newUrl = fileToUrl(new File(imageReference), imageTarget, imageTargetMapping);
                 cameraData.setImageReference(newUrl.toExternalForm());
                 cameraDatas.add(cameraData);
             }

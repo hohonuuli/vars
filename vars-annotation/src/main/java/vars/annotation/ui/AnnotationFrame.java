@@ -317,6 +317,11 @@ public class AnnotationFrame extends JFrame {
         getContentPane().add(getOuterSplitPane(), BorderLayout.CENTER);
         getContentPane().add(getQuickControlPanel(), BorderLayout.SOUTH);
         getContentPane().add(getToolBar(), BorderLayout.NORTH);
-
     }
+
+    public AnnotationFrameController getController() {
+        return controller;
+    }
+
+
 }
