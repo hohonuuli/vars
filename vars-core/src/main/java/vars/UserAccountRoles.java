@@ -26,6 +26,26 @@ public enum UserAccountRoles {
     public String toString() {
         return roleName;
     }
+    
+    /**
+     * Return the role that corresponds to 'roleName'. Useful for matching the
+     * value that's stored in the database to the correct role.
+     * @param roleName The string name of the role (Admin, Maint or ReadOnly). The serach
+     * 		is case insensitive and will match using the roleName or long name of the role
+     * @return The matching UserAccountRole or null of the string provided doens't match any
+     * 		of the roles
+     */
+    public static UserAccountRoles getRole(String roleName) {
+    	UserAccountRoles[] roles = values();
+    	UserAccountRoles matchingRole = null;
+    	for(UserAccountRoles role: roles) {
+    		if (role.getRoleName().toLowerCase().startsWith(roleName.toLowerCase())) {
+    			matchingRole = role;
+    			break;
+    		}
+    	}
+    	return matchingRole;
+    }
 
 
 }

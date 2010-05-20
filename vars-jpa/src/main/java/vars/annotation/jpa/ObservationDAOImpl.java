@@ -18,8 +18,7 @@ import com.google.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 
 
 /**
@@ -31,14 +30,9 @@ import org.slf4j.LoggerFactory;
  */
 public class ObservationDAOImpl extends DAO implements ObservationDAO {
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
-    
-
     @Inject
     public ObservationDAOImpl(EntityManager entityManager) {
         super(entityManager);
-        
-
     }
 
     public List<Observation> findAllByConceptName(String conceptName) {

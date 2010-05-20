@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.CacheClearedEvent;
 import vars.CacheClearedListener;
+import vars.DAO;
 import vars.UserAccount;
 import vars.annotation.CameraData;
 import vars.annotation.CameraDirections;
@@ -155,7 +156,7 @@ public final class NewObservationAction extends ActionAdapter {
         Observation observation = null;
 
         // Need a videoArchive to add a VideoFrame too.
-        final VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+        VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
         final VideoControlService videoService = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
         if (videoArchive != null) {
 
@@ -182,8 +183,12 @@ public final class NewObservationAction extends ActionAdapter {
                     person = UserAccount.USERNAME_DEFAULT;
                 }
 
-                // See if a VideoFrame with the given time code already exists
+                // DAOTX: See if a VideoFrame with the given time code already exists
+                DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
+                dao.startTransaction();
+                videoArchive = dao.find(videoArchive);
                 VideoFrame videoFrame = videoArchive.findVideoFrameByTimeCode(timecode);
+                dao.endTransaction();
 
                 // If none are found create a new one.
                 if (videoFrame == null) {

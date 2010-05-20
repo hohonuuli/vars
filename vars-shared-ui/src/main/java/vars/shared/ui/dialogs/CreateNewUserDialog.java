@@ -1,5 +1,5 @@
 /*
- * @(#)CreateNewUserDialog.java   2010.03.15 at 10:11:58 PDT
+ * @(#)CreateNewUserDialog.java   2010.05.20 at 09:01:54 PDT
  *
  * Copyright 2009 MBARI
  *
@@ -17,30 +17,13 @@ package vars.shared.ui.dialogs;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import java.awt.BorderLayout;
 import java.awt.Frame;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.util.logging.Level;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.JEditorPane;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import vars.MiscDAOFactory;
 import vars.MiscFactory;
 import vars.ToolBelt;
 import vars.UserAccount;
 import vars.UserAccountDAO;
 import vars.UserAccountRoles;
-import vars.VARSException;
 import vars.jpa.VarsJpaModule;
 
 /**
@@ -49,36 +32,24 @@ import vars.jpa.VarsJpaModule;
  * @version        Enter version here..., 2010.03.15 at 10:11:58 PDT
  * @author         Brian Schlining [brian@mbari.org]
  */
-public class CreateNewUserDialog extends StandardDialog {
+public class CreateNewUserDialog extends UserAccountDialog {
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
-    private final Controller controller = new Controller();
-    private JTextField affiliationTextField;
-    private JTextField emailTextField;
-    private JTextField firstNameTextField;
-    private JTextField lastNameTextField;
-    private JLabel lblAffiliationorganization;
-    private JLabel lblEmail;
-    private JLabel lblFirstName;
-    private JLabel lblLastName;
-    private JLabel lblLogin;
-    private JLabel lblPassword;
-    private JLabel lblPasswordagain;
-    private JTextField loginTextField;
-    private JTextField messageLabel;
-    private MiscDAOFactory miscDAOFactory;
-    private MiscFactory miscFactory;
-    private JPanel panel;
-    private JPasswordField passwordField1;
-    private JPasswordField passwordField2;
-    private UserAccount returnValue;
+    private final MiscDAOFactory miscDAOFactory;
+    private final MiscFactory miscFactory;
 
     /**
-     * Constructs ...
-     */
-    public CreateNewUserDialog() {
+ * Constructs ...
+     *
+     * @param miscDAOFactory
+     * @param miscFactory
+ */
+    public CreateNewUserDialog(MiscDAOFactory miscDAOFactory, MiscFactory miscFactory) {
         super();
-        initialize();
+        this.miscDAOFactory = miscDAOFactory;
+        this.miscFactory = miscFactory;
+        setDialogController(new Controller(this));
+        getRoleComboBox().setSelectedItem(UserAccountRoles.READONLY.toString());
+        getRoleComboBox().setEnabled(false);
     }
 
     /**
@@ -93,225 +64,7 @@ public class CreateNewUserDialog extends StandardDialog {
         super(parent, modal);
         this.miscDAOFactory = miscDAOFactory;
         this.miscFactory = miscFactory;
-        initialize();
-    }
-
-    private JTextField getAffiliationTextField() {
-        if (affiliationTextField == null) {
-            affiliationTextField = new JTextField();
-            affiliationTextField.setColumns(10);
-        }
-
-        return affiliationTextField;
-    }
-
-    private JTextField getEmailTextField() {
-        if (emailTextField == null) {
-            emailTextField = new JTextField();
-            emailTextField.setColumns(10);
-        }
-
-        return emailTextField;
-    }
-
-    private JTextField getFirstNameTextField() {
-        if (firstNameTextField == null) {
-            firstNameTextField = new JTextField();
-            firstNameTextField.setColumns(10);
-        }
-
-        return firstNameTextField;
-    }
-
-    private JTextField getLastNameTextField() {
-        if (lastNameTextField == null) {
-            lastNameTextField = new JTextField();
-            lastNameTextField.setColumns(10);
-        }
-
-        return lastNameTextField;
-    }
-
-    private JLabel getLblAffiliationorganization() {
-        if (lblAffiliationorganization == null) {
-            lblAffiliationorganization = new JLabel("Affiliation/Organization:");
-        }
-
-        return lblAffiliationorganization;
-    }
-
-    private JLabel getLblEmail() {
-        if (lblEmail == null) {
-            lblEmail = new JLabel("Email:");
-        }
-
-        return lblEmail;
-    }
-
-    private JLabel getLblFirstName() {
-        if (lblFirstName == null) {
-            lblFirstName = new JLabel("First Name:");
-        }
-
-        return lblFirstName;
-    }
-
-    private JLabel getLblLastName() {
-        if (lblLastName == null) {
-            lblLastName = new JLabel("Last Name:");
-        }
-
-        return lblLastName;
-    }
-
-    private JLabel getLblLogin() {
-        if (lblLogin == null) {
-            lblLogin = new JLabel("* Login:");
-        }
-
-        return lblLogin;
-    }
-
-    private JLabel getLblPassword() {
-        if (lblPassword == null) {
-            lblPassword = new JLabel("* Password:");
-        }
-
-        return lblPassword;
-    }
-
-    private JLabel getLblPasswordagain() {
-        if (lblPasswordagain == null) {
-            lblPasswordagain = new JLabel("* Password (again):");
-        }
-
-        return lblPasswordagain;
-    }
-
-    private JTextField getLoginTextField() {
-        if (loginTextField == null) {
-            loginTextField = new JTextField();
-            loginTextField.setColumns(10);
-        }
-
-        return loginTextField;
-    }
-
-    private JTextField getMessageLabel() {
-        if (messageLabel == null) {
-            messageLabel = new JTextField("Create a new user. (* required field)");
-            messageLabel.setEditable(false);
-        }
-
-        return messageLabel;
-    }
-
-    private JPanel getPanel() {
-    	if (panel == null) {
-    		panel = new JPanel();
-    		GroupLayout groupLayout = new GroupLayout(panel);
-    		groupLayout.setHorizontalGroup(
-    			groupLayout.createParallelGroup(Alignment.LEADING)
-    				.addGroup(groupLayout.createSequentialGroup()
-    					.addContainerGap()
-    					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-    						.addComponent(getLblAffiliationorganization())
-    						.addComponent(getLblLastName())
-    						.addComponent(getLblEmail())
-    						.addComponent(getLblFirstName())
-    						.addComponent(getLblPasswordagain())
-    						.addComponent(getLblPassword())
-    						.addComponent(getLblLogin()))
-    					.addPreferredGap(ComponentPlacement.RELATED)
-    					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-    						.addComponent(getLoginTextField(), GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
-    						.addComponent(getPasswordField1(), GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
-    						.addComponent(getPasswordField2(), GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
-    						.addComponent(getFirstNameTextField(), GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
-    						.addComponent(getLastNameTextField(), Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
-    						.addComponent(getEmailTextField(), Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
-    						.addComponent(getAffiliationTextField(), GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE))
-    					.addContainerGap())
-    		);
-    		groupLayout.setVerticalGroup(
-    			groupLayout.createParallelGroup(Alignment.LEADING)
-    				.addGroup(groupLayout.createSequentialGroup()
-    					.addContainerGap()
-    					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-    						.addComponent(getLblLogin())
-    						.addComponent(getLoginTextField(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-    					.addPreferredGap(ComponentPlacement.RELATED)
-    					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-    						.addComponent(getLblPassword())
-    						.addComponent(getPasswordField1(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-    					.addPreferredGap(ComponentPlacement.RELATED)
-    					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-    						.addComponent(getLblPasswordagain())
-    						.addComponent(getPasswordField2(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-    					.addPreferredGap(ComponentPlacement.RELATED)
-    					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-    						.addComponent(getLblFirstName())
-    						.addComponent(getFirstNameTextField(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-    					.addPreferredGap(ComponentPlacement.RELATED)
-    					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-    						.addComponent(getLblLastName())
-    						.addComponent(getLastNameTextField(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-    					.addPreferredGap(ComponentPlacement.RELATED)
-    					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-    						.addComponent(getLblEmail())
-    						.addComponent(getEmailTextField(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-    					.addPreferredGap(ComponentPlacement.RELATED)
-    					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-    						.addComponent(getLblAffiliationorganization())
-    						.addComponent(getAffiliationTextField(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-    					.addContainerGap(16, Short.MAX_VALUE))
-    		);
-    		panel.setLayout(groupLayout);
-    	}
-    	return panel;
-    }
-
-    private JPasswordField getPasswordField1() {
-        if (passwordField1 == null) {
-            passwordField1 = new JPasswordField();
-        }
-
-        return passwordField1;
-    }
-
-    private JPasswordField getPasswordField2() {
-        if (passwordField2 == null) {
-            passwordField2 = new JPasswordField();
-        }
-
-        return passwordField2;
-    }
-
-    /**
-     * @return
-     */
-    public UserAccount getReturnValue() {
-        return returnValue;
-    }
-
-    private void initialize() {
-        add(getMessageLabel(), BorderLayout.NORTH);
-        add(getPanel(), BorderLayout.CENTER);
-        getOkayButton().addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                controller.doOkay();
-            }
-
-        });
-        getCancelButton().addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                controller.doCancel();
-            }
-
-        });
-        pack();
+        setDialogController(new Controller(this));
     }
 
     /**
@@ -330,14 +83,6 @@ public class CreateNewUserDialog extends StandardDialog {
 
     /**
      *
-     * @param userAccount
-     */
-    public void setReturnValue(UserAccount userAccount) {
-        this.returnValue = userAccount;
-    }
-
-    /**
-     *
      * @param parent
      * @param modal
      * @param title
@@ -348,29 +93,55 @@ public class CreateNewUserDialog extends StandardDialog {
     public static UserAccount showDialog(Frame parent, boolean modal, String title, MiscDAOFactory miscDAOFactory,
             MiscFactory miscFactory) {
         CreateNewUserDialog dialog = new CreateNewUserDialog(parent, modal, miscDAOFactory, miscFactory);
+
         dialog.setTitle(title);
         dialog.setVisible(true);
-        return dialog.getReturnValue();
+
+        return dialog.getUserAccount();
     }
 
-    private class Controller {
+    @Override
+    public void setUserAccount(UserAccount userAccount) {
+        throw new UnsupportedOperationException("You can't call this method on the 'CreateNewUserDialog'!");
+    }
 
-        void doCancel() {
-            returnValue = null;
-            CreateNewUserDialog.this.setVisible(false);
-            CreateNewUserDialog.this.dispose();
+
+
+    private class Controller implements DialogController {
+
+        private final UserAccountDialog dialog;
+
+        /**
+         * Constructs ...
+         *
+         * @param dialog
+         */
+        public Controller(UserAccountDialog dialog) {
+            this.dialog = dialog;
         }
 
-        void doOkay() {
+        /**
+         */
+        public void doCancel() {
+            dialog.setReturnValue(null);
+            dialog.setVisible(false);
+            dialog.dispose();
+        }
+
+        /**
+         */
+        public void doOkay() {
             UserAccount userAccount = null;
-            String userName = getLoginTextField().getText();
-            String pwd1 = new String(getPasswordField1().getPassword());
-            String pwd2 = new String(getPasswordField2().getPassword());
+            String userName = dialog.getLoginTextField().getText();
+            String pwd1 = new String(dialog.getPasswordField1().getPassword());
+            String pwd2 = new String(dialog.getPasswordField2().getPassword());
+
             exit:
             {
 
                 if (pwd1.equals(pwd2)) {
                     UserAccountDAO userAccountDAO = miscDAOFactory.newUserAccountDAO();
+
                     userAccountDAO.startTransaction();
 
                     try {
@@ -379,18 +150,20 @@ public class CreateNewUserDialog extends StandardDialog {
                     catch (Exception ex) {
                         getMessageLabel().setText("An error occured while connecting to the database");
                         log.warn("An error occured while looking up " + userName, ex);
+
                         return;
                     }
 
                     if (userAccount != null) {
                         getMessageLabel().setText("The login, ' " + userName + "', already exists in the database");
+
                         break exit;
                     }
                     else {
                         userAccount = miscFactory.newUserAccount();
                         userAccount.setUserName(userName);
                         userAccount.setPassword(pwd1);
-                        userAccount.setRole(UserAccountRoles.MAINTENANCE.toString());
+                        userAccount.setRole(UserAccountRoles.READONLY.toString());
                         userAccount.setEmail(getEmailTextField().getText());
                         userAccount.setAffiliation(getAffiliationTextField().getText());
                         userAccount.setFirstName(getFirstNameTextField().getText());
@@ -410,7 +183,7 @@ public class CreateNewUserDialog extends StandardDialog {
                     }
 
                     userAccountDAO.endTransaction();
-                    returnValue = userAccount;
+                    setReturnValue(userAccount);
                 }
                 else {
                     getMessageLabel().setText("The passwords do not match");

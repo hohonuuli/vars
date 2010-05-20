@@ -100,7 +100,8 @@ public class VideoArchiveImpl implements Serializable, VideoArchive, JPAEntity {
 
         Collection<VideoFrame> frames = Collections2.filter(getVideoFrames(), new TimecodePredicate(videoFrame.getTimecode()));
         if (frames.size() != 0) {
-            throw new IllegalArgumentException("A VideoFrame with a timecode of ${videoFrame.timecode} already exists in ${this}.");
+            throw new IllegalArgumentException("A VideoFrame with a timecode of " + videoFrame.getTimecode() +
+                    " already exists in " + this + ".");
         }
         if (getVideoFrames().add(videoFrame)) {
             ((VideoFrameImpl) videoFrame).setVideoArchive(this);

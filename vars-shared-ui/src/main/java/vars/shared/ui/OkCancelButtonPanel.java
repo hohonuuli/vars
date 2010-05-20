@@ -49,7 +49,12 @@ public class OkCancelButtonPanel extends JPanel {
     public JButton getCancelButton() {
         if (cancelButton == null) {
             cancelButton = new FancyButton("Cancel");
-            cancelButton.setIcon(new ImageIcon(getClass().getResource("/vars/images/24/delete2.png")));
+            try {
+            	cancelButton.setIcon(new ImageIcon(getClass().getResource("/vars/images/24/delete2.png")));
+            }
+            catch (Exception e) {
+            	// BUMMER. Do nothing.
+            }
             cancelButton.addKeyListener(new KeyAdapter() {
                 @Override
                 public void keyReleased(KeyEvent e) {
@@ -69,7 +74,12 @@ public class OkCancelButtonPanel extends JPanel {
     public JButton getOkayButton() {
         if (okayButton == null) {
             okayButton = new FancyButton("OK");
-            okayButton.setIcon(new ImageIcon(getClass().getResource("/vars/images/24/check2.png")));
+            try {
+            	okayButton.setIcon(new ImageIcon(getClass().getResource("/vars/images/24/check2.png")));
+            }
+            catch (Exception e) {
+            	// BUMMER. Do nothing.
+            }
             okayButton.addKeyListener(new KeyAdapter() {
                 @Override
                 public void keyReleased(KeyEvent e) {

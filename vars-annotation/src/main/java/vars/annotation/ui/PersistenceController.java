@@ -286,7 +286,7 @@ public class PersistenceController {
     public VideoArchive loadVideoFramesFor(VideoArchive videoArchive) {
         DAO dao = annotationDAOFactory.newDAO();
         dao.startTransaction();
-        videoArchive = dao.merge(videoArchive);
+        videoArchive = dao.find(videoArchive);
         @SuppressWarnings("unused") Collection<VideoFrame> videoFrames = videoArchive.getVideoFrames();
         dao.endTransaction();
         return videoArchive;
