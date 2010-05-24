@@ -452,7 +452,7 @@ public class ConceptButtonPanel extends JPanel {
          */
         public void doAction() {
             
-            final UserAccount userAccount = (UserAccount)  Lookup.getUserAccountDispatcher();
+            final UserAccount userAccount = (UserAccount)  Lookup.getUserAccountDispatcher().getValueObject();
 
             if (userAccount != null) {
                 final int response = JOptionPane.showConfirmDialog(ConceptButtonPanel.this,

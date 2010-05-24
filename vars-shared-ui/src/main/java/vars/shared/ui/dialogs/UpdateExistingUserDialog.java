@@ -19,7 +19,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import java.awt.Frame;
 import org.bushe.swing.event.EventBus;
-import org.mbari.util.BeanUtil;
+import org.mbari.util.BeanUtilities;
 import vars.MiscDAOFactory;
 import vars.ToolBelt;
 import vars.UserAccount;
@@ -100,12 +100,17 @@ public class UpdateExistingUserDialog extends UserAccountDialog {
     public void setUserAccount(UserAccount userAccount) {
         super.setUserAccount(userAccount);
         getOkayButton().setEnabled(userAccount != null);
-        String name = BeanUtil.getProperty(userAccount, "userName", "");
+        String name = BeanUtilities.getProperty(userAccount, "userName", "");
         getLoginTextField().setText(name);
-        String email = BeanUtil.getProperty(userAccount, "email", "");
+        String email = BeanUtilities.getProperty(userAccount, "email", "");
         getEmailTextField().setText(email);
         // TODO finish implementing setting UI fields when the useraccount is set
-        getAffiliationTextField().setText(userAccount.getAffiliation());
+        String affiliation = BeanUtilities.getProperty(userAccount, "affiliation", "");
+        getAffiliationTextField().setText(affiliation);
+        String firstName = BeanUtilities.getProperty(userAccount, "firstName", "");
+        getFirstNameTextField().setText(firstName);
+        String lastName = BeanUtilities.getProperty(userAccount, "lastName", "");
+        getLastNameTextField().setText(lastName);
     }
 
     private class Controller implements DialogController {
@@ -151,10 +156,10 @@ public class UpdateExistingUserDialog extends UserAccountDialog {
 	                dialog.dispose();
 	            }
 	            userAccount.setPassword(pwd1);
-	            userAccount.setEmail(getEmailTextField().getText());
-	            userAccount.setAffiliation(getAffiliationTextField().getText());
-	            userAccount.setFirstName(getFirstNameTextField().getText());
-	            userAccount.setLastName(getLastNameTextField().getText());
+	            userAccount.setEmail(valueOf(getEmailTextField().getText()));
+	            userAccount.setAffiliation(valueOf(getAffiliationTextField().getText()));
+	            userAccount.setFirstName(valueOf(getFirstNameTextField().getText()));
+	            userAccount.setLastName(valueOf(getLastNameTextField().getText()));
 	            dao.endTransaction();
 	            setReturnValue(userAccount);
             }
@@ -166,6 +171,17 @@ public class UpdateExistingUserDialog extends UserAccountDialog {
 
             dialog.dispose();
             
+        }
+
+        private String valueOf(String v0) {
+            String v1 = null;
+            if (v0 == null || v0.trim().isEmpty()) {
+                // Do nothing
+            }
+            else {
+                v1 = v0;
+            }
+            return v1;
         }
     }
 }

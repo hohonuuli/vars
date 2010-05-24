@@ -47,6 +47,7 @@ import vars.annotation.ui.cbpanel.ConceptButtonPanel;
 import vars.annotation.ui.preferences.PreferenceFrameButton;
 import vars.annotation.ui.roweditor.RowEditorPanel;
 import vars.annotation.ui.table.JXObservationTable;
+import vars.annotation.ui.table.JXObservationTableColumnModel;
 import vars.annotation.ui.video.VideoControlPanel;
 import vars.annotation.ui.videoset.VideoArchiveSetEditorButton;
 
@@ -192,6 +193,7 @@ public class AnnotationFrame extends JFrame {
         if (table == null) {
             table = new JXObservationTable();
             table.setFocusable(false);    // The row editor panel should get focus NOT the table
+            ((JXObservationTableColumnModel) table.getColumnModel()).setMiniView(true);
 
             // Map Mask+UP-ARROW Key Stroke
             String upTable = "up-table";

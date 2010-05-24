@@ -17,6 +17,7 @@ package vars.annotation.ui.table;
 
 import java.util.List;
 import java.util.Vector;
+import javax.swing.table.TableColumn;
 import org.jdesktop.swingx.table.DefaultTableColumnModelExt;
 import vars.annotation.Association;
 import vars.annotation.CameraData;
@@ -29,6 +30,8 @@ import vars.annotation.VideoFrame;
  *
  */
 public class JXObservationTableColumnModel extends DefaultTableColumnModelExt {
+
+    private boolean miniView = false;
 
     /**
      * Constructs ...
@@ -44,6 +47,33 @@ public class JXObservationTableColumnModel extends DefaultTableColumnModelExt {
         addColumn(new CameraDirectionColumn());
         addColumn(new VideoArchiveNameColumn());
         addColumn(new NotesColumn());
+    }
+
+    /**
+     * Set the state of the view. Full view includes all available columns.
+     * 'Mini-view' hides teh notes columne and teh VideoArchviveNameColumn. The
+     * miniview is used in the annotation editor, the full view is used in
+     * the videoarchiveSetEditorPanel.
+     * 
+     * @param miniView
+     */
+    public void setMiniView(boolean miniView) {
+        this.miniView = miniView;
+        List<TableColumn> columns = getColumns(true);
+        for (TableColumn tableColumn : columns) {
+            if (tableColumn instanceof ValueColumn) {
+                ValueColumn valueColumn = (ValueColumn) tableColumn;
+                String id = (String) valueColumn.getIdentifier();
+                if (id != null && (id.equalsIgnoreCase(VideoArchiveNameColumn.ID) ||
+                        id.equalsIgnoreCase(NotesColumn.ID))) {
+                    valueColumn.setVisible(!miniView);
+                }
+            }
+        }
+    }
+
+    public boolean isMiniView() {
+        return miniView;
     }
 
  
@@ -63,7 +93,7 @@ public class JXObservationTableColumnModel extends DefaultTableColumnModelExt {
         public AssociationColumn() {
 
             // super();
-            super(COLUMN_INDEX, 120);
+            super(ID, COLUMN_INDEX, 120);
             setMinWidth(100);
             setPreferredWidth(140);
             setMaxWidth(700);
@@ -121,7 +151,7 @@ public class JXObservationTableColumnModel extends DefaultTableColumnModelExt {
         public CameraDirectionColumn() {
 
             // super();
-            super(COLUMN_INDEX);
+            super(ID, COLUMN_INDEX);
             setIdentifier(ID);
             setHeaderValue(ID);
             setMinWidth(20);
@@ -205,7 +235,7 @@ public class JXObservationTableColumnModel extends DefaultTableColumnModelExt {
         public FGSColumn() {
 
             // super();
-            super(COLUMN_INDEX, 45);
+            super(ID, COLUMN_INDEX, 45);
             setMaxWidth(45);
             setMinWidth(45);
             setPreferredWidth(45);
@@ -281,7 +311,7 @@ public class JXObservationTableColumnModel extends DefaultTableColumnModelExt {
         public NotesColumn() {
 
             // super();
-            super(COLUMN_INDEX);
+            super(ID, COLUMN_INDEX);
             setIdentifier(ID);
             setHeaderValue(ID);
             setMinWidth(60);
@@ -349,7 +379,7 @@ public class JXObservationTableColumnModel extends DefaultTableColumnModelExt {
 
             // super();
             // ModelIndex = 2, FieldWidth, Use default editor and renderers
-            super(COLUMN_INDEX, 140);
+            super(ID, COLUMN_INDEX, 140);
             setMinWidth(120);
             setPreferredWidth(140);
             setMaxWidth(200);
@@ -415,7 +445,7 @@ public class JXObservationTableColumnModel extends DefaultTableColumnModelExt {
         public ObserverColumn() {
 
             // super();
-            super(COLUMN_INDEX);
+            super(ID, COLUMN_INDEX);
             setIdentifier(ID);
             setHeaderValue(ID);
             setMinWidth(20);
@@ -483,7 +513,7 @@ public class JXObservationTableColumnModel extends DefaultTableColumnModelExt {
 
             // super();
             // ModelIndex = 1, FieldWidth, Use default editor and renderers
-            super(COLUMN_INDEX, 90);
+            super(ID, COLUMN_INDEX, 90);
             setMinWidth(90);
             setMaxWidth(90);
             setPreferredWidth(90);
@@ -554,7 +584,7 @@ public class JXObservationTableColumnModel extends DefaultTableColumnModelExt {
         public VideoArchiveNameColumn() {
 
             // super();
-            super(COLUMN_INDEX);
+            super(ID, COLUMN_INDEX);
             setIdentifier(ID);
             setHeaderValue(ID);
             setMinWidth(20);

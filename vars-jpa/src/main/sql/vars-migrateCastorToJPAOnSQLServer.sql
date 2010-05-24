@@ -341,3 +341,6 @@ SET
     Password = 'Vzt4WKZEiP+mfOTrYxBcW7HjcC+erlB1'
 WHERE
     UserName = 'brian'
+
+-- Insert a starting value into the primary key table for artifact objects
+INSERT INTO UniqueID VALUES ('Artifact' , 100)

@@ -1,3 +1,38 @@
+-- Artifact -----------------------------------------------------------
+CREATE TABLE Artifact  (
+    ConceptDelegateID_FK	bigint NOT NULL,
+    GroupId             	varchar(64) NOT NULL,
+    ArtifactId          	varchar(256) NOT NULL,
+    Version             	varchar(64) NOT NULL,
+    Classifier          	varchar(64) ,
+    Description         	varchar(2048) ,
+    MimeType            	varchar(32) ,
+    Caption             	varchar(1024) ,
+    Reference           	varchar(1024) NOT NULL,
+    Credit              	varchar(1024) ,
+    id                  	bigint NOT NULL,
+    LAST_UPDATED_TIME   	timestamp NOT NULL,
+    CreationDate        	timestamp ,
+    CONSTRAINT Artifact_PK PRIMARY KEY(id)
+)
+GO
+ALTER TABLE Artifact
+    ADD CONSTRAINT Artifact_FK1
+	FOREIGN KEY(ConceptDelegateID_FK)
+	REFERENCES ConceptDelegate(id)
+	ON DELETE NO ACTION
+	ON UPDATE NO ACTION
+GO
+CREATE INDEX idx_Artifact_LUT
+    ON Artifact(LAST_UPDATED_TIME)
+GO
+CREATE UNIQUE INDEX idx_Artifact_CK
+    ON Artifact(GroupId, ArtifactId, Version, Classifier)
+GO
+CREATE INDEX idx_Artifact_FK1
+    ON Artifact(ConceptDelegateID_FK)
+GO
+
 ALTER TABLE Association
 	ADD LAST_UPDATED_TIME TIMESTAMP
 GO
@@ -323,4 +358,17 @@ GO
 RENAME COLUMN "VARSUSER"."HISTORY"."APPROVERNAME" TO "PROCESSORNAME"
 GO
 RENAME COLUMN "VARSUSER"."HISTORY"."REJECTED" TO "APPROVED"
+GO
+
+--
+INSERT INTO UNIQUEID VALUES
+  ('VideoArchiveSet', 100),
+  ('CameraPlatformDeployment', 100),
+  ('VideoArchive', 100),
+  ('VideoFrame', 100),
+  ('CameraData', 100),
+  ('PhysicalData', 100),
+  ('Observation', 100),
+  ('Association', 100),
+  ('UserAccount', 100)
 GO

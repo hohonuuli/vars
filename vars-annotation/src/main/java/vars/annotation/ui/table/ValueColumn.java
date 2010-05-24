@@ -22,7 +22,7 @@ package vars.annotation.ui.table;
 
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
+import org.jdesktop.swingx.table.TableColumnExt;
 import vars.annotation.Observation;
 
 /**
@@ -30,28 +30,32 @@ import vars.annotation.Observation;
  * @author   <a href="http://www.mbari.org">MBARI</a>
  * @version   $Id: ValueColumn.java 332 2006-08-01 18:38:46Z hohonuuli $
  */
-public abstract class ValueColumn extends TableColumn {
+public abstract class ValueColumn extends TableColumnExt {
+
 
     /**
      * Constructor for the ValueColumn object
      */
-    public ValueColumn() {
+    public ValueColumn(String id) {
         super();
+        setIdentifier(id);
     }
 
     /**
      * @param  modelIndex
      */
-    public ValueColumn(final int modelIndex) {
+    public ValueColumn(String id, final int modelIndex) {
         super(modelIndex);
+        setIdentifier(id);
     }
 
     /**
      * @param  modelIndex
      * @param  width
      */
-    public ValueColumn(final int modelIndex, final int width) {
+    public ValueColumn(String id, final int modelIndex, final int width) {
         super(modelIndex, width);
+        setIdentifier(id);
     }
 
     /**
@@ -60,9 +64,10 @@ public abstract class ValueColumn extends TableColumn {
      * @param  cellRenderer
      * @param  cellEditor
      */
-    public ValueColumn(final int modelIndex, final int width, final TableCellRenderer cellRenderer,
+    public ValueColumn(String id, final int modelIndex, final int width, final TableCellRenderer cellRenderer,
                        final TableCellEditor cellEditor) {
         super(modelIndex, width, cellRenderer, cellEditor);
+        setIdentifier(id);
     }
 
     /**
