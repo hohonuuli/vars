@@ -43,7 +43,14 @@ public class LinkListCellRenderer extends DefaultListCellRenderer {
 
         super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
         if (value != null) {
-            setText(LinkUtilities.formatAsString((ILink) value));
+            String text;
+            if (value instanceof ILink) {
+                text = LinkUtilities.formatAsString((ILink) value);
+            }
+            else {
+                text = value.toString();
+            }
+            setText(text);
         }
 
         return this;

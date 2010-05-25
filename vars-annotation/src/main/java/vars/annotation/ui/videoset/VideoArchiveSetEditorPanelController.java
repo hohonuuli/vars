@@ -561,7 +561,7 @@ public class VideoArchiveSetEditorPanelController {
 
     protected void renameAssociations() {
         Collection<ILink> linkTemplates = findLinkTemplatesForObservations(getObservations(true));
-
+ 
         // Build dialog
         ILink link = (ILink) panel.getAssociationComboBox().getSelectedItem();
         AssociationSelectionDialog dialog = getRenameAssociationsDialog();

@@ -52,6 +52,7 @@ public final class AddOldRefNumPropAction extends AddPropertyAction {
      *     Adds the association 'identity-reference|self|[some integer]'
      *     [some integer] increments by one after each call.
      */
+    @Override
     public void doAction() {
         setLinkValue(refNumber);
         super.doAction();

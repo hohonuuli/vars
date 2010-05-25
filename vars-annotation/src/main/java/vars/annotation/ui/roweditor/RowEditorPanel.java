@@ -15,6 +15,7 @@
 
 package vars.annotation.ui.roweditor;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -22,6 +23,9 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
@@ -246,6 +250,17 @@ public class RowEditorPanel extends JPanel {
                 }
 
             });
+
+            // Tried to update concept name before adding an association, but this doesn't
+            // work as I though it would
+//            conceptComboBox.addFocusListener(new FocusAdapter() {
+//                @Override
+//                public void focusLost(FocusEvent e) {
+//                    Collection<Observation> observations = ImmutableList.of(getObservation());
+//                    toolBelt.getPersistenceController().updateAndValidate(observations);
+//                    //throw new UnsupportedOperationException("Not supported yet.");
+//                }
+//            });
         }
 
         return conceptComboBox;

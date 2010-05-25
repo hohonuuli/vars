@@ -151,8 +151,6 @@ public class LinkSelectionPanel extends JPanel {
                         setLink((ILink) e.getItem());
                     }
                 }
-
-
             });
 
         }

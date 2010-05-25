@@ -155,7 +155,6 @@ public class ImageAnnotationFrame extends JFrame {
             url = new URL(videoFrame.getCameraData().getImageReference());
         }
         catch (Exception e) {
-
             log.info("Failed to display " + url, e);
         }
 

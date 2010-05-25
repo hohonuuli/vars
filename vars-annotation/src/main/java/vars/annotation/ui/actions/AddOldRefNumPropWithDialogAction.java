@@ -110,13 +110,13 @@ public class AddOldRefNumPropWithDialogAction extends ActionAdapter {
         if (refNums.size() == 0) {
             EventBus.publish(Lookup.TOPIC_WARNING,
                              "<html><body>No reference numbers for " + conceptName +
-                             "were found. Use 'New #' instead.</body></html>");
+                             " were found. Use 'New #' instead.</body></html>");
         }
         else {
 
             final Object[] choices = refNums.toArray(new Integer[refNums.size()]);
             Arrays.sort(choices, COMPARATOR);
-            final String i = (String) JOptionPane.showInputDialog(
+            final Integer i = (Integer) JOptionPane.showInputDialog(
                 (Frame) Lookup.getApplicationFrameDispatcher().getValueObject(), "Select a reference number",
                 "VARS - Select Reference Number", JOptionPane.PLAIN_MESSAGE, null, choices, choices[0]);
 

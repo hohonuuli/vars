@@ -14,10 +14,8 @@
 
 package vars.knowledgebase.jpa;
 
-import com.google.common.collect.ImmutableList;
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.util.Collection;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -32,7 +30,6 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
-import javax.persistence.Transient;
 import javax.persistence.Version;
 import vars.LinkUtilities;
 import vars.jpa.JPAEntity;

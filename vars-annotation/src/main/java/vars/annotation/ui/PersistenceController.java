@@ -194,7 +194,15 @@ public class PersistenceController {
         dao.startTransaction();
 
         for (Observation observation : observations) {
-            observation = dao.find(observation);
+
+            // Try a merge first to try an update the conceptName incase it's been
+            // changed. If a merge fails just find it
+            try {
+                observation = dao.merge(observation);
+            }
+            catch (Exception e) {
+                observation = dao.find(observation);
+            }
 
             if (observation != null) {
                 uiObservations.add(observation);
