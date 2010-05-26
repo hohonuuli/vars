@@ -6,7 +6,15 @@
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <name>vars-redux</name>
+    <inceptionYear>2002</inceptionYear>
+    <organization>
+        <name>Monterey Bay Aquarium Research Institute</name>
+        <url>http://www.mbari.org</url>
+    </organization>
     <url>http://code.google.com/p/vars-redux/</url>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
     <modules>
         <module>vars-core</module>
         <module>vars-jpa</module>
@@ -32,7 +40,6 @@
             </roles>
             <organization>MBARI</organization>
             <timezone>-8</timezone>
-
         </developer>
     </developers>
     <dependencies>
@@ -247,9 +254,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.7</version>
                 <configuration>
+                    <detectLinks>true</detectLinks>
                     <links>
-                        <link>http://java.sun.com/j2se/1.5.0/docs/api/</link>
+                        <link>http://java.sun.com/j2se/1.6.0/docs/api/</link>
                     </links>
                 </configuration>
             </plugin>
