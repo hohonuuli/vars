@@ -447,6 +447,7 @@ public class PersistenceController {
         Collection<CameraData> cameraDatas = new ArrayList<CameraData>();
         DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
         dao.startTransaction();
+        videoArchive = dao.find(videoArchive);
         Collection<VideoFrame> videoFrames = videoArchive.getVideoFrames();
         URL imageTargetUrl = imageTarget.toURI().toURL();
         String imageTargetExternalForm = imageTargetUrl.toExternalForm();

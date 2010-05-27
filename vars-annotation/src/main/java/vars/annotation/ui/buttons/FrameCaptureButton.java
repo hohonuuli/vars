@@ -59,6 +59,7 @@ public class FrameCaptureButton extends FancyButton {
         super();
 
         try {
+            //setAction(new ImageCaptureAction(toolBelt));
             setAction(new WorkerAction(toolBelt));
         }
         catch (final Exception e) {

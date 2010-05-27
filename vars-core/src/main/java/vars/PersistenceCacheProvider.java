@@ -5,6 +5,9 @@
 
 package vars;
 
+import vars.annotation.AnnotationObject;
+import vars.knowledgebase.KnowledgebaseObject;
+
 /**
  *
  * @author brian
@@ -12,5 +15,9 @@ package vars;
 public interface PersistenceCacheProvider {
 
     void clear();
+
+    void evict(AnnotationObject entity);
+
+    void evict(KnowledgebaseObject entity);
 
 }

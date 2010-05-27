@@ -151,11 +151,13 @@ public class ImageAnnotationFrame extends JFrame {
     public void setVideoFrame(VideoFrame videoFrame) {
         layerUI.setVideoFrame(videoFrame);
         URL url = null;
-        try {
-            url = new URL(videoFrame.getCameraData().getImageReference());
-        }
-        catch (Exception e) {
-            log.info("Failed to display " + url, e);
+        if (videoFrame != null && videoFrame.getCameraData() != null) {
+            try {
+                url = new URL(videoFrame.getCameraData().getImageReference());
+            }
+            catch (Exception e) {
+                log.info("Failed to display " + url, e);
+            }
         }
 
         if (url == null || !url.equals(imageUrl)) {

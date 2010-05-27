@@ -20,6 +20,8 @@ import java.util.Collections;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.annotation.AnnotationObject;
+import vars.knowledgebase.KnowledgebaseObject;
 
 /**
  * It's expected that there will be an underlying level 2 cache used for most
@@ -55,6 +57,14 @@ public class PersistenceCache {
         notifyCacheClearedListenersBeforeClear();
         provider.clear();
         notifyCacheClearedListenersAfterClear();
+    }
+
+    public void evict(AnnotationObject object) {
+        provider.evict(object);
+    }
+
+    public void evict(KnowledgebaseObject object) {
+        provider.evict(object);
     }
 
     private void notifyCacheClearedListenersAfterClear() {

@@ -28,6 +28,7 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -226,19 +227,6 @@ public class ImageCaptureAction extends ActionAdapter {
     }
 
     /**
-     * Method description
-     *
-     */
-
-//    public static void showSettingsDialog() {
-//        final Framegrabber2 framegrabber2 =
-//            (Framegrabber2) Dispatcher.getDispatcher(DISPATCHER_KEY_FRAMEGRABBER).getValueObject();
-//        if (framegrabber2 != null) {
-//            framegrabber2.showSettingsDialog();
-//        }
-//    }
-
-    /**
      * Performs the frame-capture related tasks, then updates the VideoArchive object.
      * @author   brian
      */
@@ -367,6 +355,7 @@ public class ImageCaptureAction extends ActionAdapter {
 
             final Collection<Observation> selectedObservations = ImmutableList.of(observation);
             toolBelt.getPersistenceController().updateUI(selectedObservations);
+            Lookup.getSelectedObservationsDispatcher().setValueObject(new ArrayList<Observation>());
             Lookup.getSelectedObservationsDispatcher().setValueObject(selectedObservations);
         }
     }

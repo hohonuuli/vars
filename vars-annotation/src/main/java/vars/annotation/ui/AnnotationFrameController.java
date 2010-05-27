@@ -51,15 +51,26 @@ public class AnnotationFrameController implements PreferenceUpdater {
         this.toolBelt = toolBelt;
         
         // Make sure we save the last observations we annotated to the database
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+        Thread cleanupThread = new Thread(new Runnable() {
             public void run() {
                 log.debug("Saving last Observations to persistent storage during JVM shutdown");
                 Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
                 toolBelt.getPersistenceController().updateAndValidate(new ArrayList<Observation>(observations));
+
+                // Update current videoarchive's image URLs on shutdown
+                VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+                if (videoArchive != null) {
+                    updateCameraData(videoArchive);
+                }
+
                 persistPreferences();
             }
-        }));
+        }, "VARS-cleanupBeforeShutdownThread");
+        cleanupThread.setDaemon(false);
+        Runtime.getRuntime().addShutdownHook(cleanupThread);
 
+                
+        // This listener displays a wait indicator while the cache is being cleared
         toolBelt.getPersistenceCache().addCacheClearedListener(new CacheClearedListener() {
 
             private WaitIndicator waitIndicator;
@@ -80,6 +91,8 @@ public class AnnotationFrameController implements PreferenceUpdater {
             }
         });
 
+        // When new observations are selected we need to persist changes to the old
+        // observations to the database, then redraw them in the UI
         Lookup.getSelectedObservationsDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 PersistenceController persistenceController = toolBelt.getPersistenceController();
@@ -92,9 +105,8 @@ public class AnnotationFrameController implements PreferenceUpdater {
             }
         });
 
-        /*
-         * Get/set size of frame from user preferences
-         */
+        // When preferences change (i.e. when a new user logs in) we need save
+        // the old preferences into the database and load the new ones
         Lookup.getPreferencesDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
@@ -126,6 +138,10 @@ public class AnnotationFrameController implements PreferenceUpdater {
                         VideoArchive videoArchive = (VideoArchive) evt.getOldValue();
                         if (videoArchive != null) {
                             updateCameraData(videoArchive);
+
+                            // Evict the videoArchive from the JPA cache. or we
+                            // won't get a frech copy when we reopen it.
+                            toolBelt.getPersistenceCache().evict(videoArchive);
                         }
                     }
                 };
