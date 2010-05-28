@@ -146,9 +146,11 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
                             else {
                                 try {
                                     final URL url = new URL(media.getUrl());
-                                    getImageFrame().setImageUrl(url);
-                                    getImageFrame().setVisible(true);
-                                    getImageFrame().repaint();
+                                    final JImageUrlFrame jif = getImageFrame();
+                                    jif.setImageUrl(url);
+                                    jif.setTitle("KNOWLEDGEBASE: " + media.getConceptMetadata().getConcept().getPrimaryConceptName().getName());
+                                    jif.setVisible(true);
+                                    jif.repaint();
                                 }
                                 catch (MalformedURLException e1) {
                                     EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR,

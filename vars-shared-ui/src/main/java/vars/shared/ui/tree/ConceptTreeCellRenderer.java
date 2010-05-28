@@ -35,7 +35,9 @@ import vars.knowledgebase.ConceptName;
 public class ConceptTreeCellRenderer extends DefaultTreeCellRenderer {
 
     private static final String DEFAULT = "/vars/images/16/nav_plain_blue.png";
+    private static final String DEFAULT_WITH_IMAGE = "/vars/images/16/nav_plain_blue_square_glass_grey.png";
     private static final String PENDING = "/vars/images/16/nav_plain_red.png";
+    private static final String PENDING_WITH_IMAGE = "/vars/images/16/nav_plain_red_square_glass_grey.png";
     private static final long serialVersionUID = -7382528013502852004L;
     private static final Color pendingTextColor = Color.RED.brighter().brighter();
     private static final Color loadingTextColor = Color.GRAY;
@@ -53,8 +55,11 @@ public class ConceptTreeCellRenderer extends DefaultTreeCellRenderer {
         }
     };
     private final ImageIcon defaultIcon;
+    private final ImageIcon defaultWithImageIcon;
     private final Icon loadingIcon;
     private final ImageIcon pendingIcon;
+    private final ImageIcon pendingWithImageIcon;
+
 
     /**
      * Constructs ...
@@ -63,7 +68,9 @@ public class ConceptTreeCellRenderer extends DefaultTreeCellRenderer {
     public ConceptTreeCellRenderer() {
         super();
         defaultIcon = new ImageIcon(getClass().getResource(DEFAULT));
+        defaultWithImageIcon = new ImageIcon(getClass().getResource(DEFAULT_WITH_IMAGE));
         pendingIcon = new ImageIcon(getClass().getResource(PENDING));
+        pendingWithImageIcon = new ImageIcon(getClass().getResource(PENDING_WITH_IMAGE));
         loadingIcon = new SpinningDial(18, 18, 8);
     }
 
@@ -103,13 +110,18 @@ public class ConceptTreeCellRenderer extends DefaultTreeCellRenderer {
         }
         else {
 
+            ImageIcon imageIcon = defaultIcon;
             if (concept.getConceptMetadata().isPendingApproval()) {
+                imageIcon = (concept.getConceptMetadata().getPrimaryImage() == null) ?
+                        pendingIcon : pendingWithImageIcon;
                 setForeground(pendingTextColor);
-                setIcon(pendingIcon);
             }
             else {
-                setIcon(defaultIcon);
+                imageIcon = (concept.getConceptMetadata().getPrimaryImage() == null) ?
+                    defaultIcon : defaultWithImageIcon;
             }
+
+            setIcon(imageIcon);
 
             // Put the primary ConceptName in first
             textBuf.replace(0, textBuf.length(), concept.getPrimaryConceptName().getName());
