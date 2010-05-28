@@ -19,11 +19,16 @@ import java.util.Date;
 @EntityListeners({TransactionLogger.class, KeyNullifier.class})
 @NamedQueries( {
     @NamedQuery(name = "Artifact.findById", query = "SELECT a FROM Artifact a WHERE a.id = :id") ,
-    @NamedQuery(name = "Artifact.findByGroup", query = "SELECT c FROM Artifact c WHERE c.groupId = :group") ,
-    @NamedQuery(name = "Artifact.findByGroupAndKey", query = "SELECT c FROM Artifact c WHERE c.groupId = :group AND c.artifactId = :key") ,
-    @NamedQuery(name = "Artifact.findByGroupKeyAndVersion", query = "SELECT c FROM Artifact c WHERE c.groupId = :group AND c.artifactId = :key AND c.version = :version") ,
-    @NamedQuery(name = "Artifact.findByParams", query = "SELECT c FROM Artifact c, IN (c.conceptMetadata.concept.conceptNames) AS n WHERE c.groupId = :group AND c.artifactId = :key AND c.version = :version AND n.name = :name") ,
-@NamedQuery(name = "Artifact.findAll", query = "SELECT c FROM Artifact c")
+    @NamedQuery(name = "Artifact.findByReference", query = "SELECT a FROM Artifact a WHERE a.reference = :reference"),
+    @NamedQuery(name = "Artifact.findAllByGroup", query = "SELECT c FROM Artifact c WHERE c.groupId = :group") ,
+    @NamedQuery(name = "Artifact.findAllByGroupAndKey", query = "SELECT c FROM Artifact c WHERE c.groupId = :group AND c.artifactId = :key") ,
+    @NamedQuery(name = "Artifact.findAllByGroupKeyAndVersion", query = "SELECT c FROM Artifact c WHERE c.groupId = :group AND c.artifactId = :key AND c.version = :version") ,
+    @NamedQuery(name = "Artifact.findByParameters", query = "SELECT c FROM Artifact c, IN (c.conceptMetadata.concept.conceptNames) AS n WHERE c.groupId = :group AND c.artifactId = :key AND c.version = :version AND c.classifier = :classifier AND n.name = :name") ,
+    @NamedQuery(name = "Artifact.findByGroupKeyAndVersion", query = "SELECT c FROM Artifact c, IN (c.conceptMetadata.concept.conceptNames) AS n WHERE c.groupId = :group AND c.artifactId = :key AND c.version = :version AND n.name = :name") ,
+    @NamedQuery(name = "Artifact.findByGroupAndKey", query = "SELECT c FROM Artifact c, IN (c.conceptMetadata.concept.conceptNames) AS n WHERE c.groupId = :group AND c.artifactId = :key AND n.name = :name") ,
+    @NamedQuery(name = "Artifact.findByGroup", query = "SELECT c FROM Artifact c, IN (c.conceptMetadata.concept.conceptNames) AS n WHERE c.groupId = :group AND n.name = :name") ,
+    @NamedQuery(name = "Artifact.findAll", query = "SELECT c FROM Artifact c"),
+    @NamedQuery(name = "Artifact.findAllByConcept", query = "SELECT c FROM Artifact c, IN (c.conceptMetadata.concept.conceptNames) AS n WHERE n.name = :name")
 })
 public class ArtifactImpl implements Artifact, Serializable, JPAEntity {
 
@@ -196,7 +201,7 @@ public class ArtifactImpl implements Artifact, Serializable, JPAEntity {
         if (groupId != null ? !groupId.equals(artifact.groupId) : artifact.groupId != null) return false;
         if (artifactId != null ? !artifactId.equals(artifact.artifactId) : artifact.artifactId != null) return false;
         if (version != null ? !version.equals(artifact.version) : artifact.version != null) return false;
-
+        if (reference != null ? !reference.equals(artifact.reference) : artifact.reference != null) return false;
         return true;
     }
 
@@ -206,6 +211,7 @@ public class ArtifactImpl implements Artifact, Serializable, JPAEntity {
         result = 31 * result + (artifactId != null ? artifactId.hashCode() : 0);
         result = 31 * result + (version != null ? version.hashCode() : 0);
         result = 31 * result + (classifier != null ? classifier.hashCode() : 0);
+        result = 31 * result + (reference != null ? reference.hashCode() : 0);
         return result;
     }
 

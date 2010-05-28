@@ -17,6 +17,7 @@ package vars.jpa;
 
 import com.google.inject.Inject;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.persistence.EntityManager;
@@ -266,5 +267,30 @@ public class DAO implements vars.DAO, EntityManagerAspect {
             entityTransaction.begin();
             log.debug("JPA Transaction Started");
         }
+    }
+
+    /**
+     * The findByNamedQuery method needs a Map of parameters. This method
+     * generates the map for you. For example, instead of using:
+     * {@code
+     *  Map<String, Object> map = new HashMap<String, Object>();
+     *  map.put("groupId", "vaap.annotation");
+     *  map.put("artifactId", "VARS-Histogram");
+     * }
+     * You could use
+     * {@code
+     *  Map<String, Object> map = toParameterMap("groupId", "vaap-annotation", "artifactId", "VARS-Histogram")
+     *
+     * }
+     * @param args An even numbered set of args. The first value in each pair is the parameter name
+     *      as a string, the 2nd value is the parameter value
+     * @return A Map containing the key-value pairs
+     */
+    public Map<String, Object> toParameterMap(Object... args) {
+        Map<String, Object> params = new HashMap<String, Object>();
+        for (int i = 0; i < args.length; i += 2) {
+            params.put((String) args[i], args[i + 1]);
+        }
+        return params;
     }
 }

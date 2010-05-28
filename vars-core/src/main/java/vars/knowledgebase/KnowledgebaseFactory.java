@@ -11,6 +11,8 @@ public interface KnowledgebaseFactory {
 
     /* --- Knowledgebase --- */
 
+    Artifact newArtifact();
+
     Concept newConcept();
 
     ConceptName newConceptName();

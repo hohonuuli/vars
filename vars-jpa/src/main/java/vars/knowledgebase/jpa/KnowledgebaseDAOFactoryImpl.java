@@ -21,15 +21,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import vars.DAO;
 import vars.jpa.EntityManagerFactoryAspect;
-import vars.knowledgebase.ConceptDAO;
-import vars.knowledgebase.ConceptMetadataDAO;
-import vars.knowledgebase.ConceptNameDAO;
-import vars.knowledgebase.HistoryDAO;
-import vars.knowledgebase.KnowledgebaseDAOFactory;
-import vars.knowledgebase.LinkRealizationDAO;
-import vars.knowledgebase.LinkTemplateDAO;
-import vars.knowledgebase.MediaDAO;
-import vars.knowledgebase.UsageDAO;
+import vars.knowledgebase.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -58,6 +50,14 @@ public class KnowledgebaseDAOFactoryImpl implements KnowledgebaseDAOFactory, Ent
      */
     public EntityManagerFactory getEntityManagerFactory() {
         return entityManagerFactory;
+    }
+
+    public ArtifactDAO newArtifactDAO() {
+        return new ArtifactDAOImpl((entityManagerFactory.createEntityManager()));
+    }
+
+    public ArtifactDAO newArtifactDAO(EntityManager entityManager) {
+        return new ArtifactDAOImpl(entityManager);
     }
 
     /**
