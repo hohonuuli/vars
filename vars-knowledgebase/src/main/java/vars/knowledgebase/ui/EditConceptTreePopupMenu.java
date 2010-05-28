@@ -21,7 +21,6 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.tree.TreePath;
 import org.bushe.swing.event.EventBus;
@@ -35,12 +34,13 @@ import vars.knowledgebase.ui.dialogs.AddConceptDialog;
 import vars.shared.ui.ILockableEditor;
 import vars.shared.ui.tree.ConceptTreeModel;
 import vars.shared.ui.tree.ConceptTreeNode;
+import vars.shared.ui.tree.ConceptTreePopupMenu;
 
 /**
  *
  * @author brian
  */
-public class EditConceptTreePopupMenu extends JPopupMenu implements ILockableEditor {
+public class EditConceptTreePopupMenu extends ConceptTreePopupMenu implements ILockableEditor {
 
     private final JMenuItem addConceptMenuItem;
     private JDialog dialog;
@@ -58,6 +58,7 @@ public class EditConceptTreePopupMenu extends JPopupMenu implements ILockableEdi
      * @param toolBelt
      */
     public EditConceptTreePopupMenu(JTree tree, ToolBelt toolBelt) {
+        super(tree, toolBelt.getKnowledgebaseDAOFactory());
         if (toolBelt == null) {
             throw new IllegalArgumentException("ToolBelt argument can not be null");
         }

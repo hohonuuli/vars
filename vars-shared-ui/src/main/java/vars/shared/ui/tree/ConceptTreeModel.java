@@ -128,7 +128,11 @@ public class ConceptTreeModel extends DefaultTreeModel {
 
             node.setLoaded(true);
 
-            // Refresh node in UI
+            // Refresh node in UI.
+            // I commented this out since it was causing the expand item
+            // in the ConceptTreePopupMenu to only expand the immediate children
+            // of a node (even though they all were loaded from the database.
+            // When I commented out invokeLater everything expanded fine.
             SwingUtilities.invokeLater(new Runnable() {
 
                 public void run() {
@@ -280,5 +284,13 @@ public class ConceptTreeModel extends DefaultTreeModel {
                 log.error("DAO queue died", e);
             }
         }
+
+        @Override
+        protected void finalize() throws Throwable {
+            dao.endTransaction();
+            super.finalize();
+        }
+
+
     }
 }

@@ -39,6 +39,7 @@ import vars.annotation.ui.ppanel.PPhysicalDataPanel;
 import vars.annotation.ui.ppanel.PVideoArchivePanel;
 import vars.knowledgebase.Concept;
 import vars.shared.ui.tree.ConceptTreeNode;
+import vars.shared.ui.tree.ConceptTreePopupMenu;
 
 /**
  * <p>JPanel that contains various tabbed panes used in the annotation
@@ -80,6 +81,8 @@ public class MiscTabsPanel extends javax.swing.JPanel {
             tree.setCellRenderer(new ConceptTreeCellRenderer());
             treeDecorator = new JTreeDragAndDropDecorator(tree);
             treePanel.setJTree(tree);
+            ((ConceptTreePanel) treePanel).setPopupMenu(new ConceptTreePopupMenu(tree, toolbelt.getKnowledgebaseDAOFactory()));
+
             lookupConceptSubscriber = new EventTopicSubscriber<String>() {
 
                 public void onEvent(String topic, String data) {
