@@ -66,7 +66,7 @@ public class RSS422VideoControlService extends AbstractVideoControlService {
 
         disconnect();
 
-        IVCR vcr = (IVCR) getVcr();
+        IVCR vcr = getVcr();
 
         if ((args.length != 2) && !(args[0] instanceof String)) {
             throw new IllegalArgumentException(

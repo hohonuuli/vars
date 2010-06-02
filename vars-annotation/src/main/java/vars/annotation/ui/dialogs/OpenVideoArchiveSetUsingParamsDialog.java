@@ -12,8 +12,7 @@
  */
 
 
-
-package org.mbari.vars.annotation.locale;
+package vars.annotation.ui.dialogs;
 
 import java.awt.BorderLayout;
 import java.awt.Frame;

@@ -29,7 +29,7 @@ import javax.swing.JTextField;
 import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.swing.PropertyPanel;
-import org.mbari.vars.annotation.locale.OpenVideoArchiveSetUsingParamsDialog;
+import vars.annotation.ui.dialogs.OpenVideoArchiveSetUsingParamsDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.VideoArchive;
@@ -167,9 +167,6 @@ public class PVideoArchivePanel extends PropertiesPanel {
         if (changeNameDialog == null) {
             changeNameDialog = new OpenVideoArchiveSetUsingParamsDialog(toolBelt.getAnnotationDAOFactory()) {
 
-                /**
-                 *  @see org.mbari.vars.annotation.ui.dialogs.OpenVideoArchiveSetUsingParamsDialog#getOkButtonAction()
-                 */
                 @Override
                 public ActionAdapter getOkButtonAction() {
                     if (okButtonAction == null) {

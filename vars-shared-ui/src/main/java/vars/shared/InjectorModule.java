@@ -72,9 +72,13 @@ public class InjectorModule implements Module {
         }
 
         binder.bind(ImageCaptureService.class).toProvider(ImageCaptureServiceProvider.class).in(Scopes.SINGLETON);
-        //binder.bind(ImageCaptureService.class).to(grabberClazz).in(Scopes.SINGLETON);
     }
 
+    /**
+     * This is where we configure the different image capture services for different
+     * platforms. Currently the default is to try to use QuickTime for Java to do
+     * the capture but we may change this in the future.
+     */
     private static class ImageCaptureServiceProvider implements Provider<ImageCaptureService> {
 
         private final Logger log = LoggerFactory.getLogger(getClass());
@@ -91,7 +95,7 @@ public class InjectorModule implements Module {
                     grabberClazz = (Class<ImageCaptureService>) Class.forName("vars.quicktime.QTImageCaptureServiceImpl");
                 }
                 catch (ClassNotFoundException ex) {
-                    log.info("QuickTime for Java could not be intialized", ex);
+                    log.info("QuickTime for Java could not be initialized", ex);
                 }
             }
             else if (SystemUtilities.isWindowsOS()) {
@@ -99,7 +103,7 @@ public class InjectorModule implements Module {
                     grabberClazz = (Class<ImageCaptureService>) Class.forName("vars.quicktime.QTImageCaptureServiceImpl");
                 }
                 catch (ClassNotFoundException ex) {
-                    log.info("QuickTime for Java could not be intialized");
+                    log.info("QuickTime for Java could not be initialized");
                 }
             }
 
