@@ -191,19 +191,26 @@ public class PersistenceController {
         final Collection<Observation> uiObservations = new ArrayList<Observation>();
         final ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
         final AssociationDAO dao = annotationDAOFactory.newAssociationDAO();
+
+        // DAOTX
         dao.startTransaction();
-
         for (Observation observation : observations) {
-
             // Try a merge first to try an update the conceptName incase it's been
-            // changed. If a merge fails just find it
+            // changed.
             try {
                 observation = dao.merge(observation);
             }
             catch (Exception e) {
-                observation = dao.find(observation);
+                // Do nothing
             }
+        }
+        dao.endTransaction();
 
+        // DAOTX
+        dao.startTransaction();
+        for (Observation observation : observations) {
+            // We do a find so that associations added else where will be available
+            observation = dao.find(observation);
             if (observation != null) {
                 uiObservations.add(observation);
                 Association ass = annotationFactory.newAssociation(associationTemplate.getLinkName(),
