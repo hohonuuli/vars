@@ -1,13 +1,210 @@
--- Example for obtaining a DAO object in the Groovy shell
+Video Annotation and Reference System (VARS) version 6.0
 
-import vars.knowledgebase.ui.Lookup
-import vars.knowledgebase.ui.ToolBelt
-injector = Lookup.guiceInjectorDispatcher.valueObject
-toolBelt = injector.getInstance(ToolBelt.class)                           
-dao = toolBelt.knowledgebaseDAOFactory.newDAO()
+http://vars.sourceforge.net
 
--- Example for testing expd code in Groovy shell
-import org.mbari.expd.*; import org.mbari.expd.jdbc.*; import com.google.inject.Guice 
-inj = Guice.createInjector(new ExpdModule());ddao = inj.getInstance(DiveDAO.class);dao = inj.getInstance(UberDatumDAO.class);
-d = ddao.findByPlatformAndDiveNumber('Ventana', 2000); ud = dao.fetchData(d, false, 7.5) 
-ud.each { println("${it.cameraDatum} --- ${it.ctdDatum} --- ${it.navigationDatum}") } 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~  What is VARS?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The Video Annotation and Reference System (VARS) is a software interface and 
+database system that provides tools for describing, cataloging, retrieving, and 
+viewing the visual, descriptive, and quantitative data associated with video 
+archives. 
+
+VARS is a suite of applications that communicate with a relational database 
+mangement system. VARS comes with a database system (Apache Derby) that is 
+suitable for testing, development, and small deployment applications. For production 
+systems, it is recommended that you set up a database server. VARS has been 
+tested on Apache Derby, MS SQL Server 2000 and MS SQL Server 2008 but should 
+also run on most relational databases.
+
+Developed and Maintained by the Monterey Bay Aquarium research institute 
+(MBARI), VARS is aimed at the oceanographic community. However, it can be used 
+for other fields and we welcome suggestions or code contributions that would 
+help expand the VARS community.
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~  About this release?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+VARS 6.0 is not backwards compatibly with previous VARS databases (i.e. 5.1.0 or
+earlier). If you have significant data from a previous VARS installation, it is
+possbible to migrate the older database to work with VARS 6.0. Contact 
+brian AT mbari DOT org for assistance.
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~  Installing VARS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For installation instructions refer to the INSTALL.macosx and INSTALL.windows 
+files. You will need to follow these instructions before you can run VARS.
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~  Running VARS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To quickly get started on windows, refer to QUICKSTART.windows. Mac users should
+refer to QUICKSTART.macosx
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~ Deploying VARS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Fresh out of the box, VARS is configured as a demonstration application. Here
+are a few configuration tips to help set VARS up for your use.
+ 
+I. Customizing the Camera-platforms
+
+   A camera-platform is the name of whatever it is you have your camera 
+   mounted on. At MBARI, we use 2 ROVs, Ventana and Tiburon. But the camera-
+   platform can be anything that you want to use to uniquely identify the 
+   source of the video. Configuring VARS to recognize your camera-platform is 
+   simple; just follow these steps:
+   
+    A) Open conf/vars.properties.
+    B) At the bottom of the file is several lines starting with ship and 
+       cameraplatform. You can delete all of these, then add a line like:
+       
+        cameraplatform.0=MyCameraPlatform
+        
+       You can add as many camera-platforms as you like; subsequent ones would 
+       be identified as cameraplatform.1, cameraplatform.2, etc. One caveat, each
+       camera-platform's name should start with a different letter. 
+       
+II. Capturing images
+
+    When VARS is used to capture images from video, it initially stores them
+    in a directory that you specify. When a session is closed, VARS can be 
+    configured to change the reference of these images to a web accessable URLs.
+    In order to do this you will need to do the following:
+    
+    A) You will need to setup a web server. (The details of which are WAY
+       beyond the scope of this document). 
+    B) When setting up the web server you will need to have a directory that
+       can be both accessed from the annotation workstation and served 
+       through the web server. This directory should have write permissions
+       for the user accounts that will be running the Annotation 
+       applications. In addition, the directory will need to be mounted (for 
+       Mac OS X) or accessed by UNC paths (on Windows) so that VARS can move
+       images to them. 
+    C) In the VARS annotation application, open the preferences (it's a button on 
+       the toolbar.
+    D) In the preference window you will need to specify
+       1) The directory that you wish to write the images too. Ideally, this
+          directory will be on a shared drive that is mounted on a web server.
+          For Example, this might be \\SomeSharedDrive\framegrabs. Mac\Linux
+          users may have to mount the shared directory before annotation 
+       2) The URL that points to the above directory on the web server. For example
+          http://mywebsite.edu/video/framegrabs.
+
+          
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~  Running VARS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The scripts for running VARS are located in the bin directory (e.g. VARS\bin)
+
+!!! IMPORTANT !!!
+VARS requires a networked database server in order to function. This download
+includes one, but you must start it before running VARS. To start the database 
+server use: derbystart (Mac\Linux) or derbystart.bat (Windows)
+!!!!!!!!!!!!!!!!!
+
+There are 3 applications in VARS. You can start them by running the appropriate
+launcher script. The applications and corresponding scripts are:
+
+Application        Windows             Mac OS X \ Linux
+~~~~~~~~~~~        ~~~~~~~~~~~         ~~~~~~~~~~~~~~~~
+Annotation         annotation.bat      annotation
+Knowledgebase      knowledgebase.bat   knowledgebase
+Query              query.bat           query
+
+NOTE: The Annotation application may take a long time to start. This is 
+normal because a) it must load all the information from the knowledgebase database
+when starting and b) The RXTX serial port libraries used to talk to the VCR can
+take a long time to initialize.
+
+NOTE: Framecapture is only support on Mac OS X or Windows. QuickTime must be 
+installed on Windows in order to use Framecapture.
+ 
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~  Configuring your professional VCR for use with VARS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+VARS is designed to operate with VCR's that support Sony's 9-pin (RS-422) 
+protocol. In order to VARS to function correctly you will need to adjust a few 
+settings on the VCR. 
+
+By default, VCR's do not allow remote control; VARS will not be able to control 
+a VCR unless remote control is enabled. To enable remote control there is 
+typically a 'Remote' switch on the front of the VCR, this should be turned on.
+
+In addition, VARS can write UTC time directly onto the video tape. This assumes 
+that the computer running VARS has the correct time for your timezone set. The 
+time is written to the 'userbits' of the videotape (refer to your VCR's 
+documentation about userbits). The benefit of writing time to the tape is that 
+when the tape is annotated using VARS later on, VARS reads the time off the tape
+and stores the moment in time that you recorded the video for a particular 
+annotation. This is EXTREMELY important when trying to integrate other data, 
+such as location of the camera, later on. To enable this feature, the remote 
+switch on the VCR needs to be enabled (see above) and several other setting will
+need to be performed. These settings vary depending on your make and model of 
+VCR. Here are the instructions for 2 of the VCR's that we use at MBARI:
+
+SONY DVW-A500 DECK CONFIGURATION
+    1) Connect serial cable to "Remote 1-IN(9P)" connector.
+    2) On the Sub control panel: (pull handles out, look on top edge)
+        Set "TC GENERATOR" switches to "INT" and PRESET"
+    3) On the System set-up panel: (pull handles out, tilt up, look behind)
+        Set "TC" to "AUTO"
+        Set "TC GENERATOR" to "REC RUN", "NDF", "VITC, ON", "ID PRESET, OFF"
+
+PANASONIC AJ-HD2000 DECK CONFIGURATION
+    1) Connect serial cable to "Remote 1-IN(9P)" connector.
+    2) From Home (you may need to press the home button), Press 4 on the number 
+       pad to bring up TC/CHR menu. Set the following:
+        SOURCE = INT, 
+        TC SLAVE = AUTO, 
+        UB SLAVE = OFF, 
+        RUN MD = REC RUN, 
+        DF MD = OFF
+    3) From Home, Press 5 (SET UP)
+        Press F11 (Panel) then F11 again (REMOTE OP MAP)
+    Set MAP MODE = ALL
+    
+    
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~  Integrating other data with VARS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+VARS was designed to integrate other data such as position (latitude, longitude,
+depth) and physical parameters (salinity, temperature, etc.). This information 
+is stored in a table named PhysicalData in the database. If you need help or 
+suggestions on how to import your physical data into VARS send an email to the
+mailing lists at http://vars.sourceforge.net. Also, if you would like to 
+integrate other information thats not available in the default tables, send an 
+email. It's very easy to modify VARS to store additional information.
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~ Using your own database
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+VARS comes with Apache Derby as a database server. Derby is very useful for 
+small deployments or for testing VARS. However, it is likely that if you are
+seriously considering running VARS, you will want to use your own database 
+server. Instructions for setting VARS up using Microsoft SQL Server and Oracle 
+XE can be found in README.SQLSERVER and README.ORACLE
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~  Feedback
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+VARS is an open source project. We welcome contributions and suggestions. 
+Contributions can come in many different forms such as documentation, code 
+contributions, web site improvements etc. More information can be found 
+http://vars.sourceforge.net or http://code.google.com/p/vars-redux/

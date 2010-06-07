@@ -1,0 +1,62 @@
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~  Prerequisites
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you are using VARS to annotate video tapes be aware that Apple computers do 
+not ship with built in serial ports. In order to fully use the Annotation 
+application you will need to install a serial port in order to talk to the VCR. 
+Their are several options for this, the easiest is using a USB Serial Port 
+adapter such as the USB PDA/Serial Adapter (GUC232A) from IOGEAR. Be sure to 
+install the correct driver too! Some video capture cards include an RS422 serial
+port that can be used by VARS.
+
+NOTE: The serial port libraries included with VARS do not work with Java 6 on 
+Leopard. If you need to run Java 6 you will need to download the source code
+for RXTX and recompile it to target Java 6. If you don't know what that means, 
+stick with Java 5 on the Mac.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~  Running VARS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+NOTE: If you're reading this I'm assuming you've already downloaded VARS and 
+extracted the zip file to a directory. For this documentation, the directory
+containing VARS will be called 'VARS_HOME'
+
+Step 1:
+    Locate the directory VARS_HOME/bin. This contains all the batch files need 
+to run the different VARS applications.
+
+Step 2: 
+    Start the "Terminal" application. It's located in Applications->Utilities->Terminal
+
+Step 3:
+    In the terminal type: 
+        cd VARS_HOME/bin
+    Remember to replace VARS_HOME with the full path to the VARS directory.
+
+Step 4:
+    The 1st time you run VARS you need to tell the Mac that VARS_HOME contains 
+executable files. To do this, in the terminal type:
+        chmod u+x *
+
+Step 5:
+    Start the database from the Terminal by typing:
+        ./derbystart
+
+Step 6: 
+    If this is your 1st time running VARS, you will need to create a user 
+account. Otherwise you can skip this step. To create a user account:
+        1) In the terminal type: ./knowledgebase
+        2) When asked if you want to create an administrator account, click "Yes"
+        3) Enter a login name and password
+
+Step 7:
+    To start the Annotation application, in the terminal type: ./annotation
+
+Step 5:
+    To start the Query application, in the terminal type: ./query
+
+Cleaning up:
+    When you're fininished you can stop the database server by typing:
+        ./derbystop

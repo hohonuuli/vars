@@ -1,0 +1,14 @@
+-- Example for obtaining a DAO object in the Groovy shell
+
+toolBox = new vars.ToolBox()                           
+dao = toolBox.toolBelt.knowledgebaseDAOFactory.newDAO()
+
+-- Example for testing expd code in Groovy shell
+import org.mbari.expd.*; import org.mbari.expd.jdbc.*; import com.google.inject.Guice 
+inj = Guice.createInjector(new ExpdModule())
+df = inj.getInstance(DAOFactory.class)
+ddao = df.newDiveDAO()
+dao = df.newUberDatumDAO()
+d = ddao.findByPlatformAndDiveNumber('Ventana', 2000)
+ud = dao.fetchData(d, false, 7.5) 
+ud.each { println("${it.cameraDatum} --- ${it.ctdDatum} --- ${it.navigationDatum}") } 

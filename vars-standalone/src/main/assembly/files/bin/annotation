@@ -1,9 +1,10 @@
 #!/bin/sh
 
-source `dirname "$0"`/varsSetup
+VARS_HOME=`dirname "$0"`/..
+VARS_CLASSPATH=$VARS_HOME/conf:$VARS_HOME/lib/*
 
 ${JAVACMD:=java} -Xms16m -Xmx512m \
-         -Duser.timezone="UTC" \
+         -Duser.timezone=UTC \
          -Dfile.encoding=UTF8 \
          -classpath "$VARS_CLASSPATH" \
          vars.annotation.ui.App "$@"

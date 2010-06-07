@@ -3,29 +3,28 @@
 # $Id: $
 # GSH: Execute groovy script using the projects library directory.
 
-source `dirname "$0"`/varsSetup
+VARS_HOME=`dirname "$0"`/..
+VARS_CLASSPATH="$VARS_HOME/conf":"$VARS_HOME/lib/*"
 
-GSH_CLASSPATH=${HOME}/.groovy/lib
+GSH_CLASSPATH="${HOME}/.groovy/lib"
 for jar in $(ls ${HOME}/.groovy/lib/*.jar)
 do
-    GSH_CLASSPATH=$GSH_CLASSPATH:$jar
+    GSH_CLASSPATH=$GSH_CLASSPATH:"$jar"
 done
 
-GSH_CLASSPATH=$GSH_CLASSPATH:${VARS_HOME}/scripts/groovy:$VARS_CLASSPATH
+GSH_CLASSPATH=$GSH_CLASSPATH:"${VARS_HOME}/scripts/groovy":$VARS_CLASSPATH
 
 if [ -z $1 ]; then
     echo $FNAME " Starting Groovy shell"
     ${JAVACMD:=java} -Xms16m -Xmx512m \
-		 -Djava.library.path="${VARS_HOME}/native" \
-         -Duser.timezone="UTC" \
+         -Duser.timezone=UTC \
          -Dfile.encoding=UTF8 \
-         -classpath "$GSH_CLASSPATH" \
+         -classpath $GSH_CLASSPATH \
          org.codehaus.groovy.tools.shell.Main "$@"
 else
     ${JAVACMD:=java} -Xms16m -Xmx512m \
-         -Djava.library.path="${VARS_HOME}/native" \
-         -Duser.timezone="UTC" \
+         -Duser.timezone=UTC \
          -Dfile.encoding=UTF8 \
-         -classpath "$GSH_CLASSPATH" \
+         -classpath $GSH_CLASSPATH \
          groovy.ui.GroovyMain "$@"
 fi

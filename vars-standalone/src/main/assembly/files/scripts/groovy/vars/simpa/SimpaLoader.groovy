@@ -70,7 +70,7 @@ class SimpaLoader {
         return data
     }
 
-   def load(List<SimpaDatum> simpaData, String platform, Integer sequenceNumber, String startTimecodeS, String endTimecodeS, int tapeNumber) {
+    def load(List<SimpaDatum> simpaData, String platform, Integer sequenceNumber, String startTimecodeS, String endTimecodeS, int tapeNumber) {
 
 		log.info("Loading records into VARS for ${platform} #${sequenceNumber}")
 		def startTimecode = new Timecode(startTimecodeS)

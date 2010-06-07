@@ -1,0 +1,30 @@
+INSTALLING VARS ON MAC OS X    
+    
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~  Prerequisites
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you are using VARS to annotate video tapes be aware that Apple computers do 
+not ship with built in serial ports. In order to fully use the Annotation 
+application you will need to install a serial port in order to talk to the VCR. 
+Their are several options for this, the easiest is using a USB Serial Port 
+adapter such as the USB PDA/Serial Adapter (GUC232A) from IOGEAR. Be sure to 
+install the correct driver too! Some video capture cards include an RS422 serial
+port that can be used by VARS.
+
+NOTE: The serial port libraries included with VARS  work on Snow Leopard (Mac
+OS X 10.6). If you need to run on Leopard you should contact Brian Schlining
+at brian AT mbari DOT org
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~  Running VARS for the first time
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+'Out-of-the-box', VARS is configured to run against a bundled database server. 
+This server is suitable for testing and small deployments. Other than installing 
+the prerequisites, no configuration is necessary to start VARS.
+
+When you are ready to run VARS for the first time, start the Knowledgebase 
+application (using varsKb or knowledgebase). This will prompt you to create an 
+administrator account for controlling modifications to the VARS knowledgebase.

@@ -1,0 +1,57 @@
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~  Prerequisites
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+VARS 6.0 is configured to run on a 32-bit JVM only!!
+
+In order for VARS to run on your system you will need to install the following 
+before installing VARS:
+
+    1) Java 1.6 (also known as Java 6)
+    2) Quicktime for Java
+
+Installation Instructions for Prerequisites
+
+I) Installing Java
+
+   You can download Java for Windows from http://java.com. Simply 
+   download the installer for the latest version of Java and run it.
+    
+II) Installing Quicktime for Java
+    
+    Go to http://www.apple.com/quicktime/download. Download and run the 
+    installer. Installing iTunes will also install Quicktime for Java.
+     
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~  Running VARS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+NOTE: If you're reading this I'm assuming you've already downloaded VARS and 
+extracted the zip file to a directory. For this documentation, the directory
+containing VARS will be called 'VARS_HOME'
+
+Step 1:
+    Locate the directory VARS_HOME\bin. This contains all the batch files need 
+to run the different VARS applications.
+
+Step 2:
+    Start the database by double-clicking VARS_HOME\bin\derbystart.bat.
+
+Step 3: 
+    If this is your 1st time running VARS, you will need to create a user 
+account. Otherwise you can skip this step. To create a user account:
+        1) Double-click VARS_HOME\bin\knowledgebase.bat
+        2) When asked if you want to create an administrator account, click "Yes"
+        3) Enter a login name and password
+
+Step 4:
+    To start the Annotation application, double click VARS_HOME\bin\annotation.bat
+
+Step 5:
+    To start the Query application, double click VARS_HOME\bin\query.bat
+
+Cleaning up:
+    When you're fininished you can stop the database server by double clicking
+VARS_HOME\bin\derbystop.bat
