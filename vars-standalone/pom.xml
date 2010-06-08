@@ -17,7 +17,7 @@
             <artifactId>vars-query</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency> 
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>vars-annotation</artifactId>
             <version>${project.version}</version>
@@ -41,9 +41,9 @@
             <version>0.9.94</version>
         </dependency>
         <dependency>
-            <groupId>jline</groupId>
-            <artifactId>jline</artifactId>
-            <version>0.9.94</version>
+            <groupId>org.fusesource.jansi</groupId>
+            <artifactId>jansi</artifactId>
+            <version>1.2</version>
         </dependency>
         <dependency>
             <groupId>commons-cli</groupId>
