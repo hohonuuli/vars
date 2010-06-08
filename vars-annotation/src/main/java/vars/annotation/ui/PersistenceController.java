@@ -15,8 +15,10 @@
 
 package vars.annotation.ui;
 
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DecimalFormat;
@@ -24,7 +26,6 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Vector;
-import java.util.logging.Level;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
@@ -189,10 +190,11 @@ public class PersistenceController {
     public Collection<Association> insertAssociations(Collection<Observation> observations, ILink associationTemplate) {
         final Collection<Association> associations = new ArrayList<Association>(observations.size());
         final Collection<Observation> uiObservations = new ArrayList<Observation>();
+        final Collection<Observation> mergedObservations = new ArrayList<Observation>();
         final ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
         final AssociationDAO dao = annotationDAOFactory.newAssociationDAO();
 
-        // DAOTX
+        // DAOTX - Add Association to each observation
         dao.startTransaction();
         for (Observation observation : observations) {
             // Try a merge first to try an update the conceptName incase it's been
@@ -201,16 +203,9 @@ public class PersistenceController {
                 observation = dao.merge(observation);
             }
             catch (Exception e) {
-                // Do nothing
+                observation = dao.find(observation);
             }
-        }
-        dao.endTransaction();
-
-        // DAOTX
-        dao.startTransaction();
-        for (Observation observation : observations) {
-            // We do a find so that associations added else where will be available
-            observation = dao.find(observation);
+            
             if (observation != null) {
                 uiObservations.add(observation);
                 Association ass = annotationFactory.newAssociation(associationTemplate.getLinkName(),
@@ -223,8 +218,45 @@ public class PersistenceController {
         }
 
         dao.endTransaction();
+
+        resetObservationsInDispatcher(uiObservations);
         updateUI(uiObservations);    // update view
         return associations;
+    }
+
+    /**
+     * If any of the observations provided in the argument match those in those
+     * referenced in {@code (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();}
+     * then they ones in the dispatcher will be replaced by those you provided.
+     * This helps keep observations in sync
+     * 
+     * @param observations
+     */
+    private void resetObservationsInDispatcher(Collection<Observation> observations) {
+
+        // ---- Remove overlapping references from the observations in the
+        // dispatcher. We'll replace them with the observations in our argument
+        // collection.
+        Collection<Observation> selectedObservations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+        Function<Observation, Long> f = new Function<Observation, Long>() {
+            public Long apply(Observation from) {
+                return (Long) from.getPrimaryKey();
+            }
+        };
+        final Collection<Long> pks = Collections2.transform(observations, f);
+        final Collection<Long> selectedPks = Collections2.transform(selectedObservations, f);
+        selectedPks.removeAll(pks);
+        selectedObservations = Collections2.filter(selectedObservations, new Predicate<Observation>() {
+            public boolean apply(Observation input) {
+                return selectedPks.contains((Long) input.getPrimaryKey());
+            }
+        });
+
+        // ---- Once the overlaps are removed add the replacements
+        Collection<Observation> uiObservations = new ArrayList<Observation>(selectedObservations);
+        uiObservations.addAll(observations);
+
+        Lookup.getSelectedObservationsDispatcher().setValueObject(uiObservations);
     }
 
     /**
