@@ -20,10 +20,14 @@ import vars.ToolBox
 import vars.annotation.ui.PersistenceController
 import org.mbari.expd.actions.CoallateByDateFunction
 import org.mbari.vcr.rs422.VCR
+import org.mbari.vcr.VCRAdapter
 import org.mbari.vcr.VCRUtil
 import org.mbari.movie.Timecode
 import org.mbari.movie.VideoTimeBean
 import vars.annotation.CameraData
+import vars.annotation.ui.Lookup
+import vars.annotation.ui.video.RSS422VideoControlService
+import vars.shared.ui.video.ImageCaptureService
 
 class SimpaLoader {
 
@@ -35,7 +39,7 @@ class SimpaLoader {
     private targetRootUrl
     private vcr
     private log = LoggerFactory.getLogger("SimpaLoader")
-	private frameGrabber = new VideoChannelGrabber()
+    private frameGrabber
 
     /**
      * @param targetDir is the root of the directory to write images into
@@ -44,8 +48,40 @@ class SimpaLoader {
     def SimpaLoader(String targetDir, String targetUrl, String commport) {
         targetRootDirectory = new File(targetDir)
         targetRootUrl = new URL(targetUrl);
-        vcr = new VCR(commport);
         dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        // Intialize image capture
+        /* 
+           FIXME - This fails with
+           010-06-08 21:42:53,555 [main] WARN  vars.quicktime.QTImageCaptureServiceImpl  - Failed to initialize QuickTime for Java components.
+                org.mbari.framegrab.GrabberException: Failed to initialize QuickTime components
+                at org.mbari.framegrab.VideoChannelGrabber.<init>(VideoChannelGrabber.java:57)
+                at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+                ...
+           Caused by: java.lang.SecurityException: Only able to capture media with security settings when class is signed
+                at quicktime.std.sg.SequenceGrabber.initialize(SequenceGrabber.java:90)
+                at quicktime.std.sg.SequenceGrabber.<init>(SequenceGrabber.java:58)
+                at quicktime.std.sg.SequenceGrabber.<init>(SequenceGrabber.java:46)
+                at org.mbari.framegrab.VideoChannelGrabber.<init>(VideoChannelGrabber.java:53)
+                ... 111 more
+                
+           I found a note at http://www.oreillynet.com/mac/blog/2006/12/explaining_the_quartz_composer.html
+           that says I need to sign my classes for this to work. I need to add
+           some code to sign the jars when building the standalone app
+        */
+        def imageCaptureService = Lookup.guiceInjectorDispatcher.valueObject.getInstance(ImageCaptureService.class);
+        frameGrabber = imageCaptureService.grabber
+        
+        // Initialize video control service
+        try {
+        def videoControlService = new RSS422VideoControlService()
+            videoControlService.connect(commport, 29.97D)
+            vcr = videoControlService.vcr
+        }
+        catch (Exception e) {
+            log.warn("Could not connect to VCR. VCR control is disabled", e)
+            vcr = new VCRAdapter()
+        }
     }
 
     def close() {

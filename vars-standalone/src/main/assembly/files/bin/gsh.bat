@@ -10,4 +10,4 @@ SET GROOVY_CLASSPATH="%VARS_HOME%\scripts\groovy";%VARS_CLASSPATH%
 
 if (%1)==() SET ARGS="%VARS_HOME%\scripts\groovy\openshell.groovy" ELSE ARGS=%*
 
-java -Xms16m -Xmx512m -Duser.timezone="UTC" -classpath %GROOVY_CLASSPATH% groovy.ui.GroovyMain %ARGS%
+java -Xms16m -Xmx512m -Duser.timezone="UTC" -classpath %GROOVY_CLASSPATH% -Djava.security.manager -Djava.security.policy==%VARS_HOME%/conf/java.policy \groovy.ui.GroovyMain %ARGS%

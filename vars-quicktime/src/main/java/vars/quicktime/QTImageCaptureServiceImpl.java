@@ -75,6 +75,8 @@ public class QTImageCaptureServiceImpl implements ImageCaptureService {
 
     }
 
-
+    public IGrabber getGrabber() {
+        return grabber;
+    }
 
 }
