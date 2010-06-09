@@ -1,24 +1,13 @@
 package vars.annotation.jpa;
 
+import vars.annotation.*;
 import vars.jpa.DAO;
-import vars.annotation.CameraDeployment;
 import vars.knowledgebase.Concept;
 
-import java.util.Set;
-import java.util.Date;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import com.google.inject.Inject;
 import javax.persistence.EntityManager;
-import vars.annotation.AnnotationFactory;
-import vars.annotation.VideoArchive;
-import vars.annotation.VideoArchiveDAO;
-import vars.annotation.VideoArchiveSet;
-import vars.annotation.VideoArchiveSetDAO;
 
 
 public class VideoArchiveSetDAOImpl extends DAO implements VideoArchiveSetDAO {
@@ -129,8 +118,22 @@ public class VideoArchiveSetDAOImpl extends DAO implements VideoArchiveSetDAO {
         return null;  // TODO implement this method.
     }
 
+    /**
+     *
+     * @return VideoArchiveSets that are missing startDate or endDate values
+     */
     public Collection<VideoArchiveSet> findAllWithoutDates() {
-        return null;  // TODO implement this method.
+        return findByNamedQuery("VideoArchiveSet.findAllWithMissingDates");
+    }
+
+    public Collection<VideoArchiveSet> findAllWithNoChiefScientist() {
+        CameraDeploymentDAO dao = new CameraDeploymentDAOImpl(getEntityManager());
+        Collection<CameraDeployment> cameraDeployments = dao.findAllWithoutChiefScientistName();
+        Collection<VideoArchiveSet> videoArchiveSets = new HashSet<VideoArchiveSet>();
+        for (CameraDeployment cameraDeployment : cameraDeployments) {
+            videoArchiveSets.add(cameraDeployment.getVideoArchiveSet());
+        }
+        return videoArchiveSets;
     }
 
     public VideoArchiveSet findByPrimaryKey(final Object primaryKey) {

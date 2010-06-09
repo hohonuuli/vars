@@ -435,7 +435,7 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
 
         mergeStatus.setNavigationEdited((rawNavRecords.size() == 0) ? 1 : 0);
 
-        // Set merged flat
+        // Set merged flag
         mergeStatus.setMerged((data.size() > 0) ? 1 : 0);
 
         DAOFactory daoFactory = new DAOFactoryImpl();
@@ -445,5 +445,10 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
         mergeStatusDAO.update(mergeStatus);
 
 
+    }
+
+    public MergeStatus getMergeStatus() {
+        fetch();
+        return mergeStatus;
     }
 }

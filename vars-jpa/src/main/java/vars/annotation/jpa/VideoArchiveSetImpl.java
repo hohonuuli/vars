@@ -71,7 +71,10 @@ import vars.jpa.TransactionLogger;
     @NamedQuery(name = "VideoArchiveSet.findByPlatformAndTrackingNumber",
                 query = "SELECT v FROM VideoArchiveSet v WHERE v.platformName = :platformName AND v.trackingNumber = :trackingNumber"),
     @NamedQuery(name = "VideoArchiveSet.findByPlatformAndSequenceNumber",
-                query = "SELECT v FROM VideoArchiveSet v, IN (v.cameraDeployments) c WHERE v.platformName = :platformName AND c.sequenceNumber = :sequenceNumber")
+                query = "SELECT v FROM VideoArchiveSet v, IN (v.cameraDeployments) c WHERE v.platformName = :platformName AND c.sequenceNumber = :sequenceNumber"),
+    @NamedQuery(name = "VideoArchiveSet.findAllWithMissingDates",
+                query = "SELECT v FROM VideoArchiveSet v WHERE v.startDate IS NULL OR v.endDate IS NULL")
+
 })
 public class VideoArchiveSetImpl implements Serializable, VideoArchiveSet, JPAEntity {
 

@@ -31,4 +31,9 @@ public class CameraDeploymentDAOImpl extends DAO implements CameraDeploymentDAO 
         return findByNamedQuery("CameraDeployment.findByChiefScientistName", params);
     }
 
+    public List<CameraDeployment> findAllWithoutChiefScientistName() {
+        Map<String, Object> params = new HashMap<String, Object>();
+        return findByNamedQuery("CameraDeployment.findAllWithoutChiefScientistName", params);
+    }
+
 }

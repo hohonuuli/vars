@@ -1,76 +1,87 @@
 package vars.annotation
 
-import org.mbari.expd.EXPDDAO
-import org.mbari.vars.annotation.model.dao.VideoArchiveSetDAO
-import org.mbari.vars.annotation.model.VideoArchiveSet
-import org.mbari.vars.DAO
-import org.mbari.util.Logger
 import java.text.SimpleDateFormat
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.LinkedBlockingQueue
 import org.slf4j.LoggerFactory
+import vars.integration.MergeStatusDAO
+import org.mbari.vars.integration.MergeEXPDAnnotations
+import vars.integration.MergeFunction
+import org.mbari.expd.UberDatum
+import org.mbari.expd.DiveDAO
 
 
-class DbTools {
+class DatabaseUtility {
 
-    static log = LoggerFactory.getLogger(DbTools.class)
+    final log = LoggerFactory.getLogger(DatabaseUtility.class)
+    final toolBox = new vars.ToolBox()
 
-    static void merge() {
+
+    def DatabaseUtility() {
+    }
+
+    void merge() {
 
         log.debug("----- Merging Annotations with EXPD data ----")
 
         def ids = new TreeSet()
+        MergeStatusDAO mergeStatusDAO = toolBox.mergeStatusDAO
+        VideoArchiveSetDAO dao = toolBox.toolBelt.annotationDAOFactory.newVideoArchiveSetDAO()
 
-        ids.addAll(EXPDMergeStatusDAO.findUnmergedSets())
-        ids.addAll(EXPDMergeStatusDAO.findFailedSets())
-        ids.addAll(EXPDMergeStatusDAO.findSetsWithEditedNav())
-        ids.addAll(EXPDMergeStatusDAO.findUpdatedSets())
+        ids.addAll(mergeStatusDAO.findUnmergedSets())
+        ids.addAll(mergeStatusDAO.findFailedSets())
+        ids.addAll(mergeStatusDAO.findSetsWithEditedNav())
+        ids.addAll(mergeStatusDAO.findUpdatedSets())
 
         for (id in ids) {
 
             if (id == null) { continue }
 
-            def videoArchiveSet = VideoArchiveSetDAO.getInstance().findByPK("${id}")
+            // DAOTX
+            dao.startTransaction()
+            def videoArchiveSet = dao.findByPrimaryKey(id)
 
             if (videoArchiveSet == null) { continue }
 
             def platform = videoArchiveSet.platformName
 
             // A VideoArchiveSet must have exactly 1 cameraPlatformDeployment in order to merge it
-            def cds = videoArchiveSet.cameraPlatformDeployments
+            def cds = videoArchiveSet.cameraDeployments
             def n = cds.size()
             if (n == 0) {
+                // ---- Can't merge but update the status to reflect no-merge
                 def s = "${videoArchiveSet} does not have any dives associated " +
                         "with it. Unable to merge"
-                def action = new MergeAction(platform, 0)
-                action.statusMessages << s
+                def action = new MergeEXPDAnnotations(platform, 0, false)
+                action.mergeStatus.statusMessage = action.mergeStatus.statusMessage + ";" + s
                 try {
-                    action.update(false)
+                    action.update(new HashMap<VideoFrame, UberDatum>(), MergeFunction.MergeType.PRAGMATIC)
                 }
                 catch (Exception e) {
                     log.debug("Failed to update EXPDMergeStatus for ${id}", e)
                 }
             }
             else if (n > 1) {
+                // ---- Can't merge but update the status to reflect no-merge
                 def s = "${videoArchiveSet} has more that one dive (${n}) associated " +
                         "with it. Unable to merge"
-                def action = new MergeAction(platform, cds.iterator().next().seqNumber)
-                action.statusMessages << s
+                def action = new MergeEXPDAnnotations(platform, cds.iterator().next().sequenceNumber, false)
+                action.mergeStatus.statusMessage = action.mergeStatus.statusMessage + ";" + s
                 try {
-                    action.update(false)
+                    action.update(new HashMap<VideoFrame, UberDatum>(), MergeFunction.MergeType.PRAGMATIC)
                 }
                 catch (Exception e) {
                     log.debug("Failed to update EXPDMergeStatus for ${id}", e)
                 }
             }
             else {
-                def seqNumber = cds.iterator().next().seqNumber
+                def seqNumber = cds.iterator().next().sequenceNumber
                 // Merge both both SD and HD tapes
                 for (isHD in [false, true]) {
-                    def action = new MergeAction(platform, seqNumber, isHD)
+                    def action = new MergeEXPDAnnotations(platform, seqNumber, isHD)
                     try {
-                        action.doAction(MergeAction.FLAG_PRAGMATIC)
+                        action.apply(MergeFunction.MergeType.PRAGMATIC)
                     }
                     catch (Exception e) {
                         log.debug("Failed to merge ${platform} #${seqNumber}. It's " +
@@ -79,99 +90,101 @@ class DbTools {
                     }
                 }
 
-                // Clear Castor's cache. Otherwise we can really eat up a lot of memory
-                DAO.expireCache()
             }
+            dao.endTransaction()
         }
     }
 
     /**
      * Fixes CameraPlatformDeployments without ChiefScientists
      */
-    static void fixChiefScientists() {
-        Logger.log(DbTools.class, "----- Fixing CameraPlatformDeployments with no ChiefScientists -----")
-        List badVas = AnnotationDAO.findVideoArchiveSetsWithNoChiefScientist()
+    void fixChiefScientists() {
+        log.info("----- Fixing CameraPlatformDeployments with no ChiefScientists -----")
+        def dao = toolBox.toolBelt.annotationDAOFactory.newVideoArchiveSetDAO()
+
+        def badVas = dao.findAllWithNoChiefScientist()
         log.debug("Found ${badVas.size()} VideoArchiveSets to fix.")
         def platforms = ['Ventana':"vnta", 'Tiburon':"tibr", 'Doc Ricketts':'docr']
-        for (vas in badVas) {
-            def doUpdate = false
-            for (cpd in vas.getCameraPlatformDeployments) {
-                def chiefScientist = EXPDDAO.findChiefScientist(platforms[vas.platformName], cpd.seqNumber)
+        def diveDao = toolBox.daoFactory.newDiveDAO()
+        for (VideoArchiveSet vas in badVas) {
+            for (cpd in vas.cameraDeployments) {
+                def dive = diveDao.findByPlatformAndDiveNumber(platforms[vas.platformName], cpd.sequenceNumber)
+                def chiefScientist = dive.chiefScientist
                 if (chiefScientist) {
-                    log.debug("Updating ${vas}.chiefScientist = ${chiefScientist} for dive ${vas.platformName} ${cpd.seqNumber} ")
+                    log.debug("Updating ${vas}.chiefScientist = ${chiefScientist} for dive ${vas.platformName} ${cpd.sequenceNumber} ")
+                    dao.startTransaction()
+                    cpd = dao.find(cpd)
                     cpd.chiefScientistName = chiefScientist
-                    doUpdate = true
+                    dao.endTransaction()
                 }
                 else {
-                    log.debug("Unable to find chiefScientist for ${vas.platformName} #${cpd.seqNumber}")
+                    log.debug("Unable to find chiefScientist for ${vas.platformName} #${cpd.sequenceNumber}")
                 }
-            }
-
-            if (doUpdate) {
-                VideoArchiveSetDAO.instance.update(vas)
             }
 
         }
+
     }
 
-    static void fixDiveDates() {
+    void fixDiveDates() {
         log.debug("---- Fixing CameraPlatformDeployments and VideoArchiveSets without start or end dates -----")
-        List badVas = AnnotationDAO.findVideoArchiveSetsWithoutDates()
+        def dao = toolBox.toolBelt.annotationDAOFactory.newVideoArchiveSetDAO()
+        def badVas = dao.findAllWithoutDates()
         badVas.each { videoArchiveSet ->
             updateDiveDates(videoArchiveSet)
         }
     }
     
-    static void fixAllDiveDates() {
-        List allVas = VideoArchiveSetDAO.instance.findAll()
+    void fixAllDiveDates() {
+        def dao = toolBox.toolBelt.annotationDAOFactory.newVideoArchiveSetDAO()
+        def allVas = dao.findAll()
         allVas.each { videoArchiveSet ->
             updateDiveDates(videoArchiveSet)
         }
     }
     
-    static void updateDiveDates(VideoArchiveSet videoArchiveSet) {
-            Date start = null
-            Date end = null
+    void updateDiveDates(VideoArchiveSet videoArchiveSet) {
+        Date start = null
+        Date end = null
 
-            videoArchiveSet.cameraPlatformDeployments.each { deployment ->
-                def bounds = org.mbari.expd.EXPDDAO.findDateBounds(videoArchiveSet.platformName, deployment.seqNumber)
+        def diveDao = toolBox.daoFactory.newDiveDAO()
+        def dao = toolBox.toolBelt.annotationDAOFactory.newDAO()
+        dao.startTransaction()
+        videoArchiveSet = dao.find(videoArchiveSet)
+        videoArchiveSet.cameraDeployments.each { deployment ->
 
-                if (bounds?.size() == 2) {
-                    // Set values in CameraPlatformDeployment
-                    deployment.startDate = bounds[0]
-                    deployment.endDate = bounds[1]
+            def dive = diveDao.findByPlatformAndDiveNumber(videoArchiveSet.platformName, deployment.sequenceNumber)
+
+            if (dive) {
+                // Set values in CameraPlatformDeployment
+                deployment.startDate = dive.startDate
+                deployment.endDate = dive.endDate
 
 
-                    if (start == null) {
-                        start = bounds[0]
-                    }
-                    else {
-                        start = (start.before(bounds[0])) ? start : bounds[0]
-                    }
-
-                    if (end == null) {
-                        end = bounds[1]
-                    }
-                    else {
-                        end = (end.after(bounds[1])) ? end : bounds[1]
-                    }
+                if (start == null) {
+                    start = dive.startDate
                 }
                 else {
-                    log.info("No start and end dates for ${videoArchiveSet.platformName} #${deployment.seqNumber}")
+                    start = (start.before(dive.startDate)) ? start : dive.startDate
                 }
 
+                if (end == null) {
+                    end = dive.endDate
+                }
+                else {
+                    end = (end.after(dive.endDate)) ? end : dive.endDate
+                }
+            }
+            else {
+                log.info("No start and end dates for ${videoArchiveSet.platformName} #${deployment.seqNumber}")
             }
 
-        try {
-            videoArchiveSet.startDate = start
-            videoArchiveSet.endDate = end
+        }
 
-            log.debug("Fixing start [${start}] and end [${end}] dates in ${videoArchiveSet}")
-            VideoArchiveSetDAO.instance.update(videoArchiveSet)
-        }
-        catch (Exception e) {
-            log.warn("Unable to update ${videoArchiveSet}", e)
-        }
+        videoArchiveSet.startDate = start
+        videoArchiveSet.endDate = end
+        dao.endTransaction()
+
     }
     
 
@@ -179,9 +192,14 @@ class DbTools {
         log.debug("----- Fixing VideoArchiveSets with no trackingNumbers ----")
     }
 
-    static showMergeStatus(String platform, def seqNumber) {
+    void showMergeStatus(String platform, def seqNumber) {
         def dateFormat = new SimpleDateFormat('yyyy-MM-dd HH:mm:ss')
-        def id = EXPDMergeStatusDAO.findByPlatformAndSeqNumber(platform, seqNumber)
+        MergeStatusDAO mergeStatusDao = toolBox.mergeStatusDAO
+        def mergeStatus = mergeStatusDao.findByPlatformAndSequenceNumber(platform, seqNumber)
+
+        // ----- TODO 20100609 - Continue fixing from this line on
+
+        def id = mergeStatusDao.findByPlatformAndSequenceNumber(platform, seqNumber)
         def vas = null
         def va = null
         if (id) {

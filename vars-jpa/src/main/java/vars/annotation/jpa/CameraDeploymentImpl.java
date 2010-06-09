@@ -58,8 +58,9 @@ import vars.jpa.TransactionLogger;
     @NamedQuery(name = "CameraDeployment.findByStartDate",
                 query = "SELECT v FROM CameraDeployment v WHERE v.startDate = :startDate") ,
     @NamedQuery(name = "CameraDeployment.findByEndDate",
-                query = "SELECT v FROM CameraDeployment v WHERE v.endDate = :endDate")
-
+                query = "SELECT v FROM CameraDeployment v WHERE v.endDate = :endDate"),
+    @NamedQuery(name = "CameraDeployment.findAllWithoutChiefScientistName",
+                query = "SELECT c FROM CameraDeployment c WHERE c.chiefScientistName IS NULL")
 })
 public class CameraDeploymentImpl implements Serializable, CameraDeployment, JPAEntity {
 

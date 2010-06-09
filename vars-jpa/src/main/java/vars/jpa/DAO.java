@@ -175,6 +175,17 @@ public class DAO implements vars.DAO, EntityManagerAspect {
     }
 
     /**
+     * Executes a named query that does not take any parameters
+     * 
+     * @param name The name of the JPL query
+     * @return A list of objects returned by the query
+     */
+    public List findByNamedQuery(String name) {
+        Map<String, Object> params = new HashMap<String, Object>();
+        return findByNamedQuery(name, params);
+    }
+
+    /**
      *
      * @param clazz
      * @param primaryKey

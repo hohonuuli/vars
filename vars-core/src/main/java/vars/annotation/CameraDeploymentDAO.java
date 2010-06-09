@@ -14,5 +14,7 @@ import java.util.List;
 public interface CameraDeploymentDAO extends DAO {
 
     List<CameraDeployment> findAllByChiefScientistName(String name);
+
+    List<CameraDeployment> findAllWithoutChiefScientistName();
     
 }
