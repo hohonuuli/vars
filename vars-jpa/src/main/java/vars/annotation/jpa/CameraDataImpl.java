@@ -453,4 +453,10 @@ public class CameraDataImpl implements Serializable, CameraData, JPAEntity {
     public void setZoom(Integer zoom) {
         this.zoom = zoom;
     }
+
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + " ([id=" + id + "] imageReference=" + imageReference + ")";
+    }
 }

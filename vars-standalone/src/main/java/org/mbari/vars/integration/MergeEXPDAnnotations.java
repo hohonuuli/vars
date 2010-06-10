@@ -25,6 +25,8 @@ import org.mbari.expd.actions.CoallateByDateFunction;
 import org.mbari.expd.actions.CoallateByTimecodeFunction;
 import org.mbari.expd.actions.CoallateFunction;
 import org.mbari.expd.jdbc.DAOFactoryImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import vars.DAO;
 import vars.annotation.*;
 import vars.annotation.ui.Lookup;
@@ -49,6 +51,7 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
     private Collection<UberDatum> uberData;
     private final boolean useHD;
     private Collection<VideoFrame> videoFrames;
+    public final Logger log = LoggerFactory.getLogger(getClass());
 
     /**
      * Constructs ...
@@ -345,28 +348,43 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
             CameraData cameraData = videoFrame.getCameraData();
             CameraDatum cameraDatum = uberDatum.getCameraDatum();
 
-            cameraData.setFocus((cameraDatum.getFocus() == null) ? null : Math.round(cameraDatum.getFocus()));
-            cameraData.setLogDate(cameraDatum.getDate());
-            videoFrame.setAlternateTimecode(cameraDatum.getAlternativeTimecode());
-            cameraData.setZoom((cameraDatum.getZoom() == null) ? null : Math.round(cameraDatum.getZoom()));
-            cameraData.setIris((cameraDatum.getIris() == null) ? null : Math.round(cameraDatum.getIris()));
+            if (cameraDatum != null) {
+
+                cameraData.setFocus((cameraDatum.getFocus() == null) ? null : Math.round(cameraDatum.getFocus()));
+                cameraData.setLogDate(cameraDatum.getDate());
+                videoFrame.setAlternateTimecode(cameraDatum.getAlternativeTimecode());
+                cameraData.setZoom((cameraDatum.getZoom() == null) ? null : Math.round(cameraDatum.getZoom()));
+                cameraData.setIris((cameraDatum.getIris() == null) ? null : Math.round(cameraDatum.getIris()));
+            }
+            else {
+                log.info("No camera data was found in EXPD for {}", videoFrame);
+            }
 
             // ---- Update physicaldata
             PhysicalData physicalData = videoFrame.getPhysicalData();
             CtdDatum ctdDatum = uberDatum.getCtdDatum();
 
-            physicalData.setLight(ctdDatum.getLightTransmission());
-            physicalData.setOxygen(ctdDatum.getOxygen());
-            physicalData.setSalinity(ctdDatum.getSalinity());
-            physicalData.setTemperature(ctdDatum.getTemperature());
+            if (ctdDatum != null) {
+                physicalData.setLight(ctdDatum.getLightTransmission());
+                physicalData.setOxygen(ctdDatum.getOxygen());
+                physicalData.setSalinity(ctdDatum.getSalinity());
+                physicalData.setTemperature(ctdDatum.getTemperature());
+            }
+            else {
+                log.info("No CTD data was found in EXPD for {}", videoFrame);
+            }
 
             NavigationDatum navigationDatum = uberDatum.getNavigationDatum();
 
-            physicalData.setDepth(navigationDatum.getDepth());
-            physicalData.setLatitude(navigationDatum.getLatitude());
-            physicalData.setLogDate(navigationDatum.getDate());
-            physicalData.setLongitude(navigationDatum.getLongitude());
-
+            if (navigationDatum != null) {
+                physicalData.setDepth(navigationDatum.getDepth());
+                physicalData.setLatitude(navigationDatum.getLatitude());
+                physicalData.setLogDate(navigationDatum.getDate());
+                physicalData.setLongitude(navigationDatum.getLongitude());
+            }
+            else {
+                log.info("No navigation data was found in EXPD for {}", videoFrame);
+            }
 
             // ---- Update date 
             switch (mergeType) {
