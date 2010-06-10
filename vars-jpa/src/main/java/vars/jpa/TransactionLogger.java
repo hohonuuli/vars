@@ -26,7 +26,7 @@ public class TransactionLogger {
     @PostLoad
     public void logLoad(Object object) {
         if (log.isDebugEnabled()) {
-            log.debug("Loaded '" + object + "' into persistent context");
+            log.debug("Loaded '{}' into persistent context", object);
         }
     }
 
@@ -47,7 +47,7 @@ public class TransactionLogger {
 
     private void logTransaction(Object object, DAO.TransactionType transactionType) {
         if (log.isDebugEnabled()) {
-            log.debug("Performing '" + transactionType + "' on " + object);
+            log.debug("Performing '{}' on {}", transactionType, object);
         }
     }
 }

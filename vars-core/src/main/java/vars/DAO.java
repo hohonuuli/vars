@@ -54,7 +54,7 @@ public interface DAO {
      * @param name The name of the JPL query
      * @return A list of objects returned by the query
      */
-    List findByNamedQuery(String name)
+    List findByNamedQuery(String name);
 
     <T> T findByPrimaryKey(Class<T> clazz, Object primaryKey);
 

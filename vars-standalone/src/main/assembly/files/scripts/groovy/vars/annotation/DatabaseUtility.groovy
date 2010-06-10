@@ -9,8 +9,6 @@ import vars.integration.MergeStatusDAO
 import org.mbari.vars.integration.MergeEXPDAnnotations
 import vars.integration.MergeFunction
 import org.mbari.expd.UberDatum
-import org.mbari.expd.DiveDAO
-
 
 class DatabaseUtility {
 
@@ -109,7 +107,7 @@ class DatabaseUtility {
         for (VideoArchiveSet vas in badVas) {
             for (cpd in vas.cameraDeployments) {
                 def dive = diveDao.findByPlatformAndDiveNumber(platforms[vas.platformName], cpd.sequenceNumber)
-                def chiefScientist = dive.chiefScientist
+                def chiefScientist = dive?.chiefScientist
                 if (chiefScientist) {
                     log.debug("Updating ${vas}.chiefScientist = ${chiefScientist} for dive ${vas.platformName} ${cpd.sequenceNumber} ")
                     dao.startTransaction()
@@ -176,7 +174,7 @@ class DatabaseUtility {
                 }
             }
             else {
-                log.info("No start and end dates for ${videoArchiveSet.platformName} #${deployment.seqNumber}")
+                log.info("No start and end dates for ${videoArchiveSet.platformName} #${deployment.sequenceNumber}")
             }
 
         }
@@ -188,7 +186,7 @@ class DatabaseUtility {
     }
     
 
-    static void fixTrackingNumbers() {
+    void fixTrackingNumbers() {
         log.debug("----- Fixing VideoArchiveSets with no trackingNumbers ----")
     }
 
@@ -197,19 +195,6 @@ class DatabaseUtility {
         MergeStatusDAO mergeStatusDao = toolBox.mergeStatusDAO
         def mergeStatus = mergeStatusDao.findByPlatformAndSequenceNumber(platform, seqNumber)
 
-        // ----- TODO 20100609 - Continue fixing from this line on
-
-        def id = mergeStatusDao.findByPlatformAndSequenceNumber(platform, seqNumber)
-        def vas = null
-        def va = null
-        if (id) {
-            vas = VideoArchiveSetDAO.instance.findByPK("${id}")
-            va = vas.videoArchives
-            va.each { v ->
-                v.videoFrames.size()
-            }
-        }
-        def mergeStatus = EXPDMergeStatusDAO.find(id)
         println "==========================================================================="
         println " ROV:                ${platform}"
         println " Dive Number:        ${seqNumber}"
@@ -217,7 +202,7 @@ class DatabaseUtility {
         println "==== Status of Data Merge with EXPD ===="
 
         // Show merge information
-        if (id) {
+        if (mergeStatus) {
 
             if (!mergeStatus.merged) {
                 println " THIS DIVE HAS NOT BEEN MERGED!!"
@@ -232,22 +217,25 @@ class DatabaseUtility {
             }
 
             // Show VideoArchiveSet information
-            //def vas = VideoArchiveSetDAO.instance.findByPK("${id}")
-            def cpds = vas.cameraPlatformDeployments
+            def dao = toolBox.toolBelt.annotationDAOFactory.newVideoArchiveSetDAO()
+            dao.startTransaction()
+            def vas = dao.findByPrimaryKey(mergeStatus.videoArchiveSetID)
+            def cpds = vas.cameraDeployments
             println ""
             println "==== Details About this VideoArchiveSet ===="
             println " Tracking Number:    ${vas.trackingNumber ?: ''}"
             println " Number of dives:    ${cpds.size()}"
             cpds.inject(1) { n, c ->
-                println "\t${n}) Dive Number:       ${c.seqNumber}"
-                println "\t   Chief Scientist:   ${c.chiefScientist.name}"
+                println "\t${n}) Dive Number:       ${c.sequenceNumber}"
+                println "\t   Chief Scientist:   ${c.chiefScientistName}"
                 n += 1
             }
 
             //def va = vas.videoArchiveColl
+            def va = vas.videoArchives
             println " Number of Tapes:    ${va.size()}"
             va.inject(1) { n, v ->
-                println "\t${n}) Name:              ${v.videoArchiveName}"
+                println "\t${n}) Name:              ${v.name}"
                 println "\t   Video-frame count: ${v.videoFrames.size()}"
                 n += 1
             }
@@ -267,7 +255,7 @@ class DatabaseUtility {
      * write the ouput onto the console.
      * @return A collection of bogus image URL's that are linked to annotations in the VARS database.
      */
-    static Collection<URL> listMissingStillImages() {
+    Collection<URL> listMissingStillImages() {
 
         def badUrls = new Vector<URL>()
 
@@ -275,26 +263,13 @@ class DatabaseUtility {
          * Grab all the URL's into a list
          */
         def sql = "SELECT StillImageURL FROM CameraData WHERE StillImageURL LIKE 'http%'"
-        def urls = []
-        def handler = { resultSet ->
-            while(resultSet.next()) {
-                def s = resultSet.getString(1)
-                try {
-                    
-                    def url = new URL(s)
-                    urls << url
-                }
-                catch (Exception e) {
-                    // bogus URL
-                    log.debug("ERROR: Can't process ${s}")
-                }
-            }
-        }
-        DAO.query(sql, handler)
+        def dao = toolBox.toolBelt.annotationDAOFactory.newDAO()
+        def query = dao.entityManager.createNativeQuery(sql)
+        def urls = query.resultList
         log.debug("----- Found ${urls.size()} images ----")
         
         /*
-         * We'll use 5 threads to check if the images exists
+         * We'll use 10 threads to check if the images exists
          */
         def queue = new LinkedBlockingQueue(100)
         def imageCheckers = []
@@ -305,7 +280,12 @@ class DatabaseUtility {
             thread.start()
         }
         urls.each { url ->
-            queue.put(url) 
+            try {
+                queue.put(new URL(url)) 
+            }
+            catch (Exception e) {
+                log.info("${url} is not a valid URL", e)
+            }
         }
 
         /*
@@ -331,14 +311,16 @@ private class ImageChecker implements Runnable {
     static log = LoggerFactory.getLogger(ImageChecker.class)
 
     final queue
+    final badUrls
     def terminate = false
 
     /**
      * @param queue A queue full of URL's to process
-     * @param badUrls Where the bad URL's are stored (SHould be a synchronized collecion)
+     * @param badUrls Where the bad URL's are stored (Should be a synchronized collection)
      */
     ImageChecker(BlockingQueue<URL> queue, Collection<URL> badUrls) {
         this.queue = queue
+        this.badUrls = badUrls
     }
 
     public void run() {

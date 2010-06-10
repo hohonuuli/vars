@@ -33,6 +33,7 @@ import org.mbari.sql.DBException;
 import org.mbari.sql.QueryFunction;
 import org.mbari.sql.QueryableImpl;
 import vars.DAO;
+import vars.annotation.VideoArchiveSetDAO;
 import vars.integration.MergeStatusDAO;
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.VideoArchiveSet;
@@ -210,10 +211,10 @@ public class MergeStatusDAOImpl extends QueryableImpl implements MergeStatusDAO 
     public List<Long> findSetsWithEditedNav() {
         List<Long> mergedWithRawNav = executeQueryFunction("SELECT VideoArchiveSetID_FK FROM EXPDMergeStatus WHERE isNavigationEdited = 0", ID_FUNCTION);
         List<Long> good = new ArrayList<Long>();
-        DAO dao = annotationDAOFactory.newVideoArchiveSetDAO();
+        VideoArchiveSetDAO dao = annotationDAOFactory.newVideoArchiveSetDAO();
         dao.startTransaction();
         for (Long id : mergedWithRawNav) {
-            VideoArchiveSet videoArchiveSet = dao.findByPrimaryKey(VideoArchiveSet.class, id);
+            VideoArchiveSet videoArchiveSet = dao.findByPrimaryKey(id);
             if (videoArchiveSet == null) {
                 log.info("Unable to find VideoArchiveSet with id = " + id + " in the database");
                 continue;
