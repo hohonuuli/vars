@@ -271,6 +271,7 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
         // Merge by Date
         CoallateFunction<Date> f1 = new CoallateByDateFunction();
 
+        // Extract the dates from the video frames
         Collection<Date> d = Collections2.transform(vfc, new Function<VideoFrame, Date>() {
             public Date apply(VideoFrame from) {
                 return from.getRecordedDate();

@@ -28,7 +28,7 @@ CREATE INDEX [idx_Artifact_LUT]
     ON [dbo].[Artifact]([LAST_UPDATED_TIME])
 GO
 CREATE UNIQUE INDEX [idx_Artifact_CK]
-    ON [dbo].[Artifact]([GroupId], [ArtifactId], [Version], [Classifier])
+	ON [dbo].[Artifact]([ConceptDelegateID_FK], [GroupId], [ArtifactId], [Version], [Classifier])
 GO
 CREATE INDEX [idx_Artifact_FK1]
     ON [dbo].[Artifact]([ConceptDelegateID_FK])

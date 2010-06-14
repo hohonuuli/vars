@@ -26,8 +26,9 @@ GO
 CREATE INDEX idx_Artifact_LUT
     ON Artifact(LAST_UPDATED_TIME)
 GO
+
 CREATE UNIQUE INDEX idx_Artifact_CK
-    ON Artifact(GroupId, ArtifactId, Version, Classifier)
+    ON Artifact(ConceptDelegateID_FK, GroupId, ArtifactId, Version, Classifier)
 GO
 CREATE INDEX idx_Artifact_FK1
     ON Artifact(ConceptDelegateID_FK)
