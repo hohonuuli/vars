@@ -33,7 +33,7 @@
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
-            <version>1.7.2</version>
+            <version>1.7.3</version>
         </dependency>
         <dependency>
             <groupId>jline</groupId>
@@ -68,12 +68,12 @@
         <dependency>
             <groupId>org.mbari</groupId>
             <artifactId>expd-core</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0</version>
         </dependency>
         <dependency>
             <groupId>org.mbari</groupId>
             <artifactId>expd-jdbc</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0</version>
         </dependency>
         <!--
             Sanselan is used for accessing image metadata. Used for image loading
@@ -91,9 +91,14 @@
         </dependency>
         <!-- Need for loading SIMPA -->
         <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>vars-quicktime</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.mbari</groupId>
             <artifactId>qtx4j</artifactId>
-            <version>0.13-SNAPSHOT</version>
+            <version>0.13</version>
         </dependency>
     </dependencies>
     <build>

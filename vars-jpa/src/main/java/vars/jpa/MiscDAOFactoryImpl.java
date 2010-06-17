@@ -35,5 +35,4 @@ public class MiscDAOFactoryImpl implements MiscDAOFactory, EntityManagerFactoryA
         return new UserAccountDAOImpl(entityManager);
     }
 
-
 }

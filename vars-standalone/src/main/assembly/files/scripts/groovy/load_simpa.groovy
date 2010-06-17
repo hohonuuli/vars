@@ -36,4 +36,3 @@ def data = simpaLoader.read(dataFile.toURI().toURL())
 simpaLoader.load(data, cameraId, sequenceId, startTimecode, endTimecode, tapeNumber)
 simpaLoader.close()
 
-

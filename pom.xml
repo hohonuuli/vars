@@ -98,7 +98,7 @@
         <dependency>
             <groupId>org.mbari</groupId>
             <artifactId>mbarix4j</artifactId>
-            <version>1.8-SNAPSHOT</version>
+            <version>1.8.1</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -187,6 +187,11 @@
     </build>
     <repositories>
         <repository>
+            <id>mbari-maven-repository</id>
+            <name>MBARI Maven Repository</name>
+            <url>http://mbari-maven-repository.googlecode.com/svn/repository/</url>
+        </repository>
+        <repository>
             <id>eclipselink</id>
             <name>EclipseLink Repository</name>
             <url>http://www.eclipse.org/downloads/download.php?r=1&amp;nf=1&amp;file=/rt/eclipselink/maven.repo</url>
@@ -195,11 +200,6 @@
             <id>Maven-Central</id>
             <name>Maven Central Repository</name>
             <url>http://repo1.maven.org/maven2</url>
-        </repository>
-        <repository>
-            <id>VARS</id>
-            <name>VARS Repository</name>
-            <url>http://vars.sourceforge.net/maven2</url>
         </repository>
         <repository>
             <id>codehaus</id>
@@ -211,27 +211,12 @@
             <name>Java.net</name>
             <url>http://download.java.net/maven/2/</url>
         </repository>
-        <repository>
-            <id>mbarix4j</id>
-            <name>mbarix4j</name>
-            <url>http://mbarix4j.googlecode.com/svn/maven2/</url>
-        </repository>
-        <repository>
-            <id>qtx4j</id>
-            <name>qtx4j</name>
-            <url>http://qtx4j.googlecode.com/svn/maven2/</url>
-        </repository>
-        <repository>
-            <id>vcr4j</id>
-            <name>vcr4j</name>
-            <url>http://vcr4j.googlecode.com/svn/maven2/</url>
-        </repository>
-        <repository>
+        <!-- <repository>
             <id>apache-ibiblio</id>
             <name>Apache Ibiblio Repository</name>
             <url>http://people.apache.org/repo/m1-ibiblio-rsync-repository/</url>
             <layout>legacy</layout>
-        </repository>
+        </repository> -->
         <repository>
             <id>jboss</id>
             <name>JBoss Repository</name>
