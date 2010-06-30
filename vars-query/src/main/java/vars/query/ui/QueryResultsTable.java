@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  */
 public class QueryResultsTable extends JTable {
 
-    private static final Logger log = LoggerFactory.getLogger(QueryResultsTable.class);
+    private final Logger log = LoggerFactory.getLogger(getClass());
     private MouseListener urlMouseListener;
 
     /**
@@ -109,17 +109,19 @@ public class QueryResultsTable extends JTable {
                                 log.warn("The URL, " + url + ", is not valid. Unable to display it");
                             }
 
-                            getImageFrame().setImageUrl(url);
-                            getImageFrame().setVisible(true);
-                            getImageFrame().repaint();
+                            JImageUrlFrame f = getImageFrame();
+                            f.setTitle(url.toExternalForm());
+                            f.setImageUrl(url);
+                            f.setVisible(true);
                         }
                     }
                 }
+                
                 JImageUrlFrame getImageFrame() {
                     if (imageFrame == null) {
                         imageFrame = new JImageUrlFrame();
-                        imageFrame.setSize(400, 300);
-                        imageFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+                        //imageFrame.setSize(400, 300);
+                        imageFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);                        
                     }
 
                     return imageFrame;

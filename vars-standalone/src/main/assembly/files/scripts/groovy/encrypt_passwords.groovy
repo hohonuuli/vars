@@ -15,11 +15,11 @@ def ua = dao.executeQueryFunction(sql, {rs ->
         
 def encryptor = new BasicPasswordEncryptor()
 ua.each { id, password ->
-    dao.executeUpdate("""
-UPDATE 
-    UserAccount 
-SET 
-    Password = '${encryptor.encryptPassword(password)}'
-WHERE
-id = ${id}""" as String)
+    dao.executeUpdate("""\
+            UPDATE
+                UserAccount
+            SET
+                Password = '${encryptor.encryptPassword(password)}'
+            WHERE
+            id = ${id}""".stripIndent() as String)
 }
