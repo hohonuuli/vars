@@ -1,6 +1,5 @@
 package vars.knowledgebase;
 
-import java.util.Collection;
 import java.util.Date;
 
 /**
