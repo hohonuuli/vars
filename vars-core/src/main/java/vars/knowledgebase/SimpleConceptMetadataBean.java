@@ -5,6 +5,7 @@
 
 package vars.knowledgebase;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -67,6 +68,10 @@ public class SimpleConceptMetadataBean implements ConceptMetadata {
 
     public Concept getConcept() {
         return concept;
+    }
+
+    public Collection<Artifact> getArtifacts() {
+        return new HashSet<Artifact>();
     }
 
     public Set<History> getHistories() {

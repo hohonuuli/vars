@@ -99,6 +99,8 @@ public interface ConceptMetadata extends KnowledgebaseObject {
 
     void removeArtifact(Artifact artifact);
 
+    Collection<Artifact> getArtifacts();
+
 
     /**
      * Gets the concept attribute of the ConceptDelegate object
