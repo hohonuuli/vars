@@ -223,6 +223,20 @@ public class AnnotationPersistenceServiceImpl extends QueryableImpl implements A
         return executeQueryFunction(sql, queryFunction);
     }
 
+    public List<String> findAllPlatformNames() {
+        String sql = "SELECT DISTINCT PlatformName FROM VideoArchiveSet ORDER BY PlatformName";
+        QueryFunction<List<String>> queryFunction = new QueryFunction<List<String>>() {
+            public List<String> apply(ResultSet resultSet) throws SQLException {
+                List<String> platformNames = new ArrayList<String>();
+                while(resultSet.next()) {
+                    platformNames.add(resultSet.getString(1));
+                }
+                return platformNames;
+            }
+        };
+        return executeQueryFunction(sql, queryFunction);
+    }
+
     /**
      * Updates all {@link Observation}s, {@link Association}s, and {@link LinkTemplate}s
      * in the database so that any that use a non-primary name for the given

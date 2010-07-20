@@ -53,6 +53,13 @@ public interface AnnotationPersistenceService {
     List<String> findAllVideoArchiveNames();
 
     void updateConceptNameUsedByAnnotations(Concept concept);
+
+    /**
+     * Find all platforms that were used in the annotations database.
+     * 
+     * @return A List of each distinct platform found in the VideoArchiveSet table.
+     */
+    List<String> findAllPlatformNames();
     
 
 }

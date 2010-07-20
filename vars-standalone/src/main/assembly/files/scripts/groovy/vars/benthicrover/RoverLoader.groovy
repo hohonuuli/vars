@@ -78,6 +78,7 @@ class RoverLoader {
                 }
 
             }
+            videoArchiveDAO.endTransaction()
 
         }
         catch (Exception e) {
