@@ -58,13 +58,19 @@ import vars.jpa.TransactionLogger;
 @EntityListeners({ TransactionLogger.class, KeyNullifier.class })
 @NamedQueries( {
 
-    @NamedQuery(name = "Observation.findById", query = "SELECT v FROM Observation v WHERE v.id = :id") ,
+    @NamedQuery(name = "Observation.findById",
+                query = "SELECT v FROM Observation v WHERE v.id = :id") ,
     @NamedQuery(name = "Observation.findByConceptName",
                 query = "SELECT v FROM Observation v WHERE v.conceptName = :conceptName") ,
-    @NamedQuery(name = "Observation.findByNotes", query = "SELECT o FROM Observation o WHERE o.notes = :notes") ,
+    @NamedQuery(name = "Observation.findByNotes",
+                query = "SELECT o FROM Observation o WHERE o.notes = :notes") ,
     @NamedQuery(name = "Observation.findByObservationDate",
                 query = "SELECT o FROM Observation o WHERE o.observationDate = :observationDate") ,
-    @NamedQuery(name = "Observation.findByObserver", query = "SELECT o FROM Observation o WHERE o.observer = :observer")
+    @NamedQuery(name = "Observation.findByObserver",
+                query = "SELECT o FROM Observation o WHERE o.observer = :observer")
+//    @NamedQuery(name = "Observation.findAllByConceptNameAndAssociation",
+//                query = "SELECT DISTINCT o FROM Observation, IN (o.associations) AS a WHERE a.linkName = :linkName AND a.toConcept = :toConcept AND a.linkValue = :linkValue AND o.conceptName = :conceptName ORDER BY o.observationDate DESC")
+
 
 })
 public class ObservationImpl implements Serializable, Observation, JPAEntity {

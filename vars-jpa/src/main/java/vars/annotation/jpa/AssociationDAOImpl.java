@@ -1,11 +1,14 @@
 package vars.annotation.jpa;
 
+import com.google.common.collect.ImmutableMap;
 import vars.annotation.AssociationDAO;
 import vars.annotation.Association;
 import vars.jpa.DAO;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.Concept;
 import com.google.inject.Inject;
+import java.util.List;
+import java.util.Map;
 import javax.persistence.EntityManager;
 
 /**
@@ -22,6 +25,14 @@ public class AssociationDAOImpl extends DAO implements AssociationDAO {
     public AssociationDAOImpl(EntityManager entityManager) {
         super(entityManager);
 
+    }
+
+    public List<Association> findAllByConceptNameAndValues(String conceptName,
+            String linkName, String toConcept, String linkValue) {
+        Map<String, Object> params = toParameterMap("conceptName", conceptName, "linkName", linkName,
+                "toConcept", toConcept, "linkValue", linkValue);
+        return null;
+        //return findByNamedQuery("Observation.findAllByConceptNameAndAssociation", params);
     }
 
     /**
