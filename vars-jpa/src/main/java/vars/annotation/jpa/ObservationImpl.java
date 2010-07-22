@@ -69,8 +69,8 @@ import vars.jpa.TransactionLogger;
     @NamedQuery(name = "Observation.findByObserver",
                 query = "SELECT o FROM Observation o WHERE o.observer = :observer")
 //    @NamedQuery(name = "Observation.findAllByConceptNameAndAssociation",
-//                query = "SELECT DISTINCT o FROM Observation, IN (o.associations) AS a WHERE a.linkName = :linkName AND a.toConcept = :toConcept AND a.linkValue = :linkValue AND o.conceptName = :conceptName ORDER BY o.observationDate DESC")
-
+//                query = "SELECT o FROM Observation, IN (o.associations) AS a WHERE a.linkName = :linkName AND a.linkValue = :linkValue AND o.conceptName = :conceptName")
+//
 
 })
 public class ObservationImpl implements Serializable, Observation, JPAEntity {
