@@ -24,15 +24,7 @@ import com.google.inject.name.Named;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -270,6 +262,42 @@ public class AnnotationPersistenceServiceImpl extends QueryableImpl implements A
 
         }
 
+    }
+
+    /**
+     * Find the recorded date (from VideoFrame) of the earliest annotation made in the VARS database
+     * @return The date of the earliest annotation
+     */
+    public Date findEarliestAnnotationDate() {
+        String sql = "SELECT min(RecordedDTG) FROM VideoFrame";
+        QueryFunction<Date> queryFunction = new QueryFunction<Date>() {
+            public Date apply(ResultSet resultSet) throws SQLException {
+                Date earliestDate = null;
+                if (resultSet.next()) {
+                    earliestDate = resultSet.getDate(1);
+                }
+                return earliestDate;
+            }
+        };
+        return executeQueryFunction(sql, queryFunction);
+    }
+
+    /**
+     * Find the recorded date (from VideoFrame) of the latest annotation made in the VARS database
+     * @return The date of the latest annotation
+     */
+    public Date findLatestAnnotationDate() {
+        String sql = "SELECT max(RecordedDTG) FROM VideoFrame";
+        QueryFunction<Date> queryFunction = new QueryFunction<Date>() {
+            public Date apply(ResultSet resultSet) throws SQLException {
+                Date earliestDate = null;
+                if (resultSet.next()) {
+                    earliestDate = resultSet.getDate(1);
+                }
+                return earliestDate;
+            }
+        };
+        return executeQueryFunction(sql, queryFunction);
     }
     
 

@@ -297,7 +297,7 @@ public class DAO implements vars.DAO, EntityManagerAspect {
      *      as a string, the 2nd value is the parameter value
      * @return A Map containing the key-value pairs
      */
-    public Map<String, Object> toParameterMap(Object... args) {
+    public static Map<String, Object> toParameterMap(Object... args) {
         Map<String, Object> params = new HashMap<String, Object>();
         for (int i = 0; i < args.length; i += 2) {
             params.put((String) args[i], args[i + 1]);

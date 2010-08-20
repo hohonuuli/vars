@@ -5,9 +5,13 @@
 
 package vars.annotation;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
+import org.mbari.sql.QueryFunction;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.LinkTemplate;
@@ -60,6 +64,14 @@ public interface AnnotationPersistenceService {
      * @return A List of each distinct platform found in the VideoArchiveSet table.
      */
     List<String> findAllPlatformNames();
+
+    Date findEarliestAnnotationDate();
+
+    /**
+     * Find the recorded date (from VideoFrame) of the latest annotation made in the VARS database
+     * @return The date of the latest annotation
+     */
+    public Date findLatestAnnotationDate();
     
 
 }

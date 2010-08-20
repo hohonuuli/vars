@@ -1,6 +1,5 @@
 package vars.annotation.jpa;
 
-import com.google.common.collect.ImmutableMap;
 import vars.annotation.AssociationDAO;
 import vars.annotation.Association;
 import vars.jpa.DAO;
@@ -31,8 +30,7 @@ public class AssociationDAOImpl extends DAO implements AssociationDAO {
             String linkName, String toConcept, String linkValue) {
         Map<String, Object> params = toParameterMap("conceptName", conceptName, "linkName", linkName,
                 "toConcept", toConcept, "linkValue", linkValue);
-        return null;
-        //return findByNamedQuery("Observation.findAllByConceptNameAndAssociation", params);
+        return findByNamedQuery("Association.findByConceptNameAndLinkFields", params);
     }
 
     /**

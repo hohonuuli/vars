@@ -56,7 +56,9 @@ import vars.jpa.TransactionLogger;
     @NamedQuery(name = "Association.findByToConcept",
                 query = "SELECT a FROM Association a WHERE a.toConcept = :toConcept") ,
     @NamedQuery(name = "Association.findByLinkValue",
-                query = "SELECT a FROM Association a WHERE a.linkValue = :linkValue")
+                query = "SELECT a FROM Association a WHERE a.linkValue = :linkValue"),
+    @NamedQuery(name = "Association.findByConceptNameAndLinkFields",
+                query = "SELECT a FROM Association a WHERE a.observation.conceptName = :conceptName AND a.linkName = :linkName AND a.toConcept = :toConcept AND a.linkValue = :linkValue")
 
 })
 public class AssociationImpl implements Serializable, Association, JPAEntity {
