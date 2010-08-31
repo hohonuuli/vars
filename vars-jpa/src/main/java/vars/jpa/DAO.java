@@ -62,6 +62,15 @@ public class DAO implements vars.DAO, EntityManagerAspect {
     }
 
     /**
+     * Closes the associated entityManger if it's open.
+     */
+    public void close() {
+        if (entityManager.isOpen()) {
+            entityManager.close();
+        }
+    }
+
+    /**
      */
     public void commit() {
         if (entityManager.getTransaction().isActive()) {

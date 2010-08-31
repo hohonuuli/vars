@@ -197,6 +197,7 @@ public class AnnotationPersistenceServiceImpl extends QueryableImpl implements A
                 }
             }
         }
+        dao.close();
         return referenceNumbers;
     }
 

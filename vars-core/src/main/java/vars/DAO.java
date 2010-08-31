@@ -27,6 +27,8 @@ public interface DAO {
 
     void commit();
 
+    void close();
+
     void endTransaction();
 
     /**
