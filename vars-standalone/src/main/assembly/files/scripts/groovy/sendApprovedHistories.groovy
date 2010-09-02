@@ -5,7 +5,7 @@ import vars.UserAccountRoles
 
 def df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 def startDate = args.size() ? df.parse(args[0]) : (new Date()) - 7
-def endDate = args.size() > 1 ? def.parse(args[1]) : new Date()
+def endDate = args.size() > 1 ? df.parse(args[1]) : new Date()
 
 def toolBox = new ToolBox()
 def historyDao = toolBox.toolBelt.knowledgebaseDAOFactory.newHistoryDAO()
@@ -14,7 +14,7 @@ approvedHistories = approvedHistories.findAll { h ->
     h.approvalDate >= startDate && h.approvalDate <= endDate
 }
 
-def userAccountDao = toolBox.toolBelt..miscDAOFactory.newUserAccountDAO()
+def userAccountDao = toolBox.toolBelt.miscDAOFactory.newUserAccountDAO()
 def admins = userAccountDao.findAllByRole(UserAccountRoles.ADMINISTRATOR.toString())
 
 def email = new SimpleEmail()
@@ -26,6 +26,8 @@ email.setFrom("brian@mbari.org", "Brian Schlining")
 email.setSubject("VARS Knowledgebase Report: Recently approved changes")
 
 def msg = """\
+${df.format(new Date())}
+
 This report list changes made to the VARS knowledgebase that were
 approved between ${df.format(startDate)} and ${df.format(endDate)}. You are
 receiving this report because you are listed as a a VARS administrator.

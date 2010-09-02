@@ -444,6 +444,7 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
         }
 
         dao.endTransaction();
+        dao.close();
 
         // ---- Set the navigationedited flag
         Collection<UberDatum> rawNavRecords = Collections2.filter(data.values(), new Predicate<UberDatum>() {

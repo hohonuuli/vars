@@ -25,7 +25,7 @@ class DatabaseUtility {
 
         def ids = new TreeSet()
         MergeStatusDAO mergeStatusDAO = toolBox.mergeStatusDAO
-        VideoArchiveSetDAO dao = toolBox.toolBelt.annotationDAOFactory.newVideoArchiveSetDAO()
+        def cache = toolBox.toolBelt.persistenceCache
 
         ids.addAll(mergeStatusDAO.findUnmergedSets())
         ids.addAll(mergeStatusDAO.findFailedSets())
@@ -36,7 +36,8 @@ class DatabaseUtility {
 
             if (id == null) { continue }
 
-            // DAOTX
+            // DAOTX - Create new DAO with each loop or 1st level cache causes memory leak
+            VideoArchiveSetDAO dao = toolBox.toolBelt.annotationDAOFactory.newVideoArchiveSetDAO()
             dao.startTransaction()
             def videoArchiveSet = dao.findByPrimaryKey(id)
 
@@ -90,7 +91,11 @@ class DatabaseUtility {
 
             }
             dao.endTransaction()
+            dao.close()
+            cache.clear() // Plug up memory leaks
+
         }
+        dao.close()
     }
 
     /**
@@ -121,6 +126,7 @@ class DatabaseUtility {
             }
 
         }
+        dao.close()
 
     }
 
@@ -131,6 +137,7 @@ class DatabaseUtility {
         badVas.each { videoArchiveSet ->
             updateDiveDates(videoArchiveSet)
         }
+        dao.close()
     }
     
     void fixAllDiveDates() {
@@ -139,6 +146,7 @@ class DatabaseUtility {
         allVas.each { videoArchiveSet ->
             updateDiveDates(videoArchiveSet)
         }
+        dao.close()
     }
     
     void updateDiveDates(VideoArchiveSet videoArchiveSet) {
@@ -182,6 +190,7 @@ class DatabaseUtility {
         videoArchiveSet.startDate = start
         videoArchiveSet.endDate = end
         dao.endTransaction()
+        dao.close()
 
     }
     
