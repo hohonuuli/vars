@@ -16,7 +16,7 @@ class DatabaseUtility {
      *
      * @param linkValue A string representing the linkValue to search for. Only exact matches are returned.
      */
-    static void listLinkRealizations(String linkValue) {
+    void listLinkRealizations(String linkValue) {
         def dao = toolBox.toolBelt.knowledgebaseDAOFactory.newLinkRealizationDAO()
         def linkRealizations = dao.findAllByLinkName(linkValue)
 
@@ -25,7 +25,7 @@ class DatabaseUtility {
         linkRealizations.each {lr ->
             def concept = lr.conceptMetadata.concept
             def name = concept.primaryConceptName.name
-            println "${name} | ${lr}"
+            println "${name} | ${lr.stringValue()}"
         }
         println "==========================================================================="
     }

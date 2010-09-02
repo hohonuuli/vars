@@ -15,12 +15,13 @@
 
 package org.mbari.vars.integration;
 
+import com.google.inject.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.ToolBelt;
-import vars.ToolBox;
 import vars.annotation.CameraData;
 import vars.annotation.CameraDataDAO;
+import vars.knowledgebase.ui.Lookup;
 
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -57,7 +58,12 @@ public class UpdateStillImageUrlTool {
      */
     public static final String SEARCH_KEY = "VARS/data";
     private static final Logger log = LoggerFactory.getLogger(UpdateStillImageUrlTool.class);
-    private static final ToolBox toolBox = new ToolBox();
+    private static ToolBelt toolBelt;
+
+    static {
+        Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
+        toolBelt = injector.getInstance(ToolBelt.class);
+    }
 
     /**
      * THis is the string that gets prepended onto fiel urls to create web URLs
@@ -113,7 +119,7 @@ public class UpdateStillImageUrlTool {
      *
      */
     public static Collection findFileUrls() {
-        CameraDataDAO dao = ((ToolBelt) toolBox.getToolBelt()).getAnnotationDAOFactory().newCameraDataDAO();
+        CameraDataDAO dao = toolBelt.getAnnotationDAOFactory().newCameraDataDAO();
         List<CameraData> cameraData = dao.findByFrameGrabURLPrefix(FILE_PREFIX);
 
         dao.close();
@@ -204,7 +210,7 @@ public class UpdateStillImageUrlTool {
             }
 
             if (isImageOnWebServer(newUrl)) {
-                CameraDataDAO dao = ((ToolBelt) toolBox.getToolBelt()).getAnnotationDAOFactory().newCameraDataDAO();
+                CameraDataDAO dao = toolBelt.getAnnotationDAOFactory().newCameraDataDAO();
 
                 cameraData = dao.find(cameraData);
                 dao.startTransaction();

@@ -5,6 +5,7 @@ import org.mbari.sql.QueryableImpl
 import org.mbari.sql.QueryFunction
 import org.slf4j.LoggerFactory
 import vars.ToolBox
+import org.mbari.samples.integration.DatabaseUtility
 
 class SamplingEvent {
 
@@ -108,11 +109,11 @@ class CTDOLoader {
 
             def sampleDate = new Date(e.epochSeconds * 1000)
 
-            def dive = diveDatabase.findByPlatformAndDate(e.rov, sampleDate)
+            def dive = diveDatabase.findByPlatformAndDate(diveDatabase.resolveFullRovName(e.rov), sampleDate)
 
             if (dive) {
                 def ctdData = ctdDatabase.fetchCtdData(dive, [sampleDate], 7.5);
-                if (ctdData) {
+                if (ctdData && ctdData[0]) {
                     def datum = ctdData[0]
                     def uSql = """
                         UPDATE

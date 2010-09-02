@@ -15,7 +15,6 @@
 
 package org.mbari.samples.integration;
 
-import org.mbari.samples.DatabaseUtility;
 
 import java.sql.*;
 import java.util.Collection;

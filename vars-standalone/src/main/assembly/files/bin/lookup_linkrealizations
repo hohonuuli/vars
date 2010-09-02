@@ -10,4 +10,4 @@
 LINK_NAME=$1
 
 echo [VARS] Searching for LinkRealizations containing a 'linkValue' of $LINK_NAME
-`dirname "$0"`/gsh -e "(new vars.knowledgebase.DatabaseUtility).listLinkRealizations('$LINK_NAME')"
+`dirname "$0"`/gsh -e "(new vars.knowledgebase.DatabaseUtility()).listLinkRealizations('$LINK_NAME')"

@@ -11,4 +11,4 @@ ROV=$1
 DIVE_NUMBER=$2
 
 echo "[VARS] Searching for merge status of $ROV #$DIVE_NUMBER"
-`dirname "$0"`/gsh -e "(new vars.annotation.DatabaseUtility).showMergeStatus('$ROV', $DIVE_NUMBER)"
+`dirname "$0"`/gsh -e "(new vars.annotation.DatabaseUtility()).showMergeStatus('$ROV', $DIVE_NUMBER)"
