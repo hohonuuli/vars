@@ -1,0 +1,6 @@
+#!/bin/sh
+# $Id: $
+
+echo [VARS] Migrating images to VARSPUB
+TARGETDIR = $1
+`dirname "$0"`/gsh -e "org.mbari.varspub.integration.ImageMigrator.update -t $TARGETDIR" 

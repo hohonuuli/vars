@@ -62,6 +62,8 @@ import vars.knowledgebase.History;
 @Table(name = "History")
 @EntityListeners({TransactionLogger.class, KeyNullifier.class})
 @NamedQueries( {
+    @NamedQuery(name = "History.findAll", 
+                query = "SELECT h FROM History h"),
     @NamedQuery(name = "History.findById",
                 query = "SELECT v FROM History v WHERE v.id = :id"),
     @NamedQuery(name = "History.findByProcessedDate",

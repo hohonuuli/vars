@@ -1,0 +1,13 @@
+#!/bin/sh
+# $Id: $
+
+# This is a script used for looking up the LinkRealizations that use a particular LinkName
+#
+# Usage: lookup_linkrealizations [LINK_NAME]
+# Arguments:
+#    LINK_NAME = The linkName of to be used for lookup. Any LinkRealizations that use this will be displayed
+
+LINK_NAME=$1
+
+echo [VARS] Searching for LinkRealizations containing a 'linkValue' of $LINK_NAME
+`dirname "$0"`/gsh -e "(new vars.knowledgebase.DatabaseUtility).listLinkRealizations('$LINK_NAME')"

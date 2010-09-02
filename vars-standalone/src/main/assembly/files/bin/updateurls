@@ -1,0 +1,6 @@
+#!/bin/sh
+# $Id: $
+
+source `dirname "$0"`/varsSetup
+echo [VARS] Changing file URLs in the VARS database to HTTP URLs
+java -cp $VARS_CLASSPATH org.mbari.vars.integration.UpdateStillImageUrlTool &

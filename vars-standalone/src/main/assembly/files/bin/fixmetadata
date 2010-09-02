@@ -1,0 +1,8 @@
+#!/bin/sh
+# $Id: $
+
+echo [VARS] Fixing Chief Scientists
+`dirname "$0"`/gsh -e "(new annotation.DatabaseUtility()).fixChiefScientists()"
+
+echo [VARS] Fixing Dive Start and End Dates
+`dirname "$0"`/gsh -e "new annotation.DatabaseUtility()).fixAllDiveDates()"

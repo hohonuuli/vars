@@ -61,16 +61,12 @@ class CTDOLoader {
 
     final toolBox = new ToolBox()
     final log = LoggerFactory.getLogger(getClass())
-    final samplesDatabase = new QueryableImpl("jdbc:jtds:sqlserver://solstice.shore.mbari.org:1433/MBARI_Samples",
-                'samp', 'samp', 'net.sourceforge.jtds.jdbc.Driver')
+    final samplesDatabase = new DatabaseUtility().samplesDatabase
 
     final ctdDatabase = toolBox.getDaoFactory().newCtdDatumDAO()
     final diveDatabase = toolBox.getDaoFactory().newDiveDAO()
 
     def findSamplingEvents() {
-
-        def samplesDatabase = new QueryableImpl("jdbc:jtds:sqlserver://solstice.shore.mbari.org:1433/MBARI_Samples",
-                'samp', 'samp', 'net.sourceforge.jtds.jdbc.Driver')
 
         def sql = """
             SELECT DISTINCT

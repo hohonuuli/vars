@@ -13,6 +13,6 @@ import java.util.Collection;
  */
 public interface LinkRealizationDAO extends DAO, ConceptNameValidator<LinkRealization> {
 
-    Collection<LinkRealization> findAllByLinkName();
+    Collection<LinkRealization> findAllByLinkName(String linkName);
 
 }

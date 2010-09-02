@@ -12,6 +12,8 @@ import java.util.Set;
  * To change this template use File | Settings | File Templates.
  */
 public interface HistoryDAO extends DAO {
+    
+    Set<History> findAll();
 
     Set<History> findPendingHistories();
 

@@ -1,0 +1,4 @@
+#!/bin/sh
+# $Id: $
+
+`dirname "$0"`/gsh -e "(new org.mbari.samples.CTDOLoader).load()"

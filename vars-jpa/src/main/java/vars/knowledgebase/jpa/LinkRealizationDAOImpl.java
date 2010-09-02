@@ -30,8 +30,9 @@ public class LinkRealizationDAOImpl extends DAO implements LinkRealizationDAO {
         this.conceptDAO = new ConceptDAOImpl(entityManager);
     }
 
-    public Collection<LinkRealization> findAllByLinkName() {
+    public Collection<LinkRealization> findAllByLinkName(String linkName) {
         Map<String, Object> params = new HashMap<String, Object>();
+        params.put("linkName", linkName);
         return findByNamedQuery("LinkRealization.findByLinkName", params);
     }
 

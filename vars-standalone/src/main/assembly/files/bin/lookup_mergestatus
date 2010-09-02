@@ -1,0 +1,14 @@
+#!/bin/sh
+# $Id: $
+
+# This is a script used for looking up the merge status of a VideoArchiveSet
+#
+# Usage: lookup_mergestatus [ROV] [DIVE_NUMBER]
+# Arguments:
+#    ROV = the name of the ROV (e.g. 'Ventana' or 'Tiburon')
+
+ROV=$1
+DIVE_NUMBER=$2
+
+echo "[VARS] Searching for merge status of $ROV #$DIVE_NUMBER"
+`dirname "$0"`/gsh -e "(new vars.annotation.DatabaseUtility).showMergeStatus('$ROV', $DIVE_NUMBER)"

@@ -25,6 +25,10 @@ public class HistoryDAOImpl extends DAO implements HistoryDAO {
     public HistoryDAOImpl(EntityManager entityManager) {
         super(entityManager);
     }
+    
+    public Set<History> findAll() {
+        return new HashSet<History>(findByNamedQuery("History.findAll"));
+    }
 
     public Set<History> findPendingHistories() {
         Map<String, Object> params = new HashMap<String, Object>();
