@@ -18,8 +18,7 @@
 //$Header: /cvsroot/vars/vars/src/main/java/org/mbari/vars/annotation/ui/table/TableCellRenderer4AssociationList.java,v 1.1 2005/10/27 16:20:10 hohonuuli Exp $
 package vars.annotation.ui.table;
 
-import java.awt.Component;
-import java.awt.Dimension;
+import java.awt.*;
 import java.util.Collections;
 import java.util.List;
 import javax.swing.JLabel;
