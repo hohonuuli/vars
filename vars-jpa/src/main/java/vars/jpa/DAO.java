@@ -218,6 +218,15 @@ public class DAO implements vars.DAO, EntityManagerAspect {
     }
 
     /**
+     * Checks to see if the given object is persisted in the databas
+     * @param entity The object of interest
+     * @return true if it's in the database. False if it is not
+     */
+    public boolean isPersistent(Object entity) {
+        return find(entity) != null;
+    }
+
+    /**
      * Many one-to-many relations are lazy loaded in JPA. For convience, this
      * method will load all lazy relations of an IEntity object. This method has
      * no effect on objects that are not persistant

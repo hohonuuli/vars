@@ -69,6 +69,13 @@ public interface DAO {
     EntityManager getEntityManager();
 
     /**
+     * Checks to see if the given object is persisted in the databas
+     * @param entity The object of interest
+     * @return true if it's in the database. False if it is not
+     */
+    boolean isPersistent(Object entity);
+
+    /**
      * Many one-to-many relations are lazy loaded in JPA. For convenience, this
      * method will load all lazy relations of an IEntity object. This method has
      * no effect on objects that are not persistent
