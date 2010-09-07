@@ -1,4 +1,4 @@
-import vars.coolpix.CoolpixLoader
+import org.mbari.vars.coolpix.CoolpixLoader
 /**
  * Example:
  * gsh ../scripts/groovy/load_coolpix.groovy \

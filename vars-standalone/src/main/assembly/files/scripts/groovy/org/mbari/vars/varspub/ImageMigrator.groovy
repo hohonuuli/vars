@@ -1,10 +1,10 @@
-package org.mbari.varspub.integration
+package org.mbari.vars.varspub
 
 
 /**
  * Copies images from the internal framegrab repository to the external 
  * 'varspub' repository and watermarks them. Run as
- * gsh -e "org.mbari.varspub.integration.ImageMigrator.update '/mnt/varspub/framegrabs'"
+ * gsh -e "ImageMigrator.update '/mnt/varspub/framegrabs'"
  */
 
 
@@ -148,7 +148,7 @@ WHERE
         /*
         * Setup command line interface
         */
-        /*def cli = new CliBuilder(usage: "gsh ../scripts/groovy/org.mbari.varspub.integration.ImageMigrator -t [targetDirectory]")
+        /*def cli = new CliBuilder(usage: "gsh ../scripts/groovy/ImageMigrator -t [targetDirectory]")
                 cli.h(longOpt: "help", "usage information")
                 cli.t(argName: "target", longOpt: "target", args:1, required: true, "Target directory for images")
         */

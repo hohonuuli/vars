@@ -43,7 +43,7 @@ public class StatusLabelForVideoArchive extends StatusLabel {
     /**
      * Constructor for the StatusLabelForVideoArchive object
      *
-     * @param persistenceController
+     * @param toolBelt Friendly god object
      */
     public StatusLabelForVideoArchive(ToolBelt toolBelt) {
         super();

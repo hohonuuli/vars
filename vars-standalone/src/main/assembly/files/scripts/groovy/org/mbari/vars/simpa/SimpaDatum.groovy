@@ -1,4 +1,4 @@
-package vars.simpa
+package org.mbari.vars.simpa
 class SimpaDatum {
     int tileIndex
     Date date

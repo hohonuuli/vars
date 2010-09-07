@@ -1,4 +1,4 @@
-package vars.coolpix
+package org.mbari.vars.coolpix
 
 
 import org.slf4j.LoggerFactory

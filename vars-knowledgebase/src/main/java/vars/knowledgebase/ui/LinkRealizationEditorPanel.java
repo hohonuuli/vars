@@ -426,6 +426,8 @@ public class LinkRealizationEditorPanel extends EditorPanel {
             Collection<LinkTemplate> matchingLinkTemplates = linkTemplateDAO.findAllByLinkName(link.getLinkName(),
                 toConcept);
             linkTemplateDAO.endTransaction();
+            linkTemplateDAO.close();
+
 
             /*
              * Get the toConceptAsString that's used. It will be a child of the toConceptAsString in the LinkTemplate
@@ -469,6 +471,7 @@ public class LinkRealizationEditorPanel extends EditorPanel {
                             concept = conceptDAO.findByName(fToConceptAsString);
                             selectedConcept = conceptDAO.findByName(link.getToConcept());
                             conceptDAO.endTransaction();
+                            conceptDAO.close();
                             cb.setConcept(concept);
                         }
                         catch (Exception e) {
@@ -555,7 +558,10 @@ public class LinkRealizationEditorPanel extends EditorPanel {
                 try {
                     LinkRealizationDAO linkRealizationDAO = getToolBelt().getKnowledgebaseDAOFactory()
                         .newLinkRealizationDAO();
+                    linkRealizationDAO.startTransaction();
                     linkRealizationDAO.persist(linkRealization);
+                    linkRealizationDAO.endTransaction();
+                    linkRealizationDAO.close();
                 }
                 catch (Exception e) {
                     concept.getConceptMetadata().removeLinkRealization(linkRealization);
@@ -589,6 +595,7 @@ public class LinkRealizationEditorPanel extends EditorPanel {
                     conceptDelegate.addHistory(history);
                     dao.persist(history);
                     dao.endTransaction();
+                    dao.close();
 
                     EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
                 }
@@ -663,6 +670,7 @@ public class LinkRealizationEditorPanel extends EditorPanel {
                 linkRealization.getConceptMetadata().addHistory(history);
                 dao.persist(history);
                 dao.endTransaction();
+                dao.close();
 
                 EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
 

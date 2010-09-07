@@ -18,6 +18,9 @@ package vars.annotation.ui;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
+
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -607,6 +610,7 @@ public class PersistenceController {
                         row = model.getObservationRow(observation);
 
                         if ((row > -1) && (row < model.getRowCount())) {
+                            
                             observationTable.scrollToVisible(row, 0);
                         }
                     }
@@ -735,10 +739,28 @@ public class PersistenceController {
     }
 
     /**
+     * Bascially a UI refresh using the currently open videoArchive. Scrolls to the currently open
+     * visible rectangle.
      */
     public void updateUI() {
+
+         // Get the TableModel
+        final ObservationTable observationTable = (ObservationTable) Lookup.getObservationTableDispatcher().getValueObject();
+        if (observationTable == null) {
+            log.info("No UI is available to update");
+            return;
+        }
+        final JTable table = observationTable.getJTable();
+        final Rectangle rect = table.getVisibleRect();
         VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
         updateUI(videoArchive);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                // When observations are deleted the table would jump to the last row UNLESS
+                // we make this call which mostly preserves the current view.
+                table.scrollRectToVisible(rect);
+            }
+        });
     }
 
     /**

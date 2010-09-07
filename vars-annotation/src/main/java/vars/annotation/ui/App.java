@@ -138,10 +138,11 @@ public class App {
                 }
 
                 // Update local image URL's to http URL's before you exit
-                VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
-                if (videoArchive != null) {
-                    getAnnotationFrame().getController().updateCameraData(videoArchive);
-                }
+                // updateCameraData is called in the shutdown thread in the AnnotationFrameController
+//                VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+//                if (videoArchive != null) {
+//                    getAnnotationFrame().getController().updateCameraData(videoArchive);
+//                }
 
                 super.onEvent(topic, data);
             }

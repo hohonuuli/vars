@@ -1,4 +1,4 @@
-import vars.simpa.SimpaLoader
+import org.mbari.vars.simpa.SimpaLoader
 /**
  * Load simpa data from a file
  *

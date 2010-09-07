@@ -140,7 +140,7 @@ public class AnnotationFrameController implements PreferenceUpdater {
                             updateCameraData(videoArchive);
 
                             // Evict the videoArchive from the JPA cache. or we
-                            // won't get a frech copy when we reopen it.
+                            // won't get a fresh copy when we reopen it.
                             toolBelt.getPersistenceCache().evict(videoArchive);
                         }
                     }

@@ -8,7 +8,13 @@
     </parent>
     <artifactId>vars-standalone</artifactId>
     <name>vars-standalone</name>
+
+    <properties>
+        <scala.version>2.8.0</scala.version>
+    </properties>
+
     <dependencies>
+        
         <!--
             Reference the 3 VARS applications
         -->
@@ -27,6 +33,7 @@
             <artifactId>vars-knowledgebase</artifactId>
             <version>${project.version}</version>
         </dependency>
+
         <!--
             Groovy related classes for running a Groovy Shell
         -->
@@ -50,6 +57,7 @@
             <artifactId>commons-cli</artifactId>
             <version>1.2</version>
         </dependency>
+        
         <!-- Used by scripts for sending emails -->
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -62,6 +70,7 @@
             <artifactId>tagsoup</artifactId>
             <version>1.2</version>
         </dependency>
+        
         <!--
             Dependencies for referencing the EXPD database. Used for merges
         -->
@@ -75,6 +84,7 @@
             <artifactId>expd-jdbc</artifactId>
             <version>1.1-SNAPSHOT</version>
         </dependency>
+        
         <!--
             Sanselan is used for accessing image metadata. Used for image loading
             scripts
@@ -89,6 +99,7 @@
             <artifactId>guice</artifactId>
             <version>2.0</version>
         </dependency>
+        
         <!-- Need for loading SIMPA -->
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -100,9 +111,33 @@
             <artifactId>qtx4j</artifactId>
             <version>0.13</version>
         </dependency>
+
+        <!--
+            Scala related classes
+        -->
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>${scala.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.specs</groupId>
+            <artifactId>specs</artifactId>
+            <version>1.2.5</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>javassist</groupId>
+            <artifactId>javassist</artifactId>
+            <version>3.11.0.GA</version>
+        </dependency>
     </dependencies>
+    
     <build>
         <plugins>
+            <!--
+                Generate an assembly
+            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -121,8 +156,58 @@
                     </execution>
                 </executions>
             </plugin>
+            
+            <!--
+                Include Scala compiler
+            -->
+            <plugin>
+                <groupId>org.scala-tools</groupId>
+                <artifactId>maven-scala-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>compile</goal>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <scalaVersion>${scala.version}</scalaVersion>
+                    <args>
+                        <arg>-target:jvm-1.5</arg>
+                    </args>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
+
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.scala-tools</groupId>
+                <artifactId>maven-scala-plugin</artifactId>
+                <configuration>
+                    <scalaVersion>${scala.version}</scalaVersion>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
+
+    <repositories>
+        <repository>
+            <id>scala-tools.org</id>
+            <name>Scala-Tools Maven2 Repository</name>
+            <url>http://scala-tools.org/repo-releases</url>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>scala-tools.org</id>
+            <name>Scala-Tools Maven2 Repository</name>
+            <url>http://scala-tools.org/repo-releases</url>
+        </pluginRepository>
+    </pluginRepositories>
 </project>
 
 

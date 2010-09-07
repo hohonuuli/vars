@@ -159,7 +159,8 @@ public class JXObservationTable extends JXTable implements ObservationTable {
      * @param vColIndex
      */
     public void scrollToVisible(final int rowIndex, final int vColIndex) {
-        scrollCellToVisible(rowIndex, vColIndex);
+        scrollRowToVisible(rowIndex);
+        //scrollCellToVisible(rowIndex, vColIndex);
     }
 
     /**
@@ -174,7 +175,7 @@ public class JXObservationTable extends JXTable implements ObservationTable {
         final int row = convertRowIndexToView(((JXObservationTableModel) getModel()).getObservationRow(obs));
 
         getSelectionModel().setSelectionInterval(row, row);
-        scrollCellToVisible(row, 0);
+        scrollRowToVisible(row);
     }
 
     /**
@@ -200,7 +201,7 @@ public class JXObservationTable extends JXTable implements ObservationTable {
 
         int[] i = getSelectedRows();
         if (i != null && i.length > 0) {
-            scrollCellToVisible(i[0], 0);
+            scrollRowToVisible(i[0]);
         }
     }
 

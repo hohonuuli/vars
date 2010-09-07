@@ -351,6 +351,7 @@ public class ImageCaptureAction extends ActionAdapter {
                 }
 
                 dao.endTransaction();
+                dao.close();
             }
 
             final Collection<Observation> selectedObservations = ImmutableList.of(observation);

@@ -178,6 +178,7 @@ public class LinkTemplateEditorPanel extends EditorPanel {
                         conceptMetadata.addHistory(history);
                         dao.persist(history);
                         dao.endTransaction();
+                        dao.close();
                         EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);    // Will refresh everything
 
                     }

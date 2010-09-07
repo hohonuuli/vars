@@ -1,25 +1,14 @@
-package vars.simpa
+package org.mbari.vars.simpa
 
-import java.io.BufferedReader
-import java.io.IOException
-import java.io.InputStreamReader
-import java.net.URL
-import java.text.DateFormat
-import java.text.ParseException
 import java.text.SimpleDateFormat
-import java.util.ArrayList
-import java.util.Arrays
-import java.util.Date
-import java.util.List
-import java.util.TimeZone
-import org.mbari.framegrab.VideoChannelGrabber
+
 import org.mbari.framegrab.GrabUtil
-import org.slf4j.Logger
+
 import org.slf4j.LoggerFactory
 import vars.ToolBox
 import vars.annotation.ui.PersistenceController
 import org.mbari.expd.actions.CoallateByDateFunction
-import org.mbari.vcr.rs422.VCR
+
 import org.mbari.vcr.VCRAdapter
 import org.mbari.vcr.VCRUtil
 import org.mbari.movie.Timecode

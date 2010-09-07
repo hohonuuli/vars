@@ -1,10 +1,10 @@
-package vars.simpa
+package org.mbari.vars.simpa
 
 import vars.annotation.ui.ToolBelt
 import vars.annotation.VideoArchiveSet
 import vars.annotation.VideoFrame
 import vars.annotation.ObservationsSpatialLocations
-import vars.shared.ui.GlobalLookup
+
 import java.text.DecimalFormat
 import org.slf4j.LoggerFactory
 import java.text.DateFormat

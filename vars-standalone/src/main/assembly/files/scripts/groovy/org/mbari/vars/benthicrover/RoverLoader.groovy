@@ -1,4 +1,4 @@
-package vars.benthicrover
+package org.mbari.vars.benthicrover
 
 import org.slf4j.LoggerFactory
 import vars.ToolBox
