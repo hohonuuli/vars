@@ -108,7 +108,8 @@ public class ConceptTreeModel extends DefaultTreeModel {
             node.removeAllChildren();
             Concept concept = (Concept) node.getUserObject();
 
-            concept = dao.merge(concept);
+            //concept = dao.merge(concept);
+            concept = dao.find(concept);
             List<Concept> childConcepts = new ArrayList<Concept>(concept.getChildConcepts());
 
             for (Concept child : childConcepts) {
@@ -288,6 +289,7 @@ public class ConceptTreeModel extends DefaultTreeModel {
         @Override
         protected void finalize() throws Throwable {
             dao.endTransaction();
+            dao.close();
             super.finalize();
         }
 

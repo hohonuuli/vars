@@ -281,6 +281,7 @@ public class LinkTemplateEditorPanel extends EditorPanel {
                                     conceptMetadata.removeLinkTemplate(lt);
                                     newFromConcept.getConceptMetadata().addLinkTemplate(linkTemplate);
                                     conceptDAO.endTransaction();
+                                    conceptDAO.close();
                                 }
                                 catch (Exception e) {
                                     String message = "Failed to change parent of " + linkTemplate + " from " +
@@ -340,7 +341,9 @@ public class LinkTemplateEditorPanel extends EditorPanel {
                                         EventBus.publish(Lookup.TOPIC_WARNING, e);
                                     }
                                 }
+                                linkTemplateDAO.close();
                             }
+
                             EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, newFromConceptName);
                             return null;
                         }

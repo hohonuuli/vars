@@ -14,6 +14,7 @@
 
 package vars.knowledgebase.ui;
 
+import org.mbari.text.ObjectToStringConverter;
 import vars.shared.ui.FullLinkListCellRender;
 import vars.shared.ui.ILockableEditor;
 import foxtrot.Job;
@@ -118,6 +119,27 @@ public class LinkEditorPanel extends javax.swing.JPanel implements ILockableEdit
      * @return  the linkComboBox
      */
     public JComboBox getLinkComboBox() {
+        if (linkComboBox == null) {
+            linkComboBox = new javax.swing.JComboBox();
+            linkComboBox.setModel(new SearchableComboBoxModel(new LinkComparator(), new ObjectToStringConverter() {
+                public String convert(Object object) {
+                    return object.toString().toLowerCase();
+                }
+            }));
+            linkComboBox.setRenderer(new FullLinkListCellRender());
+             /*
+             * Setup linkComboBox
+             */
+            linkComboBox.addItemListener(new java.awt.event.ItemListener() {
+
+                public void itemStateChanged(ItemEvent e) {
+                    if (e.getStateChange() == ItemEvent.SELECTED) {
+                        setLink((ILink) e.getItem());
+                    }
+                }
+
+            });
+        }
         return linkComboBox;
     }
 
@@ -147,6 +169,64 @@ public class LinkEditorPanel extends javax.swing.JPanel implements ILockableEdit
      * @return  the searchField
      */
     public JTextField getSearchField() {
+        if (searchField == null) {
+            searchField = new JTextField();
+            /*
+             * setup searchField
+             */
+            searchField.addFocusListener(new FocusAdapter() {
+
+                @Override
+                public void focusGained(FocusEvent fe) {
+                    searchField.setSelectionStart(0);
+                    searchField.setSelectionEnd(searchField.getText().length());
+                }
+
+            });
+
+            searchField.addActionListener(new ActionListener() {
+
+                public void actionPerformed(final ActionEvent e) {
+
+                    /*
+                     * FIXME 20040907 brian: There is a known bug here that occurs
+                     * when enter is pressed repeatedly when tfSearch has focus.
+                     * This bug causes the UI to hang.
+                     */
+                    JComboBox linkCb = getLinkComboBox();
+                    int startIndex = linkCb.getSelectedIndex() + 1;
+                    SearchableComboBoxModel linksModel = (SearchableComboBoxModel) linkCb.getModel();
+
+                    startIndex = startIndex >= linksModel.getSize() ? 0 : startIndex;
+                    String searchTerm = searchField.getText().toLowerCase(); // Case-insensitive serach
+
+                    int index = linksModel.searchForItemContaining(searchTerm, startIndex);
+                    if (index > -1) {
+
+                        // Handle if match was found
+                        linkCb.setSelectedIndex(index);
+                        linkCb.hidePopup();
+                    }
+                    else {
+
+                        // If no match was found search from the start of
+                        // the
+                        // list.
+                        if (startIndex > 0) {
+                            index = linksModel.searchForItemContaining(searchTerm);
+
+                            if (index > -1) {
+
+                                // Handle if match was found
+                                linkCb.setSelectedIndex(index);
+                                linkCb.hidePopup();
+                            }
+                        }
+                    }
+                }
+
+            });
+        }
         return searchField;
     }
 
@@ -167,8 +247,6 @@ public class LinkEditorPanel extends javax.swing.JPanel implements ILockableEdit
 
     private void initialize() {
         jLabel4 = new javax.swing.JLabel();
-        searchField = new javax.swing.JTextField();
-        linkComboBox = new javax.swing.JComboBox();
         jLabel1 = new javax.swing.JLabel();
         linkNameField = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
@@ -181,8 +259,6 @@ public class LinkEditorPanel extends javax.swing.JPanel implements ILockableEdit
 
         jLabel4.setText("Search:");
 
-        linkComboBox.setModel(new SearchableComboBoxModel(new LinkComparator()));
-        linkComboBox.setRenderer(new FullLinkListCellRender());
 
         jLabel1.setText("Link:");
 
@@ -219,11 +295,11 @@ public class LinkEditorPanel extends javax.swing.JPanel implements ILockableEdit
                                                                         .addPreferredGap(
                                                                                 org.jdesktop.layout.LayoutStyle.RELATED)
                                                                         .add(
-                                                                                searchField,
+                                                                                getSearchField(),
                                                                                 org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
                                                                                 305,
                                                                                 Short.MAX_VALUE))
-                                                        .add(linkComboBox, 0,
+                                                        .add(getLinkComboBox(), 0,
                                                                 360,
                                                                 Short.MAX_VALUE)
                                                         .add(
@@ -286,7 +362,7 @@ public class LinkEditorPanel extends javax.swing.JPanel implements ILockableEdit
                                                                 org.jdesktop.layout.GroupLayout.BASELINE)
                                                         .add(jLabel4)
                                                         .add(
-                                                                searchField,
+                                                                getSearchField(),
                                                                 org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
                                                                 org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
                                                                 org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
@@ -300,7 +376,7 @@ public class LinkEditorPanel extends javax.swing.JPanel implements ILockableEdit
                                         .addPreferredGap(
                                                 org.jdesktop.layout.LayoutStyle.RELATED)
                                         .add(
-                                                linkComboBox,
+                                                getLinkComboBox(),
                                                 org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
                                                 org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
                                                 org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -366,72 +442,9 @@ public class LinkEditorPanel extends javax.swing.JPanel implements ILockableEdit
                                         .addContainerGap(
                                                 org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
                                                 Short.MAX_VALUE)));
-        /*
-         * setup searchField
-         */
-        searchField.addFocusListener(new FocusAdapter() {
 
-            @Override
-            public void focusGained(FocusEvent fe) {
-                searchField.setSelectionStart(0);
-                searchField.setSelectionEnd(searchField.getText().length());
-            }
 
-        });
 
-        searchField.addActionListener(new ActionListener() {
-
-            public void actionPerformed(final ActionEvent e) {
-
-                /*
-                 * FIXME 20040907 brian: There is a known bug here that occurs
-                 * when enter is pressed repeatedly when tfSearch has focus.
-                 * This bug causes the UI to hang.
-                 */
-                int startIndex = linkComboBox.getSelectedIndex() + 1;
-                SearchableComboBoxModel linksModel = (SearchableComboBoxModel) linkComboBox.getModel();
-                
-                startIndex = startIndex >= linksModel.getSize() ? 0 : startIndex;
-                
-                int index = linksModel.searchForItemContaining(searchField.getText(), startIndex);
-                if (index > -1) {
-
-                    // Handle if match was found
-                    linkComboBox.setSelectedIndex(index);
-                    linkComboBox.hidePopup();
-                }
-                else {
-
-                    // If no match was found search from the start of
-                    // the
-                    // list.
-                    if (startIndex > 0) {
-                        index = linksModel.searchForItemContaining(searchField.getText());
-
-                        if (index > -1) {
-
-                            // Handle if match was found
-                            linkComboBox.setSelectedIndex(index);
-                            linkComboBox.hidePopup();
-                        }
-                    }
-                }
-            }
-
-        });
-
-        /*
-         * Setup linkComboBox
-         */
-        linkComboBox.addItemListener(new java.awt.event.ItemListener() {
-
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    setLink((ILink) e.getItem());
-                }
-            }
-
-        });
 
     }    // </editor-fold>//GEN-END:initComponents
 
@@ -482,7 +495,7 @@ public class LinkEditorPanel extends javax.swing.JPanel implements ILockableEdit
          * to the collection so we generate a copy.
          */
         linkTemplates.add(nilLinkTemplate);
-        SearchableComboBoxModel model = (SearchableComboBoxModel) linkComboBox.getModel();
+        SearchableComboBoxModel model = (SearchableComboBoxModel) getLinkComboBox().getModel();
         model.clear();
         model.addAll(linkTemplates);
         model.setSelectedItem(nilLinkTemplate);
@@ -578,6 +591,8 @@ public class LinkEditorPanel extends javax.swing.JPanel implements ILockableEdit
             linkValueField.setEnabled(allowEditing);
             toConceptComboBox.setEnabled(allowEditing);
         }
+
+        conceptDAO.close();
     }
 
     /**

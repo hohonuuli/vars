@@ -28,11 +28,14 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
+
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import org.mbari.awt.AwtUtilities;
 import org.mbari.swing.LabeledSpinningDialWaitIndicator;
 import org.mbari.swing.SearchableComboBoxModel;
+import org.mbari.swing.SwingUtils;
 import org.mbari.swing.WaitIndicator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +45,8 @@ import vars.LinkComparator;
 import vars.LinkUtilities;
 import vars.annotation.AnnotationFactory;
 import vars.annotation.Association;
+import vars.annotation.CameraData;
+import vars.annotation.CameraDirections;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchiveSet;
 import vars.annotation.VideoArchiveSetDAO;
@@ -96,6 +101,44 @@ public class VideoArchiveSetEditorPanelController {
         dialog.setLinks(linkTemplates);
         dialog.setVisible(true);
     }
+    
+    protected void changeCameraDirectionsTo(CameraDirections direction) {
+    	Collection<Observation> observations = getObservations(true);
+    	if (observations.size() < 1) {
+    		return;
+    	}
+    	
+    	Set<VideoFrame> videoFrames = new HashSet<VideoFrame>(Collections2.transform(observations, new Function<Observation, VideoFrame>() {
+			public VideoFrame apply(Observation from) {
+                return from.getVideoFrame();
+            }
+        }));
+
+    	
+    	 final Object[] options = { "OK", "CANCEL" };
+         final int confirm = JOptionPane.showOptionDialog(
+                 AwtUtilities.getFrame(panel),
+                 "Do you want to change the camera direction to '" + direction.getDirection() + 
+                 "' for the " + videoFrames.size() + " selected video-frames(s)?", 
+                 "VARS - Confirm Delete", JOptionPane.DEFAULT_OPTION,
+                 JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+         if (confirm == JOptionPane.YES_OPTION) {
+             DAO dao = toolBelt.getAnnotationDAOFactory().newVideoFrameDAO();
+             dao.startTransaction();
+        	 for (VideoFrame videoFrame : videoFrames) {
+        	     videoFrame = dao.find(videoFrame);
+        	     CameraData cameraData = videoFrame.getCameraData();
+        	     cameraData.setDirection(direction.getDirection());
+        	     if (!dao.isPersistent(cameraData)) {
+        	         dao.persist(cameraData);
+        	     }
+        	 }
+        	 dao.endTransaction();
+        	 dao.close();
+        	 refresh();
+         }
+    	
+    }
 
     protected void deleteObservations() {
 
@@ -108,20 +151,28 @@ public class VideoArchiveSetEditorPanelController {
 
         final Object[] options = { "OK", "CANCEL" };
         final int confirm = JOptionPane.showOptionDialog(
-            (Frame) Lookup.getApplicationFrameDispatcher().getValueObject(),
-            "Do you want to delete " + count + " observation(s)?", "VARS - Confirm Delete", JOptionPane.DEFAULT_OPTION,
-            JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+                AwtUtilities.getFrame(panel),
+                "Do you want to delete " + count + " observation(s)?", 
+                "VARS - Confirm Delete", JOptionPane.DEFAULT_OPTION,
+                JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+        
         if (confirm == JOptionPane.YES_OPTION) {
             DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
             dao.startTransaction();
-
             for (Observation observation : observations) {
                 observation = dao.find(observation);
-                observation.getVideoFrame().removeObservation(observation);
-                dao.remove(observation);
+                if (observation != null) {
+                	VideoFrame videoFrame = observation.getVideoFrame();
+                	videoFrame.removeObservation(observation);
+                	dao.remove(observation);
+                	if (videoFrame.getObservations().size() == 0) {
+                	    dao.remove(videoFrame);
+                	}
+                }
+                
             }
-
             dao.endTransaction();
+            dao.close();
             refresh();
         }
 
@@ -301,9 +352,9 @@ public class VideoArchiveSetEditorPanelController {
 
                     final Object[] options = { "OK", "CANCEL" };
                     final int confirm = JOptionPane.showOptionDialog(
-                        (Frame) Lookup.getApplicationFrameDispatcher().getValueObject(),
-                        "Do you want to delete " + associations.size() + " association(s)?", "VARS - Confirm Delete",
-                        JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+                            AwtUtilities.getFrame(panel),
+                            "Do you want to delete " + associations.size() + " association(s)?", "VARS - Confirm Delete",
+                            JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
 
                     if (confirm == JOptionPane.YES_OPTION) {
                         WaitIndicator waitIndicator = new LabeledSpinningDialWaitIndicator(panel,
@@ -416,14 +467,19 @@ public class VideoArchiveSetEditorPanelController {
                         @Override
                         public Object run() {
                             DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
+                            ConceptDAO conceptDao = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
+                            Concept concept = conceptDao.findByName(name);
+                            conceptDao.close();
+                            String primaryName = concept.getPrimaryConceptName().getName();
                             dao.startTransaction();
                             for (Observation observation : observations) {
                                 observation = dao.find(observation);
                                 if (observation != null) {
-                                    observation.setConceptName(name);
+                                    observation.setConceptName(primaryName);
                                 }
                             }
                             dao.endTransaction();
+                            dao.close();
                             return null;
                         }
                     });

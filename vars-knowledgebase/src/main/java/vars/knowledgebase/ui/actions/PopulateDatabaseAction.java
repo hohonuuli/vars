@@ -103,6 +103,7 @@ public class PopulateDatabaseAction extends ActionAdapter {
             }
         }
         conceptDAO.endTransaction();
+        conceptDAO.close();
         return gotRoot;
     }
     
@@ -140,6 +141,7 @@ public class PopulateDatabaseAction extends ActionAdapter {
 
             }
         }
+        userAccountDAO.close();
         return gotAdmins;
     }
     

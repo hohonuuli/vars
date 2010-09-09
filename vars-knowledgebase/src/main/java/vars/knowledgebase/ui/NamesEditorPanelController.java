@@ -58,7 +58,7 @@ class NamesEditorPanelController {
     /**
      * Constructs ...
      *
-     * @param toolBelt
+     * @param namesEditorPanel The panel to be controlled.
      */
     NamesEditorPanelController(NamesEditorPanel namesEditorPanel) {
         this.namesEditorPanel = namesEditorPanel;
@@ -90,6 +90,7 @@ class NamesEditorPanelController {
                 conceptName.getConcept().getConceptMetadata().addHistory(history);
                 dao.persist(history);
                 dao.endTransaction();
+                dao.close();
                 waitIndicator.dispose();
                 EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
                 
@@ -104,7 +105,7 @@ class NamesEditorPanelController {
      * Update a conceptName
      *
      * @param concept
-     * @param name
+     * @param newName
      * @param author
      * @param nameType
      * @param userAccount
@@ -237,6 +238,7 @@ class NamesEditorPanelController {
 
         }
 
+        conceptDAO.close();
 
         return okToProceed;
     }

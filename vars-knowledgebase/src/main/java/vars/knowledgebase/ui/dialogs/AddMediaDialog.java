@@ -325,9 +325,8 @@ public class AddMediaDialog extends JDialog {
 
                     EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, s);
                 }
-                finally {
-                    dao.endTransaction();
-                }
+                dao.endTransaction();
+                dao.close();
 
                 progressBar.setString("Refreshing");
                 progressBar.setValue(3);

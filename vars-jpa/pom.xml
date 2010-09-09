@@ -9,7 +9,6 @@
     <artifactId>vars-jpa</artifactId>
     <name>vars-jpa [Library]</name>
     <properties>
-        <!-- <derbyVersion>10.5.3.0_1</derbyVersion> -->
         <derby.version>10.6.1.0</derby.version>
         <jtds.version>1.2.5</jtds.version>
     </properties>
@@ -26,6 +25,29 @@
                 <filtering>true</filtering>
             </resource>
         </resources>
+        <!-- Uncomment the following lines to use eclipselink's static weaving to enable lazy
+            loading of conceptmetadata -->
+        <!-- <plugins>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>process-classes</phase>
+                        <configuration>
+                            <tasks>
+                                <java classname="org.eclipse.persistence.tools.weaving.jpa.StaticWeave"
+                                      classpathref="maven.runtime.classpath" fork="true">
+                                    <arg line="-loglevel FINE -persistenceinfo src/main/resources target/classes target/classes"/>
+                                </java>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins> -->
     </build>
     <!--
     Dependencies

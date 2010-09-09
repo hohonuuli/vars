@@ -163,6 +163,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
         }
         finally {
             dao.endTransaction();
+            dao.close();
         }
     }
 
@@ -192,6 +193,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
             }
         }
         dao.endTransaction();
+        dao.close();
     }
 
     private class ADeleteChildConceptTask extends GenericApproveTask {
@@ -211,7 +213,6 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
              */
             String nameToDelete = history.getOldValue();
 
-            // DAOTX
             final Concept parentConcept = history.getConceptMetadata().getConcept();
             final Collection<Concept> children = new ArrayList<Concept>(parentConcept.getChildConcepts());
             Concept concept = null;
@@ -237,6 +238,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
             /*
              * Get a count of all the concepts we're about to disappear forever
              */
+            // DAOTX
             ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO(dao.getEntityManager());
 
             concept = conceptDAO.find(concept);

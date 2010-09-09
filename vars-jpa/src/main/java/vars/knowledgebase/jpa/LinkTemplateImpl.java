@@ -91,7 +91,7 @@ public class LinkTemplateImpl implements Serializable, LinkTemplate, JPAEntity {
     @Column(name = "LinkValue", length = 255)
     String linkValue;
     
-    @Column(name = "ToConcept", length = 50)
+    @Column(name = "ToConcept", length = 128)
     String toConcept;
 
     /** Optimistic lock to prevent concurrent overwrites */

@@ -154,6 +154,7 @@ public class RejectHistoryTask extends AbstractHistoryTask {
         }
         finally {
             dao.endTransaction();
+            dao.close();
         }
     }
 

@@ -85,10 +85,10 @@ public class LinkRealizationImpl implements Serializable, LinkRealization, JPAEn
     @Column(name = "LinkName", length = 50)
     String linkName;
 
-    @Column(name = "ToConcept", length = 50)
+    @Column(name = "ToConcept", length = 128)
     String toConcept;
 
-    @Column(name = "LinkValue", length = 255)
+    @Column(name = "LinkValue", length = 2048)
     String linkValue;
 
     @ManyToOne(optional = false, targetEntity = ConceptMetadataImpl.class, cascade = {CascadeType.MERGE, CascadeType.REFRESH})

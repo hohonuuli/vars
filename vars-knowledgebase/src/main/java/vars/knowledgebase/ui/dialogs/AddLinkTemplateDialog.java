@@ -132,6 +132,7 @@ public class AddLinkTemplateDialog extends JDialog {
                                          " database. Unable to add '" + linkTemplate.stringValue() + "'");
                     }
                     conceptDAO.endTransaction();
+                    conceptDAO.close();
 
                     /*
                      * Add the new linkTemplate and refresh the view

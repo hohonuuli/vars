@@ -460,6 +460,8 @@ public class PersistenceController {
         }
 
         dao.endTransaction();
+        dao.close();
+        conceptDAO.close();
         updateUI(uiObservations);
         return updatedAssociations;
     }
@@ -506,6 +508,7 @@ public class PersistenceController {
             }
         }
         dao.endTransaction();
+        dao.close();
         return cameraDatas;
     }
 
@@ -757,7 +760,9 @@ public class PersistenceController {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 // When observations are deleted the table would jump to the last row UNLESS
-                // we make this call which mostly preserves the current view.
+                // we make this call which mostly preserves the current view. Doing this still
+                // makes a little visible 'jump' but it takes the user back to about the same
+                // position in the table
                 table.scrollRectToVisible(rect);
             }
         });

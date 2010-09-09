@@ -42,7 +42,8 @@ public class LinkRealizationDAOImpl extends DAO implements LinkRealizationDAO {
             object.setToConcept(concept.getPrimaryConceptName().getName());
         }
         else {
-            log.warn(object + " contains a 'conceptName', " + object.getToConcept() + " that was not found in the knowlegebase");
+            log.warn(object + " contains a 'conceptName', " + object.getToConcept() +
+                    " that was not found in the knowlegebase");
         }
     }
 }

@@ -127,7 +127,7 @@ public class AnnotationFrameController implements PreferenceUpdater {
 
 
         /*
-         * This listener updates the URL's of he image you;ve captured in
+         * This listener updates the URL's of the image you've captured in
          * a background thread.
          */
         Lookup.getVideoArchiveDispatcher().addPropertyChangeListener(new PropertyChangeListener() {

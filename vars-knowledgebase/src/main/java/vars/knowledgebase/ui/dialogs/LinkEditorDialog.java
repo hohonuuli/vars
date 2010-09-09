@@ -115,7 +115,7 @@ public class LinkEditorDialog extends JDialog implements ILockableEditor {
 
     /**
      *
-     * @param knowledgebaseDAOFactory
+     * @param toolBelt
      * @throws HeadlessException
      */
     public LinkEditorDialog(ToolBelt toolBelt) throws HeadlessException {
@@ -128,7 +128,7 @@ public class LinkEditorDialog extends JDialog implements ILockableEditor {
 
     /**
      * @param owner
-     * @param knowledgebaseDAOFactory
+     * @param toolBelt
      * @throws HeadlessException
      */
     public LinkEditorDialog(Frame owner, ToolBelt toolBelt) throws HeadlessException {

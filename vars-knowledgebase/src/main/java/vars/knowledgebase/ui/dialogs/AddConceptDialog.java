@@ -486,6 +486,8 @@ public class AddConceptDialog extends javax.swing.JDialog {
                 }
 
             }
+            dao.endTransaction();
+            dao.close();
 
             return concept;
         }
@@ -594,6 +596,7 @@ public class AddConceptDialog extends javax.swing.JDialog {
             }
 
             conceptDAO.endTransaction();
+            conceptDAO.close();
 
             EventBus.publish(Lookup.TOPIC_APPROVE_HISTORIES, histories);
 

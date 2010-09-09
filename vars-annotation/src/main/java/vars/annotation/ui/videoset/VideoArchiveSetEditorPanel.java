@@ -19,6 +19,9 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+
 import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -39,7 +42,9 @@ import vars.ILink;
 import vars.LinkBean;
 import vars.LinkComparator;
 import vars.LinkUtilities;
+import vars.annotation.CameraDirections;
 import vars.annotation.VideoArchiveSet;
+import vars.annotation.ui.CameraDirectionComboBox;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.table.JXObservationTable;
 import vars.shared.ui.ConceptNameComboBox;
@@ -64,6 +69,7 @@ public class VideoArchiveSetEditorPanel extends JPanel {
     private JButton btnRenameConcepts;
     private JButton btnReplaceAssociations;
     private JButton btnSearch;
+    private JComboBox cameraDirectionCB;
     private JCheckBox chckbxAssociation;
     private JCheckBox chckbxConcept;
     private ConceptNameComboBox conceptComboBox;
@@ -291,38 +297,38 @@ public class VideoArchiveSetEditorPanel extends JPanel {
     private JPanel getSearchPanel() {
         if (searchPanel == null) {
                 searchPanel = new JPanel();
-                GroupLayout groupLayout = new GroupLayout(searchPanel);
-                groupLayout.setHorizontalGroup(
-                        groupLayout.createParallelGroup(Alignment.LEADING)
-                                .addGroup(groupLayout.createSequentialGroup()
+                GroupLayout gl_searchPanel = new GroupLayout(searchPanel);
+                gl_searchPanel.setHorizontalGroup(
+                        gl_searchPanel.createParallelGroup(Alignment.LEADING)
+                                .addGroup(gl_searchPanel.createSequentialGroup()
                                         .addContainerGap()
-                                        .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-                                                .addGroup(groupLayout.createSequentialGroup()
-                                                        .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+                                        .addGroup(gl_searchPanel.createParallelGroup(Alignment.LEADING)
+                                                .addGroup(gl_searchPanel.createSequentialGroup()
+                                                        .addGroup(gl_searchPanel.createParallelGroup(Alignment.LEADING)
                                                                 .addComponent(getChckbxAssociation())
                                                                 .addComponent(getChckbxConcept()))
                                                         .addPreferredGap(ComponentPlacement.RELATED)
-                                                        .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+                                                        .addGroup(gl_searchPanel.createParallelGroup(Alignment.LEADING)
                                                                 .addComponent(getConceptComboBox(), 0, 309, Short.MAX_VALUE)
                                                                 .addComponent(getAssociationComboBox(), 0, 309, Short.MAX_VALUE)))
                                                 .addComponent(getBtnSearch(), Alignment.TRAILING))
                                         .addContainerGap())
                 );
-                groupLayout.setVerticalGroup(
-                        groupLayout.createParallelGroup(Alignment.TRAILING)
-                                .addGroup(groupLayout.createSequentialGroup()
+                gl_searchPanel.setVerticalGroup(
+                        gl_searchPanel.createParallelGroup(Alignment.TRAILING)
+                                .addGroup(gl_searchPanel.createSequentialGroup()
                                         .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+                                        .addGroup(gl_searchPanel.createParallelGroup(Alignment.BASELINE)
                                                 .addComponent(getChckbxConcept())
                                                 .addComponent(getConceptComboBox(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                                         .addPreferredGap(ComponentPlacement.RELATED)
-                                        .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+                                        .addGroup(gl_searchPanel.createParallelGroup(Alignment.BASELINE)
                                                 .addComponent(getChckbxAssociation())
                                                 .addComponent(getAssociationComboBox(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                                         .addPreferredGap(ComponentPlacement.RELATED)
                                         .addComponent(getBtnSearch()))
                 );
-                searchPanel.setLayout(groupLayout);
+                searchPanel.setLayout(gl_searchPanel);
         }
         return searchPanel;
     }
@@ -344,14 +350,30 @@ public class VideoArchiveSetEditorPanel extends JPanel {
             toolBar.add(getBtnDelete());
             toolBar.add(getBtnAddAssociation());
             toolBar.add(getBtnReplaceAssociations());
-            toolBar.add(getBtnRemoveAssociations());
+            toolBar.add(getBtnRemoveAssociations());            
+            toolBar.add(getCameraDirectionCB());
         }
 
         return toolBar;
     }
+    
+    private JComboBox getCameraDirectionCB() {
+    	if (cameraDirectionCB == null) {
+    		cameraDirectionCB = new CameraDirectionComboBox();
+    		cameraDirectionCB.setToolTipText("Change the camera direction of the selected video-frames");
+    		cameraDirectionCB.addItemListener(new ItemListener() {
+				public void itemStateChanged(ItemEvent e) {
+				    if (e.getStateChange() == ItemEvent.SELECTED) {
+				        controller.changeCameraDirectionsTo((CameraDirections) cameraDirectionCB.getSelectedItem());
+				    }
+				}
+			});
+    	}
+    	return cameraDirectionCB;
+    }
 
     /**
-     * @return
+     * @return The VideoArchiveSet that is currently being edited
      */
     public synchronized VideoArchiveSet getVideoArchiveSet() {
         return videoArchiveSet;
@@ -366,7 +388,7 @@ public class VideoArchiveSetEditorPanel extends JPanel {
 
     /**
      *
-     * @param videoArchiveSet
+     * @param videoArchiveSet The VideoArchiveSet that will be edited
      */
     public synchronized void setVideoArchiveSet(VideoArchiveSet videoArchiveSet) {
         this.videoArchiveSet = videoArchiveSet;
@@ -376,5 +398,4 @@ public class VideoArchiveSetEditorPanel extends JPanel {
             }
         });
     }
-
 }

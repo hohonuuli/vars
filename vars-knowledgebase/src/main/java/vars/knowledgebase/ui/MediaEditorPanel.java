@@ -273,6 +273,7 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
             concept.getConceptMetadata().addHistory(history);
             dao.persist(history);
             dao.endTransaction();
+            dao.close();
 
             EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
         }
@@ -393,6 +394,7 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
             }
 
             dao.endTransaction();
+            dao.close();
 
             getMediaList().paintImmediately(getMediaList().getBounds());
 

@@ -54,9 +54,7 @@ public class AddLinkRealizationDialog extends JDialog {
     /**
      * Constructs ...
      *
-     * @param approveHistoryTask
-     * @param knowledgebaseDAOFactory
-     * @param knowledgebaseFactory
+     * @param toolBelt
      */
     public AddLinkRealizationDialog(ToolBelt toolBelt) {
         this(null, toolBelt);
@@ -64,9 +62,7 @@ public class AddLinkRealizationDialog extends JDialog {
 
     /**
      * @param owner
-     * @param approveHistoryTask
-     * @param knowledgebaseDAOFactory
-     * @param knowledgebaseFactory
+     * @param toolBelt
      */
     public AddLinkRealizationDialog(Frame owner, ToolBelt toolBelt) {
         super(owner);
@@ -187,6 +183,7 @@ public class AddLinkRealizationDialog extends JDialog {
                 conceptDAO.startTransaction();
                 Concept toConcept = conceptDAO.findByName(linkRealization.getToConcept());
                 conceptDAO.endTransaction();
+                conceptDAO.close();
                 
                 if (toConcept != null) {
                     linkRealization.setToConcept(toConcept.getPrimaryConceptName().getName());
@@ -205,6 +202,7 @@ public class AddLinkRealizationDialog extends JDialog {
                 c.getConceptMetadata().addHistory(history);
                 dao.persist(history);
                 dao.endTransaction();
+                dao.close();
 
                 EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
 

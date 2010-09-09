@@ -46,9 +46,13 @@ public class QueryResultsDecorator {
                  * Iterate through each conceptname and create a hierarchy for each.
                  */
                 Map<String, String> map = new HashMap<String, String>();
+                ConceptDAO dao = knowledgebaseDAOFactory.newConceptDAO();
                 for (String n : uniqueNames) {
 
-                    Concept concept = knowledgebaseDAOFactory.newConceptDAO().findByName(n);
+                    Concept concept = dao.findByName(n);
+                    if (concept == null) {
+                        log.info("Unable to find " + n + " in the knowledgebase");
+                    }
 
                     /*
                      * Generate a List of Concepts as we walk up the heirarchy
@@ -83,55 +87,14 @@ public class QueryResultsDecorator {
                     resultsMap.put("Hierarchy", aList);
 
                 }
+                dao.close();
                 break; // exit for loop after processing the conceptname column
             }
+           
         }
     }
     
-    /**
-     * Modifies a QueryResults object  by adding a column for storing the scientific 
-     * name for each taxonimic level. This includes infra, sub and supra levels.
-     * 
-     * @param queryResults The QueryResults object from a VARS query. The
-     *  queryResults object should contain a column named "conceptname" (case-insensitive)
-     */
-    public void addFullPhylogeny(QueryResults queryResults) {
-        
-        // TODO - This is not implemented correctly yet
-        final List<String> phylogeny = new ArrayList<String>() {
-
-            {
-                add("superkingdom");
-                add("kingdom");
-                add("infrakingdom");
-                add("subkingdom");
-                add("superphylum");
-                add("phylum");
-                add("infraphylum");
-                add("subphylum");
-                add("superclass");
-                add("class");
-                add("infraclass");
-                add("subclass");
-                add("superorder");
-                add("order");
-                add("infraorder");
-                add("suborder");
-                add("superfamily");
-                add("family");
-                add("infrafamily");
-                add("subfamily");
-                add("supergenus");
-                add("genus");
-                add("infragenus");
-                add("subgenus");
-                add("superspecies");
-                add("species");
-                add("infraspecies");
-                add("subspecies");
-            } //superkingdom, infraphylum, subphylum, superclass, subclass, superorder, suborder, infraorder, superfamily, subfamily, subspecies
-        };
-
+    private void addPhylogeny(QueryResults queryResults, List<String> phylogeny) {
         Set<String> columnNames = (Set<String>) queryResults.getColumnNames();
         for (String name : columnNames) {
             if (name.equalsIgnoreCase("conceptname")) {
@@ -147,8 +110,9 @@ public class QueryResultsDecorator {
                  * Iterate through each conceptname and create a hierarchy for each.
                  */
                 Map<String, List<String>> map = new HashMap<String, List<String>>();
+                ConceptDAO conceptDao = knowledgebaseDAOFactory.newConceptDAO();
                 for (String n : uniqueNames) {
-                    Concept concept = knowledgebaseDAOFactory.newConceptDAO().findByName(n);
+                    Concept concept = conceptDao.findByName(n);
 
                     /*
                      * Generate a List of Concepts as we walk up the heirarchy.
@@ -156,7 +120,8 @@ public class QueryResultsDecorator {
                      * is found within the phylogeny array
                      */
                     List<String> ancestors = new ArrayList<String>(phylogeny.size());
-                    map.put(concept.getPrimaryConceptName().getName(), ancestors);
+                    String primaryName = (concept == null) ? n : concept.getPrimaryConceptName().getName();
+                    map.put(primaryName, ancestors);
                     for (int i = 0; i < phylogeny.size(); i++) {
                         ancestors.add(null);
                     }
@@ -188,6 +153,7 @@ public class QueryResultsDecorator {
                     }
 
                 }
+                conceptDao.close();
                
                 
                 /*
@@ -219,6 +185,51 @@ public class QueryResultsDecorator {
             }
         }
     }
+    
+    /**
+     * Modifies a QueryResults object  by adding a column for storing the scientific 
+     * name for each taxonimic level. This includes infra, sub and supra levels.
+     * 
+     * @param queryResults The QueryResults object from a VARS query. The
+     *  queryResults object should contain a column named "conceptname" (case-insensitive)
+     */
+    public void addFullPhylogeny(QueryResults queryResults) {
+        
+        // TODO - This is not implemented correctly yet
+        final List<String> phylogeny = new ArrayList<String>() {{
+                add("superkingdom");
+                add("kingdom");
+                add("infrakingdom");
+                add("subkingdom");
+                add("superphylum");
+                add("phylum");
+                add("infraphylum");
+                add("subphylum");
+                add("superclass");
+                add("class");
+                add("infraclass");
+                add("subclass");
+                add("superorder");
+                add("order");
+                add("infraorder");
+                add("suborder");
+                add("superfamily");
+                add("family");
+                add("infrafamily");
+                add("subfamily");
+                add("supergenus");
+                add("genus");
+                add("infragenus");
+                add("subgenus");
+                add("superspecies");
+                add("species");
+                add("infraspecies");
+                add("subspecies");
+            } //superkingdom, infraphylum, subphylum, superclass, subclass, superorder, suborder, infraorder, superfamily, subfamily, subspecies
+        };
+
+       addPhylogeny(queryResults, phylogeny);
+    }
 
     /**
      * Modifies a QueryResults object  by adding a column for storing the scientific 
@@ -229,9 +240,7 @@ public class QueryResultsDecorator {
      */
     public void addBasicPhylogeny(QueryResults queryResults) {
 
-        final List<String> phylogeny = new ArrayList<String>() {
-
-            {
+        final List<String> phylogeny = new ArrayList<String>() {{
                 add("kingdom");
                 add("phylum");
                 add("class");
@@ -241,87 +250,8 @@ public class QueryResultsDecorator {
                 add("species");
             } //superkingdom, infraphylum, subphylum, superclass, subclass, superorder, suborder, infraorder, superfamily, subfamily, subspecies
         };
-
-        Set<String> columnNames = (Set<String>) queryResults.getColumnNames();
-        for (String name : columnNames) {
-            if (name.equalsIgnoreCase("conceptname")) {
-
-                /*
-                 * Create a list of all the unique conceptNames
-                 */
-                List<String> conceptNames = queryResults.getResults(name);
-                Set<String> uniqueNames = new HashSet<String>();
-                uniqueNames.addAll(conceptNames);
-
-                /*
-                 * Iterate through each conceptname and create a hierarchy for each.
-                 */
-                Map<String, List<String>> map = new HashMap<String, List<String>>();
-                for (String n : uniqueNames) {
-                    Concept concept = knowledgebaseDAOFactory.newConceptDAO().findByName(n);
-
-                    /*
-                     * Generate a List of Concepts as we walk up the heirarchy.
-                     * Only use concepts with no rank level AND whos rank name
-                     * is found within the phylogeny array
-                     */
-                    List<String> ancestors = new ArrayList<String>(phylogeny.size());
-                    map.put(concept.getPrimaryConceptName().getName(), ancestors);
-                    for (int i = 0; i < phylogeny.size(); i++) {
-                        ancestors.add(null);
-                    }
-
-
-                    while (concept != null) {
-                        if ((concept.getRankLevel() == null || concept.getRankLevel().length() == 0) && phylogeny.contains(concept.getRankName())) {
-                            String rank = concept.getRankName();
-                            int idx = phylogeny.indexOf(rank);
-                            if (log.isDebugEnabled()) {
-                                log.debug("Found rank of '" + rank + "' for '" + concept + 
-                                        "'. Adding as ancestors.add(" + idx + ", " +
-                                        concept + ")");
-                            }
-                            ancestors.set(idx, concept.getPrimaryConceptName().getName());
-                        }
-                        concept = concept.getParentConcept();
-                    }
-                    
-                    if (log.isDebugEnabled()) {
-                        log.debug(n + ": " + ancestors.toString());
-                    }
-
-                }
-               
-                
-                /*
-                 * Populate the queryResults with the new columns
-                 */
-                Map resultsMap = queryResults.getResultsMap();
-                for (int i = 0; i < phylogeny.size(); i++) {
-                    List<String> terms = new ArrayList<String>(conceptNames.size());
-                    for (String cn : conceptNames) {
-                        List<String> ancestors = map.get(cn);
-                        boolean added = false;
-                        if (ancestors != null) {
-                            String concept = ancestors.get(i);
-                            if (concept != null) {
-                                terms.add(concept);
-                                added = true;
-                            }
-                        }
-                        
-                        if (!added) {
-                            terms.add("");
-                        }
-                    }
-                    resultsMap.put(phylogeny.get(i), terms);
-                }
-                
-                break;
-
-            }
-        }
-
+        
+        addPhylogeny(queryResults, phylogeny);
     }
     
     /**

@@ -78,6 +78,7 @@ class KnowledgebaseFrameController {
         conceptDAO.startTransaction();
         Concept concept = conceptDAO.findByName(name);
         conceptDAO.endTransaction();
+        conceptDAO.close();
         treePanel.refreshAndOpenNode(concept);
         waitIndicator.dispose();
     }
