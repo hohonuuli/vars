@@ -21,6 +21,7 @@
             <property name="javax.persistence.jdbc.driver" value="${KNOWLEDGEBASE_JDBC_DRIVER}"/>
             <property name="javax.persistence.jdbc.password" value="${KNOWLEDGEBASE_JDBC_PASSWORD}"/>
             <property name="eclipselink.logging.level" value="CONFIG"/>
+            <!-- <property name="eclipselink.weaving" value="static" /> -->
         </properties>
     </persistence-unit>
 

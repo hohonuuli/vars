@@ -46,4 +46,5 @@ public class LinkRealizationDAOImpl extends DAO implements LinkRealizationDAO {
                     " that was not found in the knowlegebase");
         }
     }
+    
 }

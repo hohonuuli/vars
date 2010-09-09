@@ -25,7 +25,7 @@ public interface ObservationTableModel {
     void clear();
 
     /**
-     * Find the index of the COlumn based on it's String identifier. This method
+     * Find the index of the Column based on it's String identifier. This method
      * delegates the call to <code>ObservationColumnModel.findColumn</code>
      *
      * @param  id Description of the Parameter
@@ -56,7 +56,7 @@ public interface ObservationTableModel {
      int getNumberOfObservations();
 
     /**
-     *  Gets the observationAt attribute of the ObservationTableModel object
+     *  Get the observation at the given model index (not view)
      *
      * @param  rowIndex Description of the Parameter
      * @return  The observationAt value
@@ -64,6 +64,7 @@ public interface ObservationTableModel {
      Observation getObservationAt(final int rowIndex);
 
     /**
+     * Get the model index of the given observation
      * @param  observation THe observation to find
      * @return  The row containing the observation. -1 is return if the observation is
      *                  not found or if the observation was null

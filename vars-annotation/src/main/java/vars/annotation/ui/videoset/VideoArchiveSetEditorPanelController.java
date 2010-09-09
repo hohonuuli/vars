@@ -319,7 +319,9 @@ public class VideoArchiveSetEditorPanelController {
         if (useSelectedOnly) {
             int[] rows = myTable.getSelectedRows();
             for (int i : rows) {
-                observations.add(model.getObservationAt(i));
+                int modelRow = myTable.convertRowIndexToModel(i);
+                Observation observation = model.getObservationAt(modelRow);
+                observations.add(observation);
             }
         }
         else {

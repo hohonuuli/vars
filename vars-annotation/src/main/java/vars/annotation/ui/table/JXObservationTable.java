@@ -15,11 +15,13 @@
 
 package vars.annotation.ui.table;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.util.Collection;
 
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.SortOrder;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
@@ -55,6 +57,9 @@ public class JXObservationTable extends JXTable implements ObservationTable {
         setAutoscrolls(true);
         aTableHeader.setTable(this);
         setTableHeader(aTableHeader);
+        setShowGrid(true, false);
+        setGridColor(new Color(235, 235, 235));
+        setSortOrder(0, SortOrder.ASCENDING); // Default sort is by timecode
 
         // SwingX Highlighters do not play well with custom sell renderers. Turned this off for now
         //super.setHighlighters(HighlighterFactory.createSimpleStriping());
@@ -191,6 +196,7 @@ public class JXObservationTable extends JXTable implements ObservationTable {
         for (Observation observation : observations) {
             try {
                 final int row = convertRowIndexToView(model.getObservationRow(observation));
+                //final int row = model.getObservationRow(observation);
                 mySelectionModel.addSelectionInterval(row, row);
             }
             catch (IndexOutOfBoundsException e) {
