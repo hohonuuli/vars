@@ -12,6 +12,10 @@
         <level value="error" />
     </logger>
 
+    <logger name="vars.jpa">
+        <level value="error" />
+    </logger>
+
     <root>
         <priority value="info" />
         <appender-ref ref="CONSOLE" />

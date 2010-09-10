@@ -30,14 +30,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.DAO;
 import vars.ILink;
+import vars.LinkBean;
 import vars.UserAccount;
-import vars.knowledgebase.Concept;
-import vars.knowledgebase.ConceptDAO;
-import vars.knowledgebase.ConceptMetadata;
-import vars.knowledgebase.ConceptName;
-import vars.knowledgebase.History;
-import vars.knowledgebase.LinkTemplate;
-import vars.knowledgebase.LinkTemplateDAO;
+import vars.knowledgebase.*;
 import vars.knowledgebase.ui.dialogs.AddLinkTemplateDialog;
 
 /**
@@ -219,6 +214,55 @@ public class LinkTemplateEditorPanel extends EditorPanel {
 
     private class UpdateAction extends ActionAdapter {
 
+        void updateLink(LinkTemplate linkTemplate, ILink newLink) {
+            KnowledgebaseDAOFactory factory = getToolBelt().getKnowledgebaseDAOFactory();
+            LinkTemplateDAO linkTemplateDAO = factory.newLinkTemplateDAO();
+            linkTemplateDAO.startTransaction();
+            linkTemplate = linkTemplateDAO.find(linkTemplate);
+            // TODO what if linkTemplate is null
+            // Change the parent concept
+            if (!linkTemplate.getFromConcept().equals(newLink.getFromConcept())) {
+                final ConceptDAO conceptDAO = factory.newConceptDAO(linkTemplateDAO.getEntityManager());
+                final Concept newFromConcept = conceptDAO.findByName(newLink.getFromConcept());
+                final ConceptMetadata conceptMetadata = linkTemplate.getConceptMetadata();
+                conceptMetadata.removeLinkTemplate(linkTemplate);
+                newFromConcept.getConceptMetadata().addLinkTemplate(linkTemplate);
+            }
+
+            // Verify that the link name/ link value combo is unique
+            Collection<LinkTemplate> links = new ArrayList<LinkTemplate>();
+            links.addAll(linkTemplateDAO.findAllByLinkName(linkTemplate.getLinkName()));
+            for (LinkTemplate link : links) {
+                if (!linkTemplateDAO.equalInDatastore(link, linkTemplate) &&
+                        link.getLinkValue().equalsIgnoreCase(newLink.getLinkValue())) {
+                    // Don't allow duplicate link names
+                    EventBus.publish(Lookup.TOPIC_WARNING,
+                                     "A LinkTemplate with a LinkName of '" +
+                                     linkTemplate.getLinkName() + "' and a LinkValue of '" +
+                                     newLink.getLinkValue() +
+                                     "' already exist. Unable to change the LinkTemplate.");
+                    getLinkEditorPanel().setLink(linkTemplate);
+                    return;
+                }
+            }
+
+            linkTemplate.setLinkName(newLink.getLinkName());
+            linkTemplate.setLinkValue(newLink.getLinkValue());
+            linkTemplate.setToConcept(newLink.getToConcept());
+            linkTemplateDAO.endTransaction();
+            linkTemplateDAO.close();
+        }
+
+        
+
+        boolean needsUpdate(ILink oldLink, ILink newLink) {
+            // Did we actually make changes
+            return !newLink.getToConcept().equals(oldLink.getToConcept()) ||
+                    !newLink.getFromConcept().equals(oldLink.getFromConcept()) ||
+                    !newLink.getLinkName().equals(oldLink.getLinkName()) ||
+                    !newLink.getLinkValue().equals(oldLink.getLinkValue());
+        }
+
 
         /**
          */
@@ -235,116 +279,28 @@ public class LinkTemplateEditorPanel extends EditorPanel {
 
                     // This happens when you try to delete 'nil | nil | nil'
                     EventBus.publish(Lookup.TOPIC_WARNING,
-                                     "You are not allowed to delete '" + link.stringValue() + "'");
+                            "You are not allowed to delete '" + link.stringValue() + "'");
                 }
                 else {
 
                     final LinkTemplate linkTemplate = (LinkTemplate) link;
+                    final ILink newLink = new LinkBean(panel.getLinkName(), panel.getToConcept(),
+                            panel.getLinkValue(), panel.getFromConcept());
 
                     // Get new values
                     WaitIndicator waitIndicator = new SpinningDialWaitIndicator(LinkTemplateEditorPanel.this);
-                    final String newToConceptName = panel.getToConcept();
-                    final String newFromConceptName = panel.getFromConcept();
-                    final String newLinkName = panel.getLinkName();
-                    final String newLinkValue = panel.getLinkValue();
 
                     Worker.post(new Job() {
-
                         public Object run() {
-
-                            // Get old values
-                            String oldToConceptName = panel.getToConcept();
-                            String oldFromConceptName = null;
-                            try {
-                                oldFromConceptName = linkTemplate.getFromConcept();
-                            }
-                            catch (Exception e) {
-                                oldFromConceptName = ConceptName.NAME_DEFAULT;
-                            }
-
-                            String oldLinkName = linkTemplate.getLinkName();
-                            String oldLinkValue = linkTemplate.getLinkValue();
-
-                            // Did we actually make changes
-                            boolean updateLink = !newToConceptName.equals(oldToConceptName) ||
-                                                 !newFromConceptName.equals(oldFromConceptName) ||
-                                                 !newLinkName.equals(oldLinkName) || !newLinkValue.equals(oldLinkValue);
-
-                            // Change the parent concept
-                            if (!newFromConceptName.equals(oldFromConceptName)) {
+                            if (needsUpdate(linkTemplate, newLink)) {
                                 try {
-                                    final ConceptDAO conceptDAO = getToolBelt().getKnowledgebaseDAOFactory().newConceptDAO();
-                                    conceptDAO.startTransaction();
-                                    final Concept newFromConcept = conceptDAO.findByName(newFromConceptName);
-                                    final LinkTemplate lt = conceptDAO.merge(linkTemplate);
-                                    final ConceptMetadata conceptMetadata = lt.getConceptMetadata();
-                                    conceptMetadata.removeLinkTemplate(lt);
-                                    newFromConcept.getConceptMetadata().addLinkTemplate(linkTemplate);
-                                    conceptDAO.endTransaction();
-                                    conceptDAO.close();
+                                    updateLink(linkTemplate, newLink);
                                 }
                                 catch (Exception e) {
-                                    String message = "Failed to change parent of " + linkTemplate + " from " +
-                                                     oldFromConceptName + " to " + newFromConceptName;
-                                    log.error(message, e);
                                     EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
                                 }
                             }
-
-                            if (updateLink) {
-
-                                // Verify that the link name/ link value combo is unique
-                                LinkTemplateDAO linkTemplateDAO = getToolBelt().getKnowledgebaseDAOFactory()
-                                    .newLinkTemplateDAO();
-                                Collection<LinkTemplate> links = new ArrayList<LinkTemplate>();
-                                boolean okToProceed = true;
-                                try {
-
-                                    links.addAll(linkTemplateDAO.findAllByLinkName(linkTemplate.getLinkName()));
-
-                                    for (LinkTemplate link : links) {
-                                        if (!linkTemplateDAO.equalInDatastore(link, linkTemplate) &&
-                                                link.getLinkValue().equalsIgnoreCase(newLinkValue)) {
-                                            okToProceed = false;
-
-                                            break;
-                                        }
-                                    }
-                                }
-                                catch (Exception e1) {
-                                    log.error("Failed to look up linkname", e1);
-                                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e1);
-                                }
-
-                                if (!okToProceed) {
-
-                                    // Don't allow duplicate link names
-                                    EventBus.publish(Lookup.TOPIC_WARNING,
-                                                     "A LinkTemplate with a LinkName of '" +
-                                                     linkTemplate.getLinkName() + "' and a LinkValue of '" +
-                                                     newLinkValue +
-                                                     "' already exist. Unable to change the LinkTemplate.");
-                                    panel.setLink(linkTemplate);
-                                }
-                                else {
-
-                                    try {
-                                        linkTemplateDAO.startTransaction();
-                                        final LinkTemplate lt = linkTemplateDAO.merge(linkTemplate);
-                                        lt.setLinkName(newLinkName);
-                                        lt.setLinkValue(newLinkValue);
-                                        lt.setToConcept(newToConceptName);
-                                        linkTemplateDAO.endTransaction();
-                                    }
-                                    catch (Exception e) {
-                                        log.error("Update to " + linkTemplate + " failed.", e);
-                                        EventBus.publish(Lookup.TOPIC_WARNING, e);
-                                    }
-                                }
-                                linkTemplateDAO.close();
-                            }
-
-                            EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, newFromConceptName);
+                            EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, newLink.getFromConcept());
                             return null;
                         }
                     });

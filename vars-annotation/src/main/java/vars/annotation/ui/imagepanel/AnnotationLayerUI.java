@@ -328,7 +328,7 @@ public class AnnotationLayerUI<T extends JImageUrlCanvas> extends CrossHairLayer
             selectionModel.clearSelection();
 
             for (Observation observation : obs) {
-                int row = model.getObservationRow(observation);
+                int row = ((JTable) table).convertRowIndexToView(model.getObservationRow(observation));
                 selectionModel.addSelectionInterval(row, row);
             }
         }
