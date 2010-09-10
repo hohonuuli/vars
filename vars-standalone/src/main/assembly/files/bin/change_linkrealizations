@@ -1,0 +1,14 @@
+#!/bin/sh
+# $Id: $
+
+# This is a script used for changing up the LinkRealizations that use a particular LinkName
+#
+# Usage: lookup_linkrealizations [OLD_LINK_NAME] [NEW_LINK_NAME]
+# Arguments:
+#    LINK_NAME = The linkName of to be used for lookup. Any LinkRealizations that use this will be displayed
+
+OLD_LINK_NAME=$1
+NEW_LINK_NAME=$2
+
+echo [VARS] Searching for LinkRealizations containing a 'linkValue' of $LINK_NAME
+`dirname "$0"`/gsh -e "(new vars.knowledgebase.DatabaseUtility()).changeLinkRealizations('$OLD_LINK_NAME', '$NEW_LINK_NAME')"
