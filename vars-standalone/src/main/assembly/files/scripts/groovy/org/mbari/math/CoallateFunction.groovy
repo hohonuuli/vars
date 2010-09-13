@@ -11,10 +11,10 @@ class CoallateFunction {
 
     private static final log = LoggerFactory.getLogger(CoallateFunction.getClass())
 
-    private static final doNothingClosure = { it }
+    static final DO_NOTHING_CLOSURE = { it }
 
     static coallate(List d0, String field0, List d1, String field1, offset) {
-        coallate(d0, field0, doNothingClosure, d1, field1, doNothingClosure, offset)
+        coallate(d0, field0, DO_NOTHING_CLOSURE, d1, field1, DO_NOTHING_CLOSURE, offset)
     }
 
     /**
@@ -33,6 +33,7 @@ class CoallateFunction {
      * @param transform1 A transform applied to field1 to convert it to some numeric value (if needed)
      * @param offset A cutoff value such that if no match is found between field0 and field1 that's within offset
      *      no value will be returned for that d0 record.
+     * @return a Map of 
      *
      */
     static coallate(List d0, String field0, Closure transform0, List d1, String field1, Closure transform1, offset) {

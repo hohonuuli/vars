@@ -63,12 +63,12 @@ object LogRecordReader {
 
         records.foreach { r => r.data = r.data.reverse }
         val elapsedTime = (System.nanoTime - startTime) / 1000D / 1000D / 1000D
-        log.debug(String.format("Elapsed time is %12.9f nano seconds\n", Array(elapsedTime)))
+        //log.debug(String.format("Elapsed time is %12.9f nano seconds\n", Array(elapsedTime)))
         return records
 
     }
 
-    /**
+    /**af
      * Parses the ASCII header into something useful
      *
      * @param buffer The buffer of the memory mapped log file
