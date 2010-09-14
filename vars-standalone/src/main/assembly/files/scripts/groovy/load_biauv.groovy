@@ -1,16 +1,7 @@
-import org.mbari.biauv.integration.LogRecordReader
 import org.mbari.biauv.integration.IOUtilities
-import groovy.io.FileType
-import org.apache.sanselan.Sanselan
-import org.apache.sanselan.common.IImageMetadata
-import org.apache.sanselan.formats.tiff.TiffImageMetadata
-import org.apache.sanselan.formats.tiff.constants.GPSTagConstants
 import org.mbari.vars.biauv.AUVLoader
 import vars.annotation.ImageUtility
-import vars.ToolBox
-import vars.annotation.ui.PersistenceController
-import vars.annotation.CameraDeployment
-import java.text.SimpleDateFormat
+import org.mbari.biauv.integration.*
 /**
  * 
  * @author Brian Schlining
@@ -19,10 +10,10 @@ import java.text.SimpleDateFormat
 
 /**
  * Example:
- * gsh ../scripts/groovy/load_benthicrover.groovy \
- *   /Volumes/DigitalImages/DocRicketts/2009/docr84 \
- *   84 \
- *   http://search.mbari.org/ARCHIVE/digitalImages/DocRicketts/2009/docr84/
+ * gsh ../scripts/groovy/load_biauv.groovy \
+ *  /Volumes/AUVBI/missionlogs/2009/2009173/2009.173.03 \
+ *  /Volumes/AUVBI/missionlogs/2009/2009173/Images \
+ *  http://ssds.shore.mbari.org/auvbi/missionlogs/2009/2009173/Images
  */
 
 /* --------------------------------------------------------------------
@@ -55,7 +46,7 @@ webMapping = webMapping.endsWith("/") ? webMapping : webMapping + "/"
 println("Loading mission data from logs")
 def cameraLog = new File(missionDirectory, "camera.log")
 def navigationLog = new File(missionDirectory, "navigation.log")
-def mergeData = IOUtilities.extractLogRecords(navigationLog, cameraLog)
+def mergeData = new ArrayList(MergeData.toMergeDatumList(IOUtilities.extractLogRecords(navigationLog, cameraLog)))
 
 
 /* --------------------------------------------------------------------
@@ -91,5 +82,6 @@ def diveNumber = missionDirectory.name                  // 2009.173.01
 def sequenceNumber = diveNumber.replace(".", "") as int // 200917301
 
 def loader = new AUVLoader()
-loader.load("biauv-${diveNumber}", platform, sequenceNumber, imageMap, mergeData)
+loader.load("biauv-${diveNumber}" as String, platform, sequenceNumber, imageMap, mergeData)
+
 

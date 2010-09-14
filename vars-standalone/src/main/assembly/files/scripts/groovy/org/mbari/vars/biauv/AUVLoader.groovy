@@ -57,8 +57,9 @@ class AUVLoader {
                  
         // -- Coallate the mergedata with the images
         def dates = new ArrayList(images.keySet())
-        def data = CoallateFunction.coallate(dates, "time",
-            CoallateFunction.DO_NOTHING_CLOSURE, mergeData, "time", { (it * 1000) as Long })
+        def data = CoallateFunction.coallate(dates, {Date d -> d.time}, 
+                mergeData, {MergeDatum d -> (d.time * 1000) as Long }, 5000)
+        // TODO get bounds of mergedata only process images that occur between those times
 
         def videoArchiveDAO = toolBox.toolBelt.annotationDAOFactory.newVideoArchiveDAO()
         videoArchiveDAO.startTransaction()
@@ -67,7 +68,13 @@ class AUVLoader {
         images.each { date, image ->
             try {
                 def mergeDatum = data[date]
-                makeVideoFrame(videoArchive, videoArchiveDAO, date, image, mergeDatum)
+                if (mergeDatum) {
+                    makeVideoFrame(videoArchive, videoArchiveDAO, date, image, mergeDatum)
+                    log.debug("Found image at ${date}")
+                }
+                else {
+                    log.debug("Ignoring image at ${date}")   
+                }
             }
             catch (Exception e) {
                 log.info("Failed to add VideoFrame for $image")
@@ -139,7 +146,7 @@ class AUVLoader {
             merge(dao, videoFrame, mergeDatum)
         }
         catch (Exception e) {
-            log.info("Failed to merge ${videoFrame} for $image with position information ")
+            log.info("Failed to merge ${videoFrame} for $image with position information ", e)
         }
     }
 

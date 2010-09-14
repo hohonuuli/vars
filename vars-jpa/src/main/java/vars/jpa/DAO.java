@@ -218,12 +218,13 @@ public class DAO implements vars.DAO, EntityManagerAspect {
     }
 
     /**
-     * Checks to see if the given object is persisted in the databas
+     * Checks to see if the given object is persisted in the database
      * @param entity The object of interest
      * @return true if it's in the database. False if it is not
      */
     public boolean isPersistent(Object entity) {
-        return find(entity) != null;
+        boolean hasNullPK = (entity instanceof JPAEntity) ? ((JPAEntity) entity).getId() == null : false;
+        return (hasNullPK) ? false : find(entity) != null;
     }
 
     /**

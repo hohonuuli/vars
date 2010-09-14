@@ -13,8 +13,8 @@ class CoallateFunction {
 
     static final DO_NOTHING_CLOSURE = { it }
 
-    static coallate(List d0, String field0, List d1, String field1, offset) {
-        coallate(d0, field0, DO_NOTHING_CLOSURE, d1, field1, DO_NOTHING_CLOSURE, offset)
+    static coallate(List d0, List d1, offset) {
+        coallate(d0, DO_NOTHING_CLOSURE, d1, DO_NOTHING_CLOSURE, offset)
     }
 
     /**
@@ -26,30 +26,33 @@ class CoallateFunction {
      * will not be included in the returned list
      *
      * @param d0 The list of 'key' objects that you wish to coallate to
-     * @param field0 The field of the objects in d0 that you want to use as a coallation key
      * @param transform0 A transform applied to field0 to convert it to some numeric value (if needed)
      * @param d1 The list of value objects that will be coallated to d0
-     * @param field1 The field of the objects in d1 that you want to use as a coallation key
      * @param transform1 A transform applied to field1 to convert it to some numeric value (if needed)
-     * @param offset A cutoff value such that if no match is found between field0 and field1 that's within offset
+     * @param offset A cutoff value such that if no match is found between val1 and val2 that's within offset
      *      no value will be returned for that d0 record.
      * @return a Map of 
      *
      */
-    static coallate(List d0, String field0, Closure transform0, List d1, String field1, Closure transform1, offset) {
+    static coallate(List d0, Closure transform0, List d1, Closure transform1, offset) {
         def data = [:]
-        def list0 = d0.sort { transform0(it[field0]) }
-        def list1 = d1.sort { transform1(it[field1]) }
+
+        def list0 = d0.sort(transform0)         // Sorted d0
+        def list1 = d1.sort(transform1)        // Sorted d1
+
+        def vals0 = list0.collect(transform0) // transformed d0 in same order as vals0
+        def vals1 = list1.collect(transform1) // transformed d1 in same order as vals1
+
 
         int i = 0
-        list0.each { val0 ->
-            def t0 = transform0(val0[field0])
+        vals0.eachWithIndex { val0, idx ->
+            def t0 = val0
             def dtBest = offset
 
             def goodDatum = null
             for (row in i..<list1.size()) {
-                def val1 = list1[row]
-                def t1 = transform1(val1[field1])
+                def val1 = vals1[row]
+                def t1 = val1
                 def dt = Math.abs(t0 - t1)
                 if (dt <= dtBest) {
                     dtBest = dt
@@ -62,7 +65,7 @@ class CoallateFunction {
             }
 
             if (goodDatum) {
-                data[val0] = goodDatum
+                data[list0[idx]] = list1[i]
             }
             else {
                 log.debug("No record was found to match ${val0}")
@@ -72,3 +75,4 @@ class CoallateFunction {
     }
 
 }
+
