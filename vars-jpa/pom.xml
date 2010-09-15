@@ -120,9 +120,9 @@
     -->
     <profiles>
         <profile>
-            <id>coolpix</id>
+            <id>imaging</id>
             <properties>
-                <environment>coolpix</environment>
+                <environment>imaging</environment>
             </properties>
             <dependencies>
                 <dependency>
@@ -188,9 +188,9 @@
             </dependencies>
         </profile>
         <profile>
-            <id>simpa</id>
+            <id>shoredev</id>
             <properties>
-                <environment>simpa</environment>
+                <environment>shoredev</environment>
             </properties>
             <dependencies>
                 <dependency>

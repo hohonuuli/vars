@@ -59,7 +59,6 @@ class AUVLoader {
         def dates = new ArrayList(images.keySet())
         def data = CoallateFunction.coallate(dates, {Date d -> d.time}, 
                 mergeData, {MergeDatum d -> (d.time * 1000) as Long }, 5000)
-        // TODO get bounds of mergedata only process images that occur between those times
 
         def videoArchiveDAO = toolBox.toolBelt.annotationDAOFactory.newVideoArchiveDAO()
         videoArchiveDAO.startTransaction()

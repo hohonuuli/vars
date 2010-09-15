@@ -79,7 +79,6 @@ object LogRecordReader {
     private def readHeader(mappedByteBuffer: MappedByteBuffer): (List[LogRecord], Int) = {
         val charsetDecoder = Charset.forName("ISO-8859-15").newDecoder()
         val charBuffer = charsetDecoder.decode(mappedByteBuffer)
-
         var records: List[LogRecord] = Nil
         val linePattern = Pattern.compile(".*\r?\n")
         val lineMatcher = linePattern.matcher(charBuffer)

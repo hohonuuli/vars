@@ -34,6 +34,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingUtilities;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
 import org.mbari.swing.SearchableComboBoxModel;
 import org.mbari.text.ObjectToStringConverter;
 import org.slf4j.Logger;
@@ -336,6 +339,16 @@ public class VideoArchiveSetEditorPanel extends JPanel {
     protected JXObservationTable getTable() {
         if (table == null) {
             table = new JXObservationTable();
+
+            // When a new row is selected we want to deselect whatever was in the
+            // CameraDirectionCB
+            table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+                public void valueChanged(ListSelectionEvent e) {
+                    if (!e.getValueIsAdjusting()) {
+                        getCameraDirectionCB().setSelectedItem(null);
+                    }
+                }
+            });
         }
 
         return table;
