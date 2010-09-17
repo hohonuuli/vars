@@ -193,6 +193,18 @@ public class ConceptImpl implements Serializable, Concept, JPAEntity {
         return conceptMetadata;
     }
 
+    /**
+     * This method shouldn't be called by developers. It's added to support the
+     * cascadeDelete method in the ConceptDAO
+     * 
+     * @param conceptMetadata
+     */
+    protected void setConceptMetadata(ConceptMetadata conceptMetadata) {
+        ((ConceptMetadataImpl) getConceptMetadata()).setConcept(null);
+        this.conceptMetadata = conceptMetadata;
+        ((ConceptMetadataImpl) conceptMetadata).setConcept(this);
+    }
+
     public ConceptName getConceptName(String name) {
 
         ConceptName conceptName = null;

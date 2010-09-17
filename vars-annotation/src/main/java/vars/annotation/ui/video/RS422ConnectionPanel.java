@@ -43,7 +43,7 @@ public class RS422ConnectionPanel extends JPanel implements ConnectionParameters
         initialize();
     }
 
-    private JComboBox getComboBox() {
+    protected JComboBox getComboBox() {
         if (comboBox == null) {
             comboBox = new JComboBox();
             RSS422VideoControlService videoControlService = new RSS422VideoControlService();

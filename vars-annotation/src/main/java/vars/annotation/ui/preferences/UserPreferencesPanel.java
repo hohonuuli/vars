@@ -2,6 +2,7 @@ package vars.annotation.ui.preferences;
 
 import javax.swing.JPanel;
 
+import vars.MiscDAOFactory;
 import vars.shared.preferences.PreferenceUpdater;
 import vars.shared.ui.UserAccountPreferencesPanel;
 
@@ -17,8 +18,8 @@ public class UserPreferencesPanel extends JPanel implements PreferenceUpdater {
     /**
      * Create the panel.
      */
-    public UserPreferencesPanel() {
-        this.controller = new UserPreferencesPanelController(this);
+    public UserPreferencesPanel(MiscDAOFactory daoFactory) {
+        this.controller = new UserPreferencesPanelController(this, daoFactory);
         initialize();
     }
     private void initialize() {

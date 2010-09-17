@@ -377,11 +377,19 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
             ConceptName conceptName = conceptNameDAO.findByName(conceptNameToDelete);
 
             if (conceptName != null) {
-                if (conceptName.getNameType().equals(ConceptNameTypes.PRIMARY.getName())) {
-                    EventBus.publish(Lookup.TOPIC_WARNING,
-                                     "You are attempting to delete a primary concept-name." + " This is NOT allowed.");
 
-                    return;
+                if (conceptName.getNameType().equals(ConceptNameTypes.PRIMARY.getName())) {
+                    // findByName is case-insensitive. Check that we got the right name
+                    ConceptName otherName = conceptName.getConcept().getConceptName(conceptNameToDelete);
+                    if (conceptNameDAO.equalInDatastore(conceptName, otherName)) {
+                        EventBus.publish(Lookup.TOPIC_WARNING,
+                                         "You are attempting to delete a primary concept-name." + " This is NOT allowed.");
+                        return;
+                    }
+                    else {
+                        // same name different case. Use the non-primary name
+                        conceptName = otherName;
+                    }
                 }
 
                 conceptName.getConcept().removeConceptName(conceptName);

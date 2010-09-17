@@ -19,6 +19,8 @@ import java.util.Collection;
 import java.util.prefs.Preferences;
 import java.util.prefs.PreferencesFactory;
 import javax.swing.SwingUtilities;
+
+import com.google.inject.Injector;
 import org.bushe.swing.event.EventBus;
 import org.mbari.swing.LabeledSpinningDialWaitIndicator;
 import org.mbari.swing.WaitIndicator;
@@ -32,6 +34,7 @@ import vars.VarsUserPreferencesFactory;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.video.VideoControlService;
+import vars.annotation.ui.video.VideoControlServiceFactory;
 import vars.shared.preferences.PreferenceUpdater;
 import vars.shared.preferences.PreferencesService;
 import vars.shared.ui.video.ImageCaptureService;
@@ -84,6 +87,7 @@ public class AnnotationFrameController implements PreferenceUpdater {
                 }
 
                 persistPreferences();
+                log.info("Shutdown thread is finished. Bye Bye");
             }
         }, "VARS-cleanupBeforeShutdownThread");
         cleanupThread.setDaemon(false);
@@ -181,6 +185,7 @@ public class AnnotationFrameController implements PreferenceUpdater {
     private void persistPreferences(Preferences userPreferences) {
         if (userPreferences != null) {
 
+            // Persist UI preferences
             String hostName = null;
             try {
                 hostName = InetAddress.getLocalHost().getHostName();
@@ -195,6 +200,20 @@ public class AnnotationFrameController implements PreferenceUpdater {
             Dimension size = annotationFrame.getSize();
             preferences.putInt(PREF_WIDTH, size.width);
             preferences.putInt(PREF_HEIGHT, size.height);
+
+            // Persist video control info
+            Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
+            PreferencesFactory preferencesFactory = injector.getInstance(PreferencesFactory.class);
+            PreferencesService preferencesService = new PreferencesService(preferencesFactory);
+            VideoControlService videoControlService = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
+            try {
+                preferencesService.persistLastVideoConnectionId(preferencesService.getHostname(),
+                        videoControlService.getVideoControlInformation().getVideoConnectionID());
+            }
+            catch (NullPointerException e) {
+                log.info("Did not save Last VideoConnection ID preference. Most likely this " +
+                        "was attempted after the video connection was closed");
+            }
 
         }
     }
@@ -224,6 +243,16 @@ public class AnnotationFrameController implements PreferenceUpdater {
             width = width <= screenSize.width ? width : screenSize.width;
             height = height <= screenSize.height ? height : screenSize.height;
             annotationFrame.setSize(width, height);
+
+            // Load video control info
+            Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
+            PreferencesFactory preferencesFactory = injector.getInstance(PreferencesFactory.class);
+            PreferencesService preferencesService = new PreferencesService(preferencesFactory);
+            if (preferencesService.findAutoconnectVcr(preferencesService.getHostname())) {
+                String videoID = preferencesService.findLastVideoConnectionId(preferencesService.getHostname());
+                VideoControlService videoControlService = VideoControlServiceFactory.newVideoControlService(videoID);
+                Lookup.getVideoControlServiceDispatcher().setValueObject(videoControlService);
+            }
 
         }
     }

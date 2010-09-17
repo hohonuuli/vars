@@ -307,7 +307,7 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
         }
     }
 
-    void setConcept(Concept concept) {
+    protected void setConcept(Concept concept) {
         this.concept = concept;
     }
 

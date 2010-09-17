@@ -212,6 +212,10 @@ public class StatusLabelForVcr extends StatusLabel {
                 hostname = preferencesService.findVcrHostname(userAccount.getUserName(),
                         preferencesService.getHostname());
                 dialog.setUDPConnectionParameters(hostname, port);
+
+                String lastVcr = preferencesService.findLastVideoConnectionId(preferencesService.getHostname());
+                dialog.setLastConnectionParameters(lastVcr);
+
             }
         }
     }

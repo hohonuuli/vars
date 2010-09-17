@@ -6,6 +6,8 @@
 package vars.annotation.ui.preferences;
 
 import com.google.inject.Inject;
+import com.google.inject.Injector;
+
 import java.awt.BorderLayout;
 
 import java.awt.event.ActionEvent;
@@ -21,6 +23,8 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+
+import vars.MiscDAOFactory;
 import vars.UserAccount;
 import vars.annotation.ui.Lookup;
 import vars.shared.preferences.PreferenceUpdater;
@@ -37,6 +41,8 @@ public class PreferencesFrame extends JFrame {
     private JPanel buttonPanel;
     private JTabbedPane tabbedPane;
     private ImagePreferencesPanel imagePreferencesPanel;
+    private UserPreferencesPanel userPreferencesPanel;
+    private VideoConnectionPreferencesPanel videoConnectionPreferencesPanel;
     private List<PreferenceUpdater> updaters = new ArrayList<PreferenceUpdater>();
     private final PreferencesFactory preferencesFactory;
     private UserAccount userAccount;
@@ -66,6 +72,8 @@ public class PreferencesFrame extends JFrame {
 
         // Configure the updaters
         updaters.add(getImagePreferencesPanel());
+        updaters.add(getUserPreferencesPanel());
+        updaters.add(getVideoConnectionPreferencesPanel());
     }
 
     /**
@@ -75,6 +83,8 @@ public class PreferencesFrame extends JFrame {
         if (tabbedPane == null) {
             tabbedPane = new JTabbedPane();
             tabbedPane.addTab("Image Settings", getImagePreferencesPanel());
+            tabbedPane.addTab("Account Information", getUserPreferencesPanel());
+            tabbedPane.addTab("Video Connection", getVideoConnectionPreferencesPanel());
         }
         return tabbedPane;
     }
@@ -132,6 +142,23 @@ public class PreferencesFrame extends JFrame {
     public void setUserAccount(UserAccount userAccount) {
         getImagePreferencesPanel().setUserAccount(userAccount);
         this.userAccount = userAccount;
+    }
+    
+    public UserPreferencesPanel getUserPreferencesPanel() {
+        if (userPreferencesPanel == null) {
+            // INJECTION HACK!!
+            Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
+            MiscDAOFactory daoFactory = injector.getInstance(MiscDAOFactory.class);
+            userPreferencesPanel = new UserPreferencesPanel(daoFactory);
+        }
+        return userPreferencesPanel;
+    }
+
+    public VideoConnectionPreferencesPanel getVideoConnectionPreferencesPanel() {
+        if (videoConnectionPreferencesPanel == null) {
+            videoConnectionPreferencesPanel = new VideoConnectionPreferencesPanel(preferencesFactory);
+        }
+        return videoConnectionPreferencesPanel;
     }
 
 

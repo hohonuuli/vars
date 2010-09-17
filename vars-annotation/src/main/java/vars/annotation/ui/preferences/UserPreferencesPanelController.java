@@ -17,7 +17,6 @@ import vars.shared.ui.UserAccountPreferencesPanel;
 
 public class UserPreferencesPanelController implements PreferenceUpdater {
     
-    private final Logger log = LoggerFactory.getLogger(getClass());
     private final UserPreferencesPanel panel;
     private final MiscDAOFactory daoFactory;
     
@@ -30,14 +29,10 @@ public class UserPreferencesPanelController implements PreferenceUpdater {
         Lookup.getUserAccountDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 UserAccount userAccount = (UserAccount) evt.getNewValue();
-                if (userAccount == null) {
-                    resetUI(userAccount);
-                }
-                else {
-                    updateUI(userAccount);
-                }
+                setUserAccount(userAccount);
             }
         });
+        setUserAccount((UserAccount) Lookup.getUserAccountDispatcher().getValueObject());
     }
 
     public void persistPreferences() {
@@ -77,6 +72,15 @@ public class UserPreferencesPanelController implements PreferenceUpdater {
         }
     }
     
+    private void setUserAccount(UserAccount userAccount) {
+        if (userAccount == null) {
+            resetUI(userAccount);
+        }
+        else {
+            updateUI(userAccount);
+        }
+    }
+    
     private void resetUI(UserAccount userAccount) {
         UserAccountPreferencesPanel p = panel.getPanel();
         p.getAffiliationTextField().setText(null);
@@ -103,7 +107,4 @@ public class UserPreferencesPanelController implements PreferenceUpdater {
         p.getRoleComboBox().setSelectedItem(userAccount.getRole());
     }
     
-    
-    
-
 }

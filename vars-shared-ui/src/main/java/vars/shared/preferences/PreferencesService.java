@@ -35,6 +35,8 @@ import vars.shared.ui.GlobalLookup;
  */
 public class PreferencesService {
 
+    private static final String PROP_LAST_VIDEO_CONNECTION_ID = "defaultVcrUrl";
+    private static final String PROP_AUTOCONNECT_VCR = "autoconnectVCR";
     private static final String PROP_IMAGETARGET = "imageTarget";
     private static final String PROP_IMAGETARGETMAPPING = "imageTargetMapping";
     private static final String PROP_VCR_URL = "vcrUrl";
@@ -120,7 +122,7 @@ public class PreferencesService {
     }
 
     /**
-     * Retreive the hostname used to access a networked VCR
+     * Retrieve the hostname used to access a networked VCR
      * @param username UserAccount.getUserName()
      * @param hostname preferencesService.getHostname()
      * @return
@@ -131,11 +133,58 @@ public class PreferencesService {
         return (parts.length >= 1) ? parts[0] : getHostname();
     }
 
-    private String findFullVcrUrl(String username, String hostname) {
+    public String findFullVcrUrl(String username, String hostname) {
         Preferences preferences = hostPrefs(username, hostname);
         return preferences.get(PROP_VCR_URL, getHostname() + ":9000");
     }
+    
+    /**
+     * Returns the default VCR URL. In general this will be the last VCR 
+     * that was connected to on that host.
+     * 
+     * @param hostname The hostname of the current system
+     * @return The VCR URL. If it contains a colon its a UDP URL otherwise
+     *  it's a comm port.
+     */
+    public String findLastVideoConnectionId(String hostname) {
+        Preferences preferences = systemPrefs(hostname);
+        return preferences.get(PROP_LAST_VIDEO_CONNECTION_ID, getHostname() + ":9000");
+    }
+    
+    /**
+     * Store the default (i.e. last connect VCR URL in prefs). This should be 
+     * either the comm port name or a URL in the form of 'hostname:port' (for
+     * example: oyashio.shore.mbari.org:9000)
+     * @param hostname
+     * @param vcrUrl
+     */
+    public void persistLastVideoConnectionId(String hostname, String vcrUrl) {
+        // If it contains a colon it's a url, otherwise it's a com port
+        Preferences preferences = systemPrefs(hostname);
+        preferences.put(PROP_LAST_VIDEO_CONNECTION_ID, vcrUrl);
+    }
+    
+    /**
+     * Returns the autoconnect setting
+     * @param hostname
+     * @return true if you should autoconnect on startup, false otherwise
+     */
+    public boolean findAutoconnectVcr(String hostname) {
+        Preferences preferences = systemPrefs(hostname);
+        String autoconnect = preferences.get(PROP_AUTOCONNECT_VCR, "false");
+        return autoconnect.equals("true");
+    }
 
+    /**
+     * Store the autoconnect setting
+     * @param hostname
+     * @param autoconnect
+     */
+    public void persistAutoconnectVcr(String hostname, boolean autoconnect) {
+        String a = autoconnect ? "true" : "false";
+        Preferences preferences = systemPrefs(hostname);
+        preferences.put(PROP_AUTOCONNECT_VCR, a);
+    }
     /**
      * Save the UDP VCR's information
      * @param username
@@ -161,13 +210,25 @@ public class PreferencesService {
         final Preferences lookupPreferences = userPrefs(username);
         return lookupPreferences.node(hostname);
     }
+    
+    /**
+     * Looks up the node that contains the preferences that apply to the 
+     * current hostname irregardless of username.
+     * 
+     * @param hostname The name of the host
+     * @return A preferences object for the given host
+     */
+    private Preferences systemPrefs(String hostname) {
+        final Preferences systemPreferences = preferencesFactory.systemRoot().node("VARS");
+        return systemPreferences.node(hostname);
+    }
 
     /**
      * Write the URL used to write images to.
      *
      * @param username The username
      * @param hostname The current hostname of the platform that VARS is running on
-     * @param targetURL The URL to write images to.
+     * @param targetDirectory The URL to write images to.
      */
     public void persistImageTarget(String username, String hostname, File targetDirectory) {
         Preferences preferences = hostPrefs(username, hostname);
@@ -196,7 +257,6 @@ public class PreferencesService {
      * /[username]/simpa/annotation/UserLookupService
      *
      * @param username The name of the user as logged into VARS
-     * @param hostname The host name of the computer running VARS
      * @return The preference node like /[username]/vars/annotation/ui/PreferencesService
      */
     private Preferences userPrefs(String username) {

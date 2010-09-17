@@ -22,12 +22,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.prefs.PreferencesFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import vars.annotation.ui.Lookup;
+import vars.shared.preferences.PreferencesService;
 import vars.shared.ui.dialogs.StandardDialog;
 
 /**
@@ -42,7 +44,7 @@ public class VideoControlServiceDialog extends StandardDialog {
     private JComboBox comboBox;
     private JLabel lblSelectTimecodeSource;
     private JPanel panel;
-    private JPanel rs422Panel;
+    private RS422ConnectionPanel rs422Panel;
     private UDPConnectionPanel udpPanel;
 
     private enum Sources { RS422, UDP; }
@@ -77,17 +79,10 @@ public class VideoControlServiceDialog extends StandardDialog {
         if (comboBox == null) {
             comboBox = new JComboBox();
 
-            /*
-             * FIXME: I commented out the RS422 source for now. When I've
-             * fixed the native deployment of RXTX (refer to JNA's
-             * Native and Platform classes
-             */
+
             for (Sources source : Sources.values()) {
                 comboBox.addItem(source);
             }
-
-            //comboBox.addItem(Sources.UDP);
-
 
             comboBox.addItemListener(new ItemListener() {
 
@@ -138,7 +133,7 @@ public class VideoControlServiceDialog extends StandardDialog {
         return panel;
     }
 
-    private JPanel getRs422Panel() {
+    private RS422ConnectionPanel getRs422Panel() {
         if (rs422Panel == null) {
             rs422Panel = new RS422ConnectionPanel();
         }
@@ -196,6 +191,7 @@ public class VideoControlServiceDialog extends StandardDialog {
 
         });
 
+
         //pack();
     }
 
@@ -206,5 +202,16 @@ public class VideoControlServiceDialog extends StandardDialog {
      */
     public void setUDPConnectionParameters(String hostname, String port) {
         getUdpPanel().setConnectionParameters(hostname, port);
+    }
+
+    public void setLastConnectionParameters(String connectionParams) {
+        boolean isUDP = connectionParams.contains(":");
+        if (isUDP) {
+            getComboBox().setSelectedItem(Sources.UDP);
+        }
+        else {
+            getComboBox().setSelectedItem(Sources.RS422);
+            getRs422Panel().getComboBox().setSelectedItem(connectionParams);
+        }
     }
 }

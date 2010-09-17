@@ -27,6 +27,8 @@ import org.bushe.swing.event.EventBus;
 import org.mbari.util.Dispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.CacheClearedEvent;
+import vars.CacheClearedListener;
 import vars.UserAccount;
 import vars.VARSException;
 import vars.knowledgebase.Concept;
@@ -53,7 +55,7 @@ public class AddConceptDialog extends javax.swing.JDialog {
     private javax.swing.JLabel authorLabel;
     private javax.swing.JButton cancelButton;
     private Concept concept;
-    private javax.swing.JComboBox conceptComboBox;
+    private AllConceptNamesComboBox conceptComboBox;
     private final AddConceptDialogController controller;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -92,6 +94,15 @@ public class AddConceptDialog extends javax.swing.JDialog {
         initModel();
         setLocationRelativeTo((Frame) Lookup.getApplicationFrameDispatcher().getValueObject());
         pack();
+        toolBelt.getPersistenceCache().addCacheClearedListener(new CacheClearedListener() {
+            public void afterClear(CacheClearedEvent evt) {
+                conceptComboBox.updateConceptNames();
+            }
+
+            public void beforeClear(CacheClearedEvent evt) {
+                // DO nothing
+            }
+        });
     }
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {

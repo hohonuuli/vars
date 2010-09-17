@@ -151,8 +151,6 @@ public class ConceptDAOImpl extends DAO implements ConceptDAO {
                 if (parent != null) {
                     parent.removeChildConcept(c);
                 }
-                //ConceptMetadata conceptMetadata = c.getConceptMetadata();
-                //remove(conceptMetadata);
                 remove(c);
                 endTransaction();
             }
