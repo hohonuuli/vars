@@ -82,15 +82,27 @@ public class EditConceptTreePopupMenu extends ConceptTreePopupMenu implements IL
         removeConceptMenuItem.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent evt) {
-                triggerRemoveAction();
+                try {
+                    triggerRemoveAction();
+                }
+                catch (Exception e) {
+                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+                    EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, null);
+                }
             }
 
         });
 
         moveConceptItem.addActionListener(new ActionListener() {
 
-            public void actionPerformed(ActionEvent e) {
-                triggerEditAction();
+            public void actionPerformed(ActionEvent evt) {
+                try {
+                    triggerEditAction();
+                }
+                catch (Exception e) {
+                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+                    EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, null);
+                }
             }
 
         });

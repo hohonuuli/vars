@@ -114,40 +114,8 @@ public class App {
         EventTopicSubscriber fatalErrorSubscriber = new FatalExceptionSubscriber(getAnnotationFrame());
         EventTopicSubscriber nonFatalErrorSubscriber = new NonFatalErrorSubscriber(getAnnotationFrame());
         EventTopicSubscriber warningSubscriber = new WarningSubscriber(getAnnotationFrame());       
-        EventTopicSubscriber exitSubscriber = new ExitTopicSubscriber() {
-
-            private final Logger log = LoggerFactory.getLogger(getClass());
-
-            @Override
-            public void onEvent(String topic, Object data) {
-                // Clean up NATIVE resources when we exit
-                try {
-                    ImageCaptureService imageCaptureService = (ImageCaptureService) Lookup.getImageCaptureServiceDispatcher().getValueObject();
-                    imageCaptureService.dispose();
-                }
-                catch (Throwable e) {
-                    log.warn("An error occurred while closing the image capture services", e);
-                }
-
-                try {
-                    VideoControlService videoControlService = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
-                    videoControlService.disconnect();
-                }
-                catch (Exception e) {
-                     log.warn("An error occurred while closing the video control services", e);
-                }
-
-                // Update local image URL's to http URL's before you exit
-                // updateCameraData is called in the shutdown thread in the AnnotationFrameController
-//                VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
-//                if (videoArchive != null) {
-//                    getAnnotationFrame().getController().updateCameraData(videoArchive);
-//                }
-
-                super.onEvent(topic, data);
-            }
-
-        };
+        EventTopicSubscriber exitSubscriber = new ExitTopicSubscriber();
+        
         GC_PREVENTION.add(fatalErrorSubscriber);
         GC_PREVENTION.add(nonFatalErrorSubscriber);
         GC_PREVENTION.add(warningSubscriber);

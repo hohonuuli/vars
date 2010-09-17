@@ -452,6 +452,7 @@ public class AddConceptDialog extends javax.swing.JDialog {
             UserAccount userAccount = (UserAccount) GlobalLookup.getUserAccountDispatcher().getValueObject();
 
             String primaryName = nameField.getText();
+            History history = null;
             if ((userAccount != null) && (primaryName != null)) {
 
                 // Do not add a concept with a name that already exists in the database
@@ -473,11 +474,10 @@ public class AddConceptDialog extends javax.swing.JDialog {
                     dao.persist(concept);
 
                     // Add History
-                    History history = toolBelt.getHistoryFactory().add(userAccount, concept);
+                    history = toolBelt.getHistoryFactory().add(userAccount, concept);
                     parentConcept.getConceptMetadata().addHistory(history);
                     dao.persist(history);
 
-                    EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
 
                 }
                 else {
@@ -488,6 +488,10 @@ public class AddConceptDialog extends javax.swing.JDialog {
             }
             dao.endTransaction();
             dao.close();
+
+            if (history != null) {
+                EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
+            }
 
             return concept;
         }
@@ -599,21 +603,6 @@ public class AddConceptDialog extends javax.swing.JDialog {
             conceptDAO.close();
 
             EventBus.publish(Lookup.TOPIC_APPROVE_HISTORIES, histories);
-
-            /*
-             *  TODO We aren't automatically approving all histories. This sometimes causes a
-             *  concurrent modification exception in the knowledbase. So we add all the histories
-             *  but only approve any change in parents.
-             */
-//            for (History history : histories) {
-//                EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
-//            }
-//
-//            // Adding the change parent history triggers a refresh. But if we
-//            // make other changes we need to trigger a refresh manually
-//            if (histories.size() == 0) {
-//                EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, primaryName.getName());
-//            }
 
         }
     }

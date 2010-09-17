@@ -144,7 +144,7 @@ class NamesEditorPanelController {
         }
 
         if (okToProceed) {
-            if ((matchingConcept != null) && conceptDAO.equalInDatastore(matchingConcept, concept)) {
+            if ((matchingConcept != null) && !conceptDAO.equalInDatastore(matchingConcept, concept)) {
                 EventBus.publish(Lookup.TOPIC_WARNING,
                                  "A concept with " + "the name '" + newName + "' already exists.");
                 okToProceed = false;

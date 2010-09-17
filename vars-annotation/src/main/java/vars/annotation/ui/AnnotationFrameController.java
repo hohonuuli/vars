@@ -31,8 +31,10 @@ import vars.VARSException;
 import vars.VarsUserPreferencesFactory;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
+import vars.annotation.ui.video.VideoControlService;
 import vars.shared.preferences.PreferenceUpdater;
 import vars.shared.preferences.PreferencesService;
+import vars.shared.ui.video.ImageCaptureService;
 
 /**
  *
@@ -53,6 +55,24 @@ public class AnnotationFrameController implements PreferenceUpdater {
         // Make sure we save the last observations we annotated to the database
         Thread cleanupThread = new Thread(new Runnable() {
             public void run() {
+
+                // Clean up NATIVE resources when we exit
+                try {
+                    ImageCaptureService imageCaptureService = (ImageCaptureService) Lookup.getImageCaptureServiceDispatcher().getValueObject();
+                    imageCaptureService.dispose();
+                }
+                catch (Throwable e) {
+                    log.warn("An error occurred while closing the image capture services", e);
+                }
+
+                try {
+                    VideoControlService videoControlService = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
+                    videoControlService.disconnect();
+                }
+                catch (Exception e) {
+                     log.warn("An error occurred while closing the video control services", e);
+                }
+
                 log.debug("Saving last Observations to persistent storage during JVM shutdown");
                 Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
                 toolBelt.getPersistenceController().updateAndValidate(new ArrayList<Observation>(observations));
@@ -146,7 +166,7 @@ public class AnnotationFrameController implements PreferenceUpdater {
                     }
                 };
 
-                new Thread(runnable).start();
+                new Thread(runnable, "UpdateCameraDataThread-" + System.currentTimeMillis()).start();
 
             }
         });

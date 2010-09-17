@@ -26,6 +26,7 @@ import vars.UserAccount;
 import vars.UserAccountDAO;
 import vars.jpa.VarsJpaModule;
 import vars.shared.ui.GlobalLookup;
+import vars.shared.ui.UserAccountPreferencesPanel;
 
 /**
  *
@@ -62,7 +63,7 @@ public class UpdateExistingUserDialog extends UserAccountDialog {
 
 
     private void initialize() {
-        getLoginTextField().setEnabled(false);
+        getPanel().getLoginTextField().setEnabled(false);
     }
 
     /**
@@ -100,17 +101,18 @@ public class UpdateExistingUserDialog extends UserAccountDialog {
     public void setUserAccount(UserAccount userAccount) {
         super.setUserAccount(userAccount);
         getOkayButton().setEnabled(userAccount != null);
+        final UserAccountPreferencesPanel panel = getPanel();
         String name = BeanUtilities.getProperty(userAccount, "userName", "");
-        getLoginTextField().setText(name);
+        panel.getLoginTextField().setText(name);
         String email = BeanUtilities.getProperty(userAccount, "email", "");
-        getEmailTextField().setText(email);
+        panel.getEmailTextField().setText(email);
         // TODO finish implementing setting UI fields when the useraccount is set
         String affiliation = BeanUtilities.getProperty(userAccount, "affiliation", "");
-        getAffiliationTextField().setText(affiliation);
+        panel.getAffiliationTextField().setText(affiliation);
         String firstName = BeanUtilities.getProperty(userAccount, "firstName", "");
-        getFirstNameTextField().setText(firstName);
+        panel.getFirstNameTextField().setText(firstName);
         String lastName = BeanUtilities.getProperty(userAccount, "lastName", "");
-        getLastNameTextField().setText(lastName);
+        panel.getLastNameTextField().setText(lastName);
     }
 
     private class Controller implements DialogController {
@@ -136,8 +138,8 @@ public class UpdateExistingUserDialog extends UserAccountDialog {
         /**
          */
         public void doOkay() {
-            String pwd1 = new String(dialog.getPasswordField1().getPassword());
-            String pwd2 = new String(dialog.getPasswordField2().getPassword());
+            String pwd1 = new String(dialog.getPanel().getPasswordField1().getPassword());
+            String pwd2 = new String(dialog.getPanel().getPasswordField2().getPassword());
             pwd1 = (pwd1.equals("")) ? null : pwd1;
             pwd2 = (pwd2.equals("")) ? null : pwd2;
             boolean ok = (pwd1 == null && pwd2 == null) || pwd1.equals(pwd2);
@@ -156,10 +158,10 @@ public class UpdateExistingUserDialog extends UserAccountDialog {
 	                dialog.dispose();
 	            }
 	            userAccount.setPassword(pwd1);
-	            userAccount.setEmail(valueOf(getEmailTextField().getText()));
-	            userAccount.setAffiliation(valueOf(getAffiliationTextField().getText()));
-	            userAccount.setFirstName(valueOf(getFirstNameTextField().getText()));
-	            userAccount.setLastName(valueOf(getLastNameTextField().getText()));
+	            userAccount.setEmail(valueOf(getPanel().getEmailTextField().getText()));
+	            userAccount.setAffiliation(valueOf(getPanel().getAffiliationTextField().getText()));
+	            userAccount.setFirstName(valueOf(getPanel().getFirstNameTextField().getText()));
+	            userAccount.setLastName(valueOf(getPanel().getLastNameTextField().getText()));
 	            dao.endTransaction();
 	            setReturnValue(userAccount);
             }

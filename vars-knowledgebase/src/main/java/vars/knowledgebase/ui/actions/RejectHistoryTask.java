@@ -367,8 +367,8 @@ public class RejectHistoryTask extends AbstractHistoryTask {
              * Get all concept-names that will be deleted. Use those to find all the Observations that
              * will be affected.
              */
-            ObservationDAO observationDAO = toolBelt.getAnnotationDAOFactory().newObservationDAO(
-                dao.getEntityManager());
+            ObservationDAO observationDAO = toolBelt.getAnnotationDAOFactory().newObservationDAO();
+            observationDAO.startTransaction();
             Collection<Observation> observations = observationDAO.findAllByConcept(rejectedConcept, true, conceptDAO);
             final String newName = parentConcept.getPrimaryConceptName().getName();
             final String msg = observations.size() + " Observations were found using '" + rejectedName +
@@ -403,6 +403,8 @@ public class RejectHistoryTask extends AbstractHistoryTask {
                 // Cancel
                 return;
             }
+            observationDAO.endTransaction();
+            observationDAO.close();
 
             // Delete the concept and it's children
             conceptDAO.endTransaction();

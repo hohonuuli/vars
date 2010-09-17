@@ -55,7 +55,8 @@ class KnowledgebaseFrameController {
     /**
     * This call clears the Knowledgebase cache, refreshes the Concept tree
     * and opens the tree to the given node.
-    * @param name Representing the node that we want to open to.
+    * @param name Representing the node that we want to open to. If it's <b>null</b> then
+    *  the root node will be opened
     */
     public void refreshTreeAndOpenNode(String name) {
 
@@ -73,10 +74,21 @@ class KnowledgebaseFrameController {
                              "Failed to clear" + " knowledgebase cache. Please close this " + "application");
         }
 
+
         final ConceptTreePanel treePanel = knowledgebaseFrame.getTreePanel();
         ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
         conceptDAO.startTransaction();
-        Concept concept = conceptDAO.findByName(name);
+        Concept concept = null;
+        if (name == null) {
+            concept = conceptDAO.findRoot();
+        }
+        else {
+            concept = conceptDAO.findByName(name);
+        }
+        
+        if (concept == null) {
+            concept = conceptDAO.findRoot();
+        }
         conceptDAO.endTransaction();
         conceptDAO.close();
         treePanel.refreshAndOpenNode(concept);

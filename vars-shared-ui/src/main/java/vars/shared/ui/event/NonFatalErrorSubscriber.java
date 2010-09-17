@@ -104,6 +104,7 @@ public class NonFatalErrorSubscriber implements EventTopicSubscriber {
 
         errorPane.setIcon(errorIcon);
         errorPane.setErrorInfo(errorInfo);
+        errorPane.setErrorReporter(new EmailErrorReporter(errorPane));
         JXErrorPane.showDialog(parentFrame, errorPane);
     }
 }

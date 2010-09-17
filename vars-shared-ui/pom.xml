@@ -42,6 +42,13 @@
             <artifactId>foxtrot-core</artifactId>
             <version>3.0</version>
         </dependency>
+        <!-- Used for sending emails by error dialogs -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-email</artifactId>
+            <version>1.2</version>
+            <scope>compile</scope>
+        </dependency>
 
     </dependencies>
 </project>

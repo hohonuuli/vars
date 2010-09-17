@@ -40,6 +40,7 @@ import vars.knowledgebase.ui.actions.PopulateDatabaseAction;
 import vars.shared.ui.event.ExitTopicSubscriber;
 import vars.shared.ui.event.FatalExceptionSubscriber;
 import vars.shared.ui.event.NonFatalErrorSubscriber;
+import vars.shared.ui.event.WarningSubscriber;
 
 /**
  *
@@ -75,6 +76,11 @@ public class App {
     private final EventTopicSubscriber fatalErrorSubscriber;
 
     /**
+     * This subscriber displays a warning dialog containing any messages sent to it.
+     */
+    private final EventTopicSubscriber warningSubscriber;
+
+    /**
      * Constructs ...
      *
      */
@@ -106,10 +112,11 @@ public class App {
         EventBus.unsubscribe(Lookup.TOPIC_NONFATAL_ERROR, tempNonFatalErrorSubscriber);
         fatalErrorSubscriber  = new FatalExceptionSubscriber(getKnowledgebaseFrame());
         nonFatalErrorSubscriber = new NonFatalErrorSubscriber(getKnowledgebaseFrame());
+        warningSubscriber = new WarningSubscriber(getKnowledgebaseFrame());
         EventBus.subscribe(Lookup.TOPIC_FATAL_ERROR, fatalErrorSubscriber);
         EventBus.subscribe(Lookup.TOPIC_NONFATAL_ERROR, nonFatalErrorSubscriber);
+        EventBus.subscribe(Lookup.TOPIC_WARNING, warningSubscriber);
 
-        
 
         /*
          * We put this application into a dispatcher so that other components

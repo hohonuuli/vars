@@ -4,6 +4,7 @@ import vars.jpa.DAO;
 import vars.jpa.JPAEntity;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptMetadata;
 import vars.knowledgebase.ConceptName;
 import vars.VARSPersistenceException;
 import com.google.inject.Inject;
@@ -145,11 +146,13 @@ public class ConceptDAOImpl extends DAO implements ConceptDAO {
             if (c.getChildConcepts().size() == 0) {
                 // If it doesn't have any children delete the concept
                 startTransaction();
-                c = merge(c);
+                c = find(c);
                 Concept parent = c.getParentConcept();
                 if (parent != null) {
                     parent.removeChildConcept(c);
                 }
+                //ConceptMetadata conceptMetadata = c.getConceptMetadata();
+                //remove(conceptMetadata);
                 remove(c);
                 endTransaction();
             }

@@ -95,6 +95,7 @@ public class FatalExceptionSubscriber implements EventTopicSubscriber<Exception>
 
         errorPane.setIcon(errorIcon);
         errorPane.setErrorInfo(errorInfo);
+        errorPane.setErrorReporter(new EmailErrorReporter(errorPane));
         JXErrorPane.showDialog(parentFrame, errorPane);
 
     }

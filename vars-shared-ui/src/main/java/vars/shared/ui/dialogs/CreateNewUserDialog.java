@@ -25,6 +25,7 @@ import vars.UserAccount;
 import vars.UserAccountDAO;
 import vars.UserAccountRoles;
 import vars.jpa.VarsJpaModule;
+import vars.shared.ui.UserAccountPreferencesPanel;
 
 /**
  *
@@ -48,8 +49,8 @@ public class CreateNewUserDialog extends UserAccountDialog {
         this.miscDAOFactory = miscDAOFactory;
         this.miscFactory = miscFactory;
         setDialogController(new Controller(this));
-        getRoleComboBox().setSelectedItem(UserAccountRoles.READONLY.toString());
-        getRoleComboBox().setEnabled(false);
+        getPanel().getRoleComboBox().setSelectedItem(UserAccountRoles.READONLY.toString());
+        getPanel().getRoleComboBox().setEnabled(false);
     }
 
     /**
@@ -132,9 +133,10 @@ public class CreateNewUserDialog extends UserAccountDialog {
          */
         public void doOkay() {
             UserAccount userAccount = null;
-            String userName = dialog.getLoginTextField().getText();
-            String pwd1 = new String(dialog.getPasswordField1().getPassword());
-            String pwd2 = new String(dialog.getPasswordField2().getPassword());
+            final UserAccountPreferencesPanel panel = dialog.getPanel();
+            String userName = panel.getLoginTextField().getText();
+            String pwd1 = new String(panel.getPasswordField1().getPassword());
+            String pwd2 = new String(panel.getPasswordField2().getPassword());
 
             exit:
             {
@@ -164,10 +166,10 @@ public class CreateNewUserDialog extends UserAccountDialog {
                         userAccount.setUserName(userName);
                         userAccount.setPassword(pwd1);
                         userAccount.setRole(UserAccountRoles.READONLY.toString());
-                        userAccount.setEmail(getEmailTextField().getText());
-                        userAccount.setAffiliation(getAffiliationTextField().getText());
-                        userAccount.setFirstName(getFirstNameTextField().getText());
-                        userAccount.setLastName(getLastNameTextField().getText());
+                        userAccount.setEmail(panel.getEmailTextField().getText());
+                        userAccount.setAffiliation(panel.getAffiliationTextField().getText());
+                        userAccount.setFirstName(panel.getFirstNameTextField().getText());
+                        userAccount.setLastName(panel.getLastNameTextField().getText());
 
                         try {
                             userAccountDAO.persist(userAccount);

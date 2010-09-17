@@ -177,29 +177,7 @@ public class ObservationImpl implements Serializable, Observation, JPAEntity {
         }
 
         final ObservationImpl other = (ObservationImpl) obj;
-
-        if ((this.observationDate != other.observationDate) &&
-                ((this.observationDate == null) || !this.observationDate.equals(other.observationDate))) {
-            return false;
-        }
-
-        if ((this.observer == null) ? (other.observer != null) : !this.observer.equals(other.observer)) {
-            return false;
-        }
-
-        if ((this.conceptName == null) ? (other.conceptName != null) : !this.conceptName.equals(other.conceptName)) {
-            return false;
-        }
-
-        if ((this.x == null) ? (other.x != null) : !this.x.equals(other.x)) {
-            return false;
-        }
-
-        if ((this.y == null) ? (other.y != null) : !this.y.equals(other.y)) {
-            return false;
-        }
-
-        return true;
+        return this.hashCode() == other.hashCode();
     }
 
     /**
@@ -307,11 +285,20 @@ public class ObservationImpl implements Serializable, Observation, JPAEntity {
     public int hashCode() {
         int hash = 3;
 
-        hash = 59 * hash + ((this.observationDate != null) ? this.observationDate.hashCode() : 0);
-        hash = 59 * hash + ((this.observer != null) ? this.observer.hashCode() : 0);
-        hash = 59 * hash + ((this.conceptName != null) ? this.conceptName.hashCode() : 0);
-        hash = 59 * hash + ((this.x != null) ? this.x.hashCode() : 0);
-        hash = 59 * hash + ((this.y != null) ? this.y.hashCode() : 0);
+        // I had to use the ID as a hashcode. Due to the second precision of observationDate
+        // it is not uncommon to have several different observations that generate the
+        // same hashcode when using fields as the hash. This is VERY annoying as the
+        // annotation interface doesn't know that a different line has been selected
+        if (id != null) {
+            hash = id.intValue();
+        }
+        else {
+            hash = 59 * hash + ((this.observationDate != null) ? this.observationDate.hashCode() : 0);
+            hash = 59 * hash + ((this.observer != null) ? this.observer.hashCode() : 0);
+            hash = 59 * hash + ((this.conceptName != null) ? this.conceptName.hashCode() : 0);
+            hash = 59 * hash + ((this.x != null) ? this.x.hashCode() : 0);
+            hash = 59 * hash + ((this.y != null) ? this.y.hashCode() : 0);
+        }
 
         return hash;
     }
@@ -433,4 +420,6 @@ public class ObservationImpl implements Serializable, Observation, JPAEntity {
     public Object getPrimaryKey() {
     	return getId();
     }
+
+
 }
