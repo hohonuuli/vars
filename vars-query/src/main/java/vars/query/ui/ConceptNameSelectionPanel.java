@@ -26,6 +26,8 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+
+import org.bushe.swing.event.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.knowledgebase.Concept;
@@ -64,7 +66,7 @@ public class ConceptNameSelectionPanel extends JPanel {
      *
      *
      * @param queryDAO
-     * @param conceptDAO
+     * @param knowledgebaseDAOFactory
      */
     @Inject
     public ConceptNameSelectionPanel(QueryPersistenceService queryDAO, KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
@@ -152,9 +154,8 @@ public class ConceptNameSelectionPanel extends JPanel {
                 conceptNames = queryDAO.findAllNamesUsedInAnnotations();
             }
             catch (Exception e) {
-
-                // TODO report error to eventbus
                 log.error("Failed to lookup conceptnames", e);
+                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
                 conceptNames = new ArrayList();
             }
 

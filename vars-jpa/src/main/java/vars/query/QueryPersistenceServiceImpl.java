@@ -18,14 +18,8 @@ package vars.query;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.TreeMap;
+import java.util.*;
+
 import org.mbari.sql.QueryFunction;
 import org.mbari.sql.QueryResults;
 import org.mbari.sql.QueryableImpl;
@@ -132,7 +126,7 @@ public class QueryPersistenceServiceImpl implements QueryPersistenceService {
     public Collection<String> findAllNamesUsedInAnnotations() {
 
         // All the conceptnames will be stored here
-        final List<String> allNames = new ArrayList<String>();
+        final Set<String> allNames = new HashSet<String>();
 
         final QueryFunction queryFunction = new QueryFunction() {
 
@@ -154,10 +148,11 @@ public class QueryPersistenceServiceImpl implements QueryPersistenceService {
                        " UNION SELECT DISTINCT ToConcept FROM Association WHERE ToConcept IS NOT NULL";
         annoQueryable.executeQueryFunction(query, queryFunction);
 
-        // Sort in place
-        Collections.sort(allNames);
+        // Turn names into a sorted list
+        List<String> sortedNames = new ArrayList<String>(allNames);
+        Collections.sort(sortedNames);
 
-        return allNames;
+        return sortedNames;
     }
 
     /**
