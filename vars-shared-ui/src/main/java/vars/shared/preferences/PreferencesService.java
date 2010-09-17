@@ -35,7 +35,7 @@ import vars.shared.ui.GlobalLookup;
  */
 public class PreferencesService {
 
-    private static final String PROP_LAST_VIDEO_CONNECTION_ID = "defaultVcrUrl";
+    private static final String PROP_LAST_VIDEO_CONNECTION_ID = "lastVideoConnectionID";
     private static final String PROP_AUTOCONNECT_VCR = "autoconnectVCR";
     private static final String PROP_IMAGETARGET = "imageTarget";
     private static final String PROP_IMAGETARGETMAPPING = "imageTargetMapping";

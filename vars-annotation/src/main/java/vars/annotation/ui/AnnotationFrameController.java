@@ -59,6 +59,10 @@ public class AnnotationFrameController implements PreferenceUpdater {
         Thread cleanupThread = new Thread(new Runnable() {
             public void run() {
 
+                // Persist prefs BEFORE shutting off services. Otherwise video connection
+                // information is lost.
+                persistPreferences();
+
                 // Clean up NATIVE resources when we exit
                 try {
                     ImageCaptureService imageCaptureService = (ImageCaptureService) Lookup.getImageCaptureServiceDispatcher().getValueObject();
@@ -86,7 +90,7 @@ public class AnnotationFrameController implements PreferenceUpdater {
                     updateCameraData(videoArchive);
                 }
 
-                persistPreferences();
+
                 log.info("Shutdown thread is finished. Bye Bye");
             }
         }, "VARS-cleanupBeforeShutdownThread");

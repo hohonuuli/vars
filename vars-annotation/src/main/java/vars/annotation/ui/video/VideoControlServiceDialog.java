@@ -28,6 +28,9 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import vars.annotation.ui.Lookup;
 import vars.shared.preferences.PreferencesService;
 import vars.shared.ui.dialogs.StandardDialog;
@@ -46,7 +49,8 @@ public class VideoControlServiceDialog extends StandardDialog {
     private JPanel panel;
     private RS422ConnectionPanel rs422Panel;
     private UDPConnectionPanel udpPanel;
-
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    
     private enum Sources { RS422, UDP; }
 
     /**
@@ -205,6 +209,7 @@ public class VideoControlServiceDialog extends StandardDialog {
     }
 
     public void setLastConnectionParameters(String connectionParams) {
+        log.debug("Setting last connection params to: " + connectionParams);
         boolean isUDP = connectionParams.contains(":");
         if (isUDP) {
             getComboBox().setSelectedItem(Sources.UDP);

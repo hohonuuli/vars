@@ -132,6 +132,7 @@ public class App {
         Toolkit.getDefaultToolkit().getSystemEventQueue().push(new WaitCursorEventQueue(500));
 
         JFrame frame = getAnnotationFrame();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Lookup.getApplicationFrameDispatcher().setValueObject(frame);
         frame.pack();
         splashFrame.dispose();
