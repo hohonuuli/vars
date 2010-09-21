@@ -481,6 +481,26 @@ public class AddConceptDialog extends javax.swing.JDialog {
                     concept.addConceptName(conceptName);
                     concept.setOriginator(userAccount.getUserName());
 
+                    // Set optional fields
+                    final String nodcCode = isValidString(nodcField.getText()) ? nodcField.getText() : null;
+                    concept.setNodcCode(nodcCode);
+                    final String rankName = isValidString((String) rankNameComboBox.getSelectedItem())
+                                    ? (String) rankNameComboBox.getSelectedItem() : null;
+                    concept.setRankName(rankName);
+                    final String rankLevel = isValidString((String) rankLevelComboBox.getSelectedItem())
+                                     ? (String) rankLevelComboBox.getSelectedItem() : null;
+                    concept.setRankLevel(rankLevel);
+                    final String reference = isValidString(referenceText.getText()) ? referenceText.getText() : null;
+                    concept.setReference(reference);
+
+                    final String author = authorField.getText();
+                    if (isValidString(author)) {
+                        conceptName.setAuthor(author);
+                    }
+                    else {
+                        conceptName.setAuthor(null);
+                    }
+
                     parentConcept.addChildConcept(concept);
                     dao.persist(concept);
 
