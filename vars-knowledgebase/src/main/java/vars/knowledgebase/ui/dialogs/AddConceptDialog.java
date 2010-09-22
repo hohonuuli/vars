@@ -452,7 +452,6 @@ public class AddConceptDialog extends javax.swing.JDialog {
             Concept parentConcept = dao.findByName((String) getConceptComboBox().getSelectedItem());
 
             if (parentConcept == null) {
-
                 // TODO brian: Make sure that there are no existing root concepts
                 throw new VARSException("No parent Concept was specified. You MUST Specify a parent Concept");
             }
@@ -466,8 +465,13 @@ public class AddConceptDialog extends javax.swing.JDialog {
             History history = null;
             if ((userAccount != null) && (primaryName != null)) {
 
-                // Do not add a concept with a name that already exists in the database
+                // Do not add a concept with a name that already exists in the database.
+                // NOTE: findByName can be case insensitive (depending on DB config), so check case
                 Concept existingConcept = dao.findByName(primaryName);
+                if (existingConcept != null &&
+                        !existingConcept.getPrimaryConceptName().getName().equals(primaryName)) {
+                    existingConcept = null;
+                }
 
                 // Add the concept to the database;
                 if (existingConcept == null) {

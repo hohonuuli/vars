@@ -74,7 +74,7 @@ public class ImagePreferencesPanelController implements PreferenceUpdater {
             imageMappingTarget = new URL(imageTargetMappingTextField.getText());
         }
         catch (MalformedURLException ex) {
-            log.warn("The user specified and invalid URL as an imageTarget. The bogus URL is '" +
+            log.warn("The user specified an invalid URL as an imageTarget. The bogus URL is '" +
                      imageTargetMappingTextField.getText() + "'");
             EventBus.publish(Lookup.TOPIC_WARNING,
                              "The location, " + imageTargetTextField.getText() +
@@ -96,5 +96,36 @@ public class ImagePreferencesPanelController implements PreferenceUpdater {
             panel.getImageTargetTextField().setText("");
         }
         panel.getImageTargetMappingTextField().setText(imageTargetMapping.toExternalForm());
+    }
+
+    protected void persistDefaults() {
+        // Parse and set the defaultImageTarget
+        final JTextField imageTargetTextField = panel.getImageTargetTextField();
+        File defaultImageTarget = new File(imageTargetTextField.getText());
+        if (!defaultImageTarget.exists() && !defaultImageTarget.canWrite()) {
+            EventBus.publish(Lookup.TOPIC_WARNING,
+                                 "The location, " + imageTargetTextField.getText() +
+                                 ", that you specified is not valid or does not exist");
+        }
+        preferencesService.persistDefaultImageTarget(preferencesService.getHostname(), defaultImageTarget);
+
+        // Parse and set the defaultImageTargetMapping
+        final JTextField imageTargetMappingTextField = panel.getImageTargetMappingTextField();
+        URL imageMappingTarget = null;
+        try {
+            imageMappingTarget = new URL(imageTargetMappingTextField.getText());
+        }
+        catch (MalformedURLException ex) {
+            log.warn("The user specified an invalid URL as an imageTarget. The bogus URL is '" +
+                     imageTargetMappingTextField.getText() + "'");
+            EventBus.publish(Lookup.TOPIC_WARNING,
+                             "The location, " + imageTargetTextField.getText() +
+                             ", that you specified is not a valid URL");
+            return;
+        }
+        preferencesService.persistDefaultImageTargetMapping(preferencesService.getHostname(),
+                imageMappingTarget);
+
+
     }
 }

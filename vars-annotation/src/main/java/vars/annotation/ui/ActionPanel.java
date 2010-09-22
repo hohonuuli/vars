@@ -28,12 +28,7 @@ import javax.swing.KeyStroke;
 import org.mbari.awt.layout.WrappingFlowLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.annotation.ui.buttons.DeepCopyObservationsButton;
-import vars.annotation.ui.buttons.DeleteSelectedObservationsButton;
-import vars.annotation.ui.buttons.DuplicateObservationButton;
-import vars.annotation.ui.buttons.FrameCaptureButton;
-import vars.annotation.ui.buttons.NewObservationButton;
-import vars.annotation.ui.buttons.PropButton;
+import vars.annotation.ui.buttons.*;
 
 /**
  * <p> This panel contains buttons for actions that can modify the contents of the
@@ -49,6 +44,7 @@ public class ActionPanel extends JPanel {
     JButton btnDeepCopy;
     JButton btnDelete;
     JButton btnFramegrab;
+    JButton btnRemoveFramegrab;
     JButton btnNew;
     JButton btnShallowCopy;
 
@@ -73,6 +69,7 @@ public class ActionPanel extends JPanel {
         btnNew = new NewObservationButton(toolBelt);
         btnShallowCopy = new DuplicateObservationButton(toolBelt);
         btnFramegrab = new FrameCaptureButton(toolBelt);
+        btnRemoveFramegrab = new DeleteImageReferenceButton(toolBelt);
         initialize();
         registerHotKeys();
     }
@@ -84,6 +81,7 @@ public class ActionPanel extends JPanel {
         add(btnShallowCopy, null);
         add(btnDeepCopy, null);
         add(btnFramegrab, null);
+        add(btnRemoveFramegrab, null);
 
         /*
          * The majority of buttons are read from the annotation-app property

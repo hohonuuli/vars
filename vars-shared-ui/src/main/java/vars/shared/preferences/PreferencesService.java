@@ -40,7 +40,8 @@ public class PreferencesService {
     private static final String PROP_IMAGETARGET = "imageTarget";
     private static final String PROP_IMAGETARGETMAPPING = "imageTargetMapping";
     private static final String PROP_VCR_URL = "vcrUrl";
-    private final File DEFAULT_IMAGETARGET;
+    private File defaultImageTarget;
+    private URL defaultImageTargetMapping;
     private final PreferencesFactory preferencesFactory;
     /** The name of the computer */
     private final String hostname;
@@ -53,7 +54,7 @@ public class PreferencesService {
     @Inject
     public PreferencesService(PreferencesFactory preferencesFactory) {
         this.preferencesFactory = preferencesFactory;
-        DEFAULT_IMAGETARGET = new File(GlobalLookup.getSettingsDirectory(), "images");
+        defaultImageTarget = new File(GlobalLookup.getSettingsDirectory(), "images");
 
         /*
          * Store the login information
@@ -65,6 +66,22 @@ public class PreferencesService {
             // This should never get thrown... ;-)
             throw new VARSException("Unable to get hostname", ex);
         }
+
+        try {
+            defaultImageTarget = findDefaultImageTarget(getHostname());
+            defaultImageTargetMapping = defaultImageTarget.toURI().toURL();
+        }
+        catch (Exception e) {
+            throw new VARSException("Failed to lookup default image target", e);
+        }
+
+        try {
+            defaultImageTargetMapping = findDefaultImageTargetMapping(getHostname());
+        }
+        catch (Exception e) {
+            throw new VARSException("Failed to lookup default image target mapping", e);
+        }
+
     }
 
     /**
@@ -78,7 +95,7 @@ public class PreferencesService {
         Preferences preferences = hostPrefs(username, hostname);
         File imageTarget = null;
         try {
-            String value = preferences.get(PROP_IMAGETARGET, DEFAULT_IMAGETARGET.getCanonicalPath());
+            String value = preferences.get(PROP_IMAGETARGET, defaultImageTarget.getCanonicalPath());
             imageTarget = new File(value);
         }
         catch (IOException ex) {
@@ -99,7 +116,7 @@ public class PreferencesService {
         Preferences preferences = userPrefs(username);
         URL imageTarget = null;
         try {
-            String value = preferences.get(PROP_IMAGETARGETMAPPING, DEFAULT_IMAGETARGET.toURI().toURL().toExternalForm());
+            String value = preferences.get(PROP_IMAGETARGETMAPPING, findDefaultImageTargetMapping(getHostname()).toExternalForm());
             imageTarget = new URL(value);
         }
         catch (MalformedURLException ex) {
@@ -108,9 +125,51 @@ public class PreferencesService {
 
         return imageTarget;
     }
+    
+    
+    /**
+     * Read the default URL used to write images to.
+     *
+     * @param hostname
+     * @return The Base URL where images should be written into
+     */
+    public File findDefaultImageTarget(String hostname) {
+        Preferences preferences = systemPrefs(hostname);
+        File imageTarget = null;
+        try {
+            String value = preferences.get(PROP_IMAGETARGET, defaultImageTarget.getCanonicalPath());
+            imageTarget = new File(value);
+        }
+        catch (IOException ex) {
+            throw new VARSException("Failed to lookup and resolve default image target", ex);
+        }
+
+        return imageTarget;
+    }
 
     /**
-     * Retreive the port number used to access a networked VCR
+     * Read the URL used to read images from a web server that were written to
+     * <i>imageTarget</i>.
+     *
+     * @param hostname The computer of interest
+     * @return The Base URL on a web server that maps to <i>imageTarget</i>
+     */
+    public URL findDefaultImageTargetMapping(String hostname) {
+        Preferences preferences = systemPrefs(hostname);
+        URL imageTarget = null;
+        try {
+            String value = preferences.get(PROP_IMAGETARGETMAPPING, defaultImageTarget.toURI().toURL().toExternalForm());
+            imageTarget = new URL(value);
+        }
+        catch (MalformedURLException ex) {
+            throw new VARSException("Failed to lookup and resolve default image target mapping", ex);
+        }
+
+        return imageTarget;
+    }
+
+    /**
+     * Retrieve the port number used to access a networked VCR
      * @param username UserAccount.getUserName()
      * @param hostname preferencesService.getHostname()
      * @return
@@ -232,6 +291,34 @@ public class PreferencesService {
      */
     public void persistImageTarget(String username, String hostname, File targetDirectory) {
         Preferences preferences = hostPrefs(username, hostname);
+        try {
+            preferences.put(PROP_IMAGETARGET, targetDirectory.getCanonicalPath());
+        } catch (IOException ex) {
+            throw new VARSException("Failed to save image target to preferences");
+        }
+    }
+
+    /**
+     * Write the URL used to read images from a web server that were written to
+     * <i>imageTarget</i>.
+     *
+     * @param hostname The name of the user as logged into VARS
+     * @param targetMappingURL The Base URL on a web server that maps to <i>imageTarget</i>
+     */
+    public void persistDefaultImageTargetMapping(String hostname, URL targetMappingURL) {
+        Preferences preferences = systemPrefs(hostname);
+        preferences.put(PROP_IMAGETARGETMAPPING, targetMappingURL.toExternalForm());
+    }
+    
+    /**
+     * Write the URL used to write images to.
+     *
+     * @param hostname The username
+     * @param hostname The current hostname of the platform that VARS is running on
+     * @param targetDirectory The URL to write images to.
+     */
+    public void persistDefaultImageTarget(String hostname, File targetDirectory) {
+        Preferences preferences = systemPrefs(hostname);
         try {
             preferences.put(PROP_IMAGETARGET, targetDirectory.getCanonicalPath());
         } catch (IOException ex) {

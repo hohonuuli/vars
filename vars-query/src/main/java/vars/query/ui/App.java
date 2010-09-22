@@ -153,6 +153,7 @@ public class App {
             // Let's let Guice autowire the dependencies
         	Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
             queryFrame = injector.getInstance(QueryFrame.class);
+            queryFrame.setSize(300, 200);
             Lookup.getApplicationFrameDispatcher().setValueObject(queryFrame);
         }
 
@@ -222,8 +223,7 @@ public class App {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         Dimension frameSize = getQueryFrame().getSize();
         double newHeight = (screenSize.getHeight() - 150);
-
-        frameSize.setSize(frameSize.getWidth(), (int) newHeight);
+        frameSize.setSize(650, (int) newHeight);
         getQueryFrame().setSize(frameSize);
         getQueryFrame().setVisible(true);
         getQueryFrame().setIconImage(mbariLogo.getImage());
@@ -232,7 +232,7 @@ public class App {
         /*
          * Add a special eventQueue that toggles the cursor if the application is busy
          */
-        Toolkit.getDefaultToolkit().getSystemEventQueue().push(new WaitCursorEventQueue(500));
+          Toolkit.getDefaultToolkit().getSystemEventQueue().push(new WaitCursorEventQueue(500));
     }
 
     /**
