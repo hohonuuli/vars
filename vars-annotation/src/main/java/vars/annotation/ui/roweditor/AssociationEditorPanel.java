@@ -343,9 +343,9 @@ public class AssociationEditorPanel extends JPanel {
                                                         .addGroup(groupLayout.createSequentialGroup()
                                                                 .addComponent(getLinkValueTextField(), GroupLayout.DEFAULT_SIZE, 154, Short.MAX_VALUE)
                                                                 .addPreferredGap(ComponentPlacement.RELATED)
-                                                                .addComponent(getCancelButton())
+                                                                .addComponent(getOkButton())
                                                                 .addPreferredGap(ComponentPlacement.RELATED)
-                                                                .addComponent(getOkButton())))))
+                                                                .addComponent(getCancelButton())))))
                                 .addGap(4))
         );
         groupLayout.setVerticalGroup(
@@ -369,8 +369,8 @@ public class AssociationEditorPanel extends JPanel {
                                 .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
                                         .addComponent(getLblValue())
                                         .addComponent(getLinkValueTextField(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(getCancelButton())
-                                        .addComponent(getOkButton()))
+                                        .addComponent(getOkButton())
+                                        .addComponent(getCancelButton()))
                                 .addContainerGap(165, Short.MAX_VALUE))
         );
         setLayout(groupLayout);

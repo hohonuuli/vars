@@ -181,20 +181,21 @@ public class AnnotationPersistenceServiceImpl extends QueryableImpl implements A
      * Looks up the 'identity-reference' values for a given concept within a {@link VideoArchiveSet}
      * These are used to tag an annotation as the same creature that's been seen before.
      */
-    public Collection<Integer> findAllReferenceNumbers(VideoArchiveSet videoArchiveSet, Concept concept) {
+    public Collection<String> findAllReferenceNumbers(VideoArchiveSet videoArchiveSet, Concept concept) {
         VideoArchiveDAO dao = annotationDAOFactory.newVideoArchiveDAO();
-        Collection<Integer> referenceNumbers = new TreeSet<Integer>();
+        Collection<String> referenceNumbers = new TreeSet<String>();
         for (VideoArchive videoArchive : new ArrayList<VideoArchive>(videoArchiveSet.getVideoArchives())) {
             // TODO identity-reference is hard coded. It should be pulled out into a properties file
             Set<String> values = dao.findAllLinkValues(videoArchive, "identity-reference", concept);
             for (String string : values) {
-                try {
-                    Integer v = Integer.valueOf(string);
-                    referenceNumbers.add(v);
-                }
-                catch (Exception e) {
-                    log.info("Unable to parse integer from " + string);
-                }
+                referenceNumbers.add(string);
+//                try {
+//                    Integer v = Integer.valueOf(string);
+//                    referenceNumbers.add(v);
+//                }
+//                catch (Exception e) {
+//                    log.info("Unable to parse integer from " + string);
+//                }
             }
         }
         dao.close();

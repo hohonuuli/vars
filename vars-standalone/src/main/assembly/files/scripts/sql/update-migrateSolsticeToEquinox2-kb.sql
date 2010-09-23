@@ -188,9 +188,15 @@ ALTER TABLE [dbo].[Media]
 	REFERENCES [dbo].[ConceptDelegate]([id])
 GO
 
+CREATE INDEX [idx_Media_FK1]
+	ON [dbo].[Media]([ConceptDelegateID_FK])
+GO
+
 CREATE INDEX [idx_Media_LUT]
 	ON [dbo].[Media]([LAST_UPDATED_TIME])
 GO
+
+
 
 
 -- Prefs

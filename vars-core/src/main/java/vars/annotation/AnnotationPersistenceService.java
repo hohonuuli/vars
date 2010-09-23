@@ -45,7 +45,7 @@ public interface AnnotationPersistenceService {
     
     Collection<LinkTemplate> findLinkTemplatesFor(Concept concept);
     
-    Collection<Integer> findAllReferenceNumbers(VideoArchiveSet videoArchiveSet, Concept concept);
+    Collection<String> findAllReferenceNumbers(VideoArchiveSet videoArchiveSet, Concept concept);
 
     /**
      * Find Descendant Names as a sorted List of Strings

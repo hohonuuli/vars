@@ -93,8 +93,12 @@ public class UpdateNewRefNumAction extends ActionAdapter implements IVideoArchiv
                         }
                     }
 
-                    refNum = ((Integer) Collections.max(intValues)).intValue();
-                    refNum++;
+                    // Get the largest ref number and add 1
+                    if (!intValues.isEmpty()) {
+                       refNum = ((Integer) Collections.max(intValues)).intValue();
+                       refNum++;
+                    }
+
                 }
             }
 

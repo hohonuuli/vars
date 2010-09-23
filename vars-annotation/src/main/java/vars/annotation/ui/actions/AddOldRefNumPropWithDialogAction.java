@@ -90,7 +90,7 @@ public class AddOldRefNumPropWithDialogAction extends ActionAdapter {
 
         final VideoArchiveSet vas = videoArchive.getVideoArchiveSet();
         Concept concept = null;
-        Collection<Integer> refNums = new TreeSet<Integer>();
+        Collection<String> refNums = new TreeSet<String>();
         try {
             AnnotationPersistenceService service = toolBelt.getAnnotationPersistenceService();
             concept = service.findConceptByName(conceptName);
@@ -114,9 +114,9 @@ public class AddOldRefNumPropWithDialogAction extends ActionAdapter {
         }
         else {
 
-            final Object[] choices = refNums.toArray(new Integer[refNums.size()]);
+            final Object[] choices = refNums.toArray(new String[refNums.size()]);
             Arrays.sort(choices, COMPARATOR);
-            final Integer i = (Integer) JOptionPane.showInputDialog(
+            final String i = (String) JOptionPane.showInputDialog(
                 (Frame) Lookup.getApplicationFrameDispatcher().getValueObject(), "Select a reference number",
                 "VARS - Select Reference Number", JOptionPane.PLAIN_MESSAGE, null, choices, choices[0]);
 

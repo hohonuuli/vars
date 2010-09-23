@@ -635,6 +635,7 @@ public class PersistenceController {
                             break;
                         }
                     }
+                    dao.close();
                 }
 
                 if (updateSelection) {
@@ -736,6 +737,7 @@ public class PersistenceController {
             }
 
             dao.endTransaction();
+            dao.close();
 
             updateUI(observations, false);
         }
@@ -778,6 +780,7 @@ public class PersistenceController {
         dao.startTransaction();
         videoArchive = dao.merge(videoArchive);
         dao.endTransaction();
+        dao.close();
         updateUI();
         return videoArchive;
     }

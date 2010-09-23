@@ -42,6 +42,7 @@ public class ChangeTimeCodeFrame extends TimeCodeSelectionFrame {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
     private final ToolBelt toolBelt;
+    private ChangeTimeCodeAction changeTimeCodeAction;
 
     /**
      * Constructor for the ChangeTimeCodeFrame object
@@ -75,17 +76,24 @@ public class ChangeTimeCodeFrame extends TimeCodeSelectionFrame {
                     final Collection<Observation> observations = (Collection<Observation>) dispatcher.getValueObject();
                     if (observations.size() == 1) {
                         final VideoFrame vf = observations.iterator().next().getVideoFrame();
-                        action.setTimeCode(getTimePanel().getTimeAsString());
-                        action.doAction();
+                        getChangeTimeCodeAction().setTimeCode(getTimePanel().getTimeAsString());
+                        getChangeTimeCodeAction().doAction();
                     }
 
                     setVisible(false);
                 }
-                private final ChangeTimeCodeAction action = new ChangeTimeCodeAction(toolBelt);
+
             };
         }
 
         return okActionListener;
+    }
+
+    private ChangeTimeCodeAction getChangeTimeCodeAction() {
+        if (changeTimeCodeAction == null) {
+            changeTimeCodeAction = new ChangeTimeCodeAction(toolBelt);
+        }
+        return changeTimeCodeAction;
     }
 
     /**

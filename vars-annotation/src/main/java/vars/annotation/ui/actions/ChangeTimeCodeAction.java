@@ -104,6 +104,7 @@ public class ChangeTimeCodeAction extends ActionAdapter {
         }
 
         dao.endTransaction();
+        dao.close();
 
         toolBelt.getPersistenceController().updateUI(observations);
 
