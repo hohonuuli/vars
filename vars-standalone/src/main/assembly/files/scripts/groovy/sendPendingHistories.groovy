@@ -13,7 +13,9 @@ def admins = toolBox.toolBelt.miscDAOFactory.newUserAccountDAO().findAllByRole(U
 def email = new SimpleEmail()
 email.setHostName("mail.shore.mbari.org")
 admins.each { a ->
-    email.addBcc("${a.userName}@mbari.org")
+    if (a.email) {
+        email.addBcc("${a.userName}@mbari.org")
+    }
 }
 email.setFrom("brian@mbari.org", "Brian Schlining")
 email.setSubject("VARS Knowledgebase Report: Changes pending approval")
@@ -33,7 +35,7 @@ Pending changes:
 """
 
 pendingHistories.each { h ->
-    msg += "${h.conceptDelegate.concept.primaryConceptNameAsString}: ${h.stringValue()}\n\n"
+    msg += "${h?.conceptMetadata?.concept?.primaryConceptName?.name}: ${h.stringValue()}\n\n"
 }
 email.msg = msg
 

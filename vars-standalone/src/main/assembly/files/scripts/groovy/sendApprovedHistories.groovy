@@ -11,16 +11,19 @@ def toolBox = new ToolBox()
 def historyDao = toolBox.toolBelt.knowledgebaseDAOFactory.newHistoryDAO()
 def approvedHistories = historyDao.findApprovedHistories()
 approvedHistories = approvedHistories.findAll { h ->
-    h.approvalDate >= startDate && h.approvalDate <= endDate
+    h.processedDate >= startDate && h.processedDate <= endDate
 }
 
 def userAccountDao = toolBox.toolBelt.miscDAOFactory.newUserAccountDAO()
 def admins = userAccountDao.findAllByRole(UserAccountRoles.ADMINISTRATOR.toString())
 
 def email = new SimpleEmail()
+
 email.setHostName("mail.shore.mbari.org")
 admins.each { a ->
-    email.addBcc(a.email)
+    if (a.email) {
+        email.addBcc(a.email)
+    }
 }
 email.setFrom("brian@mbari.org", "Brian Schlining")
 email.setSubject("VARS Knowledgebase Report: Recently approved changes")
@@ -41,7 +44,7 @@ Recently approved changes:
 """
 
 approvedHistories.each { h ->
-    msg += "${h.conceptDelegate.concept.primaryConceptNameAsString}: ${h.stringValue()}\n\n"
+    msg += "${h.conceptMetadata.concept.primaryConceptName.name}: ${h.stringValue()}\n\n"
 }
 email.msg = msg
 
