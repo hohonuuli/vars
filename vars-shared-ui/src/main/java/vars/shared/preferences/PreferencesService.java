@@ -333,8 +333,8 @@ public class PreferencesService {
      * @param username The name of the user as logged into VARS
      * @param targetMappingURL The Base URL on a web server that maps to <i>imageTarget</i>
      */
-    public void persistImageTargetMapping(String username, URL targetMappingURL) {
-        Preferences preferences = userPrefs(username);
+    public void persistImageTargetMapping(String username, String hostname, URL targetMappingURL) {
+        Preferences preferences = hostPrefs(username, hostname);
         preferences.put(PROP_IMAGETARGETMAPPING, targetMappingURL.toExternalForm());
     }
 

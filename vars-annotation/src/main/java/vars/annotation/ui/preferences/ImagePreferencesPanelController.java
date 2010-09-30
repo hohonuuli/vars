@@ -82,7 +82,8 @@ public class ImagePreferencesPanelController implements PreferenceUpdater {
             return;
         }
 
-        preferencesService.persistImageTargetMapping(userAccount.getUserName(), imageMappingTarget);
+        preferencesService.persistImageTargetMapping(userAccount.getUserName(), preferencesService.getHostname(),
+                imageMappingTarget);
 
     }
 
