@@ -238,6 +238,7 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
 
             videoArchiveSetDAO.endTransaction();
         }
+        videoArchiveSetDAO.close();
 
         return myMergeStatus;
     }
@@ -258,6 +259,7 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
         }
 
         videoArchiveSetDAO.endTransaction();
+        videoArchiveSetDAO.close();
 
         if (myVideoFrames.size() == 0) {
             mergeStatus.setStatusMessage(mergeStatus.getStatusMessage() + "; No annotations found in VARS");

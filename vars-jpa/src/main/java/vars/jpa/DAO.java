@@ -137,7 +137,7 @@ public class DAO implements vars.DAO, EntityManagerAspect {
         if ((entityManager != null) && entityManager.isOpen()) {
             if (log.isWarnEnabled()) {
                 log.warn("Disposing of DAO that references an open entitymanager  [" +
-                        entityManager + "]. Did you forget to call endTransaction?");
+                        entityManager + "]. Did you forget to call close()?");
             }
 
             //entityManager.close();

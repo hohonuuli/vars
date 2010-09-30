@@ -34,14 +34,31 @@ class DatabaseUtility {
 
         for (id in ids) {
 
-            if (id == null) { continue }
+            if (id != null) {
+                try {
+                    doMerge(id)
+                    cache.clear()
+                }
+                catch (Exception e) {
+                    log.error("An error occurred while trying to merge VideoArchivSet with id = ${id}", e)
+                }
+            }
+        }
+        
+    }
 
-            // DAOTX - Create new DAO with each loop or 1st level cache causes memory leak
-            VideoArchiveSetDAO dao = toolBox.toolBelt.annotationDAOFactory.newVideoArchiveSetDAO()
-            dao.startTransaction()
-            def videoArchiveSet = dao.findByPrimaryKey(id)
+    /**
+     * Merges a {@link VideoArchiveSet} by it's primary-key (id)
+     * 
+     * @param id
+     */
+    private void doMerge(id) {
+        // DAOTX - Create new DAO with each loop or 1st level cache causes memory leak
+        VideoArchiveSetDAO dao = toolBox.toolBelt.annotationDAOFactory.newVideoArchiveSetDAO()
+        dao.startTransaction()
+        def videoArchiveSet = dao.findByPrimaryKey(id)
 
-            if (videoArchiveSet == null) { continue }
+        if (videoArchiveSet != null) {  
 
             def platform = videoArchiveSet.platformName
 
@@ -90,11 +107,8 @@ class DatabaseUtility {
                 }
 
             }
-            dao.endTransaction()
-            dao.close()
-            cache.clear() // Plug up memory leaks
-
         }
+        dao.endTransaction()
         dao.close()
     }
 

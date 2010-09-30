@@ -286,8 +286,8 @@ public class ImageCaptureAction extends ActionAdapter {
             }
             catch (final Exception e) {
                 EventBus.publish(Lookup.TOPIC_WARNING,
-                                 "ERROR!! Failed to capture the frame. Reason given is " + e.getMessage() +
-                                 ". See vars.log for more details.");
+                                 "ERROR!! Failed to capture the frame. Reason given is " +
+                                 e.getMessage() + ". ");
                 log.error("Frame-grab failed", e);
                 return;
             }
@@ -317,8 +317,8 @@ public class ImageCaptureAction extends ActionAdapter {
             }
             catch (final Exception e) {
                 EventBus.publish(Lookup.TOPIC_WARNING,
-                                 "ERROR!! Failed to create preview image. Reason given is " + e.getMessage() +
-                                 ". See vars.log for more details.");
+                                 "ERROR!! Failed to create preview image. Reason given is " +
+                                 e.getMessage() + ".");
                 log.error("Frame-grab failed", e);
 
                 return;
@@ -473,9 +473,7 @@ public class ImageCaptureAction extends ActionAdapter {
         }
 
         /**
-         * <p><!-- Method description --></p>
          * @return  A date
-         * @uml.property  name="date"
          */
         Date getDate() {
             return date;
@@ -489,9 +487,6 @@ public class ImageCaptureAction extends ActionAdapter {
         }
 
         /**
-         * <p><!-- Method description --></p>
-         *
-         *
          * @return time formatted for the GMT timezone
          */
         String getFormattedGmtTime() {
@@ -501,9 +496,6 @@ public class ImageCaptureAction extends ActionAdapter {
         }
 
         /**
-         * <p><!-- Method description --></p>
-         *
-         *
          * @return time formatted for the local timezone
          */
         String getFormattedLocalTime() {
@@ -513,9 +505,6 @@ public class ImageCaptureAction extends ActionAdapter {
         }
 
         /**
-         * <p><!-- Method description --></p>
-         *
-         *
          * @return  The timezone offset between local and GMT
          */
         String getGmtOffset() {
@@ -523,9 +512,6 @@ public class ImageCaptureAction extends ActionAdapter {
         }
 
         /**
-         * <p><!-- Method description --></p>
-         *
-         *
          * @return  Timecode formatted for names (':' is replaced with '_')
          */
         String getTimeCodeAsName() {
@@ -533,9 +519,6 @@ public class ImageCaptureAction extends ActionAdapter {
         }
 
         /**
-         * <p><!-- Method description --></p>
-         *
-         *
          * @return THe timecode as a string
          */
         String getTimeCodeAsString() {
@@ -543,9 +526,6 @@ public class ImageCaptureAction extends ActionAdapter {
         }
 
         /**
-         * <p><!-- Method description --></p>
-         *
-         *
          * @return  The current time in seconds
          */
         long getTimeInSecs() {
