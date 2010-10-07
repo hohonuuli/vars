@@ -397,6 +397,7 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
             dao.close();
 
             getMediaList().paintImmediately(getMediaList().getBounds());
+            EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, media.getConceptMetadata().getConcept().getPrimaryConceptName().getName());
 
         }
     }

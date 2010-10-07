@@ -138,6 +138,7 @@ public class MediaViewPanel extends JPanel implements ILockableEditor {
             for (int i = 0; i < types.length; i++) {
                 typeComboBox.addItem(types[i]);
             }
+            typeComboBox.setSelectedItem(Media.TYPE_IMAGE);
 
         }
 
