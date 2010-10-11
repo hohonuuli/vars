@@ -19,6 +19,8 @@ package vars.annotation.ui.buttons;
 
 import foxtrot.Job;
 import foxtrot.Worker;
+
+import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.Action;
@@ -103,6 +105,10 @@ public class FrameCaptureButton extends FancyButton {
 
         public WorkerAction(ToolBelt toolBelt) {
             super(toolBelt);
+            putValue(Action.NAME, "Frame Capture");
+            putValue(Action.ACTION_COMMAND_KEY, "frame capture");
+            putValue(Action.ACCELERATOR_KEY,
+                  KeyStroke.getKeyStroke('F', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         }
 
         /**

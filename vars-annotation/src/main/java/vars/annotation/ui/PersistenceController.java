@@ -247,7 +247,7 @@ public class PersistenceController {
             }
         };
         final Collection<Long> pks = Collections2.transform(observations, f);
-        final Collection<Long> selectedPks = Collections2.transform(selectedObservations, f);
+        final Collection<Long> selectedPks = new ArrayList<Long>(Collections2.transform(selectedObservations, f));
         selectedPks.removeAll(pks);
         selectedObservations = Collections2.filter(selectedObservations, new Predicate<Observation>() {
             public boolean apply(Observation input) {

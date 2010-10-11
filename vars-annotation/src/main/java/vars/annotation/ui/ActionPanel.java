@@ -115,8 +115,8 @@ public class ActionPanel extends JPanel {
      *  Register
      */
     public void registerHotKeys() {
-        final Action[] as = { btnDelete.getAction(), btnNew.getAction(), btnDeepCopy.getAction(),
-                              btnShallowCopy.getAction(), btnFramegrab.getAction() };
+        final Action[] as = { btnFramegrab.getAction() , btnDelete.getAction(), btnNew.getAction(), btnDeepCopy.getAction(),
+                              btnShallowCopy.getAction()};
         for (int i = 0; i < as.length; i++) {
             final Action a = as[i];
             getActionMap().put(a.getValue(Action.ACTION_COMMAND_KEY), a);
