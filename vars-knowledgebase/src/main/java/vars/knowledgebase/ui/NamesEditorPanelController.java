@@ -187,7 +187,7 @@ class NamesEditorPanelController {
              * name, so we add a new Concept with the old values.
              */
             
-            if (nameType.equals(ConceptNameTypes.PRIMARY.toString())) {
+            if (nameType.equalsIgnoreCase(ConceptNameTypes.PRIMARY.toString())) {
                 ConceptName copyCn = knowledgebaseFactory.newConceptName();
                 copyCn.setName(oldConceptName.getName());
                 copyCn.setAuthor(oldConceptName.getAuthor());

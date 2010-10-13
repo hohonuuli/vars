@@ -169,7 +169,7 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
                     /*
                      * Warn users if they are trying to change the primary name.
                      */
-                    if (okToProceed && nameType.equals(ConceptNameTypes.PRIMARY.toString())) {
+                    if (okToProceed && nameType.equalsIgnoreCase(ConceptNameTypes.PRIMARY.toString())) {
                         value = JOptionPane.showConfirmDialog(NamesEditorPanel.this,
                                 "Are you really sure that you want\n" + "to change the primary name?",
                                 "VARS - Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
@@ -506,7 +506,7 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
             type = conceptName.getNameType();
         }
 
-        boolean isPrimaryName = type.equals(ConceptNameTypes.PRIMARY.toString());
+        boolean isPrimaryName = type.equalsIgnoreCase(ConceptNameTypes.PRIMARY.toString());
 
         getNameField().setText(name);
         getAuthorField().setText(author);
@@ -514,7 +514,7 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
         if (isPrimaryName) {
             getPrimaryRb().setSelected(true);
         }
-        else if (type.equals(ConceptNameTypes.COMMON.toString())) {
+        else if (type.equalsIgnoreCase(ConceptNameTypes.COMMON.toString())) {
             getCommonRb().setSelected(true);
         }
         else {

@@ -378,7 +378,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
 
             if (conceptName != null) {
 
-                if (conceptName.getNameType().equals(ConceptNameTypes.PRIMARY.getName())) {
+                if (conceptName.getNameType().equalsIgnoreCase(ConceptNameTypes.PRIMARY.getName())) {
                     // findByName is case-insensitive. Check that we got the right name
                     ConceptName otherName = conceptName.getConcept().getConceptName(conceptNameToDelete);
                     if (conceptNameDAO.equalInDatastore(conceptName, otherName)) {
