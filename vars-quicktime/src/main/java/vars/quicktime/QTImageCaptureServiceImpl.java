@@ -54,6 +54,7 @@ public class QTImageCaptureServiceImpl implements ImageCaptureService {
     }
 
     public void dispose() {
+        log.info("Disposing of " + getClass());
         grabber.dispose();
     }
 

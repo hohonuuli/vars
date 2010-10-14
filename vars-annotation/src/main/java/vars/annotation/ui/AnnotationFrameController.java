@@ -61,9 +61,11 @@ public class AnnotationFrameController implements PreferenceUpdater {
 
                 // Persist prefs BEFORE shutting off services. Otherwise video connection
                 // information is lost.
+                log.info("Persisting preferences");
                 persistPreferences();
 
                 // Clean up NATIVE resources when we exit
+                log.info("Closing ImageCaptureService");
                 try {
                     ImageCaptureService imageCaptureService = (ImageCaptureService) Lookup.getImageCaptureServiceDispatcher().getValueObject();
                     imageCaptureService.dispose();
@@ -72,6 +74,7 @@ public class AnnotationFrameController implements PreferenceUpdater {
                     log.warn("An error occurred while closing the image capture services", e);
                 }
 
+                log.info("Closing VideoControlService");
                 try {
                     VideoControlService videoControlService = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
                     videoControlService.disconnect();
@@ -80,7 +83,7 @@ public class AnnotationFrameController implements PreferenceUpdater {
                      log.warn("An error occurred while closing the video control services", e);
                 }
 
-                log.debug("Saving last Observations to persistent storage during JVM shutdown");
+                log.info("Saving last Observations to persistent storage during JVM shutdown");
                 Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
                 toolBelt.getPersistenceController().updateAndValidate(new ArrayList<Observation>(observations));
 
@@ -94,7 +97,7 @@ public class AnnotationFrameController implements PreferenceUpdater {
                 log.info("Shutdown thread is finished. Bye Bye");
             }
         }, "VARS-cleanupBeforeShutdownThread");
-        cleanupThread.setDaemon(false);
+        //cleanupThread.setDaemon(false);
         Runtime.getRuntime().addShutdownHook(cleanupThread);
 
                 

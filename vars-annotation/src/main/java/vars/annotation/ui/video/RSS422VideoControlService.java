@@ -95,6 +95,7 @@ public class RSS422VideoControlService extends AbstractVideoControlService {
     @Override
     public void disconnect() {
         IVCR vcr = getVcr();
+        log.info("Disconnecting from " + vcr);
         if (vcr != null) {
             vcr.disconnect();
             setVcr(null);
@@ -196,4 +197,5 @@ public class RSS422VideoControlService extends AbstractVideoControlService {
         // occurs reset the time. If timer ends throw a VideoControlException
         getVcr().seekTimecode(new Timecode(timecode, frameRate));
     }
+
 }
