@@ -275,7 +275,8 @@ public class AnnotationFrameController implements PreferenceUpdater {
             VarsUserPreferencesFactory vpf = (VarsUserPreferencesFactory) preferencesFactory;
             PreferencesService preferencesService = new PreferencesService(vpf);
             File imageTarget = preferencesService.findImageTarget(userAccount.getUserName(), preferencesService.getHostname());
-            URL imageTargetMapping = preferencesService.findImageTargetMapping(userAccount.getUserName());
+            URL imageTargetMapping = preferencesService.findImageTargetMapping(userAccount.getUserName(),
+                    preferencesService.getHostname());
             try {
                 toolBelt.getPersistenceController().updateCameraDataUrls(videoArchive, imageTarget, imageTargetMapping);
             } catch (MalformedURLException ex) {

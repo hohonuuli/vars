@@ -110,10 +110,11 @@ public class PreferencesService {
      * <i>imageTarget</i>.
      *
      * @param username The name of the user as logged into VARS
+     * @param hostname the name of the host computer
      * @return The Base URL on a web server that maps to <i>imageTarget</i>
      */
-    public URL findImageTargetMapping(String username) {
-        Preferences preferences = userPrefs(username);
+    public URL findImageTargetMapping(String username, String hostname) {
+        Preferences preferences = hostPrefs(username, hostname);
         URL imageTarget = null;
         try {
             String value = preferences.get(PROP_IMAGETARGETMAPPING, findDefaultImageTargetMapping(getHostname()).toExternalForm());

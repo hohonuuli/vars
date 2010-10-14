@@ -18,6 +18,8 @@ import java.awt.BorderLayout;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import org.bushe.swing.event.EventBus;
@@ -66,7 +68,7 @@ public class AddLinkRealizationDialog extends JDialog {
      */
     public AddLinkRealizationDialog(Frame owner, ToolBelt toolBelt) {
         super(owner);
-        setTitle("VARS - Add Description");
+        setTitle("VARS - Add Property");
         this.toolBelt = toolBelt;
         initialize();
     }
@@ -126,6 +128,15 @@ public class AddLinkRealizationDialog extends JDialog {
         if (linkEditorPanel == null) {
             linkEditorPanel = new LinkEditorPanel(toolBelt);
             linkEditorPanel.getLinkNameField().setEditable(false);
+            linkEditorPanel.getFromConceptComboBox().setEditable(false);
+            linkEditorPanel.addPropertyChangeListener("link", new PropertyChangeListener() {
+                public void propertyChange(PropertyChangeEvent evt) {
+                    linkEditorPanel.getFromConceptComboBox().setEditable(false);
+                    if (concept != null) {
+                        linkEditorPanel.getFromConceptComboBox().setSelectedItem(concept.getPrimaryConceptName().getName());
+                    }
+                }
+            });
         }
 
         return linkEditorPanel;
@@ -218,6 +229,9 @@ public class AddLinkRealizationDialog extends JDialog {
 
     public void setConcept(Concept concept) {
         getLinkEditorPanel().setConcept(concept);
+        if (concept != null) {
+            getLinkEditorPanel().getFromConceptComboBox().setSelectedItem(concept.getPrimaryConceptName().getName());
+        }
         this.concept = concept;
     }
 }

@@ -61,7 +61,7 @@ import vars.knowledgebase.LinkTemplateDAO;
 import vars.knowledgebase.SimpleConceptBean;
 import vars.knowledgebase.SimpleConceptNameBean;
 import vars.knowledgebase.ui.dialogs.AddLinkRealizationDialog;
-import vars.knowledgebase.ui.dialogs.LinkEditorDialog;
+//import vars.knowledgebase.ui.dialogs.LinkEditorDialog;
 import vars.shared.ui.HierachicalConceptNameComboBox;
 import vars.shared.ui.LinkListCellRenderer;
 
@@ -505,73 +505,74 @@ public class LinkRealizationEditorPanel extends EditorPanel {
 
     }
 
-    private class ANewAction extends ActionAdapter {
-
-        private final LinkEditorDialog dialog = new MyLinkEditorDialog();
-
-        /**
-         * Show the dialog. The dialog  is used to set the properties of the link
-         */
-        @Override
-        public void doAction() {
-            final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
-            if ((userAccount != null) && !userAccount.isReadOnly()) {
-
-                LinkTemplate linkTemplate = (LinkTemplate) getLinkList().getSelectedValue();
-                LinkRealization linkRealization = getToolBelt().getKnowledgebaseFactory().newLinkRealization();
-                linkRealization.setLinkName(linkTemplate.getLinkName());
-                linkRealization.setLinkValue(linkTemplate.getLinkValue());
-                linkRealization.setToConcept(linkTemplate.getToConcept());
-
-                // Show new dialog
-                dialog.setLink(linkRealization);
-                dialog.setVisible(true);
-            }
-        }
-
-        /**
-                 * Class that adds some functionality to a LinkEditorDialog when it's
-                 * okbutton is clicked.
-                 */
-        private final class MyLinkEditorDialog extends LinkEditorDialog {
-
-            MyLinkEditorDialog() {
-                super((Frame) Lookup.getApplicationFrameDispatcher().getValueObject(), getToolBelt());
-                getLinkField().setEditable(false);
-                setLocationRelativeTo((Frame) Lookup.getApplicationFrameDispatcher().getValueObject());
-                this.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
-            }
-
-            /**
-             */
-            @Override
-            public void onOkClick() {
-
-                /*
-                 * The dialog handles setting the link propertes. We just have to
-                 * save it in this method.
-                 */
-                Concept concept = getConcept();
-                LinkRealization linkRealization = (LinkRealization) getLink();
-                concept.getConceptMetadata().addLinkRealization(linkRealization);
-
-                try {
-                    LinkRealizationDAO linkRealizationDAO = getToolBelt().getKnowledgebaseDAOFactory()
-                        .newLinkRealizationDAO();
-                    linkRealizationDAO.startTransaction();
-                    linkRealizationDAO.persist(linkRealization);
-                    linkRealizationDAO.endTransaction();
-                    linkRealizationDAO.close();
-                }
-                catch (Exception e) {
-                    concept.getConceptMetadata().removeLinkRealization(linkRealization);
-                    log.error("Database transaction failed", e);
-                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR,
-                                     "Failed to update " + concept + ". Rolling back changes.");
-                }
-            }
-        }
-    }
+//    private class ANewAction extends ActionAdapter {
+//
+//        private final LinkEditorDialog dialog = new MyLinkEditorDialog();
+//
+//        /**
+//         * Show the dialog. The dialog  is used to set the properties of the link
+//         */
+//        @Override
+//        public void doAction() {
+//            final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+//            if ((userAccount != null) && !userAccount.isReadOnly()) {
+//
+//                LinkTemplate linkTemplate = (LinkTemplate) getLinkList().getSelectedValue();
+//                LinkRealization linkRealization = getToolBelt().getKnowledgebaseFactory().newLinkRealization();
+//                linkRealization.setLinkName(linkTemplate.getLinkName());
+//                linkRealization.setLinkValue(linkTemplate.getLinkValue());
+//                linkRealization.setToConcept(linkTemplate.getToConcept());
+//
+//                // Show new dialog
+//                dialog.setLink(linkRealization);
+//                dialog.setVisible(true);
+//            }
+//        }
+//
+//        /**
+//                 * Class that adds some functionality to a LinkEditorDialog when it's
+//                 * okbutton is clicked.
+//                 */
+//        private final class MyLinkEditorDialog extends LinkEditorDialog {
+//
+//            MyLinkEditorDialog() {
+//                super((Frame) Lookup.getApplicationFrameDispatcher().getValueObject(), getToolBelt());
+//                getLinkField().setEditable(false);
+//                setLocationRelativeTo((Frame) Lookup.getApplicationFrameDispatcher().getValueObject());
+//                this.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
+//
+//            }
+//
+//            /**
+//             */
+//            @Override
+//            public void onOkClick() {
+//
+//                /*
+//                 * The dialog handles setting the link propertes. We just have to
+//                 * save it in this method.
+//                 */
+//                Concept concept = getConcept();
+//                LinkRealization linkRealization = (LinkRealization) getLink();
+//                concept.getConceptMetadata().addLinkRealization(linkRealization);
+//
+//                try {
+//                    LinkRealizationDAO linkRealizationDAO = getToolBelt().getKnowledgebaseDAOFactory()
+//                        .newLinkRealizationDAO();
+//                    linkRealizationDAO.startTransaction();
+//                    linkRealizationDAO.persist(linkRealization);
+//                    linkRealizationDAO.endTransaction();
+//                    linkRealizationDAO.close();
+//                }
+//                catch (Exception e) {
+//                    concept.getConceptMetadata().removeLinkRealization(linkRealization);
+//                    log.error("Database transaction failed", e);
+//                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR,
+//                                     "Failed to update " + concept + ". Rolling back changes.");
+//                }
+//            }
+//        }
+//    }
 
 
     private class DeleteAction extends ActionAdapter {

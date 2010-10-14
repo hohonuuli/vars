@@ -500,7 +500,9 @@ public class LinkEditorPanel extends javax.swing.JPanel implements ILockableEdit
         model.addAll(linkTemplates);
         model.setSelectedItem(nilLinkTemplate);
 
+        Concept oldConcept = this.concept;
         this.concept = concept;
+        firePropertyChange("concept", oldConcept, concept);
     }
 
     /**
@@ -510,6 +512,7 @@ public class LinkEditorPanel extends javax.swing.JPanel implements ILockableEdit
 
         ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
 
+        ILink oldLink = this.link;
         this.link = link;
 
         if (link == null) {
@@ -593,6 +596,7 @@ public class LinkEditorPanel extends javax.swing.JPanel implements ILockableEdit
         }
 
         conceptDAO.close();
+        firePropertyChange("link", oldLink, link);
     }
 
     /**

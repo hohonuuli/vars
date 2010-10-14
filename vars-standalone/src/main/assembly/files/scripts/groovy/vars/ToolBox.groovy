@@ -38,6 +38,11 @@ class ToolBox {
         injector.getInstance(MergeStatusDAO.class)
     }
 
+    def getPreferences(String username) {
+        def factory = injector.getInstance(VarsUserPreferencesFactory.class);
+        return factory.userRoot(username);
+    }
+
 }
 
 

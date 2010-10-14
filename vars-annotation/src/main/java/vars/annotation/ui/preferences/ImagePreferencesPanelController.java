@@ -90,7 +90,8 @@ public class ImagePreferencesPanelController implements PreferenceUpdater {
     protected void setUserAccount(UserAccount userAccount) {
         File imageTarget = preferencesService.findImageTarget(userAccount.getUserName(),
             preferencesService.getHostname());
-        URL imageTargetMapping = preferencesService.findImageTargetMapping(userAccount.getUserName());
+        URL imageTargetMapping = preferencesService.findImageTargetMapping(userAccount.getUserName(),
+                preferencesService.getHostname());
         try {
             panel.getImageTargetTextField().setText(imageTarget.getCanonicalPath());
         } catch (IOException ex) {
