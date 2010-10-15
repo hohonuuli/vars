@@ -77,7 +77,7 @@ public class AnnotationFrameController implements PreferenceUpdater {
                 log.info("Closing VideoControlService");
                 try {
                     VideoControlService videoControlService = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
-                    videoControlService.disconnect();
+                    videoControlService.kill();
                 }
                 catch (Exception e) {
                      log.warn("An error occurred while closing the video control services", e);

@@ -1,6 +1,7 @@
 #!/bin/sh
 # $Id: $
 
-source `dirname "$0"`/varsSetup
+VARS_HOME=`dirname "$0"`/..
+VARS_CLASSPATH=$VARS_HOME/conf:$VARS_HOME/lib/*
 echo [VARS] Changing file URLs in the VARS database to HTTP URLs
 java -cp $VARS_CLASSPATH org.mbari.vars.integration.UpdateStillImageUrlTool &

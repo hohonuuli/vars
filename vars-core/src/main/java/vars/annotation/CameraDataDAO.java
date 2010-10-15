@@ -13,10 +13,10 @@ import java.util.List;
  */
 public interface CameraDataDAO extends DAO {
 
-    List<CameraData> findByFrameGrabURLContaining(String s);
+    List<CameraData> findByImageReferenceContaining(String s);
 
-    List<CameraData> findByFrameGrabURLPostfix(String postfix);
+    List<CameraData> findByImageReferencePostfix(String postfix);
 
-    List<CameraData> findByFrameGrabURLPrefix(String prefix);
+    List<CameraData> findByImageReferencePrefix(String prefix);
 
 }

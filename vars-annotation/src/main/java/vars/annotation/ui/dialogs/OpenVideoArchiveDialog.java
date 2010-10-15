@@ -125,6 +125,7 @@ public class OpenVideoArchiveDialog extends StandardDialog {
     private JCheckBox getHdCheckBox() {
         if (hdCheckBox == null) {
             hdCheckBox = new JCheckBox("Check if High Definition");
+            hdCheckBox.setSelected(true);
             hdCheckBox.addKeyListener(new KeyAdapter() {
                 @Override
                 public void keyReleased(KeyEvent e) {

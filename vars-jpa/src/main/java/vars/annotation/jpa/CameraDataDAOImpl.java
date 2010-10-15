@@ -25,21 +25,21 @@ public class CameraDataDAOImpl extends DAO implements CameraDataDAO {
         super(entityManager);
     }
 
-    public List<CameraData> findByFrameGrabURLContaining(String s) {
+    public List<CameraData> findByImageReferenceContaining(String s) {
         Map<String, Object> params = new HashMap<String, Object>();
-        params.put("frameGrabURL", "%" + s + "%");
-        return findByNamedQuery("CameraData.findByFrameGrabURLLike", params);
+        params.put("imageReference", "%" + s + "%");
+        return findByNamedQuery("CameraData.findByImageReferenceLike", params);
     }
 
-    public List<CameraData> findByFrameGrabURLPostfix(String postfix) {
+    public List<CameraData> findByImageReferencePostfix(String postfix) {
         Map<String, Object> params = new HashMap<String, Object>();
-        params.put("frameGrabURL", "%" + postfix);
-        return findByNamedQuery("CameraData.findByFrameGrabURLLike", params);
+        params.put("imageReference", "%" + postfix);
+        return findByNamedQuery("CameraData.findByImageReferenceLike", params);
     }
 
-    public List<CameraData> findByFrameGrabURLPrefix(String prefix) {
+    public List<CameraData> findByImageReferencePrefix(String prefix) {
         Map<String, Object> params = new HashMap<String, Object>();
-        params.put("frameGrabURL", prefix + "%");
-        return findByNamedQuery("CameraData.findByFrameGrabURLLike", params);
+        params.put("imageReference", prefix + "%");
+        return findByNamedQuery("CameraData.findByImageReferenceLike", params);
     }
 }

@@ -175,6 +175,10 @@ public abstract class AbstractVideoControlService implements VideoControlService
         vcr.eject();
     }
 
+    public void kill() {
+        vcr.kill();
+    }
+
     public void disconnect() {
         vcr.disconnect();
         VideoControlInformation oldInfo = getVideoControlInformation();

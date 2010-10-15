@@ -55,7 +55,7 @@
         <dependency>
             <groupId>org.mbari</groupId>
             <artifactId>vcr4j</artifactId>
-            <version>1.6</version>
+            <version>1.6.1</version>
         </dependency>
         <dependency>
             <groupId>rxtx</groupId>

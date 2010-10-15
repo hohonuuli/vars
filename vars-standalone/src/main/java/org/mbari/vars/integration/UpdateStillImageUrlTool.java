@@ -1,5 +1,5 @@
 /*
- * @(#)UpdateStillImageUrlTool.java   2010.09.02 at 11:59:47 PDT
+ * @(#)UpdateStillImageUrlTool.java   2010.10.15 at 08:30:26 PDT
  *
  * Copyright 2009 MBARI
  *
@@ -32,7 +32,7 @@ import java.util.*;
  *
  *
  * @version        Enter version here..., 2010.09.02 at 11:59:47 PDT
- * @author         Brian Schlining [brian@mbari.org]    
+ * @author         Brian Schlining [brian@mbari.org]
  */
 public class UpdateStillImageUrlTool {
 
@@ -41,13 +41,13 @@ public class UpdateStillImageUrlTool {
      */
     public static final String FILE_PREFIX = "file:";
 
-    /** <!-- Field description --> */
+    /**  */
     public static final byte[] GIF_KEY = { (byte) 0x47, (byte) 0x49, (byte) 0x46 };
 
-    /** <!-- Field description --> */
+    /**  */
     public static final byte[] JPG_KEY = { (byte) 0x89, (byte) 0x50, (byte) 0x4E };
 
-    /** <!-- Field description --> */
+    /**  */
     public static final byte[] PNG_KEY = { (byte) 0xFF, (byte) 0xD8, (byte) 0xFF };
 
     /**
@@ -58,17 +58,18 @@ public class UpdateStillImageUrlTool {
      */
     public static final String SEARCH_KEY = "VARS/data";
     private static final Logger log = LoggerFactory.getLogger(UpdateStillImageUrlTool.class);
+
+    /**
+     * THis is the string that gets prepended onto file urls to create web URLs
+     */
+    public static String HTTP_PREFIX = "http://search.mbari.org/ARCHIVE/frameGrabs/";
     private static ToolBelt toolBelt;
 
     static {
         Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
+
         toolBelt = injector.getInstance(ToolBelt.class);
     }
-
-    /**
-     * THis is the string that gets prepended onto fiel urls to create web URLs
-     */
-    public static final String HTTP_PREFIX = ResourceBundle.getBundle("vars").getString("image.archive.url");
 
     /**
      *
@@ -120,8 +121,7 @@ public class UpdateStillImageUrlTool {
      */
     public static Collection findFileUrls() {
         CameraDataDAO dao = toolBelt.getAnnotationDAOFactory().newCameraDataDAO();
-        List<CameraData> cameraData = dao.findByFrameGrabURLPrefix(FILE_PREFIX);
-
+        List<CameraData> cameraData = dao.findByImageReferencePrefix(FILE_PREFIX);
         dao.close();
 
         return cameraData;
@@ -168,6 +168,11 @@ public class UpdateStillImageUrlTool {
      * @param args
      */
     public static void main(String[] args) {
+        // Parse args
+//        String prefix = args[0];
+//        prefix = prefix.endsWith("/") ? prefix : prefix + "/";
+//        HTTP_PREFIX = prefix;
+
         try {
             updateStillImageUrls();
         }
@@ -211,7 +216,6 @@ public class UpdateStillImageUrlTool {
 
             if (isImageOnWebServer(newUrl)) {
                 CameraDataDAO dao = toolBelt.getAnnotationDAOFactory().newCameraDataDAO();
-
                 cameraData = dao.find(cameraData);
                 dao.startTransaction();
                 cameraData.setImageReference(newUrl.toExternalForm());
