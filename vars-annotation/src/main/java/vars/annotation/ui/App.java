@@ -19,7 +19,9 @@ import com.google.inject.Injector;
 import foxtrot.Job;
 import foxtrot.Worker;
 import java.awt.Toolkit;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.Vector;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -156,10 +158,13 @@ public class App {
      */
     public static void main(String[] args) {
 
+
+
         /**
          * We like to do all database transaction in the UTC timezone
          */
         System.setProperty("user.timezone", "UTC");
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 
         /*
          * Make it pretty on Macs

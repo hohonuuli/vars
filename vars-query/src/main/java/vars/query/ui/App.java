@@ -23,6 +23,7 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.Vector;
 import javax.swing.ActionMap;
 import javax.swing.ImageIcon;
@@ -249,6 +250,7 @@ public class App {
          * start.
          */
         System.setProperty("user.timezone", "UTC");
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         GlobalLookup.getSettingsDirectory(); // Not used
 
 
