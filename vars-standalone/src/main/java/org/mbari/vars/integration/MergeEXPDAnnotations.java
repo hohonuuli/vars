@@ -448,7 +448,8 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
         // ---- Set the navigationedited flag
         Collection<UberDatum> rawNavRecords = Collections2.filter(data.values(), new Predicate<UberDatum>() {
             public boolean apply(UberDatum input) {
-                return input.getNavigationDatum().isEdited() == Boolean.FALSE;
+                NavigationDatum nav = input.getNavigationDatum();
+                return (nav != null) && nav.isEdited() == Boolean.FALSE;
             }
         });
 
