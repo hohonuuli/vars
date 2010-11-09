@@ -53,7 +53,7 @@ public class StringLikeValuePanel extends ValuePanel {
         return sb.toString();
     }
 
-    private JTextField getTextField() {
+    public JTextField getTextField() {
         if (textField == null) {
             textField = new JTextField();
             textField.setToolTipText("Enter a value. The query will return items that contain this value.");

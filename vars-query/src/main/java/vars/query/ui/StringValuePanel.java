@@ -44,7 +44,7 @@ public class StringValuePanel extends ValuePanel {
         initialize();
     }
 
-    private JList getList() {
+    public JList getList() {
         if (list == null) {
             list = new JList();
             list.setVisibleRowCount(4);

@@ -44,6 +44,14 @@ public abstract class ValuePanel extends JPanel {
         initialize();
     }
 
+    public boolean isReturned() {
+        return getReturnCheckBox().isSelected();
+    }
+
+    public boolean isConstrained() {
+        return getConstrainCheckBox().isSelected();
+    }
+
     /**
          * This method initializes jCheckBox
          * @return  javax.swing.JCheckBox

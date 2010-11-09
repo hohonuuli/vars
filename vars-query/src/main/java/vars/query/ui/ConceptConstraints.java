@@ -55,7 +55,7 @@ public class ConceptConstraints {
     /**
 	 * A Collection of Strings. This represents the concepts that we're attempting lookup
 	 */
-    private Collection conceptNamesAsStrings;
+    private Collection<String> conceptNamesAsStrings;
 
 
     /**
@@ -68,7 +68,7 @@ public class ConceptConstraints {
     /**
 	 * @return  Returns the conceptNamesAsStrings.
 	 */
-    public Collection getConceptNamesAsStrings() {
+    public Collection<String> getConceptNamesAsStrings() {
         return conceptNamesAsStrings;
     }
 

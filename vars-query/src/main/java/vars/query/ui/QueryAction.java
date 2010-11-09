@@ -108,7 +108,7 @@ public class QueryAction extends ActionAdapter {
      *
      * @param  query Description of the Parameter
      * @param  queryable Description of the Parameter
-     * @param conceptDAO
+     * @param knowledgebaseDAOFactory
      */
     public QueryAction(final String query, IQueryable queryable, KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
         this(query, queryable, knowledgebaseDAOFactory, false, false, false);
@@ -119,7 +119,7 @@ public class QueryAction extends ActionAdapter {
      *
      * @param query
      * @param queryable
-     * @param conceptDAO
+     * @param knowledgebaseDAOFactory
      * @param showHiearchy
      * @param showBasicPhylogeny
      * @param showFullPhylogeny
