@@ -98,7 +98,7 @@ public class ConceptDAOImpl extends DAO implements ConceptDAO {
     private void findDescendentNames(Collection<Concept> concepts, Collection<ConceptName> conceptNames) {
 
         for (Concept concept : concepts) {
-            log.info("In findDescendentNames processing " + concept);
+            //log.info("In findDescendentNames processing " + concept);
             conceptNames.addAll(concept.getConceptNames());
             findDescendentNames(concept.getChildConcepts(), conceptNames);
         }

@@ -355,9 +355,11 @@ public class ImageCaptureAction extends ActionAdapter {
             }
 
             final Collection<Observation> selectedObservations = ImmutableList.of(observation);
-            toolBelt.getPersistenceController().updateUI(selectedObservations);
             Lookup.getSelectedObservationsDispatcher().setValueObject(new ArrayList<Observation>());
             Lookup.getSelectedObservationsDispatcher().setValueObject(selectedObservations);
+            toolBelt.getPersistenceController().updateUI(selectedObservations);
+            //Lookup.getSelectedObservationsDispatcher().setValueObject(new ArrayList<Observation>());
+            //.getSelectedObservationsDispatcher().setValueObject(selectedObservations);
         }
     }
 
