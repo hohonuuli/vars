@@ -1,6 +1,8 @@
 package vars.knowledgebase;
 
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
@@ -9,6 +11,7 @@ import java.util.ArrayList;
 import org.mbari.sql.QueryFunction;
 
 import org.mbari.sql.QueryableImpl;
+import vars.VARSException;
 import vars.annotation.Association;
 import vars.annotation.Observation;
 
@@ -41,6 +44,7 @@ public class KnowledgebasePersistenceServiceImpl extends QueryableImpl implement
         super(jdbcUrl, jdbcUsername, jdbcPassword, jdbcDriver);
     }
 
+
     /**
      * Updates all {@link Observation}s, {@link Association}s, and {@link LinkTemplate}s
      * in the database so that any that use a non-primary name for the given
@@ -58,17 +62,25 @@ public class KnowledgebasePersistenceServiceImpl extends QueryableImpl implement
         Collection<ConceptName> conceptNames = new ArrayList<ConceptName>(concept.getConceptNames());
         conceptNames.remove(concept.getPrimaryConceptName());
 
-        for (ConceptName conceptName : conceptNames) {
-
-            // Update LinkTemplates
-            String sql = "UPDATE LinkTemplate SET ToConcept = '" +
-                primaryName + "' WHERE ToConcept = '" +
-                conceptName.getName() + "'";
-            executeUpdate(sql);
-
+        String sql = "UPDATE LinkTemplate SET ToConcept = ? WHERE ToConcept = ?";
+        try {
+            Connection connection = getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            for (ConceptName conceptName : conceptNames) {
+                preparedStatement.setString(1, primaryName);
+                preparedStatement.setString(2, conceptName.getName());
+                preparedStatement.addBatch();
+            }
+            preparedStatement.executeBatch();
+            //connection.commit();
+            preparedStatement.close();
+        }
+        catch (Exception e) {
+            throw new VARSException("Failed to update LinkTemplates", e);
         }
 
     }
+
 
     /**
      *
@@ -77,22 +89,30 @@ public class KnowledgebasePersistenceServiceImpl extends QueryableImpl implement
      */
     public boolean doesConceptNameExist(String conceptname) {
 
-        String sql = "SELECT count(*) FROM ConceptName WHERE ConceptName = '" + conceptname + "'";
+        String sql = "SELECT count(*) FROM ConceptName WHERE ConceptName = ?";
 
         final QueryFunction<Boolean> queryFunction = new QueryFunction<Boolean>() {
-
             public Boolean apply(ResultSet resultSet) throws SQLException {
                 Integer n = 0;
-
                 while (resultSet.next()) {
                     n = resultSet.getInt(1);
                 }
-
                 return new Boolean(n > 0);
             }
         };
 
-        return executeQueryFunction(sql, queryFunction).booleanValue();
+        try {
+            Connection connection = getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, conceptname);
+            boolean exists = queryFunction.apply(preparedStatement.executeQuery());
+            preparedStatement.close();
+            return exists;
+        }
+        catch (Exception e) {
+            throw new VARSException("Failed to execute " + sql, e);
+        }
+
     }
 
 

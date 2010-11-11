@@ -46,8 +46,9 @@ public class ObservationDAOImpl extends DAO implements ObservationDAO {
      * @param concept
      * @param cascade
      * @return
+     * @deprecated
      */
-    public List<Observation> findAllByConcept(final Concept concept, final boolean cascade, ConceptDAO conceptDAO) {
+    public List<Observation> findAllByConcept_(final Concept concept, final boolean cascade, ConceptDAO conceptDAO) {
 
         Collection<ConceptName> conceptNames = null;
         if (cascade) {
@@ -70,6 +71,46 @@ public class ObservationDAOImpl extends DAO implements ObservationDAO {
         sb.append(")");
 
         Query query = getEntityManager().createQuery(sb.toString());
+        List<Observation> observations = query.getResultList();
+
+        return observations;
+    }
+
+    /**
+     * This should be called within a JPA transaction
+     * @param concept
+     * @param cascade
+     * @return
+     */
+    public List<Observation> findAllByConcept(final Concept concept, final boolean cascade, ConceptDAO conceptDAO) {
+
+        Collection<ConceptName> conceptNames = null;
+        if (cascade) {
+            conceptNames = conceptDAO.findDescendentNames(concept);
+        }
+        else {
+            conceptNames = new HashSet<ConceptName>();
+            conceptNames.addAll(concept.getConceptNames());
+        }
+
+        StringBuilder sb = new StringBuilder("SELECT o FROM Observation o WHERE o.conceptName IN (");
+        int n = 1;
+        for (ConceptName cn : conceptNames) {
+            sb.append("?" + n);
+            if (n < conceptNames.size() - 1) {
+                sb.append(", ");
+            }
+            n++;
+        }
+        sb.append(")");
+
+        Query query = getEntityManager().createQuery(sb.toString());
+        n = 1;
+        for (ConceptName cn : conceptNames) {
+            query.setParameter(n, cn.getName());
+            n++;
+        }
+
         List<Observation> observations = query.getResultList();
 
         return observations;

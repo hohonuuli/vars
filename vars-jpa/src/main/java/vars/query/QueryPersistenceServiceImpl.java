@@ -15,10 +15,7 @@
 
 package vars.query;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.*;
 
 import org.mbari.sql.QueryFunction;
@@ -158,7 +155,7 @@ public class QueryPersistenceServiceImpl implements QueryPersistenceService {
         return sortedNames;
     }
 
-    /**
+       /**
      * Looks up all assotations in a database that were used with Observations
      * containing the specified conceptNames
      *
@@ -170,8 +167,8 @@ public class QueryPersistenceServiceImpl implements QueryPersistenceService {
      */
     public Collection<ILink> findByConceptNames(Collection<String> conceptNames) {
 
+        // Here's the function that extracts the contents of a results set
         final QueryFunction queryFunction = new QueryFunction() {
-
             public Object apply(ResultSet resultSet) throws SQLException {
                 Collection<ILink> associationBeans = new ArrayList<ILink>();
                 while (resultSet.next()) {
@@ -181,33 +178,47 @@ public class QueryPersistenceServiceImpl implements QueryPersistenceService {
                     bean.setLinkValue(resultSet.getString(3));
                     associationBeans.add(bean);
                 }
-
                 return associationBeans;
             }
         };
 
         /*
-         * Assemble a query to search for all annotations used for the respective
+         * Assemble a preparedStatement query to search for all annotations used for the respective
          * conceptnames.
          */
-        // TODO use prepared statement to escape special characters
         StringBuffer sb = new StringBuffer();
         sb.append("SELECT DISTINCT linkName, toConcept, linkValue ");
         sb.append("FROM Association JOIN Observation ON Observation.id = Association.ObservationID_FK ");
         sb.append("WHERE ");
-
         for (Iterator i = conceptNames.iterator(); i.hasNext(); ) {
             String conceptName = (String) i.next();
-            sb.append("ConceptName = '").append(conceptName).append("'");
-
+            sb.append("ConceptName = ?");
             if (i.hasNext()) {
                 sb.append(" OR ");
             }
         }
-
         sb.append(" ORDER BY LinkName, toConcept, linkValue");
 
-        return (Collection<ILink>) annoQueryable.executeQueryFunction(sb.toString(), queryFunction);
+
+        // Execute Query
+        Collection<ILink> links = new ArrayList<ILink>();
+        try {
+            Connection connection = annoQueryable.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(sb.toString());
+            int idx = 1;
+            for (String name : conceptNames) {
+                preparedStatement.setString(idx, name);
+                idx++;
+            }
+            ResultSet resultSet = preparedStatement.executeQuery();
+            links.addAll((Collection<ILink>) queryFunction.apply(resultSet));
+            preparedStatement.close();
+        }
+        catch (Exception e) {
+            throw new VARSException("Failed to execute PreparedStatement of " + sb.toString(), e);
+        }
+
+        return links;
     }
 
     public QueryableImpl getAnnotationQueryable() {

@@ -22,6 +22,8 @@ import com.google.common.collect.Collections2;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
@@ -248,20 +250,29 @@ public class AnnotationPersistenceServiceImpl extends QueryableImpl implements A
         Collection<ConceptName> conceptNames = new ArrayList<ConceptName>(concept.getConceptNames());
         conceptNames.remove(concept.getPrimaryConceptName());
 
-        for (ConceptName conceptName : conceptNames) {
+        String sql1 = "UPDATE Observation SET ConceptName = ? WHERE ConceptName = ?";
+        String sql2 = "UPDATE Association SET ToConcept = ? WHERE ToConcept = ?";
 
-            // Update Observations
-            String sql = "UPDATE Observation SET ConceptName = '" +
-                primaryName + "' WHERE ConceptName = '" +
-                conceptName.getName() + "'";
-            executeUpdate(sql);
-
-            // Update Associations
-            sql = "UPDATE Association SET ToConcept = '" +
-                primaryName + "' WHERE ToConcept = '" +
-                conceptName.getName() + "'";
-            executeUpdate(sql);
-
+        try {
+            Connection connection = getConnection();
+            PreparedStatement preparedStatement1 = connection.prepareStatement(sql1);
+            PreparedStatement preparedStatement2 = connection.prepareStatement(sql2);
+            for (ConceptName conceptName: conceptNames) {
+                preparedStatement1.setString(1, primaryName);
+                preparedStatement1.setString(2, conceptName.getName());
+                preparedStatement1.addBatch();
+                preparedStatement2.setString(1, primaryName);
+                preparedStatement2.setString(2, conceptName.getName());
+                preparedStatement2.addBatch();
+            }
+            preparedStatement1.executeBatch();
+            preparedStatement2.executeBatch();
+            //connection.commit();
+            preparedStatement1.close();
+            preparedStatement2.close();
+        }
+        catch (Exception e) {
+            throw new VARSException("Failed to update concept-names used by annotations", e);
         }
 
     }

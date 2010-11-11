@@ -226,7 +226,7 @@ class NamesEditorPanelController {
                 String msg = "Failed to change primary names of annotations from '" + oldName + "' to '" +
                              newName + "'.";
                 log.error(msg);
-                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, msg);
+                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
             }
 
             /*
