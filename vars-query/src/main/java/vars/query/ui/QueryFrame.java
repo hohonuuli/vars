@@ -40,6 +40,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.query.QueryPersistenceService;
+import vars.query.ui.db.QueryAction;
+import vars.query.ui.db.QueryActionImpl;
+import vars.query.ui.db.QueryActionUI;
+import vars.query.ui.db.QueryExecutor;
+import vars.query.ui.db.preparedstatement.EscapedQueryExecutorImpl;
+import vars.query.ui.db.sql.SQLGenerator;
 
 /**
  * @author Brian Schlining
@@ -219,24 +225,21 @@ public class QueryFrame extends JFrame {
 
                 public void doAction() {
 
-                    /*
-                     * Create the query string. This is a bit hacky, poor separation
-                     * of concerns, but it works.
-                     */
-                    final String query = SQLGenerator.getSQL(getSearchPanel().getConceptConstraints(),
-                        getRefineSearchPanel().getValuePanels(),
-                        getSearchPanel().getCbAllInterpretations().isSelected(),
-                        getSearchPanel().getCbAllAssociations().isSelected());
 
                     /*
                      * Create a QueryAction
                      */
-                    QueryAction queryAction = new QueryAction(query, queryPersistenceService, knowledgebaseDAOFactory,
-                        getSearchPanel().getCbHierarchy().isSelected(), getSearchPanel().getCbPhylogeny().isSelected(),
-                        getSearchPanel().getCbFullPhylogeny().isSelected());
+                    QueryExecutor queryExecutor = new EscapedQueryExecutorImpl(getSearchPanel().getConceptConstraints(),
+                            getRefineSearchPanel().getValuePanels(),
+                            getSearchPanel().getCbAllInterpretations().isSelected(),
+                            getSearchPanel().getCbAllAssociations().isSelected(),
+                            queryPersistenceService.getAnnotationQueryable());
+                    QueryAction queryAction = new QueryActionImpl(queryExecutor, knowledgebaseDAOFactory,
+                            getSearchPanel().getCbHierarchy().isSelected(), getSearchPanel().getCbPhylogeny().isSelected(),
+                             getSearchPanel().getCbFullPhylogeny().isSelected());
 
                     /*
-                     * This generates the UI components for a QUeryaction such
+                     * This generates the UI components for a QueryAction such
                      * as a cancel dialog, a results frame and a dialog to
                      * display any errors that might occur.
                      */

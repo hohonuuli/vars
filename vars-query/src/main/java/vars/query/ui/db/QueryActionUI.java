@@ -15,7 +15,7 @@
  */
 
 
-package vars.query.ui;
+package vars.query.ui.db;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -38,6 +38,9 @@ import org.slf4j.LoggerFactory;
 import org.mbari.sql.QueryResults;
 import org.mbari.util.Dispatcher;
 import org.mbari.util.ExceptionHandler;
+import vars.query.ui.App;
+import vars.query.ui.Lookup;
+import vars.query.ui.QueryResultsFrame;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -80,10 +83,8 @@ public class QueryActionUI {
         initialize();
     }
 
-    //~--- methods ------------------------------------------------------------
 
     /**
-     * <p><!-- Method description --></p>
      *
      */
     private void initialize() {
@@ -250,14 +251,14 @@ public class QueryActionUI {
          *
          * @param e
          */
-        protected void doAction(Exception e) {
+        protected void doAction(final Exception e) {
             log.info("Unable to complete query.", e);
             SwingUtilities.invokeLater(new Runnable() {
 
                 public void run() {
                     queryActionDialog.dispose();
                     // Use EventBus to deal with error messages
-                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, "Query Failed");
+                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
                 }
             });
 
@@ -290,7 +291,7 @@ public class QueryActionUI {
                     public void run() {
                         queryActionDialog.dispose();
                         QueryResultsFrame f = new QueryResultsFrame(
-                            queryResults, queryAction.getQuery(), databaseUrl);
+                            queryResults, queryAction.getSQL(), databaseUrl);
                         f.pack();
                         f.setVisible(true);
                     }

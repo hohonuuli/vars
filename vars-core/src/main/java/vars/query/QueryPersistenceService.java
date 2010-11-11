@@ -5,10 +5,12 @@
 
 package vars.query;
 
+import java.sql.Connection;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import org.mbari.sql.IQueryable;
+import org.mbari.sql.QueryableImpl;
 import vars.ILink;
 
 /**
@@ -36,5 +38,7 @@ public interface QueryPersistenceService extends IQueryable {
     Collection<String> findAllNamesUsedInAnnotations();
 
     List<String> findAllConceptNamesAsStrings();
+
+    QueryableImpl getAnnotationQueryable();
 
 }

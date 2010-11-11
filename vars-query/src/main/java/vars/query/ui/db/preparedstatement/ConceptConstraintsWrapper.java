@@ -12,8 +12,7 @@
  */
 
 
-
-package vars.query.ui.jdbc;
+package vars.query.ui.db.preparedstatement;
 
 import vars.LinkBean;
 import vars.query.ui.ConceptConstraints;
@@ -91,18 +90,16 @@ class ConceptConstraintsWrapper {
             List<String> conceptNamesAsStrings =  new ArrayList<String>(conceptConstraints.getConceptNamesAsStrings());
             // ---- Step 1: BIND TO conceptNamesAsStrings
             for (int i = 0; i < conceptNamesAsStrings.size(); i++) {
-                idx = idx + i;
                 statement.setString(idx, conceptNamesAsStrings.get(i));
+                idx++;
             }
-            idx++;
 
             // ---- Step 2: BIND TO conceptNamesAsStrings
             if (!hasToConcept) {
                 for (int i = 0; i < conceptNamesAsStrings.size(); i++) {
-                    idx = idx + i;
                     statement.setString(idx, conceptNamesAsStrings.get(i));
+                    idx++;
                 }
-                idx++;
             }
 
             // ---- Step 3: BIND TO associationBean.getToConcept()

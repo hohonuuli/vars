@@ -1,7 +1,6 @@
-package vars.query.ui.jdbc;
+package vars.query.ui.db.preparedstatement;
 
-import vars.query.ui.DateValuePanel;
-import vars.query.ui.ValuePanel;
+import vars.query.ui.NumberValuePanel;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -10,9 +9,9 @@ import java.sql.SQLException;
  * @author Brian Schlining
  * @since Nov 9, 2010
  */
-public class DateValuePanelWrapper extends AbstractValuePanelWrapper {
+public class NumberValuePanelWrapper extends AbstractValuePanelWrapper {
 
-    public DateValuePanelWrapper(DateValuePanel valuePanel) {
+    public NumberValuePanelWrapper(NumberValuePanel valuePanel) {
         super(valuePanel);
     }
 
@@ -23,7 +22,7 @@ public class DateValuePanelWrapper extends AbstractValuePanelWrapper {
     public String toSQL() {
         String s = "";
         if (isConstrained()) {
-            s =  getValuePanel().getSQL();
+            s = getValuePanel().getSQL();
         }
         return s;
     }

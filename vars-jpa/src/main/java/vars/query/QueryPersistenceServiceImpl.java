@@ -15,6 +15,7 @@
 
 package vars.query;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -25,6 +26,7 @@ import org.mbari.sql.QueryResults;
 import org.mbari.sql.QueryableImpl;
 import vars.ILink;
 import vars.LinkBean;
+import vars.VARSException;
 
 /**
  * DAO for use by the query app. This drops out of hibernate and uses a lot of
@@ -73,6 +75,7 @@ public class QueryPersistenceServiceImpl implements QueryPersistenceService {
                 return conceptNamesAsStrings;
             }
         };
+
 
         String query = "SELECT ConceptName FROM ConceptName ORDER BY ConceptName";
 
@@ -187,6 +190,7 @@ public class QueryPersistenceServiceImpl implements QueryPersistenceService {
          * Assemble a query to search for all annotations used for the respective
          * conceptnames.
          */
+        // TODO use prepared statement to escape special characters
         StringBuffer sb = new StringBuffer();
         sb.append("SELECT DISTINCT linkName, toConcept, linkValue ");
         sb.append("FROM Association JOIN Observation ON Observation.id = Association.ObservationID_FK ");
@@ -204,6 +208,10 @@ public class QueryPersistenceServiceImpl implements QueryPersistenceService {
         sb.append(" ORDER BY LinkName, toConcept, linkValue");
 
         return (Collection<ILink>) annoQueryable.executeQueryFunction(sb.toString(), queryFunction);
+    }
+
+    public QueryableImpl getAnnotationQueryable() {
+        return annoQueryable;
     }
 
     /**

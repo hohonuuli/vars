@@ -1,4 +1,4 @@
-package vars.query.ui.jdbc;
+package vars.query.ui.db.preparedstatement;
 
 import vars.query.ui.ValuePanel;
 

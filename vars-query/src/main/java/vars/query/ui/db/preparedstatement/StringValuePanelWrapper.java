@@ -1,7 +1,6 @@
-package vars.query.ui.jdbc;
+package vars.query.ui.db.preparedstatement;
 
 import vars.query.ui.StringValuePanel;
-import vars.query.ui.ValuePanel;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -17,15 +16,29 @@ public class StringValuePanelWrapper extends AbstractValuePanelWrapper {
     }
 
     public int bind(PreparedStatement statement, int idx) throws SQLException {
-        return 0;  //TODO finish me
+        if (isConstrained()) {
+            Object[] obj = ((StringValuePanel) getValuePanel()).getList().getSelectedValues();
+            for (Object o : obj) {
+                statement.setString(idx, obj.toString());
+                idx++;
+            }
+        }
+        return idx; 
     }
 
     public String toSQL() {
-        String s = "";
+        StringBuffer sb = new StringBuffer("");
         if (isConstrained()) {
-            // TODO finish implementation
+            Object[] obj = ((StringValuePanel) getValuePanel()).getList().getSelectedValues();
+            sb.append(" ").append(getValuePanel().getValueName()).append(" IN (");
+            for (Object o : obj) {
+                sb.append("?, ");
+            }
+            // Delete trailing ", "
+            sb.delete(sb.length() - 2, sb.length());
+            sb.append(")");
         }
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return sb.toString();
     }
 
     @Override

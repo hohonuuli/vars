@@ -11,8 +11,7 @@
  */
 
 
-
-package vars.query.ui;
+package vars.query.ui.db.sql;
 
 import org.mbari.sql.IQueryable;
 import java.beans.PropertyChangeListener;
@@ -25,7 +24,6 @@ import org.mbari.util.ExceptionHandler;
 import org.mbari.util.ExceptionHandlerSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.query.QueryResultsDecorator;
 

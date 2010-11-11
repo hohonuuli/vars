@@ -15,7 +15,10 @@
  */
 
 
-package vars.query.ui;
+package vars.query.ui.db.sql;
+
+import vars.query.ui.ConceptConstraints;
+import vars.query.ui.ValuePanel;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -96,7 +99,7 @@ public class SQLGenerator {
         StringBuffer sb = new StringBuffer("SELECT ObservationID_FK, ");
         for (Iterator i = valuePanels.iterator(); i.hasNext(); ) {
             ValuePanel vp = (ValuePanel) i.next();
-            if (vp.getReturnCheckBox().isSelected()) {
+            if (vp.isReturned()) {
                 sb.append(" ").append(vp.getValueName()).append(", ");
             }
         }
@@ -143,7 +146,7 @@ public class SQLGenerator {
 
         for (Iterator i = valuePanels.iterator(); i.hasNext(); ) {
             ValuePanel vp = (ValuePanel) i.next();
-            if (vp.getConstrainCheckBox().isSelected()) {
+            if (vp.isConstrained()) {
                 String sql = vp.getSQL();
                 if (sql.length() > 0) {
                     sb.append(" ").append(vp.getSQL()).append(" AND ");

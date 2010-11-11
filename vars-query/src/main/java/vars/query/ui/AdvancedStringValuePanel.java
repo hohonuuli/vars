@@ -79,7 +79,7 @@ public class AdvancedStringValuePanel extends ValuePanel {
         initialize();
     }
 
-    private JList getList() {
+    public JList getList() {
         if (list == null) {
             list = new JList();
             list.setVisibleRowCount(3);
@@ -245,7 +245,7 @@ public class AdvancedStringValuePanel extends ValuePanel {
         return scrollPane;
     }
 
-    private JTextField getTextField() {
+    public JTextField getTextField() {
         if (textField == null) {
             textField = new JTextField();
             textField.setToolTipText("Enter a value. The query will return items that contain this value.");
@@ -280,7 +280,7 @@ public class AdvancedStringValuePanel extends ValuePanel {
      * Toggle which 'editor' to use. If selected, use the list editor otherwise use the textField
      * @return
      */
-    private JToggleButton getToggleButton() {
+    public JToggleButton getToggleButton() {
         if (toggleButton == null) {
             toggleButton = new JToggleButton(listIcon);
             toggleButton.setSelected(false);
