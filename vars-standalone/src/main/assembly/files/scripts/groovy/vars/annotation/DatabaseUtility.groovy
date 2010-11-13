@@ -23,14 +23,18 @@ class DatabaseUtility {
 
         log.debug("----- Merging Annotations with EXPD data ----")
 
-        def ids = new TreeSet()
+        def idSet = new TreeSet()
         MergeStatusDAO mergeStatusDAO = toolBox.mergeStatusDAO
         def cache = toolBox.toolBelt.persistenceCache
 
-        ids.addAll(mergeStatusDAO.findUnmergedSets())
-        ids.addAll(mergeStatusDAO.findFailedSets())
-        ids.addAll(mergeStatusDAO.findSetsWithEditedNav())
-        ids.addAll(mergeStatusDAO.findUpdatedSets())
+        idSet.addAll(mergeStatusDAO.findUnmergedSets())
+        idSet.addAll(mergeStatusDAO.findFailedSets())
+        idSet.addAll(mergeStatusDAO.findSetsWithEditedNav())
+        idSet.addAll(mergeStatusDAO.findUpdatedSets())
+
+        def ids = []
+        ids.addAll(idSet)
+        ids = ids.sort().reverse(); // Do most recently added first.
 
         for (id in ids) {
 
