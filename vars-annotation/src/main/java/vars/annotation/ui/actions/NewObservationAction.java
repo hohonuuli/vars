@@ -36,7 +36,7 @@ import vars.annotation.VideoArchive;
 import vars.annotation.VideoFrame;
 import vars.knowledgebase.ConceptName;
 import vars.annotation.ui.ToolBelt;
-import vars.annotation.ui.video.VideoControlService;
+import vars.shared.ui.video.VideoControlService;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.PersistenceController;
 

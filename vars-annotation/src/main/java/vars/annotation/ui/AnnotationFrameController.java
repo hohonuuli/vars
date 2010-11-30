@@ -33,7 +33,7 @@ import vars.VARSException;
 import vars.VarsUserPreferencesFactory;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
-import vars.annotation.ui.video.VideoControlService;
+import vars.shared.ui.video.VideoControlService;
 import vars.annotation.ui.video.VideoControlServiceFactory;
 import vars.shared.preferences.PreferenceUpdater;
 import vars.shared.preferences.PreferencesService;

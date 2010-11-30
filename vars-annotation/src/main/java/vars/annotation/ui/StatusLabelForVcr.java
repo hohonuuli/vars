@@ -30,7 +30,7 @@ import org.mbari.util.IObserver;
 import org.mbari.vcr.IVCR;
 import org.mbari.vcr.IVCRState;
 import vars.UserAccount;
-import vars.annotation.ui.video.VideoControlService;
+import vars.shared.ui.video.VideoControlService;
 import vars.annotation.ui.video.VideoControlServiceDialog;
 import vars.shared.preferences.PreferencesService;
 

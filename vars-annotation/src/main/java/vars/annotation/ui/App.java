@@ -19,7 +19,6 @@ import com.google.inject.Injector;
 import foxtrot.Job;
 import foxtrot.Worker;
 import java.awt.Toolkit;
-import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.Vector;
@@ -36,8 +35,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.AnnotationPersistenceService;
 import vars.annotation.Observation;
-import vars.annotation.VideoArchive;
-import vars.annotation.ui.video.VideoControlService;
 import vars.knowledgebase.Concept;
 import vars.shared.ui.GlobalLookup;
 import vars.shared.ui.event.ExitTopicSubscriber;
@@ -172,6 +169,16 @@ public class App {
         if (SystemUtilities.isMacOS()) {
             SystemUtilities.configureMacOSApplication("VARS Annotation");
         }
+
+        /**
+         * Log uncaught Exceptions
+         */
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            public void uncaughtException(Thread thread, Throwable e) {
+                Logger log = LoggerFactory.getLogger(thread.getClass());
+                log.error("Exception in thread [" + thread.getName() + "]", e);
+            }
+        });
 
         /*
          * Create an application settings directory if needed

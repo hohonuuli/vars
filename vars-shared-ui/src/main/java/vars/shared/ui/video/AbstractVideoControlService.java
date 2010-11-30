@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package vars.annotation.ui.video;
+package vars.shared.ui.video;
 
 import org.mbari.movie.Timecode;
 import org.mbari.vcr.IVCR;

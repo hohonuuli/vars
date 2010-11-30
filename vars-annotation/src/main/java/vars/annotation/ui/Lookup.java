@@ -31,7 +31,7 @@ import vars.annotation.CameraDirections;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.table.ObservationTable;
-import vars.annotation.ui.video.VideoControlService;
+import vars.shared.ui.video.VideoControlService;
 import vars.shared.InjectorModule;
 import vars.shared.ui.GlobalLookup;
 import vars.shared.ui.video.ImageCaptureService;

@@ -16,7 +16,7 @@ public interface ImageCaptureService {
     /**
      *
      * @return THe image captured from the QuickTime source
-     * @throws org.mbari.framegrab.GrabberException
+     * @throws vars.shared.ui.video.ImageCaptureException
      */
     Image capture(String timecode) throws ImageCaptureException;
 

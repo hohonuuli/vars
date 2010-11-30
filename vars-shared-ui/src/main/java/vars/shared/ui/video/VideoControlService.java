@@ -1,4 +1,4 @@
-package vars.annotation.ui.video;
+package vars.shared.ui.video;
 
 import javax.swing.JDialog;
 

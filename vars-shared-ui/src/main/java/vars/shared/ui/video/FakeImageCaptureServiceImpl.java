@@ -36,7 +36,7 @@ public class FakeImageCaptureServiceImpl implements ImageCaptureService {
     /**
      * @return
      *
-     * @throws ImageGrabberException
+     * @throws vars.shared.ui.video.ImageCaptureException
      */
     public Image capture(String timecode) throws ImageCaptureException {
         return null;

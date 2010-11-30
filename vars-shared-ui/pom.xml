@@ -49,6 +49,11 @@
             <version>1.2</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mbari</groupId>
+            <artifactId>vcr4j</artifactId>
+            <version>1.6.1</version>
+        </dependency>
 
     </dependencies>
 </project>

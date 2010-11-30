@@ -253,6 +253,16 @@ public class App {
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         GlobalLookup.getSettingsDirectory(); // Not used
 
+        /**
+         * Log uncaught Exceptions
+         */
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            public void uncaughtException(Thread thread, Throwable e) {
+                Logger log = LoggerFactory.getLogger(thread.getClass());
+                log.error("Exception in thread [" + thread.getName() + "]", e);
+            }
+        });
+
 
         final Logger mainLog = getLog();
 

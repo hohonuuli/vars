@@ -22,14 +22,13 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
 import org.mbari.swing.SwingUtils;
-import org.mbari.util.Dispatcher;
 import vars.UserAccount;
 import vars.annotation.VideoArchive;
 
 import vars.annotation.ui.actions.NewObservationAction;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.Lookup;
-import vars.annotation.ui.video.VideoControlService;
+import vars.shared.ui.video.VideoControlService;
 import vars.shared.ui.FancyButton;
 
 

@@ -271,6 +271,16 @@ public class App {
         System.setProperty("user.timezone", "UTC");
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 
+        /**
+         * Log uncaught Exceptions
+         */
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            public void uncaughtException(Thread thread, Throwable e) {
+                Logger log = LoggerFactory.getLogger(thread.getClass());
+                log.error("Exception in thread [" + thread.getName() + "]", e);
+            }
+        });
+
         /*
          * Create an application settings directory if needed and create the log directory
          */
@@ -305,6 +315,8 @@ public class App {
         catch (Exception e) {
             myLog.info("Unable to set look and feel", e);
         }
+
+
 
         SwingUtilities.invokeLater(new Runnable() {
 

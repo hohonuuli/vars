@@ -28,7 +28,7 @@ import vars.annotation.Observation;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.actions.DeepCopyObservationsAction;
-import vars.annotation.ui.video.VideoControlService;
+import vars.shared.ui.video.VideoControlService;
 import vars.shared.ui.FancyButton;
 
 /**

@@ -55,6 +55,7 @@ import vars.annotation.ui.VARSProperties;
 import vars.annotation.ui.actions.NewObservationAction;
 import vars.shared.preferences.PreferencesService;
 import vars.shared.ui.video.ImageCaptureService;
+import vars.shared.ui.video.VideoControlService;
 
 /**
  * <p>Action for capturing a frame an performing related activities on it.</p>
