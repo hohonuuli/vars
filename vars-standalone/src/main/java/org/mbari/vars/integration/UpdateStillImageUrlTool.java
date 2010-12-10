@@ -83,9 +83,6 @@ public class UpdateStillImageUrlTool {
     /**
      * Converts a file URL stored in a database to the coresponding http url.
      *
-     * TODO gernate unit test for this method
-     *
-     *
      * @param fileUrl
      * @return A http URL. null if the String provided should not be converted to a
      *      URL.

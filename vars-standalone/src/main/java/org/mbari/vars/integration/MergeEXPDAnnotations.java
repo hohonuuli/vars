@@ -25,6 +25,7 @@ import org.mbari.expd.actions.CoallateByDateFunction;
 import org.mbari.expd.actions.CoallateByTimecodeFunction;
 import org.mbari.expd.actions.CoallateFunction;
 import org.mbari.expd.jdbc.DAOFactoryImpl;
+import org.mbari.expd.jdbc.UberDatumImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.DAO;
@@ -208,8 +209,21 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
 
         // Fetch EXPD data
         UberDatumDAO uberDatumDAO = daoFactory.newUberDatumDAO();
+        List<UberDatum> uberData = uberDatumDAO.fetchData(dive, useHD, offsetSecs);
 
-        return uberDatumDAO.fetchData(dive, useHD, offsetSecs);
+        // If no cameraData is found we don't get any nav data either. In that case
+        // we just fetch nav data and convert it to uberdata.
+        if (uberData.size() == 0) {
+            NavigationDatumDAO navigationDatumDAO = daoFactory.newNavigationDatumDAO();
+            List<NavigationDatum> navigationData = navigationDatumDAO.fetchBestNavigationData(dive);
+            uberData.addAll(Collections2.transform(navigationData, new Function<NavigationDatum, UberDatum>() {
+                public UberDatum apply(NavigationDatum from) {
+                    return new UberDatumImpl(null, from, null);
+                }
+            }));
+        }
+
+        return uberData;
     }
 
     private MergeStatus fetchMergeStatus() {

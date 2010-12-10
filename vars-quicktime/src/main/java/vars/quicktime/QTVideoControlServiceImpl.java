@@ -4,7 +4,6 @@ import org.mbari.movie.Timecode;
 import org.mbari.qt.VideoStandard;
 import org.mbari.vcr.IVCR;
 import org.mbari.vcr.qt.TimeSource;
-import org.mbari.vcr.qt.VCRFactory;
 import org.mbari.vcr.qt.VCRWithDisplay;
 import org.mbari.vcr.timer.AnnotationMonitoringVCR;
 import vars.VARSException;
