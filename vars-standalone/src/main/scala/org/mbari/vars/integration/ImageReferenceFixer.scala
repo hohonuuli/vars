@@ -134,7 +134,7 @@ object ImageReferenceFixer {
                 | Usage: ImageReferenceFixer [rootUrl]
                 |
                 | Args: rootUrl = The root url that hosts the images. At MBARI
-                |          its' http://search.mbari.org/ARCHIVE/frameGrabs/
+                |          it's http://search.mbari.org/ARCHIVE/frameGrabs/
                     """)
         }
 

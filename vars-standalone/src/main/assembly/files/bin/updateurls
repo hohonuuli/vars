@@ -4,4 +4,6 @@
 VARS_HOME=`dirname "$0"`/..
 VARS_CLASSPATH=$VARS_HOME/conf:$VARS_HOME/lib/*
 echo [VARS] Changing file URLs in the VARS database to HTTP URLs
-java -cp $VARS_CLASSPATH org.mbari.vars.integration.UpdateStillImageUrlTool &
+# java -cp $VARS_CLASSPATH org.mbari.vars.integration.UpdateStillImageUrlTool &
+
+java -cp $VARS_CLASSPATH org.mbari.vars.integration.ImageReferenceFixer http://search.mbari.org/ARCHIVE/frameGrabs/
