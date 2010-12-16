@@ -270,7 +270,7 @@ public class ObservationImpl implements Serializable, Observation, JPAEntity {
         // TODO this contains a hard coded reference. Needs to be moved to properties file
         boolean b = false;
         for (Association association : new ArrayList<Association>(getAssociations())) {
-            if ("sample-reference".equals(association.getLinkName())) {
+            if ("sample-reference".equals(association.getLinkName()) || "sampled-by".equals(association.getLinkName())) {
                 b = true;
                 break;
             }
