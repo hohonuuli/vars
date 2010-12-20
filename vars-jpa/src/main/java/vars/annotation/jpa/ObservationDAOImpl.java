@@ -97,7 +97,7 @@ public class ObservationDAOImpl extends DAO implements ObservationDAO {
         int n = 1;
         for (ConceptName cn : conceptNames) {
             sb.append("?" + n);
-            if (n < conceptNames.size() - 1) {
+            if (n <= conceptNames.size() - 1) {
                 sb.append(", ");
             }
             n++;

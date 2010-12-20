@@ -1,11 +1,16 @@
 package vars.quicktime;
 
+import org.mbari.framegrab.FakeGrabber;
+import org.mbari.framegrab.IGrabber;
 import org.mbari.movie.Timecode;
+import org.mbari.movie.VideoTimeBean;
 import org.mbari.qt.VideoStandard;
 import org.mbari.vcr.IVCR;
 import org.mbari.vcr.qt.TimeSource;
 import org.mbari.vcr.qt.VCRWithDisplay;
 import org.mbari.vcr.timer.AnnotationMonitoringVCR;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import vars.VARSException;
 import vars.shared.ui.video.AbstractVideoControlService;
 import vars.shared.ui.video.ImageCaptureException;
@@ -16,6 +21,7 @@ import vars.shared.ui.video.VideoTime;
 import javax.swing.*;
 import java.awt.*;
 import java.net.URL;
+import java.util.Date;
 
 /**
  * @author Brian Schlining
@@ -23,10 +29,11 @@ import java.net.URL;
  */
 public class QTVideoControlServiceImpl extends AbstractVideoControlService implements ImageCaptureService  {
 
-
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    private IGrabber grabber;
 
     public QTVideoControlServiceImpl() {
-
+        // TODO make sure we've intialized everything correctly
     }
 
     public void connect(Object... args) {
@@ -40,17 +47,20 @@ public class QTVideoControlServiceImpl extends AbstractVideoControlService imple
 
         String movieName = (String) args[0];
 
-        IVCR vcr;
         try {
-            vcr = new AnnotationMonitoringVCR(new VCRWithDisplay(movieName, TimeSource.AUTO));
+            // TODO use reflection to instantiate the VCR
+            VCRWithDisplay vcr0 = new VCRWithDisplay(movieName, TimeSource.AUTO);
+            IVCR vcr = new AnnotationMonitoringVCR(vcr0);
+            grabber = vcr0.getGrabber();
+            setVcr(vcr);
+            setVideoControlInformation(new VideoControlInformationImpl(movieName, VideoControlStatus.CONNECTED));
         } catch (Exception e) {
+            grabber = new FakeGrabber();
             setVcr(null);
             setVideoControlInformation(new VideoControlInformationImpl(movieName, VideoControlStatus.ERROR));
             throw new VARSException("Failed to open " + movieName + " with QuickTime for Java", e);
         }
 
-        setVcr(vcr);
-        setVideoControlInformation(new VideoControlInformationImpl(movieName, VideoControlStatus.CONNECTED));
     }
 
     public JDialog getConnectionDialog() {
@@ -58,23 +68,34 @@ public class QTVideoControlServiceImpl extends AbstractVideoControlService imple
     }
 
     public void seek(String timecode) {
-         //getVcr().seekTimecode(new Timecode(timecode, frameRate));
-        //To change body of implemented methods use File | Settings | File Templates.
+        getVcr().seekTimecode(new Timecode(timecode));
     }
 
     public VideoTime requestVideoTime() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        IVCR vcr = getVcr();
+        vcr.requestTimeCode();
+        Timecode timecode = vcr.getVcrTimecode().getTimecode();
+        final String tc = timecode.toString();
+        return new VideoTime() {
+            public Date getDate() {
+                return null;
+            }
+
+            public String getTimecode() {
+                return tc;
+            }
+        };
     }
 
     public Image capture(String timecode) throws ImageCaptureException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return grabber.grab();
     }
 
     public void dispose() {
-        //To change body of implemented methods use File | Settings | File Templates.
+        getVcr().disconnect();
     }
 
     public void showSettingsDialog() {
-        //To change body of implemented methods use File | Settings | File Templates.
+        // TODO Implement this
     }
 }

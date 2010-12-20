@@ -25,16 +25,42 @@ public interface VideoControlService extends IVCR {
      */
     JDialog getConnectionDialog();
 
+    /**
+     *
+     * @return <b>true</b> if the VideoControlService is connected. <b>false</b> if
+     *  it is not connected.
+     */
     boolean isConnected();
 
+    /**
+     * Seek to the given timecode
+     * @param timecode
+     */
     void seek(String timecode);
 
+    /**
+     *
+     * @return <b>true</b> If the video is playing. <b>false</b> if it is not playing (e.g.
+     *  stopped, fast-forwarding, rewinding, etc.)
+     */
     boolean isPlaying();
 
+    /**
+     *
+     * @return <b>true</b> if the video is stopped
+     */
     boolean isStopped();
 
+    /**
+     *
+     * @return The current videotimeobject
+     */
     VideoTime requestVideoTime();
 
+    /**
+     * Retrive information about the state of the connection
+     * @return An object that encapsualtes the connection name and state.
+     */
     VideoControlInformation getVideoControlInformation();
 
 
