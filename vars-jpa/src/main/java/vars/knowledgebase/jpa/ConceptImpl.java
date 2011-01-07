@@ -21,6 +21,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javax.persistence.Access;
+import javax.persistence.AccessType;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -84,7 +86,7 @@ public class ConceptImpl implements Serializable, Concept, JPAEntity {
     @OneToOne(
         mappedBy = "concept",
         fetch = FetchType.LAZY,
-        cascade = { CascadeType.ALL },
+        cascade = CascadeType.ALL,
         targetEntity = ConceptMetadataImpl.class
     )
     private ConceptMetadata conceptMetadata;

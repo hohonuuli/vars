@@ -67,7 +67,7 @@ import vars.knowledgebase.*;
                             query = "SELECT v FROM ConceptMetadata v WHERE v.id = :id") })
 public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEntity {
 
-    @OneToOne(optional = false, targetEntity = ConceptImpl.class, cascade = {CascadeType.MERGE, CascadeType.REFRESH} )
+    @OneToOne(optional = false, targetEntity = ConceptImpl.class, cascade = {CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.LAZY)
     @JoinColumn(name = "ConceptID_FK", nullable = false)
     private Concept concept;
 
