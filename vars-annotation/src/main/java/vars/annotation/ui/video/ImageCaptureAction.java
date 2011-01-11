@@ -257,7 +257,7 @@ public class ImageCaptureAction extends ActionAdapter {
             ImageCaptureService imageCaptureService = (ImageCaptureService) Lookup.getImageCaptureServiceDispatcher()
                 .getValueObject();
             if (imageCaptureService == null) {
-                EventBus.publish(Lookup.TOPIC_WARNING, "No image capture service is available for frame capure");
+                EventBus.publish(Lookup.TOPIC_WARNING, "No image capture service is available for frame capture");
                 return;
             }
 

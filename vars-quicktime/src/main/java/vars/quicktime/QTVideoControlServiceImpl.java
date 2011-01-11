@@ -36,9 +36,17 @@ public class QTVideoControlServiceImpl extends AbstractVideoControlService imple
         // TODO make sure we've intialized everything correctly
     }
 
+    /**
+     * @param args The first argument is the string URL of the movie to open. The 2nd argument is a 
+     *  {@link TimeSource} object that indicates which timecode track to read from while annotating
+     *  the movie file.
+     */
     public void connect(Object... args) {
 
         disconnect();
+        if (grabber != null) {
+            grabber.dispose();
+        }
 
         if (args.length != 1 && !(args[0] instanceof String)) {
             throw new IllegalArgumentException("You didn't call this method correctly. The argument is the " +
@@ -46,10 +54,10 @@ public class QTVideoControlServiceImpl extends AbstractVideoControlService imple
         }
 
         String movieName = (String) args[0];
+        TimeSource timeSource = (TimeSource) args[1];
 
         try {
-            // TODO use reflection to instantiate the VCR
-            VCRWithDisplay vcr0 = new VCRWithDisplay(movieName, TimeSource.AUTO);
+            VCRWithDisplay vcr0 = new VCRWithDisplay(movieName, timeSource);
             IVCR vcr = new AnnotationMonitoringVCR(vcr0);
             grabber = vcr0.getGrabber();
             setVcr(vcr);
@@ -93,6 +101,7 @@ public class QTVideoControlServiceImpl extends AbstractVideoControlService imple
 
     public void dispose() {
         getVcr().disconnect();
+        grabber.dispose();
     }
 
     public void showSettingsDialog() {

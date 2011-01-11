@@ -82,7 +82,6 @@ public interface Concept extends KnowledgebaseObject, ILazy {
      */
     ConceptMetadata getConceptMetadata();
 
-
     /**
      * Gets the <code>ConceptName</code> object of the specified String name.
      * Returns <code>null</code> if this <code>Concept</code> has no such

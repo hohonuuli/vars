@@ -279,7 +279,7 @@ public class Lookup extends GlobalLookup {
     }
 
     /**
-     * Stores a reference to the {@link ConceptTree} so that other componenets
+     * Stores a reference to the {@link ObservationTable} so that other components
      * can reference it as needed.
      * @return
      */

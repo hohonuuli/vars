@@ -44,6 +44,8 @@ import org.mbari.awt.event.NonDigitConsumingKeyListener;
 import org.mbari.swing.SpinningDialWaitIndicator;
 import org.mbari.swing.WaitIndicator;
 import org.mbari.text.IgnoreCaseToStringComparator;
+import vars.CacheClearedEvent;
+import vars.CacheClearedListener;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveDAO;
 import vars.annotation.VideoFrame;
@@ -74,7 +76,7 @@ public class OpenVideoArchiveDialog extends StandardDialog {
     private final ButtonGroup buttonGroup = new ButtonGroup();
     private final ItemListener rbItemListener = new SelectedRBItemListener();
     private JComboBox cameraPlatformComboBox;
-    private JComboBox existingNamesConceptBox;
+    private JComboBox existingNamesComboBox;
     private boolean loadExistingNames = true;
     private JCheckBox hdCheckBox;
     private JLabel lblCameraPlatform;
@@ -103,6 +105,16 @@ public class OpenVideoArchiveDialog extends StandardDialog {
         initialize();
         getRootPane().setDefaultButton(getOkayButton());
         pack();
+        toolBelt.getPersistenceCache().addCacheClearedListener(new CacheClearedListener() {
+            public void afterClear(CacheClearedEvent evt) {
+                loadExistingNames = true;
+            }
+
+            public void beforeClear(CacheClearedEvent evt) {
+                DefaultComboBoxModel model = (DefaultComboBoxModel) getExistingNamesComboBox().getModel();
+                model.removeAllElements();
+            }
+        });
     }
 
     private JComboBox getCameraPlatformComboBox() {
@@ -114,12 +126,12 @@ public class OpenVideoArchiveDialog extends StandardDialog {
         return cameraPlatformComboBox;
     }
 
-    private JComboBox getExistingNamesConceptBox() {
-        if (existingNamesConceptBox == null) {
-            existingNamesConceptBox = new JComboBox();
+    private JComboBox getExistingNamesComboBox() {
+        if (existingNamesComboBox == null) {
+            existingNamesComboBox = new JComboBox();
         }
 
-        return existingNamesConceptBox;
+        return existingNamesComboBox;
     }
 
     private JCheckBox getHdCheckBox() {
@@ -218,7 +230,7 @@ public class OpenVideoArchiveDialog extends StandardDialog {
             openExistingRB.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     if (loadExistingNames) {
-                        JComboBox comboBox = getExistingNamesConceptBox();
+                        JComboBox comboBox = getExistingNamesComboBox();
                         WaitIndicator waitIndicator = new SpinningDialWaitIndicator(comboBox);
                         List<String> names = toolBelt.getAnnotationPersistenceService().findAllVideoArchiveNames();
                         String[] van = new String[names.size()];
@@ -268,7 +280,7 @@ public class OpenVideoArchiveDialog extends StandardDialog {
                     					.addGap(29)
                     					.addComponent(getLblSelectName())
                     					.addGap(42)
-                    					.addComponent(getExistingNamesConceptBox(), 0, 325, Short.MAX_VALUE))
+                    					.addComponent(getExistingNamesComboBox(), 0, 325, Short.MAX_VALUE))
                     				.addComponent(getOpenExistingRB()))
                     			.addContainerGap())
                     );
@@ -302,7 +314,7 @@ public class OpenVideoArchiveDialog extends StandardDialog {
                     			.addPreferredGap(ComponentPlacement.RELATED)
                     			.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
                     				.addComponent(getLblSelectName())
-                    				.addComponent(getExistingNamesConceptBox(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+                    				.addComponent(getExistingNamesComboBox(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
                     );
                     panel.setLayout(groupLayout);
 
@@ -411,7 +423,7 @@ public class OpenVideoArchiveDialog extends StandardDialog {
             break;
         case EXISTING:
         {
-            String name = (String) getExistingNamesConceptBox().getSelectedItem();
+            String name = (String) getExistingNamesComboBox().getSelectedItem();
             videoArchive = dao.findByName(name);
         }
             break;
@@ -475,7 +487,7 @@ public class OpenVideoArchiveDialog extends StandardDialog {
                 getSequenceNumberTextField().setEnabled(sequenceNumberTF);
                 getHdCheckBox().setEnabled(hdChckB);
                 getNameTextField().setEnabled(nameTF);
-                getExistingNamesConceptBox().setEnabled(existingNamesCB);
+                getExistingNamesComboBox().setEnabled(existingNamesCB);
                 getTapeNumberTextField().setEnabled(tapeNumberTF);
 
             }
