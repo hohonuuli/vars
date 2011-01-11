@@ -554,6 +554,7 @@ public class RejectHistoryTask extends AbstractHistoryTask {
                 MediaDAO mediaDAO = toolBelt.getKnowledgebaseDAOFactory().newMediaDAO();
 
                 mediaDAO.startTransaction();
+                history = mediaDAO.find(history);
 
                 ConceptMetadata conceptMetadata = history.getConceptMetadata();
 

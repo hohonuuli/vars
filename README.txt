@@ -3,7 +3,7 @@ PREREQUISITES FOR BUILDING VARS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In order to build VARS you will need to have the following installed:
-	1) Java 6 (http:///www.java.com)
+	1) Java 6 (https://jdk6.dev.java.net/)
 	2) Maven 2 or 3 (http://maven.apache.org)
 	
 VARS also requires that QuickTime for Java to be installed in order to run
