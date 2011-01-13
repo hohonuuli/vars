@@ -76,7 +76,7 @@ public class ConceptButtonPanel extends JPanel {
      *     The button to rename a new tab
      */
     private JButton renameTabButton = null;
-    private boolean locked = false;
+    private boolean locked = true;
     private JButton showOverviewButton = null;
     private Preferences userPreferences = null;
     private boolean showOverview = false;
@@ -151,10 +151,11 @@ public class ConceptButtonPanel extends JPanel {
             lockButton = new FancyButton();
             lockButton.setText("");
             lockButton.setToolTipText("Buttons on the tabs can not be reordered when locked");
-            lockButton.setIcon(unlockedIcon);
+            lockButton.setIcon(lockedIcon);
 
             final Dispatcher dispatcher = Dispatcher.getDispatcher(
                 NewObservationUsingConceptNameButton.DISPATCHER_KEY_DRAG_LOCK);
+            dispatcher.setValueObject(Boolean.valueOf(locked));
 
             /*
              * If the button is locked then we want to prevent the

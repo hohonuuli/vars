@@ -47,6 +47,11 @@ public class AnnotationFrameController implements PreferenceUpdater {
 
     private final String PREF_WIDTH = "width";
     private final String PREF_HEIGHT = "height";
+    private final String PREF_OUTER_DIVIDER_LOCATION = "outerSplitPaneDividerLocation";
+    private final String PREF_INNER_DIVIDER_LOCATION = "innerSplitPaneDividerLocation";
+    private final String PREF_CONTROLS_DIVIDER_LOCATION = "allControlsSplitPaneDividerLocation";
+    private final String PREF_TABLE_WIDTH = "tableScrollPaneWidth";
+    private final String PREF_TABLE_HEIGHT = "tableScrollPaneHeight";
     private final AnnotationFrame annotationFrame;
     private final Logger log = LoggerFactory.getLogger(getClass());
     private final ToolBelt toolBelt;
@@ -64,25 +69,6 @@ public class AnnotationFrameController implements PreferenceUpdater {
                 log.info("Persisting preferences");
                 persistPreferences();
 
-                // Clean up NATIVE resources when we exit
-                log.info("Closing ImageCaptureService");
-                try {
-                    ImageCaptureService imageCaptureService = (ImageCaptureService) Lookup.getImageCaptureServiceDispatcher().getValueObject();
-                    imageCaptureService.dispose();
-                }
-                catch (Throwable e) {
-                    log.warn("An error occurred while closing the image capture services", e);
-                }
-
-                log.info("Closing VideoControlService");
-                try {
-                    VideoControlService videoControlService = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
-                    videoControlService.kill();
-                }
-                catch (Exception e) {
-                     log.warn("An error occurred while closing the video control services", e);
-                }
-
                 log.info("Saving last Observations to persistent storage during JVM shutdown");
                 Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
                 toolBelt.getPersistenceController().updateAndValidate(new ArrayList<Observation>(observations));
@@ -92,7 +78,6 @@ public class AnnotationFrameController implements PreferenceUpdater {
                 if (videoArchive != null) {
                     updateCameraData(videoArchive);
                 }
-
 
                 log.info("Shutdown thread is finished. Bye Bye");
             }
@@ -202,13 +187,31 @@ public class AnnotationFrameController implements PreferenceUpdater {
             }
 
             String className = getClass().getCanonicalName();
-
             Preferences preferences = userPreferences.node(hostName).node(className);
+
+            // -- Save AnnotationFrame size
             Dimension size = annotationFrame.getSize();
             preferences.putInt(PREF_WIDTH, size.width);
             preferences.putInt(PREF_HEIGHT, size.height);
 
-            // Persist video control info
+            // -- Save TableScrollPane size();
+            Dimension tablePaneSize = annotationFrame.getTableScrollPane().getSize();
+            preferences.putInt(PREF_TABLE_WIDTH, tablePaneSize.width);
+            preferences.putInt(PREF_TABLE_HEIGHT, tablePaneSize.height);
+
+            // -- Save OuterSplitPane split location
+            int outerDividerLocation = annotationFrame.getOuterSplitPane().getDividerLocation();
+            preferences.putInt(PREF_OUTER_DIVIDER_LOCATION, outerDividerLocation);
+
+            // -- Save InnerSplitPane split location
+            int innerDividerLocation = annotationFrame.getInnerSplitPane().getDividerLocation();
+            preferences.putInt(PREF_INNER_DIVIDER_LOCATION, innerDividerLocation);
+
+            // -- Save AllControlsSplitPane location
+            int controlsDividerLocation = annotationFrame.getAllControlsSplitPane().getDividerLocation();
+            preferences.putInt(PREF_CONTROLS_DIVIDER_LOCATION, controlsDividerLocation);
+
+            // -- Save video control info
             Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
             PreferencesFactory preferencesFactory = injector.getInstance(PreferencesFactory.class);
             PreferencesService preferencesService = new PreferencesService(preferencesFactory);
@@ -240,8 +243,9 @@ public class AnnotationFrameController implements PreferenceUpdater {
             String className = getClass().getCanonicalName();
 
             Preferences hostPreferences = userPreferences.node(hostName);
-
             Preferences preferences = hostPreferences.node(className);
+
+            // -- Set AnnotationFrame size
             Dimension currentSize = annotationFrame.getSize();
             int width = preferences.getInt(PREF_WIDTH, currentSize.width);
             int height = preferences.getInt(PREF_HEIGHT, currentSize.height);
@@ -250,8 +254,34 @@ public class AnnotationFrameController implements PreferenceUpdater {
             width = width <= screenSize.width ? width : screenSize.width;
             height = height <= screenSize.height ? height : screenSize.height;
             annotationFrame.setSize(width, height);
+            annotationFrame.validate();
 
-            // Load video control info
+            // -- Set TableScrollPane size
+            int tablePaneWidth = preferences.getInt(PREF_TABLE_WIDTH, -1);
+            int tablePaneHeight = preferences.getInt(PREF_TABLE_HEIGHT, -1);
+            if (tablePaneWidth > 0 && tablePaneHeight > 0) {
+                annotationFrame.getTableScrollPane().setPreferredSize(new Dimension(tablePaneWidth, tablePaneHeight));
+            }
+
+            // -- Set OuterSplitPane divider location
+            int outerDividerLocation = preferences.getInt(PREF_OUTER_DIVIDER_LOCATION, -1);
+            if (outerDividerLocation > 0) {
+                annotationFrame.getOuterSplitPane().setDividerLocation(outerDividerLocation);
+            }
+
+            // -- Set OuterSplitPane divider location
+            int innerDividerLocation = preferences.getInt(PREF_INNER_DIVIDER_LOCATION, -1);
+            if (innerDividerLocation > 0) {
+                annotationFrame.getInnerSplitPane().setDividerLocation(innerDividerLocation);
+            }
+
+            // -- Set OuterSplitPane divider location
+            int controlsDividerLocation = preferences.getInt(PREF_CONTROLS_DIVIDER_LOCATION, -1);
+            if (controlsDividerLocation > 0) {
+                annotationFrame.getAllControlsSplitPane().setDividerLocation(controlsDividerLocation);
+            }
+
+            // -- Load video control info
             Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
             PreferencesFactory preferencesFactory = injector.getInstance(PreferencesFactory.class);
             PreferencesService preferencesService = new PreferencesService(preferencesFactory);
@@ -287,9 +317,6 @@ public class AnnotationFrameController implements PreferenceUpdater {
             }
         }
     }
-
-
-    
     
 
 }

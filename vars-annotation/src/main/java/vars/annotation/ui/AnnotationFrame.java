@@ -97,7 +97,7 @@ public class AnnotationFrame extends JFrame {
         return actionPanel;
     }
 
-    private JSplitPane getAllControlsSplitPane() {
+    protected JSplitPane getAllControlsSplitPane() {
         if (allControlsSplitPane == null) {
             allControlsSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
             allControlsSplitPane.setLeftComponent(getControlsPanelSplitPane());
@@ -139,7 +139,7 @@ public class AnnotationFrame extends JFrame {
         return controlsPanelSplitPane;
     }
 
-    private JSplitPane getInnerSplitPane() {
+    protected JSplitPane getInnerSplitPane() {
         if (innerSplitPane == null) {
             innerSplitPane = new JSplitPane();
             innerSplitPane.setLeftComponent(getTableScrollPane());
@@ -158,7 +158,7 @@ public class AnnotationFrame extends JFrame {
         return miscTabsPanel;
     }
 
-    private JSplitPane getOuterSplitPane() {
+    protected JSplitPane getOuterSplitPane() {
         if (outerSplitPane == null) {
             outerSplitPane = new JSplitPane();
             outerSplitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
@@ -275,7 +275,7 @@ public class AnnotationFrame extends JFrame {
         return table;
     }
 
-    private JScrollPane getTableScrollPane() {
+    protected JScrollPane getTableScrollPane() {
         if (tableScrollPane == null) {
             tableScrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                                               JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
