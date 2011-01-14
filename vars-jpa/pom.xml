@@ -9,7 +9,7 @@
     <artifactId>vars-jpa</artifactId>
     <name>vars-jpa [Library]</name>
     <properties>
-        <derby.version>10.6.1.0</derby.version>
+        <derby.version>10.7.1.1</derby.version>
         <jtds.version>1.2.5</jtds.version>
     </properties>
     <!--
