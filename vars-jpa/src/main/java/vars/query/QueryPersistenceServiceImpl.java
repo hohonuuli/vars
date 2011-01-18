@@ -155,8 +155,8 @@ public class QueryPersistenceServiceImpl implements QueryPersistenceService {
         return sortedNames;
     }
 
-       /**
-     * Looks up all assotations in a database that were used with Observations
+    /**
+     * Looks up all associations in a database that were used with Observations
      * containing the specified conceptNames
      *
      * @param conceptNames A collection of Strings representing the conceptnames to

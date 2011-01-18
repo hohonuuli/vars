@@ -209,6 +209,7 @@ class NamesEditorPanelController {
             oldConceptName.setAuthor(author);
             oldConceptName.setNameType(nameType);
             dao.endTransaction();
+            dao.close();
 
 
             try {

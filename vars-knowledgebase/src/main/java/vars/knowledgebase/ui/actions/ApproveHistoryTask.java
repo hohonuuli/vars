@@ -309,7 +309,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
             super.approve(userAccount, history, dao);
             conceptDAO.endTransaction();
             conceptDAO.cascadeRemove(concept);    // This handles starting and stopping the transaction internally
-
+            conceptDAO.close();
         }
     }
 
@@ -401,6 +401,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
                 dropHistory(history,
                             "Unable to locate '" + conceptNameToDelete + "'. I'll remove the History reference.", dao);
             }
+            conceptNameDAO.close();
         }
     }
 

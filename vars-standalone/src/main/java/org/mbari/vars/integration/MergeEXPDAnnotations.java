@@ -163,7 +163,7 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
             public boolean apply(VideoFrame input) {
                 Date date = input.getRecordedDate();
 
-                return (date != null) || date.before(dive.getStartDate()) || date.after(dive.getEndDate());
+                return (date == null) || date.before(dive.getStartDate()) || date.after(dive.getEndDate());
             }
 
         });

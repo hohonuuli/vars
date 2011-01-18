@@ -485,6 +485,7 @@ public class LinkEditorPanel extends javax.swing.JPanel implements ILockableEdit
                 Concept daoConcept = linkTemplateDAO.find(fConcept);
                 List<ILink> links = new Vector<ILink>(linkTemplateDAO.findAllApplicableToConcept(daoConcept));
                 linkTemplateDAO.endTransaction();
+                linkTemplateDAO.close();
                 return links;
             }
 
@@ -510,7 +511,7 @@ public class LinkEditorPanel extends javax.swing.JPanel implements ILockableEdit
      */
     public void setLink(ILink link) {
 
-        ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
+
 
         ILink oldLink = this.link;
         this.link = link;
@@ -553,11 +554,15 @@ public class LinkEditorPanel extends javax.swing.JPanel implements ILockableEdit
         }
         else {
             try {
+                ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
+                conceptDAO.startTransaction();
                 toConcept = conceptDAO.findByName(link.getToConcept());
 
                 if (toConcept == null) {
                     toConcept = conceptDAO.findRoot();
                 }
+                conceptDAO.endTransaction();
+                conceptDAO.close();
             }
             catch (Exception e) {
                 log.error("Failed to lookup " + link.getToConcept(), e);
@@ -595,7 +600,7 @@ public class LinkEditorPanel extends javax.swing.JPanel implements ILockableEdit
             toConceptComboBox.setEnabled(allowEditing);
         }
 
-        conceptDAO.close();
+
         firePropertyChange("link", oldLink, link);
     }
 

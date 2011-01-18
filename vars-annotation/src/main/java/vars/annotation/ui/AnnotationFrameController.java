@@ -37,7 +37,6 @@ import vars.shared.ui.video.VideoControlService;
 import vars.annotation.ui.video.VideoControlServiceFactory;
 import vars.shared.preferences.PreferenceUpdater;
 import vars.shared.preferences.PreferencesService;
-import vars.shared.ui.video.ImageCaptureService;
 
 /**
  *
@@ -49,7 +48,8 @@ public class AnnotationFrameController implements PreferenceUpdater {
     private final String PREF_HEIGHT = "height";
     private final String PREF_OUTER_DIVIDER_LOCATION = "outerSplitPaneDividerLocation";
     private final String PREF_INNER_DIVIDER_LOCATION = "innerSplitPaneDividerLocation";
-    private final String PREF_CONTROLS_DIVIDER_LOCATION = "allControlsSplitPaneDividerLocation";
+    private final String PREF_ALLCONTROLS_DIVIDER_LOCATION = "allControlsSplitPaneDividerLocation";
+    private final String PREF_CONTROLS_DIVIDER_LOCATION = "controlsSplitPaneDividerLocation";
     private final String PREF_TABLE_WIDTH = "tableScrollPaneWidth";
     private final String PREF_TABLE_HEIGHT = "tableScrollPaneHeight";
     private final AnnotationFrame annotationFrame;
@@ -208,7 +208,11 @@ public class AnnotationFrameController implements PreferenceUpdater {
             preferences.putInt(PREF_INNER_DIVIDER_LOCATION, innerDividerLocation);
 
             // -- Save AllControlsSplitPane location
-            int controlsDividerLocation = annotationFrame.getAllControlsSplitPane().getDividerLocation();
+            int allControlsDividerLocation = annotationFrame.getAllControlsSplitPane().getDividerLocation();
+            preferences.putInt(PREF_ALLCONTROLS_DIVIDER_LOCATION, allControlsDividerLocation);
+
+            // -- Save ControlSplitPane location
+            int controlsDividerLocation = annotationFrame.getControlsPanelSplitPane().getDividerLocation();
             preferences.putInt(PREF_CONTROLS_DIVIDER_LOCATION, controlsDividerLocation);
 
             // -- Save video control info
@@ -269,16 +273,22 @@ public class AnnotationFrameController implements PreferenceUpdater {
                 annotationFrame.getOuterSplitPane().setDividerLocation(outerDividerLocation);
             }
 
-            // -- Set OuterSplitPane divider location
+            // -- Set innerSplitPane divider location
             int innerDividerLocation = preferences.getInt(PREF_INNER_DIVIDER_LOCATION, -1);
             if (innerDividerLocation > 0) {
                 annotationFrame.getInnerSplitPane().setDividerLocation(innerDividerLocation);
             }
 
-            // -- Set OuterSplitPane divider location
+            // -- Set AllControlsSplitPane divider location
+            int allControlsDividerLocation = preferences.getInt(PREF_ALLCONTROLS_DIVIDER_LOCATION, -1);
+            if (allControlsDividerLocation > 0) {
+                annotationFrame.getAllControlsSplitPane().setDividerLocation(allControlsDividerLocation);
+            }
+
+            // -- Set ControlsSplitPane divider location
             int controlsDividerLocation = preferences.getInt(PREF_CONTROLS_DIVIDER_LOCATION, -1);
             if (controlsDividerLocation > 0) {
-                annotationFrame.getAllControlsSplitPane().setDividerLocation(controlsDividerLocation);
+                annotationFrame.getControlsPanelSplitPane().setDividerLocation(controlsDividerLocation);
             }
 
             // -- Load video control info

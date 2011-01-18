@@ -37,6 +37,7 @@ import org.mbari.util.SystemUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ui.actions.PopulateDatabaseAction;
 import vars.shared.ui.event.ExitTopicSubscriber;
 import vars.shared.ui.event.FatalExceptionSubscriber;
@@ -238,8 +239,12 @@ public class App {
         getKnowledgebaseFrame().setIconImage(mbariLogo.getImage());
 
         try {
-            Lookup.getSelectedConceptDispatcher().setValueObject(
-                toolBelt.getKnowledgebaseDAOFactory().newConceptDAO().findRoot());
+            ConceptDAO dao = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
+            dao.startTransaction();
+            Concept rootConcept = dao.findRoot();
+            dao.endTransaction();
+            dao.close();
+            Lookup.getSelectedConceptDispatcher().setValueObject(rootConcept);
         }
         catch (Exception e) {
             log.error("Unable to locate root concept --- this means trouble!!", e);

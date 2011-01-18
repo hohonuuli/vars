@@ -229,6 +229,7 @@ public class RejectHistoryTask extends AbstractHistoryTask {
             final String name = history.getNewValue();
 
             Concept thatConcept = conceptDAO.findByName(name);
+            conceptDAO.close();
 
             if (thatConcept == null) {
                 dropHistory(history,
@@ -576,6 +577,7 @@ public class RejectHistoryTask extends AbstractHistoryTask {
                 }
 
                 mediaDAO.endTransaction();
+                mediaDAO.close();
 
                 super.reject(userAccount, history, dao);
 

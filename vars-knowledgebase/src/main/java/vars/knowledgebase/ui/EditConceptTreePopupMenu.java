@@ -222,6 +222,7 @@ public class EditConceptTreePopupMenu extends ConceptTreePopupMenu implements IL
                     else {
                         EventBus.publish(Lookup.TOPIC_WARNING, "Unable to delete root concept");
                     }
+                    dao.endTransaction();
                     dao.close();
                 }
             }

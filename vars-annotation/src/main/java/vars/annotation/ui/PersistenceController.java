@@ -104,7 +104,8 @@ public class PersistenceController {
                 updateObservations.add(observation);
             }
         }
-
+        dao.endTransaction();
+        dao.close();
         updateUI();
         return updateObservations;
     }
@@ -133,6 +134,7 @@ public class PersistenceController {
         }
 
         dao.endTransaction();
+        dao.close();
         updateUI(modifiedObservations);
     }
 
@@ -150,8 +152,8 @@ public class PersistenceController {
             videoArchive.removeVideoFrame(videoFrame);
             dao.remove(videoFrame);
         }
-
         dao.endTransaction();
+        dao.close();
         return videoArchive;
     }
 
@@ -181,6 +183,7 @@ public class PersistenceController {
         }
 
         dao.endTransaction();
+        dao.close();
         updateUI();
     }
 
@@ -195,6 +198,7 @@ public class PersistenceController {
         final Collection<Observation> uiObservations = new ArrayList<Observation>();
         final Collection<Observation> mergedObservations = new ArrayList<Observation>();
         final ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
+        conceptDAO.startTransaction();
         final AssociationDAO dao = annotationDAOFactory.newAssociationDAO();
 
         // DAOTX - Add Association to each observation
@@ -221,7 +225,9 @@ public class PersistenceController {
         }
 
         dao.endTransaction();
-
+        dao.close();
+        conceptDAO.endTransaction();
+        conceptDAO.close();
         resetObservationsInDispatcher(uiObservations);
         updateUI(uiObservations);    // update view
         return associations;
@@ -271,6 +277,7 @@ public class PersistenceController {
     public Observation insertObservation(VideoFrame videoFrame, Observation observation) {
         ObservationDAO dao = annotationDAOFactory.newObservationDAO();
         final ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
+        conceptDAO.startTransaction();
         Collection<Observation> newObservations = new ArrayList<Observation>();
         dao.startTransaction();
         videoFrame = dao.find(videoFrame);
@@ -283,6 +290,9 @@ public class PersistenceController {
         }
 
         dao.endTransaction();
+        dao.close();
+        conceptDAO.endTransaction();
+        conceptDAO.close();
         updateUI(newObservations);    // update view
         return observation;
     }
@@ -296,6 +306,7 @@ public class PersistenceController {
     public Collection<Observation> insertObservations(VideoFrame videoFrame, Collection<Observation> observations) {
         ObservationDAO dao = annotationDAOFactory.newObservationDAO();
         final ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
+        conceptDAO.startTransaction();
         dao.startTransaction();
         videoFrame = dao.find(videoFrame);
 
@@ -306,6 +317,9 @@ public class PersistenceController {
         }
 
         dao.endTransaction();
+        dao.close();
+        conceptDAO.endTransaction();
+        conceptDAO.close();
         updateUI(observations);    // update view
         return observations;
     }
@@ -323,6 +337,7 @@ public class PersistenceController {
         videoArchive.addVideoFrame(videoFrame);
         dao.persist(videoFrame);
         dao.endTransaction();
+        dao.close();
         return videoFrame;
     }
 
@@ -339,6 +354,7 @@ public class PersistenceController {
         videoArchive = dao.find(videoArchive);
         @SuppressWarnings("unused") Collection<VideoFrame> videoFrames = videoArchive.getVideoFrames();
         dao.endTransaction();
+        dao.close();
         return videoArchive;
     }
 
@@ -405,6 +421,7 @@ public class PersistenceController {
         VideoArchive videoArchive = dao.findOrCreateByParameters(platform, sequenceNumber, videoArchiveName);
         @SuppressWarnings("unused") Collection<VideoFrame> videoFrames = videoArchive.getVideoFrames();    // Load the videoFrames
         dao.endTransaction();
+        dao.close();
         Lookup.getVideoArchiveDispatcher().setValueObject(videoArchive);
 
         // TODO Do we need to call updateUI here?
@@ -423,6 +440,7 @@ public class PersistenceController {
         ObservationDAO dao = toolBelt.getAnnotationDAOFactory().newObservationDAO();
         AssociationDAO aDao = toolBelt.getAnnotationDAOFactory().newAssociationDAO(dao.getEntityManager());
         final ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
+        conceptDAO.startTransaction();
         dao.startTransaction();
 
         for (Observation observation : observations) {
@@ -437,6 +455,9 @@ public class PersistenceController {
         }
 
         dao.endTransaction();
+        dao.close();
+        conceptDAO.endTransaction();
+        conceptDAO.close();
         return updatedObservations;
     }
 
@@ -448,6 +469,7 @@ public class PersistenceController {
     public Collection<Association> updateAssociations(Collection<Association> associations) {
         final AssociationDAO dao = annotationDAOFactory.newAssociationDAO();
         final ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
+        conceptDAO.startTransaction();
         Collection<Association> updatedAssociations = new ArrayList<Association>(associations.size());
         Collection<Observation> uiObservations = new ArrayList<Observation>();
         dao.startTransaction();
@@ -461,6 +483,7 @@ public class PersistenceController {
 
         dao.endTransaction();
         dao.close();
+        conceptDAO.endTransaction();
         conceptDAO.close();
         updateUI(uiObservations);
         return updatedAssociations;
@@ -809,6 +832,7 @@ public class PersistenceController {
     public Collection<VideoFrame> updateVideoFrames(Collection<VideoFrame> videoFrames) {
         ObservationDAO dao = annotationDAOFactory.newObservationDAO();
         final ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
+        conceptDAO.startTransaction();
         final Collection<VideoFrame> updatedVideoFrames = new ArrayList<VideoFrame>(videoFrames.size());
         final Collection<Observation> observations = new ArrayList<Observation>();
         dao.startTransaction();
@@ -824,6 +848,9 @@ public class PersistenceController {
         }
 
         dao.endTransaction();
+        dao.close();
+        conceptDAO.endTransaction();
+        conceptDAO.close();
         updateUI(observations);    // update view
         return updatedVideoFrames;
     }

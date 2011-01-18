@@ -641,6 +641,7 @@ public class LinkRealizationEditorPanel extends EditorPanel {
                     try {
                         ConceptDAO conceptDAO = getToolBelt().getKnowledgebaseDAOFactory().newConceptDAO();
                         concept = conceptDAO.findByName(name);
+                        conceptDAO.close();
 
                         if (concept != null) {
                             name = concept.getPrimaryConceptName().toString();

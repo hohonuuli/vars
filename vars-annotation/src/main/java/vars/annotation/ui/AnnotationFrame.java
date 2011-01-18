@@ -126,7 +126,7 @@ public class AnnotationFrame extends JFrame {
         return controlsPanel;
     }
 
-    private JSplitPane getControlsPanelSplitPane() {
+    protected JSplitPane getControlsPanelSplitPane() {
         if (controlsPanelSplitPane == null) {
             controlsPanelSplitPane = new JSplitPane();
             controlsPanelSplitPane.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
@@ -189,7 +189,7 @@ public class AnnotationFrame extends JFrame {
         return rowEditorPanel;
     }
 
-    private JXObservationTable getTable() {
+    protected JXObservationTable getTable() {
         if (table == null) {
             table = new JXObservationTable();
             table.setFocusable(false);    // The row editor panel should get focus NOT the table

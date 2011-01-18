@@ -185,21 +185,16 @@ public class AnnotationPersistenceServiceImpl extends QueryableImpl implements A
      */
     public Collection<String> findAllReferenceNumbers(VideoArchiveSet videoArchiveSet, Concept concept) {
         VideoArchiveDAO dao = annotationDAOFactory.newVideoArchiveDAO();
+        dao.startTransaction();
         Collection<String> referenceNumbers = new TreeSet<String>();
         for (VideoArchive videoArchive : new ArrayList<VideoArchive>(videoArchiveSet.getVideoArchives())) {
             // TODO identity-reference is hard coded. It should be pulled out into a properties file
             Set<String> values = dao.findAllLinkValues(videoArchive, "identity-reference", concept);
             for (String string : values) {
                 referenceNumbers.add(string);
-//                try {
-//                    Integer v = Integer.valueOf(string);
-//                    referenceNumbers.add(v);
-//                }
-//                catch (Exception e) {
-//                    log.info("Unable to parse integer from " + string);
-//                }
             }
         }
+        dao.endTransaction();
         dao.close();
         return referenceNumbers;
     }
@@ -341,6 +336,7 @@ public class AnnotationPersistenceServiceImpl extends QueryableImpl implements A
          */
         public void beforeClear(CacheClearedEvent evt) {
             dao.endTransaction();    // Close the transaction
+            dao.close();
             descendantNameCache.clear();
         }
     }
