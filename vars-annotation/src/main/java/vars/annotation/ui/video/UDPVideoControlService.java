@@ -23,6 +23,7 @@ import org.mbari.vcr.IVCR;
 import org.mbari.vcr.IVCRTimecode;
 import org.mbari.vcr.IVCRUserbits;
 import org.mbari.vcr.timer.AnnotationMonitoringVCR;
+import org.mbari.vcr.timer.AnnotationQueueVCR;
 import org.mbari.vcr.udp01.VCR;
 import vars.VARSException;
 import vars.shared.ui.video.AbstractVideoControlService;
@@ -57,7 +58,8 @@ public class UDPVideoControlService extends AbstractVideoControlService {
 
         try {
             final IVCR vcrUdp = new VCR(host, port);
-            setVcr(new AnnotationMonitoringVCR(vcrUdp));
+            setVcr(new AnnotationQueueVCR(vcrUdp));
+            //setVcr(new AnnotationMonitoringVCR(vcrUdp));
             setVideoControlInformation(new VideoControlInformationImpl(host + ":" + port, VideoControlStatus.CONNECTED));
         }
         catch (Exception ex) {
