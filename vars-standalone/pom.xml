@@ -4,7 +4,7 @@
     <parent>
         <artifactId>vars-redux</artifactId>
         <groupId>vars-redux</groupId>
-        <version>1.0-SNAPSHOT</version>
+        <version>6.0.2</version>
     </parent>
     <artifactId>vars-standalone</artifactId>
     <name>vars-standalone</name>
@@ -77,12 +77,12 @@
         <dependency>
             <groupId>org.mbari</groupId>
             <artifactId>expd-core</artifactId>
-            <version>1.1-SNAPSHOT</version>
+            <version>1.1</version>
         </dependency>
         <dependency>
             <groupId>org.mbari</groupId>
             <artifactId>expd-jdbc</artifactId>
-            <version>1.1-SNAPSHOT</version>
+            <version>1.1</version>
         </dependency>
         
         <!--
