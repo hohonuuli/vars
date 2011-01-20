@@ -8,7 +8,7 @@ import org.mbari.qt.VideoStandard;
 import org.mbari.vcr.IVCR;
 import org.mbari.vcr.qt.TimeSource;
 import org.mbari.vcr.qt.VCRWithDisplay;
-import org.mbari.vcr.timer.AnnotationMonitoringVCR;
+import org.mbari.vcr.timer.AnnotationQueueVCR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.VARSException;
@@ -58,7 +58,7 @@ public class QTVideoControlServiceImpl extends AbstractVideoControlService imple
 
         try {
             VCRWithDisplay vcr0 = new VCRWithDisplay(movieName, timeSource);
-            IVCR vcr = new AnnotationMonitoringVCR(vcr0);
+            IVCR vcr = new AnnotationQueueVCR(vcr0);
             grabber = vcr0.getGrabber();
             setVcr(vcr);
             setVideoControlInformation(new VideoControlInformationImpl(movieName, VideoControlStatus.CONNECTED));
