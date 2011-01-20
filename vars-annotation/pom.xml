@@ -4,10 +4,10 @@
     <parent>
         <artifactId>vars-redux</artifactId>
         <groupId>vars-redux</groupId>
-        <version>6.0.2</version>
+        <version>6.0.3-SNAPSHOT</version>
     </parent>
     <artifactId>vars-annotation</artifactId>
-    <version>6.0.2</version>
+    <version>6.0.3-SNAPSHOT</version>
     <name>vars-annotation</name>
     <url>http://maven.apache.org</url>
     <!--
