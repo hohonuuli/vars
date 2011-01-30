@@ -1,6 +1,8 @@
 package vars.annotation;
 
 
+import vars.ILink;
+
 /**
  * Created by IntelliJ IDEA.
  * User: brian
@@ -15,6 +17,8 @@ public interface AnnotationFactory {
     Association newAssociation();
 
     Association newAssociation(String linkName, String toConcept, String linkValue);
+
+    Association newAssociation(ILink link);
 
     Observation newObservation();
 

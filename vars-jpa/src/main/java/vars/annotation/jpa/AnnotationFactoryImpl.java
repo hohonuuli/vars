@@ -1,5 +1,6 @@
 package vars.annotation.jpa;
 
+import vars.ILink;
 import vars.annotation.*;
 
 
@@ -18,6 +19,10 @@ public class AnnotationFactoryImpl implements AnnotationFactory {
 
     public Association newAssociation(String linkName, String toConcept, String linkValue) {
         return new AssociationImpl(linkName, toConcept, linkValue);
+    }
+
+    public Association newAssociation(ILink link) {
+        return new AssociationImpl(link.getLinkName(), link.getToConcept(), link.getLinkValue());
     }
 
     public Observation newObservation() {
