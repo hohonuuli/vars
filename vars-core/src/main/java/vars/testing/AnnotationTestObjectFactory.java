@@ -106,6 +106,7 @@ public class AnnotationTestObjectFactory {
         physicalData.setOxygen(new Float(randomNumber(0, 1000) / 100F));
         physicalData.setSalinity(new Float(randomNumber(320000, 360000) / 10000F));
         physicalData.setTemperature(new Float(randomNumber(30000, 150000) / 10000F));
+        physicalData.setAltitude(new Float(randomNumber(0, 90000) / 100F));
 
         // populate the cameraData
         CameraData camera = videoFrame.getCameraData();

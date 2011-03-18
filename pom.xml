@@ -65,7 +65,7 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
             <version>1.6.1</version>
-            <scope>runtime</scope>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.google.inject</groupId>
@@ -112,8 +112,8 @@
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
+                    <source>1.6</source>
+                    <target>1.6</target>
                 </configuration>
             </plugin>
             <!-- Create source jars when deploying -->
@@ -166,61 +166,99 @@
                     </execution>
                 </executions>
             </plugin>
-        </plugins>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>**/*.properties</include>
-                </includes>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>false</filtering>
-                <excludes>
-                    <exclude>**/*.properties</exclude>
-                </excludes>
-            </resource>
-        </resources>
-    </build>
-    <repositories>
-        <repository>
-            <id>mbari-maven-repository</id>
-            <name>MBARI Maven Repository</name>
-            <url>http://mbari-maven-repository.googlecode.com/svn/repository/</url>
-        </repository>
-        <repository>
-            <id>eclipselink</id>
-            <name>EclipseLink Repository</name>
-            <url>http://www.eclipse.org/downloads/download.php?r=1&amp;nf=1&amp;file=/rt/eclipselink/maven.repo</url>
-        </repository>
-        <repository>
-            <id>Maven-Central</id>
-            <name>Maven Central Repository</name>
-            <url>http://repo1.maven.org/maven2</url>
-        </repository>
-        <repository>
-            <id>codehaus</id>
-            <name>Maven Codehaus</name>
-            <url>http://repository.codehaus.org/</url>
-        </repository>
-        <repository>
-            <id>Java.net</id>
-            <name>Java.net</name>
-            <url>http://download.java.net/maven/2/</url>
-        </repository>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.7</version>
+                <executions>
+                    <execution>
+                        <id>aggregate</id>
+                        <goals>
+                            <goal>aggregate</goal>
+                        </goals>
+                        <phase>site</phase>
+                        </execution>
+                        </executions>
+                        <configuration>
+                            <docletArtifact>
+                                <groupId>com.google.doclava</groupId>
+                                <artifactId>doclava</artifactId>
+                                <version>1.0.3</version>
+                            </docletArtifact>
+                            <doclet>com.google.doclava.Doclava</doclet>
+                  <!--
+                    | bootclasspath required by Sun's JVM 
+                  -->
+                            <bootclasspath>${sun.boot.class.path}</bootclasspath>
+                            <additionalparam>
+                     -quiet
+                     -federate JDK http://download.oracle.com/javase/6/docs/api/index.html?
+                     -federationxml JDK http://doclava.googlecode.com/svn/static/api/openjdk-6.xml
+                     -hdf project.name "${project.name}"
+                     -d ${project.build.directory}/apidocs
+                   </additionalparam>
+                            <useStandardDocletOptions>false</useStandardDocletOptions>
+                  <!--
+                    | Apple's JVM sometimes requires more memory
+                  -->
+                            <additionalJOption>-J-Xmx1024m</additionalJOption>
+                        </configuration>
+                    </plugin>
+                </plugins>
+                <resources>
+                    <resource>
+                        <directory>src/main/resources</directory>
+                        <filtering>true</filtering>
+                        <includes>
+                            <include>**/*.properties</include>
+                        </includes>
+                    </resource>
+                    <resource>
+                        <directory>src/main/resources</directory>
+                        <filtering>false</filtering>
+                        <excludes>
+                            <exclude>**/*.properties</exclude>
+                        </excludes>
+                    </resource>
+                </resources>
+            </build>
+            <repositories>
+                <repository>
+                    <id>mbari-maven-repository</id>
+                    <name>MBARI Maven Repository</name>
+                    <url>http://mbari-maven-repository.googlecode.com/svn/repository/</url>
+                </repository>
+                <repository>
+                    <id>eclipselink</id>
+                    <name>EclipseLink Repository</name>
+                    <url>http://www.eclipse.org/downloads/download.php?r=1&amp;nf=1&amp;file=/rt/eclipselink/maven.repo</url>
+                </repository>
+                <repository>
+                    <id>Maven-Central</id>
+                    <name>Maven Central Repository</name>
+                    <url>http://repo1.maven.org/maven2</url>
+                </repository>
+                <repository>
+                    <id>codehaus</id>
+                    <name>Maven Codehaus</name>
+                    <url>http://repository.codehaus.org/</url>
+                </repository>
+                <repository>
+                    <id>Java.net</id>
+                    <name>Java.net</name>
+                    <url>http://download.java.net/maven/2/</url>
+                </repository>
         <!-- <repository>
             <id>apache-ibiblio</id>
             <name>Apache Ibiblio Repository</name>
             <url>http://people.apache.org/repo/m1-ibiblio-rsync-repository/</url>
             <layout>legacy</layout>
         </repository> -->
-        <repository>
-            <id>jboss</id>
-            <name>JBoss Repository</name>
-            <url>http://repository.jboss.org/maven2</url>
-        </repository>
+                <repository>
+                    <id>jboss</id>
+                    <name>JBoss Repository</name>
+                    <url>http://repository.jboss.org/maven2</url>
+                </repository>
         <!-- <repository>
             <id>internal</id>
             <name>Archiva Managed Internal Repository</name>
@@ -232,74 +270,74 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository> -->
-    </repositories>
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.7</version>
-                <configuration>
-                    <detectLinks>true</detectLinks>
-                    <links>
-                        <link>http://java.sun.com/j2se/1.6.0/docs/api/</link>
-                    </links>
-                </configuration>
-                <reportSets>
-                    <reportSet>
-                        <id>aggregate</id>
-                        <reports>
-                            <report>aggregate</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>taglist-maven-plugin</artifactId>
-                <configuration>
-                    <tags>
-                        <tag>TODO</tag>
-                        <tag>RxINC</tag>
-                        <tag>@todo</tag>
-                        <tag>FIXME</tag>
-                        <tag>XXX</tag>
-                    </tags>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jxr-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-pmd-plugin</artifactId>
-                <configuration>
-                    <linkXref>true</linkXref>
-                    <targetJdk>1.5</targetJdk>
-                    <rulesets>
-                        <ruleset>/rulesets/basic.xml</ruleset>
-                        <ruleset>/rulesets/imports.xml</ruleset>
-                        <ruleset>/rulesets/unusedcode.xml</ruleset>
-                        <ruleset>/rulesets/finalizers.xml</ruleset>
-                    </rulesets>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>jdepend-maven-plugin</artifactId>
-            </plugin>
+            </repositories>
+            <reporting>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>2.7</version>
+                        <configuration>
+                            <detectLinks>true</detectLinks>
+                            <links>
+                                <link>http://download.oracle.com/javase/6/docs/api/</link>
+                            </links>
+                        </configuration>
+                        <reportSets>
+                            <reportSet>
+                                <id>aggregate</id>
+                                <reports>
+                                    <report>aggregate</report>
+                                </reports>
+                            </reportSet>
+                        </reportSets>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>taglist-maven-plugin</artifactId>
+                        <configuration>
+                            <tags>
+                                <tag>TODO</tag>
+                                <tag>RxINC</tag>
+                                <tag>@todo</tag>
+                                <tag>FIXME</tag>
+                                <tag>XXX</tag>
+                            </tags>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jxr-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-pmd-plugin</artifactId>
+                        <configuration>
+                            <linkXref>true</linkXref>
+                            <targetJdk>1.5</targetJdk>
+                            <rulesets>
+                                <ruleset>/rulesets/basic.xml</ruleset>
+                                <ruleset>/rulesets/imports.xml</ruleset>
+                                <ruleset>/rulesets/unusedcode.xml</ruleset>
+                                <ruleset>/rulesets/finalizers.xml</ruleset>
+                            </rulesets>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>jdepend-maven-plugin</artifactId>
+                    </plugin>
             <!-- Java 6 64bit requires more memory to run tests -->
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <argLine>-Xmx1048M</argLine>
-                </configuration>
-            </plugin>
-        </plugins>
-    </reporting>
-</project>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <argLine>-Xmx1048M</argLine>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </reporting>
+        </project>

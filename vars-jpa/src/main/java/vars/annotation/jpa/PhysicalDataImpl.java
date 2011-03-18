@@ -1,7 +1,8 @@
 /*
- * @(#)PhysicalDataImpl.java   2009.11.10 at 01:33:37 PST
+ * @(#)PhysicalDataImpl.java   2011.03.18 at 09:08:44 PDT
  *
- * Copyright 2009 MBARI
+ * Copyright 2011 MBARI
+ *
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,9 +15,12 @@
 
 package vars.annotation.jpa;
 
-import java.io.Serializable;
-import java.sql.Timestamp;
-import java.util.Date;
+import vars.annotation.PhysicalData;
+import vars.annotation.VideoFrame;
+import vars.jpa.JPAEntity;
+import vars.jpa.KeyNullifier;
+import vars.jpa.TransactionLogger;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -32,11 +36,9 @@ import javax.persistence.TableGenerator;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
-import vars.annotation.PhysicalData;
-import vars.annotation.VideoFrame;
-import vars.jpa.JPAEntity;
-import vars.jpa.KeyNullifier;
-import vars.jpa.TransactionLogger;
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.Date;
 
 /**
  * @author brian
@@ -49,7 +51,10 @@ import vars.jpa.TransactionLogger;
 @NamedQueries({ @NamedQuery(name = "PhysicalData.findById", query = "SELECT v FROM PhysicalData v WHERE v.id = :id") })
 public class PhysicalDataImpl implements Serializable, PhysicalData, JPAEntity {
 
+    Float altitude;
+
     Float depth;
+
     @Id
     @Column(
         name = "id",
@@ -87,16 +92,24 @@ public class PhysicalDataImpl implements Serializable, PhysicalData, JPAEntity {
     @Version
     @Column(name = "LAST_UPDATED_TIME")
     private Timestamp updatedTime;
-
+    
     @OneToOne(targetEntity = VideoFrameImpl.class, optional = false)
     @JoinColumn(name = "VideoFrameID_FK")
     VideoFrame videoFrame;
 
+    /**
+     * @return
+     */
     public boolean containsData() {
         return ((depth != null) || (temperature != null) || (salinity != null) || (oxygen != null) ||
                 (light != null) || (latitude != null) || (longitude != null));
     }
 
+    /**
+     *
+     * @param obj
+     * @return
+     */
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -145,46 +158,93 @@ public class PhysicalDataImpl implements Serializable, PhysicalData, JPAEntity {
         return true;
     }
 
+    /**
+     * @return
+     */
+    public Float getAltitude() {
+        return altitude;
+    }
+
+    /**
+     * @return
+     */
     public Float getDepth() {
         return depth;
     }
 
+    /**
+     * @return
+     */
     public Long getId() {
         return id;
     }
 
+    /**
+     * @return
+     */
     public Double getLatitude() {
         return latitude;
     }
 
+    /**
+     * @return
+     */
     public Float getLight() {
         return light;
     }
 
+    /**
+     * @return
+     */
     public Date getLogDate() {
         return logDate;
     }
 
+    /**
+     * @return
+     */
     public Double getLongitude() {
         return longitude;
     }
 
+    /**
+     * @return
+     */
     public Float getOxygen() {
         return oxygen;
     }
 
+    /**
+     * @return
+     */
+    public Object getPrimaryKey() {
+        return getId();
+    }
+
+    /**
+     * @return
+     */
     public Float getSalinity() {
         return salinity;
     }
 
+    /**
+     * @return
+     */
     public Float getTemperature() {
         return temperature;
     }
 
+    /**
+     * @return
+     */
     public VideoFrame getVideoFrame() {
         return videoFrame;
     }
 
+    /**
+     * @return
+     */
     @Override
     public int hashCode() {
         int hash = 7;
@@ -200,42 +260,93 @@ public class PhysicalDataImpl implements Serializable, PhysicalData, JPAEntity {
         return hash;
     }
 
+    /**
+     *
+     * @param altitude
+     */
+    public void setAltitude(Float altitude) {
+        this.altitude = altitude;
+    }
+
+    /**
+     *
+     * @param depth
+     */
     public void setDepth(Float depth) {
         this.depth = depth;
     }
-    
+
+    /**
+     *
+     * @param id
+     */
     public void setId(Long id) {
-    	this.id = id;
+        this.id = id;
     }
 
+    /**
+     *
+     * @param latitude
+     */
     public void setLatitude(Double latitude) {
         this.latitude = latitude;
     }
 
+    /**
+     *
+     * @param light
+     */
     public void setLight(Float light) {
         this.light = light;
     }
 
+    /**
+     *
+     * @param logDate
+     */
     public void setLogDate(Date logDate) {
         this.logDate = logDate;
     }
 
+    /**
+     *
+     * @param longitude
+     */
     public void setLongitude(Double longitude) {
         this.longitude = longitude;
     }
 
+    /**
+     *
+     * @param oxygen
+     */
     public void setOxygen(Float oxygen) {
         this.oxygen = oxygen;
     }
 
+    /**
+     *
+     * @param salinity
+     */
     public void setSalinity(Float salinity) {
         this.salinity = salinity;
     }
 
+    /**
+     *
+     * @param temperature
+     */
     public void setTemperature(Float temperature) {
         this.temperature = temperature;
     }
 
+    void setVideoFrame(VideoFrame videoFrame) {
+        this.videoFrame = videoFrame;
+    }
+
+    /**
+     * @return
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(getClass().getSimpleName());
@@ -244,13 +355,5 @@ public class PhysicalDataImpl implements Serializable, PhysicalData, JPAEntity {
         sb.append(", depth=").append(depth).append(")");
 
         return sb.toString();
-    }
-
-    void setVideoFrame(VideoFrame videoFrame) {
-        this.videoFrame = videoFrame;
-    }
-    
-    public Object getPrimaryKey() {
-    	return getId();
     }
 }
