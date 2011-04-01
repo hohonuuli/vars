@@ -199,6 +199,23 @@ public class App {
             });
         }
         catch (Exception e) {
+            splashFrame.setMessage(" WARNING: Failed to load the knowledgebase");
+            getLog().warn("Failed to load the knowledgebase", e);
+            splashFrame.repaint();
+            JOptionPane.showMessageDialog(splashFrame, "Unable to load knowledgebase", "VARS - Error",
+                                          JOptionPane.ERROR_MESSAGE, null);
+            System.exit(-1);
+        }
+
+
+        /*
+         * Make sure that the knowledgebase exists. If it's empty then give the
+         * user the oppurtunity to create a root object
+         */
+        try {
+            (new PopulateDatabaseAction(toolBelt)).doAction();
+        }
+        catch (Exception e) {
             splashFrame.setMessage(" Error: Failed to load the knowledgebase");
             getLog().error("Failed to load the knowledgebase", e);
             splashFrame.repaint();
@@ -217,23 +234,6 @@ public class App {
         Dimension frameSize = getKnowledgebaseFrame().getSize();
         double newHeight = (screenSize.getHeight() - 150);
         frameSize.setSize(frameSize.getWidth(), (int) newHeight);
-
-
-        /*
-         * Make sure that the knowledgebase exists. If it's empty then give the
-         * user the oppurtunity to create a root object
-         */
-        try {
-            (new PopulateDatabaseAction(toolBelt)).doAction();
-        }
-        catch (Exception e) {
-            splashFrame.setMessage(" Error: Failed to load the knowledgebase");
-            getLog().error("Failed to load the knowledgebase", e);
-            splashFrame.repaint();
-            JOptionPane.showMessageDialog(splashFrame, "Unable to load knowledgebase", "VARS - Error",
-                                          JOptionPane.ERROR_MESSAGE, null);
-            System.exit(-1);
-        }
 
         getKnowledgebaseFrame().setSize(frameSize);
         getKnowledgebaseFrame().setIconImage(mbariLogo.getImage());

@@ -1,5 +1,7 @@
 package vars.knowledgebase.jpa;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import vars.jpa.DAO;
 import vars.jpa.JPAEntity;
 import vars.knowledgebase.ConceptDAO;
@@ -35,14 +37,20 @@ public class ConceptDAOImpl extends DAO implements ConceptDAO {
     }
 
     public Concept findRoot() {
+        Concept root = null;
         List<Concept> roots = findByNamedQuery("Concept.findRoot", new HashMap<String, Object>());
-        if (roots.size() > 1) {
+
+        if (roots.size() == 1) {
+            root = roots.get(0);
+        }
+        else if (roots.size() > 1) {
             throw new VARSPersistenceException("ERROR!! More than one root was found in the knowedgebase");
         }
         else if (roots.size() == 0) {
-            throw new VARSPersistenceException("ERROR!! No root was found in the knowedgebase");
+            log.warn("No root was found in the knowledgebase");
+            //throw new VARSPersistenceException("ERROR!! No root was found in the knowedgebase");
         }
-        return roots.get(0);
+        return root;
     }
 
     /**

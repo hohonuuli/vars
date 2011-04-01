@@ -82,9 +82,9 @@
     -->
     <profiles>
         <profile>
-            <id>coolpix</id>
+            <id>imaging</id>
             <properties>
-                <environment>coolpix</environment>
+                <environment>imaging</environment>
             </properties>
         </profile>
         <profile>
@@ -94,6 +94,12 @@
             </activation>
             <properties>
                 <environment>dev</environment>
+            </properties>
+        </profile>
+        <profile>
+            <id>pgtest</id>
+            <properties>
+                <environment>pgtest</environment>
             </properties>
         </profile>
         <profile>
