@@ -64,6 +64,8 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
     private EditorButtonPanel buttonPanel = null;
     private JLabel commonLabel = null;
     private JRadioButton commonRb = null;
+    private JLabel formerLabel = null;
+    private JRadioButton formerRb = null;
     private JTextField nameField = null;
     private JLabel nameLabel = null;
     private JList namesList = null;
@@ -157,6 +159,9 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
                     else if (getCommonRb().isSelected()) {
                         nameType = ConceptNameTypes.COMMON.toString();
                     }
+                    else if (getFormerRb().isSelected()) {
+                        nameType = ConceptNameTypes.FORMER.toString();
+                    }
 
                     /*
                      * Exit if the values are invalid
@@ -203,6 +208,14 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
         }
 
         return commonRb;
+    }
+
+    private JRadioButton getFormerRb() {
+        if (formerRb == null) {
+            formerRb = new JRadioButton();
+            formerRb.addItemListener(getRbItemListener());
+        }
+        return formerRb;
     }
 
     /**
@@ -305,6 +318,7 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
                         getUpdateButton().setEnabled(enableUpdate);
                         getCommonRb().setEnabled(enable);
                         getSynonymRb().setEnabled(enable);
+                        getFormerRb().setEnabled(enable);
                         rb.setEnabled(!enable);
                     }
                 }
@@ -322,6 +336,7 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
             synonymLabel.setText("Synonym");
             commonLabel = new JLabel();
             commonLabel.setText("Common");
+            formerLabel = new JLabel("Former");
             rbPanel = new JPanel();
             rbPanel.setLayout(new BoxLayout(getRbPanel(), BoxLayout.X_AXIS));
             rbPanel.add(primaryLabel, null);
@@ -332,6 +347,9 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
             rbPanel.add(Box.createHorizontalStrut(10));
             rbPanel.add(synonymLabel, null);
             rbPanel.add(getSynonymRb(), null);
+            rbPanel.add(Box.createHorizontalStrut(10));
+            rbPanel.add(formerLabel, null);
+            rbPanel.add(getFormerRb(), null);
             rbPanel.add(Box.createHorizontalStrut(10));
             rbPanel.add(Box.createHorizontalGlue());
         }
@@ -428,6 +446,7 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
         buttonGroup.add(getPrimaryRb());
         buttonGroup.add(getCommonRb());
         buttonGroup.add(getSynonymRb());
+        buttonGroup.add(getFormerRb());
     }
 
     /**
@@ -479,6 +498,7 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
         getPrimaryRb().setEnabled(!locked);
         getCommonRb().setEnabled(!locked);
         getSynonymRb().setEnabled(!locked);
+        getFormerRb().setEnabled(!locked);
 
         /*
          * Important to call this to keep the UI consistant
@@ -516,6 +536,9 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
         }
         else if (type.equalsIgnoreCase(ConceptNameTypes.COMMON.toString())) {
             getCommonRb().setSelected(true);
+        }
+        else if (type.equalsIgnoreCase(ConceptNameTypes.FORMER.toString())) {
+            getFormerRb().setSelected(true);
         }
         else {
             getSynonymRb().setSelected(true);
