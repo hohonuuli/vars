@@ -419,6 +419,7 @@ public class OpenVideoArchiveDialog extends StandardDialog {
             String videoArchiveName = PersistenceController.makeVideoArchiveName(platform,
                 sequenceNumber, tapeNumber, postfix);
             videoArchive = dao.findOrCreateByParameters(platform, sequenceNumber, videoArchiveName);
+
         }
             break;
         case EXISTING:

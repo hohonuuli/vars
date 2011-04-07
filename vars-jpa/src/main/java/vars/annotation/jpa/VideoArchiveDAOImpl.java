@@ -1,5 +1,6 @@
 package vars.annotation.jpa;
 
+import vars.annotation.FormatCodes;
 import vars.jpa.DAO;
 import vars.jpa.JPAEntity;
 import vars.knowledgebase.Concept;
@@ -98,8 +99,9 @@ public class VideoArchiveDAOImpl extends DAO implements VideoArchiveDAO {
             } 
             else {
                 videoArchiveSet = annotationFactory.newVideoArchiveSet();
-                persist(videoArchiveSet);
                 videoArchiveSet.setPlatformName(platform);
+                videoArchiveSet.setFormatCode(FormatCodes.UNKNOWN.getCode());
+                persist(videoArchiveSet);
                 CameraDeployment cameraDeployment = annotationFactory.newCameraDeployment();
                 cameraDeployment.setSequenceNumber(sequenceNumber);
                 videoArchiveSet.addCameraDeployment(cameraDeployment);
