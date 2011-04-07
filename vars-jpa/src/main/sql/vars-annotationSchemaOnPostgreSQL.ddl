@@ -218,7 +218,7 @@ create table videoframe  (
 	recordeddtg      	timestamp null,
 	tapetimecode     	varchar(11) null,
 	hdtimecode       	varchar(11) null,
-	insequence       	bit null,
+	insequence       	smallint null,
 	displacer        	varchar(50) null,
 	displacedtg      	timestamp null,
 	videoarchiveid_fk	int8 null,
