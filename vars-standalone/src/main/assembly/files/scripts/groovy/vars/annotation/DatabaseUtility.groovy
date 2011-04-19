@@ -215,6 +215,17 @@ class DatabaseUtility {
 
     void fixTrackingNumbers() {
         log.debug("----- Fixing VideoArchiveSets with no trackingNumbers ----")
+        def dateFormat = new SimpleDateFormat('yyyyDDD')
+        def dao = toolBox.toolBelt.annotationDAOFactory.newVideoArchiveSetDAO()
+        dao.startTransaction()
+        def badVas = dao.findAllWithoutTrackingNumber()
+        badVas.each { vas ->
+            def startDate = vas.startDate
+            if (startDate) {
+                vas.trackingNumber = dateFormat.format(startDate)
+            }
+        }
+        dao.endTransaction()
     }
 
     void showMergeStatus(String platform, def seqNumber) {

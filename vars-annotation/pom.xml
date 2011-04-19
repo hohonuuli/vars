@@ -7,9 +7,7 @@
         <version>6.0.3-SNAPSHOT</version>
     </parent>
     <artifactId>vars-annotation</artifactId>
-    <version>6.0.3-SNAPSHOT</version>
     <name>vars-annotation</name>
-    <url>http://maven.apache.org</url>
     <!--
     Build settings
     -->

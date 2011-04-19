@@ -107,7 +107,7 @@ public class VideoArchiveSetDAOImpl extends DAO implements VideoArchiveSetDAO {
     }
 
     public Collection<VideoArchiveSet> findAllWithoutTrackingNumber() {
-        return null;  // TODO implement this method.
+        return findByNamedQuery("VideoArchiveSet.findAllWithMissingTrackingNumbers");
     }
 
     public Collection<VideoArchiveSet> findAllThatDuplicatePlatformAndSequenceNumber() {
