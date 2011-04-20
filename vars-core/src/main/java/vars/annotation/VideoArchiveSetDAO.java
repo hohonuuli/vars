@@ -30,6 +30,8 @@ public interface VideoArchiveSetDAO extends DAO {
 
     Collection<VideoArchiveSet> findAllByTrackingNumber(String trackingNumber);
 
+    Collection<VideoArchiveSet> findAllByPlatform(String platform);
+
     /**
      * Find all sequence numbers (e.g. dive numbers) available for a particular platform
      * @param platformName The platform of interest

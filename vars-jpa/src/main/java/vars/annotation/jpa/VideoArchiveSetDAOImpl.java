@@ -33,6 +33,12 @@ public class VideoArchiveSetDAOImpl extends DAO implements VideoArchiveSetDAO {
         return linkValues;
     }
 
+    public Collection<VideoArchiveSet> findAllByPlatform(String platform) {
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("platformName", platform)
+        return findByNamedQuery("VideoArchiveSet.findByPlatformName", params);
+    }
+
     public Collection<VideoArchiveSet> findAllBetweenDates(Date startDate, Date endDate) {
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put("date0", startDate);
