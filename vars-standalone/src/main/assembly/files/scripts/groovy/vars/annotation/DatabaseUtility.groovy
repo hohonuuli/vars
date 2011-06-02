@@ -232,6 +232,7 @@ class DatabaseUtility {
         def dateFormat = new SimpleDateFormat('yyyy-MM-dd HH:mm:ss')
         MergeStatusDAO mergeStatusDao = toolBox.mergeStatusDAO
         def mergeStatus = mergeStatusDao.findByPlatformAndSequenceNumber(platform, seqNumber)
+        def dao = toolBox.toolBelt.annotationDAOFactory.newVideoArchiveSetDAO()
 
         println "==========================================================================="
         println " ROV:                ${platform}"
@@ -255,7 +256,7 @@ class DatabaseUtility {
             }
 
             // Show VideoArchiveSet information
-            def dao = toolBox.toolBelt.annotationDAOFactory.newVideoArchiveSetDAO()
+            
             dao.startTransaction()
             def vas = dao.findByPrimaryKey(mergeStatus.videoArchiveSetID)
             def cpds = vas.cameraDeployments
@@ -270,7 +271,7 @@ class DatabaseUtility {
             }
 
             //def va = vas.videoArchiveColl
-            def va = vas.videoArchives
+            def va = vas.videoArchives.sort { it.name }
             println " Number of Tapes:    ${va.size()}"
             va.inject(1) { n, v ->
                 println "\t${n}) Name:              ${v.name}"

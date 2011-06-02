@@ -35,7 +35,7 @@ public class VideoArchiveSetDAOImpl extends DAO implements VideoArchiveSetDAO {
 
     public Collection<VideoArchiveSet> findAllByPlatform(String platform) {
         final Map<String, Object> params = new HashMap<String, Object>();
-        params.put("platformName", platform)
+        params.put("platformName", platform);
         return findByNamedQuery("VideoArchiveSet.findByPlatformName", params);
     }
 
