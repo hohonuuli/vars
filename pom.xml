@@ -4,7 +4,7 @@
     <groupId>vars-redux</groupId>
     <artifactId>vars-redux</artifactId>
     <packaging>pom</packaging>
-    <version>6.0.3-SNAPSHOT</version>
+    <version>6.0.3</version>
     <name>vars-redux</name>
     <inceptionYear>2002</inceptionYear>
     <organization>
@@ -92,13 +92,13 @@
         <dependency>
             <groupId>org.mbari</groupId>
             <artifactId>mbarix4j</artifactId>
-            <version>1.8.2</version>
+            <version>1.8.3</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>r08</version>
+            <version>r09</version>
         </dependency>
         <!-- <dependency>
             <groupId>com.google.collections</groupId>
