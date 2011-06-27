@@ -4,7 +4,7 @@
     <parent>
         <artifactId>vars-redux</artifactId>
         <groupId>vars-redux</groupId>
-        <version>6.0.4-SNAPSHOT<</version>
+        <version>6.0.4-SNAPSHOT</version>
     </parent>
     <artifactId>vars-annotation</artifactId>
     <name>vars-annotation</name>
@@ -122,6 +122,12 @@
             <id>varspub</id>
             <properties>
                 <environment>varspub</environment>
+            </properties>
+        </profile>
+        <profile>
+            <id>video</id>
+            <properties>
+                <environment>video</environment>
             </properties>
         </profile>
         <profile>

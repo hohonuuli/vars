@@ -5,7 +5,7 @@
     <parent>
         <artifactId>vars-redux</artifactId>
         <groupId>vars-redux</groupId>
-        <version>6.0.4-SNAPSHOT<</version>
+        <version>6.0.4-SNAPSHOT</version>
     </parent>
     <artifactId>vars-knowledgebase</artifactId>
     <name>vars-knowledgebase [Library]</name>

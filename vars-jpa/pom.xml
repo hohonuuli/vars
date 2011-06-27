@@ -4,7 +4,7 @@
     <parent>
         <artifactId>vars-redux</artifactId>
         <groupId>vars-redux</groupId>
-        <version>6.0.4-SNAPSHOT<</version>
+        <version>6.0.4-SNAPSHOT</version>
     </parent>
     <artifactId>vars-jpa</artifactId>
     <name>vars-jpa [Library]</name>
@@ -217,6 +217,19 @@
             <id>varspub</id>
             <properties>
                 <environment>varspub</environment>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>net.sourceforge.jtds</groupId>
+                    <artifactId>jtds</artifactId>
+                    <version>${jtds.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>video</id>
+            <properties>
+                <environment>video</environment>
             </properties>
             <dependencies>
                 <dependency>
