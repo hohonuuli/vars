@@ -33,6 +33,7 @@ import vars.VARSException;
 import vars.VarsUserPreferencesFactory;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
+import vars.annotation.ui.video.DoNothingVideoControlService;
 import vars.shared.ui.video.VideoControlService;
 import vars.annotation.ui.video.VideoControlServiceFactory;
 import vars.shared.preferences.PreferenceUpdater;
@@ -297,7 +298,14 @@ public class AnnotationFrameController implements PreferenceUpdater {
             PreferencesService preferencesService = new PreferencesService(preferencesFactory);
             if (preferencesService.findAutoconnectVcr(preferencesService.getHostname())) {
                 String videoID = preferencesService.findLastVideoConnectionId(preferencesService.getHostname());
-                VideoControlService videoControlService = VideoControlServiceFactory.newVideoControlService(videoID);
+                VideoControlService videoControlService;
+                try {
+                    videoControlService = VideoControlServiceFactory.newVideoControlService(videoID);
+                }
+                catch (Exception e) {
+                    log.warn("Failed to create a VideoControlService for " + videoID);
+                    videoControlService = new DoNothingVideoControlService();
+                }
                 Lookup.getVideoControlServiceDispatcher().setValueObject(videoControlService);
             }
 

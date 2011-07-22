@@ -6,7 +6,7 @@ rem ---------------------------------------------------------------------------
 SET VARS_HOME=%~dp0..
 SET VARS_CLASSPATH="%VARS_HOME%\conf";"%VARS_HOME%\lib\*"
 
-SET GROOVY_CLASSPATH="%VARS_HOME%\scripts\groovy";%VARS_CLASSPATH%
+SET GROOVY_CLASSPATH="%VARS_HOME%\scripts\groovy";%VARS_CLASSPATH%;"%VARS_HOME%\lib\groovy-repl\*"
 
 if (%1)==() SET ARGS="%VARS_HOME%\scripts\groovy\openshell.groovy" ELSE ARGS=%*
 

@@ -30,6 +30,36 @@
             <outputDirectory>lib</outputDirectory>
             <unpack>false</unpack>
             <scope>runtime</scope>
+            <excludes>
+                <exclude>org.codehaus.groovy:groovy</exclude>
+                <exclude>commons-cli:commons-cli</exclude>
+                <exclude>jline:jline</exclude>
+                <exclude>org.fusesource.jansi:jansi</exclude>
+                <exclude>org.scala-lang:scala-compiler</exclude>
+                <exclude>org.scala-lang:scalap</exclude>
+                <exclude>org.scala-lang:jline</exclude>
+            </excludes>
+        </dependencySet>
+        <dependencySet>
+            <outputDirectory>lib/scala-repl</outputDirectory>
+            <unpack>false</unpack>
+            <scope>runtime</scope>
+            <includes>
+                <include>org.scala-lang:scala-compiler</include>
+                <include>org.scala-lang:scalap</include>
+                <include>org.scala-lang:jline</include>
+            </includes>
+        </dependencySet>
+        <dependencySet>
+            <outputDirectory>lib/groovy-repl</outputDirectory>
+            <unpack>false</unpack>
+            <scope>runtime</scope>
+            <includes>
+                <include>org.codehaus.groovy:groovy</include>
+                <include>commons-cli:commons-cli</include>
+                <include>jline:jline</include>
+                <include>org.fusesource.jansi:jansi</include>
+            </includes>
         </dependencySet>
     </dependencySets>
 </assembly>

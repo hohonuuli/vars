@@ -3,31 +3,26 @@
 # $Id: $
 # GSH: Execute groovy script using the projects library directory.
 
-VARS_HOME=`dirname "$0"`/..
-VARS_CLASSPATH="$VARS_HOME/conf":"$VARS_HOME/lib/*"
+APP_HOME=`dirname "$0"`/..
 
-GSH_CLASSPATH="${HOME}/.groovy/lib"
-for jar in $(ls ${HOME}/.groovy/lib/*.jar)
-do
-    GSH_CLASSPATH=$GSH_CLASSPATH:"$jar"
-done
-
-GSH_CLASSPATH=$GSH_CLASSPATH:"${VARS_HOME}/scripts/groovy":$VARS_CLASSPATH
+GSH_CLASSPATH=$APP_HOME/conf:${APP_HOME}/scripts/groovy:$APP_HOME/lib/*:$APP_HOME/lib/groovy-repl/*
 
 if [ -z $1 ]; then
     echo $FNAME " Starting Groovy shell"
-    ${JAVACMD:=java} -d32 -Xms16m -Xmx512m \
-         -Duser.timezone=UTC \
+    ${JAVACMD:=java} -Xms16m -Xmx2048m \
+		 -Djava.library.path="${APP_HOME}/native" \
+         -Duser.timezone="UTC" \
          -Dfile.encoding=UTF8 \
-         -classpath $GSH_CLASSPATH \
+         -classpath "$GSH_CLASSPATH" \
          -Djava.security.manager \
          -Djava.security.policy==$VARS_HOME/conf/java.policy \
          org.codehaus.groovy.tools.shell.Main "$@"
 else
-    ${JAVACMD:=java} -d32 -Xms16m -Xmx512m \
-         -Duser.timezone=UTC \
+    ${JAVACMD:=java} -Xms16m -Xmx2048m \
+         -Djava.library.path="${APP_HOME}/native" \
+         -Duser.timezone="UTC" \
          -Dfile.encoding=UTF8 \
-         -classpath $GSH_CLASSPATH \
+         -classpath "$GSH_CLASSPATH" \
          -Djava.security.manager \
          -Djava.security.policy==$VARS_HOME/conf/java.policy \
          groovy.ui.GroovyMain "$@"

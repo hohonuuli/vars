@@ -1,0 +1,74 @@
+#!/bin/sh
+###############################################################################
+# $Id: $
+# SCSH: Execute scala script using the projects library directory.
+
+#------------------- Configure and Save STTY settings -----------------
+# Not sure what the right default is here: trying nonzero.
+scala_exit_status=127
+saved_stty=""
+
+# restore stty settings (echo in particular)
+function restoreSttySettings() {
+  if [[ -n $SCALA_RUNNER_DEBUG ]]; then
+    echo "restoring stty: $saved_stty"
+  fi
+
+  stty $saved_stty
+  saved_stty=""
+}
+
+function onExit() {
+  if [[ "$saved_stty" != "" ]]; then
+    restoreSttySettings
+    exit $scala_exit_status
+  fi
+}
+
+# to reenable echo if we are interrupted before completing.
+trap onExit INT
+
+# save terminal settings
+saved_stty=$(stty -g 2>/dev/null)
+# clear on error so we don't later try to restore them
+if [[ ! $? ]]; then
+  saved_stty=""
+fi
+if [[ -n $SCALA_RUNNER_DEBUG ]]; then
+  echo "saved stty: $saved_stty"
+fi
+
+#------------------- Execute Scala -----------------
+APP_HOME=`dirname "$0"`/..
+
+APP_CLASSPATH=$APP_HOME/conf:${APP_HOME}/scripts/scala
+for jar in $(ls ${APP_HOME}/lib/*.jar)
+do
+    APP_CLASSPATH=$APP_CLASSPATH:$jar
+done
+for jar in $(ls ${APP_HOME}/lib/scala-repl/*.jar)
+do
+    APP_CLASSPATH=$APP_CLASSPATH:$jar
+done
+
+SCALA_LIBRARY=$(ls $APP_HOME/lib/scala-library*.jar)
+SCALA_COMPILER=$(ls $APP_HOME/lib/scala-repl/scala-compiler*.jar)
+SCALAP=$(ls $APP_HOME/lib/scala-repl/scalap*.jar)
+SCALA_JLINE=$(ls $APP_HOME/lib/scala-repl/jline*.jar)
+
+#     -Xbootclasspath/a:$SCALA_COMPILER:$SCALA_LIBRARY:$SCALAP:$SCALA_JLINE \
+
+#scala -usejavacp -classpath $APP_CLASSPATH "$@"
+
+${JAVACMD:=java} -Xms16m -Xmx512m \
+     -Duser.timezone="UTC" \
+     -Dfile.encoding=UTF8 \
+     -Xbootclasspath/a:$SCALA_COMPILER:$SCALA_LIBRARY:$SCALAP:$SCALA_JLINE \
+     scala.tools.nsc.MainGenericRunner -cp $APP_CLASSPATH  "$@"
+
+
+#----------------- Restore SSTY -------------------
+# record the exit status lest it be overwritten:
+# then reenable echo and propagate the code.
+scala_exit_status=$?
+onExit

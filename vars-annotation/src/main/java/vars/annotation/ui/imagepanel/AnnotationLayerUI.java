@@ -164,7 +164,6 @@ public class AnnotationLayerUI<T extends JImageUrlCanvas> extends CrossHairLayer
                         gp.lineTo(x - armLength, y + armLength);
                         g2.draw(gp);
                     }
-
                 }
             }
 
