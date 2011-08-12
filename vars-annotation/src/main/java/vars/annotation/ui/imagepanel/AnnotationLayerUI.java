@@ -165,6 +165,8 @@ public class AnnotationLayerUI<T extends JImageUrlCanvas> extends CrossHairLayer
                         g2.draw(gp);
                     }
                 }
+
+                // TODO if there is a measurement annotation attached then draw the measurement line
             }
 
             if (boundingBox != null) {
@@ -272,6 +274,10 @@ public class AnnotationLayerUI<T extends JImageUrlCanvas> extends CrossHairLayer
      */
     public void setConcept(Concept concept) {
         this.concept = concept;
+    }
+
+    public ToolBelt getToolBelt() {
+        return toolBelt;
     }
 
     /**

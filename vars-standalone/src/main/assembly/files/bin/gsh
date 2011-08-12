@@ -15,7 +15,7 @@ if [ -z $1 ]; then
          -Dfile.encoding=UTF8 \
          -classpath "$GSH_CLASSPATH" \
          -Djava.security.manager \
-         -Djava.security.policy==$VARS_HOME/conf/java.policy \
+         -Djava.security.policy==$APP_HOME/conf/java.policy \
          org.codehaus.groovy.tools.shell.Main "$@"
 else
     ${JAVACMD:=java} -Xms16m -Xmx2048m \
@@ -24,6 +24,6 @@ else
          -Dfile.encoding=UTF8 \
          -classpath "$GSH_CLASSPATH" \
          -Djava.security.manager \
-         -Djava.security.policy==$VARS_HOME/conf/java.policy \
+         -Djava.security.policy==$APP_HOME/conf/java.policy \
          groovy.ui.GroovyMain "$@"
 fi

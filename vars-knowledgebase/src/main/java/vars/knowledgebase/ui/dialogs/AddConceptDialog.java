@@ -223,7 +223,8 @@ public class AddConceptDialog extends javax.swing.JDialog {
         referenceText.setColumns(20);
         referenceText.setRows(5);
         referenceText.setToolTipText(
-            "(OPTIONAL) A reference to literature that contains a description of this concept.");
+            "(OBSOLETE) Add a property using 'dsg-reference' template instead");
+        referenceText.setEnabled(false);
         jScrollPane2.setViewportView(referenceText);
 
         rankNameComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] {
