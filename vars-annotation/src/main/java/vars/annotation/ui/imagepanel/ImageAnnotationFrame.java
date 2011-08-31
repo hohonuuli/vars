@@ -17,24 +17,36 @@ package vars.annotation.ui.imagepanel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.net.URL;
+import java.util.Collection;
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 import org.jdesktop.jxlayer.JXLayer;
 import org.mbari.swing.JImageUrlCanvas;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.annotation.Observation;
 import vars.annotation.VideoFrame;
+import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
 import vars.knowledgebase.Concept;
 import vars.shared.ui.AllConceptNamesComboBox;
 import vars.shared.ui.ConceptNameComboBox;
 
 /**
- *
+ * Main class for this package. This class wires together all dependant classes with the controller.
  * @author brian
  */
 public class ImageAnnotationFrame extends JFrame {
@@ -42,12 +54,15 @@ public class ImageAnnotationFrame extends JFrame {
     private final Logger log = LoggerFactory.getLogger(getClass());
     private JImageUrlCanvas imageCanvas = new JImageUrlCanvas();
     private ConceptNameComboBox comboBox;
-    private BufferedImage image;
     private URL imageUrl;
     private JXLayer<JImageUrlCanvas> layer;
-    private final AnnotationLayerUI layerUI;
+    private AnnotationLayerUI annotationLayerUI;
+    private MeasurementLayerUI measurementLayerUI;
     private JToolBar toolBar;
-
+    private final SelectObservationsListener selectObservationsListener = new SelectObservationsListenerImpl();
+    private final CreateObservationListener createObservationListener;
+    private final ImageAnnotationFrameController controller;
+    private JToggleButton makeMeasurementButton;
     /**
      * Create the frame
      *
@@ -55,35 +70,11 @@ public class ImageAnnotationFrame extends JFrame {
      */
     public ImageAnnotationFrame(final ToolBelt toolBelt) {
         super();
-        layerUI = new AnnotationLayerUI<JImageUrlCanvas>(toolBelt);
-        comboBox = new AllConceptNamesComboBox(toolBelt.getQueryPersistenceService());
-
-        /*
-         * When combo box changes, change the default concept used for point and
-         * click annotations
-         */
-        comboBox.addItemListener(new ItemListener() {
-
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    Concept concept = toolBelt.getAnnotationPersistenceService().findConceptByName(
-                        (String) comboBox.getSelectedItem());
-                    layerUI.setConcept(concept);
-                }
-            }
-
-        });
+        controller = new ImageAnnotationFrameController(toolBelt);
+        createObservationListener = new CreateObservationListenerImpl(toolBelt.getAnnotationFactory(), toolBelt.getPersistenceController());
         initialize();
     }
 
-    /**
-     * The image is stored internally as a {@code BufferedImage}. This
-     * call returns the underlying image
-     * @return The image fetched in
-     */
-    public BufferedImage getImage() {
-        return image;
-    }
 
     /**
      * @return
@@ -91,10 +82,85 @@ public class ImageAnnotationFrame extends JFrame {
     public JXLayer<JImageUrlCanvas> getLayer() {
         if (layer == null) {
             layer = new JXLayer<JImageUrlCanvas>(imageCanvas);
-            layer.setUI(layerUI);
+            layer.setUI(getAnnotationLayerUI());
         }
 
         return layer;
+    }
+
+    public AnnotationLayerUI getAnnotationLayerUI() {
+        if (annotationLayerUI == null) {
+            annotationLayerUI = new AnnotationLayerUI<JImageUrlCanvas>(controller.getToolBelt());
+            annotationLayerUI.setSelectObservationsListener(selectObservationsListener);
+            annotationLayerUI.setCreateObservationListener(createObservationListener);
+        }
+        return annotationLayerUI;
+    }
+
+    public MeasurementLayerUI getMeasurementLayerUI() {
+        if (measurementLayerUI == null) {
+            measurementLayerUI = new MeasurementLayerUI<JImageUrlCanvas>(controller.getToolBelt());
+            
+        }
+        return measurementLayerUI;
+    }
+
+    public ConceptNameComboBox getComboBox() {
+        if (comboBox == null) {
+            final ToolBelt toolBelt = controller.getToolBelt();
+            comboBox = new AllConceptNamesComboBox(toolBelt.getQueryPersistenceService());
+
+            /*
+             * When combo box changes, change the default concept used for point and
+             * click annotations
+             */
+            comboBox.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    if (e.getStateChange() == ItemEvent.SELECTED) {
+                        Concept concept = toolBelt.getAnnotationPersistenceService().findConceptByName(
+                            (String) comboBox.getSelectedItem());
+                        getAnnotationLayerUI().setConcept(concept);
+                    }
+                }
+            });
+        }
+        return comboBox;
+    }
+
+    public JToggleButton getMakeMeasurementButton() {
+        if (makeMeasurementButton == null) {
+            makeMeasurementButton = new JToggleButton("Measure");
+            makeMeasurementButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if (makeMeasurementButton.isSelected()) {
+                        useMeasurementLayer();
+                    }
+                    else {
+                        useAnnotationLayer();
+                    }
+                }
+            });
+            /*
+               Listen for selected Observations. If one is selected, set it as the GOTO observation.
+               Otherwise disable the measurements
+             */
+            Lookup.getSelectedObservationsDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
+                @Override
+                public void propertyChange(PropertyChangeEvent evt) {
+                    Collection<Observation> selectedObservations = (Collection<Observation>) evt.getNewValue();
+                    if (selectedObservations.size() == 1) {
+                        getMeasurementLayerUI().setObservation(selectedObservations.iterator().next());
+                    }
+                    else {
+                        getMeasurementLayerUI().setObservation(null);
+                        useAnnotationLayer();
+                    }
+                }
+            });
+        }
+        return makeMeasurementButton;
     }
 
     /**
@@ -103,7 +169,8 @@ public class ImageAnnotationFrame extends JFrame {
     public JToolBar getToolBar() {
         if (toolBar == null) {
             toolBar = new JToolBar();
-            toolBar.add(comboBox);
+            toolBar.add(getComboBox());
+            toolBar.add(getMakeMeasurementButton());
         }
 
         return toolBar;
@@ -113,7 +180,7 @@ public class ImageAnnotationFrame extends JFrame {
      * @return
      */
     public VideoFrame getVideoFrame() {
-        return layerUI.getVideoFrame();
+        return controller.getVideoFrame();
     }
 
     private void initialize() {
@@ -149,7 +216,8 @@ public class ImageAnnotationFrame extends JFrame {
      * @param videoFrame
      */
     public void setVideoFrame(VideoFrame videoFrame) {
-        layerUI.setVideoFrame(videoFrame);
+        controller.setVideoFrame(videoFrame);
+        getAnnotationLayerUI().setVideoFrame(videoFrame);
         URL url = null;
         if (videoFrame != null && videoFrame.getCameraData() != null) {
             try {
@@ -164,6 +232,18 @@ public class ImageAnnotationFrame extends JFrame {
             setImageUrl(url);
         }
         repaint();
+    }
+
+    public void useAnnotationLayer() {
+        getMakeMeasurementButton().setSelected(false);
+        getLayer().setUI(getAnnotationLayerUI());
+    }
+
+
+    public void useMeasurementLayer() {
+        getMakeMeasurementButton().setSelected(true);
+        getMeasurementLayerUI().resetUI();
+        getLayer().setUI(getMeasurementLayerUI());
     }
 
 }

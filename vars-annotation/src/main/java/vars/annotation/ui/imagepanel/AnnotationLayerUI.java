@@ -19,33 +19,25 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Vector;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import org.jdesktop.jxlayer.JXLayer;
 import org.mbari.awt.AwtUtilities;
 import org.mbari.swing.JImageUrlCanvas;
-import vars.UserAccount;
 import vars.annotation.Observation;
 import vars.annotation.VideoFrame;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
-import vars.annotation.ui.table.ObservationTable;
-import vars.annotation.ui.table.ObservationTableModel;
 import vars.knowledgebase.Concept;
 
 /**
@@ -82,6 +74,9 @@ public class AnnotationLayerUI<T extends JImageUrlCanvas> extends CrossHairLayer
     private final ToolBelt toolBelt;
     private VideoFrame videoFrame;
 
+    private SelectObservationsListener selectObservationsListener;
+    private CreateObservationListener createObservationListener;
+
     /**
      * Constructs ...
      *
@@ -91,22 +86,6 @@ public class AnnotationLayerUI<T extends JImageUrlCanvas> extends CrossHairLayer
         this.toolBelt = toolBelt;
     }
 
-    private enum MarkerStyle {
-        SELECTED(new Color(0, 255, 0, 180), new Font("Sans Serif", Font.PLAIN, 10), 14, new BasicStroke(3)),
-        NOTSELECTED(new Color(255, 0, 0, 180), new Font("Sans Serif", Font.PLAIN, 8), 7, new BasicStroke(3));
-
-        private final int armLength;
-        private final Color color;
-        private final Font font;
-        private final Stroke stroke;
-
-        private MarkerStyle(Color color, Font font, int armLength, Stroke stroke) {
-            this.color = color;
-            this.font = font;
-            this.armLength = armLength;
-            this.stroke = stroke;
-        }
-    }
 
     /**
      * @return
@@ -124,6 +103,22 @@ public class AnnotationLayerUI<T extends JImageUrlCanvas> extends CrossHairLayer
      */
     public VideoFrame getVideoFrame() {
         return videoFrame;
+    }
+
+    public SelectObservationsListener getSelectObservationsListener() {
+        return selectObservationsListener;
+    }
+
+    public void setSelectObservationsListener(SelectObservationsListener selectObservationsListener) {
+        this.selectObservationsListener = selectObservationsListener;
+    }
+
+    public CreateObservationListener getCreateObservationListener() {
+        return createObservationListener;
+    }
+
+    public void setCreateObservationListener(CreateObservationListener createObservationListener) {
+        this.createObservationListener = createObservationListener;
     }
 
     @Override
@@ -166,7 +161,6 @@ public class AnnotationLayerUI<T extends JImageUrlCanvas> extends CrossHairLayer
                     }
                 }
 
-                // TODO if there is a measurement annotation attached then draw the measurement line
             }
 
             if (boundingBox != null) {
@@ -286,56 +280,37 @@ public class AnnotationLayerUI<T extends JImageUrlCanvas> extends CrossHairLayer
      */
     public void setVideoFrame(VideoFrame videoFrame_) {
 
-        /*
-         * We have to look up the videoframe from the database since the reference
-         * passed may be stale
-         */
-        videoFrame = (videoFrame_ == null) ? null : toolBelt.getAnnotationDAOFactory().newDAO().find(videoFrame_);
-        observations.clear();
-        selectedObservations.clear();
-        boundingBox = null;
-        setDirty(true);
-
-        if (videoFrame != null) {
-            observations.addAll(Collections2.filter(videoFrame.getObservations(), new Predicate<Observation>() {
-
-                public boolean apply(Observation input) {
-                    return (input.getX() != null) && (input.getY() != null);
-                }
-
-            }));
+        // IF it's the same videoFrame DO NOT redraw. Otherwise the UI Will flicker
+        if (videoFrame != videoFrame_) {
+            /*
+             * We have to look up the videoframe from the database since the reference
+             * passed may be stale
+             */
+            videoFrame = (videoFrame_ == null) ? null : toolBelt.getAnnotationDAOFactory().newDAO().find(videoFrame_);
+            observations.clear();
+            selectedObservations.clear();
+            boundingBox = null;
             setDirty(true);
+
+            if (videoFrame != null) {
+                observations.addAll(Collections2.filter(videoFrame.getObservations(), new Predicate<Observation>() {
+                    public boolean apply(Observation input) {
+                        return (input.getX() != null) && (input.getY() != null);
+                    }
+                }));
+                setDirty(true);
+            }
         }
     }
 
     private class Controller {
 
         void newObservation(Point2D point) {
-            UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
-            if ((userAccount != null) && (videoFrame != null)) {
-                Observation observation = toolBelt.getAnnotationFactory().newObservation();
-                observation.setConceptName(getConcept().getPrimaryConceptName().getName());
-                observation.setObservationDate(new Date());
-                observation.setObserver(userAccount.getUserName());
-                observation.setX(point.getX());
-                observation.setY(point.getY());
-
-                // The persistence controller will trigger an update to setVideoFrame on this class
-                toolBelt.getPersistenceController().insertObservation(videoFrame, observation);
-            }
+            createObservationListener.doCreate(new CreateObservationEvent(getConcept(), getVideoFrame(), point, new Date()));
         }
 
         void sendSelectionNotification() {
-            Collection<Observation> obs = new ArrayList<Observation>(selectedObservations);
-            ObservationTable table = (ObservationTable) Lookup.getObservationTableDispatcher().getValueObject();
-            ObservationTableModel model = (ObservationTableModel) ((JTable) table).getModel();
-            ListSelectionModel selectionModel = ((JTable) table).getSelectionModel();
-            selectionModel.clearSelection();
-
-            for (Observation observation : obs) {
-                int row = ((JTable) table).convertRowIndexToView(model.getObservationRow(observation));
-                selectionModel.addSelectionInterval(row, row);
-            }
+            selectObservationsListener.doSelect(new SelectObservationsEvent(selectedObservations));
         }
     }
 }
