@@ -1,6 +1,7 @@
-package vars.annotation.ui.imagepanel;
+package vars.annotation.ui.table.events;
 
 /**
+ * A Listener that responds to CreateObservationEvents
  * @author Brian Schlining
  * @since 2011-08-31
  */

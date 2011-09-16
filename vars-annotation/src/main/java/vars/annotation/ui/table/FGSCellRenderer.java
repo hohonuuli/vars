@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)FGSCellRenderer.java   2011.09.15 at 10:15:15 PDT
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
- * (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
+ * Copyright 2011 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,15 +12,16 @@
  */
 
 
+
 /*
 Created on Dec 11, 2003
  */
 package vars.annotation.ui.table;
 
-import java.awt.Component;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
+import java.awt.Component;
 
 /**
  * <p>A cell renderer that displays if the current observation has a frame-grab
@@ -31,10 +29,7 @@ import javax.swing.table.TableCellRenderer;
  */
 public class FGSCellRenderer extends JPanel implements TableCellRenderer {
 
-
-
     private javax.swing.JLabel lblFrameGrab = null;
-
     private javax.swing.JLabel lblSample = null;
 
     /**
@@ -44,7 +39,6 @@ public class FGSCellRenderer extends JPanel implements TableCellRenderer {
         super();
         initialize();
     }
-
 
     private javax.swing.JLabel getLblFrameGrab() {
         if (lblFrameGrab == null) {
@@ -60,7 +54,6 @@ public class FGSCellRenderer extends JPanel implements TableCellRenderer {
 
         return lblFrameGrab;
     }
-
 
     private javax.swing.JLabel getLblSample() {
         if (lblSample == null) {
@@ -127,4 +120,3 @@ public class FGSCellRenderer extends JPanel implements TableCellRenderer {
         this.setSize(32, 16);
     }
 }
-

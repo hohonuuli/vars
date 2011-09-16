@@ -1,5 +1,5 @@
 /*
- * @(#)DistanceMeasurementLayerUI.java   2011.07.25 at 01:22:47 PDT
+ * @(#)MeasurementLayerUI.java   2011.09.13 at 02:15:24 PDT
  *
  * Copyright 2011 MBARI
  *
@@ -39,7 +39,6 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeSupport;
 import java.util.Collection;
-
 import java.util.Vector;
 
 /**
@@ -50,41 +49,46 @@ import java.util.Vector;
  */
 public class MeasurementLayerUI<T extends JImageUrlCanvas> extends CrossHairLayerUI<T> {
 
-    private static final int markerDiameter = 10;
+    /** Name of the observation property that can be used with property change listeners */
     public static final String PROP_OBSERVATION = "Observation";
+
+    /** The diameter of the start of measurement marker */
+    private static final int markerDiameter = 10;
+
+    /** Point to hold start of line coordinates in image pixels */
     private final Point2D lineStart = new Point2D.Double();
+
+    /** Point to hold end of line coordinates in image pixels */
     private final Point2D lineEnd = new Point2D.Double();
-    private boolean selectedLineEnd;
-    private boolean selectedLineStart;
+
+    /** Path used to draw measurement line */
     private GeneralPath line = new GeneralPath();
     private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
-    private final Collection<MeasurementCompletedListener> measurementCompletedListeners = new Vector<MeasurementCompletedListener>();
-    private Observation observation;
-    private final ToolBelt toolBelt;
 
-    class MeasurementPath {
-        final Measurement measurement;
-        final GeneralPath generalPath = new GeneralPath();
-        final Point2D commentPoint = new Point2D.Float();
-
-        MeasurementPath(Measurement measurement) {
-            this.measurement = measurement;
-        }
-
-    }
-    
     /** The path from lineStart to the current mouse position */
     private final Collection<MeasurementPath> measurementPaths = new Vector<MeasurementPath>();
+    private final Collection<MeasurementCompletedListener> measurementCompletedListeners = new Vector<MeasurementCompletedListener>();
     private Logger log = LoggerFactory.getLogger(getClass());
     private Font lineFont = new Font("Sans Serif", Font.PLAIN, 10);
 
+    /** Transform that converts an association to a measurement object */
     private final Function<ILink, MeasurementPath> associationTransform = new Function<ILink, MeasurementPath>() {
+
         @Override
         public MeasurementPath apply(ILink input) {
             return new MeasurementPath(Measurement.LINK_TO_MEASUREMENT_TRANSFORM.apply(input));
         }
     };
 
+    /** The observation that we're currently adding measurements to */
+    private Observation observation;
+
+    /** Flag, when true we've just completed measuring a line */
+    private boolean selectedLineEnd;
+
+    /** Flag, when true we've just started measuring a line */
+    private boolean selectedLineStart;
+    private final ToolBelt toolBelt;
 
     /**
      * Constructs ...
@@ -93,6 +97,40 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends CrossHairLaye
      */
     public MeasurementLayerUI(ToolBelt toolBelt) {
         this.toolBelt = toolBelt;
+    }
+
+    /**
+     * By iteself this component does nothing with a measurement. In order to add functionality just
+     * add a listener to process a measurement.
+     * 
+     * @param listener
+     */
+    public void addMeasurementCompletedListener(MeasurementCompletedListener listener) {
+        measurementCompletedListeners.add(listener);
+    }
+
+    /**
+     * Creates a measurement from the current parameters
+     * @param comment
+     * @param jxl
+     * @return
+     */
+    private Measurement getMeasurement(String comment, JXLayer<? extends T> jxl) {
+        //Point2D lineStartInImage = jxl.getView().convertToImage(lineStart);
+        //Point2D lineEndInImage = jxl.getView().convertToImage(lineEnd);
+        int x0 = (int) Math.round(lineStart.getX());
+        int y0 = (int) Math.round(lineStart.getX());
+        int x1 = (int) Math.round(lineEnd.getX());
+        int y1 = (int) Math.round(lineEnd.getX());
+
+        return new Measurement(x0, y0, x1, y1, comment);
+    }
+
+    /**
+     * @return The observation that we're adding measurements to
+     */
+    public Observation getObservation() {
+        return observation;
     }
 
     /**
@@ -105,17 +143,11 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends CrossHairLaye
         return propertyChangeSupport;
     }
 
-    /**
-     * @return
-     */
-    public Observation getObservation() {
-        return observation;
-    }
-
     @Override
     protected void paintLayer(Graphics2D g2, JXLayer<? extends T> jxl) {
         super.paintLayer(g2, jxl);
         g2.setPaintMode();    // Make sure XOR is turned off
+
         // --- Paint observation
         if (observation != null) {
             MarkerStyle markerStyle = MarkerStyle.NOTSELECTED;
@@ -151,7 +183,7 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends CrossHairLaye
         // --- Draw and label existing measurements
         g2.setXORMode(Color.GREEN);
         g2.setStroke(new BasicStroke(2));
-        for(MeasurementPath path : measurementPaths) {
+        for (MeasurementPath path : measurementPaths) {
             updateMeasurementPath(path, jxl);
             String comment = path.measurement.getComment();
             g2.draw(path.generalPath);
@@ -184,15 +216,18 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends CrossHairLaye
         case MouseEvent.MOUSE_PRESSED:
             Point2D imagePoint = jxl.getView().convertToImage(point);
             if (!selectedLineStart) {
+
                 // --- On first click set lineStart value
                 lineStart.setLocation(imagePoint);
                 selectedLineStart = true;
                 setDirty(true);
             }
             else {
+
                 // --- On second click set lineEnd value, generate association, set measuring property to false
                 lineEnd.setLocation(imagePoint);
                 selectedLineEnd = true;
+
                 // TODO show dialog to get comment added
                 Measurement measurement = getMeasurement(null, jxl);
                 setDirty(true);
@@ -207,27 +242,16 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends CrossHairLaye
 
             }
         default:
-            // Do nothing
-        }
-    }
 
-    private Measurement getMeasurement(String comment, JXLayer<? extends T> jxl) {
-        Point2D lineStartInImage = jxl.getView().convertToImage(lineStart);
-        Point2D lineEndInImage = jxl.getView().convertToImage(lineEnd);
-        int x0 = (int) Math.round(lineStartInImage.getX());
-        int y0 = (int) Math.round(lineStartInImage.getX());
-        int x1 = (int) Math.round(lineEndInImage.getX());
-        int y1 = (int) Math.round(lineEndInImage.getX());
-        return new Measurement(x0, y0, x1, y1, comment);
+        // Do nothing
+        }
     }
 
     @Override
     protected void processMouseMotionEvent(MouseEvent me, JXLayer<? extends T> jxl) {
         super.processMouseMotionEvent(me, jxl);
 
-        if (me.getID() == MouseEvent.MOUSE_MOVED  &&
-                selectedLineStart &&
-                !selectedLineEnd) {
+        if ((me.getID() == MouseEvent.MOUSE_MOVED) && selectedLineStart && !selectedLineEnd) {
             Point point = SwingUtilities.convertPoint(me.getComponent(), me.getPoint(), jxl);
             int w = jxl.getWidth();
             int h = jxl.getHeight();
@@ -236,7 +260,7 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends CrossHairLaye
              * Create crosshair
              */
             line.reset();
-            if (point.y <= h && point.x <= w) {
+            if ((point.y <= h) && (point.x <= w)) {
                 Point2D componentPoint = jxl.getView().convertToComponent(lineStart);
                 line.moveTo(componentPoint.getX(), componentPoint.getY());
                 line.lineTo(point.x, point.y);
@@ -245,31 +269,6 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends CrossHairLaye
             // mark the ui as dirty and needed to be repainted
             setDirty(true);
         }
-    }
-
-    /**
-     *
-     * @param newObservation
-     */
-    public void setObservation(Observation newObservation) {
-        Observation oldObservation = this.observation;
-        this.observation = newObservation;
-        measurementPaths.clear();
-        resetUI();
-        // --- Parse out any existing measurement
-        if (newObservation != null) {
-            Collection<Association> associations = Collections2.filter(newObservation.getAssociations(), Measurement.IS_MEASUREMENT_PREDICATE);
-            for (Association  association : associations) {
-                try {
-                    measurementPaths.add(associationTransform.apply(association));
-                }
-                catch (Exception e) {
-                    log.warn("Unable to parse coordinates from the association, " + association);
-                }
-            }
-        }
-        setDirty(true);
-        propertyChangeSupport.firePropertyChange(PROP_OBSERVATION, oldObservation, newObservation);
     }
 
     /**
@@ -284,6 +283,32 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends CrossHairLaye
         setDirty(true);
     }
 
+    /**
+     *
+     * @param newObservation
+     */
+    public void setObservation(Observation newObservation) {
+        Observation oldObservation = this.observation;
+        this.observation = newObservation;
+        measurementPaths.clear();
+        resetUI();
+
+        // --- Parse out any existing measurement
+        if (newObservation != null) {
+            Collection<Association> associations = Collections2.filter(newObservation.getAssociations(),
+                Measurement.IS_MEASUREMENT_PREDICATE);
+            for (Association association : associations) {
+                try {
+                    measurementPaths.add(associationTransform.apply(association));
+                }
+                catch (Exception e) {
+                    log.warn("Unable to parse coordinates from the association, " + association);
+                }
+            }
+        }
+        setDirty(true);
+        propertyChangeSupport.firePropertyChange(PROP_OBSERVATION, oldObservation, newObservation);
+    }
 
     /**
      * Resets the path of measurement lines and comment location based on the size of the underlying componenet
@@ -310,9 +335,14 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends CrossHairLaye
 
     }
 
-    public void addMeasurementCompletedListener(MeasurementCompletedListener listener) {
-        measurementCompletedListeners.add(listener);
+    class MeasurementPath {
+
+        final GeneralPath generalPath = new GeneralPath();
+        final Point2D commentPoint = new Point2D.Float();
+        final Measurement measurement;
+
+        MeasurementPath(Measurement measurement) {
+            this.measurement = measurement;
+        }
     }
-
-
 }

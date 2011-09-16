@@ -1,4 +1,4 @@
-package vars.annotation.ui.imagepanel;
+package vars.annotation.ui.table.events;
 
 import vars.annotation.Observation;
 import vars.annotation.VideoFrame;
@@ -8,6 +8,7 @@ import java.awt.geom.Point2D;
 import java.util.Date;
 
 /**
+ * An event to create a new observation. This is an immutable class
  * @author Brian Schlining
  * @since 2011-08-31
  */
@@ -18,6 +19,13 @@ public class CreateObservationEvent {
     private final Point2D point;
     private final Date date;
 
+    /**
+     *
+     * @param concept The concept to use for the created observation
+     * @param videoFrame The videoframe to attach the observation to
+     * @param point A point on an image for the observation, this can be <b>null</b>
+     * @param date The date the observation was created
+     */
     public CreateObservationEvent(Concept concept, VideoFrame videoFrame, Point2D point, Date date) {
         this.concept = concept;
         this.videoFrame = videoFrame;

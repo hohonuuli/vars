@@ -1,4 +1,4 @@
-package vars.annotation.ui.imagepanel;
+package vars.annotation.ui.table.events;
 
 import vars.UserAccount;
 import vars.annotation.AnnotationFactory;
@@ -6,12 +6,18 @@ import vars.annotation.Observation;
 import vars.annotation.VideoFrame;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.PersistenceController;
-import vars.knowledgebase.Concept;
 
 import java.awt.geom.Point2D;
 import java.util.Date;
 
 /**
+ * The main implementation of a CreateObservationListener. This implementation
+ * does the following:
+ * <ol>
+ *  <li>Creates a new Observation using the concept, observation and videoframe 
+ *    provided. </li>
+ *  <li>
+ * </ol>
  * @author Brian Schlining
  * @since 2011-08-31
  */
@@ -36,8 +42,10 @@ public class CreateObservationListenerImpl implements CreateObservationListener 
             observation.setConceptName(event.getConcept().getPrimaryConceptName().getName());
             observation.setObservationDate(new Date());
             observation.setObserver(userAccount.getUserName());
-            observation.setX(point.getX());
-            observation.setY(point.getY());
+            if (point != null) {
+                observation.setX(point.getX());
+                observation.setY(point.getY());
+            }
 
             // The persistence controller will trigger an update to setVideoFrame on this class
             persistenceController.insertObservation(videoFrame, observation);

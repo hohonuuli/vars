@@ -1,4 +1,4 @@
-package vars.annotation.ui.imagepanel;
+package vars.annotation.ui.table.events;
 
 /**
  * @author Brian Schlining

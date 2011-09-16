@@ -172,16 +172,15 @@ public class VideoControlServiceDialog extends StandardDialog {
                 Sources source = (Sources) getComboBox().getSelectedItem();
                 VideoControlService videoControlService = null;
                 ConnectionParameters connectionParameters = null;
-                Object[] args = null;
                 switch (source) {
                 case RS422:
                     videoControlService = new RSS422VideoControlService();
-                    connectionParameters = (ConnectionParameters) getRs422Panel();
+                    connectionParameters = getRs422Panel();
                     break;
 
                 default:
                     videoControlService = new UDPVideoControlService();
-                    connectionParameters = (ConnectionParameters) getUdpPanel();
+                    connectionParameters = getUdpPanel();
                     break;
                 }
 

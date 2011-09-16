@@ -51,7 +51,11 @@ public class AddCommentAssociationDialog extends StandardDialog {
      * Create the dialog
      */
     public AddCommentAssociationDialog() {
-        super((Frame) Lookup.getApplicationFrameDispatcher().getValueObject());
+        this((Frame) Lookup.getApplicationFrameDispatcher().getValueObject());
+    }
+
+    public AddCommentAssociationDialog(Frame parent) {
+        super(parent);
 
         try {
             initialize();
@@ -61,7 +65,6 @@ public class AddCommentAssociationDialog extends StandardDialog {
         }
 
         status = Status.Cancel;
-
     }
 
     /**

@@ -50,8 +50,10 @@ public class JXObservationTableModel extends AbstractTableModel implements Obser
     }
 
     /**
-     *
-     * @param obs
+     * Add and observation to the table model. THe obs must have a primary key. If an
+     * observation with the same primary key already exists in the model then the new
+     * observation will NOT be added.
+     * @param obs The observation to add
      */
     public void addObservation(final Observation obs) {
         if ((obs != null) && (obs.getVideoFrame() != null)) {
@@ -93,6 +95,7 @@ public class JXObservationTableModel extends AbstractTableModel implements Obser
     }
 
     /**
+     * Remove all observations from the model
      */
     public void clear() {
         observations.clear();
@@ -101,14 +104,14 @@ public class JXObservationTableModel extends AbstractTableModel implements Obser
     }
 
     /**
-     * @return
+     * @return The number of columns in the table model
      */
     public int getColumnCount() {
         return tableColumnModel.getColumnCount();
     }
 
     /**
-     * @return
+     * @return The number of rows in the table model
      */
     public int getNumberOfObservations() {
         return observations.size();
@@ -116,8 +119,8 @@ public class JXObservationTableModel extends AbstractTableModel implements Obser
 
     /**
      *
-     * @param rowIndex
-     * @return
+     * @param rowIndex THe row of interest
+     * @return THe observation at the row of interest
      */
     public Observation getObservationAt(int rowIndex) {
         Observation out = null;
@@ -130,8 +133,8 @@ public class JXObservationTableModel extends AbstractTableModel implements Obser
 
     /**
      *
-     * @param observation
-     * @return
+     * @param observation THe observation of interest
+     * @return The row number containing the observation
      */
     public int getObservationRow(Observation observation) {
         int row = -1;
@@ -147,7 +150,7 @@ public class JXObservationTableModel extends AbstractTableModel implements Obser
     }
 
     /**
-     * @return
+     * @return The number of rows in the table model
      */
     public int getRowCount() {
         return observations.size();
@@ -157,12 +160,12 @@ public class JXObservationTableModel extends AbstractTableModel implements Obser
      *
      * @param rowIndex
      * @param columnIndex
-     * @return
+     * @return THe value at the given row and column
      */
     public Object getValueAt(int rowIndex, int columnIndex) {
         Object out = null;
         if (rowIndex < observations.size()) {
-            final Observation obs = (Observation) observations.get(rowIndex);
+            final Observation obs = observations.get(rowIndex);
 
             /*
              *  Since the columns can be reordered we can't rely on the columnIndex
@@ -186,10 +189,10 @@ public class JXObservationTableModel extends AbstractTableModel implements Obser
     }
 
     /**
+     * Fires a table data changed event which will cause a redraw of the table
      */
     public void redrawAll() {
         fireTableDataChanged();
-
     }
 
     /**

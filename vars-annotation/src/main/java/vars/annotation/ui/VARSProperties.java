@@ -185,7 +185,7 @@ public class VARSProperties {
      * @return The collection of cameraplatforms found in the vars.properties file.
      * The collecition is Collection<String>
      */
-    public static Collection getCameraPlatforms() {
+    public static Collection<String> getCameraPlatforms() {
         return platforms.keySet();
     }
     

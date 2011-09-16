@@ -1,11 +1,8 @@
 /*
- * Copyright 2005 MBARI
+ * @(#)AssociationListCellRenderer.java   2011.09.15 at 10:15:03 PDT
  *
- * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
- * (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
+ * Copyright 2011 MBARI
  *
- * http://www.gnu.org/copyleft/lesser.html
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,15 +12,17 @@
  */
 
 
+
 package vars.annotation.ui.table;
 
-import java.awt.Component;
-import java.awt.Dimension;
+import vars.annotation.Association;
+
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
-import vars.annotation.Association;
- 
+import java.awt.Component;
+import java.awt.Dimension;
+
 /**
  * <p>Allows a list of <code>Associations</code> to be displayed in a
  * a single cell of a JTable</p>
@@ -37,7 +36,6 @@ import vars.annotation.Association;
  */
 public class AssociationListCellRenderer extends DefaultListCellRenderer implements ListCellRenderer {
 
- 
     String assoString;
 
     /**
@@ -81,7 +79,6 @@ public class AssociationListCellRenderer extends DefaultListCellRenderer impleme
 
         return component;
     }
-
 
     /**
      *  Gets the preferredSize attribute of the AssociationListCellRenderer object

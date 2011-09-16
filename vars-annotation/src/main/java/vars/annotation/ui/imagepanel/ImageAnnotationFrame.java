@@ -21,17 +21,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.net.URL;
 import java.util.Collection;
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import org.jdesktop.jxlayer.JXLayer;
 import org.mbari.swing.JImageUrlCanvas;
@@ -41,6 +37,10 @@ import vars.annotation.Observation;
 import vars.annotation.VideoFrame;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
+import vars.annotation.ui.table.events.CreateObservationListener;
+import vars.annotation.ui.table.events.CreateObservationListenerImpl;
+import vars.annotation.ui.table.events.SelectObservationsListener;
+import vars.annotation.ui.table.events.SelectObservationsListenerImpl;
 import vars.knowledgebase.Concept;
 import vars.shared.ui.AllConceptNamesComboBox;
 import vars.shared.ui.ConceptNameComboBox;
@@ -70,7 +70,7 @@ public class ImageAnnotationFrame extends JFrame {
      */
     public ImageAnnotationFrame(final ToolBelt toolBelt) {
         super();
-        controller = new ImageAnnotationFrameController(toolBelt);
+        controller = new ImageAnnotationFrameController(toolBelt, this);
         createObservationListener = new CreateObservationListenerImpl(toolBelt.getAnnotationFactory(), toolBelt.getPersistenceController());
         initialize();
     }
@@ -100,6 +100,7 @@ public class ImageAnnotationFrame extends JFrame {
     public MeasurementLayerUI getMeasurementLayerUI() {
         if (measurementLayerUI == null) {
             measurementLayerUI = new MeasurementLayerUI<JImageUrlCanvas>(controller.getToolBelt());
+            measurementLayerUI.addMeasurementCompletedListener(controller);
             
         }
         return measurementLayerUI;
@@ -233,6 +234,7 @@ public class ImageAnnotationFrame extends JFrame {
         }
         repaint();
     }
+    
 
     public void useAnnotationLayer() {
         getMakeMeasurementButton().setSelected(false);

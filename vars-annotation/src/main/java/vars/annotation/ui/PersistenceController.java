@@ -1,7 +1,7 @@
 /*
- * @(#)PersistenceController.java   2009.12.12 at 09:31:16 PST
+ * @(#)PersistenceController.java   2011.09.15 at 11:15:16 PDT
  *
- * Copyright 2009 MBARI
+ * Copyright 2011 MBARI
  *
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -18,20 +18,6 @@ package vars.annotation.ui;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
-
-import java.awt.*;
-import java.awt.geom.Rectangle2D;
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Vector;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
 import org.mbari.net.URLUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +38,19 @@ import vars.annotation.ui.roweditor.RowEditorPanel;
 import vars.annotation.ui.table.ObservationTable;
 import vars.annotation.ui.table.ObservationTableModel;
 import vars.knowledgebase.ConceptDAO;
+
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+import java.awt.Rectangle;
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Vector;
 
 /**
  * PersistenceService manages database transactions for the user-interface. It will keep the
@@ -107,6 +106,7 @@ public class PersistenceController {
         dao.endTransaction();
         dao.close();
         updateUI();
+
         return updateObservations;
     }
 
@@ -154,6 +154,7 @@ public class PersistenceController {
         }
         dao.endTransaction();
         dao.close();
+
         return videoArchive;
     }
 
@@ -188,6 +189,66 @@ public class PersistenceController {
     }
 
     /**
+     * Creates a URL of [image.archive.url]/[platform]/images/[dive]/filename from
+     * a file of [image.archive.dir]/[platform]/images/[dive]/filename
+     *
+     * @param  targetFile The File where the image that an image was copied to.
+     * @return  The URL that corresponds to the File targetFile.
+     * @exception  IllegalArgumentException Description of the Exception
+     * @throws  MalformedURLException
+     */
+    URL fileToUrl(final File targetFile, final File imageTarget, final URL imageTargetMapping)
+            throws IllegalArgumentException, MalformedURLException {
+
+        // ---- Ensure that the file provided is located under the image archive directory
+        String targetPath = targetFile.getAbsolutePath();
+        final String rootPath = imageTarget.getAbsolutePath();
+        if (!targetPath.startsWith(rootPath)) {
+            throw new IllegalArgumentException("The file, " + targetPath +
+                    ", is not located in the expected location, " + rootPath);
+        }
+
+        // Chop off the part of the path that matches the image target
+        // e.g. /Target/MyDir with an image of /Target/MyDir/images/Tiburon/foo.png
+        // would yield a postfix of /images/Tiburon/foo.png
+        String postfix = targetPath.substring(rootPath.length(), targetPath.length());
+        final String[] parts = postfix.split("[\\\\\\\\,/]");
+        StringBuffer dstUrl = new StringBuffer(imageTargetMapping.toExternalForm());
+
+        // Make sure the URL ends with "/"
+        if (!dstUrl.toString().endsWith("/")) {
+            dstUrl.append("/");
+        }
+
+        // Chain the parts into a new URL
+        boolean b = false;    // Don't add "/" on the first loop iteration. It's already in the URL
+        for (int i = 0; i < parts.length; i++) {
+            if (!"".equals(parts[i])) {
+                if (b) {
+                    dstUrl.append("/");
+                }
+
+                dstUrl.append(parts[i]);
+                b = true;
+            }
+        }
+
+        String dstUrlString = dstUrl.toString().replaceAll(" ", "%20");    // Space break things
+
+        URL out = null;
+        try {
+            out = new URL(dstUrlString);
+        }
+        catch (Exception e) {
+            if (log.isWarnEnabled()) {
+                log.warn("Strings in Java suck!!!", e);
+            }
+        }
+
+        return out;
+    }
+
+    /**
      *
      * @param observations
      * @param associationTemplate
@@ -204,6 +265,7 @@ public class PersistenceController {
         // DAOTX - Add Association to each observation
         dao.startTransaction();
         for (Observation observation : observations) {
+
             // Try a merge first to try an update the conceptName incase it's been
             // changed.
             try {
@@ -212,7 +274,7 @@ public class PersistenceController {
             catch (Exception e) {
                 observation = dao.find(observation);
             }
-            
+
             if (observation != null) {
                 uiObservations.add(observation);
                 Association ass = annotationFactory.newAssociation(associationTemplate.getLinkName(),
@@ -230,42 +292,8 @@ public class PersistenceController {
         conceptDAO.close();
         resetObservationsInDispatcher(uiObservations);
         updateUI(uiObservations);    // update view
+
         return associations;
-    }
-
-    /**
-     * If any of the observations provided in the argument match those in those
-     * referenced in {@code (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();}
-     * then they ones in the dispatcher will be replaced by those you provided.
-     * This helps keep observations in sync
-     * 
-     * @param observations
-     */
-    private void resetObservationsInDispatcher(Collection<Observation> observations) {
-
-        // ---- Remove overlapping references from the observations in the
-        // dispatcher. We'll replace them with the observations in our argument
-        // collection.
-        Collection<Observation> selectedObservations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
-        Function<Observation, Long> f = new Function<Observation, Long>() {
-            public Long apply(Observation from) {
-                return (Long) from.getPrimaryKey();
-            }
-        };
-        final Collection<Long> pks = Collections2.transform(observations, f);
-        final Collection<Long> selectedPks = new ArrayList<Long>(Collections2.transform(selectedObservations, f));
-        selectedPks.removeAll(pks);
-        selectedObservations = Collections2.filter(selectedObservations, new Predicate<Observation>() {
-            public boolean apply(Observation input) {
-                return selectedPks.contains((Long) input.getPrimaryKey());
-            }
-        });
-
-        // ---- Once the overlaps are removed add the replacements
-        Collection<Observation> uiObservations = new ArrayList<Observation>(selectedObservations);
-        uiObservations.addAll(observations);
-
-        Lookup.getSelectedObservationsDispatcher().setValueObject(uiObservations);
     }
 
     /**
@@ -294,6 +322,7 @@ public class PersistenceController {
         conceptDAO.endTransaction();
         conceptDAO.close();
         updateUI(newObservations);    // update view
+
         return observation;
     }
 
@@ -321,6 +350,7 @@ public class PersistenceController {
         conceptDAO.endTransaction();
         conceptDAO.close();
         updateUI(observations);    // update view
+
         return observations;
     }
 
@@ -338,6 +368,7 @@ public class PersistenceController {
         dao.persist(videoFrame);
         dao.endTransaction();
         dao.close();
+
         return videoFrame;
     }
 
@@ -355,6 +386,7 @@ public class PersistenceController {
         @SuppressWarnings("unused") Collection<VideoFrame> videoFrames = videoArchive.getVideoFrames();
         dao.endTransaction();
         dao.close();
+
         return videoArchive;
     }
 
@@ -428,6 +460,44 @@ public class PersistenceController {
         return videoArchive;
     }
 
+    /**
+     * If any of the observations provided in the argument match those in those
+     * referenced in {@code (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();}
+     * then they ones in the dispatcher will be replaced by those you provided.
+     * This helps keep observations in sync
+     *
+     * @param observations
+     */
+    private void resetObservationsInDispatcher(Collection<Observation> observations) {
+
+        // ---- Remove overlapping references from the observations in the
+        // dispatcher. We'll replace them with the observations in our argument
+        // collection.
+        Collection<Observation> selectedObservations = (Collection<Observation>) Lookup
+            .getSelectedObservationsDispatcher().getValueObject();
+        Function<Observation, Long> f = new Function<Observation, Long>() {
+
+            public Long apply(Observation from) {
+                return (Long) from.getPrimaryKey();
+            }
+        };
+        final Collection<Long> pks = Collections2.transform(observations, f);
+        final Collection<Long> selectedPks = new ArrayList<Long>(Collections2.transform(selectedObservations, f));
+        selectedPks.removeAll(pks);
+        selectedObservations = Collections2.filter(selectedObservations, new Predicate<Observation>() {
+
+            public boolean apply(Observation input) {
+                return selectedPks.contains((Long) input.getPrimaryKey());
+            }
+
+        });
+
+        // ---- Once the overlaps are removed add the replacements
+        Collection<Observation> uiObservations = new ArrayList<Observation>(selectedObservations);
+        uiObservations.addAll(observations);
+
+        Lookup.getSelectedObservationsDispatcher().setValueObject(uiObservations);
+    }
 
     /**
      * Thread-safe. Updates changes made to the observations in the database. Validates the
@@ -458,6 +528,7 @@ public class PersistenceController {
         dao.close();
         conceptDAO.endTransaction();
         conceptDAO.close();
+
         return updatedObservations;
     }
 
@@ -486,18 +557,8 @@ public class PersistenceController {
         conceptDAO.endTransaction();
         conceptDAO.close();
         updateUI(uiObservations);
-        return updatedAssociations;
-    }
 
-    /**
-     *
-     * @param observations
-     * @return
-     */
-    public Collection<Observation> updateObservations(Collection<Observation> observations) {
-        Collection<Observation> updatedObservations = updateAndValidate(observations);
-        updateUI(updatedObservations);    // update view
-        return updatedObservations;
+        return updatedAssociations;
     }
 
     /**
@@ -509,8 +570,12 @@ public class PersistenceController {
      * @param imageTargetMapping The URL that maps imageTarget onto a web server
      * @return A Collection of CameraData objects whose URL's have been updated
      *  in the database. (Returns the udpated instance)
+     *
+     * @throws MalformedURLException
      */
-    public Collection<CameraData> updateCameraDataUrls(VideoArchive videoArchive, File imageTarget, URL imageTargetMapping) throws MalformedURLException {
+    public Collection<CameraData> updateCameraDataUrls(VideoArchive videoArchive, File imageTarget,
+            URL imageTargetMapping)
+            throws MalformedURLException {
         Collection<CameraData> cameraDatas = new ArrayList<CameraData>();
         DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
         dao.startTransaction();
@@ -522,7 +587,7 @@ public class PersistenceController {
             CameraData cameraData = videoFrame.getCameraData();
             cameraData = dao.find(cameraData);
             String imageReference = cameraData.getImageReference();
-            if (imageReference != null && imageReference.startsWith(imageTargetExternalForm)) {
+            if ((imageReference != null) && imageReference.startsWith(imageTargetExternalForm)) {
                 URL imageReferenceURL = new URL(imageReference);
                 File imageReferenceFile = URLUtilities.toFile(imageReferenceURL);
                 URL newUrl = fileToUrl(imageReferenceFile, imageTarget, imageTargetMapping);
@@ -532,66 +597,20 @@ public class PersistenceController {
         }
         dao.endTransaction();
         dao.close();
+
         return cameraDatas;
     }
 
     /**
-     * Creates a URL of [image.archive.url]/[platform]/images/[dive]/filename from
-     * a file of [image.archive.dir]/[platform]/images/[dive]/filename
      *
-     * @param  targetFile The File where the image that an image was copied to.
-     * @return  The URL that corresponds to the File targetFile.
-     * @exception  IllegalArgumentException Description of the Exception
-     * @throws  MalformedURLException
+     * @param observations
+     * @return
      */
-    URL fileToUrl(final File targetFile, final File imageTarget, final URL imageTargetMapping) throws IllegalArgumentException, MalformedURLException {
+    public Collection<Observation> updateObservations(Collection<Observation> observations) {
+        Collection<Observation> updatedObservations = updateAndValidate(observations);
+        updateUI(updatedObservations);    // update view
 
-        // ---- Ensure that the file provided is located under the image archive directory
-        String targetPath = targetFile.getAbsolutePath();
-        final String rootPath = imageTarget.getAbsolutePath();
-        if (!targetPath.startsWith(rootPath)) {
-            throw new IllegalArgumentException("The file, " + targetPath +
-                                               ", is not located in the expected location, " + rootPath);
-        }
-
-        // Chop off the part of the path that matches the image target
-        // e.g. /Target/MyDir with an image of /Target/MyDir/images/Tiburon/foo.png
-        // would yield a postfix of /images/Tiburon/foo.png
-        String postfix = targetPath.substring(rootPath.length(), targetPath.length());
-        final String[] parts = postfix.split("[\\\\\\\\,/]");
-        StringBuffer dstUrl = new StringBuffer(imageTargetMapping.toExternalForm());
-
-        // Make sure the URL ends with "/"
-        if (!dstUrl.toString().endsWith("/")) {
-            dstUrl.append("/");
-        }
-
-        // Chain the parts into a new URL
-        boolean b = false; // Don't add "/" on the first loop iteration. It's already in the URL
-        for (int i = 0; i < parts.length; i++) {
-            if (!"".equals(parts[i])) {
-                if (b) {
-                    dstUrl.append("/");
-                }
-
-                dstUrl.append(parts[i]);
-                b = true;
-            }
-        }
-
-        String dstUrlString = dstUrl.toString().replaceAll(" ", "%20");    // Space break things
-
-        URL out = null;
-        try {
-            out = new URL(dstUrlString);
-        }
-        catch (Exception e) {
-            if (log.isWarnEnabled()) {
-                log.warn("Strings in Java suck!!!", e);
-            }
-        }
-
-        return out;
+        return updatedObservations;
     }
 
     /**
@@ -605,7 +624,7 @@ public class PersistenceController {
     /**
      * Updates the observations in the UI. Uses a flag to indicate if the
      * selected rows should be adjusted.
-     * 
+     *
      * @param observations
      * @param updateSelection true = reselect rows, false = don't make any adjustments
      *  to selections (useful when you know none of the rows were selected)
@@ -617,15 +636,17 @@ public class PersistenceController {
             public void run() {
 
                 // Get the TableModel
-                final ObservationTable observationTable = (ObservationTable) Lookup.getObservationTableDispatcher().getValueObject();
+                final ObservationTable observationTable = (ObservationTable) Lookup.getObservationTableDispatcher()
+                    .getValueObject();
                 final JTable table = (JTable) observationTable;
                 if (observationTable == null) {
                     log.info("No UI is available to update");
+
                     return;
                 }
 
                 final ObservationTableModel model = (ObservationTableModel) table.getModel();
-                
+
                 for (Observation observation : observations) {
                     int row = model.getObservationRow(observation);
                     if ((row > -1) && (row < model.getRowCount())) {
@@ -636,7 +657,7 @@ public class PersistenceController {
                         row = model.getObservationRow(observation);
 
                         if ((row > -1) && (row < model.getRowCount())) {
-                            
+
                             observationTable.scrollToVisible(row, 0);
                         }
                     }
@@ -647,7 +668,8 @@ public class PersistenceController {
                  * explicitly is probably best to avoid weird unintended UI
                  * side-effects.
                  */
-                AnnotationFrame annotationFrame = (AnnotationFrame) Lookup.getApplicationFrameDispatcher().getValueObject();
+                AnnotationFrame annotationFrame = (AnnotationFrame) Lookup.getApplicationFrameDispatcher()
+                    .getValueObject();
                 RowEditorPanel rowEditorPanel = annotationFrame.getRowEditorPanel();
                 Observation reObservation = rowEditorPanel.getObservation();
                 if (reObservation != null) {
@@ -662,7 +684,8 @@ public class PersistenceController {
                 }
 
                 if (updateSelection) {
-                    Collection<Observation> selectedObservations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+                    Collection<Observation> selectedObservations = (Collection<Observation>) Lookup
+                        .getSelectedObservationsDispatcher().getValueObject();
                     selectedObservations = new ArrayList<Observation>(selectedObservations);    // Copy to avoid thread issues
 
                     /*
@@ -696,7 +719,8 @@ public class PersistenceController {
         else {
             try {
                 SwingUtilities.invokeAndWait(runnable);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 log.warn("Failed to excecute updateUI() method on EDT", ex);
             }
         }
@@ -710,9 +734,11 @@ public class PersistenceController {
     public void updateUI(VideoArchive videoArchive) {
 
         // Get the TableModel
-        final ObservationTable observationTable = (ObservationTable) Lookup.getObservationTableDispatcher().getValueObject();
+        final ObservationTable observationTable = (ObservationTable) Lookup.getObservationTableDispatcher()
+            .getValueObject();
         if (observationTable == null) {
             log.info("No UI is available to update");
+
             return;
         }
 
@@ -738,7 +764,8 @@ public class PersistenceController {
         else {
             try {
                 SwingUtilities.invokeAndWait(runnable);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 log.warn("Failed to clear tabel model", ex);
             }
         }
@@ -772,10 +799,12 @@ public class PersistenceController {
      */
     public void updateUI() {
 
-         // Get the TableModel
-        final ObservationTable observationTable = (ObservationTable) Lookup.getObservationTableDispatcher().getValueObject();
+        // Get the TableModel
+        final ObservationTable observationTable = (ObservationTable) Lookup.getObservationTableDispatcher()
+            .getValueObject();
         if (observationTable == null) {
             log.info("No UI is available to update");
+
             return;
         }
         final JTable table = observationTable.getJTable();
@@ -783,13 +812,16 @@ public class PersistenceController {
         VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
         updateUI(videoArchive);
         SwingUtilities.invokeLater(new Runnable() {
+
             public void run() {
+
                 // When observations are deleted the table would jump to the last row UNLESS
                 // we make this call which mostly preserves the current view. Doing this still
                 // makes a little visible 'jump' but it takes the user back to about the same
                 // position in the table
                 table.scrollRectToVisible(rect);
             }
+
         });
     }
 
@@ -805,6 +837,7 @@ public class PersistenceController {
         dao.endTransaction();
         dao.close();
         updateUI();
+
         return videoArchive;
     }
 
@@ -852,6 +885,7 @@ public class PersistenceController {
         conceptDAO.endTransaction();
         conceptDAO.close();
         updateUI(observations);    // update view
+
         return updatedVideoFrames;
     }
 }

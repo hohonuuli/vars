@@ -33,7 +33,7 @@ public class ExitAction extends ActionAdapter {
     private final Logger log = LoggerFactory.getLogger(getClass());
 
     /**
-     * C onstructor for the ExitAction object
+     * Constructor for the ExitAction object
      */
     public ExitAction() {
         super("Exit");

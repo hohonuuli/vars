@@ -38,6 +38,10 @@ import vars.annotation.Observation;
 import vars.annotation.VideoFrame;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
+import vars.annotation.ui.table.events.CreateObservationEvent;
+import vars.annotation.ui.table.events.CreateObservationListener;
+import vars.annotation.ui.table.events.SelectObservationsEvent;
+import vars.annotation.ui.table.events.SelectObservationsListener;
 import vars.knowledgebase.Concept;
 
 /**
