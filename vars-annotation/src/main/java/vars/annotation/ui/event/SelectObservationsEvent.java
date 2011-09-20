@@ -1,4 +1,4 @@
-package vars.annotation.ui.table.events;
+package vars.annotation.ui.event;
 
 import vars.annotation.Observation;
 
@@ -12,14 +12,16 @@ import java.util.Collections;
  */
 public class SelectObservationsEvent {
 
-    final Collection<Observation> observations;
+    private final Object selectionSource;
+    private final Collection<Observation> observations;
 
 
     /**
      * The constructor creates an internal copy of the obserations collection.
      * @param observations
      */
-    public SelectObservationsEvent(Collection<Observation> observations) {
+    public SelectObservationsEvent(Object selectionSource, Collection<Observation> observations) {
+        this.selectionSource = selectionSource;
         this.observations = Collections.unmodifiableCollection(new ArrayList<Observation>(observations));
     }
 
@@ -29,5 +31,14 @@ public class SelectObservationsEvent {
      */
     public Collection<Observation> getObservations() {
         return observations;
+    }
+
+    /**
+     *
+     * @return THe object that triggered the selection event. Useful so that the object doesn't
+     * try to update it's selection, triggering an infinite loop.
+     */
+    public Object getSelectionSource() {
+        return selectionSource;
     }
 }

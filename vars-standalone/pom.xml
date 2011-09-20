@@ -10,7 +10,7 @@
     <name>vars-standalone</name>
 
     <properties>
-        <scala.version>2.9.0-1</scala.version>
+        <scala.version>2.9.1</scala.version>
     </properties> 
 
     <dependencies>
@@ -32,6 +32,11 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>vars-knowledgebase</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>0.9.29</version>
         </dependency>
 
         <!--

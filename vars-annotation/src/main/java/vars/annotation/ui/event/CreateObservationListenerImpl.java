@@ -1,4 +1,4 @@
-package vars.annotation.ui.table.events;
+package vars.annotation.ui.event;
 
 import vars.UserAccount;
 import vars.annotation.AnnotationFactory;

@@ -38,10 +38,10 @@ import vars.annotation.Observation;
 import vars.annotation.VideoFrame;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
-import vars.annotation.ui.table.events.CreateObservationEvent;
-import vars.annotation.ui.table.events.CreateObservationListener;
-import vars.annotation.ui.table.events.SelectObservationsEvent;
-import vars.annotation.ui.table.events.SelectObservationsListener;
+import vars.annotation.ui.event.CreateObservationEvent;
+import vars.annotation.ui.event.CreateObservationListener;
+import vars.annotation.ui.event.SelectObservationsEvent;
+import vars.annotation.ui.event.SelectObservationsListener;
 import vars.knowledgebase.Concept;
 
 /**
@@ -314,7 +314,7 @@ public class AnnotationLayerUI<T extends JImageUrlCanvas> extends CrossHairLayer
         }
 
         void sendSelectionNotification() {
-            selectObservationsListener.doSelect(new SelectObservationsEvent(selectedObservations));
+            selectObservationsListener.doSelect(new SelectObservationsEvent(AnnotationLayerUI.this, selectedObservations));
         }
     }
 }

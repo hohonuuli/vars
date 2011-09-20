@@ -1,6 +1,7 @@
 package vars.annotation.ui.imagepanel;
 
 
+import org.bushe.swing.event.EventBus;
 import vars.DAO;
 import vars.ILink;
 import vars.annotation.Association;
@@ -8,6 +9,7 @@ import vars.annotation.Observation;
 import vars.annotation.VideoFrame;
 
 import vars.annotation.ui.ToolBelt;
+import vars.annotation.ui.event.UpdateObservationsEvent;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -100,7 +102,9 @@ public class ImageAnnotationFrameController implements MeasurementCompletedListe
                 dao.endTransaction();
                 Collection<Observation> observations = new ArrayList<Observation>();
                 observations.add(obs);
-                toolBelt.getPersistenceController().updateObservations(observations);
+                //toolBelt.getPersistenceController().updateObservations(observations);
+                UpdateObservationsEvent updateEvent = new UpdateObservationsEvent(imageAnnotationFrame, observations);
+                EventBus.publish(updateEvent);
                 //imageAnnotationFrame.getMeasurementLayerUI().setObservation(obs);
             }
         }

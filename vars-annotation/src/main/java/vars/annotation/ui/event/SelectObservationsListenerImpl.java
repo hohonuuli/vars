@@ -1,4 +1,4 @@
-package vars.annotation.ui.table.events;
+package vars.annotation.ui.event;
 
 import vars.annotation.Observation;
 import vars.annotation.ui.Lookup;

@@ -1,4 +1,4 @@
-package vars.annotation.ui.table.events;
+package vars.annotation.ui.event;
 
 /**
  * A Listener that responds to CreateObservationEvents

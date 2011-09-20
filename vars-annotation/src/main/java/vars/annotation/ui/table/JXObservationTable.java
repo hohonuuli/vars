@@ -171,8 +171,7 @@ public class JXObservationTable extends JXTable implements ObservationTable {
     /**
      * Selects the row containing the observation
      * @param obs
-     */
-    public void setSelectedObservation(final Observation obs) {
+     */    public void setSelectedObservation(final Observation obs) {
         if (log.isDebugEnabled()) {
             log.debug("Setting the observation selected in the table to " + obs);
         }
