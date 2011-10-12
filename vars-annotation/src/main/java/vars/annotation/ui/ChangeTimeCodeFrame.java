@@ -15,11 +15,11 @@
 
 package vars.annotation.ui;
 
-import vars.annotation.ui.ToolBelt;
+import org.bushe.swing.event.annotation.AnnotationProcessor;
+import org.bushe.swing.event.annotation.EventSubscriber;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import org.mbari.movie.Timecode;
 import org.mbari.util.Dispatcher;
@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 import vars.annotation.Observation;
 import vars.annotation.VideoFrame;
 import vars.annotation.ui.actions.ChangeTimeCodeAction;
-import vars.annotation.ui.Lookup;
+import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
 
 /**
  * <p>A dialog that allows the annotator to edit the time-code for the currently
@@ -48,17 +48,27 @@ public class ChangeTimeCodeFrame extends TimeCodeSelectionFrame {
      * Constructor for the ChangeTimeCodeFrame object
      */
     public ChangeTimeCodeFrame(ToolBelt toolBelt) {
-        super();
         this.toolBelt = toolBelt;
-        final Dispatcher dispatcher = Lookup.getSelectedObservationsDispatcher();
-        dispatcher.addPropertyChangeListener(new PropertyChangeListener() {
+        AnnotationProcessor.process(this); // Create EventBus Proxy
 
-            public void propertyChange(PropertyChangeEvent evt) {
-                update(evt.getNewValue());
+//        final Dispatcher dispatcher = Lookup.getSelectedObservationsDispatcher();
+//        dispatcher.addPropertyChangeListener(new PropertyChangeListener() {
+//            public void propertyChange(PropertyChangeEvent evt) {
+//                update(evt.getNewValue());
+//            }
+//        });
 
-            }
-        });
+    }
 
+    /**
+     * EventBus method
+     * @param selectionEvent
+     */
+    @EventSubscriber(eventClass = ObservationsSelectedEvent.class)
+    public void updateObservationSelection(ObservationsSelectedEvent selectionEvent) {
+        if (selectionEvent.getSelectionSource() != this) {
+            update(selectionEvent.getObservations());
+        }
     }
 
     /**
@@ -75,7 +85,6 @@ public class ChangeTimeCodeFrame extends TimeCodeSelectionFrame {
                     final Dispatcher dispatcher = Lookup.getSelectedObservationsDispatcher();
                     final Collection<Observation> observations = (Collection<Observation>) dispatcher.getValueObject();
                     if (observations.size() == 1) {
-                        final VideoFrame vf = observations.iterator().next().getVideoFrame();
                         getChangeTimeCodeAction().setTimeCode(getTimePanel().getTimeAsString());
                         getChangeTimeCodeAction().doAction();
                     }

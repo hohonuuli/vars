@@ -34,6 +34,9 @@ import vars.annotation.CameraDirections;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoFrame;
+import vars.annotation.ui.commandqueue.Command;
+import vars.annotation.ui.commandqueue.CommandEvent;
+import vars.annotation.ui.commandqueue.impl.AddObservationCmd;
 import vars.knowledgebase.ConceptName;
 import vars.annotation.ui.ToolBelt;
 import vars.shared.ui.video.VideoControlService;
@@ -160,80 +163,46 @@ public final class NewObservationAction extends ActionAdapter {
         final VideoControlService videoService = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
         if (videoArchive != null) {
 
-            /*
-             * Verify that the timecode is acceptable
-             */
-            boolean isTimeOK = false;
-            try {
-                timeCodeObj.setTimecode(timecode);
-                isTimeOK = true;
-            }
-            catch (final Exception e) {
-                if (log.isWarnEnabled()) {
-                    log.warn("Invalid timecode of " + timecode, e);
-                }
-            }
-
-            if ((conceptName != null) && (timecode != null) && isTimeOK) {
+            if ((conceptName != null) && (timecode != null)) {
                 UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
-                final PersistenceController persistenceController = toolBelt.getPersistenceController();
 
                 String person = userAccount.getUserName();
                 if (person == null) {
                     person = UserAccount.USERNAME_DEFAULT;
                 }
 
-                // DAOTX: See if a VideoFrame with the given time code already exists
-                DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
-                dao.startTransaction();
-                videoArchive = dao.find(videoArchive);
-                VideoFrame videoFrame = videoArchive.findVideoFrameByTimeCode(timecode);
-                dao.endTransaction();
 
-                // If none are found create a new one.
-                if (videoFrame == null) {
-                    videoFrame = toolBelt.getAnnotationFactory().newVideoFrame();
-                    Date utcDate = null;
+
+                /*
+                 * If the VCR is recording we'll grab the time off of the
+                 * computer clock. Otherwise we'll get it off of the
+                 * userbits.
+                 */
+                Date utcDate;
+                if (videoService.getVcrState().isRecording()) {
+                    utcDate = new Date();
+                }
+                else {
 
                     /*
-                     * If the VCR is recording we'll grab the time off of the
-                     * computer clock. Otherwise we'll get it off of the
-                     * userbits.
+                     *  Try to grab the userbits off of the tape. The userbits
+                     *  may have the time that the frame was recorded stored as a
+                     *  little-endian 4-byte int.
                      */
-                    if (videoService.getVcrState().isRecording()) {
-                        utcDate = new Date();
-                    }
-                    else {
-
-                        /*
-                         *  Try to grab the userbits off of the tape. The userbits
-                         *  may have the time that the frame was recorded stored as a
-                         *  little-endian 4-byte int.
-                         */
-                        videoService.requestVUserbits();
-                        final int epicSeconds = NumberUtilities.toInt(videoService.getVcrUserbits().getUserbits(), true);
-                        utcDate = new Date((long) epicSeconds * 1000L);
-                    }
-
-                    videoFrame.setRecordedDate(utcDate);
-                    videoFrame.setTimecode(timecode);
-
-                    CameraDirections cameraDirections = (CameraDirections) Lookup.getCameraDirectionDispatcher().getValueObject();
-                    final String cameraDirection = cameraDirections.getDirection();
-                    CameraData cd = videoFrame.getCameraData();
-                    cd.setDirection(cameraDirection);
-
-                    videoFrame = persistenceController.insertVideoFrame(videoArchive, videoFrame);
-
+                    videoService.requestVUserbits();
+                    final int epicSeconds = NumberUtilities.toInt(videoService.getVcrUserbits().getUserbits(), true);
+                    utcDate = new Date((long) epicSeconds * 1000L);
                 }
 
-                // Create a new observation and add it to the videoFrame
-                observation = toolBelt.getAnnotationFactory().newObservation();
-                observation.setConceptName(conceptName);
-                observation.setObserver(person);
-                observation.setObservationDate(new Date());
-                observation = toolBelt.getPersistenceController().insertObservation(videoFrame, observation);
+                CameraDirections cameraDirections = (CameraDirections) Lookup.getCameraDirectionDispatcher().getValueObject();
+                final String cameraDirection = cameraDirections.getDirection();
 
+
+                // Fire command to the CommandQueue
+                Command command = new AddObservationCmd(conceptName, timecode, utcDate,
+                        videoArchive.getName(), person, cameraDirection);
+                CommandEvent commandEvent = new CommandEvent(command);
+                EventBus.publish(commandEvent);
 
             }
             else {

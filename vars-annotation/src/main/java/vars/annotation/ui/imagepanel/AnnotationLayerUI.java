@@ -31,17 +31,20 @@ import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 import javax.swing.SwingUtilities;
+
+import org.bushe.swing.event.EventBus;
 import org.jdesktop.jxlayer.JXLayer;
 import org.mbari.awt.AwtUtilities;
 import org.mbari.swing.JImageUrlCanvas;
+import vars.UserAccount;
 import vars.annotation.Observation;
 import vars.annotation.VideoFrame;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
-import vars.annotation.ui.event.CreateObservationEvent;
-import vars.annotation.ui.event.CreateObservationListener;
-import vars.annotation.ui.event.SelectObservationsEvent;
-import vars.annotation.ui.event.SelectObservationsListener;
+import vars.annotation.ui.commandqueue.Command;
+import vars.annotation.ui.commandqueue.CommandEvent;
+import vars.annotation.ui.commandqueue.impl.AddObservationCmd;
+import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
 import vars.knowledgebase.Concept;
 
 /**
@@ -78,9 +81,6 @@ public class AnnotationLayerUI<T extends JImageUrlCanvas> extends CrossHairLayer
     private final ToolBelt toolBelt;
     private VideoFrame videoFrame;
 
-    private SelectObservationsListener selectObservationsListener;
-    private CreateObservationListener createObservationListener;
-
     /**
      * Constructs ...
      *
@@ -109,21 +109,6 @@ public class AnnotationLayerUI<T extends JImageUrlCanvas> extends CrossHairLayer
         return videoFrame;
     }
 
-    public SelectObservationsListener getSelectObservationsListener() {
-        return selectObservationsListener;
-    }
-
-    public void setSelectObservationsListener(SelectObservationsListener selectObservationsListener) {
-        this.selectObservationsListener = selectObservationsListener;
-    }
-
-    public CreateObservationListener getCreateObservationListener() {
-        return createObservationListener;
-    }
-
-    public void setCreateObservationListener(CreateObservationListener createObservationListener) {
-        this.createObservationListener = createObservationListener;
-    }
 
     @Override
     protected void paintLayer(Graphics2D g2, JXLayer<? extends T> jxl) {
@@ -310,11 +295,21 @@ public class AnnotationLayerUI<T extends JImageUrlCanvas> extends CrossHairLayer
     private class Controller {
 
         void newObservation(Point2D point) {
-            createObservationListener.doCreate(new CreateObservationEvent(getConcept(), getVideoFrame(), point, new Date()));
+
+            String timecode = getVideoFrame().getTimecode();
+            String videoArchiveName = getVideoFrame().getVideoArchive().getName();
+            String conceptName = getConcept().getPrimaryConceptName().getName();
+            String user = ((UserAccount) Lookup.getUserAccountDispatcher().getValueObject()).getUserName();
+            String cameraDirection = (String) Lookup.getCameraDirectionDispatcher().getValueObject();
+            Command command = new AddObservationCmd(conceptName, timecode, new Date(), videoArchiveName,
+                    user, cameraDirection, point);
+            CommandEvent commandEvent = new CommandEvent(command);
+            EventBus.publish(commandEvent);
+
         }
 
         void sendSelectionNotification() {
-            selectObservationsListener.doSelect(new SelectObservationsEvent(AnnotationLayerUI.this, selectedObservations));
+            EventBus.publish(new ObservationsSelectedEvent(AnnotationLayerUI.this, selectedObservations));
         }
     }
 }

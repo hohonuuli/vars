@@ -18,15 +18,16 @@ package vars.annotation.ui.buttons;
 
 import javax.swing.Action;
 import javax.swing.ImageIcon;
-import javax.swing.JTable;
 import javax.swing.KeyStroke;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+
+import org.bushe.swing.event.annotation.AnnotationProcessor;
+import org.bushe.swing.event.annotation.EventSubscriber;
 import org.mbari.swing.SwingUtils;
 import vars.UserAccount;
 import vars.annotation.ui.actions.DeleteSelectedObservationsWithConfirmAction;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.Lookup;
+import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
 import vars.shared.ui.FancyButton;
 
 /**
@@ -49,17 +50,12 @@ public class DeleteSelectedObservationsButton extends FancyButton {
         setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/obs_delete.png")));
         setEnabled(false);
         setText("");
-        
-        ((JTable) Lookup.getObservationTableDispatcher().getValueObject()).getSelectionModel().addListSelectionListener(
-            new ListSelectionListener() {
+        AnnotationProcessor.process(this);
+    }
 
-            public void valueChanged(final ListSelectionEvent e) {
-                final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
-                final JTable t = (JTable) Lookup.getObservationTableDispatcher().getValueObject();
-
-                setEnabled((userAccount != null) && (t.getSelectedRowCount() > 0));
-            }
-
-        });
+    @EventSubscriber(eventClass = ObservationsSelectedEvent.class)
+    public void onSelectedObservationsEvent(ObservationsSelectedEvent selectionEvent) {
+        final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+        setEnabled((userAccount != null) && selectionEvent.get().size() > 0);
     }
 }

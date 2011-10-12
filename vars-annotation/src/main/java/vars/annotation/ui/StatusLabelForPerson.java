@@ -86,9 +86,7 @@ public class StatusLabelForPerson extends StatusLabel {
      * by the <code>PersonDispatcher</code>
      *
      *
-     * @param  personString Description of the Parameter
-     * @param  changeCode Description of the Parameter
-     * @see  org.mbari.util.IObserver#update(java.lang.Object, java.lang.Object)
+     * @param  userAccount The UserAccount to use
      */
     public void update(final UserAccount userAccount) {
         boolean ok = true;

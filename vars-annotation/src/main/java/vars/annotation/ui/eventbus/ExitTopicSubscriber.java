@@ -1,4 +1,4 @@
-package vars.annotation.ui.event;
+package vars.annotation.ui.eventbus;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

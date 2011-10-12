@@ -82,11 +82,7 @@
             <version>1.0.5</version>
             <scope>compile</scope>
         </dependency>
-        <!-- <dependency>
-            <groupId>imagej</groupId>
-            <artifactId>imagej</artifactId>
-            <version>1.37</version>
-        </dependency> -->
+
     </dependencies>
     <!--
     PROFILES

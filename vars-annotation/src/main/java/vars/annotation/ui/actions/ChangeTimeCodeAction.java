@@ -18,6 +18,8 @@ package vars.annotation.ui.actions;
 import java.util.ArrayList;
 import java.util.Collection;
 import javax.swing.Icon;
+
+import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.movie.Timecode;
 import org.slf4j.Logger;
@@ -28,6 +30,9 @@ import vars.annotation.VideoArchive;
 import vars.annotation.VideoFrame;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.Lookup;
+import vars.annotation.ui.commandqueue.Command;
+import vars.annotation.ui.commandqueue.CommandEvent;
+import vars.annotation.ui.commandqueue.impl.ChangeTimeCodeCmd;
 
 /**
  *
@@ -77,36 +82,42 @@ public class ChangeTimeCodeAction extends ActionAdapter {
      */
     public void doAction() {
         Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+        Command command = new ChangeTimeCodeCmd(observations, getTimeCode());
+        CommandEvent commandEvent = new CommandEvent(command);
+        EventBus.publish(commandEvent);
 
-        observations = new ArrayList<Observation>(observations);
 
-        // DAOTX
-        DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
-
-        dao.startTransaction();
-
-        for (Observation observation : observations) {
-            observation = dao.find(observation);
-
-            VideoFrame sourceVideoFrame = observation.getVideoFrame();
-            VideoArchive videoArchive = sourceVideoFrame.getVideoArchive();
-            VideoFrame targetVideoFrame = videoArchive.findVideoFrameByTimeCode(getTimeCode());
-
-            if (targetVideoFrame == null) {
-                sourceVideoFrame.setTimecode(getTimeCode());
-            }
-            else {
-
-                // Move observations to target
-                sourceVideoFrame.removeObservation(observation);
-                targetVideoFrame.addObservation(observation);
-            }
-        }
-
-        dao.endTransaction();
-        dao.close();
-
-        toolBelt.getPersistenceController().updateUI(observations);
+//        Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+//
+//        observations = new ArrayList<Observation>(observations);
+//
+//        // DAOTX
+//        DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
+//
+//        dao.startTransaction();
+//
+//        for (Observation observation : observations) {
+//            observation = dao.find(observation);
+//
+//            VideoFrame sourceVideoFrame = observation.getVideoFrame();
+//            VideoArchive videoArchive = sourceVideoFrame.getVideoArchive();
+//            VideoFrame targetVideoFrame = videoArchive.findVideoFrameByTimeCode(getTimeCode());
+//
+//            if (targetVideoFrame == null) {
+//                sourceVideoFrame.setTimecode(getTimeCode());
+//            }
+//            else {
+//
+//                // Move observations to target
+//                sourceVideoFrame.removeObservation(observation);
+//                targetVideoFrame.addObservation(observation);
+//            }
+//        }
+//
+//        dao.endTransaction();
+//        dao.close();
+//
+//        toolBelt.getPersistenceController().updateUI(observations);
 
     }
 

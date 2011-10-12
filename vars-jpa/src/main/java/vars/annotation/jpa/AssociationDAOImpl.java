@@ -23,7 +23,6 @@ public class AssociationDAOImpl extends DAO implements AssociationDAO {
     @Inject
     public AssociationDAOImpl(EntityManager entityManager) {
         super(entityManager);
-
     }
 
     public List<Association> findAllByConceptNameAndValues(String conceptName,
@@ -46,5 +45,10 @@ public class AssociationDAOImpl extends DAO implements AssociationDAO {
         else {
             log.warn(ass + " contains a 'toConcept', " + ass.getToConcept() + " that was not found in the knowlegebase");
         }
+    }
+
+    @Override
+    public Association findByPrimaryKey(Object primaryKey) {
+        return findByPrimaryKey(AssociationImpl.class, primaryKey);
     }
 }

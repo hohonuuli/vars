@@ -29,6 +29,8 @@ import javax.swing.JFrame;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 
+import org.bushe.swing.event.annotation.AnnotationProcessor;
+import org.bushe.swing.event.annotation.EventSubscriber;
 import org.jdesktop.jxlayer.JXLayer;
 import org.mbari.swing.JImageUrlCanvas;
 import org.slf4j.Logger;
@@ -37,10 +39,8 @@ import vars.annotation.Observation;
 import vars.annotation.VideoFrame;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
-import vars.annotation.ui.event.CreateObservationListener;
-import vars.annotation.ui.event.CreateObservationListenerImpl;
-import vars.annotation.ui.event.SelectObservationsListener;
-import vars.annotation.ui.event.SelectObservationsListenerImpl;
+import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
+import vars.annotation.ui.eventbus.ObservationsChangedEvent;
 import vars.knowledgebase.Concept;
 import vars.shared.ui.AllConceptNamesComboBox;
 import vars.shared.ui.ConceptNameComboBox;
@@ -59,8 +59,7 @@ public class ImageAnnotationFrame extends JFrame {
     private AnnotationLayerUI annotationLayerUI;
     private MeasurementLayerUI measurementLayerUI;
     private JToolBar toolBar;
-    private final SelectObservationsListener selectObservationsListener = new SelectObservationsListenerImpl();
-    private final CreateObservationListener createObservationListener;
+
     private final ImageAnnotationFrameController controller;
     private JToggleButton makeMeasurementButton;
     /**
@@ -69,9 +68,8 @@ public class ImageAnnotationFrame extends JFrame {
      * @param toolBelt
      */
     public ImageAnnotationFrame(final ToolBelt toolBelt) {
-        super();
         controller = new ImageAnnotationFrameController(toolBelt, this);
-        createObservationListener = new CreateObservationListenerImpl(toolBelt.getAnnotationFactory(), toolBelt.getPersistenceController());
+        AnnotationProcessor.process(this);
         initialize();
     }
 
@@ -91,8 +89,6 @@ public class ImageAnnotationFrame extends JFrame {
     public AnnotationLayerUI getAnnotationLayerUI() {
         if (annotationLayerUI == null) {
             annotationLayerUI = new AnnotationLayerUI<JImageUrlCanvas>(controller.getToolBelt());
-            annotationLayerUI.setSelectObservationsListener(selectObservationsListener);
-            annotationLayerUI.setCreateObservationListener(createObservationListener);
         }
         return annotationLayerUI;
     }
@@ -143,6 +139,7 @@ public class ImageAnnotationFrame extends JFrame {
                     }
                 }
             });
+            makeMeasurementButton.setEnabled(false);
             /*
                Listen for selected Observations. If one is selected, set it as the GOTO observation.
                Otherwise disable the measurements
@@ -153,15 +150,43 @@ public class ImageAnnotationFrame extends JFrame {
                     Collection<Observation> selectedObservations = (Collection<Observation>) evt.getNewValue();
                     if (selectedObservations.size() == 1) {
                         getMeasurementLayerUI().setObservation(selectedObservations.iterator().next());
+                        getMakeMeasurementButton().setEnabled(true);
                     }
                     else {
                         getMeasurementLayerUI().setObservation(null);
+                        getMakeMeasurementButton().setEnabled(false);
                         useAnnotationLayer();
                     }
                 }
             });
         }
         return makeMeasurementButton;
+    }
+
+    @EventSubscriber(eventClass = ObservationsChangedEvent.class)
+    public void updateObservationReferences(ObservationsChangedEvent updateEvent) {
+        if (updateEvent.getEventSource() != this) {
+            // TODO implement me
+
+        }
+    }
+
+    @EventSubscriber(eventClass = ObservationsSelectedEvent.class)
+    public void updateSelectedObservations(ObservationsSelectedEvent selectionEvent) {
+        if (selectionEvent.getSelectionSource() != this) {
+            Collection<Observation> selectedObservations = selectionEvent.get();
+
+            // Toggle UI layer between Annotation or Measurement
+            if (selectedObservations.size() == 1) {
+                getMeasurementLayerUI().setObservation(selectedObservations.iterator().next());
+                getMakeMeasurementButton().setEnabled(true);
+            }
+            else {
+                getMeasurementLayerUI().setObservation(null);
+                getMakeMeasurementButton().setEnabled(false);
+                useAnnotationLayer();
+            }
+        }
     }
 
     /**
@@ -225,7 +250,7 @@ public class ImageAnnotationFrame extends JFrame {
                 url = new URL(videoFrame.getCameraData().getImageReference());
             }
             catch (Exception e) {
-                log.info("Failed to display " + url, e);
+                log.info("Failed to display " + url + ". Reason: " + e.getClass());
             }
         }
 

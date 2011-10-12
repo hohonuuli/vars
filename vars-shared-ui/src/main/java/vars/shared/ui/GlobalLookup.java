@@ -5,7 +5,6 @@
 
 package vars.shared.ui;
 
-import com.google.inject.Injector;
 import java.awt.Frame;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -18,7 +17,7 @@ import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.EventTopicSubscriber;
 import org.mbari.util.Dispatcher;
 import vars.UserAccount;
-import vars.shared.ui.event.LoggingSubscriber;
+import vars.shared.ui.event.LoggingTopicSubscriber;
 
 /**
  * Central lookup for coordinating shared UI resources.
@@ -59,7 +58,7 @@ public class GlobalLookup {
     public static final String TOPIC_USERACCOUNT = "vars.shared.ui.GlobalLookup-UserAccount";
 
     @SuppressWarnings("unchecked")
-	public static final EventTopicSubscriber LOGGING_SUBSCRIBER = new LoggingSubscriber();
+	public static final EventTopicSubscriber LOGGING_SUBSCRIBER = new LoggingTopicSubscriber();
     
     private static File settingsDirectory;
     

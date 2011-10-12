@@ -1,7 +1,7 @@
 /*
- * @(#)VideoArchiveSetEditorPanelController.java   2010.03.11 at 04:16:47 PST
+ * @(#)VideoArchiveSetEditorPanelController.java   2011.10.11 at 05:10:17 PDT
  *
- * Copyright 2009 MBARI
+ * Copyright 2011 MBARI
  *
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -21,31 +21,18 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import foxtrot.Job;
 import foxtrot.Worker;
-import java.awt.BorderLayout;
-import java.awt.Frame;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
+import org.bushe.swing.event.EventBus;
 import org.mbari.awt.AwtUtilities;
 import org.mbari.swing.LabeledSpinningDialWaitIndicator;
 import org.mbari.swing.SearchableComboBoxModel;
-import org.mbari.swing.SwingUtils;
 import org.mbari.swing.WaitIndicator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.DAO;
 import vars.ILink;
 import vars.LinkComparator;
 import vars.LinkUtilities;
-import vars.annotation.AnnotationFactory;
+import vars.UserAccount;
 import vars.annotation.Association;
-import vars.annotation.CameraData;
 import vars.annotation.CameraDirections;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchiveSet;
@@ -54,6 +41,12 @@ import vars.annotation.VideoFrame;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.actions.MoveVideoFrameWithDialogAction;
+import vars.annotation.ui.commandqueue.impl.AddAssociationCmd;
+import vars.annotation.ui.commandqueue.impl.ChangeAssociationsCmd;
+import vars.annotation.ui.commandqueue.impl.ChangeCameraDirectionsCmd;
+import vars.annotation.ui.commandqueue.impl.RemoveAssociationsCmd;
+import vars.annotation.ui.commandqueue.impl.RemoveObservationsCmd;
+import vars.annotation.ui.commandqueue.impl.RenameObservationsCmd;
 import vars.annotation.ui.table.JXObservationTable;
 import vars.annotation.ui.table.ObservationTableModel;
 import vars.knowledgebase.Concept;
@@ -62,6 +55,16 @@ import vars.knowledgebase.LinkTemplateDAO;
 import vars.shared.ui.LinkSelectionPanel;
 import vars.shared.ui.dialogs.ConceptNameSelectionDialog;
 import vars.shared.ui.dialogs.StandardDialog;
+
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
@@ -101,43 +104,34 @@ public class VideoArchiveSetEditorPanelController {
         dialog.setLinks(linkTemplates);
         dialog.setVisible(true);
     }
-    
+
     protected void changeCameraDirectionsTo(CameraDirections direction) {
-    	Collection<Observation> observations = getObservations(true);
-    	if (observations.size() < 1) {
-    		return;
-    	}
-    	
-    	Set<VideoFrame> videoFrames = new HashSet<VideoFrame>(Collections2.transform(observations, new Function<Observation, VideoFrame>() {
-			public VideoFrame apply(Observation from) {
+        Collection<Observation> observations = getObservations(true);
+        if (observations.size() < 1) {
+            return;
+        }
+
+        Set<VideoFrame> videoFrames = new HashSet<VideoFrame>(Collections2.transform(observations,
+            new Function<Observation, VideoFrame>() {
+
+            public VideoFrame apply(Observation from) {
                 return from.getVideoFrame();
             }
+
         }));
 
-    	
-    	 final Object[] options = { "OK", "CANCEL" };
-         final int confirm = JOptionPane.showOptionDialog(
-                 AwtUtilities.getFrame(panel),
-                 "Do you want to change the camera direction to '" + direction.getDirection() + 
-                 "' for the " + videoFrames.size() + " selected video-frames(s)?", 
-                 "VARS - Confirm Delete", JOptionPane.DEFAULT_OPTION,
-                 JOptionPane.WARNING_MESSAGE, null, options, options[0]);
-         if (confirm == JOptionPane.YES_OPTION) {
-             DAO dao = toolBelt.getAnnotationDAOFactory().newVideoFrameDAO();
-             dao.startTransaction();
-        	 for (VideoFrame videoFrame : videoFrames) {
-        	     videoFrame = dao.find(videoFrame);
-        	     CameraData cameraData = videoFrame.getCameraData();
-        	     cameraData.setDirection(direction.getDirection());
-        	     if (!dao.isPersistent(cameraData)) {
-        	         dao.persist(cameraData);
-        	     }
-        	 }
-        	 dao.endTransaction();
-        	 dao.close();
-        	 refresh();
-         }
-    	
+
+        final Object[] options = { "OK", "CANCEL" };
+        final int confirm = JOptionPane.showOptionDialog(AwtUtilities.getFrame(panel),
+            "Do you want to change the camera direction to '" + direction.getDirection() + "' for the " +
+            videoFrames.size() + " selected video-frames(s)?", "VARS - Confirm Delete", JOptionPane.DEFAULT_OPTION,
+                JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+        if (confirm == JOptionPane.YES_OPTION) {
+            EventBus.publish(new ChangeCameraDirectionsCmd(direction.getDirection(), videoFrames));
+
+            // TODO REFRESH needs to be triggered on VideoFramesChangedEvent(); refresh()
+        }
+
     }
 
     protected void deleteObservations() {
@@ -150,30 +144,14 @@ public class VideoArchiveSetEditorPanelController {
         }
 
         final Object[] options = { "OK", "CANCEL" };
-        final int confirm = JOptionPane.showOptionDialog(
-                AwtUtilities.getFrame(panel),
-                "Do you want to delete " + count + " observation(s)?", 
-                "VARS - Confirm Delete", JOptionPane.DEFAULT_OPTION,
-                JOptionPane.WARNING_MESSAGE, null, options, options[0]);
-        
+        final int confirm = JOptionPane.showOptionDialog(AwtUtilities.getFrame(panel),
+            "Do you want to delete " + count + " observation(s)?", "VARS - Confirm Delete", JOptionPane.DEFAULT_OPTION,
+            JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+
         if (confirm == JOptionPane.YES_OPTION) {
-            DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
-            dao.startTransaction();
-            for (Observation observation : observations) {
-                observation = dao.find(observation);
-                if (observation != null) {
-                	VideoFrame videoFrame = observation.getVideoFrame();
-                	videoFrame.removeObservation(observation);
-                	dao.remove(observation);
-                	if (videoFrame.getObservations().size() == 0) {
-                	    dao.remove(videoFrame);
-                	}
-                }
-                
-            }
-            dao.endTransaction();
-            dao.close();
-            refresh();
+            EventBus.publish(new RemoveObservationsCmd(observations));
+
+            // TODO REFRESH needs to be triggered on VideoArchiveChangedEvent(); refresh()
         }
 
     }
@@ -207,7 +185,7 @@ public class VideoArchiveSetEditorPanelController {
                 }
                 else {
                     log.debug("Unable to find Concept named '" + observation.getConceptName() +
-                              "' in the knowledgebase");
+                            "' in the knowledgebase");
                 }
 
                 conceptNames.add(observation.getConceptName());
@@ -236,25 +214,10 @@ public class VideoArchiveSetEditorPanelController {
 
                     ILink link = addAssociationDialog.getLink();
                     Collection<Observation> observations = getObservations(true);
-                    AnnotationFactory annotationFactory = toolBelt.getAnnotationFactory();
-                    DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
-                    dao.startTransaction();
-
-                    for (Observation observation : observations) {
-                        observation = dao.find(observation);
-
-                        if (observation != null) {
-                            Association association = annotationFactory.newAssociation(link.getLinkName(),
-                                link.getToConcept(), link.getLinkValue());
-                            observation.addAssociation(association);
-                            dao.persist(association);
-                        }
-                    }
-
-                    dao.endTransaction();
+                    EventBus.publish(new AddAssociationCmd(link, observations));
                     addAssociationDialog.dispose();
-                    refresh();
 
+                    // TODO REFRESH needs to be triggered on ObservationsChangedEvent(); refresh();
                 }
 
             });
@@ -353,40 +316,17 @@ public class VideoArchiveSetEditorPanelController {
                     final Collection<Association> associations = getFilteredAssocations(true, link);
 
                     final Object[] options = { "OK", "CANCEL" };
-                    final int confirm = JOptionPane.showOptionDialog(
-                            AwtUtilities.getFrame(panel),
-                            "Do you want to delete " + associations.size() + " association(s)?", "VARS - Confirm Delete",
-                            JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+                    final int confirm = JOptionPane.showOptionDialog(AwtUtilities.getFrame(panel),
+                        "Do you want to delete " + associations.size() + " association(s)?", "VARS - Confirm Delete",
+                        JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
 
                     if (confirm == JOptionPane.YES_OPTION) {
-                        WaitIndicator waitIndicator = new LabeledSpinningDialWaitIndicator(panel,
-                            "Deleting Associations ...");
-                        Worker.post(new Job() {
-
-                            @Override
-                            public Object run() {
-                                DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
-                                dao.startTransaction();
-
-                                for (Association association : associations) {
-                                    association = dao.find(association);
-
-                                    if (association != null) {
-                                        association.getObservation().removeAssociation(association);
-                                        dao.remove(association);
-                                    }
-                                }
-
-                                dao.endTransaction();
-                                return null;
-                            }
-
-                        });
-                        waitIndicator.dispose();
+                        EventBus.publish(new RemoveAssociationsCmd(associations));
                     }
 
                     removeAssociationsDialog.dispose();
-                    refresh();
+
+                    // TODO REFRESH on ObservationsChangedEvent refresh();
                 }
 
             });
@@ -423,26 +363,9 @@ public class VideoArchiveSetEditorPanelController {
                     // Update the values for each association in background thread
                     final ILink newLink = renameAssociationsDialog.getLink();
                     renameAssociationsDialog.dispose();
-                    Worker.post(new Job() {
+                    EventBus.publish(new ChangeAssociationsCmd(newLink, associations));
 
-                        @Override
-                        public Object run() {
-                            DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
-                            dao.startTransaction();
-
-                            for (Association association : associations) {
-                                association = dao.find(association);
-                                association.setLinkName(newLink.getLinkName());
-                                association.setToConcept(newLink.getToConcept());
-                                association.setLinkValue(newLink.getLinkValue());
-                            }
-
-                            dao.endTransaction();
-                            return null;
-                        }
-                    });
-
-                    refresh();
+                    // TODO REFRESH on ObservationsChangedEvent refresh();
                 }
 
             });
@@ -455,42 +378,29 @@ public class VideoArchiveSetEditorPanelController {
         if (renameObservationsDialog == null) {
             renameObservationsDialog = new ConceptNameSelectionDialog();
             renameObservationsDialog.getCancelButton().addActionListener(new ActionListener() {
+
                 public void actionPerformed(ActionEvent e) {
                     renameObservationsDialog.dispose();
                 }
+
             });
             renameObservationsDialog.getOkayButton().addActionListener(new ActionListener() {
+
                 public void actionPerformed(ActionEvent e) {
                     final String name = renameObservationsDialog.getSelectedItem();
                     renameObservationsDialog.dispose();
                     final Collection<Observation> observations = getObservations(true);
-                    Worker.post(new Job() {
+                    UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+                    String user = (userAccount == null) ? UserAccount.USERNAME_DEFAULT : userAccount.getUserName();
+                    EventBus.publish(new RenameObservationsCmd(name, user, observations));
 
-                        @Override
-                        public Object run() {
-                            DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
-                            ConceptDAO conceptDao = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
-                            Concept concept = conceptDao.findByName(name);
-                            conceptDao.close();
-                            String primaryName = concept.getPrimaryConceptName().getName();
-                            dao.startTransaction();
-                            for (Observation observation : observations) {
-                                observation = dao.find(observation);
-                                if (observation != null) {
-                                    observation.setConceptName(primaryName);
-                                }
-                            }
-                            dao.endTransaction();
-                            dao.close();
-                            return null;
-                        }
-                    });
-
-                    refresh();
+                    // TODO REFRESH on ObservationsChangedEvent refresh();
                 }
+
             });
             renameObservationsDialog.setItems(toolBelt.getQueryPersistenceService().findAllConceptNamesAsStrings());
         }
+
         return renameObservationsDialog;
     }
 
@@ -508,11 +418,6 @@ public class VideoArchiveSetEditorPanelController {
         moveAction.setVideoFrames(videoFrames);
         moveAction.doAction();
         refresh();
-    }
-
-    protected void renameObservations() {
-        JDialog dialog = getRenameObservationsDialog();
-        dialog.setVisible(true);
     }
 
     /**
@@ -552,16 +457,18 @@ public class VideoArchiveSetEditorPanelController {
                     VideoArchiveSetDAO dao = toolBelt.getAnnotationDAOFactory().newVideoArchiveSetDAO();
                     dao.startTransaction();
                     VideoArchiveSet foundVas = dao.find(vas);    // Bring it into the transaction
-                    final Collection<VideoFrame> videoFrames = (foundVas == null) ? new ArrayList<VideoFrame>() : ImmutableList.copyOf(foundVas.getVideoFrames());
+                    final Collection<VideoFrame> videoFrames = (foundVas == null)
+                        ? new ArrayList<VideoFrame>() : ImmutableList.copyOf(foundVas.getVideoFrames());
                     dao.endTransaction();
+
                     return videoFrames;
                 }
             });
 
 
             // repopulate the table and pull out parts need to set other UI components
-            Collection<String> names = new HashSet<String>(); // for ConceptComboBox
-            Collection<ILink> associations = new HashSet<ILink>(); // for associationComboBox
+            Collection<String> names = new HashSet<String>();         // for ConceptComboBox
+            Collection<ILink> associations = new HashSet<ILink>();    // for associationComboBox
             for (VideoFrame videoFrame : videoFrames) {
                 final Collection<Observation> observations = ImmutableList.copyOf(videoFrame.getObservations());
                 for (Observation observation : observations) {
@@ -577,7 +484,8 @@ public class VideoArchiveSetEditorPanelController {
             panel.getConceptComboBox().updateModel(namesArray);
 
             // Populate the Association combobox
-            SearchableComboBoxModel<ILink> model = (SearchableComboBoxModel<ILink>) panel.getAssociationComboBox().getModel();
+            SearchableComboBoxModel<ILink> model = (SearchableComboBoxModel<ILink>) panel.getAssociationComboBox()
+                .getModel();
             model.clear();
             model.addAll(associations);
         }
@@ -619,12 +527,17 @@ public class VideoArchiveSetEditorPanelController {
 
     protected void renameAssociations() {
         Collection<ILink> linkTemplates = findLinkTemplatesForObservations(getObservations(true));
- 
+
         // Build dialog
         ILink link = (ILink) panel.getAssociationComboBox().getSelectedItem();
         AssociationSelectionDialog dialog = getRenameAssociationsDialog();
         dialog.setTitle("VARS - Replace " + LinkUtilities.formatAsString(link) + " with:");
         dialog.setLinks(linkTemplates);
+        dialog.setVisible(true);
+    }
+
+    protected void renameObservations() {
+        JDialog dialog = getRenameObservationsDialog();
         dialog.setVisible(true);
     }
 
@@ -635,15 +548,18 @@ public class VideoArchiveSetEditorPanelController {
         if (panel.getChckbxConcept().isSelected()) {
             final String conceptName = (String) panel.getConceptComboBox().getSelectedItem();
             observations = Collections2.filter(observations, new Predicate<Observation>() {
+
                 public boolean apply(Observation input) {
                     return input.getConceptName().equals(conceptName);
                 }
+
             });
         }
 
         if (panel.getChckbxAssociation().isSelected()) {
             final ILink link = (ILink) panel.getAssociationComboBox().getSelectedItem();
             observations = Collections2.filter(observations, new Predicate<Observation>() {
+
                 LinkComparator linkComparator = new LinkComparator();
                 public boolean apply(Observation input) {
                     boolean ok = false;
@@ -653,8 +569,10 @@ public class VideoArchiveSetEditorPanelController {
                             break;
                         }
                     }
+
                     return ok;
                 }
+
 
             });
         }
@@ -714,5 +632,4 @@ public class VideoArchiveSetEditorPanelController {
             linkSelectionPanel.setLinks(links);
         }
     }
-
 }

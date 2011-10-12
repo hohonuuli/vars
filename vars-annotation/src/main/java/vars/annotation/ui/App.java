@@ -27,6 +27,7 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import org.bushe.swing.event.EventBus;
+import org.bushe.swing.event.EventSubscriber;
 import org.bushe.swing.event.EventTopicSubscriber;
 import org.mbari.awt.WaitCursorEventQueue;
 import org.mbari.swing.SplashFrame;
@@ -35,10 +36,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.AnnotationPersistenceService;
 import vars.annotation.Observation;
-import vars.annotation.ui.event.ExitTopicSubscriber;
+import vars.annotation.ui.eventbus.ExitTopicSubscriber;
+import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
 import vars.knowledgebase.Concept;
 import vars.shared.ui.GlobalLookup;
 import vars.shared.ui.event.FatalExceptionSubscriber;
+import vars.shared.ui.event.LoggingEventSubscriber;
 import vars.shared.ui.event.NonFatalErrorSubscriber;
 import vars.shared.ui.event.WarningSubscriber;
 import vars.shared.ui.video.ImageCaptureService;
@@ -58,6 +61,7 @@ public class App {
      * is very important, otherwise they get gc'd too.
      */
     private static final List<EventTopicSubscriber> GC_PREVENTION = new Vector<EventTopicSubscriber>();
+    private static final List<EventSubscriber> GC_PREVENTION_EVENTS = new Vector<EventSubscriber>();
 
     /**
      * Constructs ...
@@ -114,16 +118,19 @@ public class App {
         EventTopicSubscriber nonFatalErrorSubscriber = new NonFatalErrorSubscriber(getAnnotationFrame());
         EventTopicSubscriber warningSubscriber = new WarningSubscriber(getAnnotationFrame());       
         EventTopicSubscriber exitSubscriber = new ExitTopicSubscriber();
+        EventSubscriber loggingSubscriber = new LoggingEventSubscriber();
         
         GC_PREVENTION.add(fatalErrorSubscriber);
         GC_PREVENTION.add(nonFatalErrorSubscriber);
         GC_PREVENTION.add(warningSubscriber);
         GC_PREVENTION.add(exitSubscriber);
+        GC_PREVENTION_EVENTS.add(loggingSubscriber);
 
         EventBus.subscribe(Lookup.TOPIC_FATAL_ERROR, fatalErrorSubscriber);
         EventBus.subscribe(Lookup.TOPIC_NONFATAL_ERROR, nonFatalErrorSubscriber);
         EventBus.subscribe(Lookup.TOPIC_WARNING, warningSubscriber);
         EventBus.subscribe(Lookup.TOPIC_EXIT, exitSubscriber);
+        EventBus.subscribe(VideoArchiveChangedEvent.class, loggingSubscriber);
 
         /*
          * Add a special eventQueue that toggles the cursor if the application is busy

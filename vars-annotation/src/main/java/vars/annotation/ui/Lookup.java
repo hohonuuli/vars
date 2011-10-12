@@ -328,4 +328,5 @@ public class Lookup extends GlobalLookup {
     public static Dispatcher getVideoControlServiceDispatcher() {
         return Dispatcher.getDispatcher(KEY_DISPATCHER_VIDEOSERVICE);
     }
+
 }

@@ -22,6 +22,8 @@ import javax.swing.SwingUtilities;
 
 import com.google.inject.Injector;
 import org.bushe.swing.event.EventBus;
+import org.bushe.swing.event.annotation.AnnotationProcessor;
+import org.bushe.swing.event.annotation.EventSubscriber;
 import org.mbari.swing.LabeledSpinningDialWaitIndicator;
 import org.mbari.swing.WaitIndicator;
 import org.slf4j.Logger;
@@ -33,6 +35,9 @@ import vars.VARSException;
 import vars.VarsUserPreferencesFactory;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
+import vars.annotation.ui.commandqueue.CommandQueue;
+import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
+import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
 import vars.annotation.ui.video.DoNothingVideoControlService;
 import vars.shared.ui.video.VideoControlService;
 import vars.annotation.ui.video.VideoControlServiceFactory;
@@ -56,10 +61,14 @@ public class AnnotationFrameController implements PreferenceUpdater {
     private final AnnotationFrame annotationFrame;
     private final Logger log = LoggerFactory.getLogger(getClass());
     private final ToolBelt toolBelt;
+    /** VERY IMPORTANT - the CommandQueue process the EventBus commands that modify model classes */
+    private final CommandQueue commandQueue;
 
     public AnnotationFrameController(final AnnotationFrame annotationFrame, final ToolBelt toolBelt) {
         this.annotationFrame = annotationFrame;
         this.toolBelt = toolBelt;
+        this.commandQueue = new CommandQueue(toolBelt);
+        AnnotationProcessor.process(this); // Make EventBus Aware
         
         // Make sure we save the last observations we annotated to the database
         Thread cleanupThread = new Thread(new Runnable() {
@@ -127,7 +136,6 @@ public class AnnotationFrameController implements PreferenceUpdater {
         Lookup.getPreferencesDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
-
 
                 /*
                  * Save old preferences
@@ -335,6 +343,29 @@ public class AnnotationFrameController implements PreferenceUpdater {
             }
         }
     }
-    
+
+    /**
+     * EventBus listener. Listens for changes in the selected observations and updates
+     * the appropriate dispatcher.
+     * @param event
+     */
+    @EventSubscriber(eventClass = ObservationsSelectedEvent.class)
+    public void updateSelectedObservationsDispatcher(ObservationsSelectedEvent event) {
+        Collection<Observation> observations = event.get() == null ?
+                new ArrayList<Observation>() : event.get();
+        Lookup.getSelectedObservationsDispatcher().setValueObject(observations);
+    }
+
+    /**
+     * EventBus listener. Listens for changes to the selected videoarchive and
+     * posts the change to the dispatcher.
+     */
+    @EventSubscriber(eventClass = VideoArchiveChangedEvent.class)
+    public void updateVideoArchiveDispatcher(VideoArchiveChangedEvent event) {
+        log.info("VideArchive Event " + event);
+        Lookup.getVideoArchiveDispatcher().setValueObject(event.get());
+    }
+
+
 
 }

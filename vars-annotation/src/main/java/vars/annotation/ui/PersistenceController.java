@@ -1,5 +1,5 @@
 /*
- * @(#)PersistenceController.java   2011.09.15 at 11:15:16 PDT
+ * @(#)PersistenceController.java   2011.09.21 at 12:05:21 PDT
  *
  * Copyright 2011 MBARI
  *
@@ -18,6 +18,8 @@ package vars.annotation.ui;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
+import org.bushe.swing.event.EventBus;
+import org.bushe.swing.event.annotation.EventSubscriber;
 import org.mbari.net.URLUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,15 +36,12 @@ import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveDAO;
 import vars.annotation.VideoArchiveSet;
 import vars.annotation.VideoFrame;
-import vars.annotation.ui.roweditor.RowEditorPanel;
-import vars.annotation.ui.table.ObservationTable;
-import vars.annotation.ui.table.ObservationTableModel;
+import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
+import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
+import vars.annotation.ui.eventbus.ObservationsChangedEvent;
+import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
-import java.awt.Rectangle;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -80,6 +79,30 @@ public class PersistenceController {
         this.annotationFactory = toolBelt.getAnnotationFactory();
     }
 
+
+    /**
+     * Look up the 'validate' name, that's the primary name for a given concept
+     * 
+     * @param conceptName The string name to validate
+     * @return The validated name. If it's not found in the knowledgebase then
+     *  then the original string is returned.
+     */
+    public String getValidatedConceptName(String conceptName) {
+        final ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
+        conceptDAO.startTransaction();
+        Concept concept = conceptDAO.findByName(conceptName);
+        String validatedName;
+        if (concept == null) {
+            log.warn("Unable to find '" + conceptName + "' in the knowledgebase.");
+            validatedName = conceptName;
+        }
+        else {
+            validatedName = concept.getPrimaryConceptName().getName();
+        }
+        conceptDAO.endTransaction();
+        return validatedName;
+    }
+
     /**
      *
      * @param observations
@@ -114,7 +137,7 @@ public class PersistenceController {
      *
      * @param associations
      */
-    public void deleteAssociations(Collection<Association> associations) {
+    public void deleteAssociations(final Collection<Association> associations) {
         final DAO dao = annotationDAOFactory.newDAO();
         Collection<Observation> modifiedObservations = new ArrayList<Observation>();
         dao.startTransaction();
@@ -136,6 +159,45 @@ public class PersistenceController {
         dao.endTransaction();
         dao.close();
         updateUI(modifiedObservations);
+
+//        Command command = new Command() {
+//
+//            private final Collection<Association> originalAssociations = associations;
+//
+//            @Override
+//            public void apply() {
+//                final DAO dao = annotationDAOFactory.newDAO();
+//                Collection<Observation> modifiedObservations = new ArrayList<Observation>();
+//                dao.startTransaction();
+//
+//                for (Association association : associations) {
+//                    association = dao.find(association);
+//
+//                    if (association != null) {
+//                        final Observation observation = association.getObservation();
+//                        observation.removeAssociation(association);
+//                        dao.remove(association);
+//
+//                        if (!modifiedObservations.contains(observation)) {
+//                            modifiedObservations.add(observation);
+//                        }
+//                    }
+//                }
+//
+//                dao.endTransaction();
+//                dao.close();
+//            }
+//
+//            @Override
+//            public void unapply() {
+//                //To change body of implemented methods use File | Settings | File Templates.
+//            }
+//
+//            @Override
+//            public String getDescription() {
+//                return null;  //To change body of implemented methods use File | Settings | File Templates.
+//            }
+//        };
     }
 
     /**
@@ -185,7 +247,9 @@ public class PersistenceController {
 
         dao.endTransaction();
         dao.close();
-        updateUI();
+        EventBus.publish(new VideoArchiveChangedEvent(null,
+                (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject()));
+
     }
 
     /**
@@ -257,7 +321,6 @@ public class PersistenceController {
     public Collection<Association> insertAssociations(Collection<Observation> observations, ILink associationTemplate) {
         final Collection<Association> associations = new ArrayList<Association>(observations.size());
         final Collection<Observation> uiObservations = new ArrayList<Observation>();
-        final Collection<Observation> mergedObservations = new ArrayList<Observation>();
         final ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
         conceptDAO.startTransaction();
         final AssociationDAO dao = annotationDAOFactory.newAssociationDAO();
@@ -266,7 +329,7 @@ public class PersistenceController {
         dao.startTransaction();
         for (Observation observation : observations) {
 
-            // Try a merge first to try an update the conceptName incase it's been
+            // Try a merge first to try an update the conceptName in case it's been
             // changed.
             try {
                 observation = dao.merge(observation);
@@ -326,33 +389,7 @@ public class PersistenceController {
         return observation;
     }
 
-    /**
-     *
-     * @param videoFrame
-     * @param observations
-     * @return
-     */
-    public Collection<Observation> insertObservations(VideoFrame videoFrame, Collection<Observation> observations) {
-        ObservationDAO dao = annotationDAOFactory.newObservationDAO();
-        final ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
-        conceptDAO.startTransaction();
-        dao.startTransaction();
-        videoFrame = dao.find(videoFrame);
 
-        for (Observation observation : observations) {
-            videoFrame.addObservation(observation);
-            dao.persist(observation);
-            dao.validateName(observation, conceptDAO);
-        }
-
-        dao.endTransaction();
-        dao.close();
-        conceptDAO.endTransaction();
-        conceptDAO.close();
-        updateUI(observations);    // update view
-
-        return observations;
-    }
 
     /**
      *
@@ -372,23 +409,7 @@ public class PersistenceController {
         return videoFrame;
     }
 
-    /**
-     * VideoFrames need to be loaded from the database. Call this method to fetch all
-     * of them for a particular {@link VideoArchive}. Be sre to grab the returned reference
-     * in order to access them.
-     * @param videoArchive
-     * @return
-     */
-    public VideoArchive loadVideoFramesFor(VideoArchive videoArchive) {
-        DAO dao = annotationDAOFactory.newDAO();
-        dao.startTransaction();
-        videoArchive = dao.find(videoArchive);
-        @SuppressWarnings("unused") Collection<VideoFrame> videoFrames = videoArchive.getVideoFrames();
-        dao.endTransaction();
-        dao.close();
 
-        return videoArchive;
-    }
 
     /**
      * Convenience method very specific to MBARI internal usage and naming
@@ -423,22 +444,6 @@ public class PersistenceController {
         return sb.toString();
     }
 
-    /**
-     *
-     * @param videoArchive
-     * @param observations
-     */
-    public void moveObservationsTo(VideoArchive videoArchive, Collection<Observation> observations) {
-        Collection<Observation> updateObservations = new ArrayList<Observation>();
-        DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
-        dao.startTransaction();
-        videoArchive = dao.find(videoArchive);
-
-        for (Observation observation : updateObservations) {
-            observation = dao.find(observation);
-            throw new UnsupportedOperationException("Implementation isn't finished yet");
-        }
-    }
 
     /**
      *
@@ -532,34 +537,13 @@ public class PersistenceController {
         return updatedObservations;
     }
 
-    /**
-     *
-     * @param associations
-     * @return
-     */
-    public Collection<Association> updateAssociations(Collection<Association> associations) {
-        final AssociationDAO dao = annotationDAOFactory.newAssociationDAO();
-        final ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
-        conceptDAO.startTransaction();
-        Collection<Association> updatedAssociations = new ArrayList<Association>(associations.size());
-        Collection<Observation> uiObservations = new ArrayList<Observation>();
-        dao.startTransaction();
 
-        for (Association association : associations) {
-            association = dao.merge(association);
-            dao.validateName(association, conceptDAO);
-            updatedAssociations.add(association);
-            uiObservations.add(association.getObservation());
-        }
-
-        dao.endTransaction();
-        dao.close();
-        conceptDAO.endTransaction();
-        conceptDAO.close();
-        updateUI(uiObservations);
-
-        return updatedAssociations;
+    @EventSubscriber(eventClass = VideoArchiveChangedEvent.class)
+    public void updateVideoArchiveReference(VideoArchiveChangedEvent updateEvent) {
+        updateUI(updateEvent.get());
     }
+
+
 
     /**
      * Changes the CameraData URL's that match the currently set local directory to
@@ -631,98 +615,12 @@ public class PersistenceController {
      */
     public void updateUI(final Collection<Observation> observations, final boolean updateSelection) {
 
-        Runnable runnable = new Runnable() {
+        ObservationsChangedEvent updateEvent = new ObservationsChangedEvent(null, observations);
+        EventBus.publish(updateEvent);
 
-            public void run() {
-
-                // Get the TableModel
-                final ObservationTable observationTable = (ObservationTable) Lookup.getObservationTableDispatcher()
-                    .getValueObject();
-                final JTable table = (JTable) observationTable;
-                if (observationTable == null) {
-                    log.info("No UI is available to update");
-
-                    return;
-                }
-
-                final ObservationTableModel model = (ObservationTableModel) table.getModel();
-
-                for (Observation observation : observations) {
-                    int row = model.getObservationRow(observation);
-                    if ((row > -1) && (row < model.getRowCount())) {
-                        observationTable.updateObservation(observation);
-                    }
-                    else {
-                        observationTable.addObservation(observation);
-                        row = model.getObservationRow(observation);
-
-                        if ((row > -1) && (row < model.getRowCount())) {
-
-                            observationTable.scrollToVisible(row, 0);
-                        }
-                    }
-                }
-
-                /*
-                 * We need to keep the RowEditorPanel in sync. Doing this
-                 * explicitly is probably best to avoid weird unintended UI
-                 * side-effects.
-                 */
-                AnnotationFrame annotationFrame = (AnnotationFrame) Lookup.getApplicationFrameDispatcher()
-                    .getValueObject();
-                RowEditorPanel rowEditorPanel = annotationFrame.getRowEditorPanel();
-                Observation reObservation = rowEditorPanel.getObservation();
-                if (reObservation != null) {
-                    DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
-                    for (Observation obs : observations) {
-                        if (dao.equalInDatastore(reObservation, obs)) {
-                            rowEditorPanel.setObservation(obs);
-                            break;
-                        }
-                    }
-                    dao.close();
-                }
-
-                if (updateSelection) {
-                    Collection<Observation> selectedObservations = (Collection<Observation>) Lookup
-                        .getSelectedObservationsDispatcher().getValueObject();
-                    selectedObservations = new ArrayList<Observation>(selectedObservations);    // Copy to avoid thread issues
-
-                    /*
-                     * If we just added one select it in the table
-                     */
-                    if (observations.size() == 1) {
-                        final Observation observation = observations.iterator().next();
-                        observationTable.setSelectedObservation(observation);
-                    }
-                    else {
-                        ListSelectionModel lsm = table.getSelectionModel();
-                        lsm.clearSelection();
-
-                        for (Observation observation : selectedObservations) {
-                            int row = model.getObservationRow(observation);
-                            lsm.addSelectionInterval(row, row);
-                        }
-
-                    }
-                }
-
-            }
-        };
-
-        /*
-         * Execute on the proper thread.
-         */
-        if (SwingUtilities.isEventDispatchThread()) {
-            runnable.run();
-        }
-        else {
-            try {
-                SwingUtilities.invokeAndWait(runnable);
-            }
-            catch (Exception ex) {
-                log.warn("Failed to excecute updateUI() method on EDT", ex);
-            }
+        if (updateSelection) {
+            ObservationsSelectedEvent selectionEvent = new ObservationsSelectedEvent(null, observations);
+            EventBus.publish(selectionEvent);
         }
 
     }
@@ -733,64 +631,64 @@ public class PersistenceController {
      */
     public void updateUI(VideoArchive videoArchive) {
 
-        // Get the TableModel
-        final ObservationTable observationTable = (ObservationTable) Lookup.getObservationTableDispatcher()
-            .getValueObject();
-        if (observationTable == null) {
-            log.info("No UI is available to update");
+//        // Get the TableModel
+//        final ObservationTable observationTable = (ObservationTable) Lookup.getObservationTableDispatcher()
+//            .getValueObject();
+//        if (observationTable == null) {
+//            log.info("No UI is available to update");
+//
+//            return;
+//        }
+//
+//        Runnable runnable = new Runnable() {
+//
+//            public void run() {
+//                JTable table = observationTable.getJTable();
+//                table.getSelectionModel().clearSelection();
+//
+//                // Remove the current contents of the table
+//                final ObservationTableModel model = (ObservationTableModel) ((JTable) observationTable).getModel();
+//                model.clear();
+//
+//            }
+//        };
+//
+//        /*
+//         * Clear the table on the proper thread
+//         */
+//        if (SwingUtilities.isEventDispatchThread()) {
+//            runnable.run();
+//        }
+//        else {
+//            try {
+//                SwingUtilities.invokeAndWait(runnable);
+//            }
+//            catch (Exception ex) {
+//                log.warn("Failed to clear tabel model", ex);
+//            }
+//        }
 
-            return;
-        }
 
-        Runnable runnable = new Runnable() {
-
-            public void run() {
-                JTable table = observationTable.getJTable();
-                table.getSelectionModel().clearSelection();
-
-                // Remove the current contents of the table
-                final ObservationTableModel model = (ObservationTableModel) ((JTable) observationTable).getModel();
-                model.clear();
-
-            }
-        };
-
-        /*
-         * Clear the table on the proper thread
-         */
-        if (SwingUtilities.isEventDispatchThread()) {
-            runnable.run();
-        }
-        else {
-            try {
-                SwingUtilities.invokeAndWait(runnable);
-            }
-            catch (Exception ex) {
-                log.warn("Failed to clear tabel model", ex);
-            }
-        }
-
-
-        Collection<Observation> observations = new ArrayList<Observation>();
-
-        // Repopulate it with the contents of the new VideoArchive
-        if (videoArchive != null) {
-
-            // DAOTX - Needed to deal with lazy loading
-            DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
-            dao.startTransaction();
-            videoArchive = dao.find(videoArchive);
-
-            final Collection<VideoFrame> videoFrames = videoArchive.getVideoFrames();
-            for (VideoFrame videoFrame : videoFrames) {
-                observations.addAll(videoFrame.getObservations());
-            }
-
-            dao.endTransaction();
-            dao.close();
-
-            updateUI(observations, false);
-        }
+//        Collection<Observation> observations = new ArrayList<Observation>();
+//
+//        // Repopulate it with the contents of the new VideoArchive
+//        if (videoArchive != null) {
+//
+//            // DAOTX - Needed to deal with lazy loading
+//            DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
+//            dao.startTransaction();
+//            videoArchive = dao.find(videoArchive);
+//
+//            final Collection<VideoFrame> videoFrames = videoArchive.getVideoFrames();
+//            for (VideoFrame videoFrame : videoFrames) {
+//                observations.addAll(videoFrame.getObservations());
+//            }
+//
+//            dao.endTransaction();
+//            dao.close();
+//
+//            updateUI(observations, false);
+//        }
     }
 
     /**
@@ -799,47 +697,33 @@ public class PersistenceController {
      */
     public void updateUI() {
 
-        // Get the TableModel
-        final ObservationTable observationTable = (ObservationTable) Lookup.getObservationTableDispatcher()
-            .getValueObject();
-        if (observationTable == null) {
-            log.info("No UI is available to update");
-
-            return;
-        }
-        final JTable table = observationTable.getJTable();
-        final Rectangle rect = table.getVisibleRect();
-        VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
-        updateUI(videoArchive);
-        SwingUtilities.invokeLater(new Runnable() {
-
-            public void run() {
-
-                // When observations are deleted the table would jump to the last row UNLESS
-                // we make this call which mostly preserves the current view. Doing this still
-                // makes a little visible 'jump' but it takes the user back to about the same
-                // position in the table
-                table.scrollRectToVisible(rect);
-            }
-
-        });
+//        // Get the TableModel
+//        final ObservationTable observationTable = (ObservationTable) Lookup.getObservationTableDispatcher()
+//            .getValueObject();
+//        if (observationTable == null) {
+//            log.info("No UI is available to update");
+//
+//            return;
+//        }
+//        final JTable table = observationTable.getJTable();
+//        final Rectangle rect = table.getVisibleRect();
+//        VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+//        updateUI(videoArchive);
+//        SwingUtilities.invokeLater(new Runnable() {
+//
+//            public void run() {
+//
+//                // When observations are deleted the table would jump to the last row UNLESS
+//                // we make this call which mostly preserves the current view. Doing this still
+//                // makes a little visible 'jump' but it takes the user back to about the same
+//                // position in the table
+//                table.scrollRectToVisible(rect);
+//            }
+//
+//        });
     }
 
-    /**
-     *
-     * @param videoArchive
-     * @return
-     */
-    public VideoArchive updateVideoArchive(VideoArchive videoArchive) {
-        DAO dao = annotationDAOFactory.newDAO();
-        dao.startTransaction();
-        videoArchive = dao.merge(videoArchive);
-        dao.endTransaction();
-        dao.close();
-        updateUI();
 
-        return videoArchive;
-    }
 
     /**
      *
@@ -856,36 +740,5 @@ public class PersistenceController {
         return videoArchiveSet;
     }
 
-    /**
-     *
-     *
-     * @param videoFrames
-     * @return
-     */
-    public Collection<VideoFrame> updateVideoFrames(Collection<VideoFrame> videoFrames) {
-        ObservationDAO dao = annotationDAOFactory.newObservationDAO();
-        final ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
-        conceptDAO.startTransaction();
-        final Collection<VideoFrame> updatedVideoFrames = new ArrayList<VideoFrame>(videoFrames.size());
-        final Collection<Observation> observations = new ArrayList<Observation>();
-        dao.startTransaction();
 
-        for (VideoFrame vf : videoFrames) {
-            VideoFrame updatedVideoFrame = dao.merge(vf);
-            updatedVideoFrames.add(updatedVideoFrame);
-            observations.addAll(updatedVideoFrame.getObservations());
-        }
-
-        for (Observation observation : observations) {
-            dao.validateName(observation, conceptDAO);
-        }
-
-        dao.endTransaction();
-        dao.close();
-        conceptDAO.endTransaction();
-        conceptDAO.close();
-        updateUI(observations);    // update view
-
-        return updatedVideoFrames;
-    }
 }

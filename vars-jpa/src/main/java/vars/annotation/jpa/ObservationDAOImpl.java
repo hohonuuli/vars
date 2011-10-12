@@ -171,5 +171,9 @@ public class ObservationDAOImpl extends DAO implements ObservationDAO {
             log.warn(object + " contains a 'conceptName', " + object.getConceptName() + " that was not found in the knowlegebase");
         }
     }
-    
+
+    @Override
+    public Observation findByPrimaryKey(Object primaryKey) {
+        return findByPrimaryKey(ObservationImpl.class, primaryKey);
+    }
 }

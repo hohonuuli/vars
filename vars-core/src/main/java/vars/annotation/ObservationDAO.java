@@ -63,4 +63,6 @@ public interface ObservationDAO extends DAO, ConceptNameValidator<Observation> {
      * @return
      */
     Observation updateFields(Observation observation);
+
+    Observation findByPrimaryKey(Object primaryKey);
 }

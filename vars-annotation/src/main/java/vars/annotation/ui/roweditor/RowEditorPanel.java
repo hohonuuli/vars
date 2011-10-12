@@ -15,7 +15,6 @@
 
 package vars.annotation.ui.roweditor;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -23,15 +22,10 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -51,19 +45,24 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.EventTopicSubscriber;
+import org.bushe.swing.event.annotation.AnnotationProcessor;
+import org.bushe.swing.event.annotation.EventSubscriber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.CacheClearedEvent;
 import vars.CacheClearedListener;
+import vars.DAO;
 import vars.UserAccount;
 import vars.annotation.Observation;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
+import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
+import vars.annotation.ui.eventbus.ObservationsChangedEvent;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptName;
 import vars.shared.ui.AllConceptNamesComboBox;
-import vars.shared.ui.event.LoggingSubscriber;
+import vars.shared.ui.event.LoggingTopicSubscriber;
 
 /**
  * <p>THis panel is explcitly desinged for editing Observations in the
@@ -91,7 +90,7 @@ public class RowEditorPanel extends JPanel {
             ((Component) evt.getSource()).transferFocus();
         }
     };
-    private final EventTopicSubscriber loggingSubscriber = new LoggingSubscriber();
+    private final EventTopicSubscriber loggingSubscriber = new LoggingTopicSubscriber();
     protected Action prevFocusAction = new AbstractAction("Move Focus Backwards") {
 
         public void actionPerformed(ActionEvent evt) {
@@ -117,6 +116,7 @@ public class RowEditorPanel extends JPanel {
      */
     public RowEditorPanel(ToolBelt toolBelt) {
         super();
+        AnnotationProcessor.process(this); // Create EventBus Proxy
         this.toolBelt = toolBelt;
         initialize();
 
@@ -124,15 +124,15 @@ public class RowEditorPanel extends JPanel {
          * Listen for changes in the observation
          *
          */
-        Lookup.getSelectedObservationsDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
-
-            public void propertyChange(final PropertyChangeEvent evt) {
-                final Collection<Observation> observations = (Collection<Observation>) evt.getNewValue();
-                Observation obs = (observations.size() == 1) ? observations.iterator().next() : null;
-                setObservation(obs);
-            }
-
-        });
+//        Lookup.getSelectedObservationsDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
+//
+//            public void propertyChange(final PropertyChangeEvent evt) {
+//                final Collection<Observation> observations = (Collection<Observation>) evt.getNewValue();
+//                Observation obs = (observations.size() == 1) ? observations.iterator().next() : null;
+//                setObservation(obs);
+//            }
+//
+//        });
 
         /*
          * This allows the notable concept names to be refreshed is the
@@ -151,6 +151,36 @@ public class RowEditorPanel extends JPanel {
         });
 
 
+    }
+
+    /**
+     * EventBus method
+     * @param selectionEvent
+     */
+    @EventSubscriber(eventClass = ObservationsSelectedEvent.class)
+    public void updateObservationSelection(ObservationsSelectedEvent selectionEvent) {
+        final Collection<Observation> observations = selectionEvent.get();
+        Observation obs = (observations.size() == 1) ? observations.iterator().next() : null;
+        setObservation(obs);
+    }
+
+    /**
+     * EventBus method
+     * @param updateEvent
+     */
+    @EventSubscriber(eventClass = ObservationsChangedEvent.class)
+    public void updateObservationReference(ObservationsChangedEvent updateEvent) {
+        Observation selectedObservation = getObservation();
+        if (selectedObservation != null) {
+            DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
+            for (Observation obs : updateEvent.get()) {
+                if (dao.equalInDatastore(selectedObservation, obs)) {
+                    setObservation(obs);
+                    break;
+                }
+            }
+            dao.close();
+        }
     }
 
     private JComboBox getConceptComboBox() {

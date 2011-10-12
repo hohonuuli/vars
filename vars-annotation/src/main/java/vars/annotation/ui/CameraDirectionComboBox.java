@@ -21,8 +21,8 @@ import javax.swing.JComboBox;
 import vars.annotation.CameraDirections;
 
 /**
- * <p>A combobox that sets the Camera direction. It's model contains {@link CameraDirections} objects.
- * A convenience class.</p>
+ * <p>A combobox that sets the Camera direction. It's model contains
+ * {@link CameraDirections} objects.</p>
  *
  * @author  <a href="http://www.mbari.org">MBARI</a>
  */
@@ -36,10 +36,7 @@ public class CameraDirectionComboBox extends JComboBox {
         initialize();
     }
 
-    /**
-     * <p><!-- Method description --></p>
-     *
-     */
+
     void initialize() {
 
         // Add acceptable values

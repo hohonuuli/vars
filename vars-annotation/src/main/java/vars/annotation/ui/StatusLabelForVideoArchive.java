@@ -22,12 +22,16 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import javax.swing.SwingUtilities;
+
+import org.bushe.swing.event.EventBus;
+import org.bushe.swing.event.annotation.AnnotationProcessor;
+import org.bushe.swing.event.annotation.EventSubscriber;
 import org.mbari.swing.SwingUtils;
 import org.mbari.util.Dispatcher;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.dialogs.OpenVideoArchiveDialog;
+import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
 
 /**
  * <p>Indicates which {@link VideoArchive} the annotator is editing. Clicking on the
@@ -55,20 +59,23 @@ public class StatusLabelForVideoArchive extends StatusLabel {
             public void actionPerformed(ActionEvent e) {
                 dialog.setVisible(false);
                 VideoArchive videoArchive = dialog.openVideoArchive();
-                videoArchiveDispatcher.setValueObject(videoArchive);
+                VideoArchiveChangedEvent event = new VideoArchiveChangedEvent(this, videoArchive);
+                EventBus.publish(event);
             }
         });
+
+        AnnotationProcessor.process(this); // Register with EventBus
 
 
         /*
          * Listen for changes in the VideoArchive being annotated. When it changes update
          * the label text
          */
-        videoArchiveDispatcher.addPropertyChangeListener(new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                update((VideoArchive) evt.getNewValue());
-            }
-        });
+//        videoArchiveDispatcher.addPropertyChangeListener(new PropertyChangeListener() {
+//            public void propertyChange(PropertyChangeEvent evt) {
+//                update((VideoArchive) evt.getNewValue());
+//            }
+//        });
         update((VideoArchive) videoArchiveDispatcher.getValueObject());
 
 
@@ -114,6 +121,15 @@ public class StatusLabelForVideoArchive extends StatusLabel {
      */
     public void propertyChange(PropertyChangeEvent evt) {
         update((VideoArchive) evt.getNewValue());
+    }
+
+    /**
+     * EventBus Listener method
+     * @param event
+     */
+    @EventSubscriber(eventClass = VideoArchiveChangedEvent.class)
+    public void updateVideoArchive(VideoArchiveChangedEvent event) {
+        update(event.get());
     }
 
     /**

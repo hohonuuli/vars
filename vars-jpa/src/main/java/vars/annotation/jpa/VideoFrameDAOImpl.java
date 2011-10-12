@@ -35,4 +35,8 @@ public class VideoFrameDAOImpl extends DAO implements VideoFrameDAO {
         set.addAll(list);
         return set;
     }
+
+    public VideoFrame findByPrimaryKey(Object primaryKey) {
+        return findByPrimaryKey(VideoFrameImpl.class, primaryKey);
+    }
 }

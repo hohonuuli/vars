@@ -18,11 +18,14 @@ package vars.annotation.ui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.HeadlessException;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Vector;
 import javax.swing.AbstractAction;
@@ -33,21 +36,35 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
+import org.bushe.swing.event.EventBus;
+import org.bushe.swing.event.annotation.AnnotationProcessor;
+import org.bushe.swing.event.annotation.EventSubscriber;
 import org.mbari.util.Dispatcher;
 import org.mbari.vcr.IVCR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.DAO;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
+import vars.annotation.VideoFrame;
 import vars.annotation.ui.cbpanel.ConceptButtonPanel;
+import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
+import vars.annotation.ui.eventbus.ObservationsChangedEvent;
+import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
 import vars.annotation.ui.preferences.PreferenceFrameButton;
 import vars.annotation.ui.roweditor.RowEditorPanel;
 import vars.annotation.ui.table.JXObservationTable;
 import vars.annotation.ui.table.JXObservationTableColumnModel;
+import vars.annotation.ui.table.ObservationTable;
+import vars.annotation.ui.table.ObservationTableModel;
 import vars.annotation.ui.video.VideoControlPanel;
 import vars.annotation.ui.videoset.VideoArchiveSetEditorButton;
 
@@ -74,6 +91,7 @@ public class AnnotationFrame extends JFrame {
     private JToolBar toolBar;
     private final ToolBelt toolBelt;
     private VideoControlPanel videoControlPanel;
+    private VideoArchive videoArchive;
 
     /**
      * Constructs ...
@@ -85,6 +103,7 @@ public class AnnotationFrame extends JFrame {
     public AnnotationFrame(ToolBelt toolBelt) throws HeadlessException {
         this.toolBelt = toolBelt;
         this.controller = new AnnotationFrameController(this, toolBelt);
+        AnnotationProcessor.process(this); // Create EventBus Proxy
         initialize();
     }
 
@@ -249,8 +268,8 @@ public class AnnotationFrame extends JFrame {
                         for (int i = 0; i < rows.length; i++) {
                             selectedObservations.add(table.getObservationAt(rows[i]));
                         }
-
-                        dispatcher.setValueObject(selectedObservations);
+                        //dispatcher.setValueObject(selectedObservations);
+                        EventBus.publish(new ObservationsSelectedEvent(table, selectedObservations));
                     }
                 }
             });
@@ -259,14 +278,14 @@ public class AnnotationFrame extends JFrame {
              * Watch for opening of a new videoarchive. When that happens we
              * have to re-populate the Table
              */
-            Lookup.getVideoArchiveDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
-
-                public void propertyChange(PropertyChangeEvent evt) {
-                    VideoArchive videoArchive = (VideoArchive) evt.getNewValue();
-                    toolBelt.getPersistenceController().updateUI(videoArchive);
-                }
-
-            });
+//            Lookup.getVideoArchiveDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
+//
+//                public void propertyChange(PropertyChangeEvent evt) {
+//                    VideoArchive videoArchive = (VideoArchive) evt.getNewValue();
+//                    toolBelt.getPersistenceController().updateUI(videoArchive);
+//                }
+//
+//            });
 
             Lookup.getObservationTableDispatcher().setValueObject(table);
 
@@ -325,5 +344,106 @@ public class AnnotationFrame extends JFrame {
         return controller;
     }
 
+    @EventSubscriber(eventClass = VideoArchiveChangedEvent.class)
+    public void updateVideoArchiveReference(VideoArchiveChangedEvent updateEvent) {
+
+        // --- hang on to videoArchive reference
+        VideoArchive oldVideoArchive = videoArchive;
+        VideoArchive newVideoArchive = updateEvent.get();
+        videoArchive = newVideoArchive;
+        
+        // --- Clear table
+        final ObservationTable observationTable = getTable();
+        final JTable table = observationTable.getJTable();
+        table.getSelectionModel().clearSelection();
+        ((ObservationTableModel) table.getModel()).clear();
+
+        // --- Repopulate table with observations
+        // DAOTX - Needed to deal with lazy loading
+        if (newVideoArchive != null) {
+            Collection<Observation> observations = new ArrayList<Observation>();
+            DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
+            dao.startTransaction();
+            VideoArchive videoArchive = dao.find(updateEvent.get());
+            final Collection<VideoFrame> videoFrames = videoArchive.getVideoFrames();
+            for (VideoFrame videoFrame : videoFrames) {
+                observations.addAll(videoFrame.getObservations());
+            }
+            dao.endTransaction();
+            dao.close();
+            final Rectangle rect = table.getVisibleRect();
+            updateObservationReferences(new ObservationsChangedEvent(null, observations));
+
+            // --- Scroll view if needed
+            if (newVideoArchive.equals(oldVideoArchive)) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        // When observations are deleted the table would jump to the last row UNLESS
+                        // we make this call which mostly preserves the current view. Doing this still
+                        // makes a little visible 'jump' but it takes the user back to about the same
+                        // position in the table
+                        table.scrollRectToVisible(rect);
+                    }
+                });
+            }
+        }
+    }
+
+    /**
+     * Update observations in Table if they are updated
+     * @param updateEvent
+     */
+    @EventSubscriber(eventClass = ObservationsChangedEvent.class)
+    public void updateObservationReferences(ObservationsChangedEvent updateEvent) {
+        final ObservationTable observationTable = getTable();
+        if (updateEvent.getEventSource() != observationTable) {
+            final JTable table = observationTable.getJTable();
+            final ObservationTableModel model = (ObservationTableModel) table.getModel();
+            for (Observation observation : updateEvent.get()) {
+                int row = model.getObservationRow(observation);
+                if ((row > -1) && (row < model.getRowCount())) {
+                    observationTable.updateObservation(observation);
+                }
+                else {
+                    observationTable.addObservation(observation);
+                    // Scroll to a new observation
+                    row = model.getObservationRow(observation);
+                    if ((row > -1) && (row < model.getRowCount())) {
+                        observationTable.scrollToVisible(row, 0);
+                    }
+                }
+            }
+        }
+    }
+
+
+    /**
+     *
+     * @param selectEvent
+     */
+    @EventSubscriber(eventClass = ObservationsSelectedEvent.class)
+    public void updateObservationSelection(ObservationsSelectedEvent selectEvent) {
+        final ObservationTable observationTable = getTable();
+        if(selectEvent.getSelectionSource() != observationTable) {
+            ObservationTableModel model = (ObservationTableModel) table.getModel();
+            Collection<Observation> observations = selectEvent.get();
+            /*
+             * If we just added one select it in the table
+             */
+            if (observations.size() == 1) {
+                final Observation observation = observations.iterator().next();
+                observationTable.setSelectedObservation(observation);
+            }
+            else {
+                ListSelectionModel lsm = table.getSelectionModel();
+                lsm.clearSelection();
+
+                for (Observation observation : observations) {
+                    int row = model.getObservationRow(observation);
+                    lsm.addSelectionInterval(row, row);
+                }
+            }
+        }
+    }
 
 }

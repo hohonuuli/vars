@@ -1,5 +1,5 @@
 /*
- * @(#)MeasurementLayerUI.java   2011.09.13 at 02:15:24 PDT
+ * @(#)MeasurementLayerUI.java   2011.09.20 at 02:51:09 PDT
  *
  * Copyright 2011 MBARI
  *
@@ -102,7 +102,7 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends CrossHairLaye
     /**
      * By iteself this component does nothing with a measurement. In order to add functionality just
      * add a listener to process a measurement.
-     * 
+     *
      * @param listener
      */
     public void addMeasurementCompletedListener(MeasurementCompletedListener listener) {
@@ -115,13 +115,14 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends CrossHairLaye
      * @param jxl
      * @return
      */
-    private Measurement getMeasurement(String comment, JXLayer<? extends T> jxl) {
+    private Measurement newMeasurement(String comment, JXLayer<? extends T> jxl) {
+
         //Point2D lineStartInImage = jxl.getView().convertToImage(lineStart);
         //Point2D lineEndInImage = jxl.getView().convertToImage(lineEnd);
         int x0 = (int) Math.round(lineStart.getX());
-        int y0 = (int) Math.round(lineStart.getX());
+        int y0 = (int) Math.round(lineStart.getY());
         int x1 = (int) Math.round(lineEnd.getX());
-        int y1 = (int) Math.round(lineEnd.getX());
+        int y1 = (int) Math.round(lineEnd.getY());
 
         return new Measurement(x0, y0, x1, y1, comment);
     }
@@ -181,7 +182,7 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends CrossHairLaye
         }
 
         // --- Draw and label existing measurements
-        g2.setXORMode(Color.GREEN);
+        g2.setPaint(Color.GREEN);
         g2.setStroke(new BasicStroke(2));
         for (MeasurementPath path : measurementPaths) {
             updateMeasurementPath(path, jxl);
@@ -194,7 +195,7 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends CrossHairLaye
 
         // --- Paint lineStart
         g2.setStroke(new BasicStroke(2));
-        g2.setXORMode(Color.RED);
+        g2.setPaint(Color.RED);
         final int markerOffset = markerDiameter / 2;
         if (selectedLineStart) {
             Point2D lineStartPoint = jxl.getView().convertToComponent(lineStart);
@@ -228,8 +229,7 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends CrossHairLaye
                 lineEnd.setLocation(imagePoint);
                 selectedLineEnd = true;
 
-                // TODO show dialog to get comment added
-                Measurement measurement = getMeasurement(null, jxl);
+                Measurement measurement = newMeasurement(null, jxl);
                 setDirty(true);
 
                 // Notify listeners

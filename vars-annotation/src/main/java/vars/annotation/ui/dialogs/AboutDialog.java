@@ -51,93 +51,44 @@ public class AboutDialog extends JDialog {
      */
     private static final long serialVersionUID = 5863660176510794934L;
 
-    /**
-     *     @uml.property  name="btnPaneLayout"
-     */
+
     private final FlowLayout btnPaneLayout = new FlowLayout();
 
-    /**
-     *     @uml.property  name="btnPanel"
-     *     @uml.associationEnd  multiplicity="(1 1)"
-     */
+
     private final JPanel btnPanel = new JPanel();
 
-    /**
-     *     @uml.property  name="commentField"
-     *     @uml.associationEnd  multiplicity="(1 1)"
-     */
+
     private final JTextArea commentField = new JTextArea();
 
-    /**
-     *     @uml.property  name="comments"
-     */
+
     private final String comments =
         " Authors:\n\tBrian Schlining\n\tAndrew Chase\n\tKevin Gomes\n\tRich Schramm\n\tMike McCann";
 
-    /**
-     *     @uml.property  name="contentPane"
-     *     @uml.associationEnd  multiplicity="(1 1)"
-     */
+
     private final JPanel contentPane = new JPanel();
 
-    /**
-     *     @uml.property  name="contentPaneLayout"
-     */
+
     private final GridBagLayout contentPaneLayout = new GridBagLayout();
 
-    /**
-     *     @uml.property  name="copLabel"
-     *     @uml.associationEnd  multiplicity="(1 1)"
-     */
+
     private final JLabel copLabel = new JLabel();
 
-    /**
-     *     @uml.property  name="copyright"
-     */
     private final String copyright = "Copyright (c) 2006";
 
-    /**
-     *     @uml.property  name="formLayout"
-     */
     private final BorderLayout formLayout = new BorderLayout();
 
-    /**
-     *     @uml.property  name="image"
-     *     @uml.associationEnd  multiplicity="(1 1)"
-     */
     private final JLabel image = new JLabel();
 
-    /**
-     *     @uml.property  name="okButton"
-     *     @uml.associationEnd  multiplicity="(1 1)"
-     */
     private final JButton okButton = new JButton();
 
-    /**
-     *     @uml.property  name="prodLabel"
-     *     @uml.associationEnd  multiplicity="(1 1)"
-     */
     private final JLabel prodLabel = new JLabel();
 
-    /**
-     *     @uml.property  name="product"
-     */
     private final String product = "Video Annotation and Reference System";
 
-    /**
-     *     @uml.property  name="title"
-     */
     private final String title = "VARS - About";
 
-    /**
-     *     @uml.property  name="verLabel"
-     *     @uml.associationEnd  multiplicity="(1 1)"
-     */
     private final JLabel verLabel = new JLabel();
 
-    /**
-     *     @uml.property  name="version"
-     */
     private String version;
 
     /**

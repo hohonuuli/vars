@@ -15,4 +15,6 @@ public interface AssociationDAO extends DAO, ConceptNameValidator<Association> {
     List<Association> findAllByConceptNameAndValues(String conceptName,
             String linkName, String toConcept, String linkValue);
 
+    Association findByPrimaryKey(Object primaryKey);
+
 }

@@ -14,4 +14,6 @@ public interface VideoFrameDAO extends DAO {
 
     Set<VideoFrame> findAllByVideoArchivePrimaryKey(Object primaryKey);
 
+    VideoFrame findByPrimaryKey(Object primaryKey);
+
 }

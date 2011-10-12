@@ -147,6 +147,6 @@ public class ToolBelt {
         return queryPersistenceService;
     }
 
-    
+
 }
 

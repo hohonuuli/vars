@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  * @author         Brian Schlining [brian@mbari.org]
  */
 @SuppressWarnings("unchecked")
-public class LoggingSubscriber implements EventTopicSubscriber {
+public class LoggingTopicSubscriber implements EventTopicSubscriber {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 

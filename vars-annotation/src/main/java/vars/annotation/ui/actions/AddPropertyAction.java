@@ -15,8 +15,9 @@
 
 package vars.annotation.ui.actions;
 
-import java.util.ArrayList;
 import java.util.Collection;
+
+import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,9 @@ import vars.annotation.Association;
 import vars.annotation.Observation;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.Lookup;
+import vars.annotation.ui.commandqueue.Command;
+import vars.annotation.ui.commandqueue.CommandEvent;
+import vars.annotation.ui.commandqueue.impl.AddAssociationCmd;
 
 /**
  * <p>
@@ -78,8 +82,11 @@ public class AddPropertyAction extends ActionAdapter {
 
         Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
         Association associationTemplate = toolBelt.getAnnotationFactory().newAssociation(linkName, toConcept, linkValue);
+        Command command = new AddAssociationCmd(associationTemplate, observations);
+        CommandEvent commandEvent = new CommandEvent(command);
+        EventBus.publish(commandEvent);
         // Pass a copy of the observation collection to the persistence controller to avoid threading issues
-        toolBelt.getPersistenceController().insertAssociations(new ArrayList<Observation>(observations), associationTemplate);
+        // toolBelt.getPersistenceController().insertAssociations(new ArrayList<Observation>(observations), associationTemplate);
 
     }
 

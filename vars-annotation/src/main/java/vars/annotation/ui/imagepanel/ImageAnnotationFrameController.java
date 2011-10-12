@@ -2,20 +2,18 @@ package vars.annotation.ui.imagepanel;
 
 
 import org.bushe.swing.event.EventBus;
-import vars.DAO;
-import vars.ILink;
-import vars.annotation.Association;
 import vars.annotation.Observation;
 import vars.annotation.VideoFrame;
 
 import vars.annotation.ui.ToolBelt;
-import vars.annotation.ui.event.UpdateObservationsEvent;
+import vars.annotation.ui.commandqueue.Command;
+import vars.annotation.ui.commandqueue.CommandEvent;
+import vars.annotation.ui.commandqueue.impl.AddAssociationCmd;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 
 /**
@@ -51,7 +49,6 @@ public class ImageAnnotationFrameController implements MeasurementCompletedListe
 
     @Override
     public void onComplete(MeasurementCompletedEvent event) {
-        // TODO show dialog for capturing comment about measurement
         measurementAction.setMeasurement(event.getMeasurement());
         measurementAction.setObservation(event.getObservation());
         getMeasurementCommentDialog().setVisible(true);
@@ -93,19 +90,14 @@ public class ImageAnnotationFrameController implements MeasurementCompletedListe
         public void apply() {
             if (measurement != null && observation != null) {
                 measurement.setComment(comment);
-                Association association = toolBelt.getAnnotationFactory().newAssociation(measurement.toLink());
-                DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
-                dao.startTransaction();
-                Observation obs = dao.find(observation);
-                obs.addAssociation(association);
-                dao.persist(association);
-                dao.endTransaction();
-                Collection<Observation> observations = new ArrayList<Observation>();
-                observations.add(obs);
-                //toolBelt.getPersistenceController().updateObservations(observations);
-                UpdateObservationsEvent updateEvent = new UpdateObservationsEvent(imageAnnotationFrame, observations);
-                EventBus.publish(updateEvent);
-                //imageAnnotationFrame.getMeasurementLayerUI().setObservation(obs);
+
+                Collection<Observation> observations = new ArrayList<Observation>() {{
+                   add(observation);
+                }};
+
+                Command command = new AddAssociationCmd(measurement.toLink(), observations);
+                CommandEvent commandEvent = new CommandEvent(command);
+                EventBus.publish(commandEvent);
             }
         }
     }
