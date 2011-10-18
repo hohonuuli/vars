@@ -132,9 +132,11 @@ public class CommandQueue {
      */
     @EventSubscriber(eventClass = RedoEvent.class)
     public void redo(RedoEvent event) {
-        CommandEvent commandEvent = redos.removeLast();
-        CommandEvent newCommandEvent = new DoCommandEvent(commandEvent.getCommand());
-        queueCommand(newCommandEvent);
+        if (redos.size() > 0) {
+            CommandEvent commandEvent = redos.removeLast();
+            CommandEvent newCommandEvent = new DoCommandEvent(commandEvent.getCommand());
+            queueCommand(newCommandEvent);
+        }
     }
 
     /**
@@ -143,8 +145,10 @@ public class CommandQueue {
      */
     @EventSubscriber(eventClass = UndoEvent.class)
     public void undo(UndoEvent event) {
-        CommandEvent commandEvent = undos.removeLast();
-        CommandEvent newCommandEvent = new UndoCommandEvent(commandEvent.getCommand());
-        queueCommand(newCommandEvent);
+        if (undos.size() > 0) {
+            CommandEvent commandEvent = undos.removeLast();
+            CommandEvent newCommandEvent = new UndoCommandEvent(commandEvent.getCommand());
+            queueCommand(newCommandEvent);
+        }
     }
 }

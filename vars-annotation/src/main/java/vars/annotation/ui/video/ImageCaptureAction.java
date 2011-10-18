@@ -39,12 +39,14 @@ import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.awt.image.ImageUtilities;
 import org.mbari.movie.Timecode;
+import org.mbari.util.NumberUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.DAO;
 import vars.UserAccount;
 import vars.annotation.CameraData;
 import vars.annotation.CameraDeployment;
+import vars.annotation.CameraDirections;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveSet;
@@ -53,6 +55,9 @@ import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.VARSProperties;
 import vars.annotation.ui.actions.NewObservationAction;
+import vars.annotation.ui.commandqueue.Command;
+import vars.annotation.ui.commandqueue.CommandEvent;
+import vars.annotation.ui.commandqueue.impl.AddObservationCmd;
 import vars.shared.preferences.PreferencesService;
 import vars.shared.ui.video.ImageCaptureService;
 import vars.shared.ui.video.VideoControlService;
@@ -106,7 +111,7 @@ public class ImageCaptureAction extends ActionAdapter {
         putValue(Action.NAME, "Frame Capture");
         putValue(Action.ACTION_COMMAND_KEY, "frame capture");
         putValue(Action.ACCELERATOR_KEY,
-                 KeyStroke.getKeyStroke('F', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+                KeyStroke.getKeyStroke('F', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
         setEnabled(ok);
     }
@@ -203,7 +208,7 @@ public class ImageCaptureAction extends ActionAdapter {
         s[0] = "Copyright " + snapTime.getYear() + " " + imageCopyrightOwner;
         s[1] = png.getAbsolutePath() + " (MAIN)";
         s[2] = snapTime.getFormattedGmtTime() + " GMT (local +" +
-               snapTime.getGmtOffset().replaceFirst("-", "").replaceAll("0", "") + ")";
+                snapTime.getGmtOffset().replaceFirst("-", "").replaceAll("0", "") + ")";
         s[3] = "";
 
         return s;
@@ -248,14 +253,14 @@ public class ImageCaptureAction extends ActionAdapter {
 
             // Verify that we have the services needed to capture an image
             VideoControlService videoControlService = (VideoControlService) Lookup.getVideoControlServiceDispatcher()
-                .getValueObject();
+                    .getValueObject();
             if (videoControlService == null) {
                 EventBus.publish(Lookup.TOPIC_WARNING, "You are not connected to the VCR. Unable to capture a frame.");
                 return;
             }
 
             ImageCaptureService imageCaptureService = (ImageCaptureService) Lookup.getImageCaptureServiceDispatcher()
-                .getValueObject();
+                    .getValueObject();
             if (imageCaptureService == null) {
                 EventBus.publish(Lookup.TOPIC_WARNING, "No image capture service is available for frame capture");
                 return;
@@ -265,7 +270,7 @@ public class ImageCaptureAction extends ActionAdapter {
             VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
             if (videoArchive == null) {
                 EventBus.publish(Lookup.TOPIC_WARNING,
-                                 "No video-archive is open for annotating. Unable to capture an image.");
+                        "No video-archive is open for annotating. Unable to capture an image.");
                 return;
             }
 
@@ -287,8 +292,8 @@ public class ImageCaptureAction extends ActionAdapter {
             }
             catch (final Exception e) {
                 EventBus.publish(Lookup.TOPIC_WARNING,
-                                 "ERROR!! Failed to capture the frame. Reason given is " +
-                                 e.getMessage() + ". ");
+                        "ERROR!! Failed to capture the frame. Reason given is " +
+                                e.getMessage() + ". ");
                 log.error("Frame-grab failed", e);
                 return;
             }
@@ -318,8 +323,8 @@ public class ImageCaptureAction extends ActionAdapter {
             }
             catch (final Exception e) {
                 EventBus.publish(Lookup.TOPIC_WARNING,
-                                 "ERROR!! Failed to create preview image. Reason given is " +
-                                 e.getMessage() + ".");
+                        "ERROR!! Failed to create preview image. Reason given is " +
+                                e.getMessage() + ".");
                 log.error("Frame-grab failed", e);
 
                 return;
@@ -332,33 +337,83 @@ public class ImageCaptureAction extends ActionAdapter {
          */
         private void updateVideoArchive(SnapTime snapTime, File jpg) {
 
-            // FIXME physical object is hardcoded. Should be set in preferences
-            Observation observation = action.doAction("physical object", snapTime.getTimeCodeAsString());
-            if (observation != null) {
+            VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+            if (videoArchive != null) {
 
-                DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
-                dao.startTransaction();
-                observation = dao.find(observation);
-                final VideoFrame videoFrame = observation.getVideoFrame();
-                CameraData cameraData = videoFrame.getCameraData();
+                /*
+                 * If the VCR is recording we'll grab the time off of the
+                 * computer clock. Otherwise we'll get it off of the
+                 * userbits.
+                 */
+                final VideoControlService videoService = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
+                Date utcDate;
+                if (videoService.getVcrState().isRecording()) {
+                    utcDate = new Date();
+                }
+                else {
+
+                    /*
+                    *  Try to grab the userbits off of the tape. The userbits
+                    *  may have the time that the frame was recorded stored as a
+                    *  little-endian 4-byte int.
+                    */
+                    videoService.requestVUserbits();
+                    final int epicSeconds = NumberUtilities.toInt(videoService.getVcrUserbits().getUserbits(), true);
+                    utcDate = new Date((long) epicSeconds * 1000L);
+                }
+
+                CameraDirections cameraDirections = (CameraDirections) Lookup.getCameraDirectionDispatcher().getValueObject();
+                final String cameraDirection = cameraDirections.getDirection();
+
+                UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+                String user = userAccount == null ? UserAccount.USERNAME_DEFAULT : userAccount.getUserName();
+                String imageReference = null;
 
                 try {
-                    cameraData.setImageReference(jpg.toURI().toURL().toExternalForm());
+                    imageReference = jpg.toURI().toURL().toExternalForm();
                 }
                 catch (final MalformedURLException e) {
                     if (log.isErrorEnabled()) {
                         log.error("Problem creating a URL.", e);
                     }
                 }
-
-                dao.endTransaction();
-                dao.close();
+                
+                // FIXME physical object is hardcoded. Should be set in preferences
+                Command command = new AddObservationCmd("physical object", snapTime.getTimeCodeAsString(), utcDate,
+                        videoArchive.getName(), user, cameraDirection, null, imageReference);
+                CommandEvent commandEvent = new CommandEvent(command);
+                EventBus.publish(commandEvent);
             }
 
-            final Collection<Observation> selectedObservations = ImmutableList.of(observation);
-            Lookup.getSelectedObservationsDispatcher().setValueObject(new ArrayList<Observation>());
-            Lookup.getSelectedObservationsDispatcher().setValueObject(selectedObservations);
-            toolBelt.getPersistenceController().updateUI(selectedObservations);
+//
+//            Observation observation = action.doAction("physical object", snapTime.getTimeCodeAsString());
+//            if (observation != null) {
+//
+//
+//
+//                DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
+//                dao.startTransaction();
+//                observation = dao.find(observation);
+//                final VideoFrame videoFrame = observation.getVideoFrame();
+//                CameraData cameraData = videoFrame.getCameraData();
+//
+//                try {
+//                    cameraData.setImageReference(jpg.toURI().toURL().toExternalForm());
+//                }
+//                catch (final MalformedURLException e) {
+//                    if (log.isErrorEnabled()) {
+//                        log.error("Problem creating a URL.", e);
+//                    }
+//                }
+//
+//                dao.endTransaction();
+//                dao.close();
+//            }
+//
+//            final Collection<Observation> selectedObservations = ImmutableList.of(observation);
+//            Lookup.getSelectedObservationsDispatcher().setValueObject(new ArrayList<Observation>());
+//            Lookup.getSelectedObservationsDispatcher().setValueObject(selectedObservations);
+//            toolBelt.getPersistenceController().updateUI(selectedObservations);
             //Lookup.getSelectedObservationsDispatcher().setValueObject(new ArrayList<Observation>());
             //.getSelectedObservationsDispatcher().setValueObject(selectedObservations);
         }
@@ -431,7 +486,7 @@ public class ImageCaptureAction extends ActionAdapter {
                 final boolean ok = imageDir.mkdirs();
                 if (!ok) {
                     final String msg = new StringBuffer().append("Unable to create the directory, ").append(
-                        imageDir.getAbsolutePath()).append(", needed to store the images").toString();
+                            imageDir.getAbsolutePath()).append(", needed to store the images").toString();
                     imageDir = null;
 
                     throw new IOException(msg);
@@ -439,7 +494,7 @@ public class ImageCaptureAction extends ActionAdapter {
             }
             else if (!imageDir.canWrite()) {
                 final String msg = new StringBuffer().append("Unable to write to the directory, ").append(
-                    imageDir.getAbsolutePath()).toString();
+                        imageDir.getAbsolutePath()).toString();
                 imageDir = null;
 
                 throw new IOException(msg);

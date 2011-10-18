@@ -21,6 +21,8 @@ import java.util.Collection;
 import java.util.Date;
 import javax.swing.Action;
 import javax.swing.KeyStroke;
+
+import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +36,9 @@ import vars.annotation.VideoArchive;
 import vars.annotation.VideoFrame;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
+import vars.annotation.ui.commandqueue.Command;
+import vars.annotation.ui.commandqueue.CommandEvent;
+import vars.annotation.ui.commandqueue.impl.CopyObservationsCmd;
 import vars.shared.ui.video.VideoControlService;
 import vars.shared.ui.video.VideoTime;
 
@@ -83,56 +88,63 @@ public final class DeepCopyObservationsAction extends ActionAdapter {
             if (observations.size() == 0) {
                 return;
             }
-
-            observations = new ArrayList<Observation>(observations);    // Copy collection to avoid threading issues
-
-            /*
-             * DAOTX See if a VideoFrame with the given time code already exists
-             */
-            DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
-            dao.startTransaction();
-            videoArchive = dao.find(videoArchive);
-
             final VideoTime videoTime = videoControlService.requestVideoTime();
-            VideoFrame videoFrame = videoArchive.findVideoFrameByTimeCode(videoTime.getTimecode());
-            if (videoFrame == null) {
-                videoFrame = annotationFactory.newVideoFrame();
-                videoFrame.setTimecode(videoTime.getTimecode());
-                videoFrame.setRecordedDate(videoTime.getDate());
-                CameraDirections cameraDirections = (CameraDirections) Lookup.getCameraDirectionDispatcher().getValueObject();
-                videoFrame.getCameraData().setDirection(cameraDirections.getDirection());
-                videoArchive.addVideoFrame(videoFrame);
-                dao.persist(videoFrame);
-            }
-
             UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
-            Date date = new Date();
+            String user = userAccount != null ? userAccount.getUserName() : UserAccount.USERNAME_DEFAULT;
 
-            Collection<Observation> newObservations = new ArrayList<Observation>();    // List used to notify UI
-            for (Observation observation : observations) {
-                Observation copyObservation = annotationFactory.newObservation();
-                copyObservation.setObserver(userAccount.getUserName());
-                copyObservation.setObservationDate(date);
-                copyObservation.setConceptName(observation.getConceptName());
-                videoFrame.addObservation(copyObservation);
-                dao.persist(copyObservation);
+            Command command = new CopyObservationsCmd(videoArchive.getName(), videoTime, user, observations);
+            CommandEvent commandEvent = new CommandEvent(command);
+            EventBus.publish(commandEvent);
 
-                // Deep copy
-                for (Association association : new ArrayList<Association>(observation.getAssociations())) {
-                    Association copyAssociation = annotationFactory.newAssociation();
-                    copyAssociation.setLinkName(association.getLinkName());
-                    copyAssociation.setLinkValue(association.getLinkValue());
-                    copyAssociation.setToConcept(association.getToConcept());
-                    copyObservation.addAssociation(copyAssociation);
-                    dao.persist(copyAssociation);
-                }
-
-                newObservations.add(copyObservation);
-            }
-
-            dao.endTransaction();
-
-            toolBelt.getPersistenceController().updateUI(newObservations);
+//            observations = new ArrayList<Observation>(observations);    // Copy collection to avoid threading issues
+//
+//            /*
+//             * DAOTX See if a VideoFrame with the given time code already exists
+//             */
+//            DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
+//            dao.startTransaction();
+//            videoArchive = dao.find(videoArchive);
+//
+//
+//            VideoFrame videoFrame = videoArchive.findVideoFrameByTimeCode(videoTime.getTimecode());
+//            if (videoFrame == null) {
+//                videoFrame = annotationFactory.newVideoFrame();
+//                videoFrame.setTimecode(videoTime.getTimecode());
+//                videoFrame.setRecordedDate(videoTime.getDate());
+//                CameraDirections cameraDirections = (CameraDirections) Lookup.getCameraDirectionDispatcher().getValueObject();
+//                videoFrame.getCameraData().setDirection(cameraDirections.getDirection());
+//                videoArchive.addVideoFrame(videoFrame);
+//                dao.persist(videoFrame);
+//            }
+//
+//            UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+//            Date date = new Date();
+//
+//            Collection<Observation> newObservations = new ArrayList<Observation>();    // List used to notify UI
+//            for (Observation observation : observations) {
+//                Observation copyObservation = annotationFactory.newObservation();
+//                copyObservation.setObserver(userAccount.getUserName());
+//                copyObservation.setObservationDate(date);
+//                copyObservation.setConceptName(observation.getConceptName());
+//                videoFrame.addObservation(copyObservation);
+//                dao.persist(copyObservation);
+//
+//                // Deep copy
+//                for (Association association : new ArrayList<Association>(observation.getAssociations())) {
+//                    Association copyAssociation = annotationFactory.newAssociation();
+//                    copyAssociation.setLinkName(association.getLinkName());
+//                    copyAssociation.setLinkValue(association.getLinkValue());
+//                    copyAssociation.setToConcept(association.getToConcept());
+//                    copyObservation.addAssociation(copyAssociation);
+//                    dao.persist(copyAssociation);
+//                }
+//
+//                newObservations.add(copyObservation);
+//            }
+//
+//            dao.endTransaction();
+//
+//            toolBelt.getPersistenceController().updateUI(newObservations);
 
         }
         else {

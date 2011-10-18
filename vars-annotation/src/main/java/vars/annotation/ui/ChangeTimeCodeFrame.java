@@ -67,7 +67,7 @@ public class ChangeTimeCodeFrame extends TimeCodeSelectionFrame {
     @EventSubscriber(eventClass = ObservationsSelectedEvent.class)
     public void updateObservationSelection(ObservationsSelectedEvent selectionEvent) {
         if (selectionEvent.getSelectionSource() != this) {
-            update(selectionEvent.getObservations());
+            update(selectionEvent.get());
         }
     }
 

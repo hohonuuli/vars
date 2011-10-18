@@ -21,7 +21,7 @@
             <property name="javax.persistence.jdbc.driver" value="${KNOWLEDGEBASE_JDBC_DRIVER}"/>
             <property name="javax.persistence.jdbc.password" value="${KNOWLEDGEBASE_JDBC_PASSWORD}"/>
             <property name="eclipselink.logging.level" value="CONFIG"/>
-            <!-- <property name="eclipselink.weaving" value="static" /> -->
+            <property name="eclipselink.weaving" value="static" />
             <!-- <property name="eclipselink.jdbc.bind-parameters" value="false"/> -->
         </properties>
     </persistence-unit>
@@ -43,7 +43,7 @@
             <property name="javax.persistence.jdbc.driver" value="${ANNOTATION_JDBC_DRIVER}"/>
             <property name="javax.persistence.jdbc.password" value="${ANNOTATION_JDBC_PASSWORD}"/>
             <property name="eclipselink.logging.level" value="CONFIG"/>
-            <!-- <property name="eclipselink.weaving" value="static" /> -->
+            <property name="eclipselink.weaving" value="static" />
             <!-- <property name="eclipselink.jdbc.bind-parameters" value="false"/> -->
         </properties>
     </persistence-unit>
@@ -59,7 +59,8 @@
             <property name="javax.persistence.jdbc.driver" value="${MISC_JDBC_DRIVER}"/>
             <property name="javax.persistence.jdbc.password" value="${MISC_JDBC_PASSWORD}"/>
             <property name="eclipselink.logging.level" value="CONFIG"/>
-            <!-- <property name="eclipselink.weaving" value="static" /> -->
+
+            <property name="eclipselink.weaving" value="static" />
             <!-- <property name="eclipselink.jdbc.bind-parameters" value="false"/> -->
         </properties>
     </persistence-unit>
@@ -104,7 +105,7 @@
             <property name="eclipselink.ddl-generation.output-mode" value="database"/>
 
             <!-- Use static weaving -->
-            <!-- <property name="eclipselink.weaving" value="static" /> -->
+            <property name="eclipselink.weaving" value="static" />
         </properties>
     </persistence-unit>
 

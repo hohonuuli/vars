@@ -1,0 +1,89 @@
+package vars.annotation.ui.commandqueue.impl;
+
+import org.bushe.swing.event.EventBus;
+import vars.DAO;
+import vars.UserAccount;
+import vars.annotation.AnnotationFactory;
+import vars.annotation.Observation;
+import vars.annotation.VideoFrame;
+import vars.annotation.ui.Lookup;
+import vars.annotation.ui.ToolBelt;
+import vars.annotation.ui.commandqueue.Command;
+import vars.annotation.ui.eventbus.ObservationsAddedEvent;
+import vars.annotation.ui.eventbus.ObservationsRemovedEvent;
+
+import java.awt.Event;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+
+/**
+ * @author Brian Schlining
+ * @since 2011-10-17
+ */
+public class DuplicateObservationsCmd implements Command {
+
+    private final String user;
+    private final Collection<Observation> sourceObservations;
+    private final Collection<Observation> duplicateObservations = Collections.synchronizedCollection(new ArrayList<Observation>());
+
+    public DuplicateObservationsCmd(String user, Collection<Observation> sourceObservations) {
+        if (user == null || sourceObservations == null) {
+            throw new IllegalArgumentException("Command arguments can not be null");
+        }
+        this.user = user;
+        this.sourceObservations = new ArrayList<Observation>(sourceObservations);
+    }
+
+    @Override
+    public void apply(ToolBelt toolBelt) {
+        AnnotationFactory annotationFactory = toolBelt.getAnnotationFactory();
+        Date observationDate = new Date();
+        synchronized (duplicateObservations) {
+            DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
+            dao.startTransaction();
+            for (Observation observation : sourceObservations) {
+                observation = dao.find(observation);
+                VideoFrame videoFrame = observation.getVideoFrame();
+                Observation newObservation = annotationFactory.newObservation();
+                newObservation.setConceptName(observation.getConceptName());
+                newObservation.setObservationDate(observationDate);
+                newObservation.setObserver(user);
+                videoFrame.addObservation(newObservation);
+                dao.persist(newObservation);
+                duplicateObservations.add(newObservation);
+            }
+            dao.endTransaction();
+        }
+        EventBus.publish(new ObservationsAddedEvent(null, duplicateObservations));
+    }
+    
+
+    @Override
+    public void unapply(ToolBelt toolBelt) {
+        Collection<Observation> deletedObservations = new ArrayList<Observation>(duplicateObservations);
+        synchronized (duplicateObservations) {
+            DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
+            dao.startTransaction();
+            for (Observation observation : duplicateObservations) {
+                observation = dao.find(observation);
+                VideoFrame videoFrame = observation.getVideoFrame();
+                videoFrame.removeObservation(observation);
+                dao.remove(observation);
+                if (videoFrame.getObservations().size() == 0) {
+                    dao.remove(videoFrame);
+                }
+            }
+            dao.endTransaction();
+            duplicateObservations.clear();
+        }
+        EventBus.publish(new ObservationsRemovedEvent(null, deletedObservations));
+
+    }
+
+    @Override
+    public String getDescription() {
+        return "Duplicate " + sourceObservations.size() + " observations";
+    }
+}

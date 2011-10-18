@@ -22,6 +22,8 @@ import java.util.Date;
 import java.util.HashSet;
 import javax.swing.Action;
 import javax.swing.KeyStroke;
+
+import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
 import vars.DAO;
 import vars.UserAccount;
@@ -31,6 +33,9 @@ import vars.annotation.VideoFrame;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.PersistenceController;
 import vars.annotation.ui.ToolBelt;
+import vars.annotation.ui.commandqueue.Command;
+import vars.annotation.ui.commandqueue.CommandEvent;
+import vars.annotation.ui.commandqueue.impl.DuplicateObservationsCmd;
 
 /**
  * <p>Duplicates selected observations</p>
@@ -59,38 +64,42 @@ public final class DuplicateObservationAction extends ActionAdapter {
      */
     public void doAction() {
 
-        final PersistenceController persistenceController = toolBelt.getPersistenceController();
-        final AnnotationFactory annotationFactory = toolBelt.getAnnotationFactory();
+        //final PersistenceController persistenceController = toolBelt.getPersistenceController();
+        //final AnnotationFactory annotationFactory = toolBelt.getAnnotationFactory();
         final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
-        final Date date = new Date();
 
         Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher()
             .getValueObject();
         observations = new ArrayList<Observation>(observations);    // Copy to avoid threading issues
 
-        Date observationDate = new Date();
+        //Date observationDate = new Date();
         String name = userAccount.getUserName();
-        Collection<Observation> newObservations = new ArrayList<Observation>(observations.size());
 
-        // DAOTX
-        DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
-        dao.startTransaction();
+        Command command = new DuplicateObservationsCmd(name, observations);
+        CommandEvent commandEvent = new CommandEvent(command);
+        EventBus.publish(commandEvent);
 
-        for (Observation observation : observations) {
-            observation = dao.find(observation);
-            VideoFrame videoFrame = observation.getVideoFrame();
-            Observation newObservation = annotationFactory.newObservation();
-            newObservation.setConceptName(observation.getConceptName());
-            newObservation.setObservationDate(observationDate);
-            newObservation.setObserver(name);
-            videoFrame.addObservation(newObservation);
-            dao.persist(newObservation);
-            newObservations.add(newObservation);
-        }
-
-        dao.endTransaction();
-
-        persistenceController.updateUI(newObservations);
+//        Collection<Observation> newObservations = new ArrayList<Observation>(observations.size());
+//
+//        // DAOTX
+//        DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
+//        dao.startTransaction();
+//
+//        for (Observation observation : observations) {
+//            observation = dao.find(observation);
+//            VideoFrame videoFrame = observation.getVideoFrame();
+//            Observation newObservation = annotationFactory.newObservation();
+//            newObservation.setConceptName(observation.getConceptName());
+//            newObservation.setObservationDate(observationDate);
+//            newObservation.setObserver(name);
+//            videoFrame.addObservation(newObservation);
+//            dao.persist(newObservation);
+//            newObservations.add(newObservation);
+//        }
+//
+//        dao.endTransaction();
+//
+//        persistenceController.updateUI(newObservations);
 
     }
 }

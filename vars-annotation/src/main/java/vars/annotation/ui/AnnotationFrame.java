@@ -55,10 +55,17 @@ import vars.DAO;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoFrame;
+import vars.annotation.ui.buttons.RedoButton;
+import vars.annotation.ui.buttons.UndoButton;
 import vars.annotation.ui.cbpanel.ConceptButtonPanel;
+import vars.annotation.ui.eventbus.ObservationsAddedEvent;
+import vars.annotation.ui.eventbus.ObservationsRemovedEvent;
 import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
 import vars.annotation.ui.eventbus.ObservationsChangedEvent;
+import vars.annotation.ui.eventbus.UIEventSubscriber;
 import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
+import vars.annotation.ui.eventbus.VideoArchiveSelectedEvent;
+import vars.annotation.ui.eventbus.VideoFramesChangedEvent;
 import vars.annotation.ui.preferences.PreferenceFrameButton;
 import vars.annotation.ui.roweditor.RowEditorPanel;
 import vars.annotation.ui.table.JXObservationTable;
@@ -72,7 +79,7 @@ import vars.annotation.ui.videoset.VideoArchiveSetEditorButton;
  *
  * @author brian
  */
-public class AnnotationFrame extends JFrame {
+public class AnnotationFrame extends JFrame implements UIEventSubscriber {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
     private JPanel actionPanel;
@@ -307,14 +314,14 @@ public class AnnotationFrame extends JFrame {
     private JToolBar getToolBar() {
         if (toolBar == null) {
             toolBar = new JToolBar();
+            toolBar.add(new UndoButton());
+            toolBar.add(new RedoButton());
             toolBar.add(new RefreshButton(toolBelt));
             toolBar.add(new VideoArchiveSetEditorButton(toolBelt));
             toolBar.add(new PreferenceFrameButton());
             toolBar.add(new StatusLabelForPerson(toolBelt));
             toolBar.add(new StatusLabelForVcr());
             toolBar.add(new StatusLabelForVideoArchive(toolBelt));
-
-
         }
 
         return toolBar;
@@ -344,62 +351,22 @@ public class AnnotationFrame extends JFrame {
         return controller;
     }
 
-    @EventSubscriber(eventClass = VideoArchiveChangedEvent.class)
-    public void updateVideoArchiveReference(VideoArchiveChangedEvent updateEvent) {
 
-        // --- hang on to videoArchive reference
-        VideoArchive oldVideoArchive = videoArchive;
-        VideoArchive newVideoArchive = updateEvent.get();
-        videoArchive = newVideoArchive;
-        
-        // --- Clear table
-        final ObservationTable observationTable = getTable();
-        final JTable table = observationTable.getJTable();
-        table.getSelectionModel().clearSelection();
-        ((ObservationTableModel) table.getModel()).clear();
-
-        // --- Repopulate table with observations
-        // DAOTX - Needed to deal with lazy loading
-        if (newVideoArchive != null) {
-            Collection<Observation> observations = new ArrayList<Observation>();
-            DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
-            dao.startTransaction();
-            VideoArchive videoArchive = dao.find(updateEvent.get());
-            final Collection<VideoFrame> videoFrames = videoArchive.getVideoFrames();
-            for (VideoFrame videoFrame : videoFrames) {
-                observations.addAll(videoFrame.getObservations());
-            }
-            dao.endTransaction();
-            dao.close();
-            final Rectangle rect = table.getVisibleRect();
-            updateObservationReferences(new ObservationsChangedEvent(null, observations));
-
-            // --- Scroll view if needed
-            if (newVideoArchive.equals(oldVideoArchive)) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        // When observations are deleted the table would jump to the last row UNLESS
-                        // we make this call which mostly preserves the current view. Doing this still
-                        // makes a little visible 'jump' but it takes the user back to about the same
-                        // position in the table
-                        table.scrollRectToVisible(rect);
-                    }
-                });
-            }
-        }
+    @EventSubscriber(eventClass = ObservationsAddedEvent.class)
+    @Override
+    public void respondTo(ObservationsAddedEvent event) {
+        respondTo(new ObservationsChangedEvent(null, event.get()));
+        EventBus.publish(new ObservationsSelectedEvent(null, event.get()));
     }
 
-    /**
-     * Update observations in Table if they are updated
-     * @param updateEvent
-     */
     @EventSubscriber(eventClass = ObservationsChangedEvent.class)
-    public void updateObservationReferences(ObservationsChangedEvent updateEvent) {
+    @Override
+    public void respondTo(ObservationsChangedEvent event) {
         final ObservationTable observationTable = getTable();
-        if (updateEvent.getEventSource() != observationTable) {
+        if (event.getEventSource() != observationTable) {
             final JTable table = observationTable.getJTable();
             final ObservationTableModel model = (ObservationTableModel) table.getModel();
-            for (Observation observation : updateEvent.get()) {
+            for (Observation observation : event.get()) {
                 int row = model.getObservationRow(observation);
                 if ((row > -1) && (row < model.getRowCount())) {
                     observationTable.updateObservation(observation);
@@ -416,17 +383,18 @@ public class AnnotationFrame extends JFrame {
         }
     }
 
+    @Override
+    public void respondTo(ObservationsRemovedEvent event) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
 
-    /**
-     *
-     * @param selectEvent
-     */
     @EventSubscriber(eventClass = ObservationsSelectedEvent.class)
-    public void updateObservationSelection(ObservationsSelectedEvent selectEvent) {
+    @Override
+    public void respondTo(ObservationsSelectedEvent event) {
         final ObservationTable observationTable = getTable();
-        if(selectEvent.getSelectionSource() != observationTable) {
+        if(event.getSelectionSource() != observationTable) {
             ObservationTableModel model = (ObservationTableModel) table.getModel();
-            Collection<Observation> observations = selectEvent.get();
+            Collection<Observation> observations = event.get();
             /*
              * If we just added one select it in the table
              */
@@ -446,4 +414,58 @@ public class AnnotationFrame extends JFrame {
         }
     }
 
+    @EventSubscriber(eventClass = VideoArchiveChangedEvent.class)
+    @Override
+    public void respondTo(VideoArchiveChangedEvent event) {
+        // --- hang on to videoArchive reference
+        VideoArchive oldVideoArchive = videoArchive;
+        VideoArchive newVideoArchive = event.get();
+        videoArchive = newVideoArchive;
+
+        // --- Clear table
+        final ObservationTable observationTable = getTable();
+        final JTable table = observationTable.getJTable();
+        table.getSelectionModel().clearSelection();
+        ((ObservationTableModel) table.getModel()).clear();
+
+        // --- Repopulate table with observations
+        // DAOTX - Needed to deal with lazy loading
+        if (newVideoArchive != null) {
+            Collection<Observation> observations = new ArrayList<Observation>();
+            DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
+            dao.startTransaction();
+            VideoArchive videoArchive = dao.find(event.get());
+            final Collection<VideoFrame> videoFrames = videoArchive.getVideoFrames();
+            for (VideoFrame videoFrame : videoFrames) {
+                observations.addAll(videoFrame.getObservations());
+            }
+            dao.endTransaction();
+            dao.close();
+            final Rectangle rect = table.getVisibleRect();
+            respondTo(new ObservationsChangedEvent(null, observations));
+
+            // --- Scroll view if needed
+            if (newVideoArchive.equals(oldVideoArchive)) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        // When observations are deleted the table would jump to the last row UNLESS
+                        // we make this call which mostly preserves the current view. Doing this still
+                        // makes a little visible 'jump' but it takes the user back to about the same
+                        // position in the table
+                        table.scrollRectToVisible(rect);
+                    }
+                });
+            }
+        }
+    }
+
+    @Override
+    public void respondTo(VideoArchiveSelectedEvent event) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void respondTo(VideoFramesChangedEvent event) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
 }

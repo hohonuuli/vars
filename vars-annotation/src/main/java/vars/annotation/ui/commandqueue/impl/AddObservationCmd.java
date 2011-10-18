@@ -14,7 +14,7 @@ import vars.annotation.VideoFrame;
 import vars.annotation.VideoFrameDAO;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.commandqueue.Command;
-import vars.annotation.ui.eventbus.ObservationAddedEvent;
+import vars.annotation.ui.eventbus.ObservationsAddedEvent;
 import vars.annotation.ui.eventbus.ObservationsRemovedEvent;
 
 import java.awt.geom.Point2D;
@@ -35,6 +35,7 @@ public class AddObservationCmd implements Command {
     private final String cameraDirection;
     private Observation newObservation;
     private final Point2D point;
+    private final String imageReference;
 
     public AddObservationCmd(String conceptName, String timecode, Date recordedDate, String videoArchiveName,
                              String user, String cameraDirection) {
@@ -43,6 +44,11 @@ public class AddObservationCmd implements Command {
 
     public AddObservationCmd(String conceptName, String timecode, Date recordedDate, String videoArchiveName,
                              String user, String cameraDirection, Point2D point) {
+        this(conceptName, timecode, recordedDate, videoArchiveName, user, cameraDirection, point, null);
+    }
+
+    public AddObservationCmd(String conceptName, String timecode, Date recordedDate, String videoArchiveName,
+                             String user, String cameraDirection, Point2D point, String imageReference) {
         this.conceptName = conceptName;
         this.timecode = timecode;
         this.recordedDate = recordedDate;
@@ -50,6 +56,7 @@ public class AddObservationCmd implements Command {
         this.user = (user == null) ? UserAccount.USERNAME_DEFAULT : user;
         this.cameraDirection = cameraDirection;
         this.point = point;
+        this.imageReference = imageReference;
     }
 
     @Override
@@ -79,6 +86,10 @@ public class AddObservationCmd implements Command {
                 videoArchive.addVideoFrame(videoFrame);
             }
 
+            if (imageReference != null) {
+                videoFrame.getCameraData().setImageReference(imageReference);
+            }
+
             /*
                 Create observation
              */
@@ -96,7 +107,7 @@ public class AddObservationCmd implements Command {
         }
         videoArchiveDAO.endTransaction();
         videoArchiveDAO.close();
-        EventBus.publish(new ObservationAddedEvent(null, newObservation));
+        EventBus.publish(new ObservationsAddedEvent(null, newObservation));
     }
 
     @Override

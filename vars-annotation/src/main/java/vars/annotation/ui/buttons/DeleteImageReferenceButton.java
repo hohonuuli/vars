@@ -1,17 +1,18 @@
 package vars.annotation.ui.buttons;
 
+import org.bushe.swing.event.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.DAO;
 import vars.UserAccount;
 import vars.annotation.Observation;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
+import vars.annotation.ui.commandqueue.Command;
+import vars.annotation.ui.commandqueue.CommandEvent;
+import vars.annotation.ui.commandqueue.impl.RemoveImageReferencesCmd;
 import vars.shared.ui.FancyButton;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -74,16 +75,19 @@ public class DeleteImageReferenceButton extends FancyButton {
         }
 
         log.debug("Setting image references to " + observations.size() + " observations to null");
-        Collection<Observation> newObservations = new ArrayList<Observation>(observations.size());
-        DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
-        dao.startTransaction();
-        for (Observation obs : observations) {
-            Observation newObs = dao.find(obs);
-            newObs.getVideoFrame().getCameraData().setImageReference(null);
-            newObservations.add(newObs);
-        }
-        dao.endTransaction();
-        dao.close();
-        toolBelt.getPersistenceController().updateUI(newObservations);
+        Command command = new RemoveImageReferencesCmd(new ArrayList<Observation>(observations));
+        CommandEvent commandEvent = new CommandEvent(command);
+        EventBus.publish(commandEvent);
+//        Collection<Observation> newObservations = new ArrayList<Observation>(observations.size());
+//        DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
+//        dao.startTransaction();
+//        for (Observation obs : observations) {
+//            Observation newObs = dao.find(obs);
+//            newObs.getVideoFrame().getCameraData().setImageReference(null);
+//            newObservations.add(newObs);
+//        }
+//        dao.endTransaction();
+//        dao.close();
+//        toolBelt.getPersistenceController().updateUI(newObservations);
     }
 }

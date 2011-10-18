@@ -99,6 +99,11 @@ public class ConceptNameCrudTest {
              // Using old reference to conceptName
              dao.startTransaction();
              concept = dao.merge(concept);
+             conceptName = kbFactory.newConceptName();
+             conceptName.setName(name1);
+             conceptName.setNameType(ConceptNameTypes.SYNONYM.toString());
+             log.info("Concept = " + concept );
+             log.info("ConceptName = " + conceptName);
              concept.addConceptName(conceptName);
              dao.persist(conceptName);
              dao.endTransaction();
@@ -114,6 +119,8 @@ public class ConceptNameCrudTest {
              // Insert by inserting a new concept
              dao.startTransaction();
              Concept childConcept = kbFactory.newConcept();
+             conceptName = kbFactory.newConceptName();
+             conceptName.setName(name1);
              conceptName.setNameType(ConceptNameTypes.PRIMARY.getName());
              childConcept.addConceptName(conceptName);
              concept.addChildConcept(childConcept);
