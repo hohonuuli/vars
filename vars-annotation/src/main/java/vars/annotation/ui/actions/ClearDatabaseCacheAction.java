@@ -29,6 +29,8 @@ import vars.annotation.VideoArchiveDAO;
 import vars.annotation.VideoFrame;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
+import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
+import vars.annotation.ui.eventbus.VideoArchiveSelectedEvent;
 
 /**
  * This action refreshes the knowledgebase used by the Annotation Application.
@@ -89,17 +91,9 @@ public class ClearDatabaseCacheAction extends ActionAdapter {
                                 VideoArchiveDAO dao = toolBelt.getAnnotationDAOFactory().newVideoArchiveDAO();
                                 dao.startTransaction();
                                 VideoArchive refreshedVideoArchive = dao.findByName(name);
-                                @SuppressWarnings("unused") Collection<VideoFrame> videoFrames = videoArchive
-                                    .getVideoFrames();
                                 dao.endTransaction();
-
-                                if (refreshedVideoArchive == null) {
-                                    EventBus.publish(Lookup.TOPIC_WARNING,
-                                                     "Unable to find " + name + " in the database");
-                                }
-                                else {
-                                    dispatcher.setValueObject(videoArchive);
-                                }
+                                dao.close();
+                                EventBus.publish(new VideoArchiveSelectedEvent(null, refreshedVideoArchive));
                             }
                         }, "Clear cache thread");
 

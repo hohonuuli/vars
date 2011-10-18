@@ -79,15 +79,11 @@ public class AddPropertyAction extends ActionAdapter {
      */
     @SuppressWarnings("unchecked")
 	public void doAction() {
-
         Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
         Association associationTemplate = toolBelt.getAnnotationFactory().newAssociation(linkName, toConcept, linkValue);
         Command command = new AddAssociationCmd(associationTemplate, observations);
         CommandEvent commandEvent = new CommandEvent(command);
         EventBus.publish(commandEvent);
-        // Pass a copy of the observation collection to the persistence controller to avoid threading issues
-        // toolBelt.getPersistenceController().insertAssociations(new ArrayList<Observation>(observations), associationTemplate);
-
     }
 
     /**

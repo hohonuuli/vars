@@ -26,6 +26,9 @@ import vars.annotation.VideoArchiveSetDAO;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.PersistenceController;
+import vars.annotation.ui.commandqueue.Command;
+import vars.annotation.ui.commandqueue.CommandEvent;
+import vars.annotation.ui.commandqueue.impl.ChangeVideoArchiveNameCmd;
 
 /**
  * <p>Changes the videoArchvieName property of  a VideoArchive. At MBARI,
@@ -59,64 +62,10 @@ public class ChangeVideoArchiveNameAction extends OpenVideoArchiveUsingParamsAct
         }
 
         VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
-        String newName = PersistenceController.makeVideoArchiveName(getPlatform(), getTapeNumber(), getTapeNumber(), getPostfix());
-
-        // DAOTX
-        try {
-
-            /*
-             * Check the database for a matching videarchive. We don't want to try to overwrite an existing one
-             */
-            VideoArchiveDAO vaDAO = toolBelt.getAnnotationDAOFactory().newVideoArchiveDAO();
-            vaDAO.startTransaction();
-            VideoArchive matchingVideoArchive = vaDAO.findByName(newName);
-            vaDAO.endTransaction();
-
-            if (matchingVideoArchive != null) {
-                EventBus.publish(Lookup.TOPIC_WARNING, "A VideoArchive named " + newName + " already exists. Unable to rename " + videoArchive);
-                return;
-            }
-
-            VideoArchiveSetDAO dao = toolBelt.getAnnotationDAOFactory().newVideoArchiveSetDAO();
-            dao.startTransaction();
-            videoArchive = dao.find(videoArchive);
-            
-
-            /*
-             *  Check the database for an existing matching VideoArchiveSet
-             */
-            VideoArchiveSet videoArchiveSet = null;
-            Collection<VideoArchiveSet> videoArchiveSets = dao.findAllByPlatformAndSequenceNumber(getPlatform(),
-                getSeqNumber());
-            if (videoArchiveSets.size() > 0) {
-                videoArchiveSet = videoArchiveSets.iterator().next();
-            }
-            else {
-
-                /*
-                 * No matching VideoArchiveSet was found so create one
-                 */
-                AnnotationFactory annotationFactory = toolBelt.getAnnotationFactory();
-                videoArchiveSet = annotationFactory.newVideoArchiveSet();
-                videoArchiveSet.setPlatformName(getPlatform());
-                dao.persist(videoArchiveSet);
-                CameraDeployment cameraDeployment = annotationFactory.newCameraDeployment();
-                cameraDeployment.setSequenceNumber(getSeqNumber());
-                videoArchiveSet.addCameraDeployment(cameraDeployment);
-                dao.persist(cameraDeployment);
-            }
-
-            // Move the VideoArchive form the old set to the new one
-            videoArchive.getVideoArchiveSet().removeVideoArchive(videoArchive);
-            videoArchive.setName(newName);
-            videoArchiveSet.addVideoArchive(videoArchive);
-            dao.endTransaction();
-
-
-        }
-        catch (Exception e) {
-            EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
-        }
+        String newName = PersistenceController.makeVideoArchiveName(getPlatform(), getSeqNumber(), getTapeNumber(), getPostfix());
+        Command command = new ChangeVideoArchiveNameCmd(videoArchive, newName, getPlatform(), getSeqNumber());
+        CommandEvent commandEvent = new CommandEvent(command);
+        EventBus.publish(commandEvent);
 
     }
 

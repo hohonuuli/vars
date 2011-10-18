@@ -166,4 +166,9 @@ public class VideoArchiveDAOImpl extends DAO implements VideoArchiveDAO {
         return videoArchive;
 
     }
+
+    @Override
+    public VideoArchive findByPrimaryKey(Object primaryKey) {
+        return findByPrimaryKey(VideoArchiveImpl.class, primaryKey);
+    }
 }

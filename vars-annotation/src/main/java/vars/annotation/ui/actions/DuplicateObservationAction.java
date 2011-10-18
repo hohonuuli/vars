@@ -64,42 +64,14 @@ public final class DuplicateObservationAction extends ActionAdapter {
      */
     public void doAction() {
 
-        //final PersistenceController persistenceController = toolBelt.getPersistenceController();
-        //final AnnotationFactory annotationFactory = toolBelt.getAnnotationFactory();
         final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
-
         Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher()
             .getValueObject();
         observations = new ArrayList<Observation>(observations);    // Copy to avoid threading issues
-
-        //Date observationDate = new Date();
         String name = userAccount.getUserName();
-
         Command command = new DuplicateObservationsCmd(name, observations);
         CommandEvent commandEvent = new CommandEvent(command);
         EventBus.publish(commandEvent);
-
-//        Collection<Observation> newObservations = new ArrayList<Observation>(observations.size());
-//
-//        // DAOTX
-//        DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
-//        dao.startTransaction();
-//
-//        for (Observation observation : observations) {
-//            observation = dao.find(observation);
-//            VideoFrame videoFrame = observation.getVideoFrame();
-//            Observation newObservation = annotationFactory.newObservation();
-//            newObservation.setConceptName(observation.getConceptName());
-//            newObservation.setObservationDate(observationDate);
-//            newObservation.setObserver(name);
-//            videoFrame.addObservation(newObservation);
-//            dao.persist(newObservation);
-//            newObservations.add(newObservation);
-//        }
-//
-//        dao.endTransaction();
-//
-//        persistenceController.updateUI(newObservations);
 
     }
 }

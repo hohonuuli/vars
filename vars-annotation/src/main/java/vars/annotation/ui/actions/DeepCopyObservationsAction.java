@@ -81,8 +81,6 @@ public final class DeepCopyObservationsAction extends ActionAdapter {
         final VideoControlService videoControlService = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
         if ((videoArchive != null) && (videoControlService != null)) {
 
-            final AnnotationFactory annotationFactory = toolBelt.getAnnotationFactory();
-
 
             Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
             if (observations.size() == 0) {

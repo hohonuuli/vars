@@ -15,6 +15,7 @@
 
 package vars.annotation.ui.actions;
 
+import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
 import vars.DAO;
 import vars.annotation.VideoArchive;
@@ -22,6 +23,7 @@ import vars.annotation.VideoArchiveSet;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.PersistenceController;
 import vars.annotation.ui.ToolBelt;
+import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
 
 /**
  * <p>Action that sets the format code in the <code>VideoArchiveSet</code></p>
@@ -52,14 +54,13 @@ public class ChangeAnnotationModeAction extends ActionAdapter {
     public void doAction() {
         VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
         if (videoArchive != null) {
-
             // DAOTX
             DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
             dao.startTransaction();
             videoArchive = dao.find(videoArchive);
             videoArchive.getVideoArchiveSet().setFormatCode(formatCode);
             dao.endTransaction();
-            toolBelt.getPersistenceController().updateUI(videoArchive);
+            EventBus.publish(new VideoArchiveChangedEvent(null, videoArchive));
         }
     }
 

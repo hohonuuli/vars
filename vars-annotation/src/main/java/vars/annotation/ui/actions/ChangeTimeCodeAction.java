@@ -85,40 +85,6 @@ public class ChangeTimeCodeAction extends ActionAdapter {
         Command command = new ChangeTimeCodeCmd(observations, getTimeCode());
         CommandEvent commandEvent = new CommandEvent(command);
         EventBus.publish(commandEvent);
-
-
-//        Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
-//
-//        observations = new ArrayList<Observation>(observations);
-//
-//        // DAOTX
-//        DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
-//
-//        dao.startTransaction();
-//
-//        for (Observation observation : observations) {
-//            observation = dao.find(observation);
-//
-//            VideoFrame sourceVideoFrame = observation.getVideoFrame();
-//            VideoArchive videoArchive = sourceVideoFrame.getVideoArchive();
-//            VideoFrame targetVideoFrame = videoArchive.findVideoFrameByTimeCode(getTimeCode());
-//
-//            if (targetVideoFrame == null) {
-//                sourceVideoFrame.setTimecode(getTimeCode());
-//            }
-//            else {
-//
-//                // Move observations to target
-//                sourceVideoFrame.removeObservation(observation);
-//                targetVideoFrame.addObservation(observation);
-//            }
-//        }
-//
-//        dao.endTransaction();
-//        dao.close();
-//
-//        toolBelt.getPersistenceController().updateUI(observations);
-
     }
 
     /**

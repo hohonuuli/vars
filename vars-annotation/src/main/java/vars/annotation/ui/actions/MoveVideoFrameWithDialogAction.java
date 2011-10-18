@@ -20,12 +20,17 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
+
+import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoFrame;
 import vars.annotation.ui.ToolBelt;
+import vars.annotation.ui.commandqueue.Command;
+import vars.annotation.ui.commandqueue.CommandEvent;
+import vars.annotation.ui.commandqueue.impl.MoveVideoFramesCmd;
 import vars.annotation.ui.dialogs.OpenVideoArchiveDialog;
 
 /**
@@ -46,7 +51,6 @@ public class MoveVideoFrameWithDialogAction extends ActionAdapter {
     public static final String ACTION_NAME = "Move Frames";
     private final Logger log = LoggerFactory.getLogger(getClass());
     private final OpenVideoArchiveDialog dialog;
-    private final MoveVideoFramesFunction function;
     private Collection<VideoFrame> videoFrames = new ArrayList<VideoFrame>();
 
     /**
@@ -56,13 +60,14 @@ public class MoveVideoFrameWithDialogAction extends ActionAdapter {
      */
     public MoveVideoFrameWithDialogAction(final Frame owner, ToolBelt toolBelt) {
         super(ACTION_NAME);
-        function = new MoveVideoFramesFunction(toolBelt.getAnnotationDAOFactory());
         dialog = new OpenVideoArchiveDialog(owner, toolBelt);
         dialog.getOkayButton().addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 VideoArchive videoArchive = dialog.openVideoArchive();
+                Command command = new MoveVideoFramesCmd(videoArchive.getName(), videoFrames);
+                CommandEvent commandEvent = new CommandEvent(command);
                 dialog.dispose();
-                function.apply(videoArchive, videoFrames);
+                EventBus.publish(commandEvent);
             }
         });
     }

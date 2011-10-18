@@ -29,6 +29,9 @@ import javax.swing.JTextField;
 import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.swing.PropertyPanel;
+import vars.annotation.ui.commandqueue.Command;
+import vars.annotation.ui.commandqueue.CommandEvent;
+import vars.annotation.ui.commandqueue.impl.ChangeVideoArchiveSetCmd;
 import vars.annotation.ui.dialogs.OpenVideoArchiveSetUsingParamsDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +43,7 @@ import vars.annotation.Observation;
 import vars.annotation.ui.actions.ChangeVideoArchiveNameAction;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.Lookup;
+import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
 
 /**
  * <p>
@@ -100,14 +104,10 @@ public class PVideoArchivePanel extends PropertiesPanel {
                         final VideoArchive va = vf.getVideoArchive();
                         if (va != null) {
                             final VideoArchiveSet vas = va.getVideoArchiveSet();
-                            vas.setShipName(f2.getText());
-    
-                            try {
-                                toolBelt.getPersistenceController().updateVideoArchiveSet(vas);
-                            }
-                            catch (final Exception e1) {
-                                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e1);
-                            }
+                            Command command = new ChangeVideoArchiveSetCmd(f2.getText(), vas.getPlatformName(),
+                                    vas.getFormatCode(), vas);
+                            CommandEvent commandEvent = new CommandEvent(command);
+                            EventBus.publish(commandEvent);
                         }
                     }
                 }
@@ -132,14 +132,10 @@ public class PVideoArchivePanel extends PropertiesPanel {
                         final VideoArchive va = vf.getVideoArchive();
                         if (va != null) {
                             final VideoArchiveSet vas = va.getVideoArchiveSet();
-                            vas.setPlatformName(f3.getText());
-    
-                            try {
-                                toolBelt.getPersistenceController().updateVideoArchiveSet(vas);
-                            }
-                            catch (final Exception e1) {
-                                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e1);
-                            }
+                            Command command = new ChangeVideoArchiveSetCmd(vas.getShipName(), f3.getText(),
+                                    vas.getFormatCode(), vas);
+                            CommandEvent commandEvent = new CommandEvent(command);
+                            EventBus.publish(commandEvent);
                         }
                     }
                 }

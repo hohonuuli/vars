@@ -24,6 +24,10 @@ import vars.annotation.AssociationDAO;
 import vars.annotation.Observation;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
+import vars.annotation.ui.commandqueue.Command;
+import vars.annotation.ui.commandqueue.CommandEvent;
+import vars.annotation.ui.commandqueue.impl.AddAssociationCmd;
+import vars.annotation.ui.commandqueue.impl.ChangeAssociationsCmd;
 import vars.knowledgebase.ConceptDAO;
 
 /**
@@ -83,24 +87,13 @@ public class AssociationEditorPanelController {
         }
     }
 
-
     private void addAssociation(ILink link) {
         if (observation != null) {
             Association newAssociation = toolBelt.getAnnotationFactory().newAssociation(link.getLinkName(),
                     link.getToConcept(), link.getLinkValue());
-            // DAOTX
-            AssociationDAO dao = toolBelt.getAnnotationDAOFactory().newAssociationDAO();
-            final ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
-            dao.startTransaction();
-            observation = dao.find(observation);
-            observation.addAssociation(newAssociation);
-            dao.persist(newAssociation);
-            dao.validateName(newAssociation, conceptDAO);
-            dao.endTransaction();
-
-            Collection<Observation> changedObservations = ImmutableList.of(newAssociation.getObservation());
-            toolBelt.getPersistenceController().updateUI(changedObservations);
-            //EventBus.publish(Lookup.TOPIC_OBSERVATION_CHANGED, newAssociation.getObservation());
+            Command command = new AddAssociationCmd(newAssociation, ImmutableList.of(observation));
+            CommandEvent commandEvent = new CommandEvent(command);
+            EventBus.publish(commandEvent);
         }
         observation = null;
         association = null;
@@ -108,20 +101,10 @@ public class AssociationEditorPanelController {
 
     private void updateAssociation(ILink link) {
         if (association != null) {
-            AssociationDAO  associationDAO = toolBelt.getAnnotationDAOFactory().newAssociationDAO();
-            final ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
-            // DAOTX
-            associationDAO.startTransaction();
-            association = associationDAO.find(association);
-            association.setLinkName(link.getLinkName());
-            association.setLinkValue(link.getLinkValue());
-            association.setToConcept(link.getToConcept());
-            associationDAO.validateName(association, conceptDAO);
-            associationDAO.endTransaction();
-
-            Collection<Observation> changedObservations = ImmutableList.of(association.getObservation());
-            toolBelt.getPersistenceController().updateUI(changedObservations);
-            //EventBus.publish(Lookup.TOPIC_OBSERVATION_CHANGED, association.getObservation());
+            ILink copyOfLink = toolBelt.getAnnotationFactory().newAssociation(link);
+            Command command = new ChangeAssociationsCmd(copyOfLink, ImmutableList.of(association));
+            CommandEvent commandEvent = new CommandEvent(command);
+            EventBus.publish(commandEvent);
         }
         observation = null;
         association = null;

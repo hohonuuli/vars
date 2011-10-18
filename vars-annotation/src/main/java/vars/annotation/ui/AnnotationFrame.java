@@ -55,6 +55,7 @@ import vars.DAO;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoFrame;
+import vars.annotation.VideoFrameDAO;
 import vars.annotation.ui.buttons.RedoButton;
 import vars.annotation.ui.buttons.UndoButton;
 import vars.annotation.ui.cbpanel.ConceptButtonPanel;
@@ -275,24 +276,11 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
                         for (int i = 0; i < rows.length; i++) {
                             selectedObservations.add(table.getObservationAt(rows[i]));
                         }
-                        //dispatcher.setValueObject(selectedObservations);
                         EventBus.publish(new ObservationsSelectedEvent(table, selectedObservations));
                     }
                 }
             });
 
-            /*
-             * Watch for opening of a new videoarchive. When that happens we
-             * have to re-populate the Table
-             */
-//            Lookup.getVideoArchiveDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
-//
-//                public void propertyChange(PropertyChangeEvent evt) {
-//                    VideoArchive videoArchive = (VideoArchive) evt.getNewValue();
-//                    toolBelt.getPersistenceController().updateUI(videoArchive);
-//                }
-//
-//            });
 
             Lookup.getObservationTableDispatcher().setValueObject(table);
 
@@ -459,9 +447,10 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
         }
     }
 
+    @EventSubscriber(eventClass = VideoArchiveSelectedEvent.class)
     @Override
     public void respondTo(VideoArchiveSelectedEvent event) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        respondTo(new VideoArchiveChangedEvent(null, event.get()));
     }
 
     @Override

@@ -64,6 +64,8 @@ public interface VideoArchiveDAO extends DAO {
      */
     VideoArchive findByName(String name);
 
+    VideoArchive findByPrimaryKey(Object primaryKey);
+
     /**
      * Removes VideoFrames that do not contain observations.
      *

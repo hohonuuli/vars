@@ -134,7 +134,7 @@ public class CommandQueue {
     public void redo(RedoEvent event) {
         if (redos.size() > 0) {
             CommandEvent commandEvent = redos.removeLast();
-            CommandEvent newCommandEvent = new DoCommandEvent(commandEvent.getCommand());
+            CommandEvent newCommandEvent = new CommandEvent(commandEvent.getCommand(), CommandEvent.DoOrUndo.DO);
             queueCommand(newCommandEvent);
         }
     }
@@ -147,7 +147,7 @@ public class CommandQueue {
     public void undo(UndoEvent event) {
         if (undos.size() > 0) {
             CommandEvent commandEvent = undos.removeLast();
-            CommandEvent newCommandEvent = new UndoCommandEvent(commandEvent.getCommand());
+            CommandEvent newCommandEvent = new CommandEvent(commandEvent.getCommand(), CommandEvent.DoOrUndo.UNDO);
             queueCommand(newCommandEvent);
         }
     }

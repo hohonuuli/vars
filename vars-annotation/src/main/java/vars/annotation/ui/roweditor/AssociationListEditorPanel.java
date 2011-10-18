@@ -49,6 +49,9 @@ import vars.annotation.Association;
 import vars.annotation.Observation;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
+import vars.annotation.ui.commandqueue.Command;
+import vars.annotation.ui.commandqueue.CommandEvent;
+import vars.annotation.ui.commandqueue.impl.RemoveAssociationsCmd;
 import vars.shared.ui.FancyButton;
 
 /**
@@ -328,20 +331,9 @@ public class AssociationListEditorPanel extends JPanel {
                         // Remove references to the selected association from
                         // the parent and the listModel
                         listModel.remove(j.getSelectedIndex());
-
-                        try {
-                            toolBelt.getPersistenceController().deleteAssociations(new ArrayList<Association>() {
-
-                                {
-                                    add(association);
-                                }
-
-                            });
-                        }
-                        catch (final Exception ex) {
-                            EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, ex);
-                        }
-
+                        Command command = new RemoveAssociationsCmd(new ArrayList<Association>() {{ add(association); }});
+                        CommandEvent commandEvent = new CommandEvent(command);
+                        EventBus.publish(commandEvent);
                     }
                 }
             };

@@ -41,6 +41,8 @@ import vars.annotation.VideoFrame;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.actions.MoveVideoFrameWithDialogAction;
+import vars.annotation.ui.commandqueue.Command;
+import vars.annotation.ui.commandqueue.CommandEvent;
 import vars.annotation.ui.commandqueue.impl.AddAssociationCmd;
 import vars.annotation.ui.commandqueue.impl.ChangeAssociationsCmd;
 import vars.annotation.ui.commandqueue.impl.ChangeCameraDirectionsCmd;
@@ -127,9 +129,9 @@ public class VideoArchiveSetEditorPanelController {
             videoFrames.size() + " selected video-frames(s)?", "VARS - Confirm Delete", JOptionPane.DEFAULT_OPTION,
                 JOptionPane.WARNING_MESSAGE, null, options, options[0]);
         if (confirm == JOptionPane.YES_OPTION) {
-            EventBus.publish(new ChangeCameraDirectionsCmd(direction.getDirection(), videoFrames));
-
-            // TODO REFRESH needs to be triggered on VideoFramesChangedEvent(); refresh()
+            Command command = new ChangeCameraDirectionsCmd(direction.getDirection(), videoFrames);
+            CommandEvent commandEvent = new CommandEvent(command);
+            EventBus.publish(commandEvent);
         }
 
     }
@@ -149,9 +151,9 @@ public class VideoArchiveSetEditorPanelController {
             JOptionPane.WARNING_MESSAGE, null, options, options[0]);
 
         if (confirm == JOptionPane.YES_OPTION) {
-            EventBus.publish(new RemoveObservationsCmd(observations));
-
-            // TODO REFRESH needs to be triggered on VideoArchiveChangedEvent(); refresh()
+            Command command = new RemoveObservationsCmd(observations);
+            CommandEvent commandEvent = new CommandEvent(command);
+            EventBus.publish(commandEvent);
         }
 
     }
@@ -214,10 +216,10 @@ public class VideoArchiveSetEditorPanelController {
 
                     ILink link = addAssociationDialog.getLink();
                     Collection<Observation> observations = getObservations(true);
-                    EventBus.publish(new AddAssociationCmd(link, observations));
+                    Command command = new AddAssociationCmd(link, observations);
+                    CommandEvent commandEvent = new CommandEvent(command);
                     addAssociationDialog.dispose();
-
-                    // TODO REFRESH needs to be triggered on ObservationsChangedEvent(); refresh();
+                    EventBus.publish(commandEvent);
                 }
 
             });
@@ -320,13 +322,12 @@ public class VideoArchiveSetEditorPanelController {
                         "Do you want to delete " + associations.size() + " association(s)?", "VARS - Confirm Delete",
                         JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
 
-                    if (confirm == JOptionPane.YES_OPTION) {
-                        EventBus.publish(new RemoveAssociationsCmd(associations));
-                    }
-
                     removeAssociationsDialog.dispose();
-
-                    // TODO REFRESH on ObservationsChangedEvent refresh();
+                    if (confirm == JOptionPane.YES_OPTION) {
+                        Command command = new RemoveAssociationsCmd(associations);
+                        CommandEvent commandEvent = new CommandEvent(command);
+                        EventBus.publish(commandEvent);
+                    }
                 }
 
             });
@@ -363,9 +364,9 @@ public class VideoArchiveSetEditorPanelController {
                     // Update the values for each association in background thread
                     final ILink newLink = renameAssociationsDialog.getLink();
                     renameAssociationsDialog.dispose();
-                    EventBus.publish(new ChangeAssociationsCmd(newLink, associations));
-
-                    // TODO REFRESH on ObservationsChangedEvent refresh();
+                    Command command = new ChangeAssociationsCmd(newLink, associations);
+                    CommandEvent commandEvent = new CommandEvent(command);
+                    EventBus.publish(commandEvent);
                 }
 
             });
@@ -392,9 +393,9 @@ public class VideoArchiveSetEditorPanelController {
                     final Collection<Observation> observations = getObservations(true);
                     UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
                     String user = (userAccount == null) ? UserAccount.USERNAME_DEFAULT : userAccount.getUserName();
-                    EventBus.publish(new RenameObservationsCmd(name, user, observations));
-
-                    // TODO REFRESH on ObservationsChangedEvent refresh();
+                    Command command = new RenameObservationsCmd(name, user, observations);
+                    CommandEvent commandEvent = new CommandEvent(command);
+                    EventBus.publish(commandEvent);
                 }
 
             });
@@ -492,7 +493,7 @@ public class VideoArchiveSetEditorPanelController {
 
         myTable.setSelectedObservations(selectedObservations);
 
-        toolBelt.getPersistenceController().updateUI();
+        //toolBelt.getPersistenceController().updateUI();
         waitIndicator.dispose();
 
     }
@@ -569,10 +570,8 @@ public class VideoArchiveSetEditorPanelController {
                             break;
                         }
                     }
-
                     return ok;
                 }
-
 
             });
         }

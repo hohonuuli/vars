@@ -29,6 +29,7 @@ import vars.annotation.VideoArchiveDAO;
 import vars.annotation.VideoFrame;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.PersistenceController;
+import vars.annotation.ui.eventbus.VideoArchiveSelectedEvent;
 
 /**
  * <p>Opens a <code>VideoArchive</code> for editing. You must first set the
@@ -96,9 +97,7 @@ public class OpenVideoArchiveUsingParamsAction extends ActionAdapter {
                 }
                 log.debug("Loaded " + i + " videoFrame");
                 videoArchiveDAO.endTransaction();
-                
-                Lookup.getVideoArchiveDispatcher().setValueObject(videoArchive);
-
+                EventBus.publish(new VideoArchiveSelectedEvent(null, videoArchive));
             }
             catch (final Exception e) {
                 EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);

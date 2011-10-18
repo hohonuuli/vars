@@ -2,7 +2,6 @@ package vars.annotation.ui.buttons;
 
 import org.bushe.swing.event.EventBus;
 import org.mbari.swing.JFancyButton;
-import vars.annotation.ui.commandqueue.DoCommandEvent;
 import vars.annotation.ui.commandqueue.RedoEvent;
 
 import javax.swing.ImageIcon;

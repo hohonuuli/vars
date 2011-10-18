@@ -78,23 +78,6 @@ public class VideoArchiveSetEditorButton extends JToggleButton {
                 }
             });
 
-            // When window loses focus make it look different. When it gains
-            // focus reload the observations from the database
-//            frame.addWindowFocusListener(new WindowFocusListener() {
-//
-//                WaitIndicator waitIndicator;
-//
-//                public void windowGainedFocus(WindowEvent e) {
-//                    if (waitIndicator != null) {
-//                        waitIndicator.dispose();
-//                    }
-//                    refresh();
-//                }
-//
-//                public void windowLostFocus(WindowEvent e) {
-//                    waitIndicator = new WaitIndicator(frame);
-//                }
-//            });
 
             frame.addWindowListener(new WindowAdapter() {
 

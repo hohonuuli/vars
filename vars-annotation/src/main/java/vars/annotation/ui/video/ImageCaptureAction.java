@@ -385,37 +385,6 @@ public class ImageCaptureAction extends ActionAdapter {
                 EventBus.publish(commandEvent);
             }
 
-//
-//            Observation observation = action.doAction("physical object", snapTime.getTimeCodeAsString());
-//            if (observation != null) {
-//
-//
-//
-//                DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
-//                dao.startTransaction();
-//                observation = dao.find(observation);
-//                final VideoFrame videoFrame = observation.getVideoFrame();
-//                CameraData cameraData = videoFrame.getCameraData();
-//
-//                try {
-//                    cameraData.setImageReference(jpg.toURI().toURL().toExternalForm());
-//                }
-//                catch (final MalformedURLException e) {
-//                    if (log.isErrorEnabled()) {
-//                        log.error("Problem creating a URL.", e);
-//                    }
-//                }
-//
-//                dao.endTransaction();
-//                dao.close();
-//            }
-//
-//            final Collection<Observation> selectedObservations = ImmutableList.of(observation);
-//            Lookup.getSelectedObservationsDispatcher().setValueObject(new ArrayList<Observation>());
-//            Lookup.getSelectedObservationsDispatcher().setValueObject(selectedObservations);
-//            toolBelt.getPersistenceController().updateUI(selectedObservations);
-            //Lookup.getSelectedObservationsDispatcher().setValueObject(new ArrayList<Observation>());
-            //.getSelectedObservationsDispatcher().setValueObject(selectedObservations);
         }
     }
 

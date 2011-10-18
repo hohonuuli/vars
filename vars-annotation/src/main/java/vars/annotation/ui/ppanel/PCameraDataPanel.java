@@ -17,6 +17,7 @@ package vars.annotation.ui.ppanel;
 
 import com.google.common.collect.ImmutableList;
 import java.awt.Frame;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import javax.swing.JOptionPane;
@@ -32,6 +33,9 @@ import vars.annotation.VideoFrame;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.PersistenceController;
 import vars.annotation.ui.ToolBelt;
+import vars.annotation.ui.commandqueue.Command;
+import vars.annotation.ui.commandqueue.CommandEvent;
+import vars.annotation.ui.commandqueue.impl.ChangeCameraDirectionsCmd;
 
 
 /**
@@ -88,18 +92,18 @@ public class PCameraDataPanel extends PropertiesPanel {
                                 Observation obs = observations.iterator().next();
                                 obs = dao.find(obs);
                                 final VideoFrame vf = obs.getVideoFrame();
-                                final CameraData cd = vf.getCameraData();
-                                cd.setDirection(selectedValue.getDirection());
                                 dao.endTransaction();
-                                toolBelt.getPersistenceController().updateUI(ImmutableList.of(obs));
-
+                                dao.close();
+                                Command command = new ChangeCameraDirectionsCmd(selectedValue.getDirection(),
+                                        ImmutableList.of(vf));
+                                CommandEvent commandEvent = new CommandEvent(command);
+                                EventBus.publish(commandEvent);
                             }
                             catch (final Exception e1) {
                                 EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e1);
                             }
 
                             f1.setText(selectedValue.toString());
-
                         }
                     }
                 }

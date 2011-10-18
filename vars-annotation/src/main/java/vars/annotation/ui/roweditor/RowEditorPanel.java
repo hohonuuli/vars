@@ -15,6 +15,7 @@
 
 package vars.annotation.ui.roweditor;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -56,6 +57,9 @@ import vars.UserAccount;
 import vars.annotation.Observation;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
+import vars.annotation.ui.commandqueue.Command;
+import vars.annotation.ui.commandqueue.CommandEvent;
+import vars.annotation.ui.commandqueue.impl.ChangeObservationNameCmd;
 import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
 import vars.annotation.ui.eventbus.ObservationsChangedEvent;
 import vars.knowledgebase.Concept;
@@ -201,19 +205,16 @@ public class RowEditorPanel extends JPanel {
                         final String conceptName = (String) conceptComboBox.getSelectedItem();
                         getNotesArea().setEditable(!getNotableConceptNames().contains(conceptName));
 
-                        if ((observation != null) && !observation.getConceptName().equals(conceptName)) {
-
-                            // DAOTX
-                            observation.setConceptName(conceptName);
-                            final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher()
-                                .getValueObject();
-                            observation.setObserver(userAccount.getUserName());
-                            observation.setObservationDate(new Date());
-
-                            if (log.isDebugEnabled()) {
-                                log.debug("Observation changed to " + conceptName + " by " + userAccount.getUserName());
-                            }
-                        }
+//                        if ((observation != null) && !observation.getConceptName().equals(conceptName)) {
+//
+//                            final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher()
+//                                .getValueObject();
+//
+//                            Command command = new ChangeObservationNameCmd(ImmutableList.of(observation), conceptName,
+//                                    userAccount.getUserName(), new Date());
+//                            CommandEvent commandEvent = new CommandEvent(command);
+//                            EventBus.publish(commandEvent);
+//                        }
                     }
 
                     /*
@@ -259,8 +260,6 @@ public class RowEditorPanel extends JPanel {
                         conceptComboBox.setEnabled(false);
 
                         try {
-
-                            // DAOTX
                             concept = toolBelt.getAnnotationPersistenceService().findConceptByName(selectedName);
                             primaryName = concept.getPrimaryConceptName().getName();
                         }
@@ -274,6 +273,16 @@ public class RowEditorPanel extends JPanel {
                             conceptComboBox.setSelectedItem(primaryName);
                         }
 
+                        // Change conceptName in database
+                        if (observation != null && !observation.getConceptName().equals(primaryName)) {
+                            final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+
+                            Command command = new ChangeObservationNameCmd(ImmutableList.of(observation), primaryName,
+                                    userAccount.getUserName(), new Date());
+                            CommandEvent commandEvent = new CommandEvent(command);
+                            EventBus.publish(commandEvent);
+                        }
+
                         conceptComboBox.setEnabled(true);
                         conceptComboBox.requestFocus();
                     }
@@ -281,16 +290,6 @@ public class RowEditorPanel extends JPanel {
 
             });
 
-            // Tried to update concept name before adding an association, but this doesn't
-            // work as I though it would
-//            conceptComboBox.addFocusListener(new FocusAdapter() {
-//                @Override
-//                public void focusLost(FocusEvent e) {
-//                    Collection<Observation> observations = ImmutableList.of(getObservation());
-//                    toolBelt.getPersistenceController().updateAndValidate(observations);
-//                    //throw new UnsupportedOperationException("Not supported yet.");
-//                }
-//            });
         }
 
         return conceptComboBox;

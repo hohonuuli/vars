@@ -36,6 +36,7 @@ import vars.VarsUserPreferencesFactory;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.commandqueue.CommandQueue;
+import vars.annotation.ui.eventbus.ObservationsChangedEvent;
 import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
 import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
 import vars.annotation.ui.video.DoNothingVideoControlService;
@@ -119,17 +120,17 @@ public class AnnotationFrameController implements PreferenceUpdater {
 
         // When new observations are selected we need to persist changes to the old
         // observations to the database, then redraw them in the UI
-        Lookup.getSelectedObservationsDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                PersistenceController persistenceController = toolBelt.getPersistenceController();
-                Collection<Observation> oldObservations = (Collection<Observation>) evt.getOldValue();
-                if (oldObservations != null) {
-                    oldObservations = new ArrayList<Observation>(oldObservations);
-                    oldObservations = persistenceController.updateAndValidate(oldObservations);
-                    persistenceController.updateUI(oldObservations, false);
-                }
-            }
-        });
+//        Lookup.getSelectedObservationsDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
+//            public void propertyChange(PropertyChangeEvent evt) {
+//                PersistenceController persistenceController = toolBelt.getPersistenceController();
+//                Collection<Observation> oldObservations = (Collection<Observation>) evt.getOldValue();
+//                if (oldObservations != null) {
+//                    oldObservations = new ArrayList<Observation>(oldObservations);
+//                    oldObservations = persistenceController.updateAndValidate(oldObservations);
+//                    EventBus.publish(new ObservationsChangedEvent(annotationFrame, oldObservations));
+//                }
+//            }
+//        });
 
         // When preferences change (i.e. when a new user logs in) we need save
         // the old preferences into the database and load the new ones
