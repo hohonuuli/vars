@@ -16,7 +16,10 @@
 package vars.annotation.ui.imagepanel;
 
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
+import org.bushe.swing.event.annotation.AnnotationProcessor;
+import org.bushe.swing.event.annotation.EventSubscriber;
 import org.jdesktop.jxlayer.JXLayer;
 import org.mbari.awt.AwtUtilities;
 import org.mbari.swing.JImageUrlCanvas;
@@ -26,6 +29,8 @@ import vars.ILink;
 import vars.annotation.Association;
 import vars.annotation.Observation;
 import vars.annotation.ui.ToolBelt;
+import vars.annotation.ui.eventbus.ObservationsChangedEvent;
+import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
 
 import javax.swing.SwingUtilities;
 import java.awt.BasicStroke;
@@ -90,6 +95,13 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends CrossHairLaye
     private boolean selectedLineStart;
     private final ToolBelt toolBelt;
 
+    private final Predicate<Observation> matchObservationPredicate = new Predicate<Observation>() {
+        @Override
+        public boolean apply(Observation input) {
+            return input.equals(observation);
+        }
+    };
+
     /**
      * Constructs ...
      *
@@ -97,6 +109,7 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends CrossHairLaye
      */
     public MeasurementLayerUI(ToolBelt toolBelt) {
         this.toolBelt = toolBelt;
+        AnnotationProcessor.process(this);
     }
 
     /**
@@ -117,8 +130,6 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends CrossHairLaye
      */
     private Measurement newMeasurement(String comment, JXLayer<? extends T> jxl) {
 
-        //Point2D lineStartInImage = jxl.getView().convertToImage(lineStart);
-        //Point2D lineEndInImage = jxl.getView().convertToImage(lineEnd);
         int x0 = (int) Math.round(lineStart.getX());
         int y0 = (int) Math.round(lineStart.getY());
         int x1 = (int) Math.round(lineEnd.getX());
@@ -154,7 +165,6 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends CrossHairLaye
             MarkerStyle markerStyle = MarkerStyle.NOTSELECTED;
             if ((observation.getX() != null) && (observation.getY() != null)) {
 
-
                 Point2D imagePoint = new Point2D.Double(observation.getX(), observation.getY());
                 Point2D componentPoint2D = jxl.getView().convertToComponent(imagePoint);
                 if (componentPoint2D != null) {
@@ -179,32 +189,32 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends CrossHairLaye
                     g2.draw(gp);
                 }
             }
-        }
 
-        // --- Draw and label existing measurements
-        g2.setPaint(Color.GREEN);
-        g2.setStroke(new BasicStroke(2));
-        for (MeasurementPath path : measurementPaths) {
-            updateMeasurementPath(path, jxl);
-            String comment = path.measurement.getComment();
-            g2.draw(path.generalPath);
-            g2.setFont(lineFont);
-            g2.drawString(comment, (float) path.commentPoint.getX(), (float) path.commentPoint.getY());
-        }
-        g2.setPaintMode();
+            // --- Draw and label existing measurements
+            g2.setPaint(Color.GREEN);
+            g2.setStroke(new BasicStroke(2));
+            for (MeasurementPath path : measurementPaths) {
+                updateMeasurementPath(path, jxl);
+                String comment = path.measurement.getComment();
+                g2.draw(path.generalPath);
+                g2.setFont(lineFont);
+                g2.drawString(comment, (float) path.commentPoint.getX(), (float) path.commentPoint.getY());
+            }
+            g2.setPaintMode();
 
-        // --- Paint lineStart
-        g2.setStroke(new BasicStroke(2));
-        g2.setPaint(Color.RED);
-        final int markerOffset = markerDiameter / 2;
-        if (selectedLineStart) {
-            Point2D lineStartPoint = jxl.getView().convertToComponent(lineStart);
-            Point componentPoint = AwtUtilities.toPoint(lineStartPoint);
-            int x = componentPoint.x;
-            int y = componentPoint.y;
-            Ellipse2D marker = new Ellipse2D.Double(x - markerOffset, y - markerOffset, markerDiameter, markerDiameter);
-            g2.draw(marker);
-            g2.draw(line);
+            // --- Paint lineStart
+            g2.setStroke(new BasicStroke(2));
+            g2.setPaint(Color.RED);
+            final int markerOffset = markerDiameter / 2;
+            if (selectedLineStart) {
+                Point2D lineStartPoint = jxl.getView().convertToComponent(lineStart);
+                Point componentPoint = AwtUtilities.toPoint(lineStartPoint);
+                int x = componentPoint.x;
+                int y = componentPoint.y;
+                Ellipse2D marker = new Ellipse2D.Double(x - markerOffset, y - markerOffset, markerDiameter, markerDiameter);
+                g2.draw(marker);
+                g2.draw(line);
+            }
         }
 
     }
@@ -291,7 +301,6 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends CrossHairLaye
         Observation oldObservation = this.observation;
         this.observation = newObservation;
         measurementPaths.clear();
-        resetUI();
 
         // --- Parse out any existing measurement
         if (newObservation != null) {
@@ -306,8 +315,22 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends CrossHairLaye
                 }
             }
         }
-        setDirty(true);
+        resetUI();
         propertyChangeSupport.firePropertyChange(PROP_OBSERVATION, oldObservation, newObservation);
+    }
+
+    @EventSubscriber(eventClass = ObservationsSelectedEvent.class)
+    public void respondsTo(ObservationsSelectedEvent event) {
+        Observation selectedObservation = (event.get().size() == 1) ? event.get().iterator().next() : null;
+        setObservation(selectedObservation);
+    }
+
+    @EventSubscriber(eventClass = ObservationsChangedEvent.class)
+    public void respondsTo(ObservationsChangedEvent event) {
+        Collection<Observation> matchingObservation = Collections2.filter(event.get(), matchObservationPredicate);
+        if (!matchingObservation.isEmpty()) {
+            setObservation(matchingObservation.iterator().next());
+        }
     }
 
     /**

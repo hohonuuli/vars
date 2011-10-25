@@ -1,5 +1,7 @@
 package vars.annotation.ui.commandqueue.impl;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
 import org.bushe.swing.event.EventBus;
 import vars.DAO;
 import vars.annotation.AnnotationDAOFactory;
@@ -11,6 +13,8 @@ import vars.annotation.VideoFrame;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.commandqueue.Command;
+import vars.annotation.ui.eventbus.ObservationsAddedEvent;
+import vars.annotation.ui.eventbus.ObservationsRemovedEvent;
 import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
 
 import java.util.ArrayList;
@@ -48,11 +52,18 @@ public class RemoveObservationsCmd implements Command {
                 }
             }
         }
-
         dao.endTransaction();
         dao.close();
-        EventBus.publish(new VideoArchiveChangedEvent(null,
-                (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject()));
+
+        Collection<Observation> removedObservations = new ArrayList<Observation>(Collections2.transform(deletedData,
+                new Function<DataBean, Observation>() {
+                    @Override
+                    public Observation apply(DataBean input) {
+                        return input.observation;
+                    }
+                }));
+        EventBus.publish(new ObservationsRemovedEvent(null, removedObservations));
+
     }
 
     @Override
@@ -63,7 +74,6 @@ public class RemoveObservationsCmd implements Command {
         final VideoArchiveDAO videoArchiveDAO = daoFactory.newVideoArchiveDAO(dao.getEntityManager());
 
         dao.startTransaction();
-
         for (DataBean bean : deletedData) {
             VideoArchive videoArchive = videoArchiveDAO.findByName(bean.videoArchiveName);
             if (videoArchive != null) {
@@ -79,8 +89,15 @@ public class RemoveObservationsCmd implements Command {
 
         dao.endTransaction();
         dao.close();
-        EventBus.publish(new VideoArchiveChangedEvent(null,
-                (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject()));
+
+        Collection<Observation> addedObservations = new ArrayList<Observation>(Collections2.transform(deletedData,
+                new Function<DataBean, Observation>() {
+                    @Override
+                    public Observation apply(DataBean input) {
+                        return input.observation;
+                    }
+                }));
+        EventBus.publish(new ObservationsAddedEvent(null, addedObservations));
     }
 
     @Override

@@ -1,5 +1,6 @@
 package vars.annotation.ui.eventbus;
 
+import com.google.common.collect.ImmutableList;
 import vars.annotation.Observation;
 
 import java.util.Collection;
@@ -14,6 +15,6 @@ import java.util.Collection;
 public class ObservationsSelectedEvent extends UISelectionEvent<Collection<Observation>> {
 
     public ObservationsSelectedEvent(Object selectionSource, Collection<Observation> observations) {
-        super(selectionSource, observations);
+        super(selectionSource, ImmutableList.copyOf(observations));
     }
 }

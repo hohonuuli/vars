@@ -18,6 +18,8 @@ package vars.annotation.ui.commandqueue;
 import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.annotation.AnnotationProcessor;
 import org.bushe.swing.event.annotation.EventSubscriber;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
 
@@ -42,6 +44,7 @@ import java.util.concurrent.LinkedBlockingDeque;
  */
 public class CommandQueue {
 
+    private final Logger log = LoggerFactory.getLogger(getClass());
     private final int maxUndos = 256;
     private final Queue<CommandEvent> pendingQueue = new ConcurrentLinkedQueue<CommandEvent>();
     private final Deque<CommandEvent> undos = new LinkedBlockingDeque<CommandEvent>(maxUndos);
@@ -56,7 +59,8 @@ public class CommandQueue {
                 if (commandEvent != null) {
                     Command command = commandEvent.getCommand();
                     try {
-
+                        log.debug("Executing Command: " + commandEvent.getDoOrUndo() + " - " +
+                                command.getDescription());
                         // Execute the command (can be DO or UNDO operation)
                         Deque<CommandEvent> inverseCommandList = null;
                         switch (commandEvent.getDoOrUndo()) {

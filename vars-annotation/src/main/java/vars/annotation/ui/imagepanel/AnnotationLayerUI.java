@@ -26,25 +26,40 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 import javax.swing.SwingUtilities;
 
 import org.bushe.swing.event.EventBus;
+import org.bushe.swing.event.annotation.AnnotationProcessor;
+import org.bushe.swing.event.annotation.EventSubscriber;
 import org.jdesktop.jxlayer.JXLayer;
 import org.mbari.awt.AwtUtilities;
 import org.mbari.swing.JImageUrlCanvas;
 import vars.UserAccount;
+import vars.annotation.CameraDirections;
 import vars.annotation.Observation;
 import vars.annotation.VideoFrame;
 import vars.annotation.ui.Lookup;
+import vars.annotation.ui.PersistenceController;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.commandqueue.Command;
 import vars.annotation.ui.commandqueue.CommandEvent;
 import vars.annotation.ui.commandqueue.impl.AddObservationCmd;
+import vars.annotation.ui.eventbus.ObservationsAddedEvent;
+import vars.annotation.ui.eventbus.ObservationsChangedEvent;
+import vars.annotation.ui.eventbus.ObservationsRemovedEvent;
 import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
+import vars.annotation.ui.eventbus.UIEventSubscriber;
+import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
+import vars.annotation.ui.eventbus.VideoArchiveSelectedEvent;
+import vars.annotation.ui.eventbus.VideoFramesChangedEvent;
 import vars.knowledgebase.Concept;
 
 /**
@@ -53,7 +68,7 @@ import vars.knowledgebase.Concept;
  *
  * @param <T>
  */
-public class AnnotationLayerUI<T extends JImageUrlCanvas> extends CrossHairLayerUI<T> {
+public class AnnotationLayerUI<T extends JImageUrlCanvas> extends CrossHairLayerUI<T> implements UIEventSubscriber {
 
     /**
      * This font is used to draw the concept name of concepts.
@@ -64,7 +79,7 @@ public class AnnotationLayerUI<T extends JImageUrlCanvas> extends CrossHairLayer
     private List<Observation> observations = new Vector<Observation>();
 
     /** A list of observations that were selected using the boundingbox */
-    private List<Observation> selectedObservations = new Vector<Observation>();
+    private Set<Observation> selectedObservations = Collections.synchronizedSet(new HashSet<Observation>());
 
     /**
      * Record of the location of the most recent mousePress event. Used for
@@ -81,6 +96,13 @@ public class AnnotationLayerUI<T extends JImageUrlCanvas> extends CrossHairLayer
     private final ToolBelt toolBelt;
     private VideoFrame videoFrame;
 
+    private final Predicate<Observation> displayableObservationsPredicate = new Predicate<Observation>() {
+        @Override
+        public boolean apply(Observation input) {
+            return (input.getX() != null) && (input.getY() != null);
+        }
+    };
+
     /**
      * Constructs ...
      *
@@ -88,6 +110,7 @@ public class AnnotationLayerUI<T extends JImageUrlCanvas> extends CrossHairLayer
      */
     public AnnotationLayerUI(ToolBelt toolBelt) {
         this.toolBelt = toolBelt;
+        AnnotationProcessor.process(this);
     }
 
 
@@ -117,10 +140,8 @@ public class AnnotationLayerUI<T extends JImageUrlCanvas> extends CrossHairLayer
 
         if (videoFrame != null) {
 
-            for (Observation observation : videoFrame.getObservations()) {
-                Collection<Observation> rowSelectedObservations = (Collection<Observation>) Lookup
-                    .getSelectedObservationsDispatcher().getValueObject();
-                MarkerStyle markerStyle = rowSelectedObservations.contains(observation)
+            for (Observation observation : observations) {
+                MarkerStyle markerStyle = selectedObservations.contains(observation)
                                           ? MarkerStyle.SELECTED : MarkerStyle.NOTSELECTED;
                 if ((observation.getX() != null) && (observation.getY() != null)) {
 
@@ -269,8 +290,8 @@ public class AnnotationLayerUI<T extends JImageUrlCanvas> extends CrossHairLayer
      */
     public void setVideoFrame(VideoFrame videoFrame_) {
 
-        // IF it's the same videoFrame DO NOT redraw. Otherwise the UI Will flicker
-        if (videoFrame != videoFrame_) {
+        if (videoFrame == null || !videoFrame.equals(videoFrame_)) {
+
             /*
              * We have to look up the videoframe from the database since the reference
              * passed may be stale
@@ -279,17 +300,105 @@ public class AnnotationLayerUI<T extends JImageUrlCanvas> extends CrossHairLayer
             observations.clear();
             selectedObservations.clear();
             boundingBox = null;
-            setDirty(true);
 
             if (videoFrame != null) {
-                observations.addAll(Collections2.filter(videoFrame.getObservations(), new Predicate<Observation>() {
-                    public boolean apply(Observation input) {
-                        return (input.getX() != null) && (input.getY() != null);
-                    }
-                }));
-                setDirty(true);
+                observations.addAll(Collections2.filter(videoFrame.getObservations(), displayableObservationsPredicate));
+                selectedObservations.addAll((Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject());
+            }
+            setDirty(true);
+        }
+    }
+
+    @EventSubscriber(eventClass = ObservationsSelectedEvent.class)
+    @Override
+    public void respondTo(ObservationsSelectedEvent event) {
+        if (event.getEventSource() == null || !event.getEventSource().equals(this)) {
+            Collection<VideoFrame> selectedVideoFrames = PersistenceController.toVideoFrames(event.get());
+            if (selectedVideoFrames.size() == 1 ) {
+                VideoFrame newVideoFrame = selectedVideoFrames.iterator().next();
+                if (!newVideoFrame.equals(videoFrame)) {
+                    // new VideoFrame is different than current one
+                    setVideoFrame(newVideoFrame);
+                }
+                else {
+                    // new VideoFrame is the same as current one.
+                    selectedObservations.clear();
+                    selectedObservations.addAll(event.get());
+                    setDirty(true);
+                }
+            }
+            else {
+                setVideoFrame(null);
             }
         }
+    }
+
+    @EventSubscriber(eventClass = ObservationsChangedEvent.class)
+    @Override
+    public void respondTo(ObservationsChangedEvent event) {
+        List<Observation> changedObservations = new ArrayList<Observation>(event.get());
+        changedObservations.retainAll(observations);
+        if (!changedObservations.isEmpty()) {
+            observations.removeAll(changedObservations); // This actually removes the OLD versions
+            observations.addAll(changedObservations); // Add the new versions
+            setDirty(true);
+        }
+    }
+
+    @EventSubscriber(eventClass = ObservationsAddedEvent.class)
+    @Override
+    public void respondTo(ObservationsAddedEvent event) {
+        Collection<Observation> addedObservations = new ArrayList<Observation>();
+        for (Observation observation : event.get()) {
+            if (observation.getVideoFrame().equals(videoFrame)) {
+                addedObservations.add(observation);
+            }
+        }
+
+        if (!addedObservations.isEmpty()) {
+            observations.addAll(addedObservations);
+            setDirty(true);
+        }
+
+    }
+
+    @EventSubscriber(eventClass = ObservationsRemovedEvent.class)
+    @Override
+    public void respondTo(ObservationsRemovedEvent event) {
+        int originalSize = observations.size();
+        observations.removeAll(event.get());
+        if (observations.size() != originalSize) {
+            setDirty(true);
+        }
+    }
+
+    @EventSubscriber(eventClass = VideoArchiveChangedEvent.class)
+    @Override
+    public void respondTo(VideoArchiveChangedEvent event) {
+        setVideoFrame(null);
+    }
+
+    @EventSubscriber(eventClass = VideoArchiveSelectedEvent.class)
+    @Override
+    public void respondTo(VideoArchiveSelectedEvent event) {
+        setVideoFrame(null);
+    }
+
+    @EventSubscriber(eventClass = VideoFramesChangedEvent.class)
+    @Override
+    public void respondTo(VideoFramesChangedEvent event) {
+
+        Collection<VideoFrame> changedVideoFrame = Collections2.filter(event.get(), new Predicate<VideoFrame>() {
+            @Override
+            public boolean apply(VideoFrame input) {
+                return input.equals(videoFrame);
+            }
+        });
+
+        if (!changedVideoFrame.isEmpty()) {
+            setVideoFrame(changedVideoFrame.iterator().next());
+        }
+
     }
 
     private class Controller {
@@ -300,9 +409,9 @@ public class AnnotationLayerUI<T extends JImageUrlCanvas> extends CrossHairLayer
             String videoArchiveName = getVideoFrame().getVideoArchive().getName();
             String conceptName = getConcept().getPrimaryConceptName().getName();
             String user = ((UserAccount) Lookup.getUserAccountDispatcher().getValueObject()).getUserName();
-            String cameraDirection = (String) Lookup.getCameraDirectionDispatcher().getValueObject();
+            CameraDirections cameraDirection = (CameraDirections) Lookup.getCameraDirectionDispatcher().getValueObject();
             Command command = new AddObservationCmd(conceptName, timecode, new Date(), videoArchiveName,
-                    user, cameraDirection, point);
+                    user, cameraDirection.getDirection(), point, true);
             CommandEvent commandEvent = new CommandEvent(command);
             EventBus.publish(commandEvent);
 

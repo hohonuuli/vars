@@ -21,6 +21,7 @@ import java.awt.HeadlessException;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -30,7 +31,9 @@ import java.util.List;
 import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ActionMap;
 import javax.swing.BoxLayout;
+import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -59,6 +62,8 @@ import vars.annotation.VideoFrameDAO;
 import vars.annotation.ui.buttons.RedoButton;
 import vars.annotation.ui.buttons.UndoButton;
 import vars.annotation.ui.cbpanel.ConceptButtonPanel;
+import vars.annotation.ui.commandqueue.RedoEvent;
+import vars.annotation.ui.commandqueue.UndoEvent;
 import vars.annotation.ui.eventbus.ObservationsAddedEvent;
 import vars.annotation.ui.eventbus.ObservationsRemovedEvent;
 import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
@@ -270,9 +275,7 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
                 public void valueChanged(ListSelectionEvent e) {
                     if (!e.getValueIsAdjusting()) {
                         int[] rows = table.getSelectedRows();
-                        final Dispatcher dispatcher = Lookup.getSelectedObservationsDispatcher();
                         final List<Observation> selectedObservations = new Vector<Observation>(rows.length);
-
                         for (int i = 0; i < rows.length; i++) {
                             selectedObservations.add(table.getObservationAt(rows[i]));
                         }
@@ -310,6 +313,28 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
             toolBar.add(new StatusLabelForPerson(toolBelt));
             toolBar.add(new StatusLabelForVcr());
             toolBar.add(new StatusLabelForVideoArchive(toolBelt));
+
+            // Map in undo and redo keys
+            InputMap inputMap = toolBar.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+            KeyStroke undoStroke = KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+            inputMap.put(undoStroke, "undo");
+            KeyStroke redoStroke = KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+            inputMap.put(redoStroke, "redo");
+
+            ActionMap actionMap = toolBar.getActionMap();
+            actionMap.put("undo", new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    EventBus.publish(new UndoEvent());
+                }
+            });
+            actionMap.put("redo", new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    EventBus.publish(new RedoEvent());
+                }
+            });
+
         }
 
         return toolBar;
@@ -344,7 +369,7 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
     @Override
     public void respondTo(ObservationsAddedEvent event) {
         respondTo(new ObservationsChangedEvent(null, event.get()));
-        EventBus.publish(new ObservationsSelectedEvent(null, event.get()));
+        //EventBus.publish(new ObservationsSelectedEvent(null, event.get()));
     }
 
     @EventSubscriber(eventClass = ObservationsChangedEvent.class)
@@ -371,9 +396,17 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
         }
     }
 
+    @EventSubscriber(eventClass = ObservationsRemovedEvent.class)
     @Override
     public void respondTo(ObservationsRemovedEvent event) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        final ObservationTable observationTable = getTable();
+        if (event.getEventSource() != observationTable) {
+            final JTable table = observationTable.getJTable();
+            final ObservationTableModel model = (ObservationTableModel) table.getModel();
+            for (Observation observation : event.get()) {
+                observationTable.removeObservation(observation);
+            }
+        }
     }
 
     @EventSubscriber(eventClass = ObservationsSelectedEvent.class)
@@ -381,24 +414,7 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
     public void respondTo(ObservationsSelectedEvent event) {
         final ObservationTable observationTable = getTable();
         if(event.getSelectionSource() != observationTable) {
-            ObservationTableModel model = (ObservationTableModel) table.getModel();
-            Collection<Observation> observations = event.get();
-            /*
-             * If we just added one select it in the table
-             */
-            if (observations.size() == 1) {
-                final Observation observation = observations.iterator().next();
-                observationTable.setSelectedObservation(observation);
-            }
-            else {
-                ListSelectionModel lsm = table.getSelectionModel();
-                lsm.clearSelection();
-
-                for (Observation observation : observations) {
-                    int row = model.getObservationRow(observation);
-                    lsm.addSelectionInterval(row, row);
-                }
-            }
+            observationTable.setSelectedObservations(event.get());
         }
     }
 
@@ -450,11 +466,20 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
     @EventSubscriber(eventClass = VideoArchiveSelectedEvent.class)
     @Override
     public void respondTo(VideoArchiveSelectedEvent event) {
-        respondTo(new VideoArchiveChangedEvent(null, event.get()));
+        VideoArchive oldVideoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+        VideoArchive newVideoArchive = event.get();
+        if (oldVideoArchive == null || newVideoArchive == null || !oldVideoArchive.equals(newVideoArchive)) {
+            respondTo(new VideoArchiveChangedEvent(null, newVideoArchive));
+        }
     }
 
+    @EventSubscriber(eventClass = VideoFramesChangedEvent.class)
     @Override
     public void respondTo(VideoFramesChangedEvent event) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        VideoArchive oldVideoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+        Collection<VideoFrame> videoFrames = event.get();
+        for (VideoFrame videoFrame : videoFrames) {
+            
+        }
     }
 }

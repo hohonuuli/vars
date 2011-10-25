@@ -1,7 +1,7 @@
 /*
- * @(#)FrameGrabPanel.java   2010.03.19 at 11:38:44 PDT
+ * @(#)FrameGrabPanel.java   2011.10.24 at 03:22:02 PDT
  *
- * Copyright 2009 MBARI
+ * Copyright 2011 MBARI
  *
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -17,28 +17,29 @@ package vars.annotation.ui.ppanel;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
+import org.bushe.swing.event.annotation.AnnotationProcessor;
+import org.bushe.swing.event.annotation.EventSubscriber;
+import org.mbari.swing.JImageUrlCanvas;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import vars.annotation.Observation;
+import vars.annotation.VideoFrame;
+import vars.annotation.ui.ToolBelt;
+import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
+import vars.annotation.ui.imagepanel.ImageAnnotationFrame;
+
+import javax.swing.JFrame;
+import javax.swing.border.TitledBorder;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.net.URL;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import javax.swing.JFrame;
-import javax.swing.border.TitledBorder;
-import org.mbari.swing.JImageUrlCanvas;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import vars.annotation.Observation;
-import vars.annotation.VideoFrame;
-import vars.annotation.ui.Lookup;
-import vars.annotation.ui.ToolBelt;
-import vars.annotation.ui.imagepanel.ImageAnnotationFrame;
 
 /**
  * <p>
@@ -65,7 +66,6 @@ public class FrameGrabPanel extends javax.swing.JPanel {
      */
     private JImageUrlCanvas imageCanvas;
     private final ImageAnnotationFrame imageFrame;
-    private VideoFrame videoFrame;
 
     /**
      * Creates new form FrameGrabPanel
@@ -77,36 +77,7 @@ public class FrameGrabPanel extends javax.swing.JPanel {
         imageFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         imageFrame.pack();
         initialize();
-
-        // Register for notifications when the Selected Observations changes
-        Lookup.getSelectedObservationsDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
-
-            public void propertyChange(PropertyChangeEvent evt) {
-                final Object object = evt.getNewValue();
-                VideoFrame vf = null;
-
-                if (object != null) {
-
-                    // If one observation is found show it's image
-                    final Collection<Observation> observations = (Collection<Observation>) object;
-                    Set<VideoFrame> videoFrames = new HashSet<VideoFrame>(Collections2.transform(observations,
-                        new Function<Observation, VideoFrame>() {
-
-                        public VideoFrame apply(Observation from) {
-                            return from.getVideoFrame();
-                        }
-
-                    }));
-
-                    if (videoFrames.size() == 1) {
-                        vf = videoFrames.iterator().next();
-                    }
-                }
-
-                setVideoFrame(vf);
-            }
-        });
-
+        AnnotationProcessor.process(this);
     }
 
     JImageUrlCanvas getImageCanvas() {
@@ -118,13 +89,6 @@ public class FrameGrabPanel extends javax.swing.JPanel {
         return imageCanvas;
     }
 
-    /**
-     *     @return   Returns the videoFrame.
-     */
-    public VideoFrame getVideoFrame() {
-        return videoFrame;
-    }
-
     private void initialize() {
         setLayout(new BorderLayout());
         setBorder(new TitledBorder("image"));
@@ -132,7 +96,6 @@ public class FrameGrabPanel extends javax.swing.JPanel {
         setPreferredSize(new Dimension(60, 50));
         add(getImageCanvas(), BorderLayout.CENTER);
         addComponentListener(new ComponentAdapter() {
-
             @Override
             public void componentResized(final ComponentEvent evt) {
                 resizeHandler(evt);
@@ -144,19 +107,14 @@ public class FrameGrabPanel extends javax.swing.JPanel {
          * sized version in it's own window.
          */
         addMouseListener(new MouseAdapter() {
-
-
             @Override
             public void mouseClicked(final MouseEvent event) {
-
                 // Ensure double-click
                 if (event.getClickCount() < 2) {
                     return;
                 }
-
                 imageFrame.setVisible(true);
             }
-
 
         });
     }
@@ -172,21 +130,44 @@ public class FrameGrabPanel extends javax.swing.JPanel {
     }
 
     /**
-     *     @param videoFrame              The videoFrame to set.
+     *
+     * @param event
      */
-    public void setVideoFrame(final VideoFrame videoFrame) {
-        VideoFrame oldVideoFrame = this.videoFrame;
-        this.videoFrame = videoFrame;
-        final JImageUrlCanvas icanvas = getImageCanvas();
-        if (videoFrame == null || !videoFrame.equals(oldVideoFrame)) {
-            try {
-                final URL imageReference = new URL(videoFrame.getCameraData().getImageReference());
-                icanvas.setUrl(imageReference);
-            } catch (Exception ex) {
-                icanvas.setUrl(null);
-            }
-        }
-        imageFrame.setVideoFrame(videoFrame);
+    @EventSubscriber(eventClass = ObservationsSelectedEvent.class)
+    public void respondTo(ObservationsSelectedEvent event) {
+        updateObservations(event.get());
     }
 
+    /**
+     *
+     * @param observations
+     */
+    public void updateObservations(Collection<Observation> observations) {
+
+        URL imageReference = null;
+        if (observations != null) {
+
+            // If one observation is found show it's image
+            Set<VideoFrame> videoFrames = new HashSet<VideoFrame>(Collections2.transform(observations,
+                new Function<Observation, VideoFrame>() {
+
+                public VideoFrame apply(Observation from) {
+                    return from.getVideoFrame();
+                }
+
+            }));
+
+            if (videoFrames.size() == 1) {
+                VideoFrame videoFrame = videoFrames.iterator().next();
+                try {
+                    imageReference = new URL(videoFrame.getCameraData().getImageReference());
+                }
+                catch (Exception e) {
+                    // DO nothing
+                }
+            }
+        }
+        getImageCanvas().setUrl(imageReference);
+
+    }
 }

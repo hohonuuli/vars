@@ -66,18 +66,7 @@ public class StatusLabelForVideoArchive extends StatusLabel {
 
         AnnotationProcessor.process(this); // Register with EventBus
 
-
-        /*
-         * Listen for changes in the VideoArchive being annotated. When it changes update
-         * the label text
-         */
-//        videoArchiveDispatcher.addPropertyChangeListener(new PropertyChangeListener() {
-//            public void propertyChange(PropertyChangeEvent evt) {
-//                update((VideoArchive) evt.getNewValue());
-//            }
-//        });
         update((VideoArchive) videoArchiveDispatcher.getValueObject());
-
 
         /*
          * When the user clicks this label a dialog should pop up allowing them

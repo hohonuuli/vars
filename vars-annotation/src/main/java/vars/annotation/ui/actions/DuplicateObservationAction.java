@@ -69,7 +69,7 @@ public final class DuplicateObservationAction extends ActionAdapter {
             .getValueObject();
         observations = new ArrayList<Observation>(observations);    // Copy to avoid threading issues
         String name = userAccount.getUserName();
-        Command command = new DuplicateObservationsCmd(name, observations);
+        Command command = new DuplicateObservationsCmd(name, observations, true);
         CommandEvent commandEvent = new CommandEvent(command);
         EventBus.publish(commandEvent);
 

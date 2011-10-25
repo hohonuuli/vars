@@ -1,5 +1,6 @@
 package vars.annotation.ui.commandqueue.impl;
 
+import com.google.common.collect.ImmutableList;
 import org.bushe.swing.event.EventBus;
 import org.mbari.movie.Timecode;
 import vars.UserAccount;
@@ -12,10 +13,12 @@ import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveDAO;
 import vars.annotation.VideoFrame;
 import vars.annotation.VideoFrameDAO;
+import vars.annotation.jpa.ObservationImpl;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.commandqueue.Command;
 import vars.annotation.ui.eventbus.ObservationsAddedEvent;
 import vars.annotation.ui.eventbus.ObservationsRemovedEvent;
+import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -33,22 +36,39 @@ public class AddObservationCmd implements Command {
     private final String videoArchiveName;
     private final String user;
     private final String cameraDirection;
-    private Observation newObservation;
+    private Object newPrimaryKey;
     private final Point2D point;
     private final String imageReference;
+    private boolean selectAddedObservation = true;
 
     public AddObservationCmd(String conceptName, String timecode, Date recordedDate, String videoArchiveName,
                              String user, String cameraDirection) {
-        this(conceptName, timecode, recordedDate, videoArchiveName, user, cameraDirection, null);
+        this(conceptName, timecode, recordedDate, videoArchiveName, user, cameraDirection, null, null, false);
+    }
+
+    public AddObservationCmd(String conceptName, String timecode, Date recordedDate, String videoArchiveName,
+                             String user, String cameraDirection, boolean selectAddedObservation) {
+        this(conceptName, timecode, recordedDate, videoArchiveName, user, cameraDirection, null, null, selectAddedObservation);
     }
 
     public AddObservationCmd(String conceptName, String timecode, Date recordedDate, String videoArchiveName,
                              String user, String cameraDirection, Point2D point) {
-        this(conceptName, timecode, recordedDate, videoArchiveName, user, cameraDirection, point, null);
+        this(conceptName, timecode, recordedDate, videoArchiveName, user, cameraDirection, point, null, false);
+    }
+
+    public AddObservationCmd(String conceptName, String timecode, Date recordedDate, String videoArchiveName,
+                             String user, String cameraDirection, Point2D point, boolean selectAddedObservation) {
+        this(conceptName, timecode, recordedDate, videoArchiveName, user, cameraDirection, point, null, selectAddedObservation);
+
     }
 
     public AddObservationCmd(String conceptName, String timecode, Date recordedDate, String videoArchiveName,
                              String user, String cameraDirection, Point2D point, String imageReference) {
+        this(conceptName, timecode, recordedDate, videoArchiveName, user, cameraDirection, point, imageReference, false);
+    }
+
+    public AddObservationCmd(String conceptName, String timecode, Date recordedDate, String videoArchiveName,
+                             String user, String cameraDirection, Point2D point, String imageReference, boolean selectAddedObservation) {
         this.conceptName = conceptName;
         this.timecode = timecode;
         this.recordedDate = recordedDate;
@@ -57,6 +77,7 @@ public class AddObservationCmd implements Command {
         this.cameraDirection = cameraDirection;
         this.point = point;
         this.imageReference = imageReference;
+        this.selectAddedObservation = selectAddedObservation;
     }
 
     @Override
@@ -67,6 +88,7 @@ public class AddObservationCmd implements Command {
         VideoArchiveDAO videoArchiveDAO = daoFactory.newVideoArchiveDAO();
         videoArchiveDAO.startTransaction();
         VideoArchive videoArchive = videoArchiveDAO.findByName(videoArchiveName);
+        Observation newObservation = null;
         if (videoArchive != null && conceptName != null && timecode != null) {
             /*
              * Verify that the timecode is acceptable
@@ -107,18 +129,32 @@ public class AddObservationCmd implements Command {
         }
         videoArchiveDAO.endTransaction();
         videoArchiveDAO.close();
+        if (newObservation != null) {
+            newPrimaryKey = newObservation.getPrimaryKey();
+        }
         EventBus.publish(new ObservationsAddedEvent(null, newObservation));
+
+        if (selectAddedObservation) {
+            EventBus.publish(new ObservationsSelectedEvent(null, ImmutableList.of(newObservation)));
+        }
     }
 
     @Override
     public void unapply(ToolBelt toolBelt) {
-        if (newObservation != null) {
+        if (newPrimaryKey != null) {
             AnnotationDAOFactory daoFactory = toolBelt.getAnnotationDAOFactory();
             ObservationDAO dao = daoFactory.newObservationDAO();
             VideoFrameDAO videoFrameDAO = daoFactory.newVideoFrameDAO(dao.getEntityManager());
             dao.startTransaction();
-            final Observation observation = dao.find(newObservation);
+            final Observation observation = dao.findByPrimaryKey(newPrimaryKey);
+
+            Observation fakeObservation = null;
             if (observation != null) {
+                // XXX - START HACK: Had to use JPA implementation instead of interface!!
+                ObservationImpl tmp  = (ObservationImpl) toolBelt.getAnnotationFactory().newObservation();
+                tmp.setId((Long) observation.getPrimaryKey());
+                fakeObservation = tmp;
+                // XXX - END HACK:
                 VideoFrame videoFrame = observation.getVideoFrame();
                 videoFrame.removeObservation(observation);
                 dao.remove(observation);
@@ -130,11 +166,10 @@ public class AddObservationCmd implements Command {
             }
             dao.endTransaction();
             dao.close();
-            EventBus.publish(new ObservationsRemovedEvent(null, new ArrayList<Observation>() {{
-                add(observation);
-            }}));
+            if (fakeObservation != null) {
+                EventBus.publish(new ObservationsRemovedEvent(null, ImmutableList.of(fakeObservation)));
+            }
         }
-
     }
 
 

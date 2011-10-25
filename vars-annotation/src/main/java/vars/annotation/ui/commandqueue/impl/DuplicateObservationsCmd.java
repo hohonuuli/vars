@@ -11,6 +11,7 @@ import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.commandqueue.Command;
 import vars.annotation.ui.eventbus.ObservationsAddedEvent;
 import vars.annotation.ui.eventbus.ObservationsRemovedEvent;
+import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
 
 import java.awt.Event;
 import java.util.ArrayList;
@@ -27,13 +28,15 @@ public class DuplicateObservationsCmd implements Command {
     private final String user;
     private final Collection<Observation> sourceObservations;
     private final Collection<Observation> duplicateObservations = Collections.synchronizedCollection(new ArrayList<Observation>());
+    private final boolean selectObservations;
 
-    public DuplicateObservationsCmd(String user, Collection<Observation> sourceObservations) {
+    public DuplicateObservationsCmd(String user, Collection<Observation> sourceObservations, boolean selectObservations) {
         if (user == null || sourceObservations == null) {
             throw new IllegalArgumentException("Command arguments can not be null");
         }
         this.user = user;
         this.sourceObservations = new ArrayList<Observation>(sourceObservations);
+        this.selectObservations = selectObservations;
     }
 
     @Override
@@ -57,6 +60,9 @@ public class DuplicateObservationsCmd implements Command {
             dao.endTransaction();
         }
         EventBus.publish(new ObservationsAddedEvent(null, duplicateObservations));
+        if (selectObservations) {
+            EventBus.publish(new ObservationsSelectedEvent(null, duplicateObservations));
+        }
     }
     
 
@@ -67,10 +73,13 @@ public class DuplicateObservationsCmd implements Command {
             DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
             dao.startTransaction();
             for (Observation observation : duplicateObservations) {
+                deletedObservations.add(observation); // Add before bringing into transaction. Hashcode changes after delete.
                 observation = dao.find(observation);
+
                 VideoFrame videoFrame = observation.getVideoFrame();
                 videoFrame.removeObservation(observation);
                 dao.remove(observation);
+
                 if (videoFrame.getObservations().size() == 0) {
                     dao.remove(videoFrame);
                 }

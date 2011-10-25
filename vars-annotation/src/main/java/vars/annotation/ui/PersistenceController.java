@@ -1,5 +1,5 @@
 /*
- * @(#)PersistenceController.java   2011.09.21 at 12:05:21 PDT
+ * @(#)PersistenceController.java   2011.10.25 at 09:36:32 PDT
  *
  * Copyright 2011 MBARI
  *
@@ -16,15 +16,11 @@
 package vars.annotation.ui;
 
 import com.google.common.base.Function;
-import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
-import org.bushe.swing.event.EventBus;
-import org.bushe.swing.event.annotation.EventSubscriber;
 import org.mbari.net.URLUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.DAO;
-import vars.ILink;
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.AnnotationFactory;
 import vars.annotation.Association;
@@ -33,12 +29,7 @@ import vars.annotation.CameraData;
 import vars.annotation.Observation;
 import vars.annotation.ObservationDAO;
 import vars.annotation.VideoArchive;
-import vars.annotation.VideoArchiveDAO;
-import vars.annotation.VideoArchiveSet;
 import vars.annotation.VideoFrame;
-import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
-import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
-import vars.annotation.ui.eventbus.ObservationsChangedEvent;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 
@@ -49,6 +40,8 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Vector;
 
 /**
@@ -78,31 +71,6 @@ public class PersistenceController {
         this.annotationDAOFactory = toolBelt.getAnnotationDAOFactory();
         this.annotationFactory = toolBelt.getAnnotationFactory();
     }
-
-
-    /**
-     * Look up the 'validate' name, that's the primary name for a given concept
-     * 
-     * @param conceptName The string name to validate
-     * @return The validated name. If it's not found in the knowledgebase then
-     *  then the original string is returned.
-     */
-    public String getValidatedConceptName(String conceptName) {
-        final ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
-        conceptDAO.startTransaction();
-        Concept concept = conceptDAO.findByName(conceptName);
-        String validatedName;
-        if (concept == null) {
-            log.warn("Unable to find '" + conceptName + "' in the knowledgebase.");
-            validatedName = conceptName;
-        }
-        else {
-            validatedName = concept.getPrimaryConceptName().getName();
-        }
-        conceptDAO.endTransaction();
-        return validatedName;
-    }
-
 
     /**
      * Creates a URL of [image.archive.url]/[platform]/images/[dive]/filename from
@@ -164,12 +132,29 @@ public class PersistenceController {
         return out;
     }
 
+    /**
+     * Look up the 'validate' name, that's the primary name for a given concept
+     *
+     * @param conceptName The string name to validate
+     * @return The validated name. If it's not found in the knowledgebase then
+     *  then the original string is returned.
+     */
+    public String getValidatedConceptName(String conceptName) {
+        final ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
+        conceptDAO.startTransaction();
+        Concept concept = conceptDAO.findByName(conceptName);
+        String validatedName;
+        if (concept == null) {
+            log.warn("Unable to find '" + conceptName + "' in the knowledgebase.");
+            validatedName = conceptName;
+        }
+        else {
+            validatedName = concept.getPrimaryConceptName().getName();
+        }
+        conceptDAO.endTransaction();
 
-
-
-
-
-
+        return validatedName;
+    }
 
     /**
      * Convenience method very specific to MBARI internal usage and naming
@@ -204,7 +189,18 @@ public class PersistenceController {
         return sb.toString();
     }
 
-
+    /**
+     * Returns the unique videoframes associated with a collection of observations
+     * @param observations A collection of observations
+     * @return The unique videoframes
+     */
+    public static Set<VideoFrame> toVideoFrames(Collection<Observation> observations) {
+        return new HashSet<VideoFrame>(Collections2.transform(observations, new Function<Observation, VideoFrame>() {
+            public VideoFrame apply(Observation from) {
+                return from.getVideoFrame();
+            }
+        }));
+    }
 
     /**
      * Thread-safe. Updates changes made to the observations in the database. Validates the
@@ -238,7 +234,6 @@ public class PersistenceController {
 
         return updatedObservations;
     }
-
 
     /**
      * Changes the CameraData URL's that match the currently set local directory to
@@ -279,6 +274,4 @@ public class PersistenceController {
 
         return cameraDatas;
     }
-
-
 }

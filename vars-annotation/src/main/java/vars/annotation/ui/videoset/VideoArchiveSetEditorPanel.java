@@ -37,6 +37,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.bushe.swing.event.annotation.AnnotationProcessor;
+import org.bushe.swing.event.annotation.EventSubscriber;
 import org.mbari.swing.SearchableComboBoxModel;
 import org.mbari.text.ObjectToStringConverter;
 import org.slf4j.Logger;
@@ -49,6 +51,14 @@ import vars.annotation.CameraDirections;
 import vars.annotation.VideoArchiveSet;
 import vars.annotation.ui.CameraDirectionComboBox;
 import vars.annotation.ui.ToolBelt;
+import vars.annotation.ui.eventbus.ObservationsAddedEvent;
+import vars.annotation.ui.eventbus.ObservationsChangedEvent;
+import vars.annotation.ui.eventbus.ObservationsRemovedEvent;
+import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
+import vars.annotation.ui.eventbus.UIEventSubscriber;
+import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
+import vars.annotation.ui.eventbus.VideoArchiveSelectedEvent;
+import vars.annotation.ui.eventbus.VideoFramesChangedEvent;
 import vars.annotation.ui.table.JXObservationTable;
 import vars.shared.ui.ConceptNameComboBox;
 import vars.shared.ui.LinkListCellRenderer;
@@ -59,7 +69,7 @@ import vars.shared.ui.LinkListCellRenderer;
  * @version        Enter version here..., 2010.03.04 at 07:21:20 PST
  * @author         Brian Schlining [brian@mbari.org]
  */
-public class VideoArchiveSetEditorPanel extends JPanel {
+public class VideoArchiveSetEditorPanel extends JPanel implements UIEventSubscriber {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
     private JPanel actionPanel;
@@ -91,6 +101,7 @@ public class VideoArchiveSetEditorPanel extends JPanel {
     public VideoArchiveSetEditorPanel(ToolBelt toolBelt) {
         initialize();
         controller = new VideoArchiveSetEditorPanelController(this, toolBelt);
+        AnnotationProcessor.process(this);
     }
 
     private JPanel getActionPanel() {
@@ -405,10 +416,55 @@ public class VideoArchiveSetEditorPanel extends JPanel {
      */
     public synchronized void setVideoArchiveSet(VideoArchiveSet videoArchiveSet) {
         this.videoArchiveSet = videoArchiveSet;
+        refresh();
+    }
+
+    @EventSubscriber(eventClass = ObservationsAddedEvent.class)
+    @Override
+    public void respondTo(ObservationsAddedEvent event) {
+        refresh();
+    }
+
+    @EventSubscriber(eventClass = ObservationsChangedEvent.class)
+    @Override
+    public void respondTo(ObservationsChangedEvent event) {
+        refresh();
+    }
+
+    @EventSubscriber(eventClass = ObservationsRemovedEvent.class)
+    @Override
+    public void respondTo(ObservationsRemovedEvent event) {
+        refresh();
+    }
+
+    private void refresh() {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 controller.refresh();
             }
         });
+    }
+
+    @Override
+    public void respondTo(ObservationsSelectedEvent event) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @EventSubscriber(eventClass = VideoArchiveChangedEvent.class)
+    @Override
+    public void respondTo(VideoArchiveChangedEvent event) {
+        refresh();
+    }
+
+    @EventSubscriber(eventClass = VideoArchiveSelectedEvent.class)
+    @Override
+    public void respondTo(VideoArchiveSelectedEvent event) {
+        refresh();
+    }
+
+    @EventSubscriber(eventClass = VideoFramesChangedEvent.class)
+    @Override
+    public void respondTo(VideoFramesChangedEvent event) {
+        refresh();
     }
 }

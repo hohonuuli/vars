@@ -200,7 +200,7 @@ public final class NewObservationAction extends ActionAdapter {
 
                 // Fire command to the CommandQueue
                 Command command = new AddObservationCmd(conceptName, timecode, utcDate,
-                        videoArchive.getName(), person, cameraDirection);
+                        videoArchive.getName(), person, cameraDirection, true);
                 CommandEvent commandEvent = new CommandEvent(command);
                 EventBus.publish(commandEvent);
 

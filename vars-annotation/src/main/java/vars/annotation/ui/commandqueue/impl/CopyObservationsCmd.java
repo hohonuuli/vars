@@ -10,11 +10,13 @@ import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveDAO;
 import vars.annotation.VideoFrame;
+import vars.annotation.jpa.ObservationImpl;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.commandqueue.Command;
 import vars.annotation.ui.eventbus.ObservationsAddedEvent;
 import vars.annotation.ui.eventbus.ObservationsRemovedEvent;
+import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
 import vars.shared.ui.video.VideoTime;
 
 import java.util.ArrayList;
@@ -34,8 +36,9 @@ public class CopyObservationsCmd implements Command {
     private final VideoTime videoTime;
     private final String user;
     private final Collection<Observation> copyObservations = Collections.synchronizedCollection(new ArrayList<Observation>());
+    private final boolean selectAddedObservations;
 
-    public CopyObservationsCmd(String videoArchiveName, VideoTime videoTime, String user, Collection<Observation> sourceObservations) {
+    public CopyObservationsCmd(String videoArchiveName, VideoTime videoTime, String user, Collection<Observation> sourceObservations, boolean selectObservations) {
         if (videoArchiveName == null || videoTime == null || sourceObservations == null) {
             throw new IllegalArgumentException("Command arguments can not be null");
         }
@@ -43,6 +46,7 @@ public class CopyObservationsCmd implements Command {
         this.videoArchiveName = videoArchiveName;
         this.videoTime = videoTime;
         this.user = user;
+        this.selectAddedObservations = selectObservations;
     }
 
     @Override
@@ -87,7 +91,6 @@ public class CopyObservationsCmd implements Command {
                         copyAssociation.setLinkValue(association.getLinkValue());
                         copyAssociation.setToConcept(association.getToConcept());
                         copyObservation.addAssociation(copyAssociation);
-                        //dao.persist(copyAssociation);
                     }
 
                     copyObservations.add(copyObservation);
@@ -97,6 +100,9 @@ public class CopyObservationsCmd implements Command {
             dao.endTransaction();
 
             EventBus.publish(new ObservationsAddedEvent(null, copyObservations));
+            if (selectAddedObservations) {
+                EventBus.publish(new ObservationsSelectedEvent(null, copyObservations));
+            }
         }
     }
 
@@ -107,9 +113,10 @@ public class CopyObservationsCmd implements Command {
             DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
             dao.startTransaction();
 
-            for (Observation observation : copyObservations) {
-                observation = dao.find(observation);
+            for (Observation obs : copyObservations) {
+                Observation observation = dao.find(obs);
                 if (observation != null) {
+                    droppedObservations.add(obs); 
                     VideoFrame videoFrame = observation.getVideoFrame();
                     videoFrame.removeObservation(observation);
                     dao.remove(observation);

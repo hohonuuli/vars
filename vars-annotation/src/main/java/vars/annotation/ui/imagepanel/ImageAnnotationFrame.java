@@ -1,7 +1,7 @@
 /*
- * @(#)ImageAnnotationFrame.java   2010.03.19 at 11:40:26 PDT
+ * @(#)ImageAnnotationFrame.java   2011.10.25 at 09:31:48 PDT
  *
- * Copyright 2009 MBARI
+ * Copyright 2011 MBARI
  *
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -15,35 +15,37 @@
 
 package vars.annotation.ui.imagepanel;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
+import org.bushe.swing.event.annotation.AnnotationProcessor;
+import org.bushe.swing.event.annotation.EventSubscriber;
+import org.jdesktop.jxlayer.JXLayer;
+import org.mbari.swing.JImageUrlCanvas;
+import vars.annotation.Observation;
+import vars.annotation.VideoFrame;
+import vars.annotation.ui.PersistenceController;
+import vars.annotation.ui.ToolBelt;
+import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
+import vars.annotation.ui.eventbus.VideoFramesChangedEvent;
+import vars.knowledgebase.Concept;
+import vars.shared.ui.AllConceptNamesComboBox;
+import vars.shared.ui.ConceptNameComboBox;
+
+import javax.swing.JFrame;
+import javax.swing.JToggleButton;
+import javax.swing.JToolBar;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
-import javax.swing.JFrame;
-import javax.swing.JToggleButton;
-import javax.swing.JToolBar;
-
-import org.bushe.swing.event.annotation.AnnotationProcessor;
-import org.bushe.swing.event.annotation.EventSubscriber;
-import org.jdesktop.jxlayer.JXLayer;
-import org.mbari.swing.JImageUrlCanvas;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import vars.annotation.Observation;
-import vars.annotation.VideoFrame;
-import vars.annotation.ui.Lookup;
-import vars.annotation.ui.ToolBelt;
-import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
-import vars.annotation.ui.eventbus.ObservationsChangedEvent;
-import vars.knowledgebase.Concept;
-import vars.shared.ui.AllConceptNamesComboBox;
-import vars.shared.ui.ConceptNameComboBox;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Main class for this package. This class wires together all dependant classes with the controller.
@@ -51,17 +53,15 @@ import vars.shared.ui.ConceptNameComboBox;
  */
 public class ImageAnnotationFrame extends JFrame {
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
     private JImageUrlCanvas imageCanvas = new JImageUrlCanvas();
-    private ConceptNameComboBox comboBox;
-    private URL imageUrl;
-    private JXLayer<JImageUrlCanvas> layer;
     private AnnotationLayerUI annotationLayerUI;
+    private ConceptNameComboBox comboBox;
+    private final ImageAnnotationFrameController controller;
+    private JXLayer<JImageUrlCanvas> layer;
+    private JToggleButton makeMeasurementButton;
     private MeasurementLayerUI measurementLayerUI;
     private JToolBar toolBar;
 
-    private final ImageAnnotationFrameController controller;
-    private JToggleButton makeMeasurementButton;
     /**
      * Create the frame
      *
@@ -73,36 +73,21 @@ public class ImageAnnotationFrame extends JFrame {
         initialize();
     }
 
+    /**
+     * @return
+     */
+    protected AnnotationLayerUI getAnnotationLayerUI() {
+        if (annotationLayerUI == null) {
+            annotationLayerUI = new AnnotationLayerUI<JImageUrlCanvas>(controller.getToolBelt());
+        }
+
+        return annotationLayerUI;
+    }
 
     /**
      * @return
      */
-    public JXLayer<JImageUrlCanvas> getLayer() {
-        if (layer == null) {
-            layer = new JXLayer<JImageUrlCanvas>(imageCanvas);
-            layer.setUI(getAnnotationLayerUI());
-        }
-
-        return layer;
-    }
-
-    public AnnotationLayerUI getAnnotationLayerUI() {
-        if (annotationLayerUI == null) {
-            annotationLayerUI = new AnnotationLayerUI<JImageUrlCanvas>(controller.getToolBelt());
-        }
-        return annotationLayerUI;
-    }
-
-    public MeasurementLayerUI getMeasurementLayerUI() {
-        if (measurementLayerUI == null) {
-            measurementLayerUI = new MeasurementLayerUI<JImageUrlCanvas>(controller.getToolBelt());
-            measurementLayerUI.addMeasurementCompletedListener(controller);
-            
-        }
-        return measurementLayerUI;
-    }
-
-    public ConceptNameComboBox getComboBox() {
+    protected ConceptNameComboBox getComboBox() {
         if (comboBox == null) {
             final ToolBelt toolBelt = controller.getToolBelt();
             comboBox = new AllConceptNamesComboBox(toolBelt.getQueryPersistenceService());
@@ -112,6 +97,7 @@ public class ImageAnnotationFrame extends JFrame {
              * click annotations
              */
             comboBox.addItemListener(new ItemListener() {
+
                 @Override
                 public void itemStateChanged(ItemEvent e) {
                     if (e.getStateChange() == ItemEvent.SELECTED) {
@@ -120,15 +106,33 @@ public class ImageAnnotationFrame extends JFrame {
                         getAnnotationLayerUI().setConcept(concept);
                     }
                 }
+
             });
         }
+
         return comboBox;
     }
 
-    public JToggleButton getMakeMeasurementButton() {
+    /**
+     * @return
+     */
+    protected JXLayer<JImageUrlCanvas> getLayer() {
+        if (layer == null) {
+            layer = new JXLayer<JImageUrlCanvas>(imageCanvas);
+            layer.setUI(getAnnotationLayerUI());
+        }
+
+        return layer;
+    }
+
+    /**
+     * @return
+     */
+    protected JToggleButton getMakeMeasurementButton() {
         if (makeMeasurementButton == null) {
             makeMeasurementButton = new JToggleButton("Measure");
             makeMeasurementButton.addActionListener(new ActionListener() {
+
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     if (makeMeasurementButton.isSelected()) {
@@ -138,61 +142,32 @@ public class ImageAnnotationFrame extends JFrame {
                         useAnnotationLayer();
                     }
                 }
+
             });
             makeMeasurementButton.setEnabled(false);
-            /*
-               Listen for selected Observations. If one is selected, set it as the GOTO observation.
-               Otherwise disable the measurements
-             */
-            Lookup.getSelectedObservationsDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
-                @Override
-                public void propertyChange(PropertyChangeEvent evt) {
-                    Collection<Observation> selectedObservations = (Collection<Observation>) evt.getNewValue();
-                    if (selectedObservations.size() == 1) {
-                        getMeasurementLayerUI().setObservation(selectedObservations.iterator().next());
-                        getMakeMeasurementButton().setEnabled(true);
-                    }
-                    else {
-                        getMeasurementLayerUI().setObservation(null);
-                        getMakeMeasurementButton().setEnabled(false);
-                        useAnnotationLayer();
-                    }
-                }
-            });
+
         }
+
         return makeMeasurementButton;
-    }
-
-    @EventSubscriber(eventClass = ObservationsChangedEvent.class)
-    public void updateObservationReferences(ObservationsChangedEvent updateEvent) {
-        if (updateEvent.getEventSource() != this) {
-            // TODO implement me
-
-        }
-    }
-
-    @EventSubscriber(eventClass = ObservationsSelectedEvent.class)
-    public void updateSelectedObservations(ObservationsSelectedEvent selectionEvent) {
-        if (selectionEvent.getSelectionSource() != this) {
-            Collection<Observation> selectedObservations = selectionEvent.get();
-
-            // Toggle UI layer between Annotation or Measurement
-            if (selectedObservations.size() == 1) {
-                getMeasurementLayerUI().setObservation(selectedObservations.iterator().next());
-                getMakeMeasurementButton().setEnabled(true);
-            }
-            else {
-                getMeasurementLayerUI().setObservation(null);
-                getMakeMeasurementButton().setEnabled(false);
-                useAnnotationLayer();
-            }
-        }
     }
 
     /**
      * @return
      */
-    public JToolBar getToolBar() {
+    protected MeasurementLayerUI getMeasurementLayerUI() {
+        if (measurementLayerUI == null) {
+            measurementLayerUI = new MeasurementLayerUI<JImageUrlCanvas>(controller.getToolBelt());
+            measurementLayerUI.addMeasurementCompletedListener(controller);
+
+        }
+
+        return measurementLayerUI;
+    }
+
+    /**
+     * @return
+     */
+    protected JToolBar getToolBar() {
         if (toolBar == null) {
             toolBar = new JToolBar();
             toolBar.add(getComboBox());
@@ -214,63 +189,83 @@ public class ImageAnnotationFrame extends JFrame {
         add(getLayer(), BorderLayout.CENTER);
         add(getToolBar(), BorderLayout.SOUTH);
         setPreferredSize(new Dimension(640, 480));
-        setImageUrl(null);
+        imageCanvas.setUrl(null);
     }
 
     /**
-     * Sets the URL of the image to display. The images is fetched from the
-     * location specified. <b>IMPORTANT!! This method avoids the cacheing that
-     * swing and/or {@code Toolkit} normally uses. So your image will not be
-     * cached in memory</b>
+     *  Listen for selected Observations. If one is selected, set it as the GOTO observation.
+     *  Otherwise disable the measurements
      *
-     * @param imageUrl the imageUrl to set
+     * @param selectionEvent
      */
-    private void setImageUrl(final URL imageUrl) {
-        URL oldUrl = this.imageUrl;
-        this.imageUrl = imageUrl;
-        log.debug("setImageUrl( " + imageUrl + " )");
-        String title = (imageUrl == null) ? "" : imageUrl.toExternalForm();
-        setTitle(title);
-        if (imageUrl == null || !imageUrl.equals(oldUrl)) {
-            imageCanvas.setUrl(imageUrl);
+    @EventSubscriber(eventClass = ObservationsSelectedEvent.class)
+    public void respondTo(ObservationsSelectedEvent selectionEvent) {
+        if ((selectionEvent.getSelectionSource() != this) &&
+                !getAnnotationLayerUI().equals(selectionEvent.getSelectionSource())) {
+            Collection<Observation> selectedObservations = selectionEvent.get();
+
+            // Toggle UI layer between Annotation or Measurement
+            if (selectedObservations.size() == 1) {
+                getMakeMeasurementButton().setEnabled(true);
+            }
+            else {
+                getMakeMeasurementButton().setEnabled(false);
+                useAnnotationLayer();
+            }
+
+            // If one observation is found show it's image
+            Set<VideoFrame> videoFrames = PersistenceController.toVideoFrames(selectionEvent.get());
+
+            if (videoFrames.size() == 1) {
+                VideoFrame videoFrame = videoFrames.iterator().next();
+                setVideoFrame(videoFrame);
+            }
+            else {
+                setVideoFrame(null);
+            }
         }
-
     }
 
     /**
      *
-     * @param videoFrame
+     * @param event
      */
-    public void setVideoFrame(VideoFrame videoFrame) {
+    @EventSubscriber(eventClass = VideoFramesChangedEvent.class)
+    public void respondTo(VideoFramesChangedEvent event) {
+        if (event.get().contains(controller.getVideoFrame())) {
+            List<VideoFrame> videoFrames = new ArrayList<VideoFrame>(event.get());
+            int idx = videoFrames.indexOf(controller.getVideoFrame());
+            if (idx > -1) {
+                //setVideoFrame(null);    // Make sure image gets redrawn on image canvas
+                setVideoFrame(videoFrames.get(idx));
+            }
+        }
+    }
+
+    private void setVideoFrame(VideoFrame videoFrame) {
         controller.setVideoFrame(videoFrame);
-        getAnnotationLayerUI().setVideoFrame(videoFrame);
-        URL url = null;
-        if (videoFrame != null && videoFrame.getCameraData() != null) {
-            try {
-                url = new URL(videoFrame.getCameraData().getImageReference());
-            }
-            catch (Exception e) {
-                log.info("Failed to display " + url + ". Reason: " + e.getClass());
-            }
+        URL imageReference = null;
+        try {
+            imageReference = new URL(videoFrame.getCameraData().getImageReference());
         }
-
-        if (url == null || !url.equals(imageUrl)) {
-            setImageUrl(url);
+        catch (Exception e) {
+            // Do Nothing
         }
-        repaint();
+        imageCanvas.setUrl(imageReference);
     }
-    
 
-    public void useAnnotationLayer() {
+    /**
+     */
+    private void useAnnotationLayer() {
         getMakeMeasurementButton().setSelected(false);
         getLayer().setUI(getAnnotationLayerUI());
     }
 
-
-    public void useMeasurementLayer() {
+    /**
+     */
+    private void useMeasurementLayer() {
         getMakeMeasurementButton().setSelected(true);
         getMeasurementLayerUI().resetUI();
         getLayer().setUI(getMeasurementLayerUI());
     }
-
 }

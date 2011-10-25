@@ -16,6 +16,7 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.prefs.Preferences;
 import java.util.prefs.PreferencesFactory;
 import javax.swing.SwingUtilities;
@@ -35,10 +36,16 @@ import vars.VARSException;
 import vars.VarsUserPreferencesFactory;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
+import vars.annotation.VideoFrame;
 import vars.annotation.ui.commandqueue.CommandQueue;
+import vars.annotation.ui.eventbus.ObservationsAddedEvent;
 import vars.annotation.ui.eventbus.ObservationsChangedEvent;
+import vars.annotation.ui.eventbus.ObservationsRemovedEvent;
 import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
+import vars.annotation.ui.eventbus.UIEventSubscriber;
 import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
+import vars.annotation.ui.eventbus.VideoArchiveSelectedEvent;
+import vars.annotation.ui.eventbus.VideoFramesChangedEvent;
 import vars.annotation.ui.video.DoNothingVideoControlService;
 import vars.shared.ui.video.VideoControlService;
 import vars.annotation.ui.video.VideoControlServiceFactory;
@@ -49,7 +56,7 @@ import vars.shared.preferences.PreferencesService;
  *
  * @author brian
  */
-public class AnnotationFrameController implements PreferenceUpdater {
+public class AnnotationFrameController implements PreferenceUpdater, UIEventSubscriber {
 
     private final String PREF_WIDTH = "width";
     private final String PREF_HEIGHT = "height";
@@ -345,28 +352,91 @@ public class AnnotationFrameController implements PreferenceUpdater {
         }
     }
 
+
+
+    @Override
+    public void respondTo(ObservationsAddedEvent event) {
+        // Do Nothing
+    }
+
     /**
-     * EventBus listener. Listens for changes in the selected observations and updates
-     * the appropriate dispatcher.
+     * When observations are changed we need to sync any that are in the dispatcher.
      * @param event
      */
+    @EventSubscriber(eventClass = ObservationsChangedEvent.class)
+    @Override
+    public void respondTo(ObservationsChangedEvent event) {
+        Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+        List<Observation> selectedObservations = new ArrayList<Observation>(observations);
+        List<Observation> changedObservations = new ArrayList<Observation>(event.get());
+        Collection<Observation> updatedObservations = new ArrayList<Observation>(selectedObservations.size());
+        for (Observation observation : selectedObservations) {
+            int idx = changedObservations.indexOf(observation);
+            if (idx >= 0) {
+                updatedObservations.add(changedObservations.get(idx));
+            }
+            else {
+                updatedObservations.add(observation);
+            }
+        }
+        Lookup.getSelectedObservationsDispatcher().setValueObject(updatedObservations);
+    }
+
+    /**
+     * When an observation is deleted we need to sync that with the dispatcher selected Observations
+     * @param event
+     */
+    @EventSubscriber(eventClass = ObservationsRemovedEvent.class)
+    @Override
+    public void respondTo(ObservationsRemovedEvent event) {
+        Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+        List<Observation> selectedObservations = new ArrayList<Observation>(observations);
+        List<Observation> removedObservations = new ArrayList<Observation>(event.get());
+        Collection<Observation> updatedObservations = new ArrayList<Observation>(selectedObservations.size());
+        for (Observation observation : selectedObservations) {
+            int idx = removedObservations.indexOf(observation);
+            if (idx >= 0) {
+                // DO nothing. Observation has been removed
+            }
+            else {
+                updatedObservations.add(observation);
+            }
+        }
+        Lookup.getSelectedObservationsDispatcher().setValueObject(updatedObservations);
+    }
+
     @EventSubscriber(eventClass = ObservationsSelectedEvent.class)
-    public void updateSelectedObservationsDispatcher(ObservationsSelectedEvent event) {
+    @Override
+    public void respondTo(ObservationsSelectedEvent event) {
         Collection<Observation> observations = event.get() == null ?
                 new ArrayList<Observation>() : event.get();
         Lookup.getSelectedObservationsDispatcher().setValueObject(observations);
     }
 
-    /**
-     * EventBus listener. Listens for changes to the selected videoarchive and
-     * posts the change to the dispatcher.
-     */
     @EventSubscriber(eventClass = VideoArchiveChangedEvent.class)
-    public void updateVideoArchiveDispatcher(VideoArchiveChangedEvent event) {
-        log.info("VideArchive Event " + event);
+    @Override
+    public void respondTo(VideoArchiveChangedEvent event) {
         Lookup.getVideoArchiveDispatcher().setValueObject(event.get());
     }
 
+    @EventSubscriber(eventClass = VideoArchiveSelectedEvent.class)
+    @Override
+    public void respondTo(VideoArchiveSelectedEvent event) {
+        Lookup.getVideoArchiveDispatcher().setValueObject(event.get());
+    }
 
-
+    @Override
+    public void respondTo(VideoFramesChangedEvent event) {
+        VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+        if (videoArchive != null) {
+            Collection<VideoFrame> videoFrames = event.get();
+            for (VideoFrame videoFrame : videoFrames) {
+                if (videoFrame.getVideoArchive().equals(videoArchive)) {
+                    Lookup.getVideoArchiveDispatcher().setValueObject(null);
+                    Lookup.getVideoArchiveDispatcher().setValueObject(videoArchive);
+                    break;
+                }
+            }
+        }
+    }
 }

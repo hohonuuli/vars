@@ -4,6 +4,8 @@ import javax.swing.JTable;
 
 import vars.annotation.Observation;
 
+import java.util.Collection;
+
 public interface ObservationTable {
 
 
@@ -27,6 +29,8 @@ public interface ObservationTable {
      * @param obs
      */
     void setSelectedObservation(final Observation obs);
+
+    void setSelectedObservations(final Collection<Observation> observations);
 
     /**
      *  Delegate method that passes the call on to the ObservationTableModel
