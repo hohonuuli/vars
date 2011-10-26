@@ -111,6 +111,7 @@ public class AnnotationLayerUI<T extends JImageUrlCanvas> extends CrossHairLayer
     public AnnotationLayerUI(ToolBelt toolBelt) {
         this.toolBelt = toolBelt;
         AnnotationProcessor.process(this);
+
     }
 
 
@@ -271,6 +272,8 @@ public class AnnotationLayerUI<T extends JImageUrlCanvas> extends CrossHairLayer
 
         }
     }
+
+
 
     /**
      *

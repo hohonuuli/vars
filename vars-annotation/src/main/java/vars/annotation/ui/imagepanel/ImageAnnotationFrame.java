@@ -207,6 +207,7 @@ public class ImageAnnotationFrame extends JFrame {
             // Toggle UI layer between Annotation or Measurement
             if (selectedObservations.size() == 1) {
                 getMakeMeasurementButton().setEnabled(true);
+
             }
             else {
                 getMakeMeasurementButton().setEnabled(false);
@@ -236,7 +237,6 @@ public class ImageAnnotationFrame extends JFrame {
             List<VideoFrame> videoFrames = new ArrayList<VideoFrame>(event.get());
             int idx = videoFrames.indexOf(controller.getVideoFrame());
             if (idx > -1) {
-                //setVideoFrame(null);    // Make sure image gets redrawn on image canvas
                 setVideoFrame(videoFrames.get(idx));
             }
         }

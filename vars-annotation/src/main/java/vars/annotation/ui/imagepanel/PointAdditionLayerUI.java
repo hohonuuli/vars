@@ -24,7 +24,7 @@ import org.mbari.swing.JImageUrlCanvas;
  * Class for testing out resizing images
  * @author brian
  */
-public class PointAdditionLayerUI <T extends JImageUrlCanvas> extends CrossHairLayerUI<T> {
+public class PointAdditionLayerUI<T extends JImageUrlCanvas> extends CrossHairLayerUI<T> {
 
     final Collection<Point> sourcePoints = new Vector<Point>();
     private String coordinateString = null;
