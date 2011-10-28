@@ -39,6 +39,7 @@ public class RenameObservationsCmd implements Command {
             if (observation != null) {
                 observation.setConceptName(conceptName);
                 observation.setObserver(user);
+                modifiedObservations.add(observation);
             }
         }
         observationDAO.endTransaction();
@@ -56,6 +57,7 @@ public class RenameObservationsCmd implements Command {
             if (observation != null) {
                 observation.setConceptName(bean.originalObservation.getConceptName());
                 observation.setObserver(bean.originalObservation.getObserver());
+                modifiedObservations.add(observation);
             }
         }
         observationDAO.endTransaction();
@@ -65,7 +67,7 @@ public class RenameObservationsCmd implements Command {
 
     @Override
     public String getDescription() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return "Rename " + originalData.size() + " Observations to " + newConceptName;
     }
 
     private class DataBean {

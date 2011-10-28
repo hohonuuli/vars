@@ -21,5 +21,6 @@ public class RedoButton extends JFancyButton {
                 EventBus.publish(new RedoEvent());
             }
         });
+        setToolTipText("Redo");
     }
 }

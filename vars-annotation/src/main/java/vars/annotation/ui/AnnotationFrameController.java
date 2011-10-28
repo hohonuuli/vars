@@ -37,6 +37,7 @@ import vars.VarsUserPreferencesFactory;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoFrame;
+import vars.annotation.ui.commandqueue.ClearCommandQueueEvent;
 import vars.annotation.ui.commandqueue.CommandQueue;
 import vars.annotation.ui.eventbus.ObservationsAddedEvent;
 import vars.annotation.ui.eventbus.ObservationsChangedEvent;
@@ -423,6 +424,7 @@ public class AnnotationFrameController implements PreferenceUpdater, UIEventSubs
     @Override
     public void respondTo(VideoArchiveSelectedEvent event) {
         Lookup.getVideoArchiveDispatcher().setValueObject(event.get());
+        EventBus.publish(new ClearCommandQueueEvent());
     }
 
     @Override

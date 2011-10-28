@@ -22,5 +22,6 @@ public class UndoButton extends JFancyButton {
                 EventBus.publish(new UndoEvent());
             }
         });
+        setToolTipText("Undo");
     }
 }
