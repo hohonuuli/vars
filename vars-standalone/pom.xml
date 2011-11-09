@@ -45,7 +45,7 @@
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy</artifactId>
-            <version>1.8.0</version>
+            <version>1.8.4</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -57,13 +57,13 @@
         <dependency>
             <groupId>jline</groupId>
             <artifactId>jline</artifactId>
-            <version>0.9.94</version>
+            <version>1.0</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.fusesource.jansi</groupId>
             <artifactId>jansi</artifactId>
-            <version>1.5</version>
+            <version>1.7</version>
             <scope>runtime</scope>
         </dependency>
         

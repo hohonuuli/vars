@@ -9,7 +9,7 @@
     <artifactId>vars-jpa</artifactId>
     <name>vars-jpa [Library]</name>
     <properties>
-        <derby.version>10.8.1.2</derby.version>
+        <derby.version>10.8.2.2</derby.version>
         <jtds.version>1.2.5</jtds.version>
     </properties>
     <!--
@@ -68,7 +68,7 @@
         <dependency>
             <groupId>org.jasypt</groupId>
             <artifactId>jasypt</artifactId>
-            <version>1.7.1</version>
+            <version>1.8</version>
             <scope>compile</scope>
         </dependency>
         <!-- Used by ExternalDataDaoExpdImpl! Needed for database testing -->

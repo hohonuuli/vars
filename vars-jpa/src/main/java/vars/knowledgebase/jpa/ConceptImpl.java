@@ -71,6 +71,7 @@ import vars.knowledgebase.ConceptNameTypes;
     @NamedQuery(name = "Concept.findAllByNameGlob", query = "SELECT DISTINCT c FROM Concept c, IN (c.conceptNames) AS n WHERE lower(n.name) LIKE :name ORDER BY n.name")
 })
 public class ConceptImpl implements Serializable, Concept, JPAEntity {
+	
 
 
     @OneToMany(
