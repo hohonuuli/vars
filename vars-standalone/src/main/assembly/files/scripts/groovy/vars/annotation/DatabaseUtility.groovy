@@ -153,7 +153,12 @@ class DatabaseUtility {
         def dao = toolBox.toolBelt.annotationDAOFactory.newVideoArchiveSetDAO()
         def badVas = dao.findAllWithoutDates()
         badVas.each { videoArchiveSet ->
-            updateDiveDates(videoArchiveSet)
+            try {
+                updateDiveDates(videoArchiveSet)
+            }
+            catch (Exception e) {
+                log.warn("Something unexpected happened", e)   
+            }
         }
         dao.close()
     }
@@ -162,7 +167,12 @@ class DatabaseUtility {
         def dao = toolBox.toolBelt.annotationDAOFactory.newVideoArchiveSetDAO()
         def allVas = dao.findAll()
         allVas.each { videoArchiveSet ->
-            updateDiveDates(videoArchiveSet)
+            try {
+                updateDiveDates(videoArchiveSet)
+            }
+            catch (Exception e) {
+                log.warn("Something unexpected happened", e)   
+            }
         }
         dao.close()
     }
