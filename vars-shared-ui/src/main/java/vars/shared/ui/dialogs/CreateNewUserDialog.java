@@ -106,8 +106,6 @@ public class CreateNewUserDialog extends UserAccountDialog {
         throw new UnsupportedOperationException("You can't call this method on the 'CreateNewUserDialog'!");
     }
 
-
-
     private class Controller implements DialogController {
 
         private final UserAccountDialog dialog;
@@ -126,6 +124,7 @@ public class CreateNewUserDialog extends UserAccountDialog {
         public void doCancel() {
             dialog.setReturnValue(null);
             dialog.setVisible(false);
+            dialog.getPanel().reset(); // removes text from the textfields
             dialog.dispose();
         }
 
@@ -174,6 +173,7 @@ public class CreateNewUserDialog extends UserAccountDialog {
                         try {
                             userAccountDAO.persist(userAccount);
                             setVisible(false);
+                            dialog.getPanel().reset(); 
                         }
                         catch (Exception ex) {
                             getMessageLabel().setText(
@@ -185,6 +185,7 @@ public class CreateNewUserDialog extends UserAccountDialog {
                     }
 
                     userAccountDAO.endTransaction();
+                    userAccountDAO.close();
                     setReturnValue(userAccount);
                 }
                 else {

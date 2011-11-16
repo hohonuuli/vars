@@ -45,7 +45,6 @@ public class StatusLabelForPerson extends StatusLabel {
 
 
   
-   // private final OpenUserAccountAction action;
 	private final LoginAction action;
 
     /**

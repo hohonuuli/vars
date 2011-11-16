@@ -7,6 +7,7 @@ import vars.annotation.VideoArchiveDAO;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.commandqueue.Command;
+import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
 
 /**
  * @author Brian Schlining
@@ -48,6 +49,7 @@ public class RenameVideoArchiveCmd implements Command {
                 videoArchiveDAO.endTransaction();
                 videoArchiveDAO.close();
                 newNameApplied = !newNameApplied;
+                EventBus.publish(new VideoArchiveChangedEvent(null, oldVideoArchive));
             }
             else {
                 EventBus.publish(Lookup.TOPIC_WARNING, "Unable to find a VideoArchive named " + from + " in the database");
@@ -63,6 +65,6 @@ public class RenameVideoArchiveCmd implements Command {
 
     @Override
     public String getDescription() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return "Rename a VideoArchive from " + oldName + " to " + newName;
     }
 }

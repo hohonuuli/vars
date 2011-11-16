@@ -1,7 +1,8 @@
 /*
- * @(#)LoginAction.java   2009.10.02 at 08:58:59 PDT
+ * @(#)LoginAction.java   2011.11.16 at 01:32:29 PST
  *
- * Copyright 2009 MBARI
+ * Copyright 2011 MBARI
+ *
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,10 +15,6 @@
 
 package vars.shared.ui.dialogs;
 
-import java.awt.Frame;
-
-import javax.swing.JDialog;
-
 import org.mbari.awt.event.ActionAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +23,9 @@ import vars.MiscFactory;
 import vars.UserAccount;
 import vars.UserAccountDAO;
 import vars.shared.ui.GlobalLookup;
+
+import javax.swing.JDialog;
+import java.awt.Frame;
 
 /**
  * Displays a login dialog and registers the resulting UserAccount in the
@@ -46,8 +46,9 @@ public class LoginAction extends ActionAdapter {
     /**
      * Constructs ...
      *
+     *
+     * @param miscDAOFactory
      * @param miscFactory
-     * @param userAccountDAO
      */
     public LoginAction(MiscDAOFactory miscDAOFactory, MiscFactory miscFactory) {
         final Frame frame = (Frame) GlobalLookup.getSelectedFrameDispatcher().getValueObject();
@@ -64,9 +65,12 @@ public class LoginAction extends ActionAdapter {
         }
         loginDialog.setVisible(true);
     }
-    
+
+    /**
+     * @return
+     */
     public JDialog getDialog() {
-    	return loginDialog;
+        return loginDialog;
     }
 
     /**
@@ -79,6 +83,7 @@ public class LoginAction extends ActionAdapter {
      *
      * @param  userName   The name of the <code>User</code>.
      * @param  password   The password for the <code>User</code>.
+     * @param userAccountDAO
      *
      *
      * @return

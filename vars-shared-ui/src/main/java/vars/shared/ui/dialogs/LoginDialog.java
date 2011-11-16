@@ -250,6 +250,7 @@ public class LoginDialog extends JDialog {
             userAccountDAO.startTransaction();
             userAccount = userAccountDAO.findByUserName(userName.trim());
             userAccountDAO.endTransaction();
+            userAccountDAO.close();
         }
         catch (Exception e) {
             msgLabel.setText("Database connection failed");

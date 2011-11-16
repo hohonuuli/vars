@@ -148,6 +148,19 @@ public class UserAccountPreferencesPanel extends JPanel {
             return loginTextField;
         }
 
+    /**
+     * Restes all the fields to empty values
+     */
+        public void reset() {
+            getFirstNameTextField().setText("");
+            getLoginTextField().setText("");
+            getLastNameTextField().setText("");
+            getPasswordField1().setText("");
+            getPasswordField2().setText("");
+            getEmailTextField().setText("");
+            getAffiliationTextField().setText("");
+        }
+
         private void initialize() {
             GroupLayout gl_panel = new GroupLayout(this);
             gl_panel.setHorizontalGroup(

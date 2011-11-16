@@ -42,6 +42,7 @@ import vars.annotation.CameraDeployment;
 import vars.annotation.Observation;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.Lookup;
+import vars.annotation.ui.commandqueue.impl.RenameVideoArchiveCmd;
 import vars.annotation.ui.dialogs.RenameVideoArchiveDialog;
 import vars.shared.ui.dialogs.StandardDialog;
 
@@ -61,7 +62,7 @@ public class PVideoArchivePanel extends PropertiesPanel {
     private ActionAdapter changeNameAction;
 
 
-    private StandardDialog changeNameDialog;
+    private RenameVideoArchiveDialog changeNameDialog;
     
     private final ToolBelt toolBelt;
 
@@ -159,7 +160,7 @@ public class PVideoArchivePanel extends PropertiesPanel {
     }
 
 
-    private JDialog getChangeNameDialog() {
+    private RenameVideoArchiveDialog getChangeNameDialog() {
         if (changeNameDialog == null) {
             changeNameDialog = new RenameVideoArchiveDialog(SwingUtilities.getWindowAncestor(this), toolBelt);
             changeNameDialog.getOkayButton().addActionListener(new ActionListener() {
@@ -167,7 +168,9 @@ public class PVideoArchivePanel extends PropertiesPanel {
                 public void actionPerformed(ActionEvent e) {
                     VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
                     if (videoArchive != null) {
-
+                        Command command = new RenameVideoArchiveCmd(videoArchive.getName(), getChangeNameDialog().getNewVideoArchiveName());
+                        CommandEvent commandEvent = new CommandEvent(command);
+                        EventBus.publish(commandEvent);
                     }
                 }
             });
