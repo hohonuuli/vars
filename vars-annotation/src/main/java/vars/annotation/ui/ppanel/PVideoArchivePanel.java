@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.Iterator;
 import javax.swing.JDialog;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
@@ -32,7 +33,6 @@ import org.mbari.swing.PropertyPanel;
 import vars.annotation.ui.commandqueue.Command;
 import vars.annotation.ui.commandqueue.CommandEvent;
 import vars.annotation.ui.commandqueue.impl.ChangeVideoArchiveSetCmd;
-import vars.annotation.ui.dialogs.OpenVideoArchiveSetUsingParamsDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.VideoArchive;
@@ -40,10 +40,10 @@ import vars.annotation.VideoArchiveSet;
 import vars.annotation.VideoFrame;
 import vars.annotation.CameraDeployment;
 import vars.annotation.Observation;
-import vars.annotation.ui.actions.ChangeVideoArchiveNameAction;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.Lookup;
-import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
+import vars.annotation.ui.dialogs.RenameVideoArchiveDialog;
+import vars.shared.ui.dialogs.StandardDialog;
 
 /**
  * <p>
@@ -61,7 +61,7 @@ public class PVideoArchivePanel extends PropertiesPanel {
     private ActionAdapter changeNameAction;
 
 
-    private JDialog changeNameDialog;
+    private StandardDialog changeNameDialog;
     
     private final ToolBelt toolBelt;
 
@@ -161,29 +161,42 @@ public class PVideoArchivePanel extends PropertiesPanel {
 
     private JDialog getChangeNameDialog() {
         if (changeNameDialog == null) {
-            changeNameDialog = new OpenVideoArchiveSetUsingParamsDialog(toolBelt.getAnnotationDAOFactory()) {
-
+            changeNameDialog = new RenameVideoArchiveDialog(SwingUtilities.getWindowAncestor(this), toolBelt);
+            changeNameDialog.getOkayButton().addActionListener(new ActionListener() {
                 @Override
-                public ActionAdapter getOkButtonAction() {
-                    if (okButtonAction == null) {
-                        okButtonAction = new ActionAdapter() {
-                            public void doAction() {
-                                final int seqNumber = Integer.parseInt(getTfDiveNumber().getText());
-                                final String platform = (String) getCbCameraPlatform().getSelectedItem();
-                                final int tapeNumber = Integer.parseInt(getTfTapeNumber().getText());
-                                action.setPlatform(platform);
-                                action.setSeqNumber(seqNumber);
-                                action.setTapeNumber(tapeNumber);
-                                action.doAction();
-                                dispose();
-                            }
-                            private final ChangeVideoArchiveNameAction action = new ChangeVideoArchiveNameAction(toolBelt);
-                        };
-                    }
+                public void actionPerformed(ActionEvent e) {
+                    VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+                    if (videoArchive != null) {
 
-                    return okButtonAction;
+                    }
                 }
-            };
+            });
+
+
+//            {
+//
+//
+//                @Override
+//                public ActionAdapter getOkButtonAction() {
+//                    if (okButtonAction == null) {
+//                        okButtonAction = new ActionAdapter() {
+//                            public void doAction() {
+//                                final int seqNumber = Integer.parseInt(getTfDiveNumber().getText());
+//                                final String platform = (String) getCbCameraPlatform().getSelectedItem();
+//                                final int tapeNumber = Integer.parseInt(getTfTapeNumber().getText());
+//                                action.setPlatform(platform);
+//                                action.setSeqNumber(seqNumber);
+//                                action.setTapeNumber(tapeNumber);
+//                                action.doAction();
+//                                dispose();
+//                            }
+//                            private final ChangeVideoArchiveNameAction action = new ChangeVideoArchiveNameAction(toolBelt);
+//                        };
+//                    }
+//
+//                    return okButtonAction;
+//                }
+//            };
         }
 
         return changeNameDialog;

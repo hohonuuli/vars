@@ -32,6 +32,7 @@ import org.mbari.util.Dispatcher;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.dialogs.OpenVideoArchiveDialog;
 import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
+import vars.annotation.ui.eventbus.VideoArchiveSelectedEvent;
 
 /**
  * <p>Indicates which {@link VideoArchive} the annotator is editing. Clicking on the
@@ -59,7 +60,7 @@ public class StatusLabelForVideoArchive extends StatusLabel {
             public void actionPerformed(ActionEvent e) {
                 dialog.setVisible(false);
                 VideoArchive videoArchive = dialog.openVideoArchive();
-                VideoArchiveChangedEvent event = new VideoArchiveChangedEvent(this, videoArchive);
+                VideoArchiveSelectedEvent event = new VideoArchiveSelectedEvent(this, videoArchive);
                 EventBus.publish(event);
             }
         });
@@ -117,9 +118,15 @@ public class StatusLabelForVideoArchive extends StatusLabel {
      * @param event
      */
     @EventSubscriber(eventClass = VideoArchiveChangedEvent.class)
-    public void updateVideoArchive(VideoArchiveChangedEvent event) {
+    public void respondTo(VideoArchiveChangedEvent event) {
         update(event.get());
     }
+
+    @EventSubscriber(eventClass = VideoArchiveSelectedEvent.class)
+    public void respondTo(VideoArchiveSelectedEvent event) {
+        update(event.get());
+    }
+
 
     /**
      * Sets the videoArchive registered with the label. In general, you don't need

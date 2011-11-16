@@ -1,5 +1,5 @@
 /*
- * @(#)CommandQueue.java   2011.10.11 at 05:22:35 PDT
+ * @(#)CommandQueue.java   2011.11.15 at 04:45:51 PST
  *
  * Copyright 2011 MBARI
  *
@@ -61,6 +61,7 @@ public class CommandQueue {
                     try {
                         log.debug("Executing Command: " + commandEvent.getDoOrUndo() + " - " +
                                 command.getDescription());
+
                         // Execute the command (can be DO or UNDO operation)
                         Deque<CommandEvent> inverseCommandList = null;
                         switch (commandEvent.getDoOrUndo()) {
