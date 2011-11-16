@@ -51,7 +51,7 @@ import vars.knowledgebase.Concept;
 
 import vars.shared.ui.ILockableEditor;
 import vars.shared.ui.dialogs.LoginAction;
-import vars.shared.ui.dialogs.ModifyUserDialog;
+import vars.shared.ui.dialogs.UpdateExistingUserDialog;
 import vars.shared.ui.tree.ConceptTreeCellRenderer;
 import vars.shared.ui.tree.ConceptTreeModel;
 import vars.shared.ui.tree.ConceptTreeNode;
@@ -491,8 +491,9 @@ public class KnowledgebaseFrame extends JFrame {
     private class EditUserAccountAction extends ActionAdapter {
 
         private static final long serialVersionUID = 1L;
-        private final ModifyUserDialog dialog = new ModifyUserDialog((Frame) Lookup.getApplicationFrameDispatcher().getValueObject(),
-                toolBelt.getMiscDAOFactory());
+//        private final ModifyUserDialog dialog = new ModifyUserDialog((Frame) Lookup.getApplicationFrameDispatcher().getValueObject(),
+//                toolBelt.getMiscDAOFactory());
+        private final UpdateExistingUserDialog dialog = new UpdateExistingUserDialog(KnowledgebaseFrame.this, true, toolBelt.getMiscDAOFactory());
 
         public void doAction() {
 
