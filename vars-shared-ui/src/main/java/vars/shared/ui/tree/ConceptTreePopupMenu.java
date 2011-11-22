@@ -131,7 +131,6 @@ public class ConceptTreePopupMenu extends JPopupMenu {
     /**
      * Makes the children nodes under the specified node visible.
      *
-     * @param  node   The node on which to act.
      */
     private void expandNode() {
 
@@ -157,16 +156,14 @@ public class ConceptTreePopupMenu extends JPopupMenu {
             protected Object doInBackground() throws Exception {
                 ConceptDAO dao = knowledgebaseDAOFactory.newConceptDAO();
 
-                dao.startTransaction();
-
                 Concept aConcept = dao.find(concept);
                 Collection<Concept> descendants = dao.findDescendents(aConcept);
 
                 for (Concept c : descendants) {
-                    model.loadNode(c.getPrimaryConceptName().getName(), dao);
+                    model.loadNode(c.getPrimaryConceptName().getName());
                 }
 
-                dao.endTransaction();
+                dao.close();
 
                 return null;
 

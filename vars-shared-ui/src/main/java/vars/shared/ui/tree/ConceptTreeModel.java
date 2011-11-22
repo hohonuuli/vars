@@ -15,6 +15,7 @@
 package vars.shared.ui.tree;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -41,8 +42,8 @@ import vars.knowledgebase.KnowledgebaseDAOFactory;
 public class ConceptTreeModel extends DefaultTreeModel {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
-    private final BlockingQueue<ConceptTreeNode> queue = new ArrayBlockingQueue<ConceptTreeNode>(1000);
-    private Thread conceptLoaderThread;
+//    private final BlockingQueue<ConceptTreeNode> queue = new ArrayBlockingQueue<ConceptTreeNode>(1000);
+//    private Thread conceptLoaderThread;
     private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
 
     /**
@@ -63,16 +64,20 @@ public class ConceptTreeModel extends DefaultTreeModel {
     * @param  name           The name of the concept for the tree.
     * @return  The list of concepts from the root to the parameter concept.
     */
-    private List<Concept> findFamilyTree(final String name, ConceptDAO dao) {
+    private List<Concept> findFamilyTree(final String name) {
 
         final LinkedList<Concept> conceptList = new LinkedList<Concept>();
+        ConceptDAO dao = knowledgebaseDAOFactory.newConceptDAO();
+        dao.startTransaction();
         Concept concept = dao.findByName(name);
         conceptList.add(concept);
 
         while (concept.hasParent()) {
-            concept = (Concept) concept.getParentConcept();
+            concept = concept.getParentConcept();
             conceptList.addFirst(concept);
         }
+        dao.endTransaction();
+        dao.close();
 
         return conceptList;
 
@@ -82,9 +87,7 @@ public class ConceptTreeModel extends DefaultTreeModel {
     public int getChildCount(Object parent) {
         ConceptTreeNode parentNode = (ConceptTreeNode) parent;
         if (!parentNode.isLoaded()) {
-
-            // Add the concept to the DAO queue for loading children
-            queue.add(parentNode);
+            loadChildConcepts(parentNode);
         }
 
         return super.getChildCount(parent);
@@ -95,39 +98,38 @@ public class ConceptTreeModel extends DefaultTreeModel {
      * the root as well as it's immediate children. This calls
      * the database so you should make calls to this method off of the EDT.
      *
-     * @param concept The concept to cache
-     * @param dao The DAO object (with it's transaction begun)
-     * @param  isRecurseve If true the entire tree below the node will be loaded.
-     *      if false the tree below the node will be lazy-loaded as needed.
+     * @param node The concept to cache
      */
-    private void loadChildConcepts(final ConceptTreeNode node, DAO dao) {
+    private void loadChildConcepts(final ConceptTreeNode node) {
 
 
         if (!node.isLoaded()) {
 
             node.removeAllChildren();
+            ConceptDAO dao = knowledgebaseDAOFactory.newConceptDAO();
+            dao.startTransaction();
             Concept concept = (Concept) node.getUserObject();
 
-            //concept = dao.merge(concept);
             concept = dao.find(concept);
+
+
             List<Concept> childConcepts = new ArrayList<Concept>(concept.getChildConcepts());
 
             for (Concept child : childConcepts) {
                 ConceptTreeNode childNode = new ConceptTreeNode(child);
                 childNode.setLoaded(false);
-
                 if (child.hasChildConcepts()) {
-
                     ConceptTreeNode fakeNode = new ConceptTreeNode(new ConceptTreeConcept("Loading ..."));
                     fakeNode.setLoaded(true);
                     childNode.add(fakeNode);
-
                 }
 
                 node.add(childNode);
             }
 
             node.setLoaded(true);
+            dao.endTransaction();
+            dao.close();
 
             // Refresh node in UI.
             // I commented this out since it was causing the expand item
@@ -145,22 +147,6 @@ public class ConceptTreeModel extends DefaultTreeModel {
         }
     }
 
-    /**
-     * Expands all tree nodes from the root down to the specified node name. Does
-     * not expand the final node as that node may not have any children. This calls
-     * the database so you should make calls to this method off of the EDT.
-     *
-     * @param  name   The name of the final node.
-     * @return    The final node, which itself has not been expanded.
-     */
-    public ConceptTreeNode loadNode(final String name) {
-        ConceptDAO dao = knowledgebaseDAOFactory.newConceptDAO();
-        dao.startTransaction();
-        ConceptTreeNode treeNode = loadNode(name, dao);
-        dao.endTransaction();
-
-        return treeNode;
-    }
 
     /**
      * Expands all tree nodes from the root down to the specified node name.
@@ -170,16 +156,15 @@ public class ConceptTreeModel extends DefaultTreeModel {
      * one between threads)
      *
      * @param name
-     * @param dao
      * @return
      */
-    ConceptTreeNode loadNode(final String name, ConceptDAO dao) {
+    ConceptTreeNode loadNode(final String name) {
 
         /*
          * Get a list of the family tree for the parameter concept. This list is
          * used to travel down the tree to the desired concept node.
          */
-        List<Concept> list = findFamilyTree(name, dao);
+        List<Concept> list = findFamilyTree(name);
         Iterator<Concept> familyTree = list.iterator();
 
         // Pop the root Concept off the stack since it is the degenerative case.
@@ -192,7 +177,7 @@ public class ConceptTreeModel extends DefaultTreeModel {
             String nextConceptName = (familyTree.next()).getPrimaryConceptName().getName();
 
             // Need to ensure the tree node for the current family name is expanded.
-            loadChildConcepts(treeNode, dao);
+            loadChildConcepts(treeNode);
 
             // Find the child node for the next family member.
             boolean found = false;
@@ -217,14 +202,6 @@ public class ConceptTreeModel extends DefaultTreeModel {
      */
     public void refresh() {
 
-        /*
-         * The thread hangs onto a single DAO/EntityManger for speed. When we
-         * refresh we need to toss the old one
-         */
-        conceptLoaderThread = new Thread(new ConceptLoaderRunnable(),
-                "Concept Loader Thread for " + getClass().getName());
-        conceptLoaderThread.setDaemon(true);
-        conceptLoaderThread.start();
         ConceptDAO conceptDAO = knowledgebaseDAOFactory.newConceptDAO();
         conceptDAO.startTransaction();
         Concept rootConcept = conceptDAO.findRoot();
@@ -244,6 +221,8 @@ public class ConceptTreeModel extends DefaultTreeModel {
         }
 
         conceptDAO.endTransaction();
+        conceptDAO.close();
+
         rootNode.setLoaded(true);
         super.setRoot(rootNode);
         super.reload();
@@ -264,35 +243,4 @@ public class ConceptTreeModel extends DefaultTreeModel {
         super.setRoot(root);
     }
 
-    /**
-     * Runnable that watches the queue and process nodes as they are added
-     */
-    private class ConceptLoaderRunnable implements Runnable {
-
-        // Transaction stays open for speed!! DAO will be closed when garbage collected
-        final DAO dao = knowledgebaseDAOFactory.newConceptDAO();
-
-        public void run() {
-            dao.startTransaction();
-            ConceptTreeNode node;
-            try {
-                while (true) {
-                    node = queue.take();
-                    loadChildConcepts(node, dao);
-                }
-            }
-            catch (InterruptedException e) {
-                log.error("DAO queue died", e);
-            }
-        }
-
-        @Override
-        protected void finalize() throws Throwable {
-            dao.endTransaction();
-            dao.close();
-            super.finalize();
-        }
-
-
-    }
 }

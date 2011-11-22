@@ -16,6 +16,7 @@ package vars.shared.ui.tree;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -44,7 +45,7 @@ public class ConceptTreeCellRenderer extends DefaultTreeCellRenderer {
 
     // Buffer for text label
     private final StringBuffer textBuf = new StringBuffer();
-    private final List<ConceptName> secondaryNames = new Vector<ConceptName>();
+    //private final List<ConceptName> secondaryNames = Collections.synchronizedList(new ArrayList<ConceptName>());
     private final Comparator<ConceptName> comparator = new Comparator<ConceptName>() {
 
         public int compare(ConceptName o1, ConceptName o2) {
@@ -90,10 +91,10 @@ public class ConceptTreeCellRenderer extends DefaultTreeCellRenderer {
      */
     @Override
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean isSelected, boolean isExpanded,
-            boolean isLeaf, int row, boolean hasFocus) {
+                                                  boolean isLeaf, int row, boolean hasFocus) {
 
         super.getTreeCellRendererComponent(tree, value, isSelected, isExpanded, isLeaf, row, hasFocus);
-        secondaryNames.clear();
+        //secondaryNames.clear();
 
         // Get the name from the Object contained in this node
         ConceptTreeNode node = (ConceptTreeNode) value;
@@ -118,7 +119,7 @@ public class ConceptTreeCellRenderer extends DefaultTreeCellRenderer {
             }
             else {
                 imageIcon = (concept.getConceptMetadata().getPrimaryImage() == null) ?
-                    defaultIcon : defaultWithImageIcon;
+                        defaultIcon : defaultWithImageIcon;
             }
 
             setIcon(imageIcon);
@@ -127,6 +128,8 @@ public class ConceptTreeCellRenderer extends DefaultTreeCellRenderer {
             textBuf.replace(0, textBuf.length(), concept.getPrimaryConceptName().getName());
 
             // now add the aliases
+            final List<ConceptName> secondaryNames = new ArrayList<ConceptName>();
+
             secondaryNames.addAll(concept.getConceptNames());
             secondaryNames.remove(concept.getPrimaryConceptName());
 
@@ -144,6 +147,7 @@ public class ConceptTreeCellRenderer extends DefaultTreeCellRenderer {
 
                 textBuf.append(")");
             }
+
 
             setText(textBuf.toString());
         }

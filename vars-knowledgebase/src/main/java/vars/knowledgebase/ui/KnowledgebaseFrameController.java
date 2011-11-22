@@ -74,7 +74,6 @@ class KnowledgebaseFrameController {
                              "Failed to clear" + " knowledgebase cache. Please close this " + "application");
         }
 
-
         final ConceptTreePanel treePanel = knowledgebaseFrame.getTreePanel();
         ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
         conceptDAO.startTransaction();

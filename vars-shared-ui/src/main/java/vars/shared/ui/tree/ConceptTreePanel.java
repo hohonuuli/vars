@@ -150,7 +150,7 @@ public class ConceptTreePanel extends SearchableTreePanel {
     }
 
     /**
-     * Perform the database lookup of all {@link Concepts} that match the criteria
+     * Perform the database lookup of all {@link Concept} that match the criteria
      *
      * @param text
      * @param useGlobSearch
@@ -172,6 +172,7 @@ public class ConceptTreePanel extends SearchableTreePanel {
                             dao.startTransaction();
                             matches = dao.findByNameContaining(text);
                             dao.endTransaction();
+                            dao.close();
                             cachedGlobSearches.add(text);
                             cachedWordSearches.add(text);
                         }
@@ -182,6 +183,7 @@ public class ConceptTreePanel extends SearchableTreePanel {
                             dao.startTransaction();
                             matches = dao.findByNameStartingWith(text);
                             dao.endTransaction();
+                            dao.close();
                             cachedWordSearches.add(text);
                         }
                     }
@@ -198,8 +200,7 @@ public class ConceptTreePanel extends SearchableTreePanel {
                  */
                 try {
                     if (matches != null) {
-                        ConceptDAO dao = knowledgebaseDAOFactory.newConceptDAO();
-                        dao.startTransaction();
+
 
                         for (final ConceptName conceptName : matches) {
                             SwingUtilities.invokeLater(new Runnable() {
@@ -209,10 +210,10 @@ public class ConceptTreePanel extends SearchableTreePanel {
                                 }
 
                             });
-                            openNode(conceptName.getConcept(), dao);
+                            openNode(conceptName.getConcept());
                         }
 
-                        dao.endTransaction();
+
 
                     }
                 }
@@ -254,30 +255,33 @@ public class ConceptTreePanel extends SearchableTreePanel {
             log.debug("Opening node containing '" + concept.getPrimaryConceptName().getName() + "', " + concept);
         }
 
-        TreePath treePath = (TreePath) Worker.post(new Job() {
+        final TreePath treePath = buildTreePathForNode(concept);
+//        TreePath treePath = (TreePath) Worker.post(new Job() {
+//
+//            @Override
+//            public Object run() {
+//                TreePath path = buildTreePathForNode(concept);
+//                return path;
+//            }
+//        });
 
+        SwingUtilities.invokeLater(new Runnable() {
             @Override
-            public Object run() {
-                ConceptDAO dao = knowledgebaseDAOFactory.newConceptDAO();
-                dao.startTransaction();
-                TreePath path = openNode(concept, dao);
-                dao.endTransaction();
-
-                return path;
+            public void run() {
+                getJTree().setSelectionPath(treePath);
+                getJTree().scrollPathToVisible(treePath);
             }
         });
 
-        getJTree().setSelectionPath(treePath);
-        getJTree().scrollPathToVisible(treePath);
+
 
     }
 
     /**
      * Internal method for opening multiple nodes in a single transaction
      * @param concept
-     * @param dao
      */
-    private TreePath openNode(final Concept concept, ConceptDAO dao) {
+    private TreePath buildTreePathForNode(final Concept concept) {
         if (log.isDebugEnabled()) {
             log.debug("Opening node containing '" + concept.getPrimaryConceptName().getName() + "', " + concept);
         }
@@ -288,7 +292,7 @@ public class ConceptTreePanel extends SearchableTreePanel {
 
         final JTree tree = getJTree();
         final ConceptTreeModel model = (ConceptTreeModel) tree.getModel();
-        final TreeNode node = model.loadNode(concept.getPrimaryConceptName().getName(), dao);
+        final TreeNode node = model.loadNode(concept.getPrimaryConceptName().getName());
 
         final TreePath path = new TreePath(model.getPathToRoot(node));
         SwingUtilities.invokeLater(new Runnable() {
@@ -322,14 +326,21 @@ public class ConceptTreePanel extends SearchableTreePanel {
      * 
      * @param concept The concept to open in the tree
      */
-    public void refreshAndOpenNode(Concept concept) {
+    public void refreshAndOpenNode(final Concept concept) {
         if (log.isDebugEnabled()) {
             String name = concept == null ? "the root node" : concept.getPrimaryConceptName().getName();
             log.debug("Refreshing ConceptTree and opening it to '" + name +
                       "' -> " + concept);
         }
         refresh();
-        openNode(concept);
+        Worker.post(new Job() {
+            @Override
+            public Object run() {
+                openNode(concept);
+                return null;
+            }
+        });
+
     }
 
     /**
