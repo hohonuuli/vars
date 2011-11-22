@@ -19,14 +19,23 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Collection;
+import java.util.HashSet;
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+
+import org.bushe.swing.event.EventBus;
 import vars.annotation.CameraDirections;
 import vars.annotation.FormatCodes;
+import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
+import vars.annotation.VideoFrame;
 import vars.annotation.ui.actions.ChangeAnnotationModeAction;
+import vars.annotation.ui.commandqueue.Command;
+import vars.annotation.ui.commandqueue.CommandEvent;
+import vars.annotation.ui.commandqueue.impl.ChangeCameraDirectionsCmd;
 
 /**
  *
@@ -68,6 +77,18 @@ public class QuickControlsPanel extends JPanel {
 
                 public void itemStateChanged(final ItemEvent e) {
                     if (e.getStateChange() == ItemEvent.SELECTED) {
+                        Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+                        Collection<VideoFrame> videoFrames = new HashSet<VideoFrame>();
+                        for (Observation observation : observations) {
+                            videoFrames.add(observation.getVideoFrame());
+                        }
+                        if (videoFrames.size() > 0) {
+                            CameraDirections cameraDirections = (CameraDirections) cbCameraDirection.getSelectedItem();
+                            final String cameraDirection = cameraDirections.getDirection();
+                            Command command = new ChangeCameraDirectionsCmd(cameraDirection, videoFrames);
+                            CommandEvent commandEvent = new CommandEvent(command);
+                            EventBus.publish(commandEvent);
+                        }
                         Lookup.getCameraDirectionDispatcher().setValueObject(cbCameraDirection.getSelectedItem());
                     }
                 }

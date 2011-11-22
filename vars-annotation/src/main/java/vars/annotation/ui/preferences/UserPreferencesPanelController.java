@@ -73,38 +73,8 @@ public class UserPreferencesPanelController implements PreferenceUpdater {
     }
     
     private void setUserAccount(UserAccount userAccount) {
-        if (userAccount == null) {
-            resetUI(userAccount);
-        }
-        else {
-            updateUI(userAccount);
-        }
-    }
-    
-    private void resetUI(UserAccount userAccount) {
-        UserAccountPreferencesPanel p = panel.getPanel();
-        p.getAffiliationTextField().setText(null);
-        p.getEmailTextField().setText(null);
-        p.getFirstNameTextField().setText(null);
-        p.getLastNameTextField().setText(null);
-        p.getLoginTextField().setText(null);
-        p.getPasswordField1().setText(null);
-        p.getPasswordField2().setText(null);
-        p.getRoleComboBox().setSelectedItem(null);
-        p.setUserAccount(null);
-    }
-    
-    private void updateUI(UserAccount userAccount) {
         UserAccountPreferencesPanel p = panel.getPanel();
         p.setUserAccount(userAccount);
-        p.getAffiliationTextField().setText(userAccount.getAffiliation());
-        p.getEmailTextField().setText(userAccount.getEmail());
-        p.getFirstNameTextField().setText(userAccount.getFirstName());
-        p.getLastNameTextField().setText(userAccount.getLastName());
-        p.getLoginTextField().setText(userAccount.getUserName());
-        p.getPasswordField1().setText(null);
-        p.getPasswordField2().setText(null);
-        p.getRoleComboBox().setSelectedItem(userAccount.getRole());
     }
     
 }

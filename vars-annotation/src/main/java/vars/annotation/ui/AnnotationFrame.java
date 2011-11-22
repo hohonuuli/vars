@@ -27,6 +27,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
 import javax.swing.AbstractAction;
@@ -466,20 +467,22 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
     @EventSubscriber(eventClass = VideoArchiveSelectedEvent.class)
     @Override
     public void respondTo(VideoArchiveSelectedEvent event) {
-        VideoArchive oldVideoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
-        VideoArchive newVideoArchive = event.get();
-        if (oldVideoArchive == null || newVideoArchive == null || !oldVideoArchive.equals(newVideoArchive)) {
-            respondTo(new VideoArchiveChangedEvent(null, newVideoArchive));
-        }
+//        VideoArchive oldVideoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+//        VideoArchive newVideoArchive = event.get();
+//        if (oldVideoArchive == null || newVideoArchive == null || !oldVideoArchive.equals(newVideoArchive)) {
+//            respondTo(new VideoArchiveChangedEvent(null, newVideoArchive));
+//        }
+        respondTo(new VideoArchiveChangedEvent(null, event.get()));
     }
 
     @EventSubscriber(eventClass = VideoFramesChangedEvent.class)
     @Override
     public void respondTo(VideoFramesChangedEvent event) {
-        VideoArchive oldVideoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+        Collection<Observation> observations = new HashSet<Observation>();
         Collection<VideoFrame> videoFrames = event.get();
         for (VideoFrame videoFrame : videoFrames) {
-            
+            observations.addAll(videoFrame.getObservations());
         }
+        respondTo(new ObservationsChangedEvent(null, observations));
     }
 }

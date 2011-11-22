@@ -6,6 +6,7 @@ import org.bushe.swing.event.EventBus;
 import vars.DAO;
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.AnnotationFactory;
+import vars.annotation.CameraData;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveDAO;
@@ -19,12 +20,14 @@ import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 
 /**
  * @author Brian Schlining
  * @since 2011-10-10
  */
 public class RemoveObservationsCmd implements Command {
+
 
     private final Collection<DataBean> deletedData = new ArrayList<DataBean>();
 
@@ -69,7 +72,6 @@ public class RemoveObservationsCmd implements Command {
     @Override
     public void unapply(ToolBelt toolBelt) {
         final AnnotationDAOFactory daoFactory = toolBelt.getAnnotationDAOFactory();
-        final AnnotationFactory factory = toolBelt.getAnnotationFactory();
         final DAO dao = daoFactory.newDAO();
         final VideoArchiveDAO videoArchiveDAO = daoFactory.newVideoArchiveDAO(dao.getEntityManager());
 
@@ -77,11 +79,10 @@ public class RemoveObservationsCmd implements Command {
         for (DataBean bean : deletedData) {
             VideoArchive videoArchive = videoArchiveDAO.findByName(bean.videoArchiveName);
             if (videoArchive != null) {
-                VideoFrame videoFrame = videoArchive.findVideoFrameByTimeCode(bean.videoFrameTimecode);
+                VideoFrame videoFrame = videoArchive.findVideoFrameByTimeCode(bean.videoFrame.getTimecode());
                 if (videoFrame == null) {
-                    videoFrame = factory.newVideoFrame();
-                    videoFrame.setTimecode(bean.videoFrameTimecode);
-                    videoArchive.addVideoFrame(videoFrame);
+                    videoFrame = bean.videoFrame;
+                    videoArchive.addVideoFrame(bean.videoFrame);
                 }
                 videoFrame.addObservation(bean.observation);
             }
@@ -108,15 +109,13 @@ public class RemoveObservationsCmd implements Command {
 
     private class DataBean {
         private final String videoArchiveName;
-        private final String videoFrameTimecode;
+        private final VideoFrame videoFrame;
         private final Observation observation;
 
         private DataBean(Observation observation) {
             this.observation = observation;
-            VideoFrame videoFrame = observation.getVideoFrame();
-            VideoArchive videoArchive = videoFrame.getVideoArchive();
-            videoArchiveName = videoArchive.getName();
-            videoFrameTimecode = videoFrame.getTimecode();
+            videoFrame = observation.getVideoFrame();
+            videoArchiveName = videoFrame.getVideoArchive().getName();
         }
     }
 

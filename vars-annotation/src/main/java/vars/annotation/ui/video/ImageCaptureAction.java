@@ -380,7 +380,7 @@ public class ImageCaptureAction extends ActionAdapter {
                 
                 // FIXME physical object is hardcoded. Should be set in preferences
                 Command command = new AddObservationCmd("physical object", snapTime.getTimeCodeAsString(), utcDate,
-                        videoArchive.getName(), user, cameraDirection, null, imageReference);
+                        videoArchive.getName(), user, cameraDirection, null, imageReference, true);
                 CommandEvent commandEvent = new CommandEvent(command);
                 EventBus.publish(commandEvent);
             }

@@ -28,7 +28,7 @@ import vars.knowledgebase.ConceptNameTypes;
 import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.ui.Lookup;
 import vars.knowledgebase.ui.ToolBelt;
-import vars.shared.ui.dialogs.CreateNewUserDialog;
+import vars.shared.ui.dialogs.CreateUserAccountDialog;
 
 
 /**
@@ -129,7 +129,7 @@ public class PopulateDatabaseAction extends ActionAdapter {
                          "VARS - No Administrator Found", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
             
             if (ok == JOptionPane.YES_OPTION) {
-                UserAccount admin = CreateNewUserDialog.showDialog(frame, true,
+                UserAccount admin = CreateUserAccountDialog.showDialog(frame, true,
                         "VARS - Create Administrator Account", toolBelt.getMiscDAOFactory(), miscFactory);
                 if (admin != null) {
                     userAccountDAO.startTransaction();

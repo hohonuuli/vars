@@ -18,7 +18,6 @@ public class UserAccountPreferencesPanel extends JPanel {
         final Logger log = LoggerFactory.getLogger(getClass());
         private JTextField affiliationTextField;
 
-        //private final Controller controller = new Controller();
         private JTextField emailTextField;
         private JTextField firstNameTextField;
         private JTextField lastNameTextField;
@@ -253,15 +252,22 @@ public class UserAccountPreferencesPanel extends JPanel {
 
         public void setUserAccount(UserAccount userAccount) {
             this.userAccount = userAccount;
+            if (userAccount == null) {
+                reset();
+            }
+            else {
+                getLoginTextField().setText(userAccount.getUserName());
+                getEmailTextField().setText(userAccount.getEmail());
+                getAffiliationTextField().setText(userAccount.getAffiliation());
+                getFirstNameTextField().setText(userAccount.getFirstName());
+                getLastNameTextField().setText(userAccount.getLastName());
+                getRoleComboBox().setSelectedItem(userAccount.getRole());
+                getPasswordField1().setText("");
+                getPasswordField2().setText("");
+            }
         }
 
-        /**
-         *
-         * @param userAccount
-         */
-        public void setReturnValue(UserAccount userAccount) {
-            this.userAccount = userAccount;
-        }
+
         private JLabel getLblPermissions() {
             if (lblPermissions == null) {
                 lblPermissions = new JLabel("Permissions:");

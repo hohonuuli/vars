@@ -1,7 +1,7 @@
 /*
- * @(#)UpdateExistingUserDialog.java   2010.05.20 at 09:30:16 PDT
+ * @(#)UpdateExistingUserDialog.java   2011.11.16 at 03:52:56 PST
  *
- * Copyright 2009 MBARI
+ * Copyright 2011 MBARI
  *
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -17,22 +17,21 @@ package vars.shared.ui.dialogs;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import java.awt.Frame;
 import org.bushe.swing.event.EventBus;
-import org.mbari.util.BeanUtilities;
 import vars.MiscDAOFactory;
 import vars.ToolBelt;
 import vars.UserAccount;
 import vars.UserAccountDAO;
 import vars.jpa.VarsJpaModule;
 import vars.shared.ui.GlobalLookup;
-import vars.shared.ui.UserAccountPreferencesPanel;
+
+import java.awt.Frame;
 
 /**
  *
  * @author brian
  */
-public class UpdateExistingUserDialog extends UserAccountDialog {
+public class ModifyUserAccountDialog extends UserAccountDialog {
 
     private final MiscDAOFactory miscDAOFactory;
 
@@ -42,9 +41,10 @@ public class UpdateExistingUserDialog extends UserAccountDialog {
      * @param miscDAOFactory
      * @wbp.parser.constructor
      */
-    public UpdateExistingUserDialog(MiscDAOFactory miscDAOFactory) {
+    public ModifyUserAccountDialog(MiscDAOFactory miscDAOFactory) {
         super();
         this.miscDAOFactory = miscDAOFactory;
+        initialize();
         setDialogController(new Controller(this));
     }
 
@@ -55,15 +55,16 @@ public class UpdateExistingUserDialog extends UserAccountDialog {
      * @param modal
      * @param miscDAOFactory
      */
-    public UpdateExistingUserDialog(Frame parent, boolean modal, MiscDAOFactory miscDAOFactory) {
+    public ModifyUserAccountDialog(Frame parent, boolean modal, MiscDAOFactory miscDAOFactory) {
         super(parent, modal);
         this.miscDAOFactory = miscDAOFactory;
+        initialize();
         setDialogController(new Controller(this));
     }
 
-
     private void initialize() {
-        getPanel().getLoginTextField().setEnabled(false);
+        getPanel().getLoginTextField().setEditable(false);
+        getPanel().getRoleComboBox().setEditable(false);
     }
 
     /**
@@ -75,9 +76,20 @@ public class UpdateExistingUserDialog extends UserAccountDialog {
         Injector injector = Guice.createInjector(new VarsJpaModule("vars-jpa-annotation", "vars-jpa-knowledgebase",
             "vars-jpa-misc"));
         ToolBelt toolBelt = injector.getInstance(ToolBelt.class);
-        UserAccount admin = CreateNewUserDialog.showDialog(null, true, "VARS - Create Administrator Account",
-            toolBelt.getMiscDAOFactory(), toolBelt.getMiscFactory());
+        UserAccount admin = CreateUserAccountDialog.showDialog(null, true, "VARS - Create Administrator Account",
+                toolBelt.getMiscDAOFactory(), toolBelt.getMiscFactory());
 
+    }
+
+    /**
+     *
+     * @param userAccount
+     */
+    @Override
+    public void setUserAccount(UserAccount userAccount) {
+        super.setUserAccount(userAccount);
+        getOkayButton().setEnabled(userAccount != null);
+        getPanel().setUserAccount(userAccount);
     }
 
     /**
@@ -89,30 +101,12 @@ public class UpdateExistingUserDialog extends UserAccountDialog {
      * @return
      */
     public static UserAccount showDialog(Frame parent, boolean modal, String title, MiscDAOFactory miscDAOFactory) {
-        UpdateExistingUserDialog dialog = new UpdateExistingUserDialog(parent, modal, miscDAOFactory);
+        ModifyUserAccountDialog dialog = new ModifyUserAccountDialog(parent, modal, miscDAOFactory);
 
         dialog.setTitle(title);
         dialog.setVisible(true);
 
         return dialog.getUserAccount();
-    }
-
-    @Override
-    public void setUserAccount(UserAccount userAccount) {
-        super.setUserAccount(userAccount);
-        getOkayButton().setEnabled(userAccount != null);
-        final UserAccountPreferencesPanel panel = getPanel();
-        String name = BeanUtilities.getProperty(userAccount, "userName", "");
-        panel.getLoginTextField().setText(name);
-        String email = BeanUtilities.getProperty(userAccount, "email", "");
-        panel.getEmailTextField().setText(email);
-        // TODO finish implementing setting UI fields when the useraccount is set
-        String affiliation = BeanUtilities.getProperty(userAccount, "affiliation", "");
-        panel.getAffiliationTextField().setText(affiliation);
-        String firstName = BeanUtilities.getProperty(userAccount, "firstName", "");
-        panel.getFirstNameTextField().setText(firstName);
-        String lastName = BeanUtilities.getProperty(userAccount, "lastName", "");
-        panel.getLastNameTextField().setText(lastName);
     }
 
     private class Controller implements DialogController {
@@ -142,47 +136,56 @@ public class UpdateExistingUserDialog extends UserAccountDialog {
             String pwd2 = new String(dialog.getPanel().getPasswordField2().getPassword());
             pwd1 = (pwd1.equals("")) ? null : pwd1;
             pwd2 = (pwd2.equals("")) ? null : pwd2;
-            boolean ok = (pwd1 == null && pwd2 == null) || pwd1.equals(pwd2);
+            boolean ok = ((pwd1 == null) && (pwd2 == null)) || pwd1.equals(pwd2);
 
             if (!ok) {
                 getMessageLabel().setText("The passwords do not match");
+
                 return;
             }
 
             try {
-	            UserAccountDAO dao = miscDAOFactory.newUserAccountDAO();
-	            dao.startTransaction();
-	            UserAccount userAccount = dao.findByUserName(getUserAccount().getUserName());
-	            if (userAccount == null) {
-	                EventBus.publish(GlobalLookup.TOPIC_WARNING, "Unable to find a user with the name '" + getUserAccount().getUserName());
-	                dialog.dispose();
-	            }
-	            userAccount.setPassword(pwd1);
-	            userAccount.setEmail(valueOf(getPanel().getEmailTextField().getText()));
-	            userAccount.setAffiliation(valueOf(getPanel().getAffiliationTextField().getText()));
-	            userAccount.setFirstName(valueOf(getPanel().getFirstNameTextField().getText()));
-	            userAccount.setLastName(valueOf(getPanel().getLastNameTextField().getText()));
-	            dao.endTransaction();
-	            setReturnValue(userAccount);
+                UserAccountDAO dao = miscDAOFactory.newUserAccountDAO();
+                dao.startTransaction();
+                UserAccount userAccount = dao.findByUserName(getUserAccount().getUserName());
+                if (userAccount == null) {
+                    EventBus.publish(GlobalLookup.TOPIC_WARNING,
+                            "Unable to find a user with the name '" + getUserAccount().getUserName());
+                    dialog.dispose();
+                }
+                else {
+                    if (pwd1 != null) {
+                        userAccount.setPassword(pwd1);
+                    }
+                    userAccount.setEmail(valueOf(getPanel().getEmailTextField().getText()));
+                    userAccount.setAffiliation(valueOf(getPanel().getAffiliationTextField().getText()));
+                    userAccount.setFirstName(valueOf(getPanel().getFirstNameTextField().getText()));
+                    userAccount.setLastName(valueOf(getPanel().getLastNameTextField().getText()));
+                }
+
+                dao.endTransaction();
+                setReturnValue(userAccount);
             }
             catch (Exception e) {
-            	setReturnValue(null);
-            	log.error("Failed to update user in database", e);
-            	EventBus.publish(GlobalLookup.TOPIC_NONFATAL_ERROR, e);
+                setReturnValue(null);
+                log.error("Failed to update user in database", e);
+                EventBus.publish(GlobalLookup.TOPIC_NONFATAL_ERROR, e);
             }
 
             dialog.dispose();
-            
+
         }
 
         private String valueOf(String v0) {
             String v1 = null;
-            if (v0 == null || v0.trim().isEmpty()) {
+            if ((v0 == null) || v0.trim().isEmpty()) {
+
                 // Do nothing
             }
             else {
                 v1 = v0;
             }
+
             return v1;
         }
     }

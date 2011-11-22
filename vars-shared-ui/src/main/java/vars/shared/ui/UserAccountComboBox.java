@@ -56,7 +56,7 @@ public class UserAccountComboBox extends FancyComboBox {
     /**
      * Constructs ...
      *
-     * @param userAccountDAO
+     * @param miscDAOFactory
      */
     public UserAccountComboBox(MiscDAOFactory miscDAOFactory) {
         super();
@@ -74,7 +74,7 @@ public class UserAccountComboBox extends FancyComboBox {
         synchronized (userAccounts) {
             final int index = Collections.binarySearch(userAccounts, userName, comparator);
             if (index > -1) {
-                userAccount = (UserAccount) userAccounts.get(index);
+                userAccount = userAccounts.get(index);
             }
         }
 
@@ -109,6 +109,7 @@ public class UserAccountComboBox extends FancyComboBox {
             userAccountDAO.startTransaction();
             Collection<UserAccount> accounts = userAccountDAO.findAll();
             userAccountDAO.endTransaction();
+            userAccountDAO.close();
 
             userAccounts.addAll(accounts);
             Collections.sort(userAccounts, userAccountComparator);

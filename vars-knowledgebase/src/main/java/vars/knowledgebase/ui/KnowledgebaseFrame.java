@@ -17,7 +17,6 @@ package vars.knowledgebase.ui;
 import com.google.inject.Inject;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -50,8 +49,9 @@ import vars.UserAccount;
 import vars.knowledgebase.Concept;
 
 import vars.shared.ui.ILockableEditor;
+import vars.shared.ui.dialogs.AdministorUserAccountDialog;
 import vars.shared.ui.dialogs.LoginAction;
-import vars.shared.ui.dialogs.UpdateExistingUserDialog;
+import vars.shared.ui.dialogs.ModifyUserAccountDialog;
 import vars.shared.ui.tree.ConceptTreeCellRenderer;
 import vars.shared.ui.tree.ConceptTreeModel;
 import vars.shared.ui.tree.ConceptTreeNode;
@@ -252,9 +252,8 @@ public class KnowledgebaseFrame extends JFrame {
 
                 public void propertyChange(PropertyChangeEvent evt) {
                     final UserAccount userAccount = (UserAccount) evt.getNewValue();
-                    final boolean enable = (userAccount != null) && !userAccount.isReadOnly();
-                    editUser.setEnabled(enable);
-                    editConcept.setEnabled(enable);
+                    editUser.setEnabled((userAccount != null) && userAccount.isAdministrator());
+                    editConcept.setEnabled((userAccount != null) && !userAccount.isReadOnly());
                 }
 
             });
@@ -491,9 +490,8 @@ public class KnowledgebaseFrame extends JFrame {
     private class EditUserAccountAction extends ActionAdapter {
 
         private static final long serialVersionUID = 1L;
-//        private final ModifyUserDialog dialog = new ModifyUserDialog((Frame) Lookup.getApplicationFrameDispatcher().getValueObject(),
-//                toolBelt.getMiscDAOFactory());
-        private final UpdateExistingUserDialog dialog = new UpdateExistingUserDialog(KnowledgebaseFrame.this, true, toolBelt.getMiscDAOFactory());
+        private final AdministorUserAccountDialog dialog = new AdministorUserAccountDialog(KnowledgebaseFrame.this,
+                "VARS - Edit a user account", true, toolBelt.getMiscDAOFactory());
 
         public void doAction() {
 

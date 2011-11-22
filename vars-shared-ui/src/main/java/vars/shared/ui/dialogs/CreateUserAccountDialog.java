@@ -33,7 +33,7 @@ import vars.shared.ui.UserAccountPreferencesPanel;
  * @version        Enter version here..., 2010.03.15 at 10:11:58 PDT
  * @author         Brian Schlining [brian@mbari.org]
  */
-public class CreateNewUserDialog extends UserAccountDialog {
+public class CreateUserAccountDialog extends UserAccountDialog {
 
     private final MiscDAOFactory miscDAOFactory;
     private final MiscFactory miscFactory;
@@ -44,7 +44,7 @@ public class CreateNewUserDialog extends UserAccountDialog {
      * @param miscDAOFactory
      * @param miscFactory
  */
-    public CreateNewUserDialog(MiscDAOFactory miscDAOFactory, MiscFactory miscFactory) {
+    public CreateUserAccountDialog(MiscDAOFactory miscDAOFactory, MiscFactory miscFactory) {
         super();
         this.miscDAOFactory = miscDAOFactory;
         this.miscFactory = miscFactory;
@@ -61,7 +61,7 @@ public class CreateNewUserDialog extends UserAccountDialog {
      * @param miscDAOFactory
      * @param miscFactory
      */
-    public CreateNewUserDialog(Frame parent, boolean modal, MiscDAOFactory miscDAOFactory, MiscFactory miscFactory) {
+    public CreateUserAccountDialog(Frame parent, boolean modal, MiscDAOFactory miscDAOFactory, MiscFactory miscFactory) {
         super(parent, modal);
         this.miscDAOFactory = miscDAOFactory;
         this.miscFactory = miscFactory;
@@ -77,8 +77,8 @@ public class CreateNewUserDialog extends UserAccountDialog {
         Injector injector = Guice.createInjector(new VarsJpaModule("vars-jpa-annotation", "vars-jpa-knowledgebase",
             "vars-jpa-misc"));
         ToolBelt toolBelt = injector.getInstance(ToolBelt.class);
-        UserAccount admin = CreateNewUserDialog.showDialog(null, true, "VARS - Create Administrator Account",
-            toolBelt.getMiscDAOFactory(), toolBelt.getMiscFactory());
+        UserAccount admin = CreateUserAccountDialog.showDialog(null, true, "VARS - Create Administrator Account",
+                toolBelt.getMiscDAOFactory(), toolBelt.getMiscFactory());
 
     }
 
@@ -93,7 +93,7 @@ public class CreateNewUserDialog extends UserAccountDialog {
      */
     public static UserAccount showDialog(Frame parent, boolean modal, String title, MiscDAOFactory miscDAOFactory,
             MiscFactory miscFactory) {
-        CreateNewUserDialog dialog = new CreateNewUserDialog(parent, modal, miscDAOFactory, miscFactory);
+        CreateUserAccountDialog dialog = new CreateUserAccountDialog(parent, modal, miscDAOFactory, miscFactory);
 
         dialog.setTitle(title);
         dialog.setVisible(true);
@@ -103,7 +103,7 @@ public class CreateNewUserDialog extends UserAccountDialog {
 
     @Override
     public void setUserAccount(UserAccount userAccount) {
-        throw new UnsupportedOperationException("You can't call this method on the 'CreateNewUserDialog'!");
+        throw new UnsupportedOperationException("You can't call this method on the 'CreateUserAccountDialog'!");
     }
 
     private class Controller implements DialogController {

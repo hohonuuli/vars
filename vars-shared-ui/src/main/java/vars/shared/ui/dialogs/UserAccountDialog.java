@@ -21,22 +21,14 @@ import java.awt.BorderLayout;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
 import javax.swing.JTextField;
-import javax.swing.LayoutStyle.ComponentPlacement;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.ToolBelt;
 import vars.UserAccount;
-import vars.UserAccountRoles;
 import vars.jpa.VarsJpaModule;
 import vars.shared.ui.UserAccountPreferencesPanel;
-
-import javax.swing.JComboBox;
 
 /**
  *
@@ -170,8 +162,8 @@ public class UserAccountDialog extends StandardDialog {
         Injector injector = Guice.createInjector(new VarsJpaModule("vars-jpa-annotation", "vars-jpa-knowledgebase",
             "vars-jpa-misc"));
         ToolBelt toolBelt = injector.getInstance(ToolBelt.class);
-        UserAccount admin = CreateNewUserDialog.showDialog(null, true, "VARS - Create Administrator Account",
-            toolBelt.getMiscDAOFactory(), toolBelt.getMiscFactory());
+        UserAccount admin = CreateUserAccountDialog.showDialog(null, true, "VARS - Create Administrator Account",
+                toolBelt.getMiscDAOFactory(), toolBelt.getMiscFactory());
 
     }
 
