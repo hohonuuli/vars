@@ -36,7 +36,7 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>0.9.29</version>
+            <version>1.0.0</version>
         </dependency>
 
         <!--
@@ -77,7 +77,7 @@
         <dependency>
             <groupId>org.ccil.cowan.tagsoup</groupId>
             <artifactId>tagsoup</artifactId>
-            <version>1.2</version>
+            <version>1.2.1</version>
         </dependency>
         
         <!--
@@ -113,7 +113,7 @@
         <dependency>
             <groupId>org.mbari</groupId>
             <artifactId>qtx4j</artifactId>
-            <version>0.14</version>
+            <version>0.15-SNAPSHOT</version>
         </dependency>
 
         <!--

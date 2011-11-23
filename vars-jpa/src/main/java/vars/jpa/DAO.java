@@ -132,7 +132,7 @@ public class DAO implements vars.DAO, EntityManagerAspect {
         return (T) entityManager.find(jpaEntity.getClass(), jpaEntity.getId());
     }
 
-/*
+
     @Override
     protected void finalize() throws Throwable {
         if ((entityManager != null) && entityManager.isOpen()) {
@@ -144,7 +144,6 @@ public class DAO implements vars.DAO, EntityManagerAspect {
 
         super.finalize();
     }
-*/
 
     /**
     * Executes a named query using a map of named parameters

@@ -389,8 +389,14 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
                     observationTable.addObservation(observation);
                     // Scroll to a new observation
                     row = model.getObservationRow(observation);
+
                     if ((row > -1) && (row < model.getRowCount())) {
-                        observationTable.scrollToVisible(row, 0);
+                        Rectangle cellRect = table.getCellRect(row, 0, true);
+                        Rectangle visibleRect = table.getVisibleRect();
+                        if (cellRect.intersects(visibleRect)) {
+                            table.scrollRectToVisible(cellRect);
+                            //observationTable.scrollToVisible(row, 0);
+                        }
                     }
                 }
             }
