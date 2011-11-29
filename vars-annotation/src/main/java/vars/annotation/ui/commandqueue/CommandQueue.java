@@ -45,9 +45,13 @@ import java.util.concurrent.LinkedBlockingDeque;
 public class CommandQueue {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
-    private final int maxUndos = 256;
+    private final int maxUndos = 25;
     private final Queue<CommandEvent> pendingQueue = new ConcurrentLinkedQueue<CommandEvent>();
     private final Deque<CommandEvent> undos = new LinkedBlockingDeque<CommandEvent>(maxUndos);
+    private final Deque<CommandEvent> redos = new LinkedBlockingDeque<CommandEvent>(maxUndos);
+    private final Thread thread;
+    private final ToolBelt toolBelt;
+
     private final Runnable runnable = new Runnable() {
 
         private volatile boolean isRunning = true;
@@ -95,9 +99,7 @@ public class CommandQueue {
             isRunning = false;
         }
     };
-    private final Deque<CommandEvent> redos = new LinkedBlockingDeque<CommandEvent>(maxUndos);
-    private final Thread thread;
-    private final ToolBelt toolBelt;
+
 
     /**
      * Constructs ...
