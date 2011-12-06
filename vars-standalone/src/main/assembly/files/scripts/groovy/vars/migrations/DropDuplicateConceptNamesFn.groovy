@@ -1,0 +1,64 @@
+package vars.migrations
+
+import org.mbari.sql.QueryFunction
+import org.slf4j.LoggerFactory
+import vars.ToolBox
+import vars.knowledgebase.ConceptNameDAO
+import vars.knowledgebase.ConceptNameTypes
+
+/**
+ * Drop duplicate concept names
+ * @author Brian Schlining
+ * @since 2011-12-05
+ */
+class DropDuplicateConceptNamesFn {
+
+    private toolBox = new ToolBox();
+    final log = LoggerFactory.getLogger(getClass())
+
+    void apply() {
+        findDuplicateNames().each { name ->
+            dropDuplicate(name)
+        }
+    }
+
+    def findDuplicateNames() {
+        def handler = { rs ->
+            def dups = []
+            while (rs.next()) {
+                dups << rs.getString(1)
+            }
+            return dups
+        } as QueryFunction
+
+        return toolBox.toolBelt.knowledgebasePersistenceService.executeQueryFunction("""
+            SELECT
+              ConceptName,
+              count(ConceptName)
+            FROM
+              ConceptName
+            GROUP BY
+              ConceptName HAVING count(ConceptName) > 1
+        """.stripIndent(), handler)
+
+    }
+
+    def dropDuplicate(name) {
+        ConceptNameDAO dao = toolBox.toolBelt.knowledgebaseDAOFactory.newConceptNameDAO()
+        dao.startTransaction()
+        def matches = dao.findByNameContaining(name).findAll { n ->
+            n.name == name && (!n.nameType.equalsIgnoreCase(ConceptNameTypes.PRIMARY.name))
+        }
+        matches.each { n ->
+            log.info("Dropping duplicate: ${n}")
+            def concept = n.concept
+            concept.removeConceptName(n)
+            dao.remove(n)
+        }
+        dao.endTransaction()
+        dao.close()
+    }
+
+
+
+}

@@ -18,6 +18,7 @@ package vars.knowledgebase.ui.dialogs;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -154,6 +155,8 @@ public class AddMediaDialog extends JDialog {
                 }
 
             });
+
+            mediaViewPanel.setPreferredSize(new Dimension(500, 300));
         }
 
         return mediaViewPanel;
@@ -165,8 +168,9 @@ public class AddMediaDialog extends JDialog {
      * @return void
      */
     private void initialize() {
-        this.setSize(300, 200);
+        //this.setSize(300, 200);
         this.setContentPane(getJContentPane());
+        pack();
     }
 
     /**

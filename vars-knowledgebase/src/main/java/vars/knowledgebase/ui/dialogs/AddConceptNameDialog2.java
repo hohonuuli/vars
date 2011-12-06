@@ -41,6 +41,8 @@ import vars.knowledgebase.ui.Lookup;
 import vars.knowledgebase.ui.ToolBelt;
 import vars.knowledgebase.ui.actions.ApproveHistoryTask;
 import vars.shared.ui.FancyButton;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.LayoutStyle.ComponentPlacement;
 
 /**
  *
@@ -67,6 +69,7 @@ public class AddConceptNameDialog2 extends javax.swing.JDialog {
     private javax.swing.JTextField nameField;
     private javax.swing.JButton okButton;
     private javax.swing.JRadioButton synonymRb;
+    private JRadioButton formerRb;
 
     /**
      * Creates new form AddConceptNameDialog2
@@ -118,6 +121,7 @@ private void initComponents() {
         authorField = new javax.swing.JTextField();
         commonRb = new javax.swing.JRadioButton();
         synonymRb = new javax.swing.JRadioButton();
+        formerRb = new JRadioButton();
         cancelButton = new FancyButton();
         okButton = new FancyButton();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -145,6 +149,11 @@ private void initComponents() {
         synonymRb.setText("Synonym");
         synonymRb.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         synonymRb.setMargin(new java.awt.Insets(0, 10, 0, 0));
+        
+        buttonGroup1.add(formerRb);
+        formerRb.setText("Former");
+        formerRb.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        formerRb.setMargin(new java.awt.Insets(0, 10, 0, 0));
 
         cancelButton.setText("Cancel");
         cancelButton.setIcon(new ImageIcon(getClass().getResource("/images/vars/knowledgebase/delete2.png")));
@@ -186,60 +195,63 @@ private void initComponents() {
         msgLabel.setForeground(new java.awt.Color(153, 0, 0));
         msgLabel.setText(" ");
 
-        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
+        GroupLayout layout = new GroupLayout(getContentPane());
         layout.setHorizontalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .addContainerGap()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(msgLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 360, Short.MAX_VALUE)
-                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 360, Short.MAX_VALUE)
-                    .add(layout.createSequentialGroup()
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(jLabel3)
-                            .add(jLabel4)
-                            .add(jLabel2))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                            .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
-                                .add(commonRb)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(synonymRb))
-                            .add(org.jdesktop.layout.GroupLayout.LEADING, authorField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 303, Short.MAX_VALUE)
-                            .add(nameField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 303, Short.MAX_VALUE)))
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                        .add(okButton)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(cancelButton)))
-                .addContainerGap())
+        	layout.createParallelGroup(Alignment.LEADING)
+        		.addGroup(layout.createSequentialGroup()
+        			.addContainerGap()
+        			.addGroup(layout.createParallelGroup(Alignment.TRAILING)
+        				.addComponent(msgLabel, GroupLayout.DEFAULT_SIZE, 360, Short.MAX_VALUE)
+        				.addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 360, Short.MAX_VALUE)
+        				.addGroup(layout.createSequentialGroup()
+        					.addGroup(layout.createParallelGroup(Alignment.LEADING)
+        						.addComponent(jLabel3)
+        						.addComponent(jLabel4)
+        						.addComponent(jLabel2))
+        					.addPreferredGap(ComponentPlacement.RELATED)
+        					.addGroup(layout.createParallelGroup(Alignment.LEADING)
+        						.addGroup(layout.createSequentialGroup()
+        							.addComponent(commonRb)
+        							.addPreferredGap(ComponentPlacement.RELATED)
+        							.addComponent(synonymRb)
+        							.addPreferredGap(ComponentPlacement.RELATED)
+        							.addComponent(formerRb))
+        						.addComponent(authorField, GroupLayout.DEFAULT_SIZE, 307, Short.MAX_VALUE)
+        						.addComponent(nameField, GroupLayout.DEFAULT_SIZE, 307, Short.MAX_VALUE)))
+        				.addGroup(layout.createSequentialGroup()
+        					.addComponent(okButton, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+        					.addPreferredGap(ComponentPlacement.RELATED)
+        					.addComponent(cancelButton, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+        			.addContainerGap())
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .addContainerGap()
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(nameField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jLabel2))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel3)
-                    .add(authorField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel4)
-                    .add(commonRb)
-                    .add(synonymRb))
-                .add(17, 17, 17)
-                .add(msgLabel)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(cancelButton)
-                    .add(okButton))
-                .addContainerGap())
+        	layout.createParallelGroup(Alignment.LEADING)
+        		.addGroup(layout.createSequentialGroup()
+        			.addContainerGap()
+        			.addComponent(jScrollPane1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+        			.addPreferredGap(ComponentPlacement.RELATED)
+        			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
+        				.addComponent(nameField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+        				.addComponent(jLabel2))
+        			.addPreferredGap(ComponentPlacement.RELATED)
+        			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
+        				.addComponent(jLabel3)
+        				.addComponent(authorField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+        			.addPreferredGap(ComponentPlacement.RELATED)
+        			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
+        				.addComponent(jLabel4)
+        				.addComponent(commonRb)
+        				.addComponent(synonymRb)
+        				.addComponent(formerRb))
+        			.addGap(17)
+        			.addComponent(msgLabel)
+        			.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
+        				.addComponent(cancelButton, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+        				.addComponent(okButton, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+        			.addContainerGap())
         );
+        getContentPane().setLayout(layout);
         pack();
     }
 
@@ -313,6 +325,9 @@ private void initComponents() {
             String nameType = ConceptNameTypes.COMMON.toString();
             if (synonymRb.isSelected()) {
                 nameType = ConceptNameTypes.SYNONYM.toString();
+            }
+            else if (formerRb.isSelected()) {
+            	nameType = ConceptNameTypes.FORMER.toString();
             }
             conceptName.setNameType(nameType);
 

@@ -133,17 +133,17 @@ public class DAO implements vars.DAO, EntityManagerAspect {
     }
 
 
-    @Override
-    protected void finalize() throws Throwable {
-        if ((entityManager != null) && entityManager.isOpen()) {
-            if (log.isWarnEnabled()) {
-                log.warn("Disposing of DAO that references an open entitymanager  [" +
-                        entityManager + "]. Did you forget to call close()?");
-            }
-        }
-
-        super.finalize();
-    }
+//    @Override
+//    protected void finalize() throws Throwable {
+//        if ((entityManager != null) && entityManager.isOpen()) {
+//            if (log.isWarnEnabled()) {
+//                log.warn("Disposing of DAO that references an open entitymanager  [" +
+//                        entityManager + "]. Did you forget to call close()?");
+//            }
+//        }
+//
+//        super.finalize();
+//    }
 
     /**
     * Executes a named query using a map of named parameters

@@ -48,6 +48,7 @@ public class MediaViewPanel extends JPanel implements ILockableEditor {
     private JComboBox typeComboBox = null;
     private JLabel typeLabel = null;
     private JTextField urlField = null;
+    private JScrollPane urlScrollPane;
     private JLabel urlLabel = null;
     private boolean locked;
     private Media media;
@@ -145,6 +146,15 @@ public class MediaViewPanel extends JPanel implements ILockableEditor {
         return typeComboBox;
     }
 
+
+    public JScrollPane getUrlScrollPane() {
+        if (urlScrollPane == null) {
+            urlScrollPane = new JScrollPane(getUrlField(), JScrollPane.VERTICAL_SCROLLBAR_NEVER,
+                    JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        }
+        return urlScrollPane;
+    }
+
     /**
      * This method initializes urlField
      * @return  javax.swing.JTextField
@@ -228,7 +238,7 @@ public class MediaViewPanel extends JPanel implements ILockableEditor {
         this.add(typeLabel, gridBagConstraints1);
         this.add(captionLabel, gridBagConstraints2);
         this.add(creditLabel, gridBagConstraints3);
-        this.add(getUrlField(), gridBagConstraints4);
+        this.add(getUrlScrollPane(), gridBagConstraints4);
         this.add(getTypeComboBox(), gridBagConstraints5);
         this.add(getCaptionScrollPane(), gridBagConstraints6);
         this.add(getCreditScrollPane(), gridBagConstraints7);
