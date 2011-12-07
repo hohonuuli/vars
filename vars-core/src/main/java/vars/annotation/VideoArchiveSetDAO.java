@@ -51,7 +51,7 @@ public interface VideoArchiveSetDAO extends DAO {
      * Looks up all VideoArchiveSets that do not havea cameradeployment associated with them
      * @return
      */
-    Collection<VideoArchiveSet> findAllWithoutCameraDeployment();
+    Collection<VideoArchiveSet> findAllWithMissingCameraDeployments();
 
     Collection<VideoArchiveSet> findAllWithoutTrackingNumber();
 

@@ -52,37 +52,21 @@ public class SaveFramegrabsAction extends ActionAdapter {
 
 
     private static final long serialVersionUID = -2264478482293981201L;
-    /** <!-- Field description --> */
     public static final String ACTION_NAME = "Download Images";
     private static final Logger log = LoggerFactory.getLogger(SaveFramegrabsAction.class);
 
-    //~--- fields -------------------------------------------------------------
 
-    /**
-	 * @uml.property  name="progressMonitor"
-	 * @uml.associationEnd  
-	 */
     private ProgressMonitor progressMonitor;
-    /**
-	 * @uml.property  name="saveLocation"
-	 */
+
     private File saveLocation;
-    /**
-	 * @uml.property  name="urls" multiplicity="(0 -1)" dimension="1"
-	 */
+
     private URL[] urls;
 
-    //~--- constructors -------------------------------------------------------
 
-    /**
-     * Constructs ...
-     *
-     */
     public SaveFramegrabsAction() {
         super(ACTION_NAME);
     }
 
-    //~--- methods ------------------------------------------------------------
 
     /**
      * Copies the contents of a URL to a local file.
@@ -118,7 +102,6 @@ public class SaveFramegrabsAction extends ActionAdapter {
     }
 
     /**
-     * <p><!-- Method description --></p>
      *
      */
     public void doAction() {
@@ -184,20 +167,12 @@ public class SaveFramegrabsAction extends ActionAdapter {
         return exists;
     }
 
-    //~--- set methods --------------------------------------------------------
 
-    /**
-	 * @param progressMonitor  The progressMonitor to set.
-	 * @uml.property  name="progressMonitor"
-	 */
     public void setProgressMonitor(ProgressMonitor progressMonitor) {
         this.progressMonitor = progressMonitor;
     }
 
-    /**
-	 * @param saveLocation  This is the name of the directory that the images will  be saved into. Additional directories will be created beneath this one.
-	 * @uml.property  name="saveLocation"
-	 */
+
     public void setSaveLocation(File saveLocation) {
         this.saveLocation = saveLocation;
     }
@@ -205,13 +180,11 @@ public class SaveFramegrabsAction extends ActionAdapter {
     /**
 	 * Set the URL of to be downloaded.
 	 * @param urls  A collection of URL objects. Each URL should correspond to a  framegrab that is to be downloaded.
-	 * @uml.property  name="urls"
 	 */
     public void setUrls(URL[] urls) {
         this.urls = urls;
     }
 
-    //~--- methods ------------------------------------------------------------
 
     /**
      * Takes a URL of the framegrab and turns it into a file name. This is nescessary
@@ -238,7 +211,7 @@ public class SaveFramegrabsAction extends ActionAdapter {
      * @return
      */
     private File urlToLocalPath(URL url) {
-        String[] parts = url.toExternalForm().split("/");
+        String[] parts = url.toExternalForm().replace("%20", " ").split("/");
         int idx = 0;
         for (int i = 0; i < parts.length; i++) {
             String s = parts[i];
@@ -259,7 +232,6 @@ public class SaveFramegrabsAction extends ActionAdapter {
         return f;
     }
 
-    //~--- inner classes ------------------------------------------------------
 
     private class UpdateProgressMonitor implements Runnable {
 
@@ -279,7 +251,6 @@ public class SaveFramegrabsAction extends ActionAdapter {
         }
 
         /**
-         * <p><!-- Method description --></p>
          *
          */
         public void run() {

@@ -278,7 +278,7 @@ public class MediaViewPanel extends JPanel implements ILockableEditor {
             getUrlField().setText("");
             getCaptionArea().setText("");
             getCreditArea().setText("");
-            getTypeComboBox().setSelectedIndex(0);
+            getTypeComboBox().setSelectedItem(Media.TYPE_IMAGE);
             getPrimaryCheckBox().setSelected(false);
         }
     }

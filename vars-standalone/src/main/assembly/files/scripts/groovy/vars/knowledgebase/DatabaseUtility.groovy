@@ -1,6 +1,7 @@
 package vars.knowledgebase
 
 import org.slf4j.LoggerFactory
+import vars.RawSQLQueryFunction
 
 /**
  * 
@@ -10,6 +11,18 @@ import org.slf4j.LoggerFactory
 class DatabaseUtility {
     final log = LoggerFactory.getLogger(DatabaseUtility.class)
     final toolBox = new vars.ToolBox()
+
+    /**
+     * Run a raw SQL Query against the VARS Annotation Database
+     * @param sql THe query to run
+     * @return A string of the data, suitable for writing to a file
+     */
+    String sqlquery(sql) {
+        def sb = new StringBuilder("# Query Results from VARS Knowledgbase database\n")
+        sb << "# SQL: ${sql.replaceAll(/\n/) { "\n# " }}\n"
+        sb << toolBox.toolBelt.knowledgebasePersistenceService.executeQueryFunction(sql, new RawSQLQueryFunction())
+        return sb.toString()
+    }
 
     /**
      * Displays a list of LinkRealizations that use the given 'linkName'

@@ -129,7 +129,7 @@ private void initComponents() {
         msgLabel = new javax.swing.JLabel();
 
         setTitle("VARS - Add Concept Name");
-        setResizable(false);
+        //setResizable(false);
         jLabel2.setText("Name:");
 
         jLabel3.setText("Author:");

@@ -27,7 +27,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.awt.event.ActionRunnable;
-import org.mbari.vars.query.ui.actions.SaveFramegrabsAction;
+import vars.query.ui.actions.SaveFramegrabsAction;
+
 
 //~--- classes ----------------------------------------------------------------
 

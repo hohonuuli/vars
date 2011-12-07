@@ -9,6 +9,7 @@ import vars.integration.MergeStatusDAO
 import org.mbari.vars.integration.MergeEXPDAnnotations
 import vars.integration.MergeFunction
 import org.mbari.expd.UberDatum
+import vars.RawSQLQueryFunction
 
 class DatabaseUtility {
 
@@ -17,6 +18,18 @@ class DatabaseUtility {
 
 
     def DatabaseUtility() {
+    }
+
+    /**
+     * Run a raw SQL Query against the VARS Annotation Database
+     * @param sql THe query to run
+     * @return A string of the data, suitable for writing to a file
+     */
+    String sqlquery(sql) {
+        def sb = new StringBuilder("# Query Results from VARS Annotation database\n")
+        sb << "# SQL: ${sql.replaceAll(/\n/) { "\n# " }}\n"
+        sb << toolBox.toolBelt.annotationPersistenceService.executeQueryFunction(sql, new RawSQLQueryFunction())
+        return sb.toString()
     }
 
     void merge() {

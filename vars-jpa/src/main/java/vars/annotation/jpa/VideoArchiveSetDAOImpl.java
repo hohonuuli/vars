@@ -108,8 +108,8 @@ public class VideoArchiveSetDAOImpl extends DAO implements VideoArchiveSetDAO {
         return count;
     }
 
-    public Collection<VideoArchiveSet> findAllWithoutCameraDeployment() {
-        return null;  // TODO implement this method.
+    public Collection<VideoArchiveSet> findAllWithMissingCameraDeployments() {
+        return findByNamedQuery("VideoArchiveSet.findAllWithMissingCameraDeployments");
     }
 
     public Collection<VideoArchiveSet> findAllWithoutTrackingNumber() {
@@ -121,7 +121,7 @@ public class VideoArchiveSetDAOImpl extends DAO implements VideoArchiveSetDAO {
     }
 
     public Collection<VideoArchiveSet> findAllWithMultipleCameraDeployments() {
-        return null;  // TODO implement this method.
+        return findByNamedQuery("VideoArchiveSet.findAllWithMultipleCameraDeployments");
     }
 
     /**
