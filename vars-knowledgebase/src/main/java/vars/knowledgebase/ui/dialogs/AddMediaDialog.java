@@ -181,7 +181,7 @@ public class AddMediaDialog extends JDialog {
 
         p.getCaptionArea().setText(null);
         p.getCreditArea().setText(null);
-        p.getTypeComboBox().setSelectedIndex(0);
+        p.setMedia(null);
         p.getUrlField().setText(null);
 
         final boolean locked = (concept == null);

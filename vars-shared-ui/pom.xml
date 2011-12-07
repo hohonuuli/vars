@@ -38,9 +38,9 @@
             <version>1.0.3</version>
         </dependency>
         <dependency>
-            <groupId>net.sourceforge.foxtrot</groupId>
+            <groupId>foxtrot</groupId>
             <artifactId>foxtrot-core</artifactId>
-            <version>3.0</version>
+            <version>4.0</version>
         </dependency>
         <!-- Used for sending emails by error dialogs -->
         <dependency>
