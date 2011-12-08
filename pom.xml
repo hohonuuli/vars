@@ -4,7 +4,7 @@
     <groupId>vars-redux</groupId>
     <artifactId>vars-redux</artifactId>
     <packaging>pom</packaging>
-    <version>6.0.4-SNAPSHOT</version>
+    <version>6.1.0</version>
     <name>vars-redux</name>
     <inceptionYear>2002</inceptionYear>
     <organization>
@@ -92,7 +92,7 @@
         <dependency>
             <groupId>org.mbari</groupId>
             <artifactId>mbarix4j</artifactId>
-            <version>1.8.4-SNAPSHOT</version>
+            <version>1.8.4</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
