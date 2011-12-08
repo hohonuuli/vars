@@ -122,14 +122,22 @@ public class SaveImagesFromQueryResultsAction extends ActionAdapter {
                 Object obj = data[row][col];
                 if (obj != null) {
                     String s = obj.toString();
-                    if (s.toLowerCase().startsWith("http")) {
-                        try {
-                            URL url = new URL(s);
-                            urlList.add(url);
-                        } catch (MalformedURLException e) {
-                            log.info(
-                                    "The value, " + s +
-                                    ", is not a valid URL");
+                    String sUpper = s.toUpperCase();
+                    if (sUpper.startsWith("HTTP")) {
+                        if (sUpper.endsWith(".PNG") ||
+                                sUpper.endsWith(".JPG") ||
+                                sUpper.endsWith(".JPEG") ||
+                                sUpper.endsWith(".TIF") ||
+                                sUpper.endsWith(".TIFF") ||
+                                sUpper.endsWith(".GIF")) {
+                            try {
+                                URL url = new URL(s);
+                                urlList.add(url);
+                            } catch (MalformedURLException e) {
+                                log.info(
+                                        "The value, " + s +
+                                        ", is not a valid URL");
+                            }
                         }
                     }
                 }
