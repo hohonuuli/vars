@@ -82,11 +82,9 @@ public class AssociationListEditorPanel extends JPanel {
     private JButton buttonEdit = null;
     private JButton buttonRemove = null;
     private final Logger log = LoggerFactory.getLogger(getClass());
-    VerticalFlowLayout verticalFlowLayout1 = new VerticalFlowLayout();
     JPanel listEditorPanel = new JPanel();
     private ActionAdapter addAction;
     private JPanel buttonPanel;
-    private PropertyChangeListener changeListener;
     private ActionAdapter editAction;
     private boolean editingAssociation;
     JList jList;

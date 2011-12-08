@@ -22,6 +22,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.KeyboardFocusManager;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -34,7 +35,10 @@ import java.util.Iterator;
 import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -94,7 +98,6 @@ public class RowEditorPanel extends JPanel {
             ((Component) evt.getSource()).transferFocus();
         }
     };
-    private final EventTopicSubscriber loggingSubscriber = new LoggingTopicSubscriber();
     protected Action prevFocusAction = new AbstractAction("Move Focus Backwards") {
 
         public void actionPerformed(ActionEvent evt) {
@@ -123,20 +126,6 @@ public class RowEditorPanel extends JPanel {
         AnnotationProcessor.process(this); // Create EventBus Proxy
         this.toolBelt = toolBelt;
         initialize();
-
-        /**
-         * Listen for changes in the observation
-         *
-         */
-//        Lookup.getSelectedObservationsDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
-//
-//            public void propertyChange(final PropertyChangeEvent evt) {
-//                final Collection<Observation> observations = (Collection<Observation>) evt.getNewValue();
-//                Observation obs = (observations.size() == 1) ? observations.iterator().next() : null;
-//                setObservation(obs);
-//            }
-//
-//        });
 
         /*
          * This allows the notable concept names to be refreshed is the
@@ -201,20 +190,8 @@ public class RowEditorPanel extends JPanel {
                      *  changes the observers name.
                      */
                     if (e.getStateChange() == ItemEvent.SELECTED) {
-
                         final String conceptName = (String) conceptComboBox.getSelectedItem();
                         getNotesArea().setEditable(!getNotableConceptNames().contains(conceptName));
-
-//                        if ((observation != null) && !observation.getConceptName().equals(conceptName)) {
-//
-//                            final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher()
-//                                .getValueObject();
-//
-//                            Command command = new ChangeObservationNameCmd(ImmutableList.of(observation), conceptName,
-//                                    userAccount.getUserName(), new Date());
-//                            CommandEvent commandEvent = new CommandEvent(command);
-//                            EventBus.publish(commandEvent);
-//                        }
                     }
 
                     /*

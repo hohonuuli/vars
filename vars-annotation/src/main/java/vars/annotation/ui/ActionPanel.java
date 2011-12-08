@@ -16,11 +16,15 @@
 package vars.annotation.ui;
 
 import java.awt.FlowLayout;
+import java.awt.Toolkit;
+import java.awt.event.KeyEvent;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.TreeMap;
 import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -29,6 +33,8 @@ import org.mbari.awt.layout.WrappingFlowLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.ui.buttons.*;
+import vars.annotation.ui.video.ImageCaptureAction;
+import vars.annotation.ui.video.SwingImageCaptureAction;
 
 /**
  * <p> This panel contains buttons for actions that can modify the contents of the
@@ -47,6 +53,7 @@ public class ActionPanel extends JPanel {
     JButton btnRemoveFramegrab;
     JButton btnNew;
     JButton btnShallowCopy;
+    private final ToolBelt toolBelt;
 
     /**
      *  Constructor for the ActionPanel object
@@ -55,9 +62,9 @@ public class ActionPanel extends JPanel {
      */
     public ActionPanel(ToolBelt toolBelt) {
         super();
-
+        this.toolBelt = toolBelt;
         /*
-         * HACK! Make toobelt available to PropButtons. PropButtons need no arg
+         * HACK! Make toolbelt available to PropButtons. PropButtons need no arg
          * constructors to be intialized BUT they all need access to the
          * toolbelt.
          *
@@ -117,11 +124,21 @@ public class ActionPanel extends JPanel {
     public void registerHotKeys() {
         final Action[] as = { btnFramegrab.getAction() , btnDelete.getAction(), btnNew.getAction(), btnDeepCopy.getAction(),
                               btnShallowCopy.getAction()};
-        for (int i = 0; i < as.length; i++) {
-            final Action a = as[i];
-            getActionMap().put(a.getValue(Action.ACTION_COMMAND_KEY), a);
-            getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put((KeyStroke) a.getValue(Action.ACCELERATOR_KEY),
-                        a.getValue(Action.ACTION_COMMAND_KEY));
+        ActionMap actionMap = getActionMap();
+        InputMap inputMap = getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        for (Action a: as) {
+            actionMap.put(a.getValue(Action.ACTION_COMMAND_KEY), a);
+            inputMap.put((KeyStroke) a.getValue(Action.ACCELERATOR_KEY), a.getValue(Action.ACTION_COMMAND_KEY));
         }
+
+        // Map delete action to delete key
+        KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
+        Action a = btnDelete.getAction();
+        inputMap.put(stroke, a.getValue(Action.ACTION_COMMAND_KEY));
+
+        // Map delete action to [meta] + backspace
+        stroke = KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+        inputMap.put(stroke, a.getValue(Action.ACTION_COMMAND_KEY));
+
     }
 }

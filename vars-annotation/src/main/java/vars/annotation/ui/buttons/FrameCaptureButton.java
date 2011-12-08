@@ -35,15 +35,16 @@ import vars.annotation.ui.Lookup;
 
 import vars.annotation.ui.video.ImageCaptureAction;
 import vars.annotation.ui.ToolBelt;
+import vars.annotation.ui.video.SwingImageCaptureAction;
+import vars.shared.ui.DoNothingAction;
 import vars.shared.ui.video.VideoControlService;
 import vars.shared.ui.FancyButton;
 import vars.shared.ui.video.ImageCaptureService;
 
 /**
  * <p>
- * Button to grab a video frame directly using the Quicktime for Java API. Uses
- * {@link org.mbari.framegrab.GrabFrame org.mbari.framegrab.GrabFrame}to
- * capture a .png file with a .jpg file containing text overlay.
+ * Button to grab a video frame directly using the Quicktime for Java API.
+ * Captures a .png file with a .jpg file containing text overlay.
  * </p>
  *
  *
@@ -53,6 +54,7 @@ public class FrameCaptureButton extends FancyButton {
 
 
     private static final Logger log = LoggerFactory.getLogger(FrameCaptureButton.class);
+    private Action action;
 
     /**
      * Constructor for the FrameCaptureButton object
@@ -61,14 +63,14 @@ public class FrameCaptureButton extends FancyButton {
         super();
 
         try {
-            //setAction(new ImageCaptureAction(toolBelt));
-            setAction(new WorkerAction(toolBelt));
+            action = new SwingImageCaptureAction(toolBelt);
+            setAction(action);
         }
         catch (final Exception e) {
+            action = new DoNothingAction();
             log.warn("Unable to set-up frame-grabbing. You may not have Quicktime installed.", e);
         }
 
-        // setEnabled(false);
         setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/fgbutton.png")));
         setToolTipText("Grab an image from the video-stream [" +
                        SwingUtils.getKeyString((KeyStroke) getAction().getValue(Action.ACCELERATOR_KEY)) + "]");
@@ -96,34 +98,5 @@ public class FrameCaptureButton extends FancyButton {
         return ics != null && va != null && ua != null && vcs != null;
     }
 
-    /**
-     * Don't hhang the UI when we grab a Frame. Use Foxtrot.
-     *
-     */
-    private class WorkerAction extends ImageCaptureAction {
 
-
-        public WorkerAction(ToolBelt toolBelt) {
-            super(toolBelt);
-            putValue(Action.NAME, "Frame Capture");
-            putValue(Action.ACTION_COMMAND_KEY, "frame capture");
-            putValue(Action.ACCELERATOR_KEY,
-                  KeyStroke.getKeyStroke('F', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        }
-
-        /**
-         * Method description
-         *
-         */
-        @Override
-        public void doAction() {
-            Worker.post(new Job() {
-                public Object run() {
-                    WorkerAction.super.doAction();
-                    return null;
-                }
-
-            });
-        }
-    }
 }

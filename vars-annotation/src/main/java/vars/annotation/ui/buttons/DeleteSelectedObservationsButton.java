@@ -30,6 +30,8 @@ import vars.annotation.ui.Lookup;
 import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
 import vars.shared.ui.FancyButton;
 
+import java.util.Collections;
+
 /**
  * <p>Deletes the observations selected in the Table. This button will bring
  * up a dialog prompting the user to confirm the delete.</p>
@@ -48,14 +50,16 @@ public class DeleteSelectedObservationsButton extends FancyButton {
         setToolTipText("Delete selected observations [" +
                        SwingUtils.getKeyString((KeyStroke) getAction().getValue(Action.ACCELERATOR_KEY)) + "]");
         setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/obs_delete.png")));
-        setEnabled(false);
         setText("");
         AnnotationProcessor.process(this);
+        onSelectedObservationsEvent(new ObservationsSelectedEvent(null, Collections.EMPTY_LIST));
     }
 
     @EventSubscriber(eventClass = ObservationsSelectedEvent.class)
     public void onSelectedObservationsEvent(ObservationsSelectedEvent selectionEvent) {
         final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
-        setEnabled((userAccount != null) && selectionEvent.get().size() > 0);
+        boolean enabled = (userAccount != null) && selectionEvent.get().size() > 0;
+        setEnabled(enabled);
+        getAction().setEnabled(enabled);
     }
 }

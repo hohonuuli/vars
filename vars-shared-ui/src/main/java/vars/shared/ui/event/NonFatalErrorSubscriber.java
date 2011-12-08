@@ -81,7 +81,7 @@ public class NonFatalErrorSubscriber implements EventTopicSubscriber {
      */
     public void onEvent(String topic, Object error) {
 
-        String msg = "An error occurred. Refer to details for more information.";
+        String msg = "An error occurred. Refer to the details for more information.";
         String details = null;
         Throwable data = null;
 
@@ -110,4 +110,4 @@ public class NonFatalErrorSubscriber implements EventTopicSubscriber {
 }
 
 
-;
+

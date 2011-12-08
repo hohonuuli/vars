@@ -61,7 +61,7 @@ public final class DeepCopyObservationsAction extends ActionAdapter {
         putValue(Action.NAME, "Copy observations to a new timecode");
         putValue(Action.ACTION_COMMAND_KEY, "copy observations");
         putValue(Action.ACCELERATOR_KEY,
-                 KeyStroke.getKeyStroke('A', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+                 KeyStroke.getKeyStroke('G', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
     }
 
     /**

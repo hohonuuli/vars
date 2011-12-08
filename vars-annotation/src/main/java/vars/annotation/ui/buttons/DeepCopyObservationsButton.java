@@ -18,9 +18,12 @@ package vars.annotation.ui.buttons;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
+import java.util.Collections;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
+
+import org.bushe.swing.event.annotation.EventSubscriber;
 import org.mbari.swing.SwingUtils;
 import org.mbari.vcr.IVCR;
 import vars.UserAccount;
@@ -28,6 +31,7 @@ import vars.annotation.Observation;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.actions.DeepCopyObservationsAction;
+import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
 import vars.shared.ui.video.VideoControlService;
 import vars.shared.ui.FancyButton;
 
@@ -50,31 +54,17 @@ public class DeepCopyObservationsButton extends FancyButton {
         setToolTipText("Copy an observation to a new timecode [" +
                        SwingUtils.getKeyString((KeyStroke) getAction().getValue(Action.ACCELERATOR_KEY)) + "]");
         setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/obs_copyanno.png")));
-        setEnabled(false);
         setText("");
+        respondTo(new ObservationsSelectedEvent(null, Collections.EMPTY_LIST));
+    }
 
-        /*
-         * Enable this button if someone is logged in AND the Observation
-         * in the ObservationDispather is not null and the VCR is enabled.
-         */
-        Lookup.getSelectedObservationsDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
-
-            public void propertyChange(PropertyChangeEvent evt) {
-
-                Collection<Observation> obs = (Collection<Observation>) evt.getNewValue();
-
-                final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
-                final VideoControlService videoService = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
-                final IVCR vcr = videoService;
-                if ((userAccount != null) && (obs.size() > 0) && (vcr != null)) {
-                    setEnabled(true);
-                }
-                else {
-                    setEnabled(false);
-                }
-
-            }
-        });
-
+    @EventSubscriber(eventClass = ObservationsSelectedEvent.class)
+    public void respondTo(ObservationsSelectedEvent event) {
+        final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+        final VideoControlService videoService = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
+        final IVCR vcr = videoService;
+        boolean enabled = (userAccount != null) && (event.get().size() > 0) && (vcr != null);
+        setEnabled(enabled);
+        getAction().setEnabled(enabled);
     }
 }

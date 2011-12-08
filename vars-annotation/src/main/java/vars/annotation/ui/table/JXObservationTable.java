@@ -49,6 +49,7 @@ public class JXObservationTable extends JXTable implements ObservationTable {
         final TableColumnModel tableColumnModel = new JXObservationTableColumnModel();
         final TableModel model = new JXObservationTableModel(tableColumnModel);
         final JTableHeader aTableHeader = new JXTableHeader(tableColumnModel);
+        aTableHeader.setReorderingAllowed(false);
 
         setModel(model);
         setColumnModel(tableColumnModel);

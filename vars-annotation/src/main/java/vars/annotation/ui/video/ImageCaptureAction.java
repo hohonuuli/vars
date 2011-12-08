@@ -107,13 +107,10 @@ public class ImageCaptureAction extends ActionAdapter {
         this.toolBelt = toolBelt;
         this.imageDirectory = new ImageDirectory();
         this.frameCaptureFunction = new FrameCaptureFunction();
-        boolean ok = false;
         putValue(Action.NAME, "Frame Capture");
         putValue(Action.ACTION_COMMAND_KEY, "frame capture");
         putValue(Action.ACCELERATOR_KEY,
                 KeyStroke.getKeyStroke('F', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-
-        setEnabled(ok);
     }
 
     /**
@@ -291,9 +288,7 @@ public class ImageCaptureAction extends ActionAdapter {
                 bufferedImage = ImageUtilities.toBufferedImage(image);
             }
             catch (final Exception e) {
-                EventBus.publish(Lookup.TOPIC_WARNING,
-                        "ERROR!! Failed to capture the frame. Reason given is " +
-                                e.getMessage() + ". ");
+                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
                 log.error("Frame-grab failed", e);
                 return;
             }
@@ -322,9 +317,7 @@ public class ImageCaptureAction extends ActionAdapter {
                 updateVideoArchive(snapTime, jpg);
             }
             catch (final Exception e) {
-                EventBus.publish(Lookup.TOPIC_WARNING,
-                        "ERROR!! Failed to create preview image. Reason given is " +
-                                e.getMessage() + ".");
+                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
                 log.error("Frame-grab failed", e);
 
                 return;
