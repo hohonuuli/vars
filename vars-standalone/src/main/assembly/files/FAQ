@@ -1,7 +1,11 @@
 
+FAQ Video Annotation and Reference System
+http://vars.sourceforge.net
+http://groups.google.com/group/mbari-vars
+
 Q: Help!! VARS isn't working for me, where do I get help?
 A: If you have problems send an email to vars-users@lists.sourceforge.net
-   or hohonuuli@users.sourceforge.net and our support staff will get back 
+   or and our support staff will get back 
    to you as soon as possible ;-)
 
 Q: VARS won't start.
@@ -10,8 +14,7 @@ A: For installation instructions refer to the INSTALL.macosx and INSTALL.windows
    we don't normally use batch files or shell scripts to start the VARS applications
    at MBARI, so sometimes an error sneaks by in the scripts that launch VARS. If
    you have problems please send an email to vars-users@lists.sourceforge.net or
-   hohonuuli@users.sourceforge.net so that I can correct the problem in future 
-   releases.
+   brian@mbari.org so that I can correct the problem in future releases.
 
 Q: Why does VARS require a database server?
 A: VARS is designed to work in a distributed environment. At any given time at MBARI,
@@ -25,10 +28,11 @@ Q: How do I deploy VARS at a large organization?
    launch the VARS query application from 
    http://varspub.mbari.org/webstart/varsquery.jnlp. If you are interested in
    deploying VARS at your organization using Java Web Start, send an email to 
-   vars-users@lists.sourceforge.net.
+   brian@mbari.org.
 
 Q: What can VARS use as a video source?
-A: VARS is designed to work VCR's that support serial connections (RS232 or RS422).
+A: VARS is designed to work VCR's that support serial connections (RS232 or RS422) or
+   video files. This version that you've downloaded is for VCRs.
 
 Q: What hardware do I need to annotate video tapes?
 A: 1) A VCR with a serial port (either RS422 or RS232), most professional quality 

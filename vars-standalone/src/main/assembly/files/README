@@ -30,7 +30,7 @@ help expand the VARS community.
 VARS 6.0 is not backwards compatibly with previous VARS databases (i.e. 5.1.0 or
 earlier). If you have significant data from a previous VARS installation, it is
 possbible to migrate the older database to work with VARS 6.0. Contact 
-brian AT mbari DOT org for assistance.
+http://groups.google.com/group/mbari-vars for assistance.
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -207,4 +207,5 @@ XE can be found in README.SQLSERVER and README.ORACLE
 VARS is an open source project. We welcome contributions and suggestions. 
 Contributions can come in many different forms such as documentation, code 
 contributions, web site improvements etc. More information can be found 
-http://vars.sourceforge.net or http://code.google.com/p/vars-redux/
+http://vars.sourceforge.net or http://code.google.com/p/vars-redux/. The VARS 
+mailing list can be found at http://groups.google.com/group/mbari-vars.
