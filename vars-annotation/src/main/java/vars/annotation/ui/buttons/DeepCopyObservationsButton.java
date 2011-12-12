@@ -23,6 +23,7 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
 
+import org.bushe.swing.event.annotation.AnnotationProcessor;
 import org.bushe.swing.event.annotation.EventSubscriber;
 import org.mbari.swing.SwingUtils;
 import org.mbari.vcr.IVCR;
@@ -51,11 +52,13 @@ public class DeepCopyObservationsButton extends FancyButton {
     public DeepCopyObservationsButton(ToolBelt toolBelt) {
         super();
         setAction(new DeepCopyObservationsAction(toolBelt));
+        AnnotationProcessor.process(this); // wire up the EventBus
         setToolTipText("Copy an observation to a new timecode [" +
                        SwingUtils.getKeyString((KeyStroke) getAction().getValue(Action.ACCELERATOR_KEY)) + "]");
         setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/obs_copyanno.png")));
         setText("");
         respondTo(new ObservationsSelectedEvent(null, Collections.EMPTY_LIST));
+
     }
 
     @EventSubscriber(eventClass = ObservationsSelectedEvent.class)
