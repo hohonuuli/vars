@@ -10,7 +10,7 @@ import vars.annotation.{CameraDataDAO, CameraData}
 import scala.collection.JavaConversions._
 
 /**
- * 
+ *
  * @author Brian Schlining
  * @since 2010-12-09
  */
@@ -45,10 +45,10 @@ class ImageReferenceFixer(toolBelt: ToolBelt, _rootUrl: String) {
                 }
             }
             while (keepGoing)
-            new URL(httpString)  // return
+            new URL(httpString) // return
         }
         else {
-            new URL(_fileUrl)    // return
+            new URL(_fileUrl) // return
         }
     }
 
@@ -62,21 +62,27 @@ class ImageReferenceFixer(toolBelt: ToolBelt, _rootUrl: String) {
     def update[A <% Traversable[CameraData]](cameraDatas: A) {
         val dao = toolBelt.getAnnotationDAOFactory.newCameraDataDAO()
         dao.startTransaction()
-        cameraDatas.foreach { cd =>
-            val cameraData = dao.find(cd)
-            update(cameraData)
+        cameraDatas.foreach {
+            cd =>
+                val cameraData = dao.find(cd)
+                update(cameraData)
         }
         dao.endTransaction()
         dao.close()
     }
-    
+
     def update(cameraData: CameraData) {
         if (cameraData != null) {
-            val url = fileUrlToHttpUrl(cameraData.getImageReference)
-            log.debug("Attempting to update " + cameraData.getImageReference + " to " + url)
+            try {
+                val url = fileUrlToHttpUrl(cameraData.getImageReference)
+                log.debug("Attempting to update " + cameraData.getImageReference + " to " + url)
 
-            if (ImageReferenceFixer.isImageOnWebServer(url)) {
-                cameraData.setImageReference(url.toExternalForm())
+                if (ImageReferenceFixer.isImageOnWebServer(url)) {
+                    cameraData.setImageReference(url.toExternalForm())
+                }
+            }
+            catch {
+                case e: Exception => log.warn("Failed to convert URL " + cameraData.getImageReference, e)
             }
         }
     }
@@ -95,7 +101,7 @@ object ImageReferenceFixer {
     /***/
     val PNG_KEY: Array[Byte] = Array[Byte](0xFF.asInstanceOf[Byte], 0xD8.asInstanceOf[Byte], 0xFF.asInstanceOf[Byte])
 
-    lazy val toolBelt  = {
+    lazy val toolBelt = {
         val injector = Lookup.getGuiceInjectorDispatcher.getValueObject.asInstanceOf[Injector]
         injector.getInstance(classOf[ToolBelt])
     }

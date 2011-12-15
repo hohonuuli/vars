@@ -46,7 +46,8 @@ class DropDuplicateConceptNamesFn {
     def dropDuplicate(name) {
         ConceptNameDAO dao = toolBox.toolBelt.knowledgebaseDAOFactory.newConceptNameDAO()
         dao.startTransaction()
-        def matches = dao.findByNameContaining(name).findAll { n ->
+        def duplicates = dao.findByNameContaining(name)
+        def matches = duplicates.findAll { n ->
             n.name == name && (!n.nameType.equalsIgnoreCase(ConceptNameTypes.PRIMARY.name))
         }
         matches.each { n ->
@@ -55,10 +56,18 @@ class DropDuplicateConceptNamesFn {
             concept.removeConceptName(n)
             dao.remove(n)
         }
+        
+        duplicates.removeAll(matches)
+        if (duplicates.size() > 0) {
+            def sb = new StringBuilder("The following duplicates still exist:\n")
+            duplicates.each { n ->
+                sb << "\t${n.concept.parentConcept.primaryConceptName.name} -> ${n.name}\t[has ${n.concept.childConcepts.size()} children]\n"
+            }
+            log.warn(sb.toString())
+        }
+        
         dao.endTransaction()
         dao.close()
     }
-
-
 
 }
