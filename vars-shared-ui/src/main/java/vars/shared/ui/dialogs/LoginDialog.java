@@ -26,6 +26,7 @@ import vars.MiscDAOFactory;
 import vars.MiscFactory;
 import vars.UserAccount;
 import vars.UserAccountDAO;
+import vars.UserAccountRoles;
 import vars.shared.ui.FancyButton;
 import vars.shared.ui.GlobalLookup;
 import vars.shared.ui.UserAccountComboBox;
@@ -50,6 +51,7 @@ public class LoginDialog extends JDialog {
     private javax.swing.JButton okButton;
     private javax.swing.JPasswordField passwordField;
     private final MiscDAOFactory miscDAOFactory;
+    private boolean passwordRequired = true;
 
     /**
      * Creates new form LoginDialog
@@ -94,7 +96,15 @@ public class LoginDialog extends JDialog {
         return nameComboBox;
     }
 
+    public boolean isPasswordRequired() {
+        return passwordRequired;
+    }
 
+    public void setPasswordRequired(boolean passwordRequired) {
+        this.passwordRequired = passwordRequired;
+        passwordField.setEnabled(passwordRequired);
+        jLabel3.setEnabled(passwordRequired);
+    }
 
     private void initComponents() {
         jLabel2 = new javax.swing.JLabel();
@@ -261,12 +271,19 @@ public class LoginDialog extends JDialog {
             msgLabel.setText("Unable to find '" + userName + "' in the database");
         }
         else {
-            if (!userAccount.authenticate(password)) {
-                msgLabel.setText("Invalid password");
+            
+            if (passwordRequired) {
+                success = userAccount.authenticate(password);
             }
             else {
+                userAccount.setRole(UserAccountRoles.READONLY.getRoleName());
                 success = true;
             }
+            
+            if (!success) {
+                msgLabel.setText("Invalid password");
+            }
+
         }
 
         if (success) {

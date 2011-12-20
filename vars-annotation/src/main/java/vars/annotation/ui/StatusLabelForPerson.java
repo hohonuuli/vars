@@ -52,7 +52,7 @@ public class StatusLabelForPerson extends StatusLabel {
      */
     public StatusLabelForPerson(ToolBelt toolBelt) {
         super();
-        action = new LoginAction(toolBelt.getMiscDAOFactory(), toolBelt.getMiscFactory());
+        action = new LoginAction(toolBelt.getMiscDAOFactory(), toolBelt.getMiscFactory(), false);
         final Dispatcher pd = Lookup.getUserAccountDispatcher();
         final UserAccount userAccount = (UserAccount) pd.getValueObject();
         update(userAccount);

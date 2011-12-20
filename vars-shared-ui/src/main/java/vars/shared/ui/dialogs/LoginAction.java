@@ -51,8 +51,21 @@ public class LoginAction extends ActionAdapter {
      * @param miscFactory
      */
     public LoginAction(MiscDAOFactory miscDAOFactory, MiscFactory miscFactory) {
+        this(miscDAOFactory, miscFactory, true);
+    }
+
+    /**
+     *
+     * @param miscDAOFactory
+     * @param miscFactory
+     * @param passwordRequired Use true if authentication is needed to login, False otherwise. If set to false
+     *                         all users will be logged in as READONLY. That means they can annotation but will
+     *                         not be able to modify the knowledgebase.
+     */
+    public LoginAction(MiscDAOFactory miscDAOFactory, MiscFactory miscFactory, boolean passwordRequired) {
         final Frame frame = (Frame) GlobalLookup.getSelectedFrameDispatcher().getValueObject();
         loginDialog = new LoginDialog(frame, true, miscDAOFactory, miscFactory);
+        loginDialog.setPasswordRequired(passwordRequired);
     }
 
     /**
@@ -69,7 +82,7 @@ public class LoginAction extends ActionAdapter {
     /**
      * @return
      */
-    public JDialog getDialog() {
+    public LoginDialog getDialog() {
         return loginDialog;
     }
 
