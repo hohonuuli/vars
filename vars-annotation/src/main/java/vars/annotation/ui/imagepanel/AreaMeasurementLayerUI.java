@@ -1,5 +1,5 @@
 /*
- * @(#)AreaMeasurementLayerUI.java   2011.12.14 at 10:48:35 PST
+ * @(#)AreaMeasurementLayerUI.java   2011.12.19 at 04:18:51 PST
  *
  * Copyright 2009 MBARI
  *
@@ -31,6 +31,7 @@ import vars.ToolBelt;
 import vars.annotation.Association;
 import vars.annotation.Observation;
 import vars.annotation.ObservationDAO;
+import vars.annotation.ui.Lookup;
 import vars.annotation.ui.eventbus.ObservationsChangedEvent;
 import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
 
@@ -41,6 +42,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -57,34 +59,53 @@ import java.util.concurrent.CopyOnWriteArraySet;
  */
 public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends CrossHairLayerUI<T> {
 
+    /*
+
+        NOTES:
+
+        IC = image coordinates, e.g. pixels. This can be stored but need to be converted to
+            component coordinates to be drawn.
+
+        CC = component coordinates, e.g. suitable for drawing with Graphics2D
+
+     */
+
     /** The diameter of the start of measurement marker */
     private static final int markerDiameter = 10;
     private Logger log = LoggerFactory.getLogger(getClass());
     private final Font lineFont = new Font("Sans Serif", Font.PLAIN, 10);
 
-    /** Collection of points to be used to create the AreaMeasurement */
-    private List<org.mbari.geometry.Point2D<Integer>> points = new CopyOnWriteArrayList<org.mbari.geometry.Point2D<Integer>>();
+    /** Collection of pointsIC to be used to create the AreaMeasurement in image pixels */
+    private List<org.mbari.geometry.Point2D<Integer>> pointsIC = new CopyOnWriteArrayList<org.mbari.geometry
+        .Point2D<Integer>>();
 
-    /** Path used to draw measurement polygon */
-    private GeneralPath polygon = new GeneralPath();
+    /** Path used to draw measurement polygonCC in component coordinates*/
+    private GeneralPath polygonCC = new GeneralPath();
 
-    /** Path used to draw the triangle that will be added to the polygon if user addes another click */
-    private GeneralPath bridge = new GeneralPath();
-    /** The current point where the mouse is */
-    private Point2D currentPoint = new Point2D.Double();
+    /** The current point where the mouse is in component coordinates*/
+    private Point2D currentPointCC = new Point2D.Double();
+
+    /**
+     * Path used to draw the triangle that will be added to the polygonCC if user addes another
+     * click. In component coordiantes*/
+    private GeneralPath bridgeCC = new GeneralPath();
+    
     /** Need a synchronized collection */
     private final Collection<AreaMeasurementPath> areaMeasurementPaths = new CopyOnWriteArrayList<AreaMeasurementPath>();
 
     /** Synchronized collection of observations in the same videoframe */
     private final Collection<Observation> relatedObservations = new CopyOnWriteArraySet<Observation>();
+    private final Predicate<Observation> matchObservationPredicate = new Predicate<Observation>() {
 
-
-    /** The observation that we're currently adding measurements to */
-    private Observation observation;
-    private final ToolBelt toolBelt;
+        @Override
+        public boolean apply(Observation input) {
+            return input.equals(observation);
+        }
+    };
 
     /** Transform that converts an association to an AreaMeasurement object */
-    private final Function<ILink, AreaMeasurementPath> associationTransform = new Function<ILink, AreaMeasurementPath>() {
+    private final Function<ILink, AreaMeasurementPath> associationTransform = new Function<ILink,
+        AreaMeasurementPath>() {
 
         @Override
         public AreaMeasurementPath apply(ILink input) {
@@ -92,33 +113,52 @@ public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends CrossHair
         }
     };
 
-    private final Predicate<Observation> matchObservationPredicate = new Predicate<Observation>() {
-        @Override
-        public boolean apply(Observation input) {
-            return input.equals(observation);
-        }
-    };
-
     /**
      * Runnable that resets the measurment UI state
      */
     private final Runnable resetRunable = new Runnable() {
+
         @Override
         public void run() {
+
             // TODO finish implementation
-            polygon.reset();
+            polygonCC.reset();
+            bridgeCC.reset();
+            areaMeasurementPaths.clear();
+            pointsIC.clear();
+            relatedObservations.clear();
             setDirty(true);
-         }
+        }
     };
+
+    /** The observation that we're currently adding measurements to */
+    private Observation observation;
+    private final ToolBelt toolBelt;
+
+    /**
+     * Constructs ...
+     *
+     * @param toolBelt
+     */
+    public AreaMeasurementLayerUI(ToolBelt toolBelt) {
+        this.toolBelt = toolBelt;
+        AnnotationProcessor.process(this);
+        Collection<Observation> selectedObservations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+        respondsTo(new ObservationsSelectedEvent(null, selectedObservations));
+    }
+
+    private AreaMeasurement newAreaMeasurement(String comment) {
+        return new AreaMeasurement(new ArrayList<org.mbari.geometry.Point2D<Integer>>(pointsIC), comment);
+    }
 
     @Override
     protected void paintLayer(Graphics2D g2, JXLayer<? extends T> jxl) {
         super.paintLayer(g2, jxl);
-        g2.setPaintMode(); // Make sure xor is turned off
+        g2.setPaintMode();    // Make sure xor is turned off
         if (observation != null) {
 
             // --- Paint related observations
-            for (Observation obs: relatedObservations) {
+            for (Observation obs : relatedObservations) {
                 if ((obs.getX() != null) && (obs.getY() != null)) {
 
                     Point2D imagePoint = new Point2D.Double(obs.getX(), obs.getY());
@@ -167,57 +207,91 @@ public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends CrossHair
                 }
             }
 
-            // --- Paint current area measurement
-            Color color = points.size() < 3 ? Color.RED : Color.CYAN;
-            g2.setStroke(new BasicStroke(2));
-            g2.setPaint(color);
+            polygonCC.reset();
+            if (pointsIC.size() > 0) {
 
-            // TODO polygon shoud start and end with the currentPoint marker.
-            for (int i = 0; i < points.size(); i++) {
-                org.mbari.geometry.Point2D<Integer> coordinate = points.get(i);
+                // --- Paint current area measurement
+                Color color = (pointsIC.size() < 3) ? Color.RED : Color.CYAN;
+                g2.setStroke(new BasicStroke(2));
+                g2.setPaint(color);
+
+                // TODO polygonCC should start and end with the currentPointCC marker.
+                for (int i = 0; i < pointsIC.size(); i++) {
+                    org.mbari.geometry.Point2D<Integer> coordinate = pointsIC.get(i);
+                    Point2D imagePoint = new Point2D.Double(coordinate.getX(), coordinate.getY());
+                    Point2D componentPoint = jxl.getView().convertToComponent(imagePoint);
+                    if (i == 0) {
+                        polygonCC.moveTo(componentPoint.getX(), componentPoint.getY());
+                    }
+                    else {
+                        polygonCC.lineTo(componentPoint.getX(), componentPoint.getY());
+                        polygonCC.moveTo(componentPoint.getX(), componentPoint.getY());
+                    }
+                }
+
+                // Close path
+
+                org.mbari.geometry.Point2D<Integer> coordinate = pointsIC.get(0);
                 Point2D imagePoint = new Point2D.Double(coordinate.getX(), coordinate.getY());
                 Point2D componentPoint = jxl.getView().convertToComponent(imagePoint);
-                if (i == 0) {
-                    polygon.moveTo(componentPoint.getX(), componentPoint.getY());
+                polygonCC.lineTo(componentPoint.getX(), componentPoint.getY());
+                g2.draw(polygonCC);
+
+                // --- Draw current mouse point as a hint to where next point will be placed
+                final int markerOffset = markerDiameter / 2;
+                if (pointsIC.size() > 1) {
+                    g2.setPaint(Color.RED);
+                    g2.draw(bridgeCC);
+                    Point p = AwtUtilities.toPoint(currentPointCC);
+                    Ellipse2D marker = new Ellipse2D.Double(p.x - markerOffset, p.y - markerOffset, markerDiameter,
+                        markerDiameter);
+                    g2.draw(marker);
                 }
-                else {
-                    polygon.lineTo(componentPoint.getX(), componentPoint.getY());
-                }
-            }
-
-            // Close path
-            org.mbari.geometry.Point2D<Integer> coordinate = points.get(0);
-            Point2D imagePoint = new Point2D.Double(coordinate.getX(), coordinate.getY());
-            Point2D componentPoint = jxl.getView().convertToComponent(imagePoint);
-            polygon.lineTo(componentPoint.getX(), componentPoint.getY());
-            g2.draw(polygon);
-
-            // --- Draw current mouse point as a hint to where next point will be placed
-            final int markerOffset = markerDiameter / 2;
-            if (points.size() > 1) {
-
             }
 
         }
     }
 
     @Override
+    protected void processMouseEvent(MouseEvent me, JXLayer<? extends T> jxl) {
+        super.processMouseEvent(me, jxl);
+        Point point = SwingUtilities.convertPoint(me.getComponent(), me.getPoint(), jxl);
+        switch (me.getID()) {
+        case MouseEvent.MOUSE_PRESSED:
+            Point2D imagePoint = jxl.getView().convertToImage(point);
+            int x = (int) Math.round(imagePoint.getX());
+            int y = (int) Math.round(imagePoint.getY());
+            if (me.getClickCount() == 1 && (me.getButton() == MouseEvent.BUTTON1)) {
+                pointsIC.add(new org.mbari.geometry.Point2D<Integer>(x, y));
+                setDirty(true);
+            }
+            else if ((me.getClickCount() == 2) || (me.getButton() != MouseEvent.BUTTON1)) {
+                controller.addAreaMeasurement(observation, newAreaMeasurement(null));
+                // TOOD fire new event that creates the polygon association
+                resetUI();
+            }
+        default:
+
+        // Do nothing
+        }
+    }
+
+    @Override
     protected void processMouseMotionEvent(MouseEvent me, JXLayer<? extends T> jxl) {
         super.processMouseMotionEvent(me, jxl);
-        if (me.getID() == MouseEvent.MOUSE_MOVED && points.size() > 1) {
+        if ((me.getID() == MouseEvent.MOUSE_MOVED) && (pointsIC.size() > 1)) {
             Point point = SwingUtilities.convertPoint(me.getComponent(), me.getPoint(), jxl);
-            currentPoint.setLocation(point.getX(), point.getY());
+            currentPointCC.setLocation(point.getX(), point.getY());
             int w = jxl.getWidth();
             int h = jxl.getHeight();
 
-
-            bridge.reset();
-            if ((point.y <= h) && (point.x <= w)) {
-                Point2D start = jxl.getView().convertToComponent(points.get(0).toJavaPoint2D());
-                Point2D end = jxl.getView().convertToComponent(points.get(points.size() - 1).toJavaPoint2D());
-                bridge.moveTo(start.getX(), start.getY());
-                bridge.lineTo(currentPoint.getX(), currentPoint.getY());
-                bridge.lineTo(end.getX(), end.getY());
+            bridgeCC.reset();
+            if ((point.y <= h) && (point.x <= w) && (point.y >= 0) && (point.x >= 0)) {
+                Point2D start = jxl.getView().convertToComponent(pointsIC.get(0).toJavaPoint2D());
+                Point2D end = jxl.getView().convertToComponent(pointsIC.get(pointsIC.size() - 1).toJavaPoint2D());
+                bridgeCC.moveTo(start.getX(), start.getY());
+                bridgeCC.lineTo(currentPointCC.getX(), currentPointCC.getY());
+                bridgeCC.lineTo(end.getX(), end.getY());
             }
 
             // mark the ui as dirty and needed to be repainted
@@ -225,25 +299,38 @@ public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends CrossHair
         }
     }
 
-    @Override
-    protected void processMouseEvent(MouseEvent me, JXLayer<? extends T> jxl) {
-        super.processMouseEvent(me, jxl);
-
+    /**
+     * resets the ui to a known state
+     */
+    public void resetUI() {
+        if (SwingUtilities.isEventDispatchThread()) {
+            resetRunable.run();
+        }
+        else {
+            SwingUtilities.invokeLater(resetRunable);
+        }
     }
-
 
     /**
-     * Constructs ...
      *
-     * @param toolBelt
+     * @param event
      */
-    public AreaMeasurementLayerUI(ToolBelt toolBelt) {
-        this.toolBelt = toolBelt;
-        AnnotationProcessor.process(this);
+    @EventSubscriber(eventClass = ObservationsSelectedEvent.class)
+    public void respondsTo(ObservationsSelectedEvent event) {
+        Observation selectedObservation = (event.get().size() == 1) ? event.get().iterator().next() : null;
+        setObservation(selectedObservation);
     }
-    
-    private AreaMeasurement newAreaMeasurement(String comment) {
-        return new AreaMeasurement(new ArrayList<org.mbari.geometry.Point2D<Integer>>(points), comment);
+
+    /**
+     *
+     * @param event
+     */
+    @EventSubscriber(eventClass = ObservationsChangedEvent.class)
+    public void respondsTo(ObservationsChangedEvent event) {
+        Collection<Observation> matchingObservation = Collections2.filter(event.get(), matchObservationPredicate);
+        if (!matchingObservation.isEmpty()) {
+            setObservation(matchingObservation.iterator().next());
+        }
     }
 
     /**
@@ -253,9 +340,9 @@ public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends CrossHair
     public void setObservation(Observation observation) {
         Observation oldObservation = this.observation;
         this.observation = observation;
-        areaMeasurementPaths.clear();
-        relatedObservations.clear();
+        resetUI();
         if (observation != null) {
+
             // DAOTX: Lookup selected observation from database. Otherwise, you may not get all the
             // related observations
             ObservationDAO observationDAO = toolBelt.getAnnotationDAOFactory().newObservationDAO();
@@ -266,7 +353,7 @@ public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends CrossHair
             observationDAO.close();
 
             Collection<Association> associations = Collections2.filter(observation.getAssociations(),
-                    AreaMeasurement.IS_AREA_MEASUREMENT_PREDICATE);
+                AreaMeasurement.IS_AREA_MEASUREMENT_PREDICATE);
             for (Association association : associations) {
                 try {
                     areaMeasurementPaths.add(associationTransform.apply(association));
@@ -276,32 +363,17 @@ public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends CrossHair
                 }
             }
         }
-        resetUI();
 
     }
 
-    @EventSubscriber(eventClass = ObservationsSelectedEvent.class)
-    public void respondsTo(ObservationsSelectedEvent event) {
-        Observation selectedObservation = (event.get().size() == 1) ? event.get().iterator().next() : null;
-        setObservation(selectedObservation);
-    }
-
-    @EventSubscriber(eventClass = ObservationsChangedEvent.class)
-    public void respondsTo(ObservationsChangedEvent event) {
-        Collection<Observation> matchingObservation = Collections2.filter(event.get(), matchObservationPredicate);
-        if (!matchingObservation.isEmpty()) {
-            setObservation(matchingObservation.iterator().next());
-        }
-    }
-
-    private void updateAreaMeasurementPath(AreaMeasurementPath areaMeasurementPath,  JXLayer<? extends T> jxl) {
+    private void updateAreaMeasurementPath(AreaMeasurementPath areaMeasurementPath, JXLayer<? extends T> jxl) {
 
         AreaMeasurement areaMeasurement = areaMeasurementPath.areaMeasurement;
         GeneralPath generalPath = areaMeasurementPath.generalPath;
         generalPath.reset();
 
         List<org.mbari.geometry.Point2D<Integer>> coordinates = areaMeasurement.getCoordinates();
-        
+
         double sumX = 0;
         double sumY = 0;
         for (int i = 0; i < coordinates.size(); i++) {
@@ -323,25 +395,12 @@ public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends CrossHair
         Point2D imagePoint = new Point2D.Double(coordinate.getX(), coordinate.getY());
         Point2D componentPoint = jxl.getView().convertToComponent(imagePoint);
         generalPath.lineTo(componentPoint.getX(), componentPoint.getY());
-        
+
         // set comment point
         double cx = (sumX / coordinates.size()) + 5;
         double cy = (sumY / coordinates.size());
         areaMeasurementPath.commentPoint.setLocation(cx, cy);
 
-    }
-
-
-    /**
-     * resets the ui to a known state
-     */
-    public void resetUI() {
-        if (SwingUtilities.isEventDispatchThread()) {
-            resetRunable.run();
-        }
-        else {
-            SwingUtilities.invokeLater(resetRunable);
-        }
     }
 
     class AreaMeasurementPath {

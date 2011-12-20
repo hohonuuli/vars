@@ -162,7 +162,7 @@ public class AreaMeasurement {
      */
     public String getComment() {
         return comment;
-    }
+    } 
 
     /**
      * @return

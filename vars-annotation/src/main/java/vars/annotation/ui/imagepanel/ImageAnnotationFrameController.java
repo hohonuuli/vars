@@ -1,7 +1,10 @@
 package vars.annotation.ui.imagepanel;
 
 
+import com.google.common.collect.ImmutableList;
 import org.bushe.swing.event.EventBus;
+import org.bushe.swing.event.annotation.AnnotationProcessor;
+import org.bushe.swing.event.annotation.EventSubscriber;
 import vars.annotation.Observation;
 import vars.annotation.VideoFrame;
 
@@ -24,15 +27,17 @@ public class ImageAnnotationFrameController implements MeasurementCompletedListe
 
     private final ToolBelt toolBelt;
     private VideoFrame videoFrame;
-    private MeasurementCommentDialog dialog;
+    private MeasurementCommentDialog measurementDialog;
+    private MeasurementCommentDialog areaMeasurementDialog;
     private final ImageAnnotationFrame imageAnnotationFrame;
     private final AddMeasurementAction measurementAction = new AddMeasurementAction();
-
+    private AddAreaMeasurementEvent addAreaMeasurementEvent;
 
 
     public ImageAnnotationFrameController(ToolBelt toolBelt, ImageAnnotationFrame imageAnnotationFrame) {
         this.toolBelt = toolBelt;
         this.imageAnnotationFrame = imageAnnotationFrame;
+        AnnotationProcessor.process(this);
     }
 
     public VideoFrame getVideoFrame() {
@@ -47,6 +52,33 @@ public class ImageAnnotationFrameController implements MeasurementCompletedListe
         return toolBelt;
     }
 
+    @EventSubscriber(eventClass = AddAreaMeasurementEvent.class)
+    public void respondTo(AddAreaMeasurementEvent event) {
+        addAreaMeasurementEvent = event;
+        getAreaMeasurementCommentDialog().setVisible(true);
+    }
+    
+    private MeasurementCommentDialog getAreaMeasurementCommentDialog() {
+        if (areaMeasurementDialog == null) {
+            areaMeasurementDialog = new MeasurementCommentDialog(imageAnnotationFrame);
+            areaMeasurementDialog.getOkayButton().addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if (addAreaMeasurementEvent != null) {
+                        AreaMeasurement areaMeasurement = addAreaMeasurementEvent.getAreaMeasurement();
+                        Observation observation = addAreaMeasurementEvent.getObservation();
+                        areaMeasurement.setComment(areaMeasurementDialog.getComment());
+                        AddAssociationCmd command = new AddAssociationCmd(areaMeasurement.toLink(), ImmutableList.of(observation));
+                        EventBus.publish(command);
+                    }
+                    areaMeasurementDialog.setVisible(false);
+
+                }
+            });
+        }
+        return measurementDialog;
+    }
+
     @Override
     public void onComplete(MeasurementCompletedEvent event) {
         measurementAction.setMeasurement(event.getMeasurement());
@@ -55,19 +87,20 @@ public class ImageAnnotationFrameController implements MeasurementCompletedListe
     }
 
     private MeasurementCommentDialog getMeasurementCommentDialog() {
-        if (dialog == null) {
-            dialog = new MeasurementCommentDialog(imageAnnotationFrame);
-            dialog.getOkayButton().addActionListener(new ActionListener() {
+        if (measurementDialog == null) {
+            measurementDialog = new MeasurementCommentDialog(imageAnnotationFrame);
+            measurementDialog.getOkayButton().addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    measurementAction.setComment(dialog.getComment());
-                    dialog.setVisible(false);
+                    measurementAction.setComment(measurementDialog.getComment());
+                    measurementDialog.setVisible(false);
                     measurementAction.apply();
                 }
             });
         }
-        return dialog;
+        return measurementDialog;
     }
+
 
     private class AddMeasurementAction {
         private String comment;
@@ -90,12 +123,7 @@ public class ImageAnnotationFrameController implements MeasurementCompletedListe
         public void apply() {
             if (measurement != null && observation != null) {
                 measurement.setComment(comment);
-
-                Collection<Observation> observations = new ArrayList<Observation>() {{
-                   add(observation);
-                }};
-
-                Command command = new AddAssociationCmd(measurement.toLink(), observations);
+                Command command = new AddAssociationCmd(measurement.toLink(), ImmutableList.of(observation));
                 CommandEvent commandEvent = new CommandEvent(command);
                 EventBus.publish(commandEvent);
             }
