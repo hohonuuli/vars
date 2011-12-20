@@ -102,9 +102,9 @@ drop table association
 create table association  ( 
 	id               	int8 not null,
 	observationid_fk 	int8 null,
-	linkname         	varchar(50) null,
+	linkname         	varchar(128) null,
 	toconcept        	varchar(50) null,
-	linkvalue        	varchar(100) null,
+	linkvalue        	varchar(1024) null,
 	last_updated_time	timestamp null,
 	constraint association_pk primary key (id)
 )

@@ -67,16 +67,18 @@ public class ImageAnnotationFrameController implements MeasurementCompletedListe
                     if (addAreaMeasurementEvent != null) {
                         AreaMeasurement areaMeasurement = addAreaMeasurementEvent.getAreaMeasurement();
                         Observation observation = addAreaMeasurementEvent.getObservation();
+                        addAreaMeasurementEvent = null; // Free reference
                         areaMeasurement.setComment(areaMeasurementDialog.getComment());
                         AddAssociationCmd command = new AddAssociationCmd(areaMeasurement.toLink(), ImmutableList.of(observation));
-                        EventBus.publish(command);
+                        CommandEvent commandEvent = new CommandEvent(command);
+                        EventBus.publish(commandEvent);
                     }
                     areaMeasurementDialog.setVisible(false);
 
                 }
             });
         }
-        return measurementDialog;
+        return areaMeasurementDialog;
     }
 
     @Override

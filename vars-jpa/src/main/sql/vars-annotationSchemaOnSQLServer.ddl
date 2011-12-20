@@ -100,9 +100,9 @@ GO
 CREATE TABLE dbo.Association  ( 
 	id               	bigint NOT NULL,
 	ObservationID_FK 	bigint NULL,
-	LinkName         	varchar(50) NULL,
+	LinkName         	varchar(128) NULL,
 	ToConcept        	varchar(50) NULL,
-	LinkValue        	varchar(100) NULL,
+	LinkValue        	varchar(1024) NULL,
 	LAST_UPDATED_TIME	datetime NULL,
 	CONSTRAINT Association_PK PRIMARY KEY NONCLUSTERED(id)
 )

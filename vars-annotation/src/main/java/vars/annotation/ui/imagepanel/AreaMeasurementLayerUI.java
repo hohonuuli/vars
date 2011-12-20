@@ -19,6 +19,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.collect.Collections2;
+import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.annotation.AnnotationProcessor;
 import org.bushe.swing.event.annotation.EventSubscriber;
 import org.jdesktop.jxlayer.JXLayer;
@@ -124,9 +125,9 @@ public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends CrossHair
             // TODO finish implementation
             polygonCC.reset();
             bridgeCC.reset();
-            areaMeasurementPaths.clear();
+            //areaMeasurementPaths.clear();
             pointsIC.clear();
-            relatedObservations.clear();
+            //relatedObservations.clear();
             setDirty(true);
         }
     };
@@ -266,13 +267,17 @@ public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends CrossHair
                 setDirty(true);
             }
             else if ((me.getClickCount() == 2) || (me.getButton() != MouseEvent.BUTTON1)) {
-                controller.addAreaMeasurement(observation, newAreaMeasurement(null));
-                // TOOD fire new event that creates the polygon association
+                if (pointsIC.size() > 2 && observation != null) {
+                    // --- Publish action via EventBus
+                    AreaMeasurement areaMeasurement = newAreaMeasurement(null);
+                    AddAreaMeasurementEvent event = new AddAreaMeasurementEvent(observation, areaMeasurement);
+                    EventBus.publish(event);
+                }
                 resetUI();
+                setObservation(observation);
             }
         default:
-
-        // Do nothing
+            // Do nothing
         }
     }
 
@@ -340,6 +345,8 @@ public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends CrossHair
     public void setObservation(Observation observation) {
         Observation oldObservation = this.observation;
         this.observation = observation;
+        areaMeasurementPaths.clear();
+        relatedObservations.clear();
         resetUI();
         if (observation != null) {
 
