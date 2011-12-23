@@ -30,7 +30,6 @@ import org.mbari.awt.event.ActionRunnable;
 import vars.query.ui.actions.SaveFramegrabsAction;
 
 
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Class for saving all the images in a search to the desktop. The class

@@ -86,12 +86,12 @@
         <dependency>
             <groupId>org.mbari</groupId>
             <artifactId>expd-core</artifactId>
-            <version>1.1.1</version>
+            <version>1.1.2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.mbari</groupId>
             <artifactId>expd-jdbc</artifactId>
-            <version>1.1.1</version>
+            <version>1.1.2-SNAPSHOT</version>
         </dependency>
         
         <!--

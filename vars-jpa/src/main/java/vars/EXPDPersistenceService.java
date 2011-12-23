@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.TimeZone;
 import org.mbari.movie.Timecode;
-import org.mbari.util.MathUtilities;
+import org.mbari.math.Matlib;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -198,8 +198,8 @@ public class EXPDPersistenceService extends QueryableImpl implements ExternalDat
                 frames[i] = new BigDecimal(tc.getFrames());
             }
 
-            BigDecimal[] iFrame = MathUtilities.interpLinear(dates, frames,
-                new BigDecimal[] { new BigDecimal(date.getTime()) });
+            BigDecimal[] iFrame = Matlib.interpLinear(dates, frames,
+                    new BigDecimal[]{new BigDecimal(date.getTime())});
             if ((iFrame != null) && (iFrame.length > 0) && (iFrame[0] != null)) {
                 timecode = new Timecode(iFrame[0].doubleValue(), frameRate);
             }
@@ -221,7 +221,7 @@ public class EXPDPersistenceService extends QueryableImpl implements ExternalDat
                 frames[i] = new BigDecimal(tc.getFrames());
             }
 
-            iFrame = MathUtilities.interpLinear(dates, frames, new BigDecimal[] { new BigDecimal(date.getTime()) });
+            iFrame = Matlib.interpLinear(dates, frames, new BigDecimal[]{new BigDecimal(date.getTime())});
 
             if ((iFrame != null) && (iFrame.length > 0) && (iFrame[0] != null)) {
                 alternateTimecode = new Timecode(iFrame[0].doubleValue(), frameRate);
