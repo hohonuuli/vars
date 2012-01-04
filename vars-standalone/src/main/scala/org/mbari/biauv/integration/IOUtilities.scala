@@ -87,10 +87,10 @@ object IOUtilities {
         val cameraDepth = extractArray(cameraData, "cam.depth")
 
         // Interpolate to cameraTime and calc needed params
-        val cameraAltitude = Matlib.interpLinear(navTime, mAltitude, cameraTime).map { _  / cos(Pi / 6) }
-        val cameraRoll = Matlib.interpLinear(navTime, mPhi, cameraTime)
-        val cameraPitch = Matlib.interpLinear(navTime, mTheta, cameraTime)
-        val cameraYaw = Matlib.interpLinear(navTime, mPsi, cameraTime)
+        val cameraAltitude = Matlib.interpolate(navTime, mAltitude, cameraTime).map { _  / cos(Pi / 6) }
+        val cameraRoll = Matlib.interpolate(navTime, mPhi, cameraTime)
+        val cameraPitch = Matlib.interpolate(navTime, mTheta, cameraTime)
+        val cameraYaw = Matlib.interpolate(navTime, mPsi, cameraTime)
         val focalLength = 28D // in mm
         val viewHeight = cameraAltitude.map { _ * 24D / focalLength }
         val viewWidth = cameraAltitude.map { _ * 36D / focalLength }

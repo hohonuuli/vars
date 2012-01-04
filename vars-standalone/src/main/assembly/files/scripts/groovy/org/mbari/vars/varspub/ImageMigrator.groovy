@@ -27,10 +27,10 @@ class ImageMigrator {
     private static final log = LoggerFactory.getLogger(ImageMigrator.class)
 
     static void doDatabaseLookup() {
-        def internalDb = Sql.newInstance("jdbc:jtds:sqlserver://solstice.shore.mbari.org:1433/VARS",
+        def internalDb = Sql.newInstance("jdbc:jtds:sqlserver://equinox.shore.mbari.org:1433/VARS",
                 "everyone", "guest", "net.sourceforge.jtds.jdbc.Driver");
 
-        def externalDb = Sql.newInstance("jdbc:jtds:sqlserver://varspub.mbari.org:46047/VARS_External",
+        def externalDb = Sql.newInstance("jdbc:jtds:sqlserver://dione.mbari.org:51001/VARS",
                 "everyone", "guest", "net.sourceforge.jtds.jdbc.Driver");
 
         // Fetch all image URL's on the external database
@@ -67,7 +67,7 @@ WHERE
             }
             
             if (n % 5000 == 0) {
-                log.info("Retrieved ${n} of ${imageCount} URL's from SOLSTICE")
+                log.info("Retrieved ${n} of ${imageCount} URL's from Equinox")
             }
         }
     }

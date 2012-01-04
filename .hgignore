@@ -1,8 +1,14 @@
 syntax: regexp
 .metadata/ 
+.settings/
 target/ 
 ^test 
 ^.*patch$
 
 syntax: glob
 .DS_Store
+.project
+.classpath
+*.iml
+*.ipr
+*.iws

@@ -198,7 +198,7 @@ public class EXPDPersistenceService extends QueryableImpl implements ExternalDat
                 frames[i] = new BigDecimal(tc.getFrames());
             }
 
-            BigDecimal[] iFrame = Matlib.interpLinear(dates, frames,
+            BigDecimal[] iFrame = Matlib.interpolate(dates, frames,
                     new BigDecimal[]{new BigDecimal(date.getTime())});
             if ((iFrame != null) && (iFrame.length > 0) && (iFrame[0] != null)) {
                 timecode = new Timecode(iFrame[0].doubleValue(), frameRate);
@@ -221,7 +221,7 @@ public class EXPDPersistenceService extends QueryableImpl implements ExternalDat
                 frames[i] = new BigDecimal(tc.getFrames());
             }
 
-            iFrame = Matlib.interpLinear(dates, frames, new BigDecimal[]{new BigDecimal(date.getTime())});
+            iFrame = Matlib.interpolate(dates, frames, new BigDecimal[]{new BigDecimal(date.getTime())});
 
             if ((iFrame != null) && (iFrame.length > 0) && (iFrame[0] != null)) {
                 alternateTimecode = new Timecode(iFrame[0].doubleValue(), frameRate);

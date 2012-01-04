@@ -3,6 +3,8 @@ package vars.annotation.ui.commandqueue.impl;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import org.bushe.swing.event.EventBus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import vars.ILink;
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.AnnotationFactory;
@@ -26,6 +28,7 @@ public class AddAssociationCmd implements Command {
 
     protected final ILink associationTemplate;
     protected final Collection<Observation> originalObservations;
+    private Logger log = LoggerFactory.getLogger(getClass());
 
     public AddAssociationCmd(ILink associationTemplate, Collection<Observation> originalObservations) {
         this.associationTemplate = associationTemplate;
@@ -52,13 +55,12 @@ public class AddAssociationCmd implements Command {
         dao.startTransaction();
         for (Observation observation : originalObservations) {
 
-            // Try a merge first to try an update the conceptName in case it's been
-            // changed.
             try {
-                observation = dao.merge(observation);
+                //observation = dao.merge(observation);
+                observation = dao.find(observation);
             }
             catch (Exception e) {
-                observation = dao.find(observation);
+                log.warn("Failed to lookup {}", observation);
             }
 
             if (observation != null) {
