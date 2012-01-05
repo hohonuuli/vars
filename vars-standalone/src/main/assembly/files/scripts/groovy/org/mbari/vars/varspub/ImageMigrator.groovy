@@ -45,7 +45,7 @@ WHERE
             externalMap[row[0]] = row[1]
         }
         def imageCount = externalMap.size()
-        log.info("${imageCount} images in VARSPUB")
+        log.info("Found ${imageCount} image URLs in VARSPUB")
 
         // Fetch corresponding URLs on the interal database
         int n = 0
@@ -76,7 +76,8 @@ WHERE
      * Checks to see if an image was found at the given URL
      */
     static boolean imageExists(URL url) {
-        log.info("Searching for ${url}")
+
+        log.info("Attempting to read image at ${url}")
         def exists = false
         try {
             // If the image doesn't exist Java will throw an IOException
@@ -92,7 +93,7 @@ WHERE
             exists = true
         }
         catch (Exception e) {
-            log.info("Unable to read ${url}")
+            log.info("\tFailed to read ${url}")
         }
         return exists
     }
@@ -140,7 +141,7 @@ WHERE
         BufferedImage image = ImageIO.read(internalUrl)
         ImageUtilities.addWatermark(image, "Copyright ${copyright} ${dateFormat.format(new Date())} MBARI", Color.WHITE, new Font("Arial", Font.BOLD, 34), 0.33f)
         ImageUtilities.saveImage(image, localFile)
-        log.info("Watermark completed.\n\tLOCAL FILE: ${localFile}\n\tINTERNAL: ${internalUrl}\n\tEXTERNAL: ${externalUrl}")
+        log.info("Watermark completed.\n\tCopied ${internalUrl}\n\tto ${localFile}\n\tthe public URL is ${externalUrl}")
     }
 
     static update(target) {
@@ -181,6 +182,7 @@ WHERE
                     log.info("Failed to watermark ${url}", e)
                 }
             }
+            Thread.sleep(50) // REQUIRED!! Otherwise Apache on Eione ends up hanging after a few hundred files
         }
     }
 }
