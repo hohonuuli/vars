@@ -374,6 +374,7 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
                 cameraData.setIris((cameraDatum.getIris() == null) ? null : Math.round(cameraDatum.getIris()));
             }
             else {
+                // TODO cameraData values should be set to null
                 log.info("No camera data was found in EXPD for {}", videoFrame);
             }
 
@@ -388,6 +389,7 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
                 physicalData.setTemperature(ctdDatum.getTemperature());
             }
             else {
+                // TODO physicalData values should be set to null
                 log.info("No CTD data was found in EXPD for {}", videoFrame);
             }
 
@@ -400,6 +402,7 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
                 physicalData.setLongitude(navigationDatum.getLongitude());
             }
             else {
+                // TODO physicalData values should be set to null
                 log.info("No navigation data was found in EXPD for {}", videoFrame);
             }
 

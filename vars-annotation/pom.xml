@@ -149,6 +149,12 @@
             </properties>
         </profile>
         <profile>
+            <id>wf-dsg</id>
+            <properties>
+                <environment>wf-dsg</environment>
+            </properties>
+        </profile>
+        <profile>
             <id>test</id>
             <properties>
                 <environment>test</environment>

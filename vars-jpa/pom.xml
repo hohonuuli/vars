@@ -253,6 +253,19 @@
             </dependencies>
         </profile>
         <profile>
+            <id>wf-dsg</id>
+            <properties>
+                <environment>wf-dsg</environment>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>net.sourceforge.jtds</groupId>
+                    <artifactId>jtds</artifactId>
+                    <version>${jtds.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
             <id>test</id>
             <properties>
                 <environment>test</environment>
