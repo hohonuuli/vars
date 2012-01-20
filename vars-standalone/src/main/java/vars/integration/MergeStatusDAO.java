@@ -66,4 +66,6 @@ public interface MergeStatusDAO {
      * @param mergeStatus
      */
     void update(MergeStatus mergeStatus);
+
+    void close();
 }

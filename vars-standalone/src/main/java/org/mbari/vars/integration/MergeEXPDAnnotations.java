@@ -234,7 +234,7 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
         DiveDAO diveDAO = daoFactory.newDiveDAO();
         MergeStatusDAO dao = new MergeStatusDAOImpl(annotationDAOFactory, diveDAO);
         MergeStatus myMergeStatus = dao.findByPlatformAndSequenceNumber(platform, sequenceNumber);
-
+        dao.close();
         if (myMergeStatus == null) {
             myMergeStatus = new MergeStatus();
             videoArchiveSetDAO.startTransaction();
@@ -374,8 +374,11 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
                 cameraData.setIris((cameraDatum.getIris() == null) ? null : Math.round(cameraDatum.getIris()));
             }
             else {
-                // TODO cameraData values should be set to null
                 log.info("No camera data was found in EXPD for {}", videoFrame);
+                cameraData.setFocus(null);
+                cameraData.setZoom(null);
+                cameraData.setIris(null);
+                cameraData.setLogDate(null);
             }
 
             // ---- Update physicaldata
@@ -389,8 +392,11 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
                 physicalData.setTemperature(ctdDatum.getTemperature());
             }
             else {
-                // TODO physicalData values should be set to null
                 log.info("No CTD data was found in EXPD for {}", videoFrame);
+                physicalData.setLight(null);
+                physicalData.setOxygen(null);
+                physicalData.setSalinity(null);
+                physicalData.setTemperature(null);
             }
 
             NavigationDatum navigationDatum = uberDatum.getNavigationDatum();
@@ -402,8 +408,11 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
                 physicalData.setLongitude(navigationDatum.getLongitude());
             }
             else {
-                // TODO physicalData values should be set to null
                 log.info("No navigation data was found in EXPD for {}", videoFrame);
+                physicalData.setDepth(null);
+                physicalData.setLatitude(null);
+                physicalData.setLogDate(null);
+                physicalData.setLongitude(null);
             }
 
             // ---- Update date 
