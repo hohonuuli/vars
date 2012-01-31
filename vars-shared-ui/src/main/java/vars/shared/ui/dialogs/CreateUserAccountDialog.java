@@ -164,6 +164,7 @@ public class CreateUserAccountDialog extends UserAccountDialog {
                         userAccount = miscFactory.newUserAccount();
                         userAccount.setUserName(userName);
                         userAccount.setPassword(pwd1);
+                        // TODO Check if this is causing reset ROLE issue
                         userAccount.setRole(UserAccountRoles.READONLY.toString());
                         userAccount.setEmail(panel.getEmailTextField().getText());
                         userAccount.setAffiliation(panel.getAffiliationTextField().getText());

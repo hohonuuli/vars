@@ -276,7 +276,8 @@ public class LoginDialog extends JDialog {
                 success = userAccount.authenticate(password);
             }
             else {
-                userAccount.setRole(UserAccountRoles.READONLY.getRoleName());
+                // Is this causing password reset issue
+                //userAccount.setRole(UserAccountRoles.READONLY.getRoleName());
                 success = true;
             }
             
