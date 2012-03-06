@@ -20,7 +20,6 @@ public class UserPreferencesPanelController implements PreferenceUpdater {
     private final UserPreferencesPanel panel;
     private final MiscDAOFactory daoFactory;
     
-    
     public UserPreferencesPanelController(UserPreferencesPanel panel, MiscDAOFactory daoFactory) {
         this.panel = panel;
         this.daoFactory = daoFactory;
@@ -49,7 +48,7 @@ public class UserPreferencesPanelController implements PreferenceUpdater {
                 userAccount.setEmail(p.getEmailTextField().getText());
                 userAccount.setFirstName(p.getFirstNameTextField().getText());
                 userAccount.setLastName(p.getLastNameTextField().getText());
-                userAccount.setRole((String) p.getRoleComboBox().getSelectedItem());
+                //userAccount.setRole((String) p.getRoleComboBox().getSelectedItem());
                 
                 // Check password
                 char[] pwd1 = p.getPasswordField1().getPassword();
