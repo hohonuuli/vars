@@ -1,5 +1,4 @@
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-PREREQUISITES FOR BUILDING VARS
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In order to build VARS you will need to have the following installed:
@@ -74,4 +73,6 @@ A standalone application will be built to
 vars-redux/vars-standalone/target/vars-standalone-[VERSION]-scripting.zip.
 
 The 'environment' variable specifies what database you are targeting, for most
-folks that will be 'dev'. 
+folks that will be 'dev'. i
+
+
