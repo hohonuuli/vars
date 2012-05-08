@@ -1,7 +1,5 @@
 package vars.annotation.ui.commandqueue;
 
-import ij.Undo;
-
 /**
  * EventBus Event class. Wraps a command that will be stored in the CommandQueue. It
  * has a direction, DO or UNDO. In general, only DO commands should be used by developers.

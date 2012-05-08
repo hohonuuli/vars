@@ -32,7 +32,7 @@ import java.util.concurrent.LinkedBlockingDeque;
  * The command queue processes commands in the order received. Commands are send via
  * EventBus as CommandEvents. There are 2 types of CommandEvents, DoCommmandEvent and
  * UndoCommandEvent. For all practical purposes components should use only the
- * {@link DoCommandEvent}; the {@link UndoCommandEvent} is mainly for internal use only.
+ * {@link CommandEvent}; the {@link UndoCommandEvent} is mainly for internal use only.
  * Other events that the command queue listens for are:
  * <ul>
  *     <li>{@link ClearCommandQueueEvent}</li>

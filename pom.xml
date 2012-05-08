@@ -4,7 +4,7 @@
     <groupId>vars-redux</groupId>
     <artifactId>vars-redux</artifactId>
     <packaging>pom</packaging>
-    <version>6.1.1-SNAPSHOT</version>
+    <version>6.1.1</version>
     <name>vars-redux</name>
     <inceptionYear>2002</inceptionYear>
     <organization>
@@ -353,7 +353,7 @@
                         <artifactId>maven-pmd-plugin</artifactId>
                         <configuration>
                             <linkXref>true</linkXref>
-                            <targetJdk>1.5</targetJdk>
+                            <targetJdk>1.6</targetJdk>
                             <rulesets>
                                 <ruleset>/rulesets/basic.xml</ruleset>
                                 <ruleset>/rulesets/imports.xml</ruleset>
