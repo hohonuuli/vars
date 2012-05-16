@@ -86,14 +86,14 @@ public class AssociationImpl implements Serializable, Association, JPAEntity {
     @Column(
         name = "LinkName",
         nullable = false,
-        length = 50
+        length = 128
     )
     String linkName;
 
     @Column(
         name = "LinkValue",
         nullable = false,
-        length = 100
+        length = 1024
     )
     String linkValue;
 
@@ -104,7 +104,7 @@ public class AssociationImpl implements Serializable, Association, JPAEntity {
     @Column(
         name = "ToConcept",
         nullable = false,
-        length = 50
+        length = 128
     )
     String toConcept;
 
