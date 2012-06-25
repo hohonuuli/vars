@@ -210,10 +210,10 @@ CREATE VIEW "VARSUSER"."ANNOTATIONS" AS SELECT
 	PHYSICALDATA.ID AS "PHYSICALDATAID_FK",   
 	CAMERADATA.ID AS "CAMERADATAID_FK"
 FROM                
-	Association LEFT OUTER JOIN     
-	Association_Child_Parent ON Association.id = Association_Child_Parent.Parent_AssociationID RIGHT OUTER JOIN     
+	Association RIGHT OUTER JOIN     
 	Observation ON Association.ObservationID_FK = Observation.id LEFT OUTER JOIN         
-	PhysicalData RIGHT OUTER JOIN   VideoFrame ON PhysicalData.VideoFrameID_FK = VideoFrame.id LEFT OUTER JOIN  
+	PhysicalData RIGHT OUTER JOIN   
+	VideoFrame ON PhysicalData.VideoFrameID_FK = VideoFrame.id LEFT OUTER JOIN  
 	CameraData ON VideoFrame.id = CameraData.VideoFrameID_FK LEFT OUTER JOIN         
 	CameraPlatformDeployment RIGHT OUTER JOIN       
 	VideoArchiveSet ON CameraPlatformDeployment.VideoArchiveSetID_FK = VideoArchiveSet.id RIGHT OUTER JOIN       

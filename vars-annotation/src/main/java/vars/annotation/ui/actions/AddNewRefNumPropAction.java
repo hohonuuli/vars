@@ -34,12 +34,12 @@ import vars.annotation.ui.ToolBelt;
  *
  * @author <a href="http://www.mbari.org">MBARI</a>
  */
-public final class AddNewRefNumPropAction extends AddPropertyAction {
+public class AddNewRefNumPropAction extends AddPropertyAction {
 
     /**
      * It's static so all instance share the same number
      */
-    private static int refNumber = 1;
+    volatile private static int refNumber = 1;
 
 
     /**

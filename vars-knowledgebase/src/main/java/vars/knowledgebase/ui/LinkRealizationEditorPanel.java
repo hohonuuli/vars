@@ -32,6 +32,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
@@ -87,7 +88,7 @@ public class LinkRealizationEditorPanel extends EditorPanel {
     private JScrollPane linkValueScrollPane = null;
     private JTextArea linkValueTextArea = null;
     private ListListModel listModel = null;
-    private JPanel propertiesPanel = null;
+    private JSplitPane propertiesPanel = null;
     private JScrollPane scrollPane = null;
     private HierachicalConceptNameComboBox toConceptComboBox = null;
     private JLabel toConceptLabel = null;
@@ -144,7 +145,7 @@ public class LinkRealizationEditorPanel extends EditorPanel {
             gridBagConstraints11.gridx = 1;
             gridBagConstraints11.gridy = 2;
             gridBagConstraints11.gridheight = 1;
-            gridBagConstraints11.anchor = GridBagConstraints.NORTHWEST;
+            //gridBagConstraints11.anchor = GridBagConstraints.NORTHWEST;
             gridBagConstraints11.insets = new Insets(0, 0, 5, 20);
             gridBagConstraints11.weightx = 1.0;
             GridBagConstraints gridBagConstraints2 = new GridBagConstraints();
@@ -171,35 +172,15 @@ public class LinkRealizationEditorPanel extends EditorPanel {
             GridBagConstraints gridBagConstraints7 = new GridBagConstraints();
             gridBagConstraints7.fill = GridBagConstraints.BOTH;
             gridBagConstraints7.gridy = 1;
-            gridBagConstraints7.weightx = 1.0;
             gridBagConstraints7.anchor = GridBagConstraints.WEST;
             gridBagConstraints7.insets = new Insets(0, 0, 5, 20);
             gridBagConstraints7.gridx = 1;
             GridBagConstraints gridBagConstraints6 = new GridBagConstraints();
             gridBagConstraints6.fill = GridBagConstraints.BOTH;
             gridBagConstraints6.gridy = 0;
-            gridBagConstraints6.weightx = 1.0;
             gridBagConstraints6.anchor = GridBagConstraints.WEST;
             gridBagConstraints6.insets = new Insets(5, 0, 5, 20);
             gridBagConstraints6.gridx = 1;
-            GridBagConstraints gridBagConstraints5 = new GridBagConstraints();
-            gridBagConstraints5.gridx = 0;
-            gridBagConstraints5.anchor = GridBagConstraints.WEST;
-            gridBagConstraints5.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints5.insets = new Insets(0, 20, 0, 10);
-            gridBagConstraints5.gridy = 2;
-            GridBagConstraints gridBagConstraints4 = new GridBagConstraints();
-            gridBagConstraints4.gridx = 0;
-            gridBagConstraints4.anchor = GridBagConstraints.WEST;
-            gridBagConstraints4.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints4.insets = new Insets(0, 20, 0, 10);
-            gridBagConstraints4.gridy = 1;
-            GridBagConstraints gridBagConstraints3 = new GridBagConstraints();
-            gridBagConstraints3.gridx = 0;
-            gridBagConstraints3.anchor = GridBagConstraints.WEST;
-            gridBagConstraints3.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints3.insets = new Insets(0, 20, 0, 10);
-            gridBagConstraints3.gridy = 0;
             linkEditorPanel = new JPanel();
             linkEditorPanel.setLayout(new GridBagLayout());
             linkEditorPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
@@ -260,7 +241,7 @@ public class LinkRealizationEditorPanel extends EditorPanel {
 
     private JScrollPane getLinkValueScrollPane() {
         if (linkValueScrollPane == null) {
-            linkValueScrollPane = new JScrollPane(getLinkValueTextArea());
+            linkValueScrollPane = new JScrollPane(getLinkValueTextArea(), JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
             //linkValueScrollPane.setPreferredSize(getLinkValueTextArea().getPreferredScrollableViewportSize());
         }
 
@@ -272,6 +253,7 @@ public class LinkRealizationEditorPanel extends EditorPanel {
         if (linkValueTextArea == null) {
             linkValueTextArea = new JTextArea();
             linkValueTextArea.setPreferredSize(new Dimension(300, 48));
+            linkValueTextArea.setLineWrap(true);
         }
 
         return linkValueTextArea;
@@ -294,15 +276,14 @@ public class LinkRealizationEditorPanel extends EditorPanel {
         return newAction;
     }
 
-    private JPanel getPropertiesPanel() {
+    private JSplitPane getPropertiesPanel() {
         if (propertiesPanel == null) {
-            propertiesPanel = new JPanel();
-            propertiesPanel.setLayout(new BorderLayout());
+            propertiesPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, getScrollPane(), getLinkEditorPanel());
+            propertiesPanel.setDividerLocation(0.25);
             propertiesPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Descriptions",
                     javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
                     javax.swing.border.TitledBorder.DEFAULT_POSITION, null, null));
-            propertiesPanel.add(getScrollPane(), BorderLayout.CENTER);
-            propertiesPanel.add(getLinkEditorPanel(), BorderLayout.SOUTH);
+
         }
 
         return propertiesPanel;
@@ -312,7 +293,6 @@ public class LinkRealizationEditorPanel extends EditorPanel {
         if (scrollPane == null) {
             scrollPane = new JScrollPane();
             scrollPane.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-            scrollPane.setViewportView(getLinkList());
             scrollPane.setViewportView(getLinkList());
         }
 
@@ -504,75 +484,6 @@ public class LinkRealizationEditorPanel extends EditorPanel {
         log.debug("Update with {} is complete", link);
 
     }
-
-//    private class ANewAction extends ActionAdapter {
-//
-//        private final LinkEditorDialog dialog = new MyLinkEditorDialog();
-//
-//        /**
-//         * Show the dialog. The dialog  is used to set the properties of the link
-//         */
-//        @Override
-//        public void doAction() {
-//            final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
-//            if ((userAccount != null) && !userAccount.isReadOnly()) {
-//
-//                LinkTemplate linkTemplate = (LinkTemplate) getLinkList().getSelectedValue();
-//                LinkRealization linkRealization = getToolBelt().getKnowledgebaseFactory().newLinkRealization();
-//                linkRealization.setLinkName(linkTemplate.getLinkName());
-//                linkRealization.setLinkValue(linkTemplate.getLinkValue());
-//                linkRealization.setToConcept(linkTemplate.getToConcept());
-//
-//                // Show new dialog
-//                dialog.setLink(linkRealization);
-//                dialog.setVisible(true);
-//            }
-//        }
-//
-//        /**
-//                 * Class that adds some functionality to a LinkEditorDialog when it's
-//                 * okbutton is clicked.
-//                 */
-//        private final class MyLinkEditorDialog extends LinkEditorDialog {
-//
-//            MyLinkEditorDialog() {
-//                super((Frame) Lookup.getApplicationFrameDispatcher().getValueObject(), getToolBelt());
-//                getLinkField().setEditable(false);
-//                setLocationRelativeTo((Frame) Lookup.getApplicationFrameDispatcher().getValueObject());
-//                this.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
-//
-//            }
-//
-//            /**
-//             */
-//            @Override
-//            public void onOkClick() {
-//
-//                /*
-//                 * The dialog handles setting the link propertes. We just have to
-//                 * save it in this method.
-//                 */
-//                Concept concept = getConcept();
-//                LinkRealization linkRealization = (LinkRealization) getLink();
-//                concept.getConceptMetadata().addLinkRealization(linkRealization);
-//
-//                try {
-//                    LinkRealizationDAO linkRealizationDAO = getToolBelt().getKnowledgebaseDAOFactory()
-//                        .newLinkRealizationDAO();
-//                    linkRealizationDAO.startTransaction();
-//                    linkRealizationDAO.persist(linkRealization);
-//                    linkRealizationDAO.endTransaction();
-//                    linkRealizationDAO.close();
-//                }
-//                catch (Exception e) {
-//                    concept.getConceptMetadata().removeLinkRealization(linkRealization);
-//                    log.error("Database transaction failed", e);
-//                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR,
-//                                     "Failed to update " + concept + ". Rolling back changes.");
-//                }
-//            }
-//        }
-//    }
 
 
     private class DeleteAction extends ActionAdapter {

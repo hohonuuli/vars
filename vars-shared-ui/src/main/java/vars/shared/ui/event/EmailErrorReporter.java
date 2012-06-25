@@ -44,7 +44,7 @@ public class EmailErrorReporter implements ErrorReporter {
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
             Email email = new HtmlEmail();
-            email.setHostName("mail.shore.mbari.org");
+            email.setHostName("mbarimail.mbari.org");
             email.addTo("brian@mbari.org");
 
             UserAccount userAccount = (UserAccount) GlobalLookup.getUserAccountDispatcher().getValueObject();
