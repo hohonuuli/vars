@@ -46,7 +46,6 @@ class TripodLoader {
             def conceptNameAsString = conceptDAO.findRoot().primaryConceptName.name
             conceptDAO.close()
             def videoArchiveDAO = toolBox.toolBelt.annotationDAOFactory.newVideoArchiveDAO()
-            videoArchiveDAO.startTransaction()
 
             VideoArchive videoArchive = videoArchiveDAO.findOrCreateByParameters(platform, sequenceNumber, videoArchiveName)
 
@@ -54,10 +53,17 @@ class TripodLoader {
             def images = fetchImagesURLs(remoteImageDirectory)
             def observationDate = new Date()
             //
+            def n = 0
+            def inTransaction = false
             images.eachWithIndex { imageRef, idx ->
+                if (!inTransaction) {
+                    videoArchiveDAO.startTransaction()
+                }
                 print("Processing ${imageRef}")
                 def url = new URL(imageRef)
-                def metadata = Sanselan.getMetadata(url.openStream(), "FOO")
+                def stream = url.openStream()
+                def metadata = Sanselan.getMetadata(stream, "FOO")
+                stream.close()
                 def creationDate = metadata.findEXIFValue(TiffConstants.EXIF_TAG_CREATE_DATE)
                 def date = dateFormat.parse(creationDate.valueDescription[1..-2])
                 def timecode = new Timecode(idx, 30)
@@ -85,9 +91,21 @@ class TripodLoader {
                 videoFrame.addObservation(observation)
                 videoArchiveDAO.persist(observation)
                 println(" ... done")
+                n = n + 1
+
+                if (n == 50) {
+                    print(" ! commiting checkpoint")
+                    videoArchiveDAO.endTransaction()
+                    inTransaction = false
+                    n = 0
+                    println(" ... done")
+                }
+
             }
 
-            videoArchiveDAO.endTransaction()
+            if (inTransaction) {
+                videoArchiveDAO.endTransaction()
+            }
             videoArchiveDAO.close()
         }
         catch (Exception e) {
