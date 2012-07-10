@@ -1,7 +1,5 @@
 package vars
 import com.google.inject.Injector
-import org.mbari.expd.jdbc.DAOFactoryImpl
-import vars.annotation.ui.Lookup
 import vars.annotation.ui.ToolBelt
 import com.google.inject.Module
 import com.google.inject.Binder
@@ -9,11 +7,9 @@ import vars.shared.InjectorModule
 import org.mbari.expd.DAOFactory
 import vars.integration.MergeStatusDAO
 import org.mbari.vars.integration.MergeStatusDAOImpl
-import vars.integration.MergeFunction
-import org.mbari.vars.integration.MergeEXPDAnnotations
+
 import com.google.inject.Guice
-import org.mbari.expd.DiveDAO
-import org.mbari.expd.jdbc.DiveDAOImpl
+
 import org.mbari.expd.jdbc.ExpdModule
 
 class ToolBox {

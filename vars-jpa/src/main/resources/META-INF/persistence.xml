@@ -43,7 +43,7 @@
             <property name="javax.persistence.jdbc.driver" value="${ANNOTATION_JDBC_DRIVER}"/>
             <property name="javax.persistence.jdbc.password" value="${ANNOTATION_JDBC_PASSWORD}"/>
             <property name="eclipselink.cache.type.default" value="Weak" />
-            <!-- property name="eclipselink.cache.shared.default" value="false"/ -->
+            <property name="eclipselink.cache.shared.default" value="false"/>
             <property name="eclipselink.logging.level" value="CONFIG"/>
             <property name="eclipselink.weaving" value="static" />
             <!-- <property name="eclipselink.jdbc.bind-parameters" value="false"/> -->
