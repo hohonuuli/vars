@@ -9,7 +9,7 @@
     <artifactId>vars-jpa</artifactId>
     <name>vars-jpa [Library]</name>
     <properties>
-        <derby.version>10.8.2.2</derby.version>
+        <derby.version>10.9.1.0</derby.version>
         <jtds.version>1.2.5</jtds.version>
     </properties>
     <!--
@@ -58,12 +58,12 @@
             <artifactId>vars-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
+        <!-- dependency>
             <groupId>org.dbunit</groupId>
             <artifactId>dbunit</artifactId>
             <version>2.4.8</version>
             <scope>test</scope>
-        </dependency>
+        </dependency -->
         <!-- For password encryption -->
         <dependency>
             <groupId>org.jasypt</groupId>
@@ -87,7 +87,7 @@
         <dependency>
             <groupId>org.eclipse.persistence</groupId>
             <artifactId>eclipselink</artifactId>
-            <version>2.3.2</version>
+            <version>2.4.0</version>
             <scope>compile</scope>
             <optional>false</optional>
         </dependency>

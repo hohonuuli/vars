@@ -32,6 +32,9 @@
             <scope>runtime</scope>
             <excludes>
                 <exclude>org.codehaus.groovy:groovy</exclude>
+                <exclude>org.codehaus.groovy:groovy-groovysh</exclude>
+                <exclude>org.codehaus.groovy:groovy-xml</exclude>
+                <exclude>org.codehaus.groovy:groovy-sql</exclude>
                 <exclude>commons-cli:commons-cli</exclude>
                 <exclude>jline:jline</exclude>
                 <exclude>org.fusesource.jansi:jansi</exclude>
@@ -56,6 +59,9 @@
             <scope>runtime</scope>
             <includes>
                 <include>org.codehaus.groovy:groovy</include>
+                <include>org.codehaus.groovy:groovy-groovysh</include>
+                <include>org.codehaus.groovy:groovy-xml</include>
+                <include>org.codehaus.groovy:groovy-sql</include>
                 <include>commons-cli:commons-cli</include>
                 <include>jline:jline</include>
                 <include>org.fusesource.jansi:jansi</include>

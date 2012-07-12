@@ -368,7 +368,7 @@ class DatabaseUtility {
  * supplied queue and checks to see if the file exists. If not then
  * it adds the ULR to the badUrls collection.
  */
-private class ImageChecker implements Runnable {
+class ImageChecker implements Runnable {
 
     static log = LoggerFactory.getLogger(ImageChecker.class)
 
