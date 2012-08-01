@@ -20,6 +20,8 @@
             <property name="javax.persistence.jdbc.user" value="${KNOWLEDGEBASE_JDBC_USERNAME}"/>
             <property name="javax.persistence.jdbc.driver" value="${KNOWLEDGEBASE_JDBC_DRIVER}"/>
             <property name="javax.persistence.jdbc.password" value="${KNOWLEDGEBASE_JDBC_PASSWORD}"/>
+            <property name="eclipselink.cache.type.default" value="Weak" />
+            <property name="eclipselink.cache.shared.default" value="false"/>
             <property name="eclipselink.logging.level" value="CONFIG"/>
             <property name="eclipselink.weaving" value="static" />
             <!-- <property name="eclipselink.jdbc.bind-parameters" value="false"/> -->
@@ -42,7 +44,8 @@
             <property name="javax.persistence.jdbc.user" value="${ANNOTATION_JDBC_USERNAME}"/>
             <property name="javax.persistence.jdbc.driver" value="${ANNOTATION_JDBC_DRIVER}"/>
             <property name="javax.persistence.jdbc.password" value="${ANNOTATION_JDBC_PASSWORD}"/>
-            <property name="eclipselink.cache.type.default" value="Weak" />
+            <!-- property name="eclipselink.cache.type.default" value="Weak" / -->
+            <property name="eclipselink.cache.type.default" value="NONE" />
             <property name="eclipselink.cache.shared.default" value="false"/>
             <property name="eclipselink.logging.level" value="CONFIG"/>
             <property name="eclipselink.weaving" value="static" />
@@ -60,6 +63,8 @@
             <property name="javax.persistence.jdbc.user" value="${MISC_JDBC_USERNAME}"/>
             <property name="javax.persistence.jdbc.driver" value="${MISC_JDBC_DRIVER}"/>
             <property name="javax.persistence.jdbc.password" value="${MISC_JDBC_PASSWORD}"/>
+            <property name="eclipselink.cache.type.default" value="Weak" />
+            <property name="eclipselink.cache.shared.default" value="false"/>
             <property name="eclipselink.logging.level" value="CONFIG"/>
             <property name="eclipselink.weaving" value="static" />
             <!-- <property name="eclipselink.jdbc.bind-parameters" value="false"/> -->
@@ -100,6 +105,10 @@
             <property name="eclipselink.logging.timestamp" value="false" />
             <property name="eclipselink.logging.session" value="false" />
             <property name="eclipselink.logging.thread" value="false" />
+
+            <!-- Disable Caching -->
+            <property name="eclipselink.cache.type.default" value="NONE" />
+            <property name="eclipselink.cache.shared.default" value="false"/>
 
             <!-- Database Table generation -->
             <property name="eclipselink.ddl-generation" value="create-tables"/>

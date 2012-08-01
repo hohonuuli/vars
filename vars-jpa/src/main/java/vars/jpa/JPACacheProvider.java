@@ -19,9 +19,7 @@ import vars.annotation.AnnotationObject;
 import vars.knowledgebase.KnowledgebaseObject;
 
 /**
- * Provides a method to clear the 2nd level cache used by Hibernate JPA. This
- * is specific to Hibernate and will need to be rewritten if using s different
- * JPA provider. In the future we can modify it to use JPA 2.0 cache API.
+ * Provides a method to clear the 2nd level cache used by JPA.
  *
  * @author brian
  */

@@ -190,6 +190,7 @@ public class JXObservationTable extends JXTable implements ObservationTable {
      */
     public void setSelectedObservations(final Collection<Observation> observations) {
         ListSelectionModel mySelectionModel = getSelectionModel();
+        mySelectionModel.setValueIsAdjusting(true);
         mySelectionModel.clearSelection();
 
         JXObservationTableModel model = (JXObservationTableModel) getModel();
@@ -205,6 +206,7 @@ public class JXObservationTable extends JXTable implements ObservationTable {
                 // We can safely ignore the exception
             }
         }
+        mySelectionModel.setValueIsAdjusting(false);
 
         int[] i = getSelectedRows();
         if (i != null && i.length > 0) {

@@ -52,6 +52,7 @@ import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.commandqueue.Command;
 import vars.annotation.ui.commandqueue.CommandEvent;
 import vars.annotation.ui.commandqueue.impl.AddObservationCmd;
+import vars.annotation.ui.commandqueue.impl.AddObservationToVideoFrameCmd;
 import vars.annotation.ui.eventbus.ObservationsAddedEvent;
 import vars.annotation.ui.eventbus.ObservationsChangedEvent;
 import vars.annotation.ui.eventbus.ObservationsRemovedEvent;
@@ -408,6 +409,14 @@ public class AnnotationLayerUI<T extends JImageUrlCanvas> extends CrossHairLayer
 
         void newObservation(Point2D point) {
 
+            String conceptName = getConcept().getPrimaryConceptName().getName();
+            String user = ((UserAccount) Lookup.getUserAccountDispatcher().getValueObject()).getUserName();
+            Command command = new AddObservationToVideoFrameCmd(conceptName, getVideoFrame(), user, point, true);
+            CommandEvent commandEvent = new CommandEvent(command);
+            EventBus.publish(commandEvent);
+
+            /*  OLD version - works but gets really slow when there are lots of videoframes
+
             String timecode = getVideoFrame().getTimecode();
             String videoArchiveName = getVideoFrame().getVideoArchive().getName();
             String conceptName = getConcept().getPrimaryConceptName().getName();
@@ -417,6 +426,7 @@ public class AnnotationLayerUI<T extends JImageUrlCanvas> extends CrossHairLayer
                     user, cameraDirection.getDirection(), point, true);
             CommandEvent commandEvent = new CommandEvent(command);
             EventBus.publish(commandEvent);
+            */
 
         }
 

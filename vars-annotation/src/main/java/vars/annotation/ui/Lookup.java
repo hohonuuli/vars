@@ -102,7 +102,7 @@ public class Lookup extends GlobalLookup {
             public void propertyChange(PropertyChangeEvent evt) {
                 if ((evt.getNewValue() != null) && !(evt.getNewValue() instanceof App)) {
                     throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
-                                                       ", EXPECTED: " + App.class.getName());
+                            ", EXPECTED: " + App.class.getName());
                 }
             }
 
@@ -113,7 +113,7 @@ public class Lookup extends GlobalLookup {
             public void propertyChange(PropertyChangeEvent evt) {
                 if ((evt.getNewValue() != null) && !(evt.getNewValue() instanceof AnnotationFrame)) {
                     throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
-                                                       ", EXPECTED: " + AnnotationFrame.class.getName());
+                            ", EXPECTED: " + AnnotationFrame.class.getName());
                 }
             }
 
@@ -124,7 +124,7 @@ public class Lookup extends GlobalLookup {
             public void propertyChange(PropertyChangeEvent evt) {
                 if ((evt.getNewValue() != null) && !(evt.getNewValue() instanceof CameraDirections)) {
                     throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
-                                                       ", EXPECTED: " + CameraDirections.class.getName());
+                            ", EXPECTED: " + CameraDirections.class.getName());
                 }
             }
         });
@@ -134,7 +134,7 @@ public class Lookup extends GlobalLookup {
             public void propertyChange(PropertyChangeEvent evt) {
                 if ((evt.getNewValue() != null) && !(evt.getNewValue() instanceof Injector)) {
                     throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
-                                                       ", EXPECTED: " + Injector.class.getName());
+                            ", EXPECTED: " + Injector.class.getName());
                 }
             }
 
@@ -145,7 +145,7 @@ public class Lookup extends GlobalLookup {
             public void propertyChange(PropertyChangeEvent evt) {
                 if ((evt.getNewValue() != null) && !(evt.getNewValue() instanceof Preferences)) {
                     throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
-                                                       ", EXPECTED: " + Preferences.class.getName());
+                            ", EXPECTED: " + Preferences.class.getName());
                 }
             }
 
@@ -157,7 +157,7 @@ public class Lookup extends GlobalLookup {
             public void propertyChange(PropertyChangeEvent evt) {
                 if ((evt.getNewValue() != null) && !(evt.getNewValue() instanceof VideoArchive)) {
                     throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
-                                                       ", EXPECTED: " + VideoArchive.class.getName());
+                            ", EXPECTED: " + VideoArchive.class.getName());
                 }
                 else {
                     log.info("Using " + evt.getNewValue());
@@ -172,7 +172,7 @@ public class Lookup extends GlobalLookup {
             public void propertyChange(PropertyChangeEvent evt) {
                 if ((evt.getNewValue() != null) && !(evt.getNewValue() instanceof VideoControlService)) {
                     throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
-                                                       ", EXPECTED: " + VideoControlService.class.getName());
+                            ", EXPECTED: " + VideoControlService.class.getName());
                 }
                 else {
                     log.info("Using " + evt.getNewValue());
@@ -189,7 +189,7 @@ public class Lookup extends GlobalLookup {
             public void propertyChange(PropertyChangeEvent evt) {
                 if ((evt.getNewValue() != null) && !(evt.getNewValue() instanceof ImageCaptureService)) {
                     throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
-                                                       ", EXPECTED: " + ImageCaptureService.class.getName());
+                            ", EXPECTED: " + ImageCaptureService.class.getName());
                 }
                 else {
                     log.info("Using " + evt.getNewValue());
@@ -202,7 +202,7 @@ public class Lookup extends GlobalLookup {
             public void propertyChange(PropertyChangeEvent evt) {
                 if ((evt.getNewValue() != null) && !(evt.getNewValue() instanceof ObservationTable)) {
                     throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
-                                                       ", EXPECTED: " + ObservationTable.class.getName());
+                            ", EXPECTED: " + ObservationTable.class.getName());
                 }
             }
         });

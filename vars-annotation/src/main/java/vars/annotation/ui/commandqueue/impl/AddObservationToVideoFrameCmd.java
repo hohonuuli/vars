@@ -2,15 +2,12 @@ package vars.annotation.ui.commandqueue.impl;
 
 import com.google.common.collect.ImmutableList;
 import org.bushe.swing.event.EventBus;
-import org.mbari.movie.Timecode;
 import vars.UserAccount;
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.AnnotationFactory;
-import vars.annotation.CameraData;
 import vars.annotation.Observation;
 import vars.annotation.ObservationDAO;
 import vars.annotation.VideoArchive;
-import vars.annotation.VideoArchiveDAO;
 import vars.annotation.VideoFrame;
 import vars.annotation.VideoFrameDAO;
 import vars.annotation.jpa.ObservationImpl;
@@ -21,65 +18,29 @@ import vars.annotation.ui.eventbus.ObservationsRemovedEvent;
 import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
 
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
 import java.util.Date;
 
 /**
- * Add a new observation
- *
+ * Add an observation to an existing videoFrame
  * @author Brian Schlining
- * @since 2011-10-10
+ * @since 2012-07-31
  */
-public class AddObservationCmd implements Command {
+public class AddObservationToVideoFrameCmd implements Command {
 
     private String conceptName;
-    private final String timecode;
-    private final Date recordedDate;
-    private final String videoArchiveName;
     private final String user;
-    private final String cameraDirection;
     private Object newPrimaryKey;
     private final Point2D point;
-    private final String imageReference;
     private boolean selectAddedObservation = true;
+    private VideoFrame videoFrameDetached;
 
-    public AddObservationCmd(String conceptName, String timecode, Date recordedDate, String videoArchiveName,
-                             String user, String cameraDirection) {
-        this(conceptName, timecode, recordedDate, videoArchiveName, user, cameraDirection, null, null, false);
-    }
-
-    public AddObservationCmd(String conceptName, String timecode, Date recordedDate, String videoArchiveName,
-                             String user, String cameraDirection, boolean selectAddedObservation) {
-        this(conceptName, timecode, recordedDate, videoArchiveName, user, cameraDirection, null, null, selectAddedObservation);
-    }
-
-    public AddObservationCmd(String conceptName, String timecode, Date recordedDate, String videoArchiveName,
-                             String user, String cameraDirection, Point2D point) {
-        this(conceptName, timecode, recordedDate, videoArchiveName, user, cameraDirection, point, null, false);
-    }
-
-    public AddObservationCmd(String conceptName, String timecode, Date recordedDate, String videoArchiveName,
-                             String user, String cameraDirection, Point2D point, boolean selectAddedObservation) {
-        this(conceptName, timecode, recordedDate, videoArchiveName, user, cameraDirection, point, null, selectAddedObservation);
-
-    }
-
-    public AddObservationCmd(String conceptName, String timecode, Date recordedDate, String videoArchiveName,
-                             String user, String cameraDirection, Point2D point, String imageReference) {
-        this(conceptName, timecode, recordedDate, videoArchiveName, user, cameraDirection, point, imageReference, false);
-    }
-
-    public AddObservationCmd(String conceptName, String timecode, Date recordedDate, String videoArchiveName,
-                             String user, String cameraDirection, Point2D point, String imageReference, boolean selectAddedObservation) {
+    public AddObservationToVideoFrameCmd(String conceptName, VideoFrame videoFrame,
+            String user, Point2D point, boolean selectAddedObservation) {
         this.conceptName = conceptName;
-        this.timecode = timecode;
-        this.recordedDate = recordedDate;
-        this.videoArchiveName = videoArchiveName;
         this.user = (user == null) ? UserAccount.USERNAME_DEFAULT : user;
-        this.cameraDirection = cameraDirection;
         this.point = point;
-        this.imageReference = imageReference;
         this.selectAddedObservation = selectAddedObservation;
+        this.videoFrameDetached = videoFrame;
     }
 
     @Override
@@ -87,33 +48,11 @@ public class AddObservationCmd implements Command {
 
         AnnotationDAOFactory daoFactory = toolBelt.getAnnotationDAOFactory();
         AnnotationFactory factory = toolBelt.getAnnotationFactory();
-        VideoArchiveDAO videoArchiveDAO = daoFactory.newVideoArchiveDAO();
-        videoArchiveDAO.startTransaction();
-        VideoArchive videoArchive = videoArchiveDAO.findByName(videoArchiveName);
+        VideoFrameDAO videoFrameDAO = daoFactory.newVideoFrameDAO();
+        videoFrameDAO.startTransaction();
+        VideoFrame videoFrame = videoFrameDAO.find(videoFrameDetached);
         Observation newObservation = null;
-        if (videoArchive != null && conceptName != null && timecode != null) {
-
-            /*
-             * Verify that the timecode is acceptable
-             */
-            new Timecode(timecode); // Bad timecodes will throw an exception
-
-            /*
-             * Get or create the VideoFrame
-             */
-            VideoFrame videoFrame = videoArchive.findVideoFrameByTimeCode(timecode);
-            if (videoFrame == null) {
-                videoFrame = factory.newVideoFrame();
-                videoFrame.setRecordedDate(recordedDate);
-                videoFrame.setTimecode(timecode);
-                CameraData cameraData = videoFrame.getCameraData();
-                cameraData.setDirection(cameraDirection);
-                videoArchive.addVideoFrame(videoFrame);
-            }
-
-            if (imageReference != null) {
-                videoFrame.getCameraData().setImageReference(imageReference);
-            }
+        if (conceptName != null && videoFrame != null) {
 
             /*
                 Create observation
@@ -130,8 +69,9 @@ public class AddObservationCmd implements Command {
             videoFrame.addObservation(newObservation);
 
         }
-        videoArchiveDAO.endTransaction();
-        videoArchiveDAO.close();
+
+        videoFrameDAO.endTransaction();
+        videoFrameDAO.close();
         if (newObservation != null) {
             newPrimaryKey = newObservation.getPrimaryKey();
         }
@@ -178,6 +118,6 @@ public class AddObservationCmd implements Command {
 
     @Override
     public String getDescription() {
-        return "Add new Observation (" + conceptName + ") to " + timecode + " (" + recordedDate + ")";
+        return "Add new Observation (" + conceptName + ") to " + videoFrameDetached;
     }
 }
