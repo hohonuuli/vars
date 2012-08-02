@@ -1,18 +1,3 @@
-/*
- * @(#)AreaMeasurementLayerUI.java   2011.12.19 at 04:18:51 PST
- *
- * Copyright 2009 MBARI
- *
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-
-
 package vars.annotation.ui.imagepanel;
 
 import com.google.common.base.Function;
@@ -24,6 +9,7 @@ import org.bushe.swing.event.annotation.AnnotationProcessor;
 import org.bushe.swing.event.annotation.EventSubscriber;
 import org.jdesktop.jxlayer.JXLayer;
 import org.mbari.awt.AwtUtilities;
+import org.mbari.geometry.Point2D;
 import org.mbari.swing.JImageUrlCanvas;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +31,6 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -54,14 +39,9 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * @author Brian Schlining
- * @since 2011-10-27
- *
- * @param <T>
+ * @since 2012-08-02
  */
-public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends MultiLayerUI<T> {
-        //extends CrossHairLayerUI<T> {
-
-    private JXCrossHairPainter<T> crossHairPainter = new JXCrossHairPainter<T>();
+public class JXAreaMeasurementPainter<T extends JImageUrlCanvas> extends AbstractJXPainter<T> {
 
     /*
 
@@ -80,20 +60,19 @@ public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends MultiLaye
     private final Font lineFont = new Font("Sans Serif", Font.PLAIN, 10);
 
     /** Collection of pointsIC to be used to create the AreaMeasurement in image pixels */
-    private List<org.mbari.geometry.Point2D<Integer>> pointsIC = new CopyOnWriteArrayList<org.mbari.geometry
-        .Point2D<Integer>>();
+    private List<Point2D<Integer>> pointsIC = new CopyOnWriteArrayList<Point2D<Integer>>();
 
     /** Path used to draw measurement polygonCC in component coordinates*/
     private GeneralPath polygonCC = new GeneralPath();
 
     /** The current point where the mouse is in component coordinates*/
-    private Point2D currentPointCC = new Point2D.Double();
+    private java.awt.geom.Point2D currentPointCC = new java.awt.geom.Point2D.Double();
 
     /**
      * Path used to draw the triangle that will be added to the polygonCC if user addes another
      * click. In component coordiantes*/
     private GeneralPath bridgeCC = new GeneralPath();
-    
+
     /** Need a synchronized collection */
     private final Collection<AreaMeasurementPath> areaMeasurementPaths = new CopyOnWriteArrayList<AreaMeasurementPath>();
 
@@ -144,26 +123,19 @@ public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends MultiLaye
      *
      * @param toolBelt
      */
-    public AreaMeasurementLayerUI(ToolBelt toolBelt) {
+    public JXAreaMeasurementPainter(ToolBelt toolBelt) {
         this.toolBelt = toolBelt;
         AnnotationProcessor.process(this);
         Collection<Observation> selectedObservations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
         respondsTo(new ObservationsSelectedEvent(null, selectedObservations));
-        addPainter(crossHairPainter);
     }
 
     private AreaMeasurement newAreaMeasurement(String comment) {
-        return new AreaMeasurement(new ArrayList<org.mbari.geometry.Point2D<Integer>>(pointsIC), comment);
+        return new AreaMeasurement(new ArrayList<Point2D<Integer>>(pointsIC), comment);
     }
 
     @Override
-    public void clearPainters() {
-        super.clearPainters();
-        addPainter(crossHairPainter);
-    }
-
-    @Override
-    protected void paintLayer(Graphics2D g2, JXLayer<? extends T> jxl) {
+    public void paintLayer(Graphics2D g2, JXLayer<? extends T> jxl) {
         super.paintLayer(g2, jxl);
         g2.setPaintMode();    // Make sure xor is turned off
         if (observation != null) {
@@ -172,8 +144,8 @@ public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends MultiLaye
             for (Observation obs : relatedObservations) {
                 if ((obs.getX() != null) && (obs.getY() != null)) {
 
-                    Point2D imagePoint = new Point2D.Double(obs.getX(), obs.getY());
-                    Point2D componentPoint2D = jxl.getView().convertToComponent(imagePoint);
+                    java.awt.geom.Point2D imagePoint = new java.awt.geom.Point2D.Double(obs.getX(), obs.getY());
+                    java.awt.geom.Point2D componentPoint2D = jxl.getView().convertToComponent(imagePoint);
                     if (componentPoint2D != null) {
                         Point componentPoint = AwtUtilities.toPoint(componentPoint2D);
                         int x = componentPoint.x;
@@ -229,8 +201,8 @@ public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends MultiLaye
                 // TODO polygonCC should start and end with the currentPointCC marker.
                 for (int i = 0; i < pointsIC.size(); i++) {
                     org.mbari.geometry.Point2D<Integer> coordinate = pointsIC.get(i);
-                    Point2D imagePoint = new Point2D.Double(coordinate.getX(), coordinate.getY());
-                    Point2D componentPoint = jxl.getView().convertToComponent(imagePoint);
+                    java.awt.geom.Point2D imagePoint = new java.awt.geom.Point2D.Double(coordinate.getX(), coordinate.getY());
+                    java.awt.geom.Point2D componentPoint = jxl.getView().convertToComponent(imagePoint);
                     if (i == 0) {
                         polygonCC.moveTo(componentPoint.getX(), componentPoint.getY());
                     }
@@ -243,8 +215,8 @@ public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends MultiLaye
                 // Close path
 
                 org.mbari.geometry.Point2D<Integer> coordinate = pointsIC.get(0);
-                Point2D imagePoint = new Point2D.Double(coordinate.getX(), coordinate.getY());
-                Point2D componentPoint = jxl.getView().convertToComponent(imagePoint);
+                java.awt.geom.Point2D imagePoint = new java.awt.geom.Point2D.Double(coordinate.getX(), coordinate.getY());
+                java.awt.geom.Point2D componentPoint = jxl.getView().convertToComponent(imagePoint);
                 polygonCC.lineTo(componentPoint.getX(), componentPoint.getY());
                 g2.draw(polygonCC);
 
@@ -264,12 +236,12 @@ public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends MultiLaye
     }
 
     @Override
-    protected void processMouseEvent(MouseEvent me, JXLayer<? extends T> jxl) {
+    public void processMouseEvent(MouseEvent me, JXLayer<? extends T> jxl) {
         super.processMouseEvent(me, jxl);
         Point point = SwingUtilities.convertPoint(me.getComponent(), me.getPoint(), jxl);
         switch (me.getID()) {
         case MouseEvent.MOUSE_PRESSED:
-            Point2D imagePoint = jxl.getView().convertToImage(point);
+            java.awt.geom.Point2D imagePoint = jxl.getView().convertToImage(point);
             int x = (int) Math.round(imagePoint.getX());
             int y = (int) Math.round(imagePoint.getY());
             if (me.getClickCount() == 1 && (me.getButton() == MouseEvent.BUTTON1)) {
@@ -292,7 +264,7 @@ public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends MultiLaye
     }
 
     @Override
-    protected void processMouseMotionEvent(MouseEvent me, JXLayer<? extends T> jxl) {
+    public void processMouseMotionEvent(MouseEvent me, JXLayer<? extends T> jxl) {
         super.processMouseMotionEvent(me, jxl);
         if ((me.getID() == MouseEvent.MOUSE_MOVED) && (pointsIC.size() > 1)) {
             Point point = SwingUtilities.convertPoint(me.getComponent(), me.getPoint(), jxl);
@@ -302,8 +274,8 @@ public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends MultiLaye
 
             bridgeCC.reset();
             if ((point.y <= h) && (point.x <= w) && (point.y >= 0) && (point.x >= 0)) {
-                Point2D start = jxl.getView().convertToComponent(pointsIC.get(0).toJavaPoint2D());
-                Point2D end = jxl.getView().convertToComponent(pointsIC.get(pointsIC.size() - 1).toJavaPoint2D());
+                java.awt.geom.Point2D start = jxl.getView().convertToComponent(pointsIC.get(0).toJavaPoint2D());
+                java.awt.geom.Point2D end = jxl.getView().convertToComponent(pointsIC.get(pointsIC.size() - 1).toJavaPoint2D());
                 bridgeCC.moveTo(start.getX(), start.getY());
                 bridgeCC.lineTo(currentPointCC.getX(), currentPointCC.getY());
                 bridgeCC.lineTo(end.getX(), end.getY());
@@ -395,8 +367,8 @@ public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends MultiLaye
         double sumY = 0;
         for (int i = 0; i < coordinates.size(); i++) {
             org.mbari.geometry.Point2D<Integer> coordinate = coordinates.get(i);
-            Point2D imagePoint = new Point2D.Double(coordinate.getX(), coordinate.getY());
-            Point2D componentPoint = jxl.getView().convertToComponent(imagePoint);
+            java.awt.geom.Point2D imagePoint = new java.awt.geom.Point2D.Double(coordinate.getX(), coordinate.getY());
+            java.awt.geom.Point2D componentPoint = jxl.getView().convertToComponent(imagePoint);
             if (i == 0) {
                 generalPath.moveTo(componentPoint.getX(), componentPoint.getY());
             }
@@ -409,8 +381,8 @@ public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends MultiLaye
 
         // Close path
         org.mbari.geometry.Point2D<Integer> coordinate = coordinates.get(0);
-        Point2D imagePoint = new Point2D.Double(coordinate.getX(), coordinate.getY());
-        Point2D componentPoint = jxl.getView().convertToComponent(imagePoint);
+        java.awt.geom.Point2D imagePoint = new java.awt.geom.Point2D.Double(coordinate.getX(), coordinate.getY());
+        java.awt.geom.Point2D componentPoint = jxl.getView().convertToComponent(imagePoint);
         generalPath.lineTo(componentPoint.getX(), componentPoint.getY());
 
         // set comment point
@@ -423,7 +395,7 @@ public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends MultiLaye
     class AreaMeasurementPath {
 
         final GeneralPath generalPath = new GeneralPath();
-        final Point2D commentPoint = new Point2D.Float();
+        final java.awt.geom.Point2D commentPoint = new java.awt.geom.Point2D.Float();
         final AreaMeasurement areaMeasurement;
 
         AreaMeasurementPath(AreaMeasurement areaMeasurement) {

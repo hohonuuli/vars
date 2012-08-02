@@ -13,6 +13,7 @@ import vars.annotation.ui.commandqueue.Command;
 import vars.annotation.ui.commandqueue.CommandEvent;
 import vars.annotation.ui.commandqueue.impl.AddAssociationCmd;
 
+import javax.swing.JFrame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -29,12 +30,12 @@ public class ImageAnnotationFrameController implements MeasurementCompletedListe
     private VideoFrame videoFrame;
     private MeasurementCommentDialog measurementDialog;
     private MeasurementCommentDialog areaMeasurementDialog;
-    private final ImageAnnotationFrame imageAnnotationFrame;
+    private final JFrame imageAnnotationFrame;
     private final AddMeasurementAction measurementAction = new AddMeasurementAction();
     private AddAreaMeasurementEvent addAreaMeasurementEvent;
 
 
-    public ImageAnnotationFrameController(ToolBelt toolBelt, ImageAnnotationFrame imageAnnotationFrame) {
+    public ImageAnnotationFrameController(ToolBelt toolBelt, JFrame imageAnnotationFrame) {
         this.toolBelt = toolBelt;
         this.imageAnnotationFrame = imageAnnotationFrame;
         AnnotationProcessor.process(this);

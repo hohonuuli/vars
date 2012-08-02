@@ -27,6 +27,7 @@ import vars.annotation.VideoFrame;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
 import vars.annotation.ui.imagepanel.ImageAnnotationFrame;
+import vars.annotation.ui.imagepanel.JXImageAnnotationFrame;
 
 import javax.swing.JFrame;
 import javax.swing.border.TitledBorder;
@@ -66,6 +67,7 @@ public class FrameGrabPanel extends javax.swing.JPanel {
      */
     private JImageUrlCanvas imageCanvas;
     private final ImageAnnotationFrame imageFrame;
+    //private final JXImageAnnotationFrame imageFrame;
 
     /**
      * Creates new form FrameGrabPanel
@@ -74,6 +76,7 @@ public class FrameGrabPanel extends javax.swing.JPanel {
      */
     public FrameGrabPanel(ToolBelt toolBelt) {
         this.imageFrame = new ImageAnnotationFrame(toolBelt);
+        //this.imageFrame = new JXImageAnnotationFrame(toolBelt);
         imageFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         imageFrame.pack();
         initialize();

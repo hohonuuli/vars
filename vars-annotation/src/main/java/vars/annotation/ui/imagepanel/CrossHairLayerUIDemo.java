@@ -15,6 +15,8 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+
 import org.jdesktop.jxlayer.JXLayer;
 
 /**
@@ -24,26 +26,37 @@ import org.jdesktop.jxlayer.JXLayer;
 public class CrossHairLayerUIDemo {
 
     public static void main(String[] args) throws IOException {
-        JFrame frame = new JFrame("DEMO");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLayout(new BorderLayout());
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                JFrame frame = new JFrame("DEMO");
+                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame.setLayout(new BorderLayout());
 
-        JPanel panel = new JPanel(new BorderLayout());
+                JPanel panel = new JPanel(new BorderLayout());
 
-        URL url = frame.getClass().getResource("/images/BrianSchlining.jpg");
-        BufferedImage image = ImageIO.read(url);
-        JLabel label = new JLabel(new ImageIcon(image));
+                URL url = frame.getClass().getResource("/images/BrianSchlining.jpg");
+                BufferedImage image = null;
+                try {
+                    image = ImageIO.read(url);
+                } catch (IOException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
+                JLabel label = new JLabel(new ImageIcon(image));
 
-        CrossHairLayerUI<JComponent> layerUI = new CrossHairLayerUI<JComponent>();
-        JXLayer<JComponent> layer = new JXLayer<JComponent>(label);
-        layer.setUI(layerUI);
+                CrossHairLayerUI<JComponent> layerUI = new CrossHairLayerUI<JComponent>();
+                JXLayer<JComponent> layer = new JXLayer<JComponent>(label);
+                layer.setUI(layerUI);
 
-        panel.add(layer, BorderLayout.CENTER);
-        frame.add(panel, BorderLayout.CENTER);
+                panel.add(layer, BorderLayout.CENTER);
+                frame.add(panel, BorderLayout.CENTER);
 
-        frame.setSize(image.getWidth(), image.getHeight());
-        frame.setLocationByPlatform(true);
-        frame.setVisible(true);
+                frame.setSize(image.getWidth(), image.getHeight());
+                frame.setLocationByPlatform(true);
+                frame.setVisible(true);
+            }
+        });
+
 
 
     }
