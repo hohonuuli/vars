@@ -6,6 +6,8 @@ import org.jdesktop.jxlayer.plaf.AbstractLayerUI;
 import javax.swing.JComponent;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -16,18 +18,31 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class MultiLayerUI<T extends JComponent> extends AbstractLayerUI<T> {
 
     private Queue<JXPainter<T>> painters = new LinkedBlockingQueue<JXPainter<T>>();
+    private final PropertyChangeListener propertyChangeListener = new PropertyChangeListener() {
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            if (evt.getPropertyName().equalsIgnoreCase("dirty")) {
+                setDirty(true);
+            }
+        }
+    };
 
     public void addPainter(JXPainter<T> painter) {
         painters.add(painter);
+        painter.getPropertyChangeSupport().addPropertyChangeListener(propertyChangeListener);
         setDirty(true);
     }
 
     public void removePainter(JXPainter<T> painter) {
         painters.remove(painter);
+        painter.getPropertyChangeSupport().removePropertyChangeListener(propertyChangeListener);
         setDirty(true);
     }
 
     public void clearPainters() {
+        for (JXPainter painter : painters) {
+            painter.getPropertyChangeSupport().removePropertyChangeListener(propertyChangeListener);
+        }
         painters.clear();
         setDirty(true);
     }

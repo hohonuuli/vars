@@ -5,6 +5,7 @@ import org.jdesktop.jxlayer.JXLayer;
 import javax.swing.JComponent;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeSupport;
 
 /**
  * @author Brian Schlining
@@ -13,6 +14,7 @@ import java.awt.event.MouseEvent;
 public abstract class AbstractJXPainter<A extends JComponent> implements JXPainter<A> {
 
     private boolean dirty;
+    private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
     @Override
     public void paintLayer(Graphics2D g2, JXLayer<? extends A> jxl) {
@@ -36,6 +38,12 @@ public abstract class AbstractJXPainter<A extends JComponent> implements JXPaint
 
     @Override
     public void setDirty(boolean dirty) {
+        boolean oldDirty = this.dirty;
         this.dirty = dirty;
+        propertyChangeSupport.firePropertyChange("dirty", oldDirty, dirty);
+    }
+
+    public PropertyChangeSupport getPropertyChangeSupport() {
+        return propertyChangeSupport;
     }
 }

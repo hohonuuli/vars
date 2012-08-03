@@ -199,6 +199,54 @@ public class AnnotationPersistenceServiceImpl extends QueryableImpl implements A
         return referenceNumbers;
     }
 
+    public Collection<Observation> findAllObservationsByNameAndReferenceNumber(VideoArchive videoArchive,
+                                                                               String conceptName,
+                                                                               int referenceNumber) {
+
+        /*
+            We'll do a 2 stage query to make this fast. Otherwise for VideoArchives with
+            thousands of images, this search usign straight JPA would be pretty slow
+         */
+
+        // --- 1) Query for id of related observations with same identity-reference
+        // related means same concept, same videoarchive, same identity-reference
+        String sql = "SELECT obs.id FROM VideoArchive AS va LEFT OUTER JOIN " +
+                "VideoFrame AS vf ON va.id = vf.VideoArchiveID_FK LEFT OUTER JOIN " +
+                "Observation as obs ON vf.id = obs.VideoFrameID_FK LEFT OUTER JOIN " +
+                "Association as ass ON obs.id = ass.ObservationID_FK " +
+                "WHERE va.videoArchiveName = '" + videoArchive.getName() + "' AND " +
+                "obs.ConceptName = '" + conceptName + "' AND " +
+                "ass.LinkName = 'identity-reference' AND " +
+                "ass.linkValue = " + referenceNumber;
+
+        QueryFunction<Collection<Long>> queryFunction = new QueryFunction<Collection<Long>>() {
+            @Override
+            public Collection<Long> apply(ResultSet resultSet) throws SQLException {
+                Collection<Long> ids = new ArrayList<Long>();
+                while (resultSet.next()) {
+                    ids.add(resultSet.getLong(1));
+                }
+                return ids;
+            }
+        };
+
+        Collection<Long> ids = executeQueryFunction(sql, queryFunction);
+
+        // 2) Fetch the observations with the given ids
+        Collection<Observation> observations = new ArrayList<Observation>();
+        ObservationDAO dao = annotationDAOFactory.newObservationDAO();
+        dao.startTransaction();
+        for (Long id : ids) {
+            Observation obs = dao.findByPrimaryKey(id);
+            if (obs != null) {
+                observations.add(obs);
+            }
+        }
+        dao.endTransaction();
+        return observations;
+
+    }
+
     public List<String> findAllVideoArchiveNames() {
         String sql = "SELECT VideoArchiveName FROM VideoArchive ORDER BY VideoArchiveName";
         QueryFunction<List<String>> queryFunction = new QueryFunction<List<String>>() {

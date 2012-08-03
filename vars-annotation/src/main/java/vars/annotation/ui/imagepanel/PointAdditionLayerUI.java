@@ -24,12 +24,19 @@ import org.mbari.swing.JImageUrlCanvas;
  * Class for testing out resizing images
  * @author brian
  */
-public class PointAdditionLayerUI<T extends JImageUrlCanvas> extends CrossHairLayerUI<T> {
+public class PointAdditionLayerUI<T extends JImageUrlCanvas> extends MultiLayerUI<T> {
 
     final Collection<Point> sourcePoints = new Vector<Point>();
     private String coordinateString = null;
     private Point coordinatePoint = null;
     private final Font font = new Font("Sans Serif", Font.PLAIN, 12);
+    private JXCrossHairPainter<T> crossHairPainter = new JXCrossHairPainter<T>();
+
+    @Override
+        public void clearPainters() {
+            super.clearPainters();
+            addPainter(crossHairPainter);
+        }
 
     @Override
     protected void paintLayer(Graphics2D g2, JXLayer<? extends T> jxl) {

@@ -71,7 +71,18 @@ public interface AnnotationPersistenceService {
      * Find the recorded date (from VideoFrame) of the latest annotation made in the VARS database
      * @return The date of the latest annotation
      */
-    public Date findLatestAnnotationDate();
+    Date findLatestAnnotationDate();
+
+    /**
+     * Find all Observations that represent a single siting in a particular VideoArchive
+     * @param videoArchive THe videoArchive of interest
+     * @param conceptName The concept of interest
+     * @param referenceNumber The reference-number used to tag a particular siting
+     * @return
+     */
+    Collection<Observation> findAllObservationsByNameAndReferenceNumber(VideoArchive videoArchive,
+                                                                                   String conceptName,
+                                                                                   int referenceNumber);
     
 
 }

@@ -57,7 +57,9 @@ import java.util.Vector;
  *
  * @param <T>
  */
-public class MeasurementLayerUI<T extends JImageUrlCanvas> extends CrossHairLayerUI<T> {
+public class MeasurementLayerUI<T extends JImageUrlCanvas> extends MultiLayerUI<T> {
+
+    private JXCrossHairPainter<T> crossHairPainter = new JXCrossHairPainter<T>();
 
     /** Name of the observation property that can be used with property change listeners */
     public static final String PROP_OBSERVATION = "Observation";
@@ -121,7 +123,7 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends CrossHairLaye
             selectedLineEnd = false;
             selectedLineStart = false;
             setDirty(true);
-         }
+        }
     };
 
     /**
@@ -134,6 +136,12 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends CrossHairLaye
         AnnotationProcessor.process(this);
         Collection<Observation> selectedObservations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
         respondsTo(new ObservationsSelectedEvent(null, selectedObservations));
+    }
+
+    @Override
+    public void clearPainters() {
+        super.clearPainters();
+        addPainter(crossHairPainter);
     }
 
     /**
@@ -257,36 +265,36 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends CrossHairLaye
         super.processMouseEvent(me, jxl);
         Point point = SwingUtilities.convertPoint(me.getComponent(), me.getPoint(), jxl);
         switch (me.getID()) {
-        case MouseEvent.MOUSE_PRESSED:
-            Point2D imagePoint = jxl.getView().convertToImage(point);
-            if (!selectedLineStart) {
+            case MouseEvent.MOUSE_PRESSED:
+                Point2D imagePoint = jxl.getView().convertToImage(point);
+                if (!selectedLineStart) {
 
-                // --- On first click set lineStart value
-                lineStart.setLocation(imagePoint);
-                selectedLineStart = true;
-                setDirty(true);
-            }
-            else {
-
-                // --- On second click set lineEnd value, generate association, set measuring property to false
-                lineEnd.setLocation(imagePoint);
-                selectedLineEnd = true;
-
-                Measurement measurement = newMeasurement(null, jxl);
-                setDirty(true);
-
-                // Notify listeners
-                MeasurementCompletedEvent event = new MeasurementCompletedEvent(measurement, observation);
-                for (MeasurementCompletedListener listener : measurementCompletedListeners) {
-                    listener.onComplete(event);
+                    // --- On first click set lineStart value
+                    lineStart.setLocation(imagePoint);
+                    selectedLineStart = true;
+                    setDirty(true);
                 }
+                else {
 
-                resetUI();
+                    // --- On second click set lineEnd value, generate association, set measuring property to false
+                    lineEnd.setLocation(imagePoint);
+                    selectedLineEnd = true;
 
-            }
-        default:
+                    Measurement measurement = newMeasurement(null, jxl);
+                    setDirty(true);
 
-        // Do nothing
+                    // Notify listeners
+                    MeasurementCompletedEvent event = new MeasurementCompletedEvent(measurement, observation);
+                    for (MeasurementCompletedListener listener : measurementCompletedListeners) {
+                        listener.onComplete(event);
+                    }
+
+                    resetUI();
+
+                }
+            default:
+
+                // Do nothing
         }
     }
 
@@ -334,7 +342,7 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends CrossHairLaye
         Observation oldObservation = this.observation;
         measurementPaths.clear();
         relatedObservations.clear();
-        
+
         // --- Parse out any existing measurement
         if (newObservation != null) {
 

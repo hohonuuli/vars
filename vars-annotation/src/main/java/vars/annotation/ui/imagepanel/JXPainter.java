@@ -6,6 +6,7 @@ import vars.annotation.Observation;
 import javax.swing.JComponent;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeSupport;
 
 /**
  * Adjunct interface that allows us to add additional drawing/painting to a JXLayer object based. This class is
@@ -26,5 +27,7 @@ public interface JXPainter<A extends JComponent> {
     boolean isDirty();
 
     void setDirty(boolean dirty);
+
+    PropertyChangeSupport getPropertyChangeSupport();
 
 }
