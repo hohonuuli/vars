@@ -1,5 +1,5 @@
 /*
- * @(#)AnnotationLayerUI.java   2010.02.17 at 02:07:49 PST
+ * @(#)AnnotationLayerUI.java   2012.08.03 at 04:18:24 PDT
  *
  * Copyright 2009 MBARI
  *
@@ -17,6 +17,32 @@ package vars.annotation.ui.imagepanel;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
+import org.bushe.swing.event.EventBus;
+import org.bushe.swing.event.annotation.AnnotationProcessor;
+import org.bushe.swing.event.annotation.EventSubscriber;
+import org.jdesktop.jxlayer.JXLayer;
+import org.mbari.awt.AwtUtilities;
+import org.mbari.swing.JImageUrlCanvas;
+import vars.UserAccount;
+import vars.annotation.Observation;
+import vars.annotation.VideoFrame;
+import vars.annotation.ui.Lookup;
+import vars.annotation.ui.PersistenceController;
+import vars.annotation.ui.ToolBelt;
+import vars.annotation.ui.commandqueue.Command;
+import vars.annotation.ui.commandqueue.CommandEvent;
+import vars.annotation.ui.commandqueue.impl.AddObservationToVideoFrameCmd;
+import vars.annotation.ui.eventbus.ObservationsAddedEvent;
+import vars.annotation.ui.eventbus.ObservationsChangedEvent;
+import vars.annotation.ui.eventbus.ObservationsRemovedEvent;
+import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
+import vars.annotation.ui.eventbus.UIEventSubscriber;
+import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
+import vars.annotation.ui.eventbus.VideoArchiveSelectedEvent;
+import vars.annotation.ui.eventbus.VideoFramesChangedEvent;
+import vars.knowledgebase.Concept;
+
+import javax.swing.SwingUtilities;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -29,39 +55,10 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
-import javax.swing.SwingUtilities;
-
-import org.bushe.swing.event.EventBus;
-import org.bushe.swing.event.annotation.AnnotationProcessor;
-import org.bushe.swing.event.annotation.EventSubscriber;
-import org.jdesktop.jxlayer.JXLayer;
-import org.mbari.awt.AwtUtilities;
-import org.mbari.swing.JImageUrlCanvas;
-import vars.UserAccount;
-import vars.annotation.CameraDirections;
-import vars.annotation.Observation;
-import vars.annotation.VideoFrame;
-import vars.annotation.ui.Lookup;
-import vars.annotation.ui.PersistenceController;
-import vars.annotation.ui.ToolBelt;
-import vars.annotation.ui.commandqueue.Command;
-import vars.annotation.ui.commandqueue.CommandEvent;
-import vars.annotation.ui.commandqueue.impl.AddObservationCmd;
-import vars.annotation.ui.commandqueue.impl.AddObservationToVideoFrameCmd;
-import vars.annotation.ui.eventbus.ObservationsAddedEvent;
-import vars.annotation.ui.eventbus.ObservationsChangedEvent;
-import vars.annotation.ui.eventbus.ObservationsRemovedEvent;
-import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
-import vars.annotation.ui.eventbus.UIEventSubscriber;
-import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
-import vars.annotation.ui.eventbus.VideoArchiveSelectedEvent;
-import vars.annotation.ui.eventbus.VideoFramesChangedEvent;
-import vars.knowledgebase.Concept;
 
 /**
  *
@@ -70,20 +67,31 @@ import vars.knowledgebase.Concept;
  * @param <T>
  */
 public class AnnotationLayerUI<T extends JImageUrlCanvas> extends MultiLayerUI<T> implements UIEventSubscriber {
-        //extends CrossHairLayerUI<T> implements UIEventSubscriber {
+
+    //extends CrossHairLayerUI<T> implements UIEventSubscriber {
 
     private JXCrossHairPainter<T> crossHairPainter = new JXCrossHairPainter<T>();
+    private JXPainter<T> selectedObservationsPainter = new JXSelectedObservationsPainter<T>();
+
+    /** A list of observations that were selected using the boundingbox */
+    private Set<Observation> selectedObservations = Collections.synchronizedSet(new HashSet<Observation>());
+
+    /** A list of all observations within the bounds of the current tile */
+    private List<Observation> observations = new Vector<Observation>();
+    private JXPainter<T> notSelectedObservationsPainter = new JXNotSelectedObservationsPainter<T>();
+
+    private final Predicate<Observation> displayableObservationsPredicate = new Predicate<Observation>() {
+
+        @Override
+        public boolean apply(Observation input) {
+            return (input.getX() != null) && (input.getY() != null);
+        }
+    };
 
     /**
      * This font is used to draw the concept name of concepts.
      */
     private final Controller controller = new Controller();
-
-    /** A list of all observations within the bounds of the current tile */
-    private List<Observation> observations = new Vector<Observation>();
-
-    /** A list of observations that were selected using the boundingbox */
-    private Set<Observation> selectedObservations = Collections.synchronizedSet(new HashSet<Observation>());
 
     /**
      * Record of the location of the most recent mousePress event. Used for
@@ -95,17 +103,11 @@ public class AnnotationLayerUI<T extends JImageUrlCanvas> extends MultiLayerUI<T
      * Bounding box is used in the UI to select annotation
      */
     private Rectangle2D boundingBox;
+
     /** The concept to use for creating new observations **/
     private Concept concept;
     private final ToolBelt toolBelt;
     private VideoFrame videoFrame;
-
-    private final Predicate<Observation> displayableObservationsPredicate = new Predicate<Observation>() {
-        @Override
-        public boolean apply(Observation input) {
-            return (input.getX() != null) && (input.getY() != null);
-        }
-    };
 
     /**
      * Constructs ...
@@ -115,14 +117,17 @@ public class AnnotationLayerUI<T extends JImageUrlCanvas> extends MultiLayerUI<T
     public AnnotationLayerUI(ToolBelt toolBelt) {
         this.toolBelt = toolBelt;
         AnnotationProcessor.process(this);
-        addPainter(crossHairPainter);
-
+        clearPainters();
     }
 
+    /**
+     */
     @Override
     public void clearPainters() {
         super.clearPainters();
         addPainter(crossHairPainter);
+        addPainter(selectedObservationsPainter);
+        addPainter(notSelectedObservationsPainter);
     }
 
     /**
@@ -139,10 +144,16 @@ public class AnnotationLayerUI<T extends JImageUrlCanvas> extends MultiLayerUI<T
     /**
      * @return
      */
+    public ToolBelt getToolBelt() {
+        return toolBelt;
+    }
+
+    /**
+     * @return
+     */
     public VideoFrame getVideoFrame() {
         return videoFrame;
     }
-
 
     @Override
     protected void paintLayer(Graphics2D g2, JXLayer<? extends T> jxl) {
@@ -151,38 +162,38 @@ public class AnnotationLayerUI<T extends JImageUrlCanvas> extends MultiLayerUI<T
 
         if (videoFrame != null) {
 
-            for (Observation observation : observations) {
-                MarkerStyle markerStyle = selectedObservations.contains(observation)
-                                          ? MarkerStyle.SELECTED : MarkerStyle.NOTSELECTED;
-                if ((observation.getX() != null) && (observation.getY() != null)) {
-
-
-                    Point2D imagePoint = new Point2D.Double(observation.getX(), observation.getY());
-                    Point2D componentPoint2D = jxl.getView().convertToComponent(imagePoint);
-                    if (componentPoint2D != null) {
-                        Point componentPoint = AwtUtilities.toPoint(componentPoint2D);
-                        int x = componentPoint.x;
-                        int y = componentPoint.y;
-
-                        g2.setStroke(markerStyle.stroke);
-                        g2.setPaint(markerStyle.color);
-
-                        // Write the concept name
-                        g2.setFont(markerStyle.font);
-                        g2.drawString(observation.getConceptName(), x + 5, y);
-
-                        // Draw the annotation
-                        int armLength = markerStyle.armLength;
-                        GeneralPath gp = new GeneralPath();
-                        gp.moveTo(x - armLength, y - armLength);
-                        gp.lineTo(x + armLength, y + armLength);
-                        gp.moveTo(x + armLength, y - armLength);
-                        gp.lineTo(x - armLength, y + armLength);
-                        g2.draw(gp);
-                    }
-                }
-
-            }
+//            for (Observation observation : observations) {
+//                MarkerStyle markerStyle = selectedObservations.contains(observation)
+//                                          ? MarkerStyle.SELECTED : MarkerStyle.NOTSELECTED;
+//                if ((observation.getX() != null) && (observation.getY() != null)) {
+//
+//
+//                    Point2D imagePoint = new Point2D.Double(observation.getX(), observation.getY());
+//                    Point2D componentPoint2D = jxl.getView().convertToComponent(imagePoint);
+//                    if (componentPoint2D != null) {
+//                        Point componentPoint = AwtUtilities.toPoint(componentPoint2D);
+//                        int x = componentPoint.x;
+//                        int y = componentPoint.y;
+//
+//                        g2.setStroke(markerStyle.stroke);
+//                        g2.setPaint(markerStyle.color);
+//
+//                        // Write the concept name
+//                        g2.setFont(markerStyle.font);
+//                        g2.drawString(observation.getConceptName(), x + 5, y);
+//
+//                        // Draw the annotation
+//                        int armLength = markerStyle.armLength;
+//                        GeneralPath gp = new GeneralPath();
+//                        gp.moveTo(x - armLength, y - armLength);
+//                        gp.lineTo(x + armLength, y + armLength);
+//                        gp.moveTo(x + armLength, y - armLength);
+//                        gp.lineTo(x - armLength, y + armLength);
+//                        g2.draw(gp);
+//                    }
+//                }
+//
+//            }
 
             if (boundingBox != null) {
 
@@ -215,11 +226,11 @@ public class AnnotationLayerUI<T extends JImageUrlCanvas> extends MultiLayerUI<T
                 if (boundingBox == null) {
 
                     /*
-                     * If the mouse is NOT being dragged then create a new Observation.
-                     * The point coordinates should be in the images
-                     * coordinate system NOT the coordiates of the view displaying
-                     * the image.
-                     */
+                    * If the mouse is NOT being dragged then create a new Observation.
+                    * The point coordinates should be in the images
+                    * coordinate system NOT the coordiates of the view displaying
+                    * the image.
+                    */
                     Point2D imagePoint = jxl.getView().convertToImage(point);
                     controller.newObservation(imagePoint);
 
@@ -231,7 +242,7 @@ public class AnnotationLayerUI<T extends JImageUrlCanvas> extends MultiLayerUI<T
                     for (Observation observation : observations) {
                         Point2D imagePoint = jxl.getView().convertToComponent(new Point2D.Double(observation.getX(),
                             observation.getY()));
-                        if (imagePoint != null && r.contains(imagePoint)) {
+                        if ((imagePoint != null) && r.contains(imagePoint)) {
                             selectedObservations.add(observation);
                         }
                     }
@@ -283,57 +294,24 @@ public class AnnotationLayerUI<T extends JImageUrlCanvas> extends MultiLayerUI<T
         }
     }
 
-
-
     /**
      *
-     * @param concept
+     * @param event
      */
-    public void setConcept(Concept concept) {
-        this.concept = concept;
-    }
-
-    public ToolBelt getToolBelt() {
-        return toolBelt;
-    }
-
-    /**
-     *
-     * @param videoFrame_
-     */
-    public void setVideoFrame(VideoFrame videoFrame_) {
-
-        if (videoFrame == null || !videoFrame.equals(videoFrame_)) {
-
-            /*
-             * We have to look up the videoframe from the database since the reference
-             * passed may be stale
-             */
-            videoFrame = (videoFrame_ == null) ? null : toolBelt.getAnnotationDAOFactory().newDAO().find(videoFrame_);
-            observations.clear();
-            selectedObservations.clear();
-            boundingBox = null;
-
-            if (videoFrame != null) {
-                observations.addAll(Collections2.filter(videoFrame.getObservations(), displayableObservationsPredicate));
-                selectedObservations.addAll((Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject());
-            }
-            setDirty(true);
-        }
-    }
-
     @EventSubscriber(eventClass = ObservationsSelectedEvent.class)
     @Override
     public void respondTo(ObservationsSelectedEvent event) {
-        if (event.getEventSource() == null || !event.getEventSource().equals(this)) {
+        if ((event.getEventSource() == null) || !event.getEventSource().equals(this)) {
             Collection<VideoFrame> selectedVideoFrames = PersistenceController.toVideoFrames(event.get());
-            if (selectedVideoFrames.size() == 1 ) {
+            if (selectedVideoFrames.size() == 1) {
                 VideoFrame newVideoFrame = selectedVideoFrames.iterator().next();
                 if (!newVideoFrame.equals(videoFrame)) {
+
                     // new VideoFrame is different than current one
                     setVideoFrame(newVideoFrame);
                 }
                 else {
+
                     // new VideoFrame is the same as current one.
                     selectedObservations.clear();
                     selectedObservations.addAll(event.get());
@@ -346,18 +324,26 @@ public class AnnotationLayerUI<T extends JImageUrlCanvas> extends MultiLayerUI<T
         }
     }
 
+    /**
+     *
+     * @param event
+     */
     @EventSubscriber(eventClass = ObservationsChangedEvent.class)
     @Override
     public void respondTo(ObservationsChangedEvent event) {
         List<Observation> changedObservations = new ArrayList<Observation>(event.get());
         changedObservations.retainAll(observations);
         if (!changedObservations.isEmpty()) {
-            observations.removeAll(changedObservations); // This actually removes the OLD versions
-            observations.addAll(changedObservations); // Add the new versions
+            observations.removeAll(changedObservations);    // This actually removes the OLD versions
+            observations.addAll(changedObservations);       // Add the new versions
             setDirty(true);
         }
     }
 
+    /**
+     *
+     * @param event
+     */
     @EventSubscriber(eventClass = ObservationsAddedEvent.class)
     @Override
     public void respondTo(ObservationsAddedEvent event) {
@@ -375,6 +361,10 @@ public class AnnotationLayerUI<T extends JImageUrlCanvas> extends MultiLayerUI<T
 
     }
 
+    /**
+     *
+     * @param event
+     */
     @EventSubscriber(eventClass = ObservationsRemovedEvent.class)
     @Override
     public void respondTo(ObservationsRemovedEvent event) {
@@ -385,33 +375,82 @@ public class AnnotationLayerUI<T extends JImageUrlCanvas> extends MultiLayerUI<T
         }
     }
 
+    /**
+     *
+     * @param event
+     */
     @EventSubscriber(eventClass = VideoArchiveChangedEvent.class)
     @Override
     public void respondTo(VideoArchiveChangedEvent event) {
         setVideoFrame(null);
     }
 
+    /**
+     *
+     * @param event
+     */
     @EventSubscriber(eventClass = VideoArchiveSelectedEvent.class)
     @Override
     public void respondTo(VideoArchiveSelectedEvent event) {
         setVideoFrame(null);
     }
 
+    /**
+     *
+     * @param event
+     */
     @EventSubscriber(eventClass = VideoFramesChangedEvent.class)
     @Override
     public void respondTo(VideoFramesChangedEvent event) {
 
         Collection<VideoFrame> changedVideoFrame = Collections2.filter(event.get(), new Predicate<VideoFrame>() {
+
             @Override
             public boolean apply(VideoFrame input) {
                 return input.equals(videoFrame);
             }
+
         });
 
         if (!changedVideoFrame.isEmpty()) {
             setVideoFrame(changedVideoFrame.iterator().next());
         }
 
+    }
+
+    /**
+     *
+     * @param concept
+     */
+    public void setConcept(Concept concept) {
+        this.concept = concept;
+    }
+
+    /**
+     *
+     * @param videoFrame_
+     */
+    public void setVideoFrame(VideoFrame videoFrame_) {
+
+        if ((videoFrame == null) || !videoFrame.equals(videoFrame_)) {
+
+            /*
+             * We have to look up the videoframe from the database since the reference
+             * passed may be stale
+             */
+            videoFrame = (videoFrame_ == null) ? null : toolBelt.getAnnotationDAOFactory().newDAO().find(videoFrame_);
+            observations.clear();
+            selectedObservations.clear();
+            boundingBox = null;
+
+            if (videoFrame != null) {
+                observations.addAll(Collections2.filter(videoFrame.getObservations(),
+                        displayableObservationsPredicate));
+                selectedObservations.addAll(
+                    (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject());
+            }
+            setDirty(true);
+        }
     }
 
     private class Controller {

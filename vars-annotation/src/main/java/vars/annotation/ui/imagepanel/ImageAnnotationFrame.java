@@ -54,7 +54,7 @@ import java.util.Set;
 public class ImageAnnotationFrame extends JFrame {
 
     private JImageUrlCanvas imageCanvas = new JImageUrlCanvas();
-    private AnnotationLayerUI annotationLayerUI;
+    private AnnotationLayerUI2 annotationLayerUI;
     private ConceptNameComboBox comboBox;
     private final ImageAnnotationFrameController controller;
     private JXLayer<JImageUrlCanvas> layer;
@@ -63,6 +63,9 @@ public class ImageAnnotationFrame extends JFrame {
     private MeasurementLayerUI measurementLayerUI;
     private AreaMeasurementLayerUI areaMeasurementLayerUI;
     private JToolBar toolBar;
+    /** Relays events fromm the annotation UI to the various painters used by LayerUI's */
+    private final UIDataCoordinator dataCoordinator
+;
 
     /**
      * Create the frame
@@ -71,6 +74,7 @@ public class ImageAnnotationFrame extends JFrame {
      */
     public ImageAnnotationFrame(final ToolBelt toolBelt) {
         controller = new ImageAnnotationFrameController(toolBelt, this);
+        dataCoordinator = new UIDataCoordinator(toolBelt.getAnnotationDAOFactory());
         AnnotationProcessor.process(this);
         initialize();
     }
@@ -78,9 +82,9 @@ public class ImageAnnotationFrame extends JFrame {
     /**
      * @return
      */
-    protected AnnotationLayerUI getAnnotationLayerUI() {
+    protected AnnotationLayerUI2 getAnnotationLayerUI() {
         if (annotationLayerUI == null) {
-            annotationLayerUI = new AnnotationLayerUI<JImageUrlCanvas>(controller.getToolBelt());
+            annotationLayerUI = new AnnotationLayerUI2<JImageUrlCanvas>(controller.getToolBelt(), dataCoordinator);
         }
 
         return annotationLayerUI;

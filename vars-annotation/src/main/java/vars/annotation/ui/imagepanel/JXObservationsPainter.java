@@ -1,7 +1,20 @@
+/*
+ * @(#)JXObservationsPainter.java   2012.08.07 at 02:18:50 PDT
+ *
+ * Copyright 2009 MBARI
+ *
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
+
 package vars.annotation.ui.imagepanel;
 
-
-import com.google.common.base.Predicate;
 import org.jdesktop.jxlayer.JXLayer;
 import org.mbari.awt.AwtUtilities;
 import org.mbari.swing.JImageUrlCanvas;
@@ -10,7 +23,6 @@ import vars.annotation.Observation;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -24,29 +36,42 @@ import java.util.Set;
  *
  * @author Brian Schlining
  * @since 2012-08-03
+ *
+ * @param <T>
  */
-public class JXObservationsPainter<T extends JImageUrlCanvas>
-        extends AbstractJXPainter<T> {
+public class JXObservationsPainter<T extends JImageUrlCanvas> extends AbstractJXPainter<T> {
 
     private Set<Observation> observations = Collections.synchronizedSet(new HashSet<Observation>());
-    private final MarkerStyle markerStyle;
-    private final boolean drawTimecode;
     private final boolean drawConceptName;
+    private final boolean drawTimecode;
+    private final MarkerStyle markerStyle;
 
+    /**
+     * Constructs ...
+     *
+     * @param markerStyle
+     * @param drawConceptName
+     * @param drawTimecode
+     */
     public JXObservationsPainter(MarkerStyle markerStyle, boolean drawConceptName, boolean drawTimecode) {
         this.markerStyle = markerStyle;
         this.drawTimecode = drawTimecode;
         this.drawConceptName = drawConceptName;
     }
 
-    public void setObservations(Collection<Observation> observations) {
-        synchronized (this.observations) {
-            this.observations.clear();
-            this.observations.addAll(observations);
-        }
-        setDirty(true);
+    /**
+     *
+     * @return A copy of the internal collection of observations
+     */
+    public Set<Observation> getObservations() {
+        return new HashSet<Observation>(observations);
     }
 
+    /**
+     *
+     * @param g2
+     * @param jxl
+     */
     @Override
     public void paintLayer(Graphics2D g2, JXLayer<? extends T> jxl) {
         super.paintLayer(g2, jxl);
@@ -91,4 +116,15 @@ public class JXObservationsPainter<T extends JImageUrlCanvas>
         }
     }
 
+    /**
+     * Set the internal collection of observations to be drawn. A copy of the collection is used.
+     * @param observations
+     */
+    public void setObservations(Collection<Observation> observations) {
+        synchronized (this.observations) {
+            this.observations.clear();
+            this.observations.addAll(observations);
+        }
+        setDirty(true);
+    }
 }

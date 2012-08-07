@@ -27,7 +27,6 @@ import vars.annotation.VideoFrame;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
 import vars.annotation.ui.imagepanel.ImageAnnotationFrame;
-import vars.annotation.ui.imagepanel.JXImageAnnotationFrame;
 
 import javax.swing.JFrame;
 import javax.swing.border.TitledBorder;

@@ -4,6 +4,7 @@ import org.jdesktop.jxlayer.JXLayer;
 import org.jdesktop.jxlayer.plaf.AbstractLayerUI;
 
 import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
@@ -18,7 +19,12 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class MultiLayerUI<T extends JComponent> extends AbstractLayerUI<T> {
 
     private Queue<JXPainter<T>> painters = new LinkedBlockingQueue<JXPainter<T>>();
+
+    /**
+     * Used to listen to the setDirty flag set by the painters
+     */
     private final PropertyChangeListener propertyChangeListener = new PropertyChangeListener() {
+
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
             if (evt.getPropertyName().equalsIgnoreCase("dirty")) {

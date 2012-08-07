@@ -4,9 +4,11 @@ import org.jdesktop.jxlayer.JXLayer;
 
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 import java.awt.geom.GeneralPath;
 
@@ -17,9 +19,12 @@ import java.awt.geom.GeneralPath;
 public class JXCrossHairPainter<A extends JComponent> extends AbstractJXPainter<A> {
 
     private GeneralPath crosshair = new GeneralPath();
+    private final Stroke stroke = new BasicStroke(1);
 
     @Override
     public void paintLayer(Graphics2D gd, JXLayer<? extends A> jxl) {
+        gd.setStroke(stroke);
+        gd.setPaint(Color.GRAY);
         gd.setXORMode(Color.WHITE);
         gd.draw(crosshair);
         gd.setPaintMode();

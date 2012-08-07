@@ -1,42 +1,55 @@
+/*
+ * @(#)JXNotSelectedObservationsPainter.java   2012.08.07 at 02:22:20 PDT
+ *
+ * Copyright 2009 MBARI
+ *
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
+
 package vars.annotation.ui.imagepanel;
 
-import com.google.common.base.Predicate;
+import org.bushe.swing.event.annotation.AnnotationProcessor;
 import org.bushe.swing.event.annotation.EventSubscriber;
 import org.mbari.swing.JImageUrlCanvas;
 import vars.annotation.Observation;
-import vars.annotation.VideoFrame;
-import vars.annotation.ui.PersistenceController;
-import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
 /**
  * @author Brian Schlining
  * @since 2012-08-03
+ *
+ * @param <T>
  */
-public class JXNotSelectedObservationsPainter<T extends JImageUrlCanvas>
-        extends JXObservationsPainter<T> {
+public class JXNotSelectedObservationsPainter<T extends JImageUrlCanvas> extends JXObservationsPainter<T> {
 
-    private Collection<Observation> emptyCollection = new ArrayList<Observation>();
 
+
+    /**
+     * Constructs ...
+     */
     public JXNotSelectedObservationsPainter() {
         super(MarkerStyle.NOTSELECTED, true, false);
+        AnnotationProcessor.process(this);
     }
 
-    @EventSubscriber(eventClass = ObservationsSelectedEvent.class)
-    public void respondTo(ObservationsSelectedEvent event) {
-        Collection<VideoFrame> selectedVideoFrames = PersistenceController.toVideoFrames(event.get());
-        if (selectedVideoFrames.size() == 1 ) {
-            VideoFrame videoFrame = selectedVideoFrames.iterator().next();
-            Collection<Observation> drawableObservations = new HashSet<Observation>(videoFrame.getObservations());
-            drawableObservations.remove(event.get());
-            setObservations(drawableObservations);
-        }
-        else {
-            setObservations(emptyCollection);
-        }
-        setDirty(true);
+    /**
+     *
+     * @param event
+     */
+    @EventSubscriber(eventClass = IAFRepaintEvent.class)
+    public void respondTo(IAFRepaintEvent event) {
+        UIDataCoordinator dataCoordinator = event.get();
+        Collection<Observation> observations = new HashSet<Observation>(dataCoordinator.getObservations());
+        observations.removeAll(dataCoordinator.getSelectedObservations());
+        setObservations(observations);
     }
 }

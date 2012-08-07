@@ -116,6 +116,5 @@ public class ClearDatabaseCacheAction extends ActionAdapter {
         persistenceCache.addCacheClearedListener(listener);
         persistenceCache.clear();
 
-
     }
 }

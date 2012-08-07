@@ -61,7 +61,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends MultiLayerUI<T> {
         //extends CrossHairLayerUI<T> {
 
-    private JXCrossHairPainter<T> crossHairPainter = new JXCrossHairPainter<T>();
+    private JXPainter<T> crossHairPainter = new JXCrossHairPainter<T>();
 
     /*
 
