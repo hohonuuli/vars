@@ -15,8 +15,6 @@
 
 package vars.annotation.ui.imagepanel;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Collections2;
 import org.bushe.swing.event.annotation.AnnotationProcessor;
 import org.bushe.swing.event.annotation.EventSubscriber;
 import org.jdesktop.jxlayer.JXLayer;
@@ -31,7 +29,10 @@ import vars.knowledgebase.Concept;
 import vars.shared.ui.AllConceptNamesComboBox;
 import vars.shared.ui.ConceptNameComboBox;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import java.awt.BorderLayout;
@@ -43,9 +44,10 @@ import java.awt.event.ItemListener;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Main class for this package. This class wires together all dependant classes with the controller.
@@ -54,18 +56,19 @@ import java.util.Set;
 public class ImageAnnotationFrame extends JFrame {
 
     private JImageUrlCanvas imageCanvas = new JImageUrlCanvas();
-    private AnnotationLayerUI2 annotationLayerUI;
+    private AnnotationLayerUI annotationLayerUI;
     private ConceptNameComboBox comboBox;
     private final ImageAnnotationFrameController controller;
     private JXLayer<JImageUrlCanvas> layer;
-    private JToggleButton makeMeasurementButton;
-    private JToggleButton makeAreaMeasurementButton;
-    private MeasurementLayerUI measurementLayerUI;
-    private AreaMeasurementLayerUI areaMeasurementLayerUI;
+    private JPanel settingsPanel;
+
+
     private JToolBar toolBar;
     /** Relays events fromm the annotation UI to the various painters used by LayerUI's */
-    private final UIDataCoordinator dataCoordinator
-;
+    private final UIDataCoordinator dataCoordinator;
+    private List<ImageFrameLayerUI<JImageUrlCanvas>> layers = new ArrayList<ImageFrameLayerUI<JImageUrlCanvas>>();
+    private ButtonGroup layersButtonGroup = new ButtonGroup();
+
 
     /**
      * Create the frame
@@ -75,6 +78,14 @@ public class ImageAnnotationFrame extends JFrame {
     public ImageAnnotationFrame(final ToolBelt toolBelt) {
         controller = new ImageAnnotationFrameController(toolBelt, this);
         dataCoordinator = new UIDataCoordinator(toolBelt.getAnnotationDAOFactory());
+
+        // --- Build UI Layers
+        layers.add(new AnnotationLayerUI<JImageUrlCanvas>(controller.getToolBelt(), dataCoordinator));
+        MeasurementLayerUI<JImageUrlCanvas> measurementLayerUI = new MeasurementLayerUI<JImageUrlCanvas>(controller.getToolBelt());
+        measurementLayerUI.addMeasurementCompletedListener(controller);
+        layers.add(measurementLayerUI);
+        layers.add(new AreaMeasurementLayerUI<JImageUrlCanvas>(controller.getToolBelt()));
+
         AnnotationProcessor.process(this);
         initialize();
     }
@@ -82,9 +93,9 @@ public class ImageAnnotationFrame extends JFrame {
     /**
      * @return
      */
-    protected AnnotationLayerUI2 getAnnotationLayerUI() {
+    protected AnnotationLayerUI getAnnotationLayerUI() {
         if (annotationLayerUI == null) {
-            annotationLayerUI = new AnnotationLayerUI2<JImageUrlCanvas>(controller.getToolBelt(), dataCoordinator);
+            annotationLayerUI = new AnnotationLayerUI<JImageUrlCanvas>(controller.getToolBelt(), dataCoordinator);
         }
 
         return annotationLayerUI;
@@ -125,75 +136,11 @@ public class ImageAnnotationFrame extends JFrame {
     protected JXLayer<JImageUrlCanvas> getLayer() {
         if (layer == null) {
             layer = new JXLayer<JImageUrlCanvas>(imageCanvas);
-            layer.setUI(getAnnotationLayerUI());
+            layer.setUI(layers.get(0)); // Add first layer in the list as the default UI.
+            setSettingsPanel(layers.get(0).getSettingsBuilder().getPanel());
         }
 
         return layer;
-    }
-
-    /**
-     * @return
-     */
-    protected JToggleButton getMakeMeasurementButton() {
-        if (makeMeasurementButton == null) {
-            makeMeasurementButton = new JToggleButton("Measure");
-            makeMeasurementButton.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if (makeMeasurementButton.isSelected()) {
-                        useMeasurementLayer();
-                    }
-                    else {
-                        useAnnotationLayer();
-                    }
-                }
-
-            });
-            makeMeasurementButton.setEnabled(false);
-
-        }
-
-        return makeMeasurementButton;
-    }
-
-    protected JToggleButton getMakeAreaMeasurementButton() {
-        if (makeAreaMeasurementButton == null) {
-            makeAreaMeasurementButton = new JToggleButton("Add Polygon");
-            makeAreaMeasurementButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if (makeAreaMeasurementButton.isSelected()) {
-                        useAreaMeasurementLayer();
-                    }
-                    else {
-                        useAnnotationLayer();
-                    }
-                }
-            });
-        }
-        return makeAreaMeasurementButton;
-    }
-
-    /**
-     * @return
-     */
-    protected MeasurementLayerUI getMeasurementLayerUI() {
-        if (measurementLayerUI == null) {
-            measurementLayerUI = new MeasurementLayerUI<JImageUrlCanvas>(controller.getToolBelt());
-            measurementLayerUI.addMeasurementCompletedListener(controller);
-
-        }
-
-        return measurementLayerUI;
-    }
-
-    protected AreaMeasurementLayerUI getAreaMeasurementLayerUI() {
-        if (areaMeasurementLayerUI == null) {
-            areaMeasurementLayerUI = new AreaMeasurementLayerUI<JImageUrlCanvas>(controller.getToolBelt());
-            // TODO handle measurement completed. Via eventbus?
-        }
-        return areaMeasurementLayerUI;
     }
 
     /**
@@ -203,8 +150,29 @@ public class ImageAnnotationFrame extends JFrame {
         if (toolBar == null) {
             toolBar = new JToolBar();
             toolBar.add(getComboBox());
-            toolBar.add(getMakeMeasurementButton());
-            toolBar.add(getMakeAreaMeasurementButton());
+
+            // --- Add buttons to select the correct LayerUI
+            for (int i = 0; i < layers.size(); i++) {
+                final int j = i;
+                ImageFrameLayerUI layerUI = layers.get(i);
+                JRadioButton button = new JRadioButton(layerUI.getDisplayName());
+                button.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        ((ImageFrameLayerUI) getLayer().getUI()).resetUI();
+                        getLayer().setUI(layers.get(j));
+                        setSettingsPanel(layers.get(j).getSettingsBuilder().getPanel());
+                    }
+                });
+
+                if (j == 0) {
+                    button.setSelected(true);
+                }
+
+                toolBar.add(button);
+                layersButtonGroup.add(button);
+            }
+
         }
 
         return toolBar;
@@ -225,6 +193,16 @@ public class ImageAnnotationFrame extends JFrame {
         imageCanvas.setUrl(null);
     }
 
+    private void setSettingsPanel(JPanel panel) {
+        if (settingsPanel != null) {
+            remove(settingsPanel);
+        }
+        settingsPanel = panel;
+        add(settingsPanel, BorderLayout.NORTH);
+        validate();
+        repaint();
+    }
+
     /**
      *  Listen for selected Observations. If one is selected, set it as the GOTO observation.
      *  Otherwise disable the measurements
@@ -238,16 +216,16 @@ public class ImageAnnotationFrame extends JFrame {
             Collection<Observation> selectedObservations = selectionEvent.get();
 
             // Toggle UI layer between Annotation or Measurement
-            if (selectedObservations.size() == 1) {
-                getMakeMeasurementButton().setEnabled(true);
-                getMakeAreaMeasurementButton().setEnabled(true);
-
-            }
-            else {
-                getMakeMeasurementButton().setEnabled(false);
-                getMakeAreaMeasurementButton().setEnabled(false);
-                useAnnotationLayer();
-            }
+//            if (selectedObservations.size() == 1) {
+//                getMakeMeasurementButton().setEnabled(true);
+//                getMakeAreaMeasurementButton().setEnabled(true);
+//
+//            }
+//            else {
+//                getMakeMeasurementButton().setEnabled(false);
+//                getMakeAreaMeasurementButton().setEnabled(false);
+//                useAnnotationLayer();
+//            }
 
             // If one observation is found show it's image
             Set<VideoFrame> videoFrames = PersistenceController.toVideoFrames(selectionEvent.get());
@@ -289,27 +267,5 @@ public class ImageAnnotationFrame extends JFrame {
         imageCanvas.setUrl(imageReference);
     }
 
-    /**
-     */
-    private void useAnnotationLayer() {
-        getMakeMeasurementButton().setSelected(false);
-        getMakeAreaMeasurementButton().setSelected(false);
-        getLayer().setUI(getAnnotationLayerUI());
-    }
 
-    /**
-     */
-    private void useMeasurementLayer() {
-        getMakeMeasurementButton().setSelected(true);
-        getMakeAreaMeasurementButton().setSelected(false);
-        getMeasurementLayerUI().resetUI();
-        getLayer().setUI(getMeasurementLayerUI());
-    }
-
-    private void useAreaMeasurementLayer() {
-        getMakeMeasurementButton().setSelected(false);
-        getMakeAreaMeasurementButton().setSelected(true);
-        getAreaMeasurementLayerUI().resetUI();
-        getLayer().setUI(getAreaMeasurementLayerUI());
-    }
 }

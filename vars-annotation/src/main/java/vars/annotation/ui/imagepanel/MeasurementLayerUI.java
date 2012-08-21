@@ -57,9 +57,10 @@ import java.util.Vector;
  *
  * @param <T>
  */
-public class MeasurementLayerUI<T extends JImageUrlCanvas> extends MultiLayerUI<T> {
+public class MeasurementLayerUI<T extends JImageUrlCanvas> extends ImageFrameLayerUI<T> {
 
-    private JXCrossHairPainter<T> crossHairPainter = new JXCrossHairPainter<T>();
+    private final JXPainter<T> crossHairPainter = new JXCrossHairPainter<T>();
+    private final JXPainter<T> selectedObservationPainter = new JXSelectedObservationsPainter<T>(MarkerStyle.SELECTED_FAINT);
 
     /** Name of the observation property that can be used with property change listeners */
     public static final String PROP_OBSERVATION = "Observation";
@@ -95,7 +96,7 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends MultiLayerUI<
     /** The observation that we're currently adding measurements to */
     private Observation observation;
 
-    private Collection<Observation> relatedObservations = Collections.synchronizedCollection(new ArrayList());
+    //private Collection<Observation> relatedObservations = Collections.synchronizedCollection(new ArrayList());
 
     /** Flag, when true we've just completed measuring a line */
     private boolean selectedLineEnd;
@@ -103,13 +104,6 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends MultiLayerUI<
     /** Flag, when true we've just started measuring a line */
     private boolean selectedLineStart;
     private final ToolBelt toolBelt;
-
-    private final Predicate<Observation> matchObservationPredicate = new Predicate<Observation>() {
-        @Override
-        public boolean apply(Observation input) {
-            return input.equals(observation);
-        }
-    };
 
     /**
      * Runnable that resets the measurment UI state
@@ -132,16 +126,19 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends MultiLayerUI<
      * @param toolBelt
      */
     public MeasurementLayerUI(ToolBelt toolBelt) {
+        setDisplayName("Distance");
+        setSettingsBuilder(new MeasurementLayerSettingsBuilder<T>(this, toolBelt.getAnnotationPersistenceService()));
         this.toolBelt = toolBelt;
+        addPainter(crossHairPainter);
+        addPainter(selectedObservationPainter);
         AnnotationProcessor.process(this);
-        Collection<Observation> selectedObservations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
-        respondsTo(new ObservationsSelectedEvent(null, selectedObservations));
     }
 
     @Override
     public void clearPainters() {
         super.clearPainters();
         addPainter(crossHairPainter);
+        addPainter(selectedObservationPainter);
     }
 
     /**
@@ -170,12 +167,6 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends MultiLayerUI<
         return new Measurement(x0, y0, x1, y1, comment);
     }
 
-    /**
-     * @return The observation that we're adding measurements to
-     */
-    public Observation getObservation() {
-        return observation;
-    }
 
     /**
      * Handle to the class that handles property changes. Used to hang listeners onto the
@@ -192,71 +183,38 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends MultiLayerUI<
         super.paintLayer(g2, jxl);
         g2.setPaintMode();    // Make sure XOR is turned off
 
-        // --- Paint observation
-        if (observation != null) {
 
-            for (Observation obs: relatedObservations) {
-                if ((obs.getX() != null) && (obs.getY() != null)) {
-
-                    Point2D imagePoint = new Point2D.Double(obs.getX(), obs.getY());
-                    Point2D componentPoint2D = jxl.getView().convertToComponent(imagePoint);
-                    if (componentPoint2D != null) {
-                        Point componentPoint = AwtUtilities.toPoint(componentPoint2D);
-                        int x = componentPoint.x;
-                        int y = componentPoint.y;
-
-                        MarkerStyle markerStyle = obs.equals(observation) ? MarkerStyle.NOTSELECTED : MarkerStyle.FAINT;
-
-                        g2.setStroke(markerStyle.stroke);
-                        g2.setPaint(markerStyle.color);
-
-                        // Write the concept name
-                        g2.setFont(markerStyle.font);
-                        g2.drawString(obs.getConceptName(), x + 5, y);
-
-                        // Draw the annotation
-                        int armLength = markerStyle.armLength;
-                        GeneralPath gp = new GeneralPath();
-                        gp.moveTo(x - armLength, y - armLength);
-                        gp.lineTo(x + armLength, y + armLength);
-                        gp.moveTo(x + armLength, y - armLength);
-                        gp.lineTo(x - armLength, y + armLength);
-                        g2.draw(gp);
-                    }
-                }
+        // --- Draw and label existing measurements for selected observation
+        g2.setPaint(Color.GREEN);
+        g2.setStroke(new BasicStroke(2));
+        for (MeasurementPath path : measurementPaths) {
+            try {
+                updateMeasurementPath(path, jxl);
+                String comment = path.measurement.getComment();
+                g2.draw(path.generalPath);
+                g2.setFont(lineFont);
+                g2.drawString(comment, (float) path.commentPoint.getX(), (float) path.commentPoint.getY());
             }
-
-            // --- Draw and label existing measurements for selected observation
-            g2.setPaint(Color.GREEN);
-            g2.setStroke(new BasicStroke(2));
-            for (MeasurementPath path : measurementPaths) {
-                try {
-                    updateMeasurementPath(path, jxl);
-                    String comment = path.measurement.getComment();
-                    g2.draw(path.generalPath);
-                    g2.setFont(lineFont);
-                    g2.drawString(comment, (float) path.commentPoint.getX(), (float) path.commentPoint.getY());
-                }
-                catch (Exception e) {
-                    log.warn("Problem with drawing measurement path", e);
-                }
-            }
-            g2.setPaintMode();
-
-            // --- Paint lineStart
-            g2.setStroke(new BasicStroke(2));
-            g2.setPaint(Color.RED);
-            final int markerOffset = markerDiameter / 2;
-            if (selectedLineStart) {
-                Point2D lineStartPoint = jxl.getView().convertToComponent(lineStart);
-                Point componentPoint = AwtUtilities.toPoint(lineStartPoint);
-                int x = componentPoint.x;
-                int y = componentPoint.y;
-                Ellipse2D marker = new Ellipse2D.Double(x - markerOffset, y - markerOffset, markerDiameter, markerDiameter);
-                g2.draw(marker);
-                g2.draw(line);
+            catch (Exception e) {
+                log.warn("Problem with drawing measurement path", e);
             }
         }
+        g2.setPaintMode();
+
+        // --- Paint lineStart
+        g2.setStroke(new BasicStroke(2));
+        g2.setPaint(Color.RED);
+        final int markerOffset = markerDiameter / 2;
+        if (selectedLineStart) {
+            Point2D lineStartPoint = jxl.getView().convertToComponent(lineStart);
+            Point componentPoint = AwtUtilities.toPoint(lineStartPoint);
+            int x = componentPoint.x;
+            int y = componentPoint.y;
+            Ellipse2D marker = new Ellipse2D.Double(x - markerOffset, y - markerOffset, markerDiameter, markerDiameter);
+            g2.draw(marker);
+            g2.draw(line);
+        }
+
 
     }
 
@@ -340,20 +298,10 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends MultiLayerUI<
      */
     public void setObservation(Observation newObservation) {
         Observation oldObservation = this.observation;
+        observation = newObservation;
         measurementPaths.clear();
-        relatedObservations.clear();
 
-        // --- Parse out any existing measurement
-        if (newObservation != null) {
-
-            // DAOTX: Lookup selected observation from database. Otherwise, you may not get all the related observations
-            ObservationDAO observationDAO = toolBelt.getAnnotationDAOFactory().newObservationDAO();
-            observationDAO.startTransaction();
-            observation = observationDAO.find(newObservation);
-            relatedObservations.addAll(observation.getVideoFrame().getObservations());
-            observationDAO.endTransaction();
-            observationDAO.close();
-
+        if (observation != null) {
             Collection<Association> associations = Collections2.filter(observation.getAssociations(),
                     Measurement.IS_MEASUREMENT_PREDICATE);
             for (Association association : associations) {
@@ -365,23 +313,21 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends MultiLayerUI<
                 }
             }
         }
+
         resetUI();
         propertyChangeSupport.firePropertyChange(PROP_OBSERVATION, oldObservation, observation);
     }
 
-    @EventSubscriber(eventClass = ObservationsSelectedEvent.class)
-    public void respondsTo(ObservationsSelectedEvent event) {
-        Observation selectedObservation = (event.get().size() == 1) ? event.get().iterator().next() : null;
-        setObservation(selectedObservation);
+
+    @EventSubscriber(eventClass = IAFRepaintEvent.class)
+    public void respondsTo(IAFRepaintEvent event) {
+        UIDataCoordinator dataCoordinator = event.get();
+        Observation obs = (dataCoordinator.getSelectedObservations().size() == 1) ?
+                dataCoordinator.getSelectedObservations().iterator().next() :
+                null;
+        setObservation(obs);
     }
 
-    @EventSubscriber(eventClass = ObservationsChangedEvent.class)
-    public void respondsTo(ObservationsChangedEvent event) {
-        Collection<Observation> matchingObservation = Collections2.filter(event.get(), matchObservationPredicate);
-        if (!matchingObservation.isEmpty()) {
-            setObservation(matchingObservation.iterator().next());
-        }
-    }
 
     /**
      * Resets the path of measurement lines and comment location based on the size of the underlying componenet

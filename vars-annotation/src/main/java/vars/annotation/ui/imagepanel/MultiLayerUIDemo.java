@@ -35,6 +35,13 @@ public class MultiLayerUIDemo {
         layerUI.addPainter(painter);
         layerUI.addPainter(new JXTargetPainter<JComponent>());
 
+        JXGridPainter<JComponent> gridPainter = new JXGridPainter<JComponent>();
+        gridPainter.setPixelHeight(image.getHeight());
+        gridPainter.setPixelWidth(image.getWidth());
+        gridPainter.setPixelDistance(20);
+        gridPainter.setAngle(45D * Math.PI / 180D);
+        layerUI.addPainter(gridPainter);
+
 
         JXLayer<JComponent> layer = new JXLayer<JComponent>(label);
         layer.setUI(layerUI);
@@ -45,5 +52,7 @@ public class MultiLayerUIDemo {
         frame.setSize(image.getWidth(), image.getHeight());
         frame.setLocationByPlatform(true);
         frame.setVisible(true);
+
+
     }
 }

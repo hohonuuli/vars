@@ -13,9 +13,12 @@ import java.awt.Stroke;
  * @since 2011-08-30
  */
 public enum MarkerStyle {
-    SELECTED(new Color(0, 255, 0, 180), new Font("Sans Serif", Font.PLAIN, 14), 14, new BasicStroke(3)),
+
+    FAINT(new Color(126, 126, 126, 180), new Font("Sans Serif", Font.PLAIN, 10), 6, new BasicStroke(2)),
     NOTSELECTED(new Color(255, 0, 0, 180), new Font("Sans Serif", Font.PLAIN, 10), 7, new BasicStroke(3)),
-    FAINT(new Color(126, 126, 126, 180), new Font("Sans Serif", Font.PLAIN, 10), 6, new BasicStroke(2));
+    NOTSELECTED_FAINT(new Color(126, 0, 0, 180), new Font("Sans Serif", Font.PLAIN, 10), 6, new BasicStroke(3)),
+    SELECTED(new Color(0, 255, 0, 180), new Font("Sans Serif", Font.PLAIN, 14), 14, new BasicStroke(3)),
+    SELECTED_FAINT(new Color(0, 126, 0, 180), new Font("Sans Serif", Font.PLAIN, 10), 7, new BasicStroke(3));
 
     final int armLength;
     final Color color;

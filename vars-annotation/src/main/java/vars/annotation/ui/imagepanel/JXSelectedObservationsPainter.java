@@ -31,7 +31,11 @@ public class JXSelectedObservationsPainter<T extends JImageUrlCanvas> extends JX
      * Constructs ...
      */
     public JXSelectedObservationsPainter() {
-        super(MarkerStyle.SELECTED, true, false);
+        this(MarkerStyle.SELECTED);
+    }
+
+    public JXSelectedObservationsPainter(MarkerStyle markerStyle) {
+        super(markerStyle, true, false);
         AnnotationProcessor.process(this);
     }
 

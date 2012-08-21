@@ -73,9 +73,9 @@ public class JXIdentityReferencePainter<T extends JImageUrlCanvas>
         }
     }
 
-    @EventSubscriber(eventClass = ObservationsSelectedEvent.class)
-    public void respondTo(ObservationsSelectedEvent event) {
-        Collection<Observation> observations = event.get();
+    @EventSubscriber(eventClass = IAFRepaintEvent.class)
+    public void respondTo(IAFRepaintEvent event) {
+        Collection<Observation> observations = new HashSet<Observation>(event.get().getSelectedObservations());
         if (observations.size() == 1) {
             setObservation(observations.iterator().next());
         }

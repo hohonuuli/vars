@@ -31,13 +31,15 @@ import java.util.HashSet;
  */
 public class JXNotSelectedObservationsPainter<T extends JImageUrlCanvas> extends JXObservationsPainter<T> {
 
-
-
     /**
      * Constructs ...
      */
     public JXNotSelectedObservationsPainter() {
-        super(MarkerStyle.NOTSELECTED, true, false);
+        this(MarkerStyle.NOTSELECTED);
+    }
+
+    public JXNotSelectedObservationsPainter(MarkerStyle markerStyle) {
+        super(markerStyle, true, false);
         AnnotationProcessor.process(this);
     }
 
@@ -52,4 +54,5 @@ public class JXNotSelectedObservationsPainter<T extends JImageUrlCanvas> extends
         observations.removeAll(dataCoordinator.getSelectedObservations());
         setObservations(observations);
     }
+
 }

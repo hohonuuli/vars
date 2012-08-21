@@ -2,6 +2,8 @@ package vars.annotation.ui.imagepanel;
 
 import org.jdesktop.jxlayer.JXLayer;
 import org.jdesktop.jxlayer.plaf.AbstractLayerUI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
@@ -18,6 +20,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class MultiLayerUI<T extends JComponent> extends AbstractLayerUI<T> {
 
+    private final Logger log = LoggerFactory.getLogger(getClass());
     private Queue<JXPainter<T>> painters = new LinkedBlockingQueue<JXPainter<T>>();
 
     /**
@@ -57,6 +60,7 @@ public class MultiLayerUI<T extends JComponent> extends AbstractLayerUI<T> {
     protected void paintLayer(Graphics2D g2, JXLayer<? extends T> jxl) {
         super.paintLayer(g2, jxl);
         for (JXPainter<T> painter : painters) {
+            //log.debug("Painting: " + painter);
             painter.paintLayer(g2, jxl);
         }
     }

@@ -58,7 +58,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
  *
  * @param <T>
  */
-public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends MultiLayerUI<T> {
+public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends ImageFrameLayerUI<T> {
         //extends CrossHairLayerUI<T> {
 
     private JXPainter<T> crossHairPainter = new JXCrossHairPainter<T>();
@@ -145,6 +145,8 @@ public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends MultiLaye
      * @param toolBelt
      */
     public AreaMeasurementLayerUI(ToolBelt toolBelt) {
+        setDisplayName("Area");
+        setSettingsBuilder(new AreaMeasurementLayerSettingsBuilder<T>(this));
         this.toolBelt = toolBelt;
         AnnotationProcessor.process(this);
         Collection<Observation> selectedObservations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
