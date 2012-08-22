@@ -87,6 +87,15 @@ public class JXObservationsPainter<T extends JImageUrlCanvas> extends AbstractJX
                     g2.setStroke(markerStyle.stroke);
                     g2.setPaint(markerStyle.color);
 
+                    // Draw the annotation
+                    int armLength = markerStyle.armLength;
+                    GeneralPath gp = new GeneralPath();
+                    gp.moveTo(x - armLength, y - armLength);
+                    gp.lineTo(x + armLength, y + armLength);
+                    gp.moveTo(x + armLength, y - armLength);
+                    gp.lineTo(x - armLength, y + armLength);
+                    g2.draw(gp);
+
                     // Write the concept name
                     g2.setFont(markerStyle.font);
                     if (drawConceptName) {
@@ -103,14 +112,6 @@ public class JXObservationsPainter<T extends JImageUrlCanvas> extends AbstractJX
                         g2.drawString(timecode, x, y);
                     }
 
-                    // Draw the annotation
-                    int armLength = markerStyle.armLength;
-                    GeneralPath gp = new GeneralPath();
-                    gp.moveTo(x - armLength, y - armLength);
-                    gp.lineTo(x + armLength, y + armLength);
-                    gp.moveTo(x + armLength, y - armLength);
-                    gp.lineTo(x - armLength, y + armLength);
-                    g2.draw(gp);
                 }
             }
         }
