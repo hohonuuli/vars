@@ -35,7 +35,7 @@ public class AddObservationToVideoFrameCmd implements Command {
     private VideoFrame videoFrameDetached;
 
     public AddObservationToVideoFrameCmd(String conceptName, VideoFrame videoFrame,
-            String user, Point2D point, boolean selectAddedObservation) {
+                                         String user, Point2D point, boolean selectAddedObservation) {
         this.conceptName = conceptName;
         this.user = (user == null) ? UserAccount.USERNAME_DEFAULT : user;
         this.point = point;
@@ -74,12 +74,13 @@ public class AddObservationToVideoFrameCmd implements Command {
         videoFrameDAO.close();
         if (newObservation != null) {
             newPrimaryKey = newObservation.getPrimaryKey();
-        }
-        EventBus.publish(new ObservationsAddedEvent(null, newObservation));
+            EventBus.publish(new ObservationsAddedEvent(null, newObservation));
 
-        if (selectAddedObservation) {
-            EventBus.publish(new ObservationsSelectedEvent(null, ImmutableList.of(newObservation)));
+            if (selectAddedObservation) {
+                EventBus.publish(new ObservationsSelectedEvent(this, ImmutableList.of(newObservation)));
+            }
         }
+
     }
 
     @Override

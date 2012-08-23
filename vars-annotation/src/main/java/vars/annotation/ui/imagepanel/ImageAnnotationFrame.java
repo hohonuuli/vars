@@ -19,6 +19,8 @@ import org.bushe.swing.event.annotation.AnnotationProcessor;
 import org.bushe.swing.event.annotation.EventSubscriber;
 import org.jdesktop.jxlayer.JXLayer;
 import org.mbari.swing.JImageUrlCanvas;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import vars.annotation.Observation;
 import vars.annotation.VideoFrame;
 import vars.annotation.ui.PersistenceController;
@@ -61,6 +63,7 @@ public class ImageAnnotationFrame extends JFrame {
     private final ImageAnnotationFrameController controller;
     private JXLayer<JImageUrlCanvas> layer;
     private JPanel settingsPanel;
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
 
     private JToolBar toolBar;
@@ -80,7 +83,7 @@ public class ImageAnnotationFrame extends JFrame {
         dataCoordinator = new UIDataCoordinator(toolBelt.getAnnotationDAOFactory());
 
         // --- Build UI Layers
-        layers.add(new AnnotationLayerUI<JImageUrlCanvas>(controller.getToolBelt(), dataCoordinator));
+        layers.add(getAnnotationLayerUI());
         MeasurementLayerUI<JImageUrlCanvas> measurementLayerUI = new MeasurementLayerUI<JImageUrlCanvas>(controller.getToolBelt());
         measurementLayerUI.addMeasurementCompletedListener(controller);
         layers.add(measurementLayerUI);
@@ -118,8 +121,10 @@ public class ImageAnnotationFrame extends JFrame {
                 @Override
                 public void itemStateChanged(ItemEvent e) {
                     if (e.getStateChange() == ItemEvent.SELECTED) {
+
                         Concept concept = toolBelt.getAnnotationPersistenceService().findConceptByName(
                             (String) comboBox.getSelectedItem());
+                        log.debug("Using concept: " + concept.getPrimaryConceptName().getName());
                         getAnnotationLayerUI().setConcept(concept);
                     }
                 }

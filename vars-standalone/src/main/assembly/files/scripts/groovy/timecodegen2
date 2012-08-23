@@ -1,0 +1,24 @@
+#!/usr/bin/env groovy
+
+/**
+ * Script for simulation a udp VCR
+ *
+ * Usage:
+ *  timecodegen2 port timecode
+ */
+
+def port = (args.size() > 0) ? Integer.valueOf(args[0]) : 9000
+def timecode = args[1]
+
+println("Static timecode generator attached to port ${port}")
+ 
+def socket = new DatagramSocket(port)
+def buffer = (' ' * 4096) as byte[]
+while(true) {
+    def incoming = new DatagramPacket(buffer, buffer.length)
+    socket.receive(incoming)
+    def c = new GregorianCalendar()
+    outgoing = new DatagramPacket(timecode.bytes, timecode.size(),
+            incoming.address, incoming.port);
+    socket.send(outgoing)
+}
