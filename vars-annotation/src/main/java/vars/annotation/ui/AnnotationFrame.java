@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -48,6 +49,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import com.google.common.collect.Sets;
 import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.annotation.AnnotationProcessor;
 import org.bushe.swing.event.annotation.EventSubscriber;
@@ -280,7 +282,13 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
                         for (int i = 0; i < rows.length; i++) {
                             selectedObservations.add(table.getObservationAt(rows[i]));
                         }
-                        EventBus.publish(new ObservationsSelectedEvent(table, selectedObservations));
+                        // TODO add check to see if the selected observations are different thant
+                        // the previously selected observations BEFORE sending this
+                        Collection<Observation> oldObservations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+                        Set<Observation> oldSelectedObservations = new HashSet<Observation>(oldObservations);
+                        if (!Sets.symmetricDifference(new HashSet<Observation>(selectedObservations), oldSelectedObservations).isEmpty()) {
+                            EventBus.publish(new ObservationsSelectedEvent(table, selectedObservations));
+                        }
                     }
                 }
             });
@@ -369,7 +377,7 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
     @EventSubscriber(eventClass = ObservationsAddedEvent.class)
     @Override
     public void respondTo(ObservationsAddedEvent event) {
-        respondTo(new ObservationsChangedEvent(null, event.get()));
+        respondTo(new ObservationsChangedEvent(this, event.get()));
         //EventBus.publish(new ObservationsSelectedEvent(null, event.get()));
     }
 

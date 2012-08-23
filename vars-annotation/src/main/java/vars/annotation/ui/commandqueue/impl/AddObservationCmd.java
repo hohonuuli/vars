@@ -138,7 +138,7 @@ public class AddObservationCmd implements Command {
         EventBus.publish(new ObservationsAddedEvent(null, newObservation));
 
         if (selectAddedObservation) {
-            EventBus.publish(new ObservationsSelectedEvent(null, ImmutableList.of(newObservation)));
+            EventBus.publish(new ObservationsSelectedEvent(this, ImmutableList.of(newObservation)));
         }
     }
 
