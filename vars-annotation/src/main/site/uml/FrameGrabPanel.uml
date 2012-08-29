@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>vars.annotation.ui.ppanel.FrameGrabPanel</OriginalElement>
+  <nodes>
+    <node x="467.16666666666663" y="292.0">vars.annotation.ui.ppanel.FrameGrabPanel</node>
+    <node x="116.5" y="104.0">vars.annotation.ui.imagepanel.AnnotationLayerUI</node>
+    <node x="443.66666666666663" y="212.0">vars.annotation.ui.imagepanel.ImageAnnotationFrame</node>
+    <node x="554.5" y="104.0">vars.annotation.ui.imagepanel.ImageAnnotationFrameController</node>
+    <node x="326.5" y="104.0">vars.annotation.ui.imagepanel.MeasurementLayerUI</node>
+  </nodes>
+  <notes>
+    <note x="834.5" y="96.0">
+      <node>vars.annotation.ui.imagepanel.ImageAnnotationFrame</node>
+      <value>on ObservationSelectionEvent -&gt; update image reference\non ObservationChangedEvent -&gt; update image referene\non VideoFrameChangedEvent -&gt; update image reference</value>
+      <edge>
+        <point x="84.4375" y="-15.0" />
+        <point x="624.6041666666666" y="192.0" />
+        <point x="1028.5" y="192.0" />
+        <point x="0.0" y="23.0" />
+      </edge>
+    </note>
+    <note x="0.0" y="38.0">
+      <node>vars.annotation.ui.imagepanel.AnnotationLayerUI</node>
+      <value>Observation Selection -&gt; Update selection\nObservation Changed -&gt; replace in internal lists and redraw\nVideoFrame Changed -&gt; redraw</value>
+      <edge>
+        <point x="0.0" y="-15.0" />
+        <point x="0.0" y="23.0" />
+      </edge>
+    </note>
+  </notes>
+  <edges>
+    <edge source="vars.annotation.ui.imagepanel.ImageAnnotationFrameController" target="vars.annotation.ui.imagepanel.ImageAnnotationFrame">
+      <point x="86.66666666666669" y="15.0" />
+      <point x="771.1666666666667" y="182.0" />
+      <point x="600.4791666666666" y="182.0" />
+      <point x="60.3125" y="-15.0" />
+    </edge>
+    <edge source="vars.annotation.ui.imagepanel.ImageAnnotationFrame" target="vars.annotation.ui.imagepanel.ImageAnnotationFrameController">
+      <point x="12.0625" y="-15.0" />
+      <point x="552.2291666666666" y="162.0" />
+      <point x="597.8333333333334" y="162.0" />
+      <point x="-86.66666666666667" y="15.0" />
+    </edge>
+    <edge source="vars.annotation.ui.imagepanel.ImageAnnotationFrame" target="vars.annotation.ui.imagepanel.MeasurementLayerUI">
+      <point x="-36.1875" y="-15.0" />
+      <point x="503.97916666666663" y="172.0" />
+      <point x="378.5" y="172.0" />
+      <point x="-52.0" y="15.0" />
+    </edge>
+    <edge source="vars.annotation.ui.imagepanel.ImageAnnotationFrame" target="vars.annotation.ui.imagepanel.AnnotationLayerUI">
+      <point x="-84.4375" y="-15.0" />
+      <point x="455.72916666666663" y="192.0" />
+      <point x="164.0" y="192.0" />
+      <point x="-47.5" y="15.0" />
+    </edge>
+    <edge source="vars.annotation.ui.ppanel.FrameGrabPanel" target="vars.annotation.ui.imagepanel.ImageAnnotationFrame">
+      <point x="36.5" y="-15.0" />
+      <point x="576.6666666666666" y="267.0" />
+      <point x="588.4166666666666" y="267.0" />
+      <point x="48.25" y="15.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="347.5" y="215.0" />
+  <SelectedNodes>
+    <node>vars.annotation.ui.imagepanel.AnnotationLayerUI</node>
+  </SelectedNodes>
+  <Categories />
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+
