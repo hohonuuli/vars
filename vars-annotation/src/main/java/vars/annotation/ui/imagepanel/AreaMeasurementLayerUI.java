@@ -41,11 +41,13 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -62,6 +64,13 @@ public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends ImageFram
         //extends CrossHairLayerUI<T> {
 
     private JXPainter<T> crossHairPainter = new JXCrossHairPainter<T>();
+
+    /**
+     * This is a reference to the image being drawn by the JImageUrlCanvas. THis is needed so
+     * that the area measurement doesn't extend outside the bounds of the image. It needs to be
+     * a bufferedImage so that we can read the width and height easily.
+     */
+    private BufferedImage image;
 
     /*
 
@@ -275,8 +284,23 @@ public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends ImageFram
             int x = (int) Math.round(imagePoint.getX());
             int y = (int) Math.round(imagePoint.getY());
             if (me.getClickCount() == 1 && (me.getButton() == MouseEvent.BUTTON1)) {
-                pointsIC.add(new org.mbari.geometry.Point2D<Integer>(x, y));
-                setDirty(true);
+                if (image != null) {
+                    if (x < 0) {
+                        x = 0;
+                    }
+                    if (x > image.getWidth()) {
+                        x = image.getWidth();
+                    }
+                    if (y < 0) {
+                        y = 0;
+                    }
+                    if (y > image.getHeight()) {
+                        y = image.getHeight();
+                    }
+
+                    pointsIC.add(new org.mbari.geometry.Point2D<Integer>(x, y));
+                    setDirty(true);
+                }
             }
             else if ((me.getClickCount() == 2) || (me.getButton() != MouseEvent.BUTTON1)) {
                 if (pointsIC.size() > 2 && observation != null) {
@@ -298,6 +322,7 @@ public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends ImageFram
         super.processMouseMotionEvent(me, jxl);
         if ((me.getID() == MouseEvent.MOUSE_MOVED) && (pointsIC.size() > 1)) {
             Point point = SwingUtilities.convertPoint(me.getComponent(), me.getPoint(), jxl);
+
             currentPointCC.setLocation(point.getX(), point.getY());
             int w = jxl.getWidth();
             int h = jxl.getHeight();
@@ -315,6 +340,7 @@ public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends ImageFram
             setDirty(true);
         }
     }
+
 
     /**
      * resets the ui to a known state
@@ -350,6 +376,14 @@ public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends ImageFram
         }
     }
 
+    public BufferedImage getImage() {
+        return image;
+    }
+
+    public void setImage(BufferedImage image) {
+        this.image = image;
+    }
+
     /**
      *
      * @param observation
@@ -367,18 +401,22 @@ public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends ImageFram
             ObservationDAO observationDAO = toolBelt.getAnnotationDAOFactory().newObservationDAO();
             observationDAO.startTransaction();
             observation = observationDAO.find(observation);
-            relatedObservations.addAll(observation.getVideoFrame().getObservations());
+            if (observation != null) {
+                relatedObservations.addAll(observation.getVideoFrame().getObservations());
+            }
             observationDAO.endTransaction();
             observationDAO.close();
 
-            Collection<Association> associations = Collections2.filter(observation.getAssociations(),
-                AreaMeasurement.IS_AREA_MEASUREMENT_PREDICATE);
-            for (Association association : associations) {
-                try {
-                    areaMeasurementPaths.add(associationTransform.apply(association));
-                }
-                catch (Exception e) {
-                    log.warn("Unable to parse coordinates from the association, " + association);
+            if (observation != null) {
+                Collection<Association> associations = Collections2.filter(observation.getAssociations(),
+                    AreaMeasurement.IS_AREA_MEASUREMENT_PREDICATE);
+                for (Association association : associations) {
+                    try {
+                        areaMeasurementPaths.add(associationTransform.apply(association));
+                    }
+                    catch (Exception e) {
+                        log.warn("Unable to parse coordinates from the association, " + association);
+                    }
                 }
             }
         }

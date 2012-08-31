@@ -18,6 +18,8 @@ package vars.annotation.ui.imagepanel;
 import org.bushe.swing.event.annotation.AnnotationProcessor;
 import org.bushe.swing.event.annotation.EventSubscriber;
 import org.mbari.swing.JImageUrlCanvas;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Brian Schlining
@@ -26,6 +28,8 @@ import org.mbari.swing.JImageUrlCanvas;
  * @param <T>
  */
 public class JXSelectedObservationsPainter<T extends JImageUrlCanvas> extends JXObservationsPainter<T> {
+
+    private Logger log = LoggerFactory.getLogger(getClass());
 
     /**
      * Constructs ...
@@ -45,6 +49,8 @@ public class JXSelectedObservationsPainter<T extends JImageUrlCanvas> extends JX
      */
     @EventSubscriber(eventClass = IAFRepaintEvent.class)
     public void respondTo(IAFRepaintEvent event) {
+        log.debug("Responding to Selection event with " + event.get().getSelectedObservations().size() +
+            " observations");
         setObservations(event.get().getSelectedObservations());
     }
 }

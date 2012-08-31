@@ -45,6 +45,7 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -104,6 +105,13 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends ImageFrameLay
     /** Flag, when true we've just started measuring a line */
     private boolean selectedLineStart;
     private final ToolBelt toolBelt;
+
+    /**
+     * This is a reference to the image being drawn by the JImageUrlCanvas. THis is needed so
+     * that the area measurement doesn't extend outside the bounds of the image. It needs to be
+     * a bufferedImage so that we can read the width and height easily.
+     */
+    private BufferedImage image;
 
     /**
      * Runnable that resets the measurment UI state
@@ -167,6 +175,13 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends ImageFrameLay
         return new Measurement(x0, y0, x1, y1, comment);
     }
 
+    public BufferedImage getImage() {
+        return image;
+    }
+
+    public void setImage(BufferedImage image) {
+        this.image = image;
+    }
 
     /**
      * Handle to the class that handles property changes. Used to hang listeners onto the
@@ -225,30 +240,49 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends ImageFrameLay
         switch (me.getID()) {
             case MouseEvent.MOUSE_PRESSED:
                 Point2D imagePoint = jxl.getView().convertToImage(point);
-                if (!selectedLineStart) {
 
-                    // --- On first click set lineStart value
-                    lineStart.setLocation(imagePoint);
-                    selectedLineStart = true;
-                    setDirty(true);
-                }
-                else {
-
-                    // --- On second click set lineEnd value, generate association, set measuring property to false
-                    lineEnd.setLocation(imagePoint);
-                    selectedLineEnd = true;
-
-                    Measurement measurement = newMeasurement(null, jxl);
-                    setDirty(true);
-
-                    // Notify listeners
-                    MeasurementCompletedEvent event = new MeasurementCompletedEvent(measurement, observation);
-                    for (MeasurementCompletedListener listener : measurementCompletedListeners) {
-                        listener.onComplete(event);
+                if (imagePoint != null && image != null) {
+                    int x = (int) Math.round(imagePoint.getX());
+                    int y = (int) Math.round(imagePoint.getY());
+                    if (x < 0) {
+                        x = 0;
                     }
+                    if (x > image.getWidth()) {
+                        x = image.getWidth();
+                    }
+                    if (y < 0) {
+                        y = 0;
+                    }
+                    if (y > image.getHeight()) {
+                        y = image.getHeight();
+                    }
+                    imagePoint.setLocation(x, y);
 
-                    resetUI();
+                    if (!selectedLineStart) {
 
+                        // --- On first click set lineStart value
+                        lineStart.setLocation(imagePoint);
+                        selectedLineStart = true;
+                        setDirty(true);
+                    }
+                    else {
+
+                        // --- On second click set lineEnd value, generate association, set measuring property to false
+                        lineEnd.setLocation(imagePoint);
+                        selectedLineEnd = true;
+
+                        Measurement measurement = newMeasurement(null, jxl);
+                        setDirty(true);
+
+                        // Notify listeners
+                        MeasurementCompletedEvent event = new MeasurementCompletedEvent(measurement, observation);
+                        for (MeasurementCompletedListener listener : measurementCompletedListeners) {
+                            listener.onComplete(event);
+                        }
+
+                        resetUI();
+
+                    }
                 }
             default:
 

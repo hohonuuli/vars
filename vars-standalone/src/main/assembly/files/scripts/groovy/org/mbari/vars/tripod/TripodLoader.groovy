@@ -65,7 +65,10 @@ class TripodLoader {
                 def metadata = Sanselan.getMetadata(stream, "FOO")
                 stream.close()
                 def creationDate = metadata.findEXIFValue(TiffConstants.EXIF_TAG_CREATE_DATE)
-                def date = dateFormat.parse(creationDate.valueDescription[1..-2])
+                def date = null
+                if (creationDate) {
+                    date = dateFormat.parse(creationDate.valueDescription[1..-2])
+                }
                 def timecode = new Timecode(idx, 30)
                 VideoFrame videoFrame = videoArchive.findVideoFrameByTimeCode(timecode.toString())
                 if (videoFrame == null) {
@@ -119,6 +122,7 @@ class TripodLoader {
         if (!remotePath.endsWith('/')) {
             remotePath = remotePath + "/"
         }
+        println("Fetching images from ${remoteDirectory}")
         def images = []
         def slurper = new XmlSlurper(new Parser())
         remoteDirectory.withReader { reader ->
@@ -127,7 +131,7 @@ class TripodLoader {
             rows.each { row ->
                 try {
                     // A is an anchor/link to an image
-                    def a = row.td[1].a
+                    def a = row.td[1].a.@href.text()
                     images << remotePath + a
                 }
                 catch (Exception e) {

@@ -189,37 +189,41 @@ public class UIDataCoordinator implements UIEventSubscriber {
      * @param _selectedObservations
      */
     public void setVideoFrame(final VideoFrame _videoFrame, final Collection<Observation> _selectedObservations) {
-        selectedObservations.clear();
-        if (_videoFrame == null) {
-            videoFrame = null;
 
-            EventBus.publish(new IAFRepaintEvent(this, this));
-        }
-        else {
-            Worker.post(new Job() {
+            selectedObservations.clear();
+            if (_videoFrame == null) {
+                videoFrame = null;
 
-                @Override
-                public Object run() {
+                EventBus.publish(new IAFRepaintEvent(this, this));
+            }
+            else {
+//                Worker.post(new Job() {
+//
+//                    @Override
+//                    public Object run() {
 
-                    VideoFrameDAO dao = annotationDAOFactory.newVideoFrameDAO();
-                    ObservationDAO obsDao = annotationDAOFactory.newObservationDAO(dao.getEntityManager());
-                    dao.startTransaction();
-                    videoFrame = dao.find(_videoFrame);
-                    for (Observation obs : _selectedObservations) {
-                        Observation foundObs = obsDao.find(obs);
-                        if (foundObs != null) {
-                            selectedObservations.add(foundObs);
+                        VideoFrameDAO dao = annotationDAOFactory.newVideoFrameDAO();
+                        ObservationDAO obsDao = annotationDAOFactory.newObservationDAO(dao.getEntityManager());
+                        dao.startTransaction();
+                        videoFrame = dao.find(_videoFrame);
+
+                        for (Observation obs : _selectedObservations) {
+                            Observation foundObs = obsDao.find(obs);
+                            if (foundObs != null) {
+                                selectedObservations.add(foundObs);
+                            }
                         }
-                    }
-                    dao.endTransaction();
-                    dao.close();
-                    EventBus.publish(new IAFRepaintEvent(UIDataCoordinator.this, UIDataCoordinator.this));
 
-                    return null;    //To change body of implemented methods use File | Settings | File Templates.
-                }
+                        dao.endTransaction();
+                        dao.close();
+                        EventBus.publish(new IAFRepaintEvent(UIDataCoordinator.this, UIDataCoordinator.this));
 
-            });
+//                        return null;    //To change body of implemented methods use File | Settings | File Templates.
+//                    }
+//
+//                });
 
-        }
+            }
+
     }
 }
