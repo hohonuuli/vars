@@ -20,6 +20,11 @@ class CSVReader {
             "longitude":"JCUSBL.Lon",
             "latEW":"JCUSBL.LonW"]
 
+    static final PARSERS = ["recordedDate":"put simple closure to pares date here",
+        "latitude": "lat parser"
+        // TODO etc. implement other parsers
+    ]
+
     static final log = LoggerFactory.getLogger(CSVReader.class)
 
     static read(File file) {
@@ -57,6 +62,8 @@ class CSVReader {
         HEADERS_OF_INTEREST.each { k, v ->
             def i = p.indexOf(v)
             if (i > -1) {
+
+                // TODO need handle latitude and longitude
                 m[k] = i
             }
             else {
