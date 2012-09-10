@@ -1,0 +1,14 @@
+#!/bin/sh
+# $Id: $
+
+# This is a script used for looking up the Concepts that use a particular rank (taxa)
+#
+# Usage: lookup_taxa [RANK]
+# Arguments:
+#    RANK = The taxonmic level (e.g. kingdom, subspecies)
+
+RANK=$1
+
+echo [VARS] Searching for Concepts with a taxonomic rank of $RANK
+`dirname "$0"`/gsh -e "(vars.knowledgebase.KBUtilities.showConceptsByRank('$RANK'))"
+#`dirname "$0"`/gsh -e "(vars.knowledgebase.KBUtilities.findConceptsByRank('$RANK')).each { println(it) }"
