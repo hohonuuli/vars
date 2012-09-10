@@ -5,6 +5,7 @@ import vars.ToolBox
 import org.slf4j.LoggerFactory
 import org.mbari.math.CoallateFunction
 import vars.annotation.VideoArchiveSetDAO
+import vars.query.ui.Lookup
 
 /**
  *
@@ -15,22 +16,26 @@ class MergeData {
 
     final String videoArchiveName
     final File file
+    final csvData
     final toolBox = new ToolBox()
     private final log = LoggerFactory.getLogger(getClass())
 
     def offsetMillisecs = 10 * 1000
+
+    def dateFormat = Lookup.DATE_FORMAT_UTC
 
     final convertVideoFrameToMillisecs = { videoFrame ->
         videoFrame?.recordedDate?.time
     }
 
     final convertCsvDatumToMillisecs = { CSVDatum datum ->
-        datum.recordedDate.time
+        datum?.recordedDate?.time
     }
 
     MergeData(String videoArchiveName, File file) {
         this.videoArchiveName = videoArchiveName
         this.file = file
+        csvData = CSVReader.read(file)
     }
 
     Map<VideoFrame, CSVDatum> apply() {
@@ -49,9 +54,26 @@ class MergeData {
         dao.endTransaction()
         dao.close()
         log.info("Found ${videoFrames?.size()} videoFrames")
-        def coallatedData = CoallateFunction.coallate(videoFrames, convertVideoFrameToMillisecs,
-                ctdData, convertCsvDatumToMillisecs, offsetMillisecs)
-        log.info("Merge Resulted in ${coallatedData?.size()} records")
+        def coallatedData = [:]
+        try {
+            coallatedData = CoallateFunction.coallate(videoFrames, convertVideoFrameToMillisecs,
+                csvData, convertCsvDatumToMillisecs, offsetMillisecs)
+        }
+        catch (Exception e) {
+            def annoDates = videoFrames.collect {it.recordedDate} findAll { it != null} sort()
+            def fileDates = csvData.collect {it.recordedDate} findAll { it != null}  sort()
+            log.warn("""\
+                Unable to match dates between the annotations and the data in the CSV file.
+
+                Annotations:
+                    start date:\t${dateFormat.format(annoDates[0])}
+                    end date:\t${dateFormat.format(annoDates[-1])}
+
+                $file
+                    start date:\t${dateFormat.format(fileDates[0])}
+                    end date:\t${dateFormat.format(fileDates[-1])}
+            """.stripIndent())
+        }
         return coallatedData
     }
 
