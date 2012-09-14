@@ -420,8 +420,8 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
             case PESSIMISTIC:
                 mergeStatus.setDateSource("EXPD");
                 // Change dates to ones found in EXPD
-                if ((cameraDatum.getDate() != null) && !cameraDatum.getDate().equals(recordedDate)) {
-                    videoFrame.setRecordedDate(cameraDatum.getDate());
+                if ((navigationDatum.getDate() != null) && !navigationDatum.getDate().equals(recordedDate)) {
+                    videoFrame.setRecordedDate(navigationDatum.getDate());
                     fixedDateCount++;
                 }
                 break;
@@ -429,7 +429,7 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
             case PRAGMATIC:
                 if ((recordedDate == null) || recordedDate.before(dive.getStartDate()) ||
                         recordedDate.after(dive.getEndDate())) {
-                    videoFrame.setRecordedDate(cameraDatum.getDate());
+                    videoFrame.setRecordedDate(navigationDatum.getDate());
                     fixedDateCount++;
                 }
                 break;

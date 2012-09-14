@@ -28,7 +28,7 @@ class SamplingEvent {
      * The name of the rov that did the collecting. This should be the full name
      * like 'Ventana', 'Tiburon'
      */
-    final String rov
+    String rov
 
     def setRov(String name) {
 

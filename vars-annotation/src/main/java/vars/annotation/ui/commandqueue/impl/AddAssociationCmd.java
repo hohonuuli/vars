@@ -76,8 +76,8 @@ public class AddAssociationCmd implements Command {
                     Collection<Association> matchingAssociation = Collections2.filter(observation.getAssociations(), new IsMatchingAnnotation(ass));
                     if (matchingAssociation.size() == 1) {
                         Association match = matchingAssociation.iterator().next();
-                        dao.remove(match);
                         observation.removeAssociation(match);
+                        dao.remove(match);
                     }
                 }
             }
