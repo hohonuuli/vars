@@ -72,7 +72,7 @@ class MergeData {
                 $file
                     start date:\t${dateFormat.format(fileDates[0])}
                     end date:\t${dateFormat.format(fileDates[-1])}
-            """.stripIndent())
+            """.stripIndent(), e)
         }
         return coallatedData
     }

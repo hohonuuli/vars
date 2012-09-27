@@ -82,8 +82,7 @@ class CSVReader {
                 m = parseHeader(line)
                 isHeader = false
             }
-
-            if (m) {
+            else if (m) {
                 try {
                     data << parse(line, m)
                 }
