@@ -23,7 +23,7 @@ class AutoFramegrabLoader {
     private targetRootDirectory
     private targetRootUrl
     private IVCR vcr
-    private log = LoggerFactory.getLogger("SimpaLoader")
+    private log = LoggerFactory.getLogger("AutoFramegrabLoader")
     private frameGrabber
 
     /**
@@ -93,7 +93,6 @@ class AutoFramegrabLoader {
             conceptDAO.close()
 
             def videoArchiveDAO = toolBox.toolBelt.annotationDAOFactory.newVideoArchiveDAO()
-            videoArchiveDAO.startTransaction()
 
             def videoArchive = videoArchiveDAO.findOrCreateByParameters(platform, sequenceNumber, videoArchiveName)
             def parentDir = new File("${targetRootDirectory.getAbsolutePath()}/${platform}/images/${sequenceNumber}/")
@@ -102,7 +101,8 @@ class AutoFramegrabLoader {
 
             log.info("Starting auto-framegrabs at ${timecode}")
             while (failedCaptureCount < 3) {
-                def videoFrame = videoArchive.findVideoFrameByTimeCode(timecode)
+                videoArchiveDAO.startTransaction()
+                def videoFrame = videoArchive.findVideoFrameByTimeCode(timecode.toString())
                 log.info("Processing data at ${timecode}")
                 // Create a VideoFrame if needed
                 if (!videoFrame) {
@@ -145,12 +145,13 @@ class AutoFramegrabLoader {
                         failedCaptureCount = failedCaptureCount + 1
                     }
                 }
+                videoArchiveDAO.endTransaction()
 
                 // increment the timecode by our interval
-                timecode.addFrames(timecode.frameRate * secondsInterval)
+                timecode = new Timecode(timecode.frames + timecode.frameRate * secondsInterval)
 
             }
-            videoArchiveDAO.endTransaction()
+            
 
         }
         catch (Exception e) {

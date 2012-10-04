@@ -18,6 +18,7 @@ if (args.size() != 6) {
               "/dev/tty.RS422 Deck Control"
 
     """.stripIndent())
+    return
 }
 
 
