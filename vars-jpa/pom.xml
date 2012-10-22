@@ -175,9 +175,9 @@
             </dependencies>
         </profile>
         <profile>
-            <id>pl</id>
+            <id>rc</id>
             <properties>
-                <environment>pl</environment>
+                <environment>rc</environment>
             </properties>
             <dependencies>
                 <dependency>
