@@ -1,7 +1,7 @@
 /*
- * @(#)JXObservationsPainter.java   2012.08.07 at 02:18:50 PDT
+ * @(#)JXObservationsPainter.java   2012.11.26 at 08:48:31 PST
  *
- * Copyright 2009 MBARI
+ * Copyright 2011 MBARI
  *
  *
  * Unless required by applicable law or agreed to in writing, software

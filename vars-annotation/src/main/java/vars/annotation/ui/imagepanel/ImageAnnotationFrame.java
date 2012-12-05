@@ -1,5 +1,5 @@
 /*
- * @(#)ImageAnnotationFrame.java   2011.10.25 at 09:31:48 PDT
+ * @(#)ImageAnnotationFrame.java   2012.11.26 at 08:48:34 PST
  *
  * Copyright 2011 MBARI
  *
@@ -23,7 +23,6 @@ import org.mbari.swing.JImageCanvas;
 import org.mbari.swing.JImageUrlCanvas;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.annotation.Observation;
 import vars.annotation.VideoFrame;
 import vars.annotation.ui.PersistenceController;
 import vars.annotation.ui.ToolBelt;
@@ -37,7 +36,6 @@ import javax.swing.ButtonGroup;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -51,11 +49,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Main class for this package. This class wires together all dependant classes with the controller.
@@ -63,23 +58,11 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class ImageAnnotationFrame extends JFrame {
 
-    private JImageUrlCanvas imageCanvas;
-    private AnnotationLayerUI annotationLayerUI;
-    private ConceptNameComboBox comboBox;
-    private final ImageAnnotationFrameController controller;
-    private JXLayer<JImageUrlCanvas> layer;
-    private JPanel settingsPanel;
     private final Logger log = LoggerFactory.getLogger(getClass());
-    private AreaMeasurementLayerUI<JImageUrlCanvas> areaMeasurementLayerUI;
-    private MeasurementLayerUI<JImageUrlCanvas> measurementLayerUI;
-
-
-    private JToolBar toolBar;
-    /** Relays events fromm the annotation UI to the various painters used by LayerUI's */
-    private final UIDataCoordinator dataCoordinator;
-    private List<ImageFrameLayerUI<JImageUrlCanvas>> layers = new ArrayList<ImageFrameLayerUI<JImageUrlCanvas>>();
     private ButtonGroup layersButtonGroup = new ButtonGroup();
+    private List<ImageFrameLayerUI<JImageUrlCanvas>> layers = new ArrayList<ImageFrameLayerUI<JImageUrlCanvas>>();
     private PropertyChangeListener imageChangeListener = new PropertyChangeListener() {
+
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
             Image image = (Image) evt.getNewValue();
@@ -88,7 +71,18 @@ public class ImageAnnotationFrame extends JFrame {
             getAreaMeasurementLayerUI().setImage(bufferedImage);
         }
     };
+    private AnnotationLayerUI annotationLayerUI;
+    private AreaMeasurementLayerUI<JImageUrlCanvas> areaMeasurementLayerUI;
+    private ConceptNameComboBox comboBox;
+    private final ImageAnnotationFrameController controller;
 
+    /** Relays events fromm the annotation UI to the various painters used by LayerUI's */
+    private final UIDataCoordinator dataCoordinator;
+    private JImageUrlCanvas imageCanvas;
+    private JXLayer<JImageUrlCanvas> layer;
+    private MeasurementLayerUI<JImageUrlCanvas> measurementLayerUI;
+    private JPanel settingsPanel;
+    private JToolBar toolBar;
 
     /**
      * Create the frame
@@ -108,30 +102,6 @@ public class ImageAnnotationFrame extends JFrame {
         initialize();
     }
 
-
-    protected JImageUrlCanvas getImageCanvas() {
-        if (imageCanvas == null) {
-            imageCanvas = new JImageUrlCanvas();
-            imageCanvas.addPropertyChangeListener(JImageCanvas.PROP_IMAGE, imageChangeListener);
-        }
-        return imageCanvas;
-    }
-
-    protected AreaMeasurementLayerUI<JImageUrlCanvas> getAreaMeasurementLayerUI() {
-        if (areaMeasurementLayerUI == null) {
-            areaMeasurementLayerUI = new AreaMeasurementLayerUI<JImageUrlCanvas>(controller.getToolBelt());
-        }
-        return areaMeasurementLayerUI;
-    }
-
-    protected MeasurementLayerUI<JImageUrlCanvas> getMeasurementLayerUI() {
-        if (measurementLayerUI == null) {
-            measurementLayerUI = new MeasurementLayerUI<JImageUrlCanvas>(controller.getToolBelt());
-            measurementLayerUI.addMeasurementCompletedListener(controller);
-        }
-        return measurementLayerUI;
-    }
-
     /**
      * @return
      */
@@ -141,6 +111,14 @@ public class ImageAnnotationFrame extends JFrame {
         }
 
         return annotationLayerUI;
+    }
+
+    protected AreaMeasurementLayerUI<JImageUrlCanvas> getAreaMeasurementLayerUI() {
+        if (areaMeasurementLayerUI == null) {
+            areaMeasurementLayerUI = new AreaMeasurementLayerUI<JImageUrlCanvas>(controller.getToolBelt());
+        }
+
+        return areaMeasurementLayerUI;
     }
 
     /**
@@ -174,17 +152,35 @@ public class ImageAnnotationFrame extends JFrame {
         return comboBox;
     }
 
+    protected JImageUrlCanvas getImageCanvas() {
+        if (imageCanvas == null) {
+            imageCanvas = new JImageUrlCanvas();
+            imageCanvas.addPropertyChangeListener(JImageCanvas.PROP_IMAGE, imageChangeListener);
+        }
+
+        return imageCanvas;
+    }
+
     /**
      * @return
      */
     protected JXLayer<JImageUrlCanvas> getLayer() {
         if (layer == null) {
             layer = new JXLayer<JImageUrlCanvas>(getImageCanvas());
-            layer.setUI(layers.get(0)); // Add first layer in the list as the default UI.
+            layer.setUI(layers.get(0));    // Add first layer in the list as the default UI.
             setSettingsPanel(layers.get(0).getSettingsBuilder().getPanel());
         }
 
         return layer;
+    }
+
+    protected MeasurementLayerUI<JImageUrlCanvas> getMeasurementLayerUI() {
+        if (measurementLayerUI == null) {
+            measurementLayerUI = new MeasurementLayerUI<JImageUrlCanvas>(controller.getToolBelt());
+            measurementLayerUI.addMeasurementCompletedListener(controller);
+        }
+
+        return measurementLayerUI;
     }
 
     /**
@@ -201,12 +197,14 @@ public class ImageAnnotationFrame extends JFrame {
                 ImageFrameLayerUI layerUI = layers.get(i);
                 JRadioButton button = new JRadioButton(layerUI.getDisplayName());
                 button.addActionListener(new ActionListener() {
+
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         ((ImageFrameLayerUI) getLayer().getUI()).resetUI();
                         getLayer().setUI(layers.get(j));
                         setSettingsPanel(layers.get(j).getSettingsBuilder().getPanel());
                     }
+
                 });
 
                 if (j == 0) {
@@ -235,16 +233,6 @@ public class ImageAnnotationFrame extends JFrame {
         add(getToolBar(), BorderLayout.SOUTH);
         setPreferredSize(new Dimension(640, 480));
         getImageCanvas().setUrl(null);
-    }
-
-    private void setSettingsPanel(JPanel panel) {
-        if (settingsPanel != null) {
-            remove(settingsPanel);
-        }
-        settingsPanel = panel;
-        add(settingsPanel, BorderLayout.NORTH);
-        validate();
-        repaint();
     }
 
     /**
@@ -286,6 +274,16 @@ public class ImageAnnotationFrame extends JFrame {
         }
     }
 
+    private void setSettingsPanel(JPanel panel) {
+        if (settingsPanel != null) {
+            remove(settingsPanel);
+        }
+        settingsPanel = panel;
+        add(settingsPanel, BorderLayout.NORTH);
+        validate();
+        repaint();
+    }
+
     private void setVideoFrame(VideoFrame videoFrame) {
         controller.setVideoFrame(videoFrame);
         URL imageReference = null;
@@ -293,10 +291,9 @@ public class ImageAnnotationFrame extends JFrame {
             imageReference = new URL(videoFrame.getCameraData().getImageReference());
         }
         catch (Exception e) {
+
             // Do Nothing
         }
         getImageCanvas().setUrl(imageReference);
     }
-
-
 }

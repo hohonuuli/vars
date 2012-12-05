@@ -1,7 +1,7 @@
 /*
- * @(#)JXNotSelectedObservationsPainter.java   2012.08.07 at 02:22:20 PDT
+ * @(#)JXNotSelectedObservationsPainter.java   2012.11.26 at 08:48:31 PST
  *
- * Copyright 2009 MBARI
+ * Copyright 2011 MBARI
  *
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -24,6 +24,8 @@ import java.util.Collection;
 import java.util.HashSet;
 
 /**
+ * JXPainter that draws the Observations in a VideoFrame that have not been selected
+ *
  * @author Brian Schlining
  * @since 2012-08-03
  *
@@ -38,6 +40,11 @@ public class JXNotSelectedObservationsPainter<T extends JImageUrlCanvas> extends
         this(MarkerStyle.NOTSELECTED);
     }
 
+    /**
+     * Constructs ...
+     *
+     * @param markerStyle
+     */
     public JXNotSelectedObservationsPainter(MarkerStyle markerStyle) {
         super(markerStyle, true, false);
         AnnotationProcessor.process(this);
@@ -54,5 +61,4 @@ public class JXNotSelectedObservationsPainter<T extends JImageUrlCanvas> extends
         observations.removeAll(dataCoordinator.getSelectedObservations());
         setObservations(observations);
     }
-
 }

@@ -1,5 +1,6 @@
 package org.mbari.vars.tripod
 
+
 import vars.ToolBox
 import java.text.SimpleDateFormat
 import vars.annotation.ui.PersistenceController
@@ -15,51 +16,67 @@ import vars.knowledgebase.ConceptName
 import org.mbari.movie.Timecode
 
 /**
- * Loads tripod images into VARS
- * @author Brian Schlining
- * @since 2011-11-11
+ * Appends image from the tripod onto an existing VARS videoarchive. Existing
+ * annotations will not be modified.
  */
-class TripodLoader {
+class TripodAppender {
 
     def toolBox = new ToolBox()
     def dateFormat = new SimpleDateFormat('yyyy:MM:dd HH:mm:ss')
     def timecodeFormat = new SimpleDateFormat("HH:mm:ss:'00'")
 
-    def TripodLoader() {
+
+    def TripodAppender() {
         dateFormat.timeZone = TimeZone.getTimeZone('UTC')
         timecodeFormat.timeZone = TimeZone.getTimeZone('UTC')
     }
 
     def load(URL remoteImageDirectory,
-             String platform,
-             Integer sequenceNumber,
-             Double longitude,
-             Double latitude,
-             Double depth,
-             Double lensToSeafloorDistance,
-             Double angleOfInclination) {
+            String videoArchiveName) {
+
         def annotationFactory = toolBox.toolBelt.annotationFactory
-        def videoArchiveName = PersistenceController.makeVideoArchiveName(platform, sequenceNumber, 1, "-tripod")
+
         try {
+            // Look up existing archive
+            def videoArchiveDAO = toolBox.toolBelt.annotationDAOFactory.newVideoArchiveDAO()
+            def videoArchive = videoArchiveDAO.findByName(videoArchiveName)
+            if (!videoArchive) {
+                print("Unable to find $videoArchive in the database")
+                return
+            }
+
+            // Figure out what images need to be loaded
+            def images = TripodLoader.fetchImagesURLs(remoteImageDirectory) // All Images
+            def existingImages = videoArchive.videoFrames.collect { vf ->   // Images that exist as annotations
+                return vf?.cameraData?.imageReference
+            } findAll { it != null}
+            images.removeAll(existingImages) // Mutate images. It now contains only missing images
+            if (images.isEmpty()) {
+                return
+            }
+
+            // Get largest timecode
+            def maxTimecodeString = videoArchive.videoFrames.collect { vf -> vf.timecode} max()
+            def maxTimecode = new Timecode(maxTimecodeString, 30)
+            def startIdx = maxTimecode.frames + 1
+
+            // Get a default concept
             def conceptDAO = toolBox.toolBelt.knowledgebaseDAOFactory.newConceptDAO()
             conceptDAO.startTransaction()
             def conceptNameAsString = conceptDAO.findRoot().primaryConceptName.name
             conceptDAO.close()
-            def videoArchiveDAO = toolBox.toolBelt.annotationDAOFactory.newVideoArchiveDAO()
 
-            VideoArchive videoArchive = videoArchiveDAO.findOrCreateByParameters(platform, sequenceNumber, videoArchiveName)
-
-            // Parse URLs of images from directory listing
-            def images = fetchImagesURLs(remoteImageDirectory)
+            // Process Images
             def observationDate = new Date()
-            //
             def n = 0
             def inTransaction = false
+            videoArchiveDAO.startTransaction()
             images.eachWithIndex { imageRef, idx ->
                 if (!inTransaction) {
                     videoArchiveDAO.startTransaction()
                     inTransaction = true
                 }
+
                 print("Processing ${imageRef}")
                 def url = new URL(imageRef)
                 def stream = url.openStream()
@@ -70,7 +87,7 @@ class TripodLoader {
                 if (creationDate) {
                     date = dateFormat.parse(creationDate.valueDescription[1..-2])
                 }
-                def timecode = new Timecode(idx, 30)
+                def timecode = new Timecode(idx + startIdx, 30)
                 VideoFrame videoFrame = videoArchive.findVideoFrameByTimeCode(timecode.toString())
                 if (videoFrame == null) {
                     videoFrame = annotationFactory.newVideoFrame()
@@ -80,13 +97,13 @@ class TripodLoader {
                 }
                 videoFrame.recordedDate = date
                 CameraData cameraData = videoFrame.cameraData
-                cameraData.z = lensToSeafloorDistance
-                cameraData.pitch = angleOfInclination
+                //cameraData.z = lensToSeafloorDistance
+                //cameraData.pitch = angleOfInclination
                 cameraData.imageReference = url.toExternalForm()
-                PhysicalData physicalData = videoFrame.physicalData
-                physicalData.latitude = latitude
-                physicalData.longitude = longitude
-                physicalData.depth = depth
+                //PhysicalData physicalData = videoFrame.physicalData
+                //physicalData.latitude = latitude
+                //physicalData.longitude = longitude
+                //physicalData.depth = depth
                 print(" ... ${videoFrame.timecode}")
                 if (videoFrame.observations.isEmpty()) {
                     Observation observation = annotationFactory.newObservation()
@@ -97,6 +114,8 @@ class TripodLoader {
                     videoArchiveDAO.persist(observation)
                 }
                 
+
+
                 println(" ... done")
                 n = n + 1
 
@@ -113,40 +132,18 @@ class TripodLoader {
             if (inTransaction) {
                 videoArchiveDAO.endTransaction()
             }
+
             videoArchiveDAO.close()
+
+
         }
         catch (Exception e) {
             println("\nFailed to process images in ${remoteImageDirectory}")
             e.printStackTrace()
         }
-        println("End processing for video archive: $videoArchiveName")
-    }
 
-    static fetchImagesURLs(URL remoteDirectory) {
-        def remotePath = remoteDirectory.toExternalForm()
-        if (!remotePath.endsWith('/')) {
-            remotePath = remotePath + "/"
-        }
-        println("Fetching images from ${remoteDirectory}")
-        def images = []
-        def slurper = new XmlSlurper(new Parser())
-        remoteDirectory.withReader { reader ->
-            def html = slurper.parse(reader)
-            def rows = html.body.table.tr
-            rows.each { row ->
-                try {
-                    // A is an anchor/link to an image
-                    def a = row.td[1].a.@href.text()
-                    images << remotePath + a
-                }
-                catch (Exception e) {
-                    e.printStackTrace()
-                }
-            }
-        }
-        return images.findAll { it.toUpperCase().endsWith("JPG")}
-    }
 
+
+    }
 
 }
-

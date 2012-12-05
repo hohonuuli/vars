@@ -1,7 +1,7 @@
 /*
- * @(#)MeasurementLayerSettingsBuilder.java   2012.08.13 at 01:42:17 PDT
+ * @(#)MeasurementLayerSettingsBuilder.java   2012.11.26 at 08:48:29 PST
  *
- * Copyright 2009 MBARI
+ * Copyright 2011 MBARI
  *
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -33,11 +33,11 @@ import java.awt.event.ItemListener;
 public class MeasurementLayerSettingsBuilder<T extends JImageUrlCanvas> implements UISettingsBuilder {
 
     private final JXPainter<T> identityReferencePainter;
-    private final JXPainter<T> notSelectedObservationsPainter;
     private final MultiLayerUI<T> layerUI;
+    private final JXPainter<T> notSelectedObservationsPainter;
     private final JPanel panel;
-    private final JCheckBox showPainterCheckBox;
     private final JCheckBox showNotSelectedCheckBox;
+    private final JCheckBox showPainterCheckBox;
 
     /**
      * Constructs ...
@@ -46,7 +46,7 @@ public class MeasurementLayerSettingsBuilder<T extends JImageUrlCanvas> implemen
      * @param annotationPersistenceService
      */
     public MeasurementLayerSettingsBuilder(MultiLayerUI<T> layerUI,
-                                           AnnotationPersistenceService annotationPersistenceService) {
+            AnnotationPersistenceService annotationPersistenceService) {
 
         this.layerUI = layerUI;
         identityReferencePainter = new JXIdentityReferencePainter<T>(annotationPersistenceService);
@@ -61,6 +61,7 @@ public class MeasurementLayerSettingsBuilder<T extends JImageUrlCanvas> implemen
         showNotSelectedCheckBox.setText("Show Observations in Same Video Frame");
         showNotSelectedCheckBox.setSelected(true);
         showNotSelectedCheckBox.addItemListener(new ItemListener() {
+
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (showNotSelectedCheckBox.isSelected()) {
@@ -70,6 +71,7 @@ public class MeasurementLayerSettingsBuilder<T extends JImageUrlCanvas> implemen
                     MeasurementLayerSettingsBuilder.this.layerUI.removePainter(notSelectedObservationsPainter);
                 }
             }
+
         });
         layerUI.addPainter(notSelectedObservationsPainter);
         panel.add(showNotSelectedCheckBox);

@@ -1,7 +1,7 @@
 /*
- * @(#)AreaMeasurement.java   2011.12.09 at 02:23:02 PST
+ * @(#)AreaMeasurement.java   2012.11.26 at 08:48:37 PST
  *
- * Copyright 2009 MBARI
+ * Copyright 2011 MBARI
  *
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -42,7 +42,7 @@ public class AreaMeasurement {
     /**
      *
      */
-    public static final String AREA_MEASUREMENT_LINKNAME = "area measurement coordinates [x0 y0 ... xn yn, comment]";
+    public static final String AREA_MEASUREMENT_LINKNAME = "area measurement coordinates [x0 y0 ... xn yn; comment]";
 
     /** Filter for the distance measurement association */
     public static final Predicate<Association> IS_AREA_MEASUREMENT_PREDICATE = new Predicate<Association>() {
@@ -77,12 +77,13 @@ public class AreaMeasurement {
     /**
      * Constructs ...
      *
-     * @param coordinates
-     * @param comment
+     * @param coordinates Coordinates of each vertex in the irregular polygon defining the area.
+     *                    The polygon should not be closed ... [x0 y0, x1 y1, ... xn yn]
+     * @param comment The comment to be associated with the resulting Association
      */
     public AreaMeasurement(List<Point2D<Integer>> coordinates, String comment) {
         Preconditions.checkArgument(coordinates.size() > 2,
-                                    "Area measurement requires at least 3 points (found " + coordinates.size() + ")");
+                "Area measurement requires at least 3 points (found " + coordinates.size() + ")");
 
         /*
          If the list forms a closed polygon, drop the last point. We'll assume the first point is always
@@ -119,12 +120,12 @@ public class AreaMeasurement {
     }
 
     /**
-     *
+     * Parses the given link into an AreaMeasurement object
      * @param link
      * @return
      */
     public static AreaMeasurement fromLink(ILink link) {
-        String[] coordsAndComment = link.getLinkValue().split(",");
+        String[] coordsAndComment = link.getLinkValue().split(";");
         String comment = (coordsAndComment.length == 2) ? coordsAndComment[1] : null;
         Preconditions.checkArgument(coordsAndComment.length > 0, "No data was found in " + link);
         String[] parts = coordsAndComment[0].split(" ");
@@ -144,9 +145,11 @@ public class AreaMeasurement {
     }
 
     /**
+     * Extract all AreaMeasurements contained by an Observation
      *
-     * @param observation
-     * @return
+     * @param observation The observation of interest
+     * @return A collection of AreaMeasurement objects contained by an observation. An empty
+     *      list is returned if their are no AreaMeasurements within the observation
      */
     public static Collection<AreaMeasurement> fromObservation(Observation observation) {
         Collection<Association> associations = Collections2.filter(observation.getAssociations(),
@@ -158,19 +161,19 @@ public class AreaMeasurement {
     }
 
     /**
-     * @return
+     * @return The comment to be associated with the resulting Association
      */
     public String getComment() {
         return comment;
-    } 
+    }
 
     /**
-     * @return
+     * @return Coordinates of each vertex in the irregular polygon defining the area.
+     *                    The polygon should not be closed ... [x0 y0, x1 y1, ... xn yn]
      */
     public List<Point2D<Integer>> getCoordinates() {
         return coordinates;
     }
-    
 
     /**
      * @return
@@ -182,17 +185,18 @@ public class AreaMeasurement {
 
     /**
      *
-     * @param comment
+     * @param comment The comment to be associated with the resulting Association
      */
     public void setComment(String comment) {
         this.comment = comment;
     }
 
     /**
-     * @return
+     * Converts the AreaMeasurement to a ILink
+     * @return The ILink representing this measurement
      */
     public ILink toLink() {
-        String c = Strings.isNullOrEmpty(comment) ? "" : ", " + comment;
+        String c = Strings.isNullOrEmpty(comment) ? "" : "; " + comment;
         StringBuilder sb = new StringBuilder();
 
         for (Point2D<Integer> p : coordinates) {

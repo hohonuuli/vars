@@ -1,7 +1,7 @@
 /*
- * @(#)AreaMeasurementLayerUI.java   2011.12.19 at 04:18:51 PST
+ * @(#)AreaMeasurementLayerUI.java   2012.11.26 at 08:48:36 PST
  *
- * Copyright 2009 MBARI
+ * Copyright 2011 MBARI
  *
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -41,7 +41,6 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
@@ -55,22 +54,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
+ * A LayerUI for adding AreaMeasurements to an image
+ *
  * @author Brian Schlining
  * @since 2011-10-27
  *
  * @param <T>
  */
 public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends ImageFrameLayerUI<T> {
-        //extends CrossHairLayerUI<T> {
-
-    private JXPainter<T> crossHairPainter = new JXCrossHairPainter<T>();
-
-    /**
-     * This is a reference to the image being drawn by the JImageUrlCanvas. THis is needed so
-     * that the area measurement doesn't extend outside the bounds of the image. It needs to be
-     * a bufferedImage so that we can read the width and height easily.
-     */
-    private BufferedImage image;
 
     /*
 
@@ -85,6 +76,10 @@ public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends ImageFram
 
     /** The diameter of the start of measurement marker */
     private static final int markerDiameter = 10;
+
+    //extends CrossHairLayerUI<T> {
+
+    private JXPainter<T> crossHairPainter = new JXCrossHairPainter<T>();
     private Logger log = LoggerFactory.getLogger(getClass());
     private final Font lineFont = new Font("Sans Serif", Font.PLAIN, 10);
 
@@ -102,7 +97,7 @@ public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends ImageFram
      * Path used to draw the triangle that will be added to the polygonCC if user addes another
      * click. In component coordiantes*/
     private GeneralPath bridgeCC = new GeneralPath();
-    
+
     /** Need a synchronized collection */
     private final Collection<AreaMeasurementPath> areaMeasurementPaths = new CopyOnWriteArrayList<AreaMeasurementPath>();
 
@@ -137,12 +132,21 @@ public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends ImageFram
             // TODO finish implementation
             polygonCC.reset();
             bridgeCC.reset();
+
             //areaMeasurementPaths.clear();
             pointsIC.clear();
+
             //relatedObservations.clear();
             setDirty(true);
         }
     };
+
+    /**
+     * This is a reference to the image being drawn by the JImageUrlCanvas. THis is needed so
+     * that the area measurement doesn't extend outside the bounds of the image. It needs to be
+     * a bufferedImage so that we can read the width and height easily.
+     */
+    private BufferedImage image;
 
     /** The observation that we're currently adding measurements to */
     private Observation observation;
@@ -158,19 +162,29 @@ public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends ImageFram
         setSettingsBuilder(new AreaMeasurementLayerSettingsBuilder<T>(this));
         this.toolBelt = toolBelt;
         AnnotationProcessor.process(this);
-        Collection<Observation> selectedObservations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+        Collection<Observation> selectedObservations = (Collection<Observation>) Lookup
+            .getSelectedObservationsDispatcher().getValueObject();
         respondsTo(new ObservationsSelectedEvent(null, selectedObservations));
         addPainter(crossHairPainter);
     }
 
-    private AreaMeasurement newAreaMeasurement(String comment) {
-        return new AreaMeasurement(new ArrayList<org.mbari.geometry.Point2D<Integer>>(pointsIC), comment);
-    }
-
+    /**
+     */
     @Override
     public void clearPainters() {
         super.clearPainters();
         addPainter(crossHairPainter);
+    }
+
+    /**
+     * @return
+     */
+    public BufferedImage getImage() {
+        return image;
+    }
+
+    private AreaMeasurement newAreaMeasurement(String comment) {
+        return new AreaMeasurement(new ArrayList<org.mbari.geometry.Point2D<Integer>>(pointsIC), comment);
     }
 
     @Override
@@ -283,7 +297,7 @@ public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends ImageFram
             Point2D imagePoint = jxl.getView().convertToImage(point);
             int x = (int) Math.round(imagePoint.getX());
             int y = (int) Math.round(imagePoint.getY());
-            if (me.getClickCount() == 1 && (me.getButton() == MouseEvent.BUTTON1)) {
+            if ((me.getClickCount() == 1) && (me.getButton() == MouseEvent.BUTTON1)) {
                 if (image != null) {
                     if (x < 0) {
                         x = 0;
@@ -303,7 +317,8 @@ public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends ImageFram
                 }
             }
             else if ((me.getClickCount() == 2) || (me.getButton() != MouseEvent.BUTTON1)) {
-                if (pointsIC.size() > 2 && observation != null) {
+                if ((pointsIC.size() > 2) && (observation != null)) {
+
                     // --- Publish action via EventBus
                     AreaMeasurement areaMeasurement = newAreaMeasurement(null);
                     AddAreaMeasurementEvent event = new AddAreaMeasurementEvent(observation, areaMeasurement);
@@ -313,7 +328,8 @@ public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends ImageFram
                 setObservation(observation);
             }
         default:
-            // Do nothing
+
+        // Do nothing
         }
     }
 
@@ -340,7 +356,6 @@ public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends ImageFram
             setDirty(true);
         }
     }
-
 
     /**
      * resets the ui to a known state
@@ -376,10 +391,10 @@ public class AreaMeasurementLayerUI<T extends JImageUrlCanvas> extends ImageFram
         }
     }
 
-    public BufferedImage getImage() {
-        return image;
-    }
-
+    /**
+     *
+     * @param image
+     */
     public void setImage(BufferedImage image) {
         this.image = image;
     }

@@ -15,7 +15,7 @@ public class AreaMeasurementTest {
     
     @Test
     public void parseTest() {
-        String linkRep = "area measurement coordinates [x0 y0 ... xn yn, comment] | self | 184 284 212 269 240 274 237 297 191 313, seastart";
+        String linkRep = "area measurement coordinates [x0 y0 ... xn yn, comment] | self | 184 284 212 269 240 274 237 297 191 313; seastart";
         ILink link = new LinkBean(linkRep);
         try {
             AreaMeasurement areaMeasurement = AreaMeasurement.fromLink(link);

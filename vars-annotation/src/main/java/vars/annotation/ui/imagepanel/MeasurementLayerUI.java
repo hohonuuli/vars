@@ -1,5 +1,5 @@
 /*
- * @(#)MeasurementLayerUI.java   2011.09.20 at 02:51:09 PDT
+ * @(#)MeasurementLayerUI.java   2012.11.26 at 08:48:28 PST
  *
  * Copyright 2011 MBARI
  *
@@ -16,7 +16,6 @@
 package vars.annotation.ui.imagepanel;
 
 import com.google.common.base.Function;
-import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import org.bushe.swing.event.annotation.AnnotationProcessor;
 import org.bushe.swing.event.annotation.EventSubscriber;
@@ -25,15 +24,10 @@ import org.mbari.awt.AwtUtilities;
 import org.mbari.swing.JImageUrlCanvas;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.DAO;
 import vars.ILink;
 import vars.annotation.Association;
 import vars.annotation.Observation;
-import vars.annotation.ObservationDAO;
-import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
-import vars.annotation.ui.eventbus.ObservationsChangedEvent;
-import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
 
 import javax.swing.SwingUtilities;
 import java.awt.BasicStroke;
@@ -47,9 +41,7 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeSupport;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Vector;
 
 /**
@@ -60,30 +52,46 @@ import java.util.Vector;
  */
 public class MeasurementLayerUI<T extends JImageUrlCanvas> extends ImageFrameLayerUI<T> {
 
-    private final JXPainter<T> crossHairPainter = new JXCrossHairPainter<T>();
-    private final JXPainter<T> selectedObservationPainter = new JXSelectedObservationsPainter<T>(MarkerStyle.SELECTED_FAINT);
-
     /** Name of the observation property that can be used with property change listeners */
     public static final String PROP_OBSERVATION = "Observation";
 
     /** The diameter of the start of measurement marker */
     private static final int markerDiameter = 10;
+    private final JXPainter<T> crossHairPainter = new JXCrossHairPainter<T>();
+    private final JXPainter<T> selectedObservationPainter = new JXSelectedObservationsPainter<T>(
+        MarkerStyle.SELECTED_FAINT);
 
-    /** Point to hold start of line coordinates in image pixels */
-    private final Point2D lineStart = new Point2D.Double();
+    /**
+     * Runnable that resets the measurment UI state
+     */
+    private final Runnable resetRunable = new Runnable() {
 
-    /** Point to hold end of line coordinates in image pixels */
-    private final Point2D lineEnd = new Point2D.Double();
-
-    /** Path used to draw measurement line */
-    private GeneralPath line = new GeneralPath();
+        @Override
+        public void run() {
+            lineStart.setLocation(0, 0);
+            lineEnd.setLocation(0, 0);
+            line.reset();
+            selectedLineEnd = false;
+            selectedLineStart = false;
+            setDirty(true);
+        }
+    };
     private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
     /** The path from lineStart to the current mouse position */
     private final Collection<MeasurementPath> measurementPaths = new Vector<MeasurementPath>();
     private final Collection<MeasurementCompletedListener> measurementCompletedListeners = new Vector<MeasurementCompletedListener>();
     private Logger log = LoggerFactory.getLogger(getClass());
+
+    /** Point to hold start of line coordinates in image pixels */
+    private final Point2D lineStart = new Point2D.Double();
     private Font lineFont = new Font("Sans Serif", Font.PLAIN, 10);
+
+    /** Point to hold end of line coordinates in image pixels */
+    private final Point2D lineEnd = new Point2D.Double();
+
+    /** Path used to draw measurement line */
+    private GeneralPath line = new GeneralPath();
 
     /** Transform that converts an association to a measurement object */
     private final Function<ILink, MeasurementPath> associationTransform = new Function<ILink, MeasurementPath>() {
@@ -93,6 +101,13 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends ImageFrameLay
             return new MeasurementPath(Measurement.LINK_TO_MEASUREMENT_TRANSFORM.apply(input));
         }
     };
+
+    /**
+     * This is a reference to the image being drawn by the JImageUrlCanvas. THis is needed so
+     * that the area measurement doesn't extend outside the bounds of the image. It needs to be
+     * a bufferedImage so that we can read the width and height easily.
+     */
+    private BufferedImage image;
 
     /** The observation that we're currently adding measurements to */
     private Observation observation;
@@ -105,28 +120,6 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends ImageFrameLay
     /** Flag, when true we've just started measuring a line */
     private boolean selectedLineStart;
     private final ToolBelt toolBelt;
-
-    /**
-     * This is a reference to the image being drawn by the JImageUrlCanvas. THis is needed so
-     * that the area measurement doesn't extend outside the bounds of the image. It needs to be
-     * a bufferedImage so that we can read the width and height easily.
-     */
-    private BufferedImage image;
-
-    /**
-     * Runnable that resets the measurment UI state
-     */
-    private final Runnable resetRunable = new Runnable() {
-        @Override
-        public void run() {
-            lineStart.setLocation(0, 0);
-            lineEnd.setLocation(0, 0);
-            line.reset();
-            selectedLineEnd = false;
-            selectedLineStart = false;
-            setDirty(true);
-        }
-    };
 
     /**
      * Constructs ...
@@ -142,13 +135,6 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends ImageFrameLay
         AnnotationProcessor.process(this);
     }
 
-    @Override
-    public void clearPainters() {
-        super.clearPainters();
-        addPainter(crossHairPainter);
-        addPainter(selectedObservationPainter);
-    }
-
     /**
      * By iteself this component does nothing with a measurement. In order to add functionality just
      * add a listener to process a measurement.
@@ -157,6 +143,32 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends ImageFrameLay
      */
     public void addMeasurementCompletedListener(MeasurementCompletedListener listener) {
         measurementCompletedListeners.add(listener);
+    }
+
+    /**
+     */
+    @Override
+    public void clearPainters() {
+        super.clearPainters();
+        addPainter(crossHairPainter);
+        addPainter(selectedObservationPainter);
+    }
+
+    /**
+     * @return
+     */
+    public BufferedImage getImage() {
+        return image;
+    }
+
+    /**
+     * Handle to the class that handles property changes. Used to hang listeners onto the
+     * 'measuring' property.
+     *
+     * @return
+     */
+    public PropertyChangeSupport getPropertyChangeSupport() {
+        return propertyChangeSupport;
     }
 
     /**
@@ -173,24 +185,6 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends ImageFrameLay
         int y1 = (int) Math.round(lineEnd.getY());
 
         return new Measurement(x0, y0, x1, y1, comment);
-    }
-
-    public BufferedImage getImage() {
-        return image;
-    }
-
-    public void setImage(BufferedImage image) {
-        this.image = image;
-    }
-
-    /**
-     * Handle to the class that handles property changes. Used to hang listeners onto the
-     * 'measuring' property.
-     *
-     * @return
-     */
-    public PropertyChangeSupport getPropertyChangeSupport() {
-        return propertyChangeSupport;
     }
 
     @Override
@@ -238,55 +232,55 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends ImageFrameLay
         super.processMouseEvent(me, jxl);
         Point point = SwingUtilities.convertPoint(me.getComponent(), me.getPoint(), jxl);
         switch (me.getID()) {
-            case MouseEvent.MOUSE_PRESSED:
-                Point2D imagePoint = jxl.getView().convertToImage(point);
+        case MouseEvent.MOUSE_PRESSED:
+            Point2D imagePoint = jxl.getView().convertToImage(point);
 
-                if (imagePoint != null && image != null) {
-                    int x = (int) Math.round(imagePoint.getX());
-                    int y = (int) Math.round(imagePoint.getY());
-                    if (x < 0) {
-                        x = 0;
-                    }
-                    if (x > image.getWidth()) {
-                        x = image.getWidth();
-                    }
-                    if (y < 0) {
-                        y = 0;
-                    }
-                    if (y > image.getHeight()) {
-                        y = image.getHeight();
-                    }
-                    imagePoint.setLocation(x, y);
-
-                    if (!selectedLineStart) {
-
-                        // --- On first click set lineStart value
-                        lineStart.setLocation(imagePoint);
-                        selectedLineStart = true;
-                        setDirty(true);
-                    }
-                    else {
-
-                        // --- On second click set lineEnd value, generate association, set measuring property to false
-                        lineEnd.setLocation(imagePoint);
-                        selectedLineEnd = true;
-
-                        Measurement measurement = newMeasurement(null, jxl);
-                        setDirty(true);
-
-                        // Notify listeners
-                        MeasurementCompletedEvent event = new MeasurementCompletedEvent(measurement, observation);
-                        for (MeasurementCompletedListener listener : measurementCompletedListeners) {
-                            listener.onComplete(event);
-                        }
-
-                        resetUI();
-
-                    }
+            if ((imagePoint != null) && (image != null)) {
+                int x = (int) Math.round(imagePoint.getX());
+                int y = (int) Math.round(imagePoint.getY());
+                if (x < 0) {
+                    x = 0;
                 }
-            default:
+                if (x > image.getWidth()) {
+                    x = image.getWidth();
+                }
+                if (y < 0) {
+                    y = 0;
+                }
+                if (y > image.getHeight()) {
+                    y = image.getHeight();
+                }
+                imagePoint.setLocation(x, y);
 
-                // Do nothing
+                if (!selectedLineStart) {
+
+                    // --- On first click set lineStart value
+                    lineStart.setLocation(imagePoint);
+                    selectedLineStart = true;
+                    setDirty(true);
+                }
+                else {
+
+                    // --- On second click set lineEnd value, generate association, set measuring property to false
+                    lineEnd.setLocation(imagePoint);
+                    selectedLineEnd = true;
+
+                    Measurement measurement = newMeasurement(null, jxl);
+                    setDirty(true);
+
+                    // Notify listeners
+                    MeasurementCompletedEvent event = new MeasurementCompletedEvent(measurement, observation);
+                    for (MeasurementCompletedListener listener : measurementCompletedListeners) {
+                        listener.onComplete(event);
+                    }
+
+                    resetUI();
+
+                }
+            }
+        default:
+
+        // Do nothing
         }
     }
 
@@ -328,6 +322,26 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends ImageFrameLay
 
     /**
      *
+     * @param event
+     */
+    @EventSubscriber(eventClass = IAFRepaintEvent.class)
+    public void respondsTo(IAFRepaintEvent event) {
+        UIDataCoordinator dataCoordinator = event.get();
+        Observation obs = (dataCoordinator.getSelectedObservations().size() == 1)
+            ? dataCoordinator.getSelectedObservations().iterator().next() : null;
+        setObservation(obs);
+    }
+
+    /**
+     *
+     * @param image
+     */
+    public void setImage(BufferedImage image) {
+        this.image = image;
+    }
+
+    /**
+     *
      * @param newObservation
      */
     public void setObservation(Observation newObservation) {
@@ -337,7 +351,7 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends ImageFrameLay
 
         if (observation != null) {
             Collection<Association> associations = Collections2.filter(observation.getAssociations(),
-                    Measurement.IS_MEASUREMENT_PREDICATE);
+                Measurement.IS_MEASUREMENT_PREDICATE);
             for (Association association : associations) {
                 try {
                     measurementPaths.add(associationTransform.apply(association));
@@ -351,17 +365,6 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends ImageFrameLay
         resetUI();
         propertyChangeSupport.firePropertyChange(PROP_OBSERVATION, oldObservation, observation);
     }
-
-
-    @EventSubscriber(eventClass = IAFRepaintEvent.class)
-    public void respondsTo(IAFRepaintEvent event) {
-        UIDataCoordinator dataCoordinator = event.get();
-        Observation obs = (dataCoordinator.getSelectedObservations().size() == 1) ?
-                dataCoordinator.getSelectedObservations().iterator().next() :
-                null;
-        setObservation(obs);
-    }
-
 
     /**
      * Resets the path of measurement lines and comment location based on the size of the underlying componenet

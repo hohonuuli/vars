@@ -1,7 +1,7 @@
 /*
- * @(#)UIDataCoordinator.java   2012.08.21 at 10:53:51 PDT
+ * @(#)UIDataCoordinator.java   2012.11.26 at 08:48:25 PST
  *
- * Copyright 2009 MBARI
+ * Copyright 2011 MBARI
  *
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -17,8 +17,6 @@ package vars.annotation.ui.imagepanel;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
-import foxtrot.Job;
-import foxtrot.Worker;
 import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.annotation.AnnotationProcessor;
 import org.bushe.swing.event.annotation.EventSubscriber;
@@ -46,6 +44,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * This is the class that listens to a Events from the Annotation interface and relays those
+ * changes to the various painters.
+ *
  * @author Brian Schlining
  * @since 2012-08-06
  */
@@ -117,15 +118,6 @@ public class UIDataCoordinator implements UIEventSubscriber {
         respondToObservationEvent(event);
     }
 
-    private void respondToObservationEvent(UIEvent<Collection<Observation>> event) {
-        Collection<Observation> alteredObservations = event.get();
-        Set<VideoFrame> videoFrames = PersistenceController.toVideoFrames(alteredObservations);
-        if (videoFrame != null && videoFrames.contains(videoFrame)) {
-            setVideoFrame(videoFrame, new ArrayList<Observation>(selectedObservations));
-        }
-    }
-
-
     /**
      * @param event
      */
@@ -178,8 +170,17 @@ public class UIDataCoordinator implements UIEventSubscriber {
         });
 
         if (!changedVideoFrame.isEmpty()) {
-            Collection<Observation> obs = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+            Collection<Observation> obs = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher()
+                .getValueObject();
             setVideoFrame(changedVideoFrame.iterator().next(), new ArrayList<Observation>(obs));
+        }
+    }
+
+    private void respondToObservationEvent(UIEvent<Collection<Observation>> event) {
+        Collection<Observation> alteredObservations = event.get();
+        Set<VideoFrame> videoFrames = PersistenceController.toVideoFrames(alteredObservations);
+        if ((videoFrame != null) && videoFrames.contains(videoFrame)) {
+            setVideoFrame(videoFrame, new ArrayList<Observation>(selectedObservations));
         }
     }
 
@@ -190,40 +191,41 @@ public class UIDataCoordinator implements UIEventSubscriber {
      */
     public void setVideoFrame(final VideoFrame _videoFrame, final Collection<Observation> _selectedObservations) {
 
-            selectedObservations.clear();
-            if (_videoFrame == null) {
-                videoFrame = null;
+        selectedObservations.clear();
+        if (_videoFrame == null) {
+            videoFrame = null;
 
-                EventBus.publish(new IAFRepaintEvent(this, this));
-            }
-            else {
+            EventBus.publish(new IAFRepaintEvent(this, this));
+        }
+        else {
+
 //                Worker.post(new Job() {
 //
 //                    @Override
 //                    public Object run() {
 
-                        VideoFrameDAO dao = annotationDAOFactory.newVideoFrameDAO();
-                        ObservationDAO obsDao = annotationDAOFactory.newObservationDAO(dao.getEntityManager());
-                        dao.startTransaction();
-                        videoFrame = dao.find(_videoFrame);
+            VideoFrameDAO dao = annotationDAOFactory.newVideoFrameDAO();
+            ObservationDAO obsDao = annotationDAOFactory.newObservationDAO(dao.getEntityManager());
+            dao.startTransaction();
+            videoFrame = dao.find(_videoFrame);
 
-                        for (Observation obs : _selectedObservations) {
-                            Observation foundObs = obsDao.find(obs);
-                            if (foundObs != null) {
-                                selectedObservations.add(foundObs);
-                            }
-                        }
+            for (Observation obs : _selectedObservations) {
+                Observation foundObs = obsDao.find(obs);
+                if (foundObs != null) {
+                    selectedObservations.add(foundObs);
+                }
+            }
 
-                        dao.endTransaction();
-                        dao.close();
-                        EventBus.publish(new IAFRepaintEvent(UIDataCoordinator.this, UIDataCoordinator.this));
+            dao.endTransaction();
+            dao.close();
+            EventBus.publish(new IAFRepaintEvent(UIDataCoordinator.this, UIDataCoordinator.this));
 
 //                        return null;    //To change body of implemented methods use File | Settings | File Templates.
 //                    }
 //
 //                });
 
-            }
+        }
 
     }
 }

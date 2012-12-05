@@ -1,7 +1,7 @@
 /*
- * @(#)AssociationSelectionPanel.java   2009.11.16 at 08:52:51 PST
+ * @(#)AssociationSelectionPanel.java   2012.11.07 at 10:03:52 PST
  *
- * Copyright 2009 MBARI
+ * Copyright 2011 MBARI
  *
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -75,9 +75,8 @@ public class AssociationSelectionPanel extends JPanel {
     /**
      *
      *
-     * @param knowledgebaseDAOFactory
-     * @param knowledgebaseFactory
-     * @param queryDAO
+     *
+     * @param queryPersistenceService
      */
     @Inject
     public AssociationSelectionPanel(QueryPersistenceService queryPersistenceService) {
@@ -205,8 +204,11 @@ public class AssociationSelectionPanel extends JPanel {
                      *  bug causes the UI to hang.
                      */
                     final JComboBox cb = getCbAssociations();
-                    int startIndex = cb.getSelectedIndex() + 1;
                     SearchableComboBoxModel linksModel = (SearchableComboBoxModel) cb.getModel();
+                    int startIndex = cb.getSelectedIndex() + 1;
+                    if (startIndex > linksModel.getSize() - 1) {
+                        startIndex = 0;
+                    }
                     int index = linksModel.searchForItemContaining(tfSearch.getText(), startIndex);
 
                     if (index > -1) {

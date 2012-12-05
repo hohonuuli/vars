@@ -1,3 +1,18 @@
+/*
+ * @(#)JXIdentityReferencePainter.java   2012.11.26 at 08:48:32 PST
+ *
+ * Copyright 2011 MBARI
+ *
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
+
 package vars.annotation.ui.imagepanel;
 
 import com.google.common.base.Predicate;
@@ -8,9 +23,7 @@ import org.mbari.swing.JImageUrlCanvas;
 import vars.annotation.AnnotationPersistenceService;
 import vars.annotation.Association;
 import vars.annotation.Observation;
-
 import vars.annotation.VideoArchive;
-import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -24,15 +37,22 @@ import java.util.Set;
  *
  * @author Brian Schlining
  * @since 2012-08-03
+ *
+ * @param <T>
  */
-public class JXIdentityReferencePainter<T extends JImageUrlCanvas>
-        extends JXObservationsPainter<T> {
+public class JXIdentityReferencePainter<T extends JImageUrlCanvas> extends JXObservationsPainter<T> {
 
-    /** The selected Observation */
-    private Observation observation;
     private final Set<Observation> emptySet = new HashSet<Observation>();
     private final AnnotationPersistenceService annotationPersistenceService;
 
+    /** The selected Observation */
+    private Observation observation;
+
+    /**
+     * Constructs ...
+     *
+     * @param annotationPersistenceService
+     */
     @Inject
     public JXIdentityReferencePainter(AnnotationPersistenceService annotationPersistenceService) {
         super(MarkerStyle.FAINT, false, true);
@@ -40,15 +60,37 @@ public class JXIdentityReferencePainter<T extends JImageUrlCanvas>
         AnnotationProcessor.process(this);
     }
 
+    /**
+     *
+     * @param event
+     */
+    @EventSubscriber(eventClass = IAFRepaintEvent.class)
+    public void respondTo(IAFRepaintEvent event) {
+        Collection<Observation> observations = new HashSet<Observation>(event.get().getSelectedObservations());
+        if (observations.size() == 1) {
+            setObservation(observations.iterator().next());
+        }
+        else {
+            setObservation(null);
+        }
+    }
+
+    /**
+     *
+     * @param observation
+     */
     public void setObservation(Observation observation) {
         if (this.observation != observation) {
             this.observation = observation;
             if (observation != null) {
-                Collection<Association> associations = Collections2.filter(observation.getAssociations(), new Predicate<Association>() {
+                Collection<Association> associations = Collections2.filter(observation.getAssociations(),
+                    new Predicate<Association>() {
+
                     @Override
                     public boolean apply(@Nullable Association association) {
                         return association.getLinkName().equalsIgnoreCase("identity-reference");
                     }
+
                 });
 
                 if (!associations.isEmpty()) {
@@ -56,9 +98,9 @@ public class JXIdentityReferencePainter<T extends JImageUrlCanvas>
                     int id = Integer.parseInt(identityAss.getLinkValue());
                     String conceptName = observation.getConceptName();
                     VideoArchive videoArchive = observation.getVideoFrame().getVideoArchive();
-                    Collection<Observation> relatedObservations =
-                            annotationPersistenceService.findAllObservationsByNameAndReferenceNumber(videoArchive, conceptName, id);
-                    relatedObservations.remove(observation); // Don't draw the current observation
+                    Collection<Observation> relatedObservations = annotationPersistenceService
+                        .findAllObservationsByNameAndReferenceNumber(videoArchive, conceptName, id);
+                    relatedObservations.remove(observation);    // Don't draw the current observation
                     setObservations(relatedObservations);
                 }
                 else {
@@ -72,17 +114,4 @@ public class JXIdentityReferencePainter<T extends JImageUrlCanvas>
             setDirty(true);
         }
     }
-
-    @EventSubscriber(eventClass = IAFRepaintEvent.class)
-    public void respondTo(IAFRepaintEvent event) {
-        Collection<Observation> observations = new HashSet<Observation>(event.get().getSelectedObservations());
-        if (observations.size() == 1) {
-            setObservation(observations.iterator().next());
-        }
-        else {
-            setObservation(null);
-        }
-    }
-
-
 }

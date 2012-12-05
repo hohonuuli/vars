@@ -1,7 +1,7 @@
 /*
- * @(#)JXSelectedObservationsPainter.java   2012.08.07 at 02:17:25 PDT
+ * @(#)JXSelectedObservationsPainter.java   2012.11.26 at 08:48:30 PST
  *
- * Copyright 2009 MBARI
+ * Copyright 2011 MBARI
  *
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * JXPainter that draws Observations in the current video frame that have been selected
  * @author Brian Schlining
  * @since 2012-08-03
  *
@@ -38,6 +39,11 @@ public class JXSelectedObservationsPainter<T extends JImageUrlCanvas> extends JX
         this(MarkerStyle.SELECTED);
     }
 
+    /**
+     * Constructs ...
+     *
+     * @param markerStyle
+     */
     public JXSelectedObservationsPainter(MarkerStyle markerStyle) {
         super(markerStyle, true, false);
         AnnotationProcessor.process(this);
@@ -50,7 +56,7 @@ public class JXSelectedObservationsPainter<T extends JImageUrlCanvas> extends JX
     @EventSubscriber(eventClass = IAFRepaintEvent.class)
     public void respondTo(IAFRepaintEvent event) {
         log.debug("Responding to Selection event with " + event.get().getSelectedObservations().size() +
-            " observations");
+                " observations");
         setObservations(event.get().getSelectedObservations());
     }
 }

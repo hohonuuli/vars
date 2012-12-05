@@ -1,7 +1,7 @@
 /*
- * @(#)AnnotationLayerUI2.java   2012.08.07 at 03:45:08 PDT
+ * @(#)AnnotationLayerUI.java   2012.11.26 at 08:48:37 PST
  *
- * Copyright 2009 MBARI
+ * Copyright 2011 MBARI
  *
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -44,10 +44,12 @@ import java.util.Collection;
 import java.util.HashSet;
 
 /**
+ * A LayerUI that allows users to add annotations by clicking on an image. The resulting annotations
+ * will contain x, and y pixel coordinates for their location in the image.
  *
  * @author brian
- *
- * @param <T>
+ * @tparam The type of JComponent that this layer will be applied to. It's required to be a subtype
+ *  of JImageUrlCanvas
  */
 public class AnnotationLayerUI<T extends JImageUrlCanvas> extends ImageFrameLayerUI<T> {
 
@@ -131,7 +133,7 @@ public class AnnotationLayerUI<T extends JImageUrlCanvas> extends ImageFrameLaye
                 g2.setPaint(Color.MAGENTA);
                 g2.setXORMode(Color.WHITE);
                 g2.setStroke(new BasicStroke(3, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 0, new float[] { 2, 2 },
-                                             2));
+                        2));
                 g2.draw(boundingBox);
                 g2.setPaintMode();
             }

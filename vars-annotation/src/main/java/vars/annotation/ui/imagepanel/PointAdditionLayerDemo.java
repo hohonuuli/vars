@@ -1,15 +1,26 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * @(#)PointAdditionLayerDemo.java   2012.11.26 at 08:48:26 PST
+ *
+ * Copyright 2011 MBARI
+ *
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
+
 
 package vars.annotation.ui.imagepanel;
 
-import java.awt.BorderLayout;
-import java.net.URL;
-import javax.swing.JFrame;
 import org.jdesktop.jxlayer.JXLayer;
 import org.mbari.swing.JImageUrlCanvas;
+
+import javax.swing.JFrame;
+import java.awt.BorderLayout;
+import java.net.URL;
 
 /**
  *
@@ -17,6 +28,10 @@ import org.mbari.swing.JImageUrlCanvas;
  */
 public class PointAdditionLayerDemo {
 
+    /**
+     *
+     * @param args
+     */
     public static void main(String[] args) {
 
         // Layout components
@@ -46,5 +61,4 @@ public class PointAdditionLayerDemo {
         frame.pack();
         frame.setVisible(true);
     }
-
 }

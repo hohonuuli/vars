@@ -1,3 +1,18 @@
+/*
+ * @(#)AnnotationLayerSettingsBuilder.java   2012.11.26 at 08:48:38 PST
+ *
+ * Copyright 2011 MBARI
+ *
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
+
 package vars.annotation.ui.imagepanel;
 
 import org.mbari.swing.JImageUrlCanvas;
@@ -11,14 +26,21 @@ import java.awt.event.ItemListener;
 /**
  * @author Brian Schlining
  * @since 2012-08-13
+ *
+ * @param <T>
  */
 public class AnnotationLayerSettingsBuilder<T extends JImageUrlCanvas> implements UISettingsBuilder {
 
-    private JPanel panel;
-    private final MultiLayerUI<T> layerUI;
     private JXPainter<T> notSelectedObservationsPainter = new JXNotSelectedObservationsPainter<T>();
+    private final MultiLayerUI<T> layerUI;
+    private JPanel panel;
     private JCheckBox showNotSelectedCheckBox;
 
+    /**
+     * Constructs ...
+     *
+     * @param layerUI
+     */
     public AnnotationLayerSettingsBuilder(MultiLayerUI<T> layerUI) {
         this.layerUI = layerUI;
 
@@ -31,24 +53,24 @@ public class AnnotationLayerSettingsBuilder<T extends JImageUrlCanvas> implement
         showNotSelectedCheckBox.setText("Show All Observations");
         showNotSelectedCheckBox.setSelected(true);
         showNotSelectedCheckBox.addItemListener(new ItemListener() {
+
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (showNotSelectedCheckBox.isSelected()) {
                     AnnotationLayerSettingsBuilder.this.layerUI.addPainter(notSelectedObservationsPainter);
-                } else {
+                }
+                else {
                     AnnotationLayerSettingsBuilder.this.layerUI.removePainter(notSelectedObservationsPainter);
                 }
             }
+
         });
         showNotSelectedCheckBox.setSelected(true);
         panel.add(showNotSelectedCheckBox);
     }
 
-    @Override
-    public JPanel getPanel() {
-        return panel;
-    }
-
+    /**
+     */
     @Override
     public void clearPainters() {
         if (showNotSelectedCheckBox.isSelected()) {
@@ -59,4 +81,11 @@ public class AnnotationLayerSettingsBuilder<T extends JImageUrlCanvas> implement
         }
     }
 
+    /**
+     * @return
+     */
+    @Override
+    public JPanel getPanel() {
+        return panel;
+    }
 }
