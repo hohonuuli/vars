@@ -17,7 +17,7 @@ import vars.LinkBean
  * @author Brian Schlining
  * @since 2012-11-26
  */
-class BasicAreaMeasurementProcessor {
+class BasicAreaMeasurementProcessor extends AbstractAreaMeasurementProcessor {
 
     def metersWidth = null
     def pixelsWidth = null
@@ -35,67 +35,12 @@ class BasicAreaMeasurementProcessor {
     }
 
 
-    public apply(File file, File target) {
-        def isHeader = true
-        def associationColumn = -1
-        file.eachLine { line ->
-            if (!line.startsWith('#')) { // skip comments
-                // Split line
-
-                if (isHeader) {
-                    associationColumn = findAssociationColumn(line)
-                    if (associationColumn > -1) {
-                        isHeader = false
-                    }
-                    target << "$line\tMeasurements\n"
-                }
-                else {
-                    def parts = line.split('\t')
-                    def associations = parts[associationColumn]
-
-
-                    def addendum = ""
-                    if (associations != null &&
-                            !associations.isEmpty() &&
-                            associations.contains(AreaMeasurement.AREA_MEASUREMENT_LINKNAME)) {
-
-                        def xs = associations.split(",")
-                        def areaMeasurements = []
-                        for (x in xs) {
-                            if (x.startsWith(AreaMeasurement.AREA_MEASUREMENT_LINKNAME)) {
-                                def link = new LinkBean(x)
-                                def areaMeasurement = AreaMeasurement.fromLink(link)
-                                //println("$link: ${areaMeasurement}: ${toArea(areaMeasurement)}")
-                                areaMeasurements << AreaMeasurement.fromLink(link)
-                            }
-                        }
-
-                        def areas = areaMeasurements.collect { toArea(it) }
-
-                        addendum = areas.join(",")
-
-                    }
-
-                    target << "$line\t$addendum\n"
-                }
-            }
-            else {
-                target << line + "\n"
-            }
-        }
-    }
-
-    static findAssociationColumn(String line) {
-        def p = line.split("\t") as List
-        return p.indexOf("Associations")
-    }
-
     /**
      * Calculates area from areaMeasurement
      * @param areaMeasurement
      * @return THe planar area
      */
-    def toArea(AreaMeasurement areaMeasurement) {
+    def toArea(AreaMeasurement areaMeasurement, URL image) {
         def coords = areaMeasurement.coordinates
         def n = coords.size()
 
