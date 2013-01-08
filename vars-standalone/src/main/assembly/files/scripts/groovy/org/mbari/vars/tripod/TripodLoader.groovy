@@ -63,9 +63,15 @@ class TripodLoader {
                 print("Processing ${imageRef}")
                 def url = new URL(imageRef)
                 def stream = url.openStream()
-                def metadata = Sanselan.getMetadata(stream, "FOO")
+                def creationDate = null
+                try {
+                    def metadata = Sanselan.getMetadata(stream, "FOO")
+                    creationDate = metadata.findEXIFValue(TiffConstants.EXIF_TAG_CREATE_DATE)
+                }
+                catch (Exception e) {
+                    print(" [unable to read creation date] ")
+                }
                 stream.close()
-                def creationDate = metadata.findEXIFValue(TiffConstants.EXIF_TAG_CREATE_DATE)
                 def date = null
                 if (creationDate) {
                     date = dateFormat.parse(creationDate.valueDescription[1..-2])
