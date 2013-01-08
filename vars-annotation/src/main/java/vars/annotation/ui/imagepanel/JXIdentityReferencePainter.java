@@ -25,7 +25,6 @@ import vars.annotation.Association;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.Collection;
 import java.util.HashSet;
@@ -87,7 +86,7 @@ public class JXIdentityReferencePainter<T extends JImageUrlCanvas> extends JXObs
                     new Predicate<Association>() {
 
                     @Override
-                    public boolean apply(@Nullable Association association) {
+                    public boolean apply(Association association) {
                         return association.getLinkName().equalsIgnoreCase("identity-reference");
                     }
 

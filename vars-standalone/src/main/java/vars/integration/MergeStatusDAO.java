@@ -16,7 +16,6 @@
 package vars.integration;
 
 import java.util.List;
-import vars.integration.MergeStatus;
 
 /**
  * Created by IntelliJ IDEA.

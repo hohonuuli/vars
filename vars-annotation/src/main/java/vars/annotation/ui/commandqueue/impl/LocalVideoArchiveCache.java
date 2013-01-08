@@ -17,7 +17,6 @@ import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
 import vars.annotation.ui.eventbus.VideoArchiveSelectedEvent;
 import vars.annotation.ui.eventbus.VideoFramesChangedEvent;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.Collection;
 import java.util.HashSet;
@@ -104,7 +103,7 @@ public class LocalVideoArchiveCache implements UIEventSubscriber {
         // New VideoFrames, possibly including duplicates in videoFrames0
         final Set<VideoFrame> videoFrames1 = new HashSet<VideoFrame>(Collections2.transform(observations, new Function<Observation, VideoFrame>() {
             @Override
-            public VideoFrame apply(@Nullable Observation observation) {
+            public VideoFrame apply(Observation observation) {
                 return observation.getVideoFrame();
             }
         }));
@@ -137,7 +136,7 @@ public class LocalVideoArchiveCache implements UIEventSubscriber {
         // VideoFrames to be droppped
         final Set<VideoFrame> videoFrames1 = new HashSet<VideoFrame>(Collections2.transform(observations, new Function<Observation, VideoFrame>() {
             @Override
-            public VideoFrame apply(@Nullable Observation observation) {
+            public VideoFrame apply(Observation observation) {
                 return observation.getVideoFrame();
             }
         }));
