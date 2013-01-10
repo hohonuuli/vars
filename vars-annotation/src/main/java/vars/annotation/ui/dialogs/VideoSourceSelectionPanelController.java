@@ -6,6 +6,7 @@
 package vars.annotation.ui.dialogs;
 
 import java.util.MissingResourceException;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +28,7 @@ public class VideoSourceSelectionPanelController {
         String property = System.getProperty(key);
         try {
             if (property == null) {
-                ResourceBundle bundle = ResourceBundle.getBundle("vars-annotation");
+                ResourceBundle bundle = ResourceBundle.getBundle("vars-annotation", Locale.US);
                 property = bundle.getString(key);
             }
             if (log.isDebugEnabled()) {

@@ -53,7 +53,7 @@ public class AnnotationPersistenceServiceImpl extends QueryableImpl implements A
     private static final String jdbcUsername;
 
     static {
-        ResourceBundle bundle = ResourceBundle.getBundle("annotation-jdbc");
+        ResourceBundle bundle = ResourceBundle.getBundle("annotation-jdbc", Locale.US);
         jdbcUrl = bundle.getString("jdbc.url");
         jdbcUsername = bundle.getString("jdbc.username");
         jdbcPassword = bundle.getString("jdbc.password");

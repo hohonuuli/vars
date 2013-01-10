@@ -10,7 +10,7 @@
     <name>vars-jpa [Library]</name>
     <properties>
         <derby.version>10.9.1.0</derby.version>
-        <jtds.version>1.2.5</jtds.version>
+        <jtds.version>1.2.7</jtds.version>
     </properties>
     <!--
     Build settings

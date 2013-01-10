@@ -40,7 +40,7 @@ public class QueryPersistenceServiceImpl implements QueryPersistenceService {
      * Constructs ...
      */
     public QueryPersistenceServiceImpl() {
-        ResourceBundle bundle = ResourceBundle.getBundle("annotation-jdbc");
+        ResourceBundle bundle = ResourceBundle.getBundle("annotation-jdbc", Locale.US);
         String jdbcUrl = bundle.getString("jdbc.url");
         url = jdbcUrl;
         String jdbcUsername = bundle.getString("jdbc.username");
@@ -48,7 +48,7 @@ public class QueryPersistenceServiceImpl implements QueryPersistenceService {
         String jdbcDriver = bundle.getString("jdbc.driver");
         annoQueryable = new QueryableImpl(jdbcUrl, jdbcUsername, jdbcPassword, jdbcDriver);
 
-        bundle = ResourceBundle.getBundle("knowledgebase-jdbc");
+        bundle = ResourceBundle.getBundle("knowledgebase-jdbc", Locale.US);
         jdbcUrl = bundle.getString("jdbc.url");
         jdbcUsername = bundle.getString("jdbc.username");
         jdbcPassword = bundle.getString("jdbc.password");

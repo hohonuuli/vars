@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.TimeZone;
 import org.mbari.movie.Timecode;
@@ -77,7 +78,7 @@ public class EXPDPersistenceService extends QueryableImpl implements ExternalDat
     
     private final ThreadLocal<Connection> connections = new ThreadLocal<Connection>();
 
-    private static final ResourceBundle bundle = ResourceBundle.getBundle("annotation-jdbc");
+    private static final ResourceBundle bundle = ResourceBundle.getBundle("annotation-jdbc", Locale.US);
 
     /**
      * Constructs ...

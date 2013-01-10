@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -77,7 +78,7 @@ public class VARSProperties {
          * cameraplatform keys. Sort by name.
          */
         platforms = new HashMap<String, String>();
-        ResourceBundle bundle = ResourceBundle.getBundle(Lookup.RESOURCE_BUNDLE);
+        ResourceBundle bundle = ResourceBundle.getBundle(Lookup.RESOURCE_BUNDLE, Locale.US);
         Enumeration<String> keys = bundle.getKeys();
         while (keys.hasMoreElements()) {
             String key = keys.nextElement();
@@ -172,7 +173,7 @@ public class VARSProperties {
     private static String getProperty(String key) {
         String property = System.getProperty(key);
         if (property == null) {
-            ResourceBundle bundle = ResourceBundle.getBundle("vars");
+            ResourceBundle bundle = ResourceBundle.getBundle("vars", Locale.US);
             property = bundle.getString(key);
         }
         if (log.isDebugEnabled()) {

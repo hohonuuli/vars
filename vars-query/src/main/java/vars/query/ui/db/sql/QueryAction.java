@@ -16,6 +16,7 @@ package vars.query.ui.db.sql;
 import org.mbari.sql.IQueryable;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import javax.swing.SwingUtilities;
 import org.mbari.awt.event.ActionAdapter;
@@ -131,7 +132,7 @@ public class QueryAction extends ActionAdapter {
         this.showBasicPhylogeny = showBasicPhylogeny;
         this.showFullPhylogeny = showFullPhylogeny;
 
-        ResourceBundle bundle = ResourceBundle.getBundle("query-app");
+        ResourceBundle bundle = ResourceBundle.getBundle("query-app", Locale.US);
         coalesceKey = bundle.getString("queryresults.coalesce.key");
     }
 

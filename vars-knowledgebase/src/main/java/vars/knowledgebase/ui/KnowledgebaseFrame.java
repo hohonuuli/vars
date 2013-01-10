@@ -23,6 +23,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
 import javax.swing.JButton;
@@ -392,7 +393,7 @@ public class KnowledgebaseFrame extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setContentPane(getSplitPane());
 
-        ResourceBundle bundle = ResourceBundle.getBundle("knowledgebase-app");
+        ResourceBundle bundle = ResourceBundle.getBundle("knowledgebase-app", Locale.US);
         final String title = bundle.getString("frame.title");
         this.setTitle(title);
     }

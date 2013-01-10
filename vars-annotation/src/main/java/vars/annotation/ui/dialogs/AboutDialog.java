@@ -29,6 +29,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -127,7 +128,7 @@ public class AboutDialog extends JDialog {
      * This method is called from within the constructor to initialize the dialog.
      */
     private void initGUI() {
-        ResourceBundle bundle = ResourceBundle.getBundle("varssettings");
+        ResourceBundle bundle = ResourceBundle.getBundle("varssettings", Locale.US);
         version = bundle.getString("version");
 
         addWindowListener(new java.awt.event.WindowAdapter() {

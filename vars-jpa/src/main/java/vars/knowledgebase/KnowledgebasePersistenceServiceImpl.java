@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Collection;
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ public class KnowledgebasePersistenceServiceImpl extends QueryableImpl implement
     private static final String jdbcDriver;
 
     static {
-        ResourceBundle bundle = ResourceBundle.getBundle("knowledgebase-jdbc");
+        ResourceBundle bundle = ResourceBundle.getBundle("knowledgebase-jdbc", Locale.US);
         jdbcUrl = bundle.getString("jdbc.url");
         jdbcUsername = bundle.getString("jdbc.username");
         jdbcPassword = bundle.getString("jdbc.password");

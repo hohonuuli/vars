@@ -9,6 +9,7 @@ package vars.query;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 import org.slf4j.Logger;
@@ -33,7 +34,7 @@ public class QueryModule implements Module {
 
 
     public QueryModule() {
-        ResourceBundle bundle = ResourceBundle.getBundle("query-app");
+        ResourceBundle bundle = ResourceBundle.getBundle("query-app", Locale.US);
         annotationPersistenceUnit = bundle.getString("annotation.persistence.unit");
         knowledgebasePersistenceUnit = bundle.getString("knowledgebase.persistence.unit");
         miscPersistenceUnit = bundle.getString("misc.persistence.unit");

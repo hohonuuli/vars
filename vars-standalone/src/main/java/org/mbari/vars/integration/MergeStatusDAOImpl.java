@@ -25,6 +25,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.TimeZone;
 import org.mbari.expd.Dive;
@@ -45,7 +46,7 @@ import vars.integration.MergeStatus;
  */
 public class MergeStatusDAOImpl extends QueryableImpl implements MergeStatusDAO {
 
-    private static final ResourceBundle bundle = ResourceBundle.getBundle("annotation-jdbc");
+    private static final ResourceBundle bundle = ResourceBundle.getBundle("annotation-jdbc", Locale.US);
 
     /**  */
     public static final DateFormat DATE_FORMAT_UTC = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss") {{

@@ -1,6 +1,6 @@
 import groovy.sql.Sql
 
-def bundle = ResourceBundle.getBundle("annotation-jdbc")
+def bundle = ResourceBundle.getBundle("annotation-jdbc", Locale.US)
 def database = Sql.newInstance(bundle.getString("jdbc.url"),
         bundle.getString("jdbc.username"),
         bundle.getString("jdbc.password"),

@@ -19,6 +19,7 @@ import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.Provider;
 import com.google.inject.Scopes;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import org.mbari.util.SystemUtilities;
 import org.slf4j.Logger;
@@ -55,7 +56,7 @@ public class InjectorModule implements Module {
      * @param bundleName
      */
     public InjectorModule(String bundleName) {
-        this(ResourceBundle.getBundle(bundleName));
+        this(ResourceBundle.getBundle(bundleName, Locale.US));
     }
 
     /**

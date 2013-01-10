@@ -19,6 +19,7 @@ import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.util.Enumeration;
+import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.TreeMap;
@@ -95,7 +96,7 @@ public class ActionPanel extends JPanel {
          * file and instantiated at runtime. This allows location specific
          * customization with requiring the agency to rebuild VARS from scratch.
          */
-        ResourceBundle bundle = ResourceBundle.getBundle(Lookup.RESOURCE_BUNDLE);
+        ResourceBundle bundle = ResourceBundle.getBundle(Lookup.RESOURCE_BUNDLE, Locale.US);
         Enumeration<String> enumeration = bundle.getKeys();
         Map<String, JButton> map = new TreeMap<String, JButton>();
         while (enumeration.hasMoreElements()) {

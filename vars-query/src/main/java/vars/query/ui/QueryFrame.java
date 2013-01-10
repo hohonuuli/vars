@@ -19,6 +19,7 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import java.awt.BorderLayout;
 import java.awt.HeadlessException;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import javax.swing.ActionMap;
 import javax.swing.Box;
@@ -329,7 +330,7 @@ public class QueryFrame extends JFrame {
         this.setSize(300, 200);
         this.setContentPane(getJContentPane());
 
-        ResourceBundle bundle = ResourceBundle.getBundle(Lookup.RESOURCE_BUNDLE);
+        ResourceBundle bundle = ResourceBundle.getBundle(Lookup.RESOURCE_BUNDLE, Locale.US);
         final String title = bundle.getString("frame.title");
 
         this.setTitle(title);

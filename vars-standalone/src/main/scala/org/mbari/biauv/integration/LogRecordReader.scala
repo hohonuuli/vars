@@ -58,20 +58,20 @@ object LogRecordReader {
             }
         }
         catch {
-            case _ => log.debug("Done. Found " + i + " records")
+            case _: Throwable => log.debug("Done. Found " + i + " records")
         }
 
         records.foreach { r => r.data = r.data.reverse }
         val elapsedTime = (System.nanoTime - startTime) / 1000D / 1000D / 1000D
         //log.debug(String.format("Elapsed time is %12.9f nano seconds\n", Array(elapsedTime)))
-        return records
+        records
 
     }
 
     /**af
      * Parses the ASCII header into something useful
      *
-     * @param buffer The buffer of the memory mapped log file
+     * @param mappedByteBuffer The buffer of the memory mapped log file
      * @return A tuple with a list of LogRecords that have not yet been populated with data
      *      as well as the byte offset to start reading the data with
      *
@@ -96,7 +96,7 @@ object LogRecordReader {
                     records = newLogRecord(parts(1), parts(2), otherParts(1), otherParts(2)) :: records
                 }
                 catch {
-                    case _ => log.debug("!!! Invalid line")
+                    case _: Throwable => log.debug("!!! Invalid line")
                 }
                 continue = lineMatcher.find()
             }
