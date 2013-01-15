@@ -13,6 +13,8 @@ import java.util.List;
  */
 public interface CameraDataDAO extends DAO {
 
+    CameraData findByImageReference(String imageReference);
+
     List<CameraData> findByImageReferenceContaining(String s);
 
     List<CameraData> findByImageReferencePostfix(String postfix);

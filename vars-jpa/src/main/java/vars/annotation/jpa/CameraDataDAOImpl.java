@@ -25,6 +25,17 @@ public class CameraDataDAOImpl extends DAO implements CameraDataDAO {
         super(entityManager);
     }
 
+    public CameraData findByImageReference(String imageReference) {
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("imageReference", imageReference);
+        List<CameraData> data = findByNamedQuery("CameraData.findByImageReference", params);
+        if (data.size() > 1) {
+            log.warn("More than one CameraData object contains " + imageReference +
+                    ". Returning the first one");
+        }
+        return (data.size() == 0) ? null : data.get(0);
+    }
+
     public List<CameraData> findByImageReferenceContaining(String s) {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("imageReference", "%" + s + "%");
