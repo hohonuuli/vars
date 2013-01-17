@@ -1,4 +1,4 @@
-package org.mbari.vars.benthicrover
+package org.mbari.vars
 
 import vars.LinkBean
 import vars.annotation.ui.imagepanel.AreaMeasurement

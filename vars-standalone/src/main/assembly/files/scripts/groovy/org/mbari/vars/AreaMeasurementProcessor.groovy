@@ -1,6 +1,7 @@
-package org.mbari.vars.benthicrover
+package org.mbari.vars
 
 import org.mbari.geometry.Point2D
+import org.mbari.vars.AbstractAreaMeasurementProcessor
 
 import javax.imageio.ImageIO
 import org.mbari.smith.Camera

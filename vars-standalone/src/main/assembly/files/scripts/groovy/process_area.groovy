@@ -1,4 +1,4 @@
-import org.mbari.vars.benthicrover.AreaMeasurementProcessor
+import org.mbari.vars.AreaMeasurementProcessor
 
 /**
  * 
