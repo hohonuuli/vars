@@ -186,8 +186,12 @@ public class RSS422VideoControlService extends AbstractVideoControlService {
         timecode.setFrameRate(frameRate);
 
         // Convert userbits from byte[]->long->Date
+
         final int epicSeconds = NumberUtilities.toInt(vcrUserbits.getUserbits(), true);
         final Date date = new Date((long) epicSeconds * 1000L);
+        log.debug("Timecode: " + timecode.toString() + '\n' +
+                "Userbits: " + vcrUserbits.getUserbits() + '\n' +
+                "Date: " + date);
 
         return new VideoTimeImpl(timecode.toString(), date);
     }
@@ -201,6 +205,13 @@ public class RSS422VideoControlService extends AbstractVideoControlService {
         // TODO Start a timer and listen for valid checksums. If a valid one
         // occurs reset the time. If timer ends throw a VideoControlException
         getVcr().seekTimecode(new Timecode(timecode, frameRate));
+    }
+
+    String bytArrayToHex(byte[] a) {
+        StringBuilder sb = new StringBuilder();
+        for(byte b: a)
+            sb.append(String.format("%02x", b&0xff));
+        return sb.toString();
     }
 
 }
