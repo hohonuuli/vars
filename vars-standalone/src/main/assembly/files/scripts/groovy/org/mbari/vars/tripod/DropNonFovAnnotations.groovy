@@ -89,7 +89,6 @@ class DropNonFovAnnotations {
                                 catch (Exception e) {
                                     // do nothing
                                 }
-
                             }
                             if (polygon != null) {
                                 break

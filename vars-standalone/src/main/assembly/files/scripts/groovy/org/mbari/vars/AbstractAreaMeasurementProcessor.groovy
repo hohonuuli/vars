@@ -30,7 +30,6 @@ abstract class AbstractAreaMeasurementProcessor {
 
                     def associations = parts[associationColumn]
 
-
                     def addendum = ""
                     if (associations != null &&
                             !associations.isEmpty() &&
