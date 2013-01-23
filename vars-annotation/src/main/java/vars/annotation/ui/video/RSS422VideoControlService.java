@@ -27,8 +27,8 @@ import org.mbari.util.NumberUtilities;
 import org.mbari.vcr.IVCR;
 import org.mbari.vcr.IVCRTimecode;
 import org.mbari.vcr.IVCRUserbits;
-import org.mbari.vcr.purejavacomm.VCR;
-//import org.mbari.vcr.rs422.VCR;
+//import org.mbari.vcr.purejavacomm.VCR;
+import org.mbari.vcr.rs422.VCR;
 import org.mbari.vcr.timer.AnnotationMonitoringVCR;
 import org.mbari.vcr.timer.AnnotationQueueVCR;
 import org.mbari.vcr.timer.priority.AnnotationPQVCR;
@@ -84,8 +84,8 @@ public class RSS422VideoControlService extends AbstractVideoControlService {
         frameRate = fr.doubleValue();
 
         try {
-            vcr = new AnnotationPQVCR(new VCR(port));
-            // vcr = new AnnotationQueueVCR(new VCR(port));
+            //vcr = new AnnotationPQVCR(new VCR(port));
+            vcr = new AnnotationQueueVCR(new VCR(port));
             //vcr = new AnnotationMonitoringVCR(new VCR(port));
         }
         catch (Exception ex) {
