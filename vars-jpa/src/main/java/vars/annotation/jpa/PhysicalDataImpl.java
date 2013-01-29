@@ -21,6 +21,7 @@ import vars.jpa.JPAEntity;
 import vars.jpa.KeyNullifier;
 import vars.jpa.TransactionLogger;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -47,6 +48,7 @@ import java.util.Date;
 
 @Entity(name = "PhysicalData")
 @Table(name = "PhysicalData")
+@Cacheable(true)
 @EntityListeners({ TransactionLogger.class, KeyNullifier.class })
 @NamedQueries({ @NamedQuery(name = "PhysicalData.findById", query = "SELECT v FROM PhysicalData v WHERE v.id = :id") })
 public class PhysicalDataImpl implements Serializable, PhysicalData, JPAEntity {

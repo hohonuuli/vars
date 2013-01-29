@@ -3,6 +3,8 @@ package vars.annotation.ui.commandqueue.impl;
 import com.google.common.collect.ImmutableList;
 import org.bushe.swing.event.EventBus;
 import org.mbari.movie.Timecode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import vars.UserAccount;
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.AnnotationFactory;
@@ -14,6 +16,7 @@ import vars.annotation.VideoArchiveDAO;
 import vars.annotation.VideoFrame;
 import vars.annotation.VideoFrameDAO;
 import vars.annotation.jpa.ObservationImpl;
+import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.commandqueue.Command;
 import vars.annotation.ui.eventbus.ObservationsAddedEvent;
@@ -31,6 +34,8 @@ import java.util.Date;
  * @since 2011-10-10
  */
 public class AddObservationCmd implements Command {
+
+    private Logger log = LoggerFactory.getLogger(getClass());
 
     private String conceptName;
     private final String timecode;
@@ -82,15 +87,24 @@ public class AddObservationCmd implements Command {
         this.selectAddedObservation = selectAddedObservation;
     }
 
+    private double elapsedTime(Long start) {
+        return (System.nanoTime() - start) / 1e9;
+    }
+
     @Override
     public void apply(ToolBelt toolBelt) {
 
+        long tic = System.nanoTime();
+
         AnnotationDAOFactory daoFactory = toolBelt.getAnnotationDAOFactory();
         AnnotationFactory factory = toolBelt.getAnnotationFactory();
-        VideoArchiveDAO videoArchiveDAO = daoFactory.newVideoArchiveDAO();
+        VideoFrameDAO videoFrameDAO = daoFactory.newVideoFrameDAO();
+        VideoArchiveDAO videoArchiveDAO = daoFactory.newVideoArchiveDAO(videoFrameDAO.getEntityManager());
         videoArchiveDAO.startTransaction();
         VideoArchive videoArchive = videoArchiveDAO.findByName(videoArchiveName);
+
         Observation newObservation = null;
+
         if (videoArchive != null && conceptName != null && timecode != null) {
 
             /*
@@ -101,19 +115,27 @@ public class AddObservationCmd implements Command {
             /*
              * Get or create the VideoFrame
              */
-            VideoFrame videoFrame = videoArchive.findVideoFrameByTimeCode(timecode);
+            log.debug(elapsedTime(tic) + "s :Lookup existing videoframe");
+            tic = System.nanoTime();
+            VideoFrame videoFrame = videoArchive.findVideoFrameByTimeCode(timecode); // TODO: THis is slow
+            log.debug(elapsedTime(tic) + "s :Find matching timecode");
+            tic = System.nanoTime();
             if (videoFrame == null) {
                 videoFrame = factory.newVideoFrame();
                 videoFrame.setRecordedDate(recordedDate);
                 videoFrame.setTimecode(timecode);
                 CameraData cameraData = videoFrame.getCameraData();
                 cameraData.setDirection(cameraDirection);
+                log.debug(elapsedTime(tic) + "s :Build new videoframe");
+                tic = System.nanoTime();
                 videoArchive.addVideoFrame(videoFrame);
             }
 
             if (imageReference != null) {
                 videoFrame.getCameraData().setImageReference(imageReference);
             }
+            log.debug(elapsedTime(tic) + "s :Built Videoframe");
+            tic = System.nanoTime();
 
             /*
                 Create observation
@@ -128,18 +150,27 @@ public class AddObservationCmd implements Command {
                 newObservation.setY(point.getY());
             }
             videoFrame.addObservation(newObservation);
+            log.debug(elapsedTime(tic) + "s :Built Observation");
+            tic = System.nanoTime();
 
         }
         videoArchiveDAO.endTransaction();
         videoArchiveDAO.close();
+        log.debug(elapsedTime(tic) + "s :End Transaction");
+        tic = System.nanoTime();
         if (newObservation != null) {
             newPrimaryKey = newObservation.getPrimaryKey();
         }
         EventBus.publish(new ObservationsAddedEvent(null, newObservation));
+        log.debug(elapsedTime(tic) + "s :Publish ObservationsAddedEvent");
+        tic = System.nanoTime();
 
         if (selectAddedObservation) {
             EventBus.publish(new ObservationsSelectedEvent(this, ImmutableList.of(newObservation)));
+            log.debug(elapsedTime(tic) + "s :Publish ObservationsSelectedEvent");
+            tic = System.nanoTime();
         }
+
     }
 
     @Override

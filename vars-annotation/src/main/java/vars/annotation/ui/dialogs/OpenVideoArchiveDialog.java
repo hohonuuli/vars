@@ -408,8 +408,8 @@ public class OpenVideoArchiveDialog extends StandardDialog {
         {
             String name = getNameTextField().getText();
             videoArchive = dao.findByName(name);
-        }
             break;
+        }
         case BY_PARAMS:
         {
             int sequenceNumber = Integer.parseInt(getSequenceNumberTextField().getText());
@@ -419,25 +419,27 @@ public class OpenVideoArchiveDialog extends StandardDialog {
             String videoArchiveName = PersistenceController.makeVideoArchiveName(platform,
                 sequenceNumber, tapeNumber, postfix);
             videoArchive = dao.findOrCreateByParameters(platform, sequenceNumber, videoArchiveName);
-        }
             break;
+        }
+
         case EXISTING:
         {
             String name = (String) getExistingNamesComboBox().getSelectedItem();
             videoArchive = dao.findByName(name);
-        }
             break;
+        }
+
         default:
         }
 
         // Load the videoFrames within the transaction
-        if (videoArchive != null) {
+        /*if (videoArchive != null) {
             @SuppressWarnings("unused")
             Collection<VideoFrame> videoFrames = videoArchive.getVideoFrames();
             for (VideoFrame videoFrame : videoFrames) {
                 videoFrame.getCameraData().getImageReference();
             }
-        }
+        } */
 
         dao.endTransaction();
         return videoArchive;

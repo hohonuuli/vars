@@ -1,6 +1,6 @@
 ----------------------------------------------------------------
-Fri Jan 18 11:20:26 PST 2013:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.9.1.0 - (1344872): instance a816c00e-013c-4f1a-dc49-000004c8a558 
+Tue Jan 29 09:07:21 PST 2013:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.9.1.0 - (1344872): instance a816c00e-013c-8746-f5b6-000004bf6190 
 on database directory memory:/Users/brian/workspace/vars-redux/vars-jpa/VARS  with class loader sun.misc.Launcher$AppClassLoader@7a9664a1 
 Loaded from file:/Users/brian/.m2/repository/org/apache/derby/derby/10.9.1.0/derby-10.9.1.0.jar
 java.vendor=Apple Inc.

@@ -16,4 +16,6 @@ public interface VideoFrameDAO extends DAO {
 
     VideoFrame findByPrimaryKey(Object primaryKey);
 
+    VideoFrame findByTimeCodeAndVideoArchiveName(String timecode, String videoArchiveName);
+
 }

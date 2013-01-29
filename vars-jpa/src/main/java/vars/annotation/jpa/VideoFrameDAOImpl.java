@@ -39,4 +39,12 @@ public class VideoFrameDAOImpl extends DAO implements VideoFrameDAO {
     public VideoFrame findByPrimaryKey(Object primaryKey) {
         return findByPrimaryKey(VideoFrameImpl.class, primaryKey);
     }
+
+    public VideoFrame findByTimeCodeAndVideoArchiveName(String timecode, String videoArchiveName) {
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("timecode", timecode);
+        params.put("videoArchiveName", videoArchiveName);
+        List<VideoFrame> list = findByNamedQuery("VideoFrame.findByTimeCodeAndVideoArchiveName", params);
+        return (list.size() > 0) ? list.get(0) : null;
+    }
 }

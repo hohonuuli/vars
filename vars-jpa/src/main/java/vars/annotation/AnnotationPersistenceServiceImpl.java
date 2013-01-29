@@ -355,6 +355,24 @@ public class AnnotationPersistenceServiceImpl extends QueryableImpl implements A
         };
         return executeQueryFunction(sql, queryFunction);
     }
+
+    public Long findTimeCodeByVideoArchiveName(String timecode, String videoArchiveName) {
+        String sql = "SELECT vf.id FROM VideoFrame AS vf RIGHT OUTER JOIN " +
+                "VideoArchive AS va ON vf.VideoArchiveID_FK = va.id WHERE " +
+                "va.videoArchiveName = '" + videoArchiveName + "' AND vf.TapeTimeCode = '" +
+                timecode + "'";
+        QueryFunction<Long> queryFunction = new QueryFunction<Long>() {
+            @Override
+            public Long apply(ResultSet resultSet) throws SQLException {
+                Long id = null;
+                if (resultSet.next()) {
+                    id = resultSet.getLong(1);
+                }
+                return id;
+            }
+        };
+        return executeQueryFunction(sql, queryFunction);
+    }
     
 
     private class MyCacheClearedListener implements CacheClearedListener {

@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -50,6 +51,7 @@ import vars.jpa.TransactionLogger;
 
 @Entity(name = "VideoArchiveSet")
 @Table(name = "VideoArchiveSet")
+@Cacheable
 @EntityListeners( {TransactionLogger.class, KeyNullifier.class} )
 @NamedQueries( {
     @NamedQuery(name = "VideoArchiveSet.findById",

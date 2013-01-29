@@ -237,7 +237,7 @@ public class PersistenceController {
 
     /**
      * Changes the CameraData URL's that match the currently set local directory to
-     * use ther URL (image mapping target) defined in the uses preferences.
+     * use there URL (image mapping target) defined in the uses preferences.
      *
      * @param videoArchive
      * @param imageTarget The  directory where the frames are saved into

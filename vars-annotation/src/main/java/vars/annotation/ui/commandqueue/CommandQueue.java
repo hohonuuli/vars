@@ -25,8 +25,11 @@ import vars.annotation.ui.ToolBelt;
 
 import java.util.Deque;
 import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 /**
  * The command queue processes commands in the order received. Commands are send via
@@ -46,7 +49,8 @@ public class CommandQueue {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
     private final int maxUndos = 25;
-    private final Queue<CommandEvent> pendingQueue = new ConcurrentLinkedQueue<CommandEvent>();
+    //private final Queue<CommandEvent> pendingQueue = new ConcurrentLinkedQueue<CommandEvent>();
+    private final BlockingQueue<CommandEvent> pendingQueue = new LinkedBlockingQueue<CommandEvent>();
     private final Deque<CommandEvent> undos = new LinkedBlockingDeque<CommandEvent>(maxUndos);
     private final Deque<CommandEvent> redos = new LinkedBlockingDeque<CommandEvent>(maxUndos);
     private final Thread thread;
@@ -59,7 +63,12 @@ public class CommandQueue {
         @Override
         public void run() {
             while (isRunning) {
-                CommandEvent commandEvent = pendingQueue.poll();
+                CommandEvent commandEvent = null;
+                try {
+                    commandEvent = pendingQueue.poll(3600L, TimeUnit.SECONDS);
+                } catch (InterruptedException e) {
+                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+                }
                 if (commandEvent != null) {
                     Command command = commandEvent.getCommand();
                     try {
