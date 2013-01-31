@@ -47,6 +47,7 @@ class AreaMeasurementProcessor extends AbstractAreaMeasurementProcessor {
                 theta.doubleValue())
     }
 
+
     private updateImageInfo(URL image) {
         if (lastImage != image) {
             println("Process: $image")

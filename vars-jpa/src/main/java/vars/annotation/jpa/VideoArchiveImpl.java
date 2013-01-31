@@ -17,7 +17,6 @@ import java.util.List;
 import javax.persistence.*;
 
 import com.google.common.collect.Iterables;
-import com.sun.istack.internal.Nullable;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveSet;
 import vars.annotation.VideoFrame;
