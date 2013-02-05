@@ -3,7 +3,7 @@ package org.mbari.smith
 import vars.annotation.ui.{ToolBelt, Lookup}
 import com.google.inject.Injector
 import scala.collection.JavaConverters._
-import vars.annotation.{Observation, VideoFrame}
+import vars.annotation.{VideoFrame}
 import org.slf4j.LoggerFactory
 import vars.annotation.ui.imagepanel.AreaMeasurement
 import java.awt.Polygon
@@ -25,10 +25,16 @@ object CoverageEstimator {
   private[this] val toolBelt = Lookup.getGuiceInjectorDispatcher.getValueObject.
       asInstanceOf[Injector].getInstance(classOf[ToolBelt])
 
+  private[this] var imageWidth: Int = _
+  private[this] var imageHeight: Int = _
+  private[this] var gotDimensions = false
+
 
   def apply(videoArchiveName: String, camera: Camera): List[ActualArea] = {
     val frameAreas0 = toFrameAreas(fetchAnnotations(videoArchiveName))
+    log.debug("Found " + frameAreas0.size + " areaMeasurements")
     val frameAreas1 = frameAreas0.map(keepAnnotationsWithinFOV(_))
+    log.debug("Found " + frameAreas1.size + " areaMeasurements within FOV")
     toArea(frameAreas1, camera)
   }
 
@@ -68,18 +74,25 @@ object CoverageEstimator {
         if (ass.getLinkName == AreaMeasurement.AREA_MEASUREMENT_LINKNAME)
       } {
 
-        val areaMeasurement = AreaMeasurement.fromLink(ass)
-        val polygon = toPolygon(areaMeasurement)
-        val areaPolygon = AreaPolygon(areaMeasurement, polygon)
-        if (areaMeasurement.getComment.contains("fov")) {
-          fov = Option(areaPolygon)
+        try {
+          log.debug("Converting: " + ass)
+          val areaMeasurement = AreaMeasurement.fromLink(ass)
+          val polygon = toPolygon(areaMeasurement)
+          val areaPolygon = AreaPolygon(areaMeasurement, polygon)
+          if (areaMeasurement.getComment.contains("fov")) {
+            fov = Option(areaPolygon)
+          }
+          else {
+            detritus += areaPolygon
+          }
         }
-        else {
-          detritus :+ areaPolygon
+        catch {
+          case e: IllegalArgumentException => log.warn("Can't parse " + ass, e)
+          case e: NullPointerException => log.warn("Can't parse " + ass, e)
         }
       }
       fov.foreach { am =>
-        frameAreas :+ FrameAreas(vf, am, detritus.toList)
+        frameAreas += FrameAreas(vf, am, detritus.toList)
       }
     }
     frameAreas.toList
@@ -93,12 +106,13 @@ object CoverageEstimator {
   private def keepAnnotationsWithinFOV(frameAreas: FrameAreas) = {
     val fovPolygon = frameAreas.fov.polygon
     val intersect = frameAreas.detritus.filter( fa => fovPolygon.intersects(fa.polygon.getBounds2D) )
+    log.debug(frameAreas.videoFrame + " has " + intersect.size + " measurements in the FOV")
     frameAreas.copy(detritus = intersect)
   }
 
   private def toPolygon(areaMeasurement: AreaMeasurement): Polygon = {
     val coords = areaMeasurement.getCoordinates.asScala
-    def polygon = new Polygon
+    val polygon = new Polygon
     coords.foreach { p =>
       polygon.addPoint(p.getX, p.getY)
     }
@@ -110,20 +124,25 @@ object CoverageEstimator {
     for {
       fa <- frameAreas
     } yield {
-      val (imageWidth, imageHeight) = imageDimensions(
-        new URL(fa.videoFrame.getCameraData.getImageReference))
+      if (!gotDimensions) {
+        imageDimensions(new URL(fa.videoFrame.getCameraData.getImageReference))
+        gotDimensions = true
+      }
+
       val totalFovArea = calculateArea(fa.fov.areaMeasurement, imageWidth, imageHeight, camera)
       val detritalAreas = fa.detritus.map(ap =>
         calculateArea(ap.areaMeasurement, imageWidth, imageHeight, camera))
-
+      log.debug(detritalAreas.sum + "")
       ActualArea(fa.videoFrame, totalFovArea, detritalAreas.sum)
 
     }
   }
 
-  private def imageDimensions(image: URL): (Int, Int) = {
+  private def imageDimensions(image: URL) {
+    log.debug("Reading " + image)
     def img = ImageIO.read(image)
-    (img.getWidth(), img.getHeight())
+    imageHeight = img.getHeight()
+    imageWidth = img.getWidth()
   }
 
   private def calculateArea(areaMeasurement: AreaMeasurement,

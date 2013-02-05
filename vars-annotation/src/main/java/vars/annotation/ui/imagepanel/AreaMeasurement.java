@@ -129,7 +129,7 @@ public class AreaMeasurement {
         String comment = (coordsAndComment.length == 2) ? coordsAndComment[1] : null;
         Preconditions.checkArgument(coordsAndComment.length > 0, "No data was found in " + link);
         String[] parts = coordsAndComment[0].split(" ");
-        Preconditions.checkArgument(parts.length > 6, "The Association does not contain 3 or more pixel coordinates");
+        Preconditions.checkArgument(parts.length >= 6, "The Association does not contain 3 or more pixel coordinates");
         Preconditions.checkArgument(parts.length % 2 == 0, "The Association does not contain X-Y coordinate pairs");
         int idx = 0;
         List<Point2D<Integer>> points = new ArrayList<Point2D<Integer>>();

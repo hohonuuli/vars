@@ -1,7 +1,7 @@
 /*
- * @(#)AreaMeasurementLayerSettingsBuilder.java   2012.11.26 at 08:48:37 PST
+ * @(#)AreaMeasurementLayerSettingsBuilder.java   2013.02.04 at 04:42:57 PST
  *
- * Copyright 2011 MBARI
+ * Copyright 2009 MBARI
  *
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -15,11 +15,13 @@
 
 package vars.annotation.ui.imagepanel;
 
-import org.mbari.swing.JImageUrlCanvas;
-
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import javax.swing.BoxLayout;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import org.mbari.swing.JImageUrlCanvas;
 
 /**
  * Builds a JPanel for allowing user adjustment of the settings for an AreaMeasurementLayerUI
@@ -31,8 +33,10 @@ import javax.swing.JPanel;
  */
 public class AreaMeasurementLayerSettingsBuilder<T extends JImageUrlCanvas> implements UISettingsBuilder {
 
+    private JXPainter<T> notSelectedAreaMeasurementsPainter = new JXNotSelectedAreaMeasurementPainter<T>();
     private final MultiLayerUI<T> layerUI;
     private final JPanel panel;
+    private JCheckBox showNotSelectedCheckBox;
 
     /**
      * Constructs ...
@@ -45,15 +49,39 @@ public class AreaMeasurementLayerSettingsBuilder<T extends JImageUrlCanvas> impl
         // --- Configure Panel
         panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-        panel.add(new JLabel("No Settings Available"));
+
+        // --- CheckBox to draw not selected annotations
+        showNotSelectedCheckBox = new JCheckBox();
+        showNotSelectedCheckBox.setText("Show All Area Measurements");
+        showNotSelectedCheckBox.setSelected(false);
+        showNotSelectedCheckBox.addItemListener(new ItemListener() {
+
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (showNotSelectedCheckBox.isSelected()) {
+                    AreaMeasurementLayerSettingsBuilder.this.layerUI.addPainter(notSelectedAreaMeasurementsPainter);
+                }
+                else {
+                    AreaMeasurementLayerSettingsBuilder.this.layerUI.removePainter(notSelectedAreaMeasurementsPainter);
+                }
+            }
+
+        });
+        showNotSelectedCheckBox.setSelected(false);
+        panel.add(showNotSelectedCheckBox);
+
     }
 
     /**
      */
     @Override
     public void clearPainters() {
-
-        // Nothing to do
+        if (showNotSelectedCheckBox.isSelected()) {
+            layerUI.addPainter(notSelectedAreaMeasurementsPainter);
+        }
+        else {
+            layerUI.removePainter(notSelectedAreaMeasurementsPainter);
+        }
     }
 
     /**

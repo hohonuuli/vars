@@ -72,7 +72,7 @@ public class ImageAnnotationFrame extends JFrame {
         }
     };
     private AnnotationLayerUI annotationLayerUI;
-    private AreaMeasurementLayerUI<JImageUrlCanvas> areaMeasurementLayerUI;
+    private AreaMeasurementLayerUI2<JImageUrlCanvas> areaMeasurementLayerUI;
     private ConceptNameComboBox comboBox;
     private final ImageAnnotationFrameController controller;
 
@@ -113,9 +113,9 @@ public class ImageAnnotationFrame extends JFrame {
         return annotationLayerUI;
     }
 
-    protected AreaMeasurementLayerUI<JImageUrlCanvas> getAreaMeasurementLayerUI() {
+    protected AreaMeasurementLayerUI2<JImageUrlCanvas> getAreaMeasurementLayerUI() {
         if (areaMeasurementLayerUI == null) {
-            areaMeasurementLayerUI = new AreaMeasurementLayerUI<JImageUrlCanvas>(controller.getToolBelt());
+            areaMeasurementLayerUI = new AreaMeasurementLayerUI2<JImageUrlCanvas>(controller.getToolBelt());
         }
 
         return areaMeasurementLayerUI;

@@ -1,7 +1,8 @@
+import java.text.SimpleDateFormat
 import org.mbari.smith.Camera
 import org.mbari.smith.CoverageEstimator
 import org.mbari.vars.AreaMeasurementProcessor
-import scala.None
+import scala.Option
 
 /**
  * 
@@ -9,7 +10,7 @@ import scala.None
  * @since 2013-01-30
  */
 
-if (args.size() < 6) {
+if (args.size() != 5) {
     println("""
     | Script that converts any 'area measurement' associations found in your VARS query results
     | and converts them to area. The results are appended to the end of each row in a new text file.
@@ -25,7 +26,6 @@ if (args.size() < 6) {
     |    beta:             The horizontal angular field of view in degrees
     |    theta:            The tilt of the camera from horizontal in degrees
     |    videoArchiveName: The VideoArchive to process
-    |    outputFile:       The file to save the results into.
     """.stripMargin('|'))
     return
 }
@@ -35,14 +35,15 @@ def alpha = Math.toRadians(Double.parseDouble(args[1]))
 def beta = Math.toRadians(Double.parseDouble(args[2]))
 def theta = Math.toRadians(Double.parseDouble(args[3]))
 def videoArchiveName = args[4]
-def outputFile = new File(args[5])
+//def outputFile = new File(args[5])
 
-
-def camera = new Camera(cameraHeight, alpha, beta, theta)
+def dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss'Z'")
+def camera = new Camera(cameraHeight, alpha, beta, theta, Option.apply("cm"))
 def actualAreas = CoverageEstimator.apply(videoArchiveName, camera)
+println("Date\tFOV Area\tDetrital Area\tPercent Detrital Cover")
 for (i in 0..<actualAreas.size()) {
-    def a = actualAreas.get(i)
+    def a = actualAreas.apply(i)
     def pct = a.detritalArea / a.fovArea * 100
-    println("${a.videoFrame.timecode}\t${a.fovArea}\t${a.detritalArea}\t$pct")
+    println("${dateFormat.format(a.videoFrame.recordedDate)}\t${a.fovArea}\t${a.detritalArea}\t$pct")
 }
 
