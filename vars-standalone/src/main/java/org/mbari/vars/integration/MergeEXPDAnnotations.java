@@ -16,7 +16,9 @@
 package org.mbari.vars.integration;
 
 import com.google.common.base.Function;
+import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
+import com.google.common.base.Strings;
 import com.google.common.collect.Collections2;
 import com.google.inject.Injector;
 import org.mbari.expd.*;
@@ -34,6 +36,7 @@ import vars.annotation.ui.Lookup;
 import vars.integration.MergeFunction;
 import vars.integration.MergeStatus;
 import vars.integration.MergeStatusDAO;
+import vars.integration.MergeType;
 import vars.jpa.JPAEntity;
 
 import java.util.*;
@@ -94,21 +97,21 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
         Map<VideoFrame, UberDatum> data = new HashMap<VideoFrame, UberDatum>();
 
         switch (mergeType) {
-        case CONSERVATIVE:
-            data = coallateConservative();
-            break;
+            case CONSERVATIVE:
+                data = coallateConservative();
+                break;
 
-        case OPTIMISTIC:
-            data = coallateOptimistic();
-            break;
+            case OPTIMISTIC:
+                data = coallateOptimistic();
+                break;
 
-        case PESSIMISTIC:
-            data = coallatePessimistic();
-            break;
+            case PESSIMISTIC:
+                data = coallatePessimistic();
+                break;
 
-        case PRAGMATIC:
-            data = coallatePragmatic();
-            break;
+            case PRAGMATIC:
+                data = coallatePragmatic();
+                break;
         }
 
         mergeStatus.setMergeDate(new Date());
@@ -167,6 +170,8 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
             }
 
         });
+
+        log.debug(Joiner.on(", ").join(bogusDates));
 
         Map<VideoFrame, UberDatum> merged = mergeByTimecode(bogusDates, uberData);
 
@@ -240,7 +245,7 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
             videoArchiveSetDAO.startTransaction();
 
             Collection<VideoArchiveSet> videoArchiveSets = videoArchiveSetDAO.findAllByPlatformAndSequenceNumber(
-                platform, sequenceNumber);
+                    platform, sequenceNumber);
 
             if (videoArchiveSets.size() > 0) {
                 VideoArchiveSet videoArchiveSet = videoArchiveSets.iterator().next();
@@ -266,7 +271,7 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
         videoArchiveSetDAO.startTransaction();
 
         Collection<VideoArchiveSet> videoArchiveSets = videoArchiveSetDAO.findAllByPlatformAndSequenceNumber(platform,
-            sequenceNumber);
+                sequenceNumber);
 
         for (VideoArchiveSet videoArchiveSet : videoArchiveSets) {
             myVideoFrames.addAll(videoArchiveSet.getVideoFrames());
@@ -353,9 +358,16 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
         // Modify data
         int fixedDateCount = 0;
 
-
         for (VideoFrame videoFrame : data.keySet()) {
             UberDatum uberDatum = data.get(videoFrame);
+            String nav = (uberDatum.getNavigationDatum() == null) ? "NO Navigation Data" :
+                    uberDatum.getNavigationDatum().getDate() + " : Depth = " + uberDatum.getNavigationDatum().getDepth();
+            String cam = (uberDatum.getCameraDatum() == null) ? "NO Camera Data" :
+                    uberDatum.getCameraDatum().getTimecode() + " - " + uberDatum.getCameraDatum().getAlternativeTimecode() +
+                           " - " + uberDatum.getCameraDatum().getDate();
+
+            log.debug(videoFrame.getTimecode() + " : " + videoFrame.getRecordedDate() + " :NAV: " +
+                    nav + " :CAM: " + cam);
 
             videoFrame = dao.find(videoFrame);
 
@@ -417,32 +429,37 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
 
             // ---- Update date 
             switch (mergeType) {
-            case PESSIMISTIC:
-                mergeStatus.setDateSource("EXPD");
-                // Change dates to ones found in EXPD
-                if (navigationDatum == null || navigationDatum.getDate() == null) {
-                    videoFrame.setRecordedDate(null);
-                    fixedDateCount++;
-                }
-                else if (!navigationDatum.getDate().equals(recordedDate)) {
-                    videoFrame.setRecordedDate(navigationDatum.getDate());
-                    fixedDateCount++;
-                }
-
-                break;
-
-            case PRAGMATIC:
-                if ((recordedDate == null) || recordedDate.before(dive.getStartDate()) ||
-                        recordedDate.after(dive.getEndDate())) {
-                    if (navigationDatum == null) {
+                case PESSIMISTIC:
+                    mergeStatus.setDateSource("EXPD");
+                    // Change dates to ones found in EXPD
+                    if (navigationDatum == null || navigationDatum.getDate() == null) {
                         videoFrame.setRecordedDate(null);
+                        fixedDateCount++;
                     }
-                    else {
+                    else if (!navigationDatum.getDate().equals(recordedDate)) {
                         videoFrame.setRecordedDate(navigationDatum.getDate());
+                        fixedDateCount++;
                     }
-                    fixedDateCount++;
-                }
-                break;
+
+                    break;
+
+                case PRAGMATIC:
+                    if ((recordedDate == null) || recordedDate.before(dive.getStartDate()) ||
+                            recordedDate.after(dive.getEndDate())) {
+
+                        Date date = null;
+                        if (navigationDatum != null) {
+                            date = navigationDatum.getDate();
+                        }
+                        if (date == null && cameraDatum != null) {
+                            date = cameraDatum.getDate();
+                        }
+
+                        videoFrame.setRecordedDate(date);
+
+                        fixedDateCount++;
+                    }
+                    break;
             }
 
         }
@@ -461,13 +478,13 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
 
         // ---- Specify the source of the data information
         switch (mergeType) {
-        case PESSIMISTIC:
-            mergeStatus.setDateSource("EXPD");
+            case PESSIMISTIC:
+                mergeStatus.setDateSource("EXPD");
 
-            break;
+                break;
 
-        default:
-            mergeStatus.setDateSource("VARS");
+            default:
+                mergeStatus.setDateSource("VARS");
         }
 
         mergeStatus.setMerged(fixedDateCount);
@@ -475,7 +492,7 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
         if (fixedDateCount > 0) {
             mergeStatus.setDateSource("Both");
             mergeStatus.setStatusMessage(mergeStatus.getStatusMessage() + "; Fixed " + fixedDateCount +
-                                         " annotation dates");
+                    " annotation dates");
         }
 
         dao.endTransaction();
