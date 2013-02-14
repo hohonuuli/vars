@@ -43,7 +43,7 @@ public class QTKitImageCaptureDialog extends StandardDialog {
                 setVisible(false);
             }
         });
-
+        pack();
     }
 
     public JPanel getPanel() {
