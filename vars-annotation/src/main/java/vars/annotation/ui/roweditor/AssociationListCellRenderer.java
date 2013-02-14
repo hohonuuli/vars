@@ -34,7 +34,7 @@ import vars.annotation.Association;
  * </pre>
  *
  */
-public class AssociationListCellRenderer extends DefaultListCellRenderer implements ListCellRenderer {
+public class AssociationListCellRenderer extends DefaultListCellRenderer {
 
     String assoString;
 
@@ -44,6 +44,7 @@ public class AssociationListCellRenderer extends DefaultListCellRenderer impleme
     public AssociationListCellRenderer() {
         super();
     }
+
 
     /**
      *  Gets the listCellRendererComponent attribute of the AssociationListCellRenderer object

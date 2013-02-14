@@ -34,7 +34,7 @@ import java.awt.Dimension;
  * </pre>
  *
  */
-public class AssociationListCellRenderer extends DefaultListCellRenderer implements ListCellRenderer {
+public class AssociationListCellRenderer extends DefaultListCellRenderer {
 
     String assoString;
 
