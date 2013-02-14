@@ -5,6 +5,8 @@ syntax: regexp
 target/ 
 ^test 
 ^.*patch$
+build/
+.svn/
 
 syntax: glob
 .DS_Store
@@ -13,3 +15,4 @@ syntax: glob
 *.iml
 *.ipr
 *.iws
+
