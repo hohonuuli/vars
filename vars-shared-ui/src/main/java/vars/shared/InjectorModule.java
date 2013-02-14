@@ -66,7 +66,7 @@ public class InjectorModule implements Module {
     public void configure(Binder binder) {
         try {
             binder.install(new VarsJpaModule(annotationPersistenceUnit, knowledgebasePersistenceUnit,
-                                             miscPersistenceUnit));
+                    miscPersistenceUnit));
         }
         catch (Exception ex) {
             throw new VARSException("Failed to intialize dependency injection", ex);
@@ -93,11 +93,20 @@ public class InjectorModule implements Module {
             Class<? extends ImageCaptureService> grabberClazz = FakeImageCaptureServiceImpl.class;
             if (SystemUtilities.isMacOS()) {
                 try {
-                    grabberClazz = (Class<ImageCaptureService>) Class.forName("vars.quicktime.QTImageCaptureServiceImpl");
+                    // Try creating a QTKit capture first
+                    grabberClazz = (Class<ImageCaptureService>) Class.forName("vars.qtkit.QTKitImageCaptureServiceImpl");
                 }
-                catch (ClassNotFoundException ex) {
-                    log.info("QuickTime for Java could not be initialized", ex);
+                catch (Exception ex) {
+                    log.info("Unable to initialize QTKit image capture", ex);
+                    // The backup is to try to use QuickTime for Java
+                    try {
+                        grabberClazz = (Class<ImageCaptureService>) Class.forName("vars.quicktime.QTImageCaptureServiceImpl");
+                    }
+                    catch (ClassNotFoundException ex2) {
+                        log.info("QuickTime for Java could not be initialized", ex2);
+                    }
                 }
+
             }
             else if (SystemUtilities.isWindowsOS()) {
                 try {

@@ -4,7 +4,7 @@
     <groupId>vars-redux</groupId>
     <artifactId>vars-redux</artifactId>
     <packaging>pom</packaging>
-    <version>6.1.6</version>
+    <version>7.0.0-SNAPSHOT</version>
     <name>vars-redux</name>
     <inceptionYear>2002</inceptionYear>
     <organization>
@@ -22,9 +22,11 @@
         <module>vars-query</module>
         <module>vars-knowledgebase</module>
         <module>vars-annotation</module>
+        <module>vars-qtkit</module>
         <module>vars-quicktime</module>
         <module>vars-standalone</module>
-    </modules>
+
+  </modules>
     <scm>
         <connection>scm:hg:https://vars-redux.googlecode.com/hg/</connection>
         <developerConnection>scm:hg:https://vars-redux.googlecode.com/hg/</developerConnection>
