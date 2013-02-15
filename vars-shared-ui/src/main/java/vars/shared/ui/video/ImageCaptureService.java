@@ -6,12 +6,23 @@
 package vars.shared.ui.video;
 
 import java.awt.Image;
+import java.io.File;
 
 /**
  *
  * @author brian
  */
 public interface ImageCaptureService {
+
+    /**
+     * Some capture code returns an Image which in turn must be saved to disk as a PNG. Other code
+     * writes the PNG directly to disk first, then it must be read back to get the Java Image
+     * object
+     * @return true if a PNG is written directly to disk first.
+     */
+    boolean isPngAutosaved();
+
+    Image capture(File file) throws ImageCaptureException;
 
     /**
      *

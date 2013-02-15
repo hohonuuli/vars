@@ -3,6 +3,7 @@ package vars.annotation.ui.video;
 import foxtrot.Job;
 import foxtrot.Worker;
 import vars.annotation.ui.ToolBelt;
+import vars.annotation.ui.video.imagecapture.*;
 
 import javax.swing.Action;
 import javax.swing.KeyStroke;
@@ -14,7 +15,7 @@ import java.awt.Toolkit;
  * @author Brian Schlining
  * @since 2011-12-08
  */
-public class SwingImageCaptureAction extends ImageCaptureAction {
+public class SwingImageCaptureAction extends vars.annotation.ui.video.imagecapture.ImageCaptureAction {
 
 
         public SwingImageCaptureAction(ToolBelt toolBelt) {

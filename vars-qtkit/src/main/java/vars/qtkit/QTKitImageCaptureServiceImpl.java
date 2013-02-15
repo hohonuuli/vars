@@ -91,6 +91,12 @@ public class QTKitImageCaptureServiceImpl implements ImageCaptureService {
     // End of Natives  //
     /////////////////////
 
+
+    @Override
+    public boolean isPngAutosaved() {
+        return true;
+    }
+
     private void startDevice() {
         Preferences preferences = Preferences.userRoot();
         String videoSource = preferences.get(LIBRARY_NAME, "");
@@ -140,6 +146,25 @@ public class QTKitImageCaptureServiceImpl implements ImageCaptureService {
             }
         }, "DELETE-" + tempFile.getName());
         thread.run();
+
+        return image;
+    }
+
+    @Override
+    public Image capture(File file) throws ImageCaptureException {
+        if (!isStarted) {
+            startDevice();
+        }
+        saveSnapshotToSpecifiedPath(file.getAbsolutePath());
+
+        // -- Reread file as image
+        BufferedImage image = null;
+        try {
+            image = ImageIO.read(file);
+        } catch (IOException e) {
+            EventBus.publish(GlobalLookup.TOPIC_WARNING, "Failed to read png image from " +
+                    file.getAbsolutePath());
+        }
 
         return image;
     }

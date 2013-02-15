@@ -68,6 +68,7 @@ import vars.shared.ui.video.VideoControlService;
  * @author  <a href="http://www.mbari.org">MBARI</a>
  * @version  $Id: FrameCaptureAction.java 332 2006-08-01 18:38:46Z hohonuuli $
  */
+@Deprecated
 public class ImageCaptureAction extends ActionAdapter {
 
     /**

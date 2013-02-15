@@ -36,6 +36,7 @@ import vars.shared.ui.video.ImageCaptureService;
  *
  * @author         Brian Schlining [brian@mbari.org]
  */
+@Deprecated
 public class ImageCaptureUtilities {
 
     private static final Logger log = LoggerFactory.getLogger(ImageCaptureUtilities.class);
