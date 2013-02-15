@@ -142,7 +142,7 @@ public class ImageCaptureAction extends ActionAdapter {
                 updateVideoArchive(snapTime, jpg);
             }
         };
-        (new Thread(runnable, "JPEG-Generation-" + (new Date()).getTime())).run();
+        (new Thread(runnable, "JPEG-Generation-" + snapTime.getObservationDate().getTime())).run();
 
     }
 
@@ -158,16 +158,16 @@ public class ImageCaptureAction extends ActionAdapter {
     private SnapTime getSnapTime(VideoControlService videoControlService) {
         final String timecode = videoControlService.getVcrTimecode().toString();
 
-        /*
-         *  Try to grab the userbits off of the tape. The userbits
-         *  may have the time that the frame was recorded stored as a
-         *  little-endian 4-byte int.
-         */
         Date recordedDate;
         if (videoControlService.getVcrState().isRecording()) {
             recordedDate = new Date();
         }
         else {
+            /*
+             *  Try to grab the userbits off of the tape. The userbits
+             *  may have the time that the frame was recorded stored as a
+             *  little-endian 4-byte int.
+             */
             videoControlService.requestUserbits();
             final int epicSeconds = NumberUtilities.toInt(videoControlService.getVcrUserbits().getUserbits(), true);
             recordedDate = new Date((long) epicSeconds * 1000L);
