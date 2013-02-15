@@ -235,7 +235,6 @@ public class ImageCaptureAction extends ActionAdapter {
      */
     private class FrameCaptureFunction {
 
-        private final NewObservationAction action = new NewObservationAction(toolBelt);
 
         /**
          * Constructs ...
@@ -272,6 +271,17 @@ public class ImageCaptureAction extends ActionAdapter {
             }
 
             final String timecode = videoControlService.getVcrTimecode().toString();
+
+            /*  ====================================================================================
+             *  Try to grab the userbits off of the tape. The userbits
+             *  may have the time that the frame was recorded stored as a
+             *  little-endian 4-byte int.
+             */
+            videoControlService.requestUserbits();
+            final int epicSeconds = NumberUtilities.toInt(videoControlService.getVcrUserbits().getUserbits(), true);
+            Date recordedDate = new Date((long) epicSeconds * 1000L);
+            /*  ==================================================================================== */
+
             final SnapTime snapTime = new SnapTime(new Date(), timecode);
             final String timecode_ = snapTime.getTimeCodeAsName();
 
@@ -314,7 +324,7 @@ public class ImageCaptureAction extends ActionAdapter {
                 /*
                  *  Update the information in the database
                  */
-                updateVideoArchive(snapTime, jpg);
+                updateVideoArchive(snapTime, recordedDate, jpg);
             }
             catch (final Exception e) {
                 EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
@@ -328,7 +338,7 @@ public class ImageCaptureAction extends ActionAdapter {
         /**
          * Populate a videoFrame with the correct information
          */
-        private void updateVideoArchive(SnapTime snapTime, File jpg) {
+        private void updateVideoArchive(SnapTime snapTime, Date recordedDate, File jpg) {
 
             VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
             if (videoArchive != null) {
@@ -339,20 +349,9 @@ public class ImageCaptureAction extends ActionAdapter {
                  * userbits.
                  */
                 final VideoControlService videoService = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
-                Date utcDate;
-                if (videoService.getVcrState().isRecording()) {
-                    utcDate = new Date();
-                }
-                else {
 
-                    /*
-                    *  Try to grab the userbits off of the tape. The userbits
-                    *  may have the time that the frame was recorded stored as a
-                    *  little-endian 4-byte int.
-                    */
-                    videoService.requestVUserbits();
-                    final int epicSeconds = NumberUtilities.toInt(videoService.getVcrUserbits().getUserbits(), true);
-                    utcDate = new Date((long) epicSeconds * 1000L);
+                if (videoService.getVcrState().isRecording()) {
+                    recordedDate = new Date();
                 }
 
                 CameraDirections cameraDirections = (CameraDirections) Lookup.getCameraDirectionDispatcher().getValueObject();
@@ -370,9 +369,9 @@ public class ImageCaptureAction extends ActionAdapter {
                         log.error("Problem creating a URL.", e);
                     }
                 }
-                
+
                 // FIXME physical object is hardcoded. Should be set in preferences
-                Command command = new AddObservationCmd("physical object", snapTime.getTimeCodeAsString(), utcDate,
+                Command command = new AddObservationCmd("physical object", snapTime.getTimeCodeAsString(), recordedDate,
                         videoArchive.getName(), user, cameraDirection, null, imageReference, true);
                 CommandEvent commandEvent = new CommandEvent(command);
                 EventBus.publish(commandEvent);

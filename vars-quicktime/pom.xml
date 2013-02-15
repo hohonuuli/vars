@@ -4,7 +4,7 @@
     <parent>
         <artifactId>vars-redux</artifactId>
         <groupId>vars-redux</groupId>
-        <version>7.0.0-SNAPSHOT</version>
+        <version>7.0.1-SNAPSHOT</version>
     </parent>
     <artifactId>vars-quicktime</artifactId>
     <name>vars-quicktime</name>
@@ -12,12 +12,12 @@
         <dependency>
             <groupId>org.mbari</groupId>
             <artifactId>qtx4j</artifactId>
-            <version>0.15</version>
+            <version>${qtx4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mbari</groupId>
             <artifactId>vcr4j</artifactId>
-            <version>1.6.2</version>
+            <version>${vcr4j.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>

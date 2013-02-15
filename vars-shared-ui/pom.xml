@@ -5,7 +5,7 @@
     <parent>
         <artifactId>vars-redux</artifactId>
         <groupId>vars-redux</groupId>
-        <version>7.0.0-SNAPSHOT</version>
+        <version>7.0.1-SNAPSHOT</version>
     </parent>
     <artifactId>vars-shared-ui</artifactId>
     <name>vars-shared-ui [Library]</name>
@@ -25,34 +25,34 @@
         <dependency>
             <groupId>org.bushe</groupId>
             <artifactId>eventbus</artifactId>
-            <version>1.4</version>
+            <version>${eventbus.version}</version>
         </dependency>
         <dependency>
             <groupId>org.swinglabs</groupId>
             <artifactId>swingx</artifactId>
-            <version>1.6.1</version>
+            <version>${swingx.version}</version>
         </dependency>
         <dependency>
             <groupId>org.swinglabs</groupId>
             <artifactId>swing-layout</artifactId>
-            <version>1.0.3</version>
+            <version>${swing.layout.version}</version>
         </dependency>
         <dependency>
             <groupId>foxtrot</groupId>
             <artifactId>foxtrot-core</artifactId>
-            <version>4.0</version>
+            <version>${foxtrot.version}</version>
         </dependency>
         <!-- Used for sending emails by error dialogs -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-email</artifactId>
-            <version>1.2</version>
+            <version>${commons.email.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.mbari</groupId>
             <artifactId>vcr4j</artifactId>
-            <version>1.6.2</version>
+            <version>${vcr4j.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>

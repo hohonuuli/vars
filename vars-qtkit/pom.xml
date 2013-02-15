@@ -5,11 +5,11 @@
     <parent>
         <groupId>vars-redux</groupId>
         <artifactId>vars-redux</artifactId>
-        <version>7.0.0-SNAPSHOT</version>
+        <version>7.0.1-SNAPSHOT</version>
     </parent>
     <groupId>vars-redux</groupId>
     <artifactId>vars-qtkit</artifactId>
-    <version>7.0.0-SNAPSHOT</version>
+    <version>7.0.1-SNAPSHOT</version>
     <name>vars-qtkit</name>
     <url>http://maven.apache.org</url>
     <properties>
@@ -70,6 +70,8 @@
                                     <tasks>
                                         <copy file="${xcode.basedir}/build/Release/libqtimagesnap.dylib"
                                               todir="${build.outputDirectory}/native" />
+                                        <copy file="${xcode.basedir}/build/Release/libqtimagesnap.dylib"
+                                              tofile="${build.outputDirectory}/native/libqtimagesnap.jnilib" />
                                     </tasks>
                                 </configuration>
                             </execution>

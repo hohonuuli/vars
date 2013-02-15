@@ -4,15 +4,10 @@
     <parent>
         <artifactId>vars-redux</artifactId>
         <groupId>vars-redux</groupId>
-        <version>7.0.0-SNAPSHOT</version>
+        <version>7.0.1-SNAPSHOT</version>
     </parent>
     <artifactId>vars-standalone</artifactId>
     <name>vars-standalone</name>
-
-    <properties>
-        <scala.version>2.10.0</scala.version>
-        <groovy.version>2.0.6</groovy.version>
-    </properties>
 
     <dependencies>
 
@@ -37,7 +32,7 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.0.9</version>
+            <version>${logback.version}</version>
         </dependency>
 
         <!--
@@ -70,19 +65,19 @@
         <dependency>
             <groupId>commons-cli</groupId>
             <artifactId>commons-cli</artifactId>
-            <version>1.2</version>
+            <version>${commons.cli.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>jline</groupId>
             <artifactId>jline</artifactId>
-            <version>1.0</version>
+            <version>${jline.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.fusesource.jansi</groupId>
             <artifactId>jansi</artifactId>
-            <version>1.9</version>
+            <version>${jansi.version}</version>
             <scope>runtime</scope>
         </dependency>
 
@@ -90,13 +85,13 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-email</artifactId>
-            <version>1.2</version>
+            <version>${commons.email.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.ccil.cowan.tagsoup</groupId>
             <artifactId>tagsoup</artifactId>
-            <version>1.2.1</version>
+            <version>${tagsoup.version}</version>
         </dependency>
 
         <!--
@@ -105,12 +100,12 @@
         <dependency>
             <groupId>org.mbari</groupId>
             <artifactId>expd-core</artifactId>
-            <version>1.2.0-SNAPSHOT</version>
+            <version>${expd.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mbari</groupId>
             <artifactId>expd-jdbc</artifactId>
-            <version>1.2.0-SNAPSHOT</version>
+            <version>${expd.version}</version>
         </dependency>
 
         <!--
@@ -120,7 +115,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>sanselan</artifactId>
-            <version>0.97</version>
+            <version>${sanselan.version}</version>
         </dependency>
 
         <!-- Need for loading SIMPA -->
@@ -132,7 +127,7 @@
         <dependency>
             <groupId>org.mbari</groupId>
             <artifactId>qtx4j</artifactId>
-            <version>0.15</version>
+            <version>${qtx4j.version}</version>
         </dependency>
 
         <!--
@@ -193,7 +188,7 @@
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.1.3</version>
                 <executions>
                     <execution>
                         <goals>
@@ -225,7 +220,7 @@
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.1.3</version>
             </plugin>
         </plugins>
     </reporting>

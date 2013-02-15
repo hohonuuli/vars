@@ -4,7 +4,7 @@
     <parent>
         <artifactId>vars-redux</artifactId>
         <groupId>vars-redux</groupId>
-        <version>7.0.0-SNAPSHOT</version>
+        <version>7.0.1-SNAPSHOT</version>
     </parent>
     <artifactId>vars-annotation</artifactId>
     <name>vars-annotation</name>
@@ -39,12 +39,12 @@
         <dependency>
             <groupId>org.swinglabs</groupId>
             <artifactId>swingx</artifactId>
-            <version>1.6.1</version>
+            <version>${swingx.version}</version>
         </dependency>
         <dependency>
             <groupId>org.swinglabs</groupId>
             <artifactId>jxlayer</artifactId>
-            <version>3.0.4</version>
+            <version>${jxlayer.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -74,12 +74,12 @@
         <dependency>
             <groupId>org.mbari</groupId>
             <artifactId>vcr4j</artifactId>
-            <version>1.7.1-SNAPSHOT</version>
+            <version>${vcr4j.version}</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.0.8</version>
+            <version>${logback.version}</version>
             <scope>compile</scope>
         </dependency>
         <!-- dependency>
@@ -90,13 +90,13 @@
         <dependency>
             <groupId>jgoodies</groupId>
             <artifactId>forms</artifactId>
-            <version>1.0.5</version>
+            <version>${jgoodies.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>jama</groupId>
             <artifactId>jama</artifactId>
-            <version>1.0.2</version>
+            <version>${jama.version}</version>
         </dependency>
 
     </dependencies>
