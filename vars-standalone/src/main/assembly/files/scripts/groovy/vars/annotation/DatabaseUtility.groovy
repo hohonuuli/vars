@@ -10,6 +10,7 @@ import org.mbari.vars.integration.MergeEXPDAnnotations
 import vars.integration.MergeFunction
 import org.mbari.expd.UberDatum
 import vars.RawSQLQueryFunction
+import vars.integration.MergeType
 
 class DatabaseUtility {
 
@@ -57,7 +58,7 @@ class DatabaseUtility {
                     cache.clear()
                 }
                 catch (Exception e) {
-                    log.error("An error occurred while trying to merge VideoArchivSet with id = ${id}", e)
+                    log.error("An error occurred while trying to merge VideoArchiveSet with id = ${id}", e)
                 }
             }
         }
@@ -89,7 +90,7 @@ class DatabaseUtility {
                 def action = new MergeEXPDAnnotations(platform, 0, false)
                 action.mergeStatus.statusMessage = action.mergeStatus.statusMessage + ";" + s
                 try {
-                    action.update(new HashMap<VideoFrame, UberDatum>(), MergeFunction.MergeType.PRAGMATIC)
+                    action.update(new HashMap<VideoFrame, UberDatum>(), MergeType.PRAGMATIC)
                 }
                 catch (Exception e) {
                     log.debug("Failed to update EXPDMergeStatus for ${id}", e)
@@ -102,7 +103,7 @@ class DatabaseUtility {
                 def action = new MergeEXPDAnnotations(platform, cds.iterator().next().sequenceNumber, false)
                 action.mergeStatus.statusMessage = action.mergeStatus.statusMessage + ";" + s
                 try {
-                    action.update(new HashMap<VideoFrame, UberDatum>(), MergeFunction.MergeType.PRAGMATIC)
+                    action.update(new HashMap<VideoFrame, UberDatum>(), MergeType.PRAGMATIC)
                 }
                 catch (Exception e) {
                     log.debug("Failed to update EXPDMergeStatus for ${id}", e)
@@ -112,9 +113,10 @@ class DatabaseUtility {
                 def seqNumber = cds.iterator().next().sequenceNumber
                 // Merge both both SD and HD tapes
                 for (isHD in [false, true]) {
+                    log.debug("Merging ${platform} #${seqNumber} [isHD = ${isHD}]")
                     def action = new MergeEXPDAnnotations(platform, seqNumber, isHD)
                     try {
-                        action.apply(MergeFunction.MergeType.PRAGMATIC)
+                        action.apply(MergeType.PRAGMATIC)
                     }
                     catch (Exception e) {
                         log.debug("Failed to merge ${platform} #${seqNumber}. It's " +

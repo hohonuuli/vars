@@ -24,6 +24,9 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.prefs.Preferences;
 import java.util.prefs.PreferencesFactory;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import vars.VARSException;
 import vars.shared.ui.GlobalLookup;
 
@@ -44,7 +47,8 @@ public class PreferencesService {
     private URL defaultImageTargetMapping;
     private final PreferencesFactory preferencesFactory;
     /** The name of the computer */
-    private final String hostname;
+    private String hostname;
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     /**
      * Constructs ...
@@ -63,8 +67,9 @@ public class PreferencesService {
             hostname = InetAddress.getLocalHost().getHostName();
         }
         catch (UnknownHostException ex) {
-            // This should never get thrown... ;-)
-            throw new VARSException("Unable to get hostname", ex);
+            hostname = "localhost";
+            log.warn("Unable to get hostname", ex);
+            //throw new VARSException("Unable to get hostname", ex);
         }
 
         try {

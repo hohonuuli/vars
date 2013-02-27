@@ -77,6 +77,10 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
      * @return
      */
     public Map<VideoFrame, UberDatum> apply(MergeType mergeType) {
+        if (log.isDebugEnabled()) {
+            log.debug("Applying " + mergeType + " merge to " + platform + " #" + sequenceNumber +
+                    " [use HD = " + useHD + "]");
+        }
         fetch();
 
         Map<VideoFrame, UberDatum> data = coallate(mergeType);

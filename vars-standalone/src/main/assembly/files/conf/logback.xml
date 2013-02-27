@@ -13,11 +13,12 @@
 
     <logger name="org.mbari.vcr" level="ERROR" />
     <logger name="vars.jpa" level="ERROR" />
+    <logger name="vars.annotation.DatabaseUtility" level="DEBUG" />
+    <logger name="org.mbari.vars.integration.MergeEXPDAnnotations" level="WARN" />
 
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
     </root>
 
 </configuration>
-
 
