@@ -47,7 +47,7 @@
             <property name="eclipselink.cache.type.default" value="Weak" />
             <!-- property name="eclipselink.cache.type.default" value="NONE" / -->
             <!-- property name="eclipselink.cache.shared.default" value="false"/ -->
-            <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
+            <!-- shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode -->
             <property name="eclipselink.logging.level" value="CONFIG"/>
             <property name="eclipselink.weaving" value="static" />
             <!-- <property name="eclipselink.jdbc.bind-parameters" value="false"/> -->

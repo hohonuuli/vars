@@ -39,7 +39,7 @@ import vars.jpa.TransactionLogger;
 
 @Entity(name = "VideoFrame")
 @Table(name = "VideoFrame")
-@Cacheable(true)
+// @Cacheable(true)
 @EntityListeners({ TransactionLogger.class, KeyNullifier.class })
 @NamedQueries({ @NamedQuery(name = "VideoFrame.findById", query = "SELECT v FROM VideoFrame v WHERE v.id = :id") ,
                 @NamedQuery(name = "VideoFrame.findByName",

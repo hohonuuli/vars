@@ -31,7 +31,7 @@ import vars.jpa.TransactionLogger;
 
 @Entity(name = "VideoArchive")
 @Table(name = "VideoArchive", uniqueConstraints = {@UniqueConstraint(columnNames = {"VideoArchiveName"})})
-@Cacheable(true)
+// @Cacheable(true)
 @EntityListeners( {TransactionLogger.class, KeyNullifier.class} )
 @NamedQueries( {
         @NamedQuery(name = "VideoArchive.findById",

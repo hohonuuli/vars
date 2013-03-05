@@ -51,7 +51,7 @@ import vars.jpa.TransactionLogger;
 
 @Entity(name = "VideoArchiveSet")
 @Table(name = "VideoArchiveSet")
-@Cacheable
+// @Cacheable
 @EntityListeners( {TransactionLogger.class, KeyNullifier.class} )
 @NamedQueries( {
     @NamedQuery(name = "VideoArchiveSet.findById",
