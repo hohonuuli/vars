@@ -21,6 +21,23 @@ import java.util.Date;
 /**
  * This record represents a successful merge of a VideoArchiveSet with the corresponding data in
  * from an expedition database (position, ctd, etc.)
+ * <pre>
+ *     CREATE TABLE [dbo].[EXPDMergeHistory]  (
+ *	[VideoArchiveSetID_FK]	bigint NOT NULL,
+ 	[MergeDate]           	datetime NOT NULL,
+ 	[IsNavigationEdited]  	smallint NOT NULL,
+ 	[StatusMessage]       	varchar(512) NULL,
+ 	[VideoFrameCount]     	int NOT NULL,
+ 	[DateSource]          	varchar(4) NULL,
+ 	[id]                  	bigint IDENTITY(1,1) NOT NULL,
+ 	[MergeType]           	varchar(25) NOT NULL,
+ 	[IsHD]                	smallint NULL,
+ 	CONSTRAINT [EXPDMergeHistory_PK] PRIMARY KEY NONCLUSTERED([id])
+ )
+ ON [PRIMARY]
+ GO
+ *
+ * </pre>
  * @author Brian Schlining
  * @since 2013-03-06
  */
