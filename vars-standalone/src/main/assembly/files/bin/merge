@@ -2,4 +2,4 @@
 # $Id: $
 
 echo [VARS] Executing VARS merge with EXPD
-`dirname "$0"`/gsh -e "(new vars.annotation.DatabaseUtility()).merge()"
+`dirname "$0"`/gsh -e "(new vars.annotation.DatabaseUtility2()).merge()"

@@ -39,6 +39,7 @@ import java.util.Set;
  *
  * @author Brian Schlining
  * @since 2012-07-31
+ * @deprecated Not used. Get rid of this class
  */
 public class LocalVideoArchiveCache implements UIEventSubscriber {
 

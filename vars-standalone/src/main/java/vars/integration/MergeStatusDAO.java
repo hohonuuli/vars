@@ -26,10 +26,12 @@ import java.util.List;
  */
 public interface MergeStatusDAO {
 
+    List<MergeStatus> findAll();
+
     /**
-         *
-         * @param id
-         */
+     *
+     * @param id
+     */
     MergeStatus find(Long id);
 
     MergeStatus findByPlatformAndSequenceNumber(String platform, Number sequenceNumber);
