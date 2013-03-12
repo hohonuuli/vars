@@ -45,7 +45,7 @@ SELECT TOP 100 PERCENT
     ass.ToConcept,
     ass.LinkValue,
     ass.LinkName + ' | ' + ass.ToConcept + ' | ' + ass.LinkValue AS Associations,
-    vf.HDTimeCode AS HighdefTimeCode,
+    vf.HDTimeCode AS AlternateTimecode,
     expd.IsNavigationEdited,
     vf.id AS VideoFrameID_FK,
     pd.id AS PhysicalDataID_FK,

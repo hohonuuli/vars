@@ -4,12 +4,11 @@
  * @author Brian Schlining
  * @since 2012-01-20
  */
-
+import vars.integration.MergeType
 import vars.shared.ui.GlobalLookup
 import vars.annotation.VideoArchiveSetDAO
-import org.mbari.vars.integration.MergeEXPDAnnotations
+import org.mbari.vars.integration.MergeEXPDAnnotations2
 import org.slf4j.LoggerFactory
-import vars.integration.MergeFunction
 
 def df = GlobalLookup.DATE_FORMAT_UTC
 def log = LoggerFactory.getLogger("bugfix461")
@@ -28,8 +27,8 @@ needsRemerge.each { videoArchiveSet ->
         def sequenceNumber = videoArchiveSet?.cameraDeployments?.iterator()?.next()?.sequenceNumber
         if (platform && sequenceNumber) {
             def isHD = videoArchives.findAll { it.name.endsWith('HD') } isEmpty()
-            def fn = new MergeEXPDAnnotations(platform, sequenceNumber, isHD)
-            fn.apply(MergeFunction.MergeType.PESSIMISTIC)
+            def fn = new MergeEXPDAnnotations2(platform, sequenceNumber, isHD)
+            fn.apply(MergeType.PESSIMISTIC)
         }
     }
     catch (Exception e) {
