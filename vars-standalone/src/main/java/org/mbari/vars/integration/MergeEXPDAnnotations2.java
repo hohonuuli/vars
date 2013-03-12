@@ -382,7 +382,12 @@ public class MergeEXPDAnnotations2 implements MergeFunction<Map<VideoFrame, Uber
 
                 cameraData.setFocus((cameraDatum.getFocus() == null) ? null : Math.round(cameraDatum.getFocus()));
                 cameraData.setLogDate(cameraDatum.getDate());
-                videoFrame.setAlternateTimecode(cameraDatum.getAlternativeTimecode());
+                if (useHD) {
+                    videoFrame.setAlternateTimecode(cameraDatum.getTimecode());
+                }
+                else {
+                    videoFrame.setAlternateTimecode(cameraDatum.getAlternativeTimecode());
+                }
                 cameraData.setZoom((cameraDatum.getZoom() == null) ? null : Math.round(cameraDatum.getZoom()));
                 cameraData.setIris((cameraDatum.getIris() == null) ? null : Math.round(cameraDatum.getIris()));
             }
