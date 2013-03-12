@@ -250,7 +250,7 @@ class DatabaseUtility2 {
         MergeHistoryDAO mergeHistoryDAO = toolBox.mergeHistoryDAO
         // TODO next line returns a list
         def mergeHistories = mergeHistoryDAO.findByPlatformAndSequenceNumber(platform, seqNumber, true)
-        mergeHistories << mergeHistoryDAO.findByPlatformAndSequenceNumber(platform, seqNumber, false)
+        mergeHistories.addAll(mergeHistoryDAO.findByPlatformAndSequenceNumber(platform, seqNumber, false))
         mergeHistories.sort {it.mergeDate}
         def dao = toolBox.toolBelt.annotationDAOFactory.newVideoArchiveSetDAO()
 
@@ -261,24 +261,25 @@ class DatabaseUtility2 {
         println "==== Status of Data Merge with EXPD ===="
 
         // Show merge information
-        if (mergeHistory) {
+        if (mergeHistories) {
 
             for (mergeHistory in mergeHistories) {
                 def tapeType = mergeHistory.hd ? "High-Definition" : "Standard-Definition"
+                println "-----------------------------------------------------------------"
                 println " Merged On:          ${dateFormat.format(mergeHistory.mergeDate)}"
                 println " Merge Type:         ${mergeHistory.mergeType}"
                 def navSrc = mergeHistory.navigationEdited ? "edited" : "raw"
                 println "                     Merged using ${navSrc} navigation data"
                 println "                     Recorded Dates are from '${mergeHistory.dateSource}' database(s)"
+                println "                     Tapes are ${tapeType}"
                 println " Video-frame count:  ${mergeHistory.videoFrameCount}"
-                println " Status Message:     ${mergeHistory.statusMessage}"
-                println " Tape Type:          ${tapeType}"
+                println " Status Message:     ${mergeHistory.statusMessage}\n"
             }
 
             // Show VideoArchiveSet information
 
             dao.startTransaction()
-            def vas = dao.findByPrimaryKey(mergeHistory[0].videoArchiveSetID)
+            def vas = dao.findByPrimaryKey(mergeHistories[0].videoArchiveSetID)
             def cpds = vas.cameraDeployments
             println ""
             println "==== Details About this VideoArchiveSet ===="

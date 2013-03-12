@@ -147,7 +147,7 @@ public class MergeStatusDAOImpl extends QueryableImpl implements MergeStatusDAO 
     public List<MergeStatus> findAll() {
         String sql = "SELECT ms.VideoArchiveSetID_FK, ms.MergeDate, ms.IsNavigationEdited, ms.StatusMessage, " +
                 "ms.VideoFrameCount, ms.IsMerged, ms.DateSource FROM " +
-                "EXPDMergeStatus";
+                "EXPDMergeStatus AS ms";
 
         QueryFunction<List<MergeStatus>> queryFunction = new QueryFunction<List<MergeStatus>>() {
             List<MergeStatus> results = new ArrayList<>();
@@ -162,6 +162,7 @@ public class MergeStatusDAOImpl extends QueryableImpl implements MergeStatusDAO 
                     mergeStatus.setVideoFrameCount(Long.valueOf(resultSet.getInt(5)));
                     mergeStatus.setMerged(resultSet.getInt(6));
                     mergeStatus.setDateSource(resultSet.getString(7));
+                    results.add(mergeStatus);
                 }
                 return results;
             }

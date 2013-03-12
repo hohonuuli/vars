@@ -14,7 +14,7 @@ def toolbox = new vars.ToolBox()
 def mergeStatusDAO = toolbox.mergeStatusDAO
 def mergeHistoryDAO = toolbox.mergeHistoryDAO
 VideoArchiveSetDAO videoArchiveSetDAO = toolbox.toolBelt.annotationDAOFactory.newVideoArchiveSetDAO()
-def cache = toolbox.toolBelt.persistenceCacheProvider
+def cache = toolbox.toolBelt.persistenceCache
 
 def mergeStatuses = mergeStatusDAO.findAll();
 for (status in mergeStatuses) {

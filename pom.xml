@@ -22,7 +22,7 @@
         <eventbus.version>1.4</eventbus.version>
         <expd.version>1.2.0-SNAPSHOT</expd.version>
         <foxtrot.version>4.0</foxtrot.version>
-        <groovy.version>2.0.6</groovy.version>
+        <groovy.version>2.1.1</groovy.version>
         <guava.version>13.0.1</guava.version>
         <guice.version>3.0</guice.version>
         <jama.version>1.0.2</jama.version>

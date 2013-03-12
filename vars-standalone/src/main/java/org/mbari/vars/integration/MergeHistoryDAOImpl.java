@@ -59,7 +59,7 @@ public class MergeHistoryDAOImpl extends QueryableImpl implements MergeHistoryDA
             while (resultSet.next()) {
                 Long id = resultSet.getLong(1);
                 Long videoArchiveSetId = resultSet.getLong(2);
-                Date mergeDate = resultSet.getDate(3, CALENDAR);
+                Date mergeDate = resultSet.getTimestamp(3, CALENDAR);
                 String mergeType = resultSet.getString(4);
                 Boolean navigationEdited = (resultSet.getInt(5) == 0) ? false : true;
                 String statusMessage = resultSet.getString(6);
