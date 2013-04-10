@@ -71,6 +71,7 @@ public class AddObservationToVideoFrameCmd implements Command {
         }
 
         videoFrameDAO.endTransaction();
+        videoFrameDAO.getEntityManager().clear();
         videoFrameDAO.close();
         if (newObservation != null) {
             newPrimaryKey = newObservation.getPrimaryKey();

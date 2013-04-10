@@ -44,6 +44,7 @@ import java.util.*;
 /**
  * Implementation of the merge function
  * @author brian
+ * @deprecated Use MergeEXPDAnnotations instead. It updates the EXPDMergeHistory table
  */
 public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberDatum>> {
 

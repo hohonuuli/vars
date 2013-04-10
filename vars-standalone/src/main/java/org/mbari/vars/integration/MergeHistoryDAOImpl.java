@@ -236,6 +236,7 @@ public class MergeHistoryDAOImpl extends QueryableImpl implements MergeHistoryDA
                 mergedWithRawNav.add(history.getVideoArchiveSetID());
             }
         }
+        log.debug("Found " + mergedWithRawNav.size() + " MergeHistories that used raw navigation");
 
         List<Long> good = new ArrayList<Long>();
         VideoArchiveSetDAO dao = annotationDAOFactory.newVideoArchiveSetDAO();

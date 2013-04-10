@@ -46,7 +46,7 @@ import vars.jpa.TransactionLogger;
 
 @Entity(name = "CameraData")
 @Table(name = "CameraData")
-// @Cacheable(true)
+@Cacheable(false)
 @EntityListeners({ TransactionLogger.class, KeyNullifier.class })
 @NamedQueries( {
 

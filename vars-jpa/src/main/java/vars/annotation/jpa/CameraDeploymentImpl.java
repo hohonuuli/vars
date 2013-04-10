@@ -17,6 +17,7 @@ package vars.annotation.jpa;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Date;
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -47,6 +48,7 @@ import vars.jpa.TransactionLogger;
  */
 @Entity(name = "CameraDeployment")
 @Table(name = "CameraPlatformDeployment")
+@Cacheable(false)
 @EntityListeners({ TransactionLogger.class, KeyNullifier.class })
 @NamedQueries( {
 

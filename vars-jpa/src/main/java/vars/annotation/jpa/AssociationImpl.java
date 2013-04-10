@@ -48,7 +48,7 @@ import vars.jpa.TransactionLogger;
  */
 @Entity(name = "Association")
 @Table(name = "Association")
-// @Cacheable(false)
+@Cacheable(false)
 @EntityListeners({ TransactionLogger.class, KeyNullifier.class })
 @NamedQueries( {
 

@@ -1,7 +1,6 @@
 import java.text.SimpleDateFormat
 import org.mbari.smith.Camera
 import org.mbari.smith.CoverageEstimator
-import org.mbari.vars.AreaMeasurementProcessor
 import scala.Option
 
 /**
@@ -35,7 +34,6 @@ def alpha = Math.toRadians(Double.parseDouble(args[1]))
 def beta = Math.toRadians(Double.parseDouble(args[2]))
 def theta = Math.toRadians(Double.parseDouble(args[3]))
 def videoArchiveName = args[4]
-//def outputFile = new File(args[5])
 
 def dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss'Z'")
 def camera = new Camera(cameraHeight, alpha, beta, theta, Option.apply("cm"))

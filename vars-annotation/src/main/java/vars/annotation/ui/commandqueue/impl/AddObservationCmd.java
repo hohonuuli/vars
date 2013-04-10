@@ -155,6 +155,7 @@ public class AddObservationCmd implements Command {
 
         }
         videoArchiveDAO.endTransaction();
+        videoArchiveDAO.getEntityManager().clear();
         videoArchiveDAO.close();
         log.debug(elapsedTime(tic) + "s :End Transaction");
         tic = System.nanoTime();
