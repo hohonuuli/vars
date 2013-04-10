@@ -12,9 +12,8 @@ adapter such as the USB PDA/Serial Adapter (GUC232A) from IOGEAR. Be sure to
 install the correct driver too! Some video capture cards include an RS422 serial
 port that can be used by VARS.
 
-NOTE: The serial port libraries included with VARS  work on Snow Leopard (Mac
-OS X 10.6). If you need to run on Leopard you should contact Brian Schlining
-at brian AT mbari DOT org
+NOTE: The serial port libraries included with VARS have been tested on 10.7 
+(Lion) and 10.8 (Mountain Lion)
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

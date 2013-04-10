@@ -1,4 +1,4 @@
-Video Annotation and Reference System (VARS) version 6.0
+Video Annotation and Reference System (VARS) version 7.x
 
 http://vars.sourceforge.net
 
@@ -13,10 +13,10 @@ archives.
 
 VARS is a suite of applications that communicate with a relational database 
 mangement system. VARS comes with a database system (Apache Derby) that is 
-suitable for testing, development, and small deployment applications. For production 
-systems, it is recommended that you set up a database server. VARS has been 
-tested on Apache Derby, MS SQL Server 2000 and MS SQL Server 2008 but should 
-also run on most relational databases.
+suitable for testing, development, and small deployment applications. For 
+production systems, it is recommended that you set up a database server. VARS 
+has been tested on Apache Derby, MySQL, PostgreSQL, Oracle, MS SQL Server 2000 
+and MS SQL Server 2008 but should also run on most relational databases.
 
 Developed and Maintained by the Monterey Bay Aquarium research institute 
 (MBARI), VARS is aimed at the oceanographic community. However, it can be used 
@@ -27,9 +27,9 @@ help expand the VARS community.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~  About this release?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-VARS 6.0 is not backwards compatibly with previous VARS databases (i.e. 5.1.0 or
-earlier). If you have significant data from a previous VARS installation, it is
-possbible to migrate the older database to work with VARS 6.0. Contact 
+VARS 7.x is backwards compatibly with previous VARS databases (i.e. 6.0 or
+later). If you have significant data from a previous VARS installation, it is
+possbible to migrate the older database to work with VARS 7.x. Contact 
 http://groups.google.com/group/mbari-vars for assistance.
 
 
@@ -197,8 +197,8 @@ email. It's very easy to modify VARS to store additional information.
 VARS comes with Apache Derby as a database server. Derby is very useful for 
 small deployments or for testing VARS. However, it is likely that if you are
 seriously considering running VARS, you will want to use your own database 
-server. Instructions for setting VARS up using Microsoft SQL Server and Oracle 
-XE can be found in README.SQLSERVER and README.ORACLE
+server. Contact http://groups.google.com/group/mbari-vars for instructions for 
+setting VARS up other databases.
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

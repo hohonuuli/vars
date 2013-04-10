@@ -4,7 +4,7 @@
     <groupId>vars-redux</groupId>
     <artifactId>vars-redux</artifactId>
     <packaging>pom</packaging>
-    <version>7.0.3-SNAPSHOT</version>
+    <version>7.0.4</version>
     <name>vars-redux</name>
     <inceptionYear>2002</inceptionYear>
     <organization>
@@ -20,7 +20,7 @@
         <derby.version>10.9.1.0</derby.version>
         <eclipselink.version>2.4.1</eclipselink.version>
         <eventbus.version>1.4</eventbus.version>
-        <expd.version>1.2.0-SNAPSHOT</expd.version>
+        <expd.version>1.2.1</expd.version>
         <foxtrot.version>4.0</foxtrot.version>
         <groovy.version>2.1.1</groovy.version>
         <guava.version>13.0.1</guava.version>
@@ -36,17 +36,17 @@
         <junit.version>4.11</junit.version>
         <jxlayer.version>3.0.4.1</jxlayer.version> <!-- This version has SHA signatures stripped out -->
         <logback.version>1.0.9</logback.version>
-        <mbarix4j.version>1.9.1-SNAPSHOT</mbarix4j.version>
+        <mbarix4j.version>1.9.2</mbarix4j.version>
         <mdateselector.version>0.347</mdateselector.version>
         <postgresql.version>9.0-801.jdbc4</postgresql.version>
-        <qtx4j.version>0.16-SNAPSHOT</qtx4j.version>
+        <qtx4j.version>0.18</qtx4j.version>
         <sanselan.version>0.97</sanselan.version>
         <scala.version>2.10.0</scala.version>
         <slf4j.version>1.7.2</slf4j.version>
         <swingx.version>1.6.1</swingx.version>
         <swing.layout.version>1.0.3</swing.layout.version>
         <tagsoup.version>1.2.1</tagsoup.version>
-        <vcr4j.version>1.7.1-SNAPSHOT</vcr4j.version>
+        <vcr4j.version>1.7.4</vcr4j.version>
 
     </properties>
     <modules>
