@@ -16,10 +16,13 @@
 package vars.shared.ui.event;
 
 import java.awt.Frame;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+
+import com.google.common.collect.Lists;
 import org.bushe.swing.event.EventTopicSubscriber;
 import org.jdesktop.swingx.JXErrorPane;
 import org.jdesktop.swingx.error.ErrorInfo;
@@ -44,8 +47,8 @@ public class FatalExceptionSubscriber implements EventTopicSubscriber<Exception>
     }
 
     /**
- * Defines a custom format for the stack trace as String.
- */
+     * Defines a custom format for the stack trace as String.
+     */
     String formatStackTraceForDialogs(Throwable throwable, boolean isCause) {
 
         //add the class name and any message passed to constructor
@@ -90,7 +93,7 @@ public class FatalExceptionSubscriber implements EventTopicSubscriber<Exception>
          * Create an error pane to display the error stuff
          */
         JXErrorPane errorPane = new JXErrorPane();
-        Icon errorIcon = new ImageIcon(getClass().getResource("/vars/images/red-frown_small.png"));
+        Icon errorIcon = randomImage();
         ErrorInfo errorInfo = new ErrorInfo("VARS - Fatal Error", msg, details, null, data, ErrorLevel.FATAL, null);
 
         errorPane.setIcon(errorIcon);
@@ -127,4 +130,27 @@ public class FatalExceptionSubscriber implements EventTopicSubscriber<Exception>
         return haikus.get((int) Math.floor(Math.random() * haikus.size()));
 
     }
+
+    ImageIcon randomImage() {
+        final List<String> images = new ArrayList<String>() {
+            {
+                add("/vars/images/red-frown_small.png");
+                add("/vars/images/fatal/202.jpg");
+                add("/vars/images/fatal/2010-01-04-null-pointer-exception.png");
+                add("/vars/images/fatal/1204185247268.jpg");
+                add("/vars/images/fatal/catchAllTheErrors-615x461.png");
+                add("/vars/images/fatal/epic-fail4.jpg");
+                add("/vars/images/fatal/error_cartoon.gif");
+                add("/vars/images/fatal/fatal-error-cartoon.jpg");
+                add("/vars/images/fatal/Flag_of_Edward_England.svg.png");
+                add("/vars/images/fatal/Funny-Animals-EPIC-FAIL-Indeed.jpg");
+                add("/vars/images/fatal/its_okay_i_wrote_an_exception.jpg");
+            }
+
+        };
+        String image = images.get((int) Math.floor(Math.random() * images.size()));
+        return new ImageIcon(getClass().getResource(image));
+    }
+
+
 }

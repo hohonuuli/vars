@@ -16,6 +16,8 @@
 package vars.shared.ui.event;
 
 import java.awt.Frame;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import org.bushe.swing.event.EventTopicSubscriber;
@@ -98,8 +100,8 @@ public class NonFatalErrorSubscriber implements EventTopicSubscriber {
          * Create an error pane to display the error stuff
          */
         JXErrorPane errorPane = new JXErrorPane();
-        Icon errorIcon = new ImageIcon(getClass().getResource("/vars/images/yellow-smile.jpg"));
-        ErrorInfo errorInfo = new ErrorInfo("VARS - Something exceptional occured (and we don't like that)", msg,
+        Icon errorIcon = randomImage();
+        ErrorInfo errorInfo = new ErrorInfo("VARS - Something exceptional occurred (and we don't like that)", msg,
             details, null, data, ErrorLevel.WARNING, null);
 
         errorPane.setIcon(errorIcon);
@@ -107,6 +109,31 @@ public class NonFatalErrorSubscriber implements EventTopicSubscriber {
         errorPane.setErrorReporter(new EmailErrorReporter(errorPane));
         JXErrorPane.showDialog(parentFrame, errorPane);
     }
+
+    ImageIcon randomImage() {
+            final List<String> images = new ArrayList<String>() {
+                {
+                    add("/vars/images/yellow-smile.jpg");
+                    add("/vars/images/warning/60_Whoops.jpg");
+                    add("/vars/images/warning/cartoonprogramming_thumb.jpg");
+                    add("/vars/images/warning/epic-fail1.jpg");
+                    add("/vars/images/warning/Frown.jpg");
+                    add("/vars/images/warning/funny-yoga-3.jpg");
+                    add("/vars/images/warning/Icon_download_bp_223x223.png");
+                    add("/vars/images/warning/images.jpeg");
+                    add("/vars/images/warning/jack-ziegler-computer-error-new-yorker-cartoon.jpg");
+                    add("/vars/images/warning/medium_whoops.jpg");
+                    add("/vars/images/warning/tumblr_ls2kwbtKLS1r07233.jpg");
+                    add("/vars/images/warning/Whoops-Not-a-firefly.jpg");
+                    add("/vars/images/warning/whoops-too-many-cookies.jpg");
+                    add("/vars/images/warning/Whoops.jpg");
+                    add("/vars/images/warning/yell-back.jpg");
+                }
+
+            };
+            String image = images.get((int) Math.floor(Math.random() * images.size()));
+            return new ImageIcon(getClass().getResource(image));
+        }
 }
 
 
