@@ -138,6 +138,7 @@ public class FatalExceptionSubscriber implements EventTopicSubscriber<Exception>
                 add("/vars/images/fatal/202.jpg");
                 add("/vars/images/fatal/2010-01-04-null-pointer-exception.png");
                 add("/vars/images/fatal/1204185247268.jpg");
+                add("/vars/images/fatal/bug.png");
                 add("/vars/images/fatal/catchAllTheErrors-615x461.png");
                 add("/vars/images/fatal/epic-fail4.jpg");
                 add("/vars/images/fatal/error_cartoon.gif");
@@ -145,6 +146,7 @@ public class FatalExceptionSubscriber implements EventTopicSubscriber<Exception>
                 add("/vars/images/fatal/Flag_of_Edward_England.svg.png");
                 add("/vars/images/fatal/Funny-Animals-EPIC-FAIL-Indeed.jpg");
                 add("/vars/images/fatal/its_okay_i_wrote_an_exception.jpg");
+                add("/vars/images/fatal/xkcd2.png");
             }
 
         };

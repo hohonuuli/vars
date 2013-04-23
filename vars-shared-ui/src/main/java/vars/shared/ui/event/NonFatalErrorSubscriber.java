@@ -123,10 +123,13 @@ public class NonFatalErrorSubscriber implements EventTopicSubscriber {
                     add("/vars/images/warning/images.jpeg");
                     add("/vars/images/warning/jack-ziegler-computer-error-new-yorker-cartoon.jpg");
                     add("/vars/images/warning/medium_whoops.jpg");
+                    add("/vars/images/warning/mistake-cartoon.gif");
                     add("/vars/images/warning/tumblr_ls2kwbtKLS1r07233.jpg");
                     add("/vars/images/warning/Whoops-Not-a-firefly.jpg");
                     add("/vars/images/warning/whoops-too-many-cookies.jpg");
                     add("/vars/images/warning/Whoops.jpg");
+                    add("/vars/images/warning/xkcd_mimic_octopus.png");
+                    add("/vars/images/warning/xkcd-free-will.png");
                     add("/vars/images/warning/yell-back.jpg");
                 }
 
