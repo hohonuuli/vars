@@ -52,6 +52,7 @@ do
 done
 
 SCALA_LIBRARY=$(ls $APP_HOME/lib/scala-library*.jar)
+SCALA_REFLECT=$(ls $APP_HOME/lib/scala-repl/scala-reflect*.jar)
 SCALA_COMPILER=$(ls $APP_HOME/lib/scala-repl/scala-compiler*.jar)
 SCALAP=$(ls $APP_HOME/lib/scala-repl/scalap*.jar)
 SCALA_JLINE=$(ls $APP_HOME/lib/scala-repl/jline*.jar)
@@ -63,7 +64,7 @@ SCALA_JLINE=$(ls $APP_HOME/lib/scala-repl/jline*.jar)
 ${JAVACMD:=java} -Xms16m -Xmx512m \
      -Duser.timezone="UTC" \
      -Dfile.encoding=UTF8 \
-     -Xbootclasspath/a:$SCALA_COMPILER:$SCALA_LIBRARY:$SCALAP:$SCALA_JLINE \
+     -Xbootclasspath/a:$SCALA_COMPILER:$SCALA_LIBRARY:$SCALA_REFLECT:$SCALAP:$SCALA_JLINE \
      scala.tools.nsc.MainGenericRunner -cp $APP_CLASSPATH  "$@"
 
 

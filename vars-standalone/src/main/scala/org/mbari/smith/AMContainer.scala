@@ -7,6 +7,7 @@ import java.awt.Polygon
 import java.lang.{Double => JDouble}
 import vars.ILink
 import org.mbari.geometry.Point2D
+import scala.math._
 
 /**
  *
@@ -94,6 +95,7 @@ case class BasicPoint[T <: ILink, P <: Number](link: Option[T],
 }
 
 object RawPoint {
+
   def centerOfMass[T <: ILink](link: T, cameraView: HasCameraView): Option[AMPoint[T, JDouble]] =
     AMContainer(link).map { c =>
       val point = {
@@ -105,13 +107,35 @@ object RawPoint {
       BasicPoint(Option(link), c.areaMeasurement, point, cameraView)
     }
 
-  def fathestPoint[T <: ILink](link: T, cameraView: HasCameraView): Option[AMPoint[T, JDouble]] = {
+
+  def farthestPoint[T <: ILink](link: T, cameraView: HasCameraView): Option[AMPoint[T, JDouble]] = {
     val a = AMContainer(link).map { c =>
       val pixels = toPixels(c.areaMeasurement, cameraView)
-      val distances = pixels.map(p => math.sqrt(p.xDistance * p.xDistance + p.yDistance + p.yDistance))
+      val distances = pixels.map(p => sqrt(p.xDistance * p.xDistance + p.yDistance + p.yDistance))
       val max = distances.max
       val farthestPixel = pixels.find { p =>
-        val d = math.sqrt(p.xDistance * p.xDistance + p.yDistance + p.yDistance)
+        val d = sqrt(p.xDistance * p.xDistance + p.yDistance + p.yDistance)
+        d == max
+      }
+
+      farthestPixel map { p =>
+        BasicPoint(Option(link),
+          c.areaMeasurement,
+          new Point2D[JDouble](p.xDistance, p.yDistance),
+          cameraView)
+      }
+    }
+    a.getOrElse(None)
+  }
+
+  def farthestPointFrom[T <: ILink](link: T, cameraView: HasCameraView, origin: Pixel): Option[AMPoint[T, JDouble]] = {
+    val a = AMContainer(link).map { c =>
+      val pixels = toPixels(c.areaMeasurement, cameraView)
+      val distances = pixels.map(p => sqrt(pow(p.xDistance - origin.xDistance, 2) +
+          pow(p.yDistance - origin.yDistance, 2)))
+      val max = distances.max
+      val farthestPixel = pixels.find { p =>
+        val d = sqrt(pow(p.xDistance - origin.xDistance, 2) + pow(p.yDistance - origin.yDistance, 2))
         d == max
       }
 
