@@ -83,7 +83,7 @@ object PointsApp {
 
   def write(points: Iterable[(AMPoint[Association, JDouble], AMPoint[Association, JDouble], AMPoint[Association, JDouble])], file: File) {
     val writer = new BufferedWriter(new FileWriter(file))
-    writer.write("VideoArchiveName\tTimecode\tRecordedDate\tConceptName\tLatitude\tLongitude\tDepth\tXOffsetCenterToCamera\tYOffsetCenterToCamera\tXOffsetCenterToImageBC\tYOffsetCenterToImageBC\tXOffsetFarthestToImageBC\tYOffsetFarthestToImageBC\tComment\tAssociation\n")
+    writer.write("VideoArchiveName\tTimecode\tRecordedDate\tConceptName\tLatitude\tLongitude\tDepth\tXOffsetCenterToCamera\tYOffsetCenterToCamera\tXOffsetCenterToImageBC\tYOffsetCenterToImageBC\tXOffsetFarthestToImageBC\tYOffsetFarthestToImageBC\tComment\tAssociation\tImage\n")
     for (p <- points) {
       require((p._1.link == p._2.link) && (p._2.link == p._3.link))
       val obs = p._1.link.get.getObservation
@@ -91,6 +91,7 @@ object PointsApp {
       val va = vf.getVideoArchive
 
       val d = if (vf.getRecordedDate == null) "" else dateFormat.format(vf.getRecordedDate)
+      val img = if (vf.getCameraData == null) "" else vf.getCameraData.getImageReference
 
 
       val (lat, lon, depth) = Option(vf.getPhysicalData) match {
@@ -98,7 +99,7 @@ object PointsApp {
         case Some(p) => (p.getLatitude, p.getLongitude, p.getDepth)
       }
 
-      val line = s"${va.getName}\t${vf.getTimecode}\t$d\t${obs.getConceptName}\t$lat\t$lon\t$depth\t${p._1.point.getX}\t${p._1.point.getY}\t${p._2.point.getX}\t${p._2.point.getY}\t${p._3.point.getX}\t${p._3.point.getY}\t${p._1.areaMeasurement.getComment}\t${p._1.link.getOrElse("")}\n"
+      val line = s"${va.getName}\t${vf.getTimecode}\t$d\t${obs.getConceptName}\t$lat\t$lon\t$depth\t${p._1.point.getX}\t${p._1.point.getY}\t${p._2.point.getX}\t${p._2.point.getY}\t${p._3.point.getX}\t${p._3.point.getY}\t${p._1.areaMeasurement.getComment}\t${p._1.link.getOrElse("")}\t${img}\n"
       writer.write(line)
     }
     writer.close()
