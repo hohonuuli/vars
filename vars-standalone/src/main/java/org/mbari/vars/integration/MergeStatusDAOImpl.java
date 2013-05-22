@@ -150,7 +150,7 @@ public class MergeStatusDAOImpl extends QueryableImpl implements MergeStatusDAO 
                 "EXPDMergeStatus AS ms";
 
         QueryFunction<List<MergeStatus>> queryFunction = new QueryFunction<List<MergeStatus>>() {
-            List<MergeStatus> results = new ArrayList<>();
+            List<MergeStatus> results = new ArrayList<MergeStatus>();
             @Override
             public List<MergeStatus> apply(ResultSet resultSet) throws SQLException {
                 while (resultSet.next()) {

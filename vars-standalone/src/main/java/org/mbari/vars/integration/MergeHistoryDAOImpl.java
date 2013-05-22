@@ -54,7 +54,7 @@ public class MergeHistoryDAOImpl extends QueryableImpl implements MergeHistoryDA
 
         public List<MergeHistory> apply(ResultSet resultSet) throws SQLException {
 
-            final List<MergeHistory> mergeHistories = new ArrayList<>();
+            final List<MergeHistory> mergeHistories = new ArrayList<MergeHistory>();
 
             while (resultSet.next()) {
                 Long id = resultSet.getLong(1);
@@ -100,7 +100,7 @@ public class MergeHistoryDAOImpl extends QueryableImpl implements MergeHistoryDA
     public final QueryFunction<List<Long>> ID_FUNCTION = new QueryFunction<List<Long>>() {
 
         public List<Long> apply(ResultSet resultSet) throws SQLException {
-            List<Long> ids = new ArrayList<>();
+            List<Long> ids = new ArrayList<Long>();
             while (resultSet.next()) {
                 ids.add(resultSet.getLong(1));
             }
@@ -150,7 +150,7 @@ public class MergeHistoryDAOImpl extends QueryableImpl implements MergeHistoryDA
             return executeQueryFunction(sql, QUERY_FUNCTION);
         }
         else {
-            return new ArrayList<>();
+            return new ArrayList<MergeHistory>();
         }
     }
 
@@ -172,7 +172,7 @@ public class MergeHistoryDAOImpl extends QueryableImpl implements MergeHistoryDA
 
         List<Long> ids = executeQueryFunction(sql, ID_FUNCTION);
 
-        List<MergeHistory> histories = new ArrayList<>(ids.size());
+        List<MergeHistory> histories = new ArrayList<MergeHistory>(ids.size());
         for (Long id : ids) {
             sql = SQL_SELECT_FROM + " WHERE ms.id = " + id;
             histories.addAll(executeQueryFunction(sql, QUERY_FUNCTION));
@@ -199,7 +199,7 @@ public class MergeHistoryDAOImpl extends QueryableImpl implements MergeHistoryDA
         List<Long> ids = executeQueryFunction(sql, ID_FUNCTION);
         Long id = (ids.size() > 0) ? ids.get(0) : null;
         if (id == null) {
-            return new ArrayList<>();
+            return new ArrayList<MergeHistory>();
         }
         else {
             return find(id, isHD);
@@ -230,7 +230,7 @@ public class MergeHistoryDAOImpl extends QueryableImpl implements MergeHistoryDA
         List<MergeHistory> allHistories = findAllMostRecent(true);
         allHistories.addAll(findAllMostRecent(false));
 
-        List<Long> mergedWithRawNav = new ArrayList<>();
+        List<Long> mergedWithRawNav = new ArrayList<Long>();
         for (MergeHistory history : allHistories) {
             if (!history.isNavigationEdited()) {
                 mergedWithRawNav.add(history.getVideoArchiveSetID());

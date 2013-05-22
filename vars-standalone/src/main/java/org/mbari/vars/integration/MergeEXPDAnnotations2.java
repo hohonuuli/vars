@@ -476,7 +476,7 @@ public class MergeEXPDAnnotations2 implements MergeFunction<Map<VideoFrame, Uber
 
         // ---- Change unmerged dates to null
         if (MergeType.PESSIMISTIC == mergeType) {
-            Collection<VideoFrame> unmerged = new ArrayList<>(videoFrames);
+            Collection<VideoFrame> unmerged = new ArrayList<VideoFrame>(videoFrames);
 
             unmerged.removeAll(data.keySet());
 
