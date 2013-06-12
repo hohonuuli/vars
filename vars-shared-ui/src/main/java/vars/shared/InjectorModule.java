@@ -19,6 +19,10 @@ import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.Provider;
 import com.google.inject.Scopes;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import org.mbari.util.SystemUtilities;
@@ -38,6 +42,8 @@ public class InjectorModule implements Module {
     private final String annotationPersistenceUnit;
     private final String knowledgebasePersistenceUnit;
     private final String miscPersistenceUnit;
+    private static ResourceBundle bundle;  // HACK! Must be static
+    private static final String fallbackImageCaptureService = "vars.shared.ui.video.FakeImageCaptureServiceImpl";
 
     /**
      * Constructs ...
@@ -45,6 +51,7 @@ public class InjectorModule implements Module {
      * @param bundle
      */
     public InjectorModule(ResourceBundle bundle) {
+        this.bundle = bundle;
         annotationPersistenceUnit = bundle.getString("annotation.persistence.unit");
         knowledgebasePersistenceUnit = bundle.getString("knowledgebase.persistence.unit");
         miscPersistenceUnit = bundle.getString("misc.persistence.unit");
@@ -79,6 +86,8 @@ public class InjectorModule implements Module {
      * This is where we configure the different image capture services for different
      * platforms. Currently the default is to try to use QuickTime for Java to do
      * the capture but we may change this in the future.
+     *
+     * MUST BE STATIC for Guice
      */
     private static class ImageCaptureServiceProvider implements Provider<ImageCaptureService> {
 
@@ -89,31 +98,40 @@ public class InjectorModule implements Module {
          */
         public ImageCaptureService get() {
 
-            // ---- Initialize framecapture. Default is to use a FakeImageGrabber
-            Class<? extends ImageCaptureService> grabberClazz = FakeImageCaptureServiceImpl.class;
-            if (SystemUtilities.isMacOS()) {
-                try {
-                    // Try creating a QTKit capture first
-                    grabberClazz = (Class<ImageCaptureService>) Class.forName("vars.qtkit.QTKitImageCaptureServiceImpl");
-                }
-                catch (Exception ex) {
-                    log.info("Unable to initialize QTKit image capture", ex);
-                    // The backup is to try to use QuickTime for Java
-                    try {
-                        grabberClazz = (Class<ImageCaptureService>) Class.forName("vars.quicktime.QTImageCaptureServiceImpl");
-                    }
-                    catch (ClassNotFoundException ex2) {
-                        log.info("QuickTime for Java could not be initialized", ex2);
-                    }
-                }
 
+            // --- Extract service classes from properties file
+            String platform = "";
+            if (SystemUtilities.isMacOS()) {
+                platform = "mac";
             }
             else if (SystemUtilities.isWindowsOS()) {
+                platform = "windows";
+            }
+
+            String rsrc = "image.capture.services." + platform;
+            List<String> imageCaptureServices = new ArrayList<String>();
+            try {
+                // Get service resource
+                String ics = bundle.getString(rsrc);
+                String[] parts = ics.split(" ");
+                imageCaptureServices.addAll(Arrays.asList(parts));
+
+            }
+            catch (Exception e) {
+                // Do nothing
+            }
+
+            // --- Instantiate the first working class
+            Class<? extends ImageCaptureService> grabberClazz = FakeImageCaptureServiceImpl.class;
+            for (int i = 0; i < imageCaptureServices.size(); i++) {
+                String clazzName = imageCaptureServices.get(i);
                 try {
-                    grabberClazz = (Class<ImageCaptureService>) Class.forName("vars.quicktime.QTImageCaptureServiceImpl");
+                    log.info("Attempting to initialize " + clazzName);
+                    grabberClazz = (Class<ImageCaptureService>) Class.forName(clazzName);
+                    break;
                 }
-                catch (ClassNotFoundException ex) {
-                    log.info("QuickTime for Java could not be initialized");
+                catch (Exception e) {
+                    log.info("Failed to initialize " + clazzName);
                 }
             }
 
@@ -127,6 +145,7 @@ public class InjectorModule implements Module {
             }
 
             return imageCaptureService;
+
         }
     }
 }
