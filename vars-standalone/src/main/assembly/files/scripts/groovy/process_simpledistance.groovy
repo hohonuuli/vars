@@ -6,14 +6,14 @@ import org.mbari.vars.SimpleLinearMeasurementProcessor
  * @since 2012-12-10
  */
 
-if (args.size() < 6) {
+if (args.size() != 2) {
     println("""
     | Script that converts any 'measurement' associations found in your VARS query results
     | and converts them to pixel distances. The results are appended to the end of each row
     | in a new text file.
     |
     | Usage:
-    |   gsh process_area <inputFile> <outputFile>
+    |   gsh process_simpledistance <inputFile> <outputFile>
     |
     | Arguments:
     |    inputFile:    The data file you saved from VARS query
