@@ -12,8 +12,8 @@ public class ValuePanelWrapperFactory {
         return new BooleanValuePanelWrapper(valuePanel);
     }
 
-    public ValuePanelWrapper wrap(DateValuePanel valuePanel) {
-        return new DateValuePanelWrapper(valuePanel);
+    public ValuePanelWrapper wrap(JXDateValuePanel valuePanel) {
+        return new JXDateValuePanelWrapper(valuePanel);
     }
 
     public ValuePanelWrapper wrap(NumberValuePanel valuePanel) {
@@ -33,8 +33,8 @@ public class ValuePanelWrapperFactory {
     }
 
     public ValuePanelWrapper wrap(ValuePanel valuePanel) {
-        if (valuePanel instanceof DateValuePanel) {
-            return wrap((DateValuePanel) valuePanel);
+        if (valuePanel instanceof JXDateValuePanel) {
+            return wrap((JXDateValuePanel) valuePanel);
         }
         else if (valuePanel instanceof NumberValuePanel) {
             return wrap((NumberValuePanel) valuePanel);

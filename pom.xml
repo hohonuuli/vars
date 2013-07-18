@@ -43,7 +43,7 @@
         <sanselan.version>0.97</sanselan.version>
         <scala.version>2.10.2</scala.version>
         <slf4j.version>1.7.5</slf4j.version>
-        <swingx.version>1.6.1</swingx.version>
+        <swingx.version>1.6.5-1</swingx.version>
         <swing.layout.version>1.0.3</swing.layout.version>
         <tagsoup.version>1.2.1</tagsoup.version>
         <vcr4j.version>1.7.4</vcr4j.version>
@@ -59,7 +59,7 @@
         <module>vars-qtkit</module>
         <module>vars-quicktime</module>
         <module>vars-standalone</module>
-  </modules>
+    </modules>
     <scm>
         <connection>scm:hg:https://vars-redux.googlecode.com/hg/</connection>
         <developerConnection>scm:hg:https://vars-redux.googlecode.com/hg/</developerConnection>
@@ -209,7 +209,7 @@
                     </dependency>
                 </dependencies>
             </plugin>
-            
+
             <!-- Filter resources using UTF-8 encoding -->
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
@@ -251,69 +251,73 @@
                         <version>1.0.3</version>
                     </docletArtifact>
                     <doclet>com.google.doclava.Doclava</doclet>
-                  <!--
-                    | bootclasspath required by Sun's JVM 
-                -->
-                <bootclasspath>${sun.boot.class.path}</bootclasspath>
-                <additionalparam>
-                   -quiet
-                   -federate JDK http://download.oracle.com/javase/6/docs/api/index.html?
-                   -federationxml JDK http://doclava.googlecode.com/svn/static/api/openjdk-6.xml
-                   -hdf project.name "${project.name}"
-                   -d ${project.build.directory}/apidocs
-               </additionalparam>
-               <useStandardDocletOptions>false</useStandardDocletOptions>
-                  <!--
-                    | Apple's JVM sometimes requires more memory
-                -->
-                <additionalJOption>-J-Xmx1024m</additionalJOption>
-            </configuration>
-        </plugin>
-    </plugins>
-    <resources>
-        <resource>
-            <directory>src/main/resources</directory>
-            <filtering>true</filtering>
-            <includes>
-                <include>**/*.properties</include>
-            </includes>
-        </resource>
-        <resource>
-            <directory>src/main/resources</directory>
-            <filtering>false</filtering>
-            <excludes>
-                <exclude>**/*.properties</exclude>
-            </excludes>
-        </resource>
-    </resources>
-</build>
-<repositories>
-    <repository>
-        <id>mbari-maven-repository</id>
-        <name>MBARI Maven Repository</name>
-        <url>http://mbari-maven-repository.googlecode.com/svn/repository/</url>
-    </repository>
-    <repository>
-        <id>eclipselink</id>
-        <name>EclipseLink Repository</name>
-        <url>http://www.eclipse.org/downloads/download.php?r=1&amp;nf=1&amp;file=/rt/eclipselink/maven.repo</url>
-    </repository>
-    <repository>
-        <id>Maven-Central</id>
-        <name>Maven Central Repository</name>
-        <url>http://repo1.maven.org/maven2</url>
-    </repository>
-    <repository>
-        <id>codehaus</id>
-        <name>Maven Codehaus</name>
-        <url>http://repository.codehaus.org/</url>
-    </repository>
-    <repository>
-        <id>Java.net</id>
-        <name>Java.net</name>
-        <url>http://download.java.net/maven/2/</url>
-    </repository>
-
+                    <!--
+                      | bootclasspath required by Sun's JVM
+                  -->
+                    <bootclasspath>${sun.boot.class.path}</bootclasspath>
+                    <additionalparam>
+                        -quiet
+                        -federate JDK http://download.oracle.com/javase/6/docs/api/index.html?
+                        -federationxml JDK http://doclava.googlecode.com/svn/static/api/openjdk-6.xml
+                        -hdf project.name "${project.name}"
+                        -d ${project.build.directory}/apidocs
+                    </additionalparam>
+                    <useStandardDocletOptions>false</useStandardDocletOptions>
+                    <!--
+                      | Apple's JVM sometimes requires more memory
+                  -->
+                    <additionalJOption>-J-Xmx1024m</additionalJOption>
+                </configuration>
+            </plugin>
+        </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>**/*.properties</exclude>
+                </excludes>
+            </resource>
+        </resources>
+    </build>
+    <repositories>
+        <repository>
+            <id>mbari-maven-repository</id>
+            <name>MBARI Maven Repository</name>
+            <url>http://mbari-maven-repository.googlecode.com/svn/repository/</url>
+        </repository>
+        <repository>
+            <id>eclipselink</id>
+            <name>EclipseLink Repository</name>
+            <url>http://www.eclipse.org/downloads/download.php?r=1&amp;nf=1&amp;file=/rt/eclipselink/maven.repo</url>
+        </repository>
+        <repository>
+            <id>Maven-Central</id>
+            <name>Maven Central Repository</name>
+            <url>http://repo1.maven.org/maven2</url>
+        </repository>
+        <repository>
+            <id>codehaus</id>
+            <name>Maven Codehaus</name>
+            <url>http://repository.codehaus.org/</url>
+        </repository>
+        <repository>
+            <id>Java.net</id>
+            <name>Maven Java.net</name>
+            <url>http://download.java.net/maven/2/</url>
+        </repository>
+        <repository>
+            <id>Maven Java.net-Kenai</id>
+            <name>Java.net-Kenai</name>
+            <url>https://java.net/downloads/swingx/releases/</url>
+        </repository>
         <repository>
             <id>jboss</id>
             <name>JBoss Repository</name>

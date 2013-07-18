@@ -330,7 +330,7 @@ public class RefineSearchPanel extends JPanel {
             }
         }
         else if (type.equals("java.sql.Timestamp")) {
-            valuePanel = new DateValuePanel(name, queryDAO);
+            valuePanel = new JXDateValuePanel(name, queryDAO);
         }
         else if (type.equals("java.lang.Boolean")) {
             valuePanel = new BooleanValuePanel(name);

@@ -28,8 +28,8 @@
             <version>${eventbus.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.swinglabs</groupId>
-            <artifactId>swingx</artifactId>
+            <groupId>org.swinglabs.swingx</groupId>
+            <artifactId>swingx-all</artifactId>
             <version>${swingx.version}</version>
         </dependency>
         <dependency>

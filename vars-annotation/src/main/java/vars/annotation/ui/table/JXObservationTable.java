@@ -64,7 +64,6 @@ public class JXObservationTable extends JXTable implements ObservationTable {
 
         // SwingX Highlighters do not play well with custom sell renderers. Turned this off for now
         //super.setHighlighters(HighlighterFactory.createSimpleStriping());
-        setRowHeightEnabled(true);
     }
 
     /**
