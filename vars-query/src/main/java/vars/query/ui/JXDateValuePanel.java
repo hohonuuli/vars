@@ -1,6 +1,5 @@
 package vars.query.ui;
 
-import mseries.ui.MDateEntryField;
 import org.bushe.swing.event.EventBus;
 import org.jdesktop.swingx.JXDatePicker;
 import org.mbari.sql.QueryResults;

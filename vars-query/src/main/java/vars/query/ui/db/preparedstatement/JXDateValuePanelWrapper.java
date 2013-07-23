@@ -1,6 +1,5 @@
 package vars.query.ui.db.preparedstatement;
 
-import vars.query.ui.DateValuePanel;
 import vars.query.ui.JXDateValuePanel;
 
 import java.sql.PreparedStatement;

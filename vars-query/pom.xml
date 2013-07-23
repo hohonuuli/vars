@@ -39,12 +39,6 @@
             <version>${foxtrot.version}</version>
         </dependency>
         <dependency>
-            <groupId>mdateselector</groupId>
-            <artifactId>mdateselector</artifactId>
-            <version>${mdateselector.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>org.bushe</groupId>
             <artifactId>eventbus</artifactId>
             <version>${eventbus.version}</version>
