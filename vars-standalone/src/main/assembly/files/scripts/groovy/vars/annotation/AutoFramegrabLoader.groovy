@@ -24,6 +24,7 @@ class AutoFramegrabLoader {
     private targetRootUrl
     private IVCR vcr
     private log = LoggerFactory.getLogger("AutoFramegrabLoader")
+    private imageCaptureService
     private frameGrabber
 
     /**
@@ -55,8 +56,8 @@ class AutoFramegrabLoader {
            that says I need to sign my classes for this to work. I need to add
            some code to sign the jars when building the standalone app
         */
-        def imageCaptureService = Lookup.guiceInjectorDispatcher.valueObject.getInstance(ImageCaptureService.class);
-        frameGrabber = imageCaptureService.grabber
+        imageCaptureService = Lookup.guiceInjectorDispatcher.valueObject.getInstance(ImageCaptureService.class);
+        // frameGrabber = imageCaptureService.grabber // using QT4J
 
         // Initialize video control service
         try {
@@ -184,7 +185,8 @@ class AutoFramegrabLoader {
                     // TODO Use Imagesnap to grab the image from the video capture card
                     //def snapCommand = "imagesnap -d videocard ${target.absolutePath}" as String
                     //snapCommand.execute()
-                    GrabUtil.capture(frameGrabber, target)
+                    //GrabUtil.capture(frameGrabber, target)  // Using QT4J
+                    imageCaptureService.capture(target)       // Using QTKit
                     captured = true
                 }
                 else {

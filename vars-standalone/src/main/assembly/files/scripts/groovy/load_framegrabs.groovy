@@ -4,7 +4,7 @@ import vars.annotation.AutoFramegrabLoader
  * @since 2012-09-04
  */
 
-if (args.size() != 6) {
+if (args.size() != 7) {
     println("""\
           Grabs framegrabs from a VCR at a specified interval and loads them into VARS
 
@@ -15,7 +15,7 @@ if (args.size() != 6) {
           Example:
             gsh ../scripts/groovy/load_framegrabs Ventana 3467 \\
               /Volumes/framegrabs http://search.mbari.org/ARCHIVE/frameGrabs/ |
-              "/dev/tty.RS422 Deck Control"
+              "/dev/tty.RS422 Deck Control" 1 3
 
     """.stripIndent())
     return

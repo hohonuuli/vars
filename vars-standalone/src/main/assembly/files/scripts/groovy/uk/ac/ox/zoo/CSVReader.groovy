@@ -14,6 +14,7 @@ class CSVReader {
      * Map a field in VARS to a Header in the CSV file
      */
     static final HEADERS_OF_INTEREST = ["recordedDate":"Timestamp",
+            "altitude":"ROV.RovAlt",
             "depth":"ROV.RovDepth",
             "temperature":"CTD.Temperature",
             "salinity":"CTD.Salinity",
@@ -21,7 +22,10 @@ class CSVReader {
             "latitude":"JCUSBL.Lat",
             "latNS":"JCUSBL.LatN",
             "longitude":"JCUSBL.Lon",
-            "lonEW":"JCUSBL.LonW"]
+            "lonEW":"JCUSBL.LonW",
+            "x":"ROV.DvlWaterXVel",
+            "y":"ROV.DvlWaterYVel",
+            "z":"ROV.DvlWaterZVel"]
 
     // --- ALL parsers except only strings as arguments
 

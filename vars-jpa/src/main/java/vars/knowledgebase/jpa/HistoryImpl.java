@@ -125,6 +125,7 @@ public class HistoryImpl implements Serializable, History, JPAEntity {
     @Column(name = "Action", length = 16)
     String action;
 
+    //@Column(name = "HistoryComment", length = 2048) // Oracle won't allow columns named 'Comment'
     @Column(name = "Comment", length = 2048)
     String comment;
 

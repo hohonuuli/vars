@@ -7,24 +7,17 @@ package uk.ac.ox.zoo
  */
 class CSVDatum {
 
-    Date recordedDate
-    Double depth
-    Double temperature
-    Double salinity
     Date logDate
+    Date recordedDate
+    Double altitude
+    Double depth
     Double latitude
     Double longitude
-
-    CSVDatum(Date recordedDate, Double depth, Double temperature, Double salinity, Date logDate,
-             Double latitude, Double longitude) {
-        this.recordedDate = recordedDate
-        this.depth = depth
-        this.temperature = temperature
-        this.salinity = salinity
-        this.logDate = logDate
-        this.latitude = latitude
-        this.longitude = longitude
-    }
+    Double salinity
+    Double temperature
+    Double xVelocity
+    Double yVelocity
+    Double zVelocity
 
     CSVDatum() {}
 

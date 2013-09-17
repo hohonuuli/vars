@@ -82,14 +82,23 @@ class MergeData {
         def newData = [:]
         dao.startTransaction()
         data.each { VideoFrame videoFrame, CSVDatum datum ->
+
             videoFrame = dao.find(videoFrame)
+            
             def physicalData = videoFrame.physicalData
-            physicalData.salinity = datum.salinity
-            physicalData.temperature = datum.temperature
+            physicalData.altitude = datum.altitude
             physicalData.depth = datum.depth
             physicalData.latitude = datum.latitude
-            physicalData.longitude = datum.longitude
             physicalData.logDate = datum.logDate
+            physicalData.longitude = datum.longitude
+            physicalData.salinity = datum.salinity
+            physicalData.temperature = datum.temperature
+            
+            def cameraData = videoFrame.cameraData
+            cameraData.x = datum.xVelocity
+            cameraData.y = datum.yVelocity
+            cameraData.z = datum.zVelocity
+
             newData[videoFrame] = datum
 
         }
