@@ -48,6 +48,8 @@ object PointsApp {
     } flatten
 
     val camera = Camera.fromRadians(cameraHeight, alpha, beta, theta)
+
+    // Assume all images are the same size, just get the first one
     val url = {
       val vf = videoFrames.find { v =>
         Try(v.getCameraData.getImageReference) match {
