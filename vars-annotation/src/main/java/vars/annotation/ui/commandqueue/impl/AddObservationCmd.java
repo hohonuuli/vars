@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import vars.UserAccount;
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.AnnotationFactory;
+import vars.annotation.AnnotationPersistenceService;
 import vars.annotation.CameraData;
 import vars.annotation.Observation;
 import vars.annotation.ObservationDAO;
@@ -96,6 +97,7 @@ public class AddObservationCmd implements Command {
 
         long tic = System.nanoTime();
 
+        AnnotationPersistenceService annotationPersistenceService = toolBelt.getAnnotationPersistenceService();
         AnnotationDAOFactory daoFactory = toolBelt.getAnnotationDAOFactory();
         AnnotationFactory factory = toolBelt.getAnnotationFactory();
         VideoFrameDAO videoFrameDAO = daoFactory.newVideoFrameDAO();
@@ -116,10 +118,14 @@ public class AddObservationCmd implements Command {
              * Get or create the VideoFrame
              */
             log.debug(elapsedTime(tic) + "s :Lookup existing videoframe");
-            tic = System.nanoTime();
-            VideoFrame videoFrame = videoArchive.findVideoFrameByTimeCode(timecode); // TODO: THis is slow
+            Long id = annotationPersistenceService.findTimeCodeByVideoArchiveName(timecode, videoArchiveName);
+            VideoFrame videoFrame = null;
+            if (id != null) {
+                videoFrame = videoFrameDAO.findByPrimaryKey(id);
+            }
             log.debug(elapsedTime(tic) + "s :Find matching timecode");
             tic = System.nanoTime();
+
             if (videoFrame == null) {
                 videoFrame = factory.newVideoFrame();
                 videoFrame.setRecordedDate(recordedDate);
@@ -130,6 +136,7 @@ public class AddObservationCmd implements Command {
                 tic = System.nanoTime();
                 videoArchive.addVideoFrame(videoFrame);
             }
+
 
             if (imageReference != null) {
                 videoFrame.getCameraData().setImageReference(imageReference);
@@ -173,6 +180,89 @@ public class AddObservationCmd implements Command {
         }
 
     }
+
+//    @Override
+//    public void apply(ToolBelt toolBelt) {
+//
+//        long tic = System.nanoTime();
+//
+//        AnnotationDAOFactory daoFactory = toolBelt.getAnnotationDAOFactory();
+//        AnnotationFactory factory = toolBelt.getAnnotationFactory();
+//        VideoFrameDAO videoFrameDAO = daoFactory.newVideoFrameDAO();
+//        VideoArchiveDAO videoArchiveDAO = daoFactory.newVideoArchiveDAO(videoFrameDAO.getEntityManager());
+//        videoArchiveDAO.startTransaction();
+//        VideoArchive videoArchive = videoArchiveDAO.findByName(videoArchiveName);
+//
+//        Observation newObservation = null;
+//
+//        if (videoArchive != null && conceptName != null && timecode != null) {
+//
+//            /*
+//             * Verify that the timecode is acceptable
+//             */
+//            new Timecode(timecode); // Bad timecodes will throw an exception
+//
+//            /*
+//             * Get or create the VideoFrame
+//             */
+//            log.debug(elapsedTime(tic) + "s :Lookup existing videoframe");
+//            tic = System.nanoTime();
+//            VideoFrame videoFrame = videoArchive.findVideoFrameByTimeCode(timecode); // TODO: THis is slow
+//            log.debug(elapsedTime(tic) + "s :Find matching timecode");
+//            tic = System.nanoTime();
+//            if (videoFrame == null) {
+//                videoFrame = factory.newVideoFrame();
+//                videoFrame.setRecordedDate(recordedDate);
+//                videoFrame.setTimecode(timecode);
+//                CameraData cameraData = videoFrame.getCameraData();
+//                cameraData.setDirection(cameraDirection);
+//                log.debug(elapsedTime(tic) + "s :Build new videoframe");
+//                tic = System.nanoTime();
+//                videoArchive.addVideoFrame(videoFrame);
+//            }
+//
+//            if (imageReference != null) {
+//                videoFrame.getCameraData().setImageReference(imageReference);
+//            }
+//            log.debug(elapsedTime(tic) + "s :Built Videoframe");
+//            tic = System.nanoTime();
+//
+//            /*
+//                Create observation
+//             */
+//            String validatedConceptName = toolBelt.getPersistenceController().getValidatedConceptName(conceptName);
+//            newObservation = factory.newObservation();
+//            newObservation.setConceptName(validatedConceptName);
+//            newObservation.setObserver(user);
+//            newObservation.setObservationDate(new Date());
+//            if (point != null) {
+//                newObservation.setX(point.getX());
+//                newObservation.setY(point.getY());
+//            }
+//            videoFrame.addObservation(newObservation);
+//            log.debug(elapsedTime(tic) + "s :Built Observation");
+//            tic = System.nanoTime();
+//
+//        }
+//        videoArchiveDAO.endTransaction();
+//        videoArchiveDAO.getEntityManager().clear();
+//        videoArchiveDAO.close();
+//        log.debug(elapsedTime(tic) + "s :End Transaction");
+//        tic = System.nanoTime();
+//        if (newObservation != null) {
+//            newPrimaryKey = newObservation.getPrimaryKey();
+//        }
+//        EventBus.publish(new ObservationsAddedEvent(null, newObservation));
+//        log.debug(elapsedTime(tic) + "s :Publish ObservationsAddedEvent");
+//        tic = System.nanoTime();
+//
+//        if (selectAddedObservation) {
+//            EventBus.publish(new ObservationsSelectedEvent(this, ImmutableList.of(newObservation)));
+//            log.debug(elapsedTime(tic) + "s :Publish ObservationsSelectedEvent");
+//            tic = System.nanoTime();
+//        }
+//
+//    }
 
     @Override
     public void unapply(ToolBelt toolBelt) {

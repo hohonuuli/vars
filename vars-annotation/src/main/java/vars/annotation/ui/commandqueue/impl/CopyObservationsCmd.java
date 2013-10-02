@@ -4,12 +4,14 @@ import org.bushe.swing.event.EventBus;
 import vars.DAO;
 import vars.UserAccount;
 import vars.annotation.AnnotationFactory;
+import vars.annotation.AnnotationPersistenceService;
 import vars.annotation.Association;
 import vars.annotation.CameraDirections;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveDAO;
 import vars.annotation.VideoFrame;
+import vars.annotation.VideoFrameDAO;
 import vars.annotation.jpa.ObservationImpl;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
@@ -55,14 +57,21 @@ public class CopyObservationsCmd implements Command {
         /*
          * DAOTX See if a VideoFrame with the given time code already exists
          */
+        AnnotationPersistenceService annotationPersistenceService = toolBelt.getAnnotationPersistenceService();
         DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();
         VideoArchiveDAO videoArchiveDAO = toolBelt.getAnnotationDAOFactory().newVideoArchiveDAO(dao.getEntityManager());
+        VideoFrameDAO videoFrameDAO = toolBelt.getAnnotationDAOFactory().newVideoFrameDAO(dao.getEntityManager());
         dao.startTransaction();
         VideoArchive videoArchive = videoArchiveDAO.findByName(videoArchiveName);
 
         if (videoArchive != null) {
 
-            VideoFrame videoFrame = videoArchive.findVideoFrameByTimeCode(videoTime.getTimecode());
+            Long id = annotationPersistenceService.findTimeCodeByVideoArchiveName(videoTime.getTimecode(), videoArchiveName);
+            VideoFrame videoFrame = null;
+            if (id != null) {
+                videoFrame = videoFrameDAO.findByPrimaryKey(id);
+            }
+
             if (videoFrame == null) {
                 videoFrame = annotationFactory.newVideoFrame();
                 videoFrame.setTimecode(videoTime.getTimecode());
@@ -116,7 +125,7 @@ public class CopyObservationsCmd implements Command {
             for (Observation obs : copyObservations) {
                 Observation observation = dao.find(obs);
                 if (observation != null) {
-                    droppedObservations.add(obs); 
+                    droppedObservations.add(obs);
                     VideoFrame videoFrame = observation.getVideoFrame();
                     videoFrame.removeObservation(observation);
                     dao.remove(observation);

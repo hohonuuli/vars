@@ -38,7 +38,13 @@ public class VideoArchiveSetEditorButton extends JToggleButton {
                     getFrame().setVisible(true);
                 }
                 else {
-                    getFrame().setVisible(false);
+                    if (frame != null) {
+                        // Dispose of ALL resources. Fix for https://oceana.mbari.org/jira/browse/VARS-598
+                        getFrame().setVisible(false);
+                        getFrame().dispose();
+                        frame = null;
+                        System.gc(); // request garbage collection as there may be a lot of memory being used
+                    }
                 }
             }
         });
@@ -78,7 +84,6 @@ public class VideoArchiveSetEditorButton extends JToggleButton {
                 }
             });
 
-
             frame.addWindowListener(new WindowAdapter() {
 
                 @Override
@@ -99,7 +104,6 @@ public class VideoArchiveSetEditorButton extends JToggleButton {
             });
 
             frame.pack();
-
 
         }
         return frame;

@@ -99,22 +99,32 @@ public class VideoArchiveImpl implements Serializable, VideoArchive, JPAEntity {
 
     public void addVideoFrame(final VideoFrame videoFrame) {
 
-        int idx = indexByTimecode(videoFrame.getTimecode());
+        getVideoFrames().add(videoFrame);
+        ((VideoFrameImpl) videoFrame).setVideoArchive(this);
 
-        if (idx >= 0) {
-            throw new IllegalArgumentException("A VideoFrame with a timecode of " + videoFrame.getTimecode() +
-                    " already exists in " + this + ".");
-        }
-        else {
-            int insertIdx = -idx - 1;
-            getVideoFrames().add(insertIdx, videoFrame);
-            ((VideoFrameImpl) videoFrame).setVideoArchive(this);
-        }
+//        int idx = indexByTimecode(videoFrame.getTimecode());
+//
+//        if (idx >= 0) {
+//            throw new IllegalArgumentException("A VideoFrame with a timecode of " + videoFrame.getTimecode() +
+//                    " already exists in " + this + ".");
+//        }
+//        else {
+//            int insertIdx = -idx - 1;
+//            getVideoFrames().add(insertIdx, videoFrame);
+//            ((VideoFrameImpl) videoFrame).setVideoArchive(this);
+//        }
     }
 
     public VideoFrame findVideoFrameByTimeCode(final String timecode) {
-        int idx = indexByTimecode(timecode);
-        return (idx >= 0) ? getVideoFrames().get(idx) : null;
+//        int idx = indexByTimecode(timecode);
+//        return (idx >= 0) ? getVideoFrames().get(idx) : null;
+        VideoFrame videoFrame = null;
+        for (VideoFrame vf : getVideoFrames()) {
+            if (vf.getTimecode().equals(timecode)) {
+                videoFrame = vf;
+            }
+        }
+        return videoFrame;
     }
 
     public Collection<VideoFrame> getEmptyVideoFrames() {
