@@ -95,12 +95,12 @@ public class VideoArchiveSetEditorButton extends JToggleButton {
 
                 @Override
                 public void windowDeiconified(WindowEvent e) {
-                    //refresh();
+                    refresh();
                 }
 
                 @Override
                 public void windowActivated(WindowEvent e) {
-                    //refresh();
+                    refresh();
                 }
 
             });

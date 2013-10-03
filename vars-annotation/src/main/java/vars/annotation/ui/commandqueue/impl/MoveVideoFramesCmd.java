@@ -6,8 +6,10 @@ import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveDAO;
 import vars.annotation.VideoFrame;
 import vars.annotation.VideoFrameDAO;
+import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.commandqueue.Command;
+import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
 import vars.annotation.ui.eventbus.VideoFramesChangedEvent;
 
 import java.util.ArrayList;
@@ -15,7 +17,7 @@ import java.util.Collection;
 
 /**
  * Moves VideoFrames from one videoarchive to another
- * 
+ *
  * @author Brian Schlining
  * @since 2011-10-11
  */
@@ -23,11 +25,34 @@ public class MoveVideoFramesCmd implements Command {
 
     private final String targetVideoArchiveName;
     private final Collection<DataBean> originalData = new ArrayList<DataBean>();
+    private final boolean refreshVideoArchive;
 
-    public MoveVideoFramesCmd(String targetVideoArchiveName, Collection<VideoFrame> originalVideoFrames) {
+
+    /**
+     *
+     * @param targetVideoArchiveName The name of the VideoArchive that you are moving VideoFrames to.
+     * @param originalVideoFrames The videoFrames that are being moved
+     *
+     * This does NOT refresh the annotations window. Used by the VideoSet Viewer
+     */
+    public MoveVideoFramesCmd(String targetVideoArchiveName,
+                              Collection<VideoFrame> originalVideoFrames) {
+        this(targetVideoArchiveName, originalVideoFrames, false);
+    }
+
+    /**
+     *
+     * @param targetVideoArchiveName The name of the VideoArchive that you are moving VideoFrames to.
+     * @param originalVideoFrames The videoFrames that are being moved
+     * @param refreshVideoArchive if true then a VideoArchiveChangedEvent is fired using the VideoArchive
+     *                            in the current Lookup. (i.e. refreshes annotation window)
+     */
+    public MoveVideoFramesCmd(String targetVideoArchiveName,
+                              Collection<VideoFrame> originalVideoFrames, boolean refreshVideoArchive) {
         if (targetVideoArchiveName == null || originalVideoFrames == null) {
             throw new IllegalArgumentException("null parameters are not allowed in the constructor");
         }
+        this.refreshVideoArchive = refreshVideoArchive;
         this.targetVideoArchiveName = targetVideoArchiveName;
         for (VideoFrame videoFrame : originalVideoFrames) {
             originalData.add(new DataBean(videoFrame.getVideoArchive().getName(), videoFrame.getPrimaryKey()));
@@ -68,6 +93,12 @@ public class MoveVideoFramesCmd implements Command {
         dao.endTransaction();
 
         EventBus.publish(new VideoFramesChangedEvent(null, modifiedVideoFrames));
+
+        if (refreshVideoArchive) {
+            VideoArchive va = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+            va = dao.find(va);
+            EventBus.publish(new VideoArchiveChangedEvent(MoveVideoFramesCmd.this, va));
+        }
     }
 
     @Override
@@ -106,6 +137,12 @@ public class MoveVideoFramesCmd implements Command {
         dao.endTransaction();
 
         EventBus.publish(new VideoFramesChangedEvent(null, modifiedVideoFrames));
+
+        if (refreshVideoArchive) {
+            VideoArchive va = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+            va = dao.find(va);
+            EventBus.publish(new VideoArchiveChangedEvent(MoveVideoFramesCmd.this, va));
+        }
     }
 
     @Override
@@ -113,7 +150,7 @@ public class MoveVideoFramesCmd implements Command {
         return "Move " + originalData.size() + " VideoFrames to VideoArchive named " + targetVideoArchiveName;
     }
 
-      /**
+    /**
      * Merges the information contained in 2 different videoFrames. <strong>This should be called within
      * a persistence transaction!!!</strong>
      * @param sourceFrame The VideoFrame whose contents will be moved to the target

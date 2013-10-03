@@ -53,18 +53,22 @@ public class MoveVideoFrameWithDialogAction extends ActionAdapter {
     private final OpenVideoArchiveDialog dialog;
     private Collection<VideoFrame> videoFrames = new ArrayList<VideoFrame>();
 
+    public MoveVideoFrameWithDialogAction(final Frame owner, ToolBelt toolBelt) {
+        this(owner, toolBelt, false);
+    }
+
     /**
      *
      * @param owner
      * @param toolBelt
      */
-    public MoveVideoFrameWithDialogAction(final Frame owner, ToolBelt toolBelt) {
+    public MoveVideoFrameWithDialogAction(final Frame owner, ToolBelt toolBelt, final boolean refreshVideoFrame) {
         super(ACTION_NAME);
         dialog = new OpenVideoArchiveDialog(owner, toolBelt);
         dialog.getOkayButton().addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 VideoArchive videoArchive = dialog.openVideoArchive();
-                Command command = new MoveVideoFramesCmd(videoArchive.getName(), videoFrames);
+                Command command = new MoveVideoFramesCmd(videoArchive.getName(), videoFrames, refreshVideoFrame);
                 CommandEvent commandEvent = new CommandEvent(command);
                 dialog.dispose();
                 EventBus.publish(commandEvent);

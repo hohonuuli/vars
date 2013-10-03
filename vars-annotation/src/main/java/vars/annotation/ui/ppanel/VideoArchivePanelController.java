@@ -57,7 +57,6 @@ import vars.annotation.ui.commandqueue.impl.ChangeCameraDirectionsCmd;
 import vars.annotation.ui.commandqueue.impl.RemoveAssociationsCmd;
 import vars.annotation.ui.commandqueue.impl.RemoveObservationsCmd;
 import vars.annotation.ui.commandqueue.impl.RenameObservationsCmd;
-import vars.annotation.ui.eventbus.VideoArchiveSelectedEvent;
 import vars.annotation.ui.table.JXObservationTable;
 import vars.annotation.ui.table.ObservationTableModel;
 import vars.knowledgebase.Concept;
@@ -91,7 +90,7 @@ public class VideoArchivePanelController {
     public VideoArchivePanelController(VideoArchiveEditorPanel panel, ToolBelt toolBelt) {
         this.panel = panel;
         this.toolBelt = toolBelt;
-        this.moveAction = new MoveVideoFrameWithDialogAction(AwtUtilities.getFrame(panel), toolBelt);
+        this.moveAction = new MoveVideoFrameWithDialogAction(AwtUtilities.getFrame(panel), toolBelt, true);
     }
 
     protected void addAssociation() {
@@ -414,18 +413,6 @@ public class VideoArchivePanelController {
         Collection<VideoFrame> videoFrames = getVideoFrames(true);
         moveAction.setVideoFrames(videoFrames);
         moveAction.doAction();
-        // TODO moving videoframes leaves them in the ObservationTable even though they're moved
-        // - the bottom does not resolve the problem as it executes while the move dialog is displayed.
-        //   it needs to execute AFTER the move has been completed. Can we edit the eventbus
-        //   listener on the ObservationTable that responds to VideoFramesChangedEvent ?
-//        final Dispatcher dispatcher = Lookup.getVideoArchiveDispatcher();
-//        final VideoArchive videoArchive = (VideoArchive) dispatcher.getValueObject();
-//        VideoArchiveDAO videoArchiveDAO = toolBelt.getAnnotationDAOFactory().newVideoArchiveDAO();
-//        videoArchiveDAO.startTransaction();
-//        final VideoArchive refreshedVideoArchive = videoArchiveDAO.find(videoArchive);
-//        videoArchiveDAO.endTransaction();
-//        videoArchiveDAO.close();
-//        EventBus.publish(new VideoArchiveSelectedEvent(null, refreshedVideoArchive));
     }
 
     /**
