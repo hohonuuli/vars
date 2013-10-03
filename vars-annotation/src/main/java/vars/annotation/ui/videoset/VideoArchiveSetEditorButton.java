@@ -81,6 +81,8 @@ public class VideoArchiveSetEditorButton extends JToggleButton {
                 @Override
                 public void windowClosed(WindowEvent e) {
                     setSelected(false);
+                    frame = null;
+                    System.gc(); // Encourage the JVM to garbage collect all the annotations
                 }
             });
 
@@ -93,12 +95,12 @@ public class VideoArchiveSetEditorButton extends JToggleButton {
 
                 @Override
                 public void windowDeiconified(WindowEvent e) {
-                    refresh();
+                    //refresh();
                 }
 
                 @Override
                 public void windowActivated(WindowEvent e) {
-                    refresh();
+                    //refresh();
                 }
 
             });

@@ -1,5 +1,5 @@
 /*
- * @(#)VideoArchiveSetEditorPanel.java   2010.03.04 at 07:21:20 PST
+ * @(#)VideoArchiveEditorPanel.java   2013.10.02 at 04:24:54 PDT
  *
  * Copyright 2009 MBARI
  *
@@ -13,45 +13,39 @@
 
 
 
-package vars.annotation.ui.videoset;
+package vars.annotation.ui.ppanel;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-
 import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.SwingUtilities;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.LayoutStyle;
 
 import org.bushe.swing.event.annotation.AnnotationProcessor;
 import org.bushe.swing.event.annotation.EventSubscriber;
 import org.mbari.swing.SearchableComboBoxModel;
 import org.mbari.text.ObjectToStringConverter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import vars.ILink;
 import vars.LinkBean;
 import vars.LinkComparator;
 import vars.LinkUtilities;
 import vars.annotation.CameraDirections;
-import vars.annotation.VideoArchiveSet;
 import vars.annotation.ui.CameraDirectionComboBox;
 import vars.annotation.ui.ToolBelt;
-import vars.annotation.ui.actions.ClearDatabaseCacheAction;
 import vars.annotation.ui.eventbus.ObservationsAddedEvent;
 import vars.annotation.ui.eventbus.ObservationsChangedEvent;
 import vars.annotation.ui.eventbus.ObservationsRemovedEvent;
@@ -60,25 +54,23 @@ import vars.annotation.ui.eventbus.UIEventSubscriber;
 import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
 import vars.annotation.ui.eventbus.VideoArchiveSelectedEvent;
 import vars.annotation.ui.eventbus.VideoFramesChangedEvent;
-import vars.annotation.ui.table.JXObservationTable;
 import vars.shared.ui.ConceptNameComboBox;
 import vars.shared.ui.LinkListCellRenderer;
 
 /**
- *
- *
- * @version        Enter version here..., 2010.03.04 at 07:21:20 PST
- * @author         Brian Schlining [brian@mbari.org]
+ * @author Brian Schlining
+ * @since 2013-10-02
  */
-public class VideoArchiveSetEditorPanel extends JPanel implements UIEventSubscriber {
+public class VideoArchiveEditorPanel extends JPanel implements UIEventSubscriber {
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
     private JPanel actionPanel;
     private JComboBox associationComboBox;
     private JButton btnAddAssociation;
     private JButton btnDelete;
     private JButton btnMoveFrames;
     private JButton btnRefresh;
+    private ImageIcon needsRefreshIcon = new ImageIcon(getClass().getResource("/images/vars/annotation/refresh-red.png"));
+    private ImageIcon noRefreshIcon = new ImageIcon(getClass().getResource("/images/vars/annotation/refresh-green.png"));
     private JButton btnRemoveAssociations;
     private JButton btnRenameConcepts;
     private JButton btnReplaceAssociations;
@@ -87,21 +79,21 @@ public class VideoArchiveSetEditorPanel extends JPanel implements UIEventSubscri
     private JCheckBox chckbxAssociation;
     private JCheckBox chckbxConcept;
     private ConceptNameComboBox conceptComboBox;
-    private final VideoArchiveSetEditorPanelController controller;
+    private final VideoArchivePanelController controller;
     private JPanel controlsPanel;
-    private JPanel innerPanel;
-    private JScrollPane scrollPane;
     private JPanel searchPanel;
-    private JXObservationTable table;
     private JToolBar toolBar;
-    private volatile VideoArchiveSet videoArchiveSet;
+    private JLabel refreshLabel = new JLabel("                                                                    ");
 
     /**
-     * Create the frame.
+     * Constructs ...
+     *
+     * @param toolBelt
      */
-    public VideoArchiveSetEditorPanel(ToolBelt toolBelt) {
+    public VideoArchiveEditorPanel(ToolBelt toolBelt) {
         initialize();
-        controller = new VideoArchiveSetEditorPanelController(this, toolBelt);
+        refreshLabel.setForeground(Color.RED);
+        controller = new VideoArchivePanelController(this, toolBelt);
         AnnotationProcessor.process(this);
     }
 
@@ -114,6 +106,9 @@ public class VideoArchiveSetEditorPanel extends JPanel implements UIEventSubscri
         return actionPanel;
     }
 
+    /**
+     * @return
+     */
     public JComboBox getAssociationComboBox() {
         if (associationComboBox == null) {
             associationComboBox = new JComboBox();
@@ -121,11 +116,11 @@ public class VideoArchiveSetEditorPanel extends JPanel implements UIEventSubscri
             SearchableComboBoxModel<ILink> model = new SearchableComboBoxModel<ILink>(new LinkComparator(),
                     new ObjectToStringConverter<ILink>() {
 
-                public String convert(ILink object) {
-                    return LinkUtilities.formatAsString(object);
-                }
+                        public String convert(ILink object) {
+                            return LinkUtilities.formatAsString(object);
+                        }
 
-            });
+                    });
             associationComboBox.setModel(model);
             ILink link = new LinkBean(ILink.VALUE_NIL, ILink.VALUE_NIL, ILink.VALUE_NIL);
             model.addElement(link);
@@ -141,9 +136,11 @@ public class VideoArchiveSetEditorPanel extends JPanel implements UIEventSubscri
             btnAddAssociation.setToolTipText("Add Association");
             btnAddAssociation.setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/branch_add.png")));
             btnAddAssociation.addActionListener(new ActionListener() {
+
                 public void actionPerformed(ActionEvent e) {
                     controller.addAssociation();
                 }
+
             });
         }
 
@@ -156,9 +153,11 @@ public class VideoArchiveSetEditorPanel extends JPanel implements UIEventSubscri
             btnDelete.setToolTipText("Delete Observations");
             btnDelete.setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/row_delete.png")));
             btnDelete.addActionListener(new ActionListener() {
+
                 public void actionPerformed(ActionEvent e) {
                     controller.deleteObservations();
                 }
+
             });
         }
 
@@ -171,11 +170,11 @@ public class VideoArchiveSetEditorPanel extends JPanel implements UIEventSubscri
             btnMoveFrames.setToolTipText("Move Frames");
             btnMoveFrames.setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/row_replace.png")));
             btnMoveFrames.addActionListener(new ActionListener() {
+
                 public void actionPerformed(ActionEvent e) {
                     controller.moveObservations();
-                    ClearDatabaseCacheAction action = new ClearDatabaseCacheAction(controller.getToolBelt());
-                    action.doAction(); // TODO we don't need to clear the cache, just rese
                 }
+
             });
         }
 
@@ -188,9 +187,11 @@ public class VideoArchiveSetEditorPanel extends JPanel implements UIEventSubscri
             btnRefresh.setToolTipText("Refresh");
             btnRefresh.setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/refresh.png")));
             btnRefresh.addActionListener(new ActionListener() {
+
                 public void actionPerformed(ActionEvent e) {
-                    controller.refresh();
+                    refresh();
                 }
+
             });
         }
 
@@ -201,11 +202,14 @@ public class VideoArchiveSetEditorPanel extends JPanel implements UIEventSubscri
         if (btnRemoveAssociations == null) {
             btnRemoveAssociations = new JButton("");
             btnRemoveAssociations.setToolTipText("Remove Associations");
-            btnRemoveAssociations.setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/branch_delete.png")));
+            btnRemoveAssociations.setIcon(
+                    new ImageIcon(getClass().getResource("/images/vars/annotation/branch_delete.png")));
             btnRemoveAssociations.addActionListener(new ActionListener() {
+
                 public void actionPerformed(ActionEvent e) {
                     controller.removeAssociations();
                 }
+
             });
         }
 
@@ -232,11 +236,14 @@ public class VideoArchiveSetEditorPanel extends JPanel implements UIEventSubscri
         if (btnReplaceAssociations == null) {
             btnReplaceAssociations = new JButton("");
             btnReplaceAssociations.setToolTipText("Replace Associations");
-            btnReplaceAssociations.setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/branch_edit.png")));
+            btnReplaceAssociations.setIcon(
+                    new ImageIcon(getClass().getResource("/images/vars/annotation/branch_edit.png")));
             btnReplaceAssociations.addActionListener(new ActionListener() {
+
                 public void actionPerformed(ActionEvent e) {
                     controller.renameAssociations();
                 }
+
             });
         }
 
@@ -247,13 +254,33 @@ public class VideoArchiveSetEditorPanel extends JPanel implements UIEventSubscri
         if (btnSearch == null) {
             btnSearch = new JButton("Search");
             btnSearch.addActionListener(new ActionListener() {
+
                 public void actionPerformed(ActionEvent e) {
                     controller.search();
                 }
+
             });
         }
 
         return btnSearch;
+    }
+
+    private JComboBox getCameraDirectionCB() {
+        if (cameraDirectionCB == null) {
+            cameraDirectionCB = new CameraDirectionComboBox();
+            cameraDirectionCB.setToolTipText("Change the camera direction of the selected video-frames");
+            cameraDirectionCB.addItemListener(new ItemListener() {
+
+                public void itemStateChanged(ItemEvent e) {
+                    if (e.getStateChange() == ItemEvent.SELECTED) {
+                        controller.changeCameraDirectionsTo((CameraDirections) cameraDirectionCB.getSelectedItem());
+                    }
+                }
+
+            });
+        }
+
+        return cameraDirectionCB;
     }
 
     protected JCheckBox getChckbxAssociation() {
@@ -291,81 +318,44 @@ public class VideoArchiveSetEditorPanel extends JPanel implements UIEventSubscri
         return controlsPanel;
     }
 
-    private JPanel getInnerPanel() {
-        if (innerPanel == null) {
-            innerPanel = new JPanel();
-            innerPanel.setLayout(new BorderLayout(0, 0));
-            innerPanel.add(getScrollPane(), BorderLayout.CENTER);
-            innerPanel.add(getControlsPanel(), BorderLayout.NORTH);
-        }
-
-        return innerPanel;
-    }
-
-    private JScrollPane getScrollPane() {
-        if (scrollPane == null) {
-            scrollPane = new JScrollPane();
-            scrollPane.setViewportView(getTable());
-        }
-
-        return scrollPane;
-    }
-
     private JPanel getSearchPanel() {
         if (searchPanel == null) {
-                searchPanel = new JPanel();
-                GroupLayout gl_searchPanel = new GroupLayout(searchPanel);
-                gl_searchPanel.setHorizontalGroup(
-                        gl_searchPanel.createParallelGroup(Alignment.LEADING)
-                                .addGroup(gl_searchPanel.createSequentialGroup()
-                                        .addContainerGap()
-                                        .addGroup(gl_searchPanel.createParallelGroup(Alignment.LEADING)
-                                                .addGroup(gl_searchPanel.createSequentialGroup()
-                                                        .addGroup(gl_searchPanel.createParallelGroup(Alignment.LEADING)
-                                                                .addComponent(getChckbxAssociation())
-                                                                .addComponent(getChckbxConcept()))
-                                                        .addPreferredGap(ComponentPlacement.RELATED)
-                                                        .addGroup(gl_searchPanel.createParallelGroup(Alignment.LEADING)
-                                                                .addComponent(getConceptComboBox(), 0, 309, Short.MAX_VALUE)
-                                                                .addComponent(getAssociationComboBox(), 0, 309, Short.MAX_VALUE)))
-                                                .addComponent(getBtnSearch(), Alignment.TRAILING))
-                                        .addContainerGap())
-                );
-                gl_searchPanel.setVerticalGroup(
-                        gl_searchPanel.createParallelGroup(Alignment.TRAILING)
-                                .addGroup(gl_searchPanel.createSequentialGroup()
-                                        .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addGroup(gl_searchPanel.createParallelGroup(Alignment.BASELINE)
-                                                .addComponent(getChckbxConcept())
-                                                .addComponent(getConceptComboBox(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                                        .addPreferredGap(ComponentPlacement.RELATED)
-                                        .addGroup(gl_searchPanel.createParallelGroup(Alignment.BASELINE)
-                                                .addComponent(getChckbxAssociation())
-                                                .addComponent(getAssociationComboBox(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                                        .addPreferredGap(ComponentPlacement.RELATED)
-                                        .addComponent(getBtnSearch()))
-                );
-                searchPanel.setLayout(gl_searchPanel);
+            searchPanel = new JPanel();
+            GroupLayout gl_searchPanel = new GroupLayout(searchPanel);
+            gl_searchPanel
+                    .setHorizontalGroup(gl_searchPanel.createParallelGroup(GroupLayout.Alignment.LEADING)
+                            .addGroup(gl_searchPanel.createSequentialGroup().addContainerGap()
+                                    .addGroup(gl_searchPanel.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                            .addGroup(gl_searchPanel.createSequentialGroup()
+                                                    .addGroup(gl_searchPanel.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                                            .addComponent(getChckbxAssociation()).addComponent(getChckbxConcept()))
+                                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                    .addGroup(gl_searchPanel.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                                            .addComponent(getConceptComboBox(), 0, 309, Short.MAX_VALUE)
+                                                            .addComponent(getAssociationComboBox(), 0, 309, Short.MAX_VALUE)))
+                                            .addComponent(getBtnSearch(), GroupLayout.Alignment.TRAILING))
+                                    .addContainerGap()));
+            gl_searchPanel
+                    .setVerticalGroup(gl_searchPanel.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                            .addGroup(gl_searchPanel.createSequentialGroup()
+                                    .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addGroup(gl_searchPanel.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                            .addComponent(getChckbxConcept())
+                                            .addComponent(getConceptComboBox(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+                                                    GroupLayout.PREFERRED_SIZE))
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addGroup(gl_searchPanel
+                                            .createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                            .addComponent(getChckbxAssociation())
+                                            .addComponent(getAssociationComboBox(),
+                                                    GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+                                                    GroupLayout.PREFERRED_SIZE))
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement
+                                            .RELATED).addComponent(getBtnSearch())));
+            searchPanel.setLayout(gl_searchPanel);
         }
+
         return searchPanel;
-    }
-
-    protected JXObservationTable getTable() {
-        if (table == null) {
-            table = new JXObservationTable();
-
-            // When a new row is selected we want to deselect whatever was in the
-            // CameraDirectionCB
-            table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-                public void valueChanged(ListSelectionEvent e) {
-                    if (!e.getValueIsAdjusting()) {
-                        getCameraDirectionCB().setSelectedItem(null);
-                    }
-                }
-            });
-        }
-
-        return table;
     }
 
     private JToolBar getToolBar() {
@@ -377,97 +367,102 @@ public class VideoArchiveSetEditorPanel extends JPanel implements UIEventSubscri
             toolBar.add(getBtnDelete());
             toolBar.add(getBtnAddAssociation());
             toolBar.add(getBtnReplaceAssociations());
-            toolBar.add(getBtnRemoveAssociations());            
+            toolBar.add(getBtnRemoveAssociations());
             toolBar.add(getCameraDirectionCB());
         }
 
         return toolBar;
     }
-    
-    private JComboBox getCameraDirectionCB() {
-    	if (cameraDirectionCB == null) {
-    		cameraDirectionCB = new CameraDirectionComboBox();
-    		cameraDirectionCB.setToolTipText("Change the camera direction of the selected video-frames");
-    		cameraDirectionCB.addItemListener(new ItemListener() {
-				public void itemStateChanged(ItemEvent e) {
-				    if (e.getStateChange() == ItemEvent.SELECTED) {
-				        controller.changeCameraDirectionsTo((CameraDirections) cameraDirectionCB.getSelectedItem());
-				    }
-				}
-			});
-    	}
-    	return cameraDirectionCB;
-    }
 
-    /**
-     * @return The VideoArchiveSet that is currently being edited
-     */
-    public synchronized VideoArchiveSet getVideoArchiveSet() {
-        return videoArchiveSet;
-    }
-
-    private void initialize() {
+    protected void initialize() {
         setLayout(new BorderLayout(0, 0));
-        add(getInnerPanel(), BorderLayout.CENTER);
         add(getToolBar(), BorderLayout.NORTH);
-    }
+        add(getControlsPanel(), BorderLayout.CENTER);
+        add(refreshLabel, BorderLayout.SOUTH);
+        addFocusListener(new FocusAdapter() {
 
-
-    /**
-     *
-     * @param videoArchiveSet The VideoArchiveSet that will be edited
-     */
-    public synchronized void setVideoArchiveSet(VideoArchiveSet videoArchiveSet) {
-        this.videoArchiveSet = videoArchiveSet;
-        refresh();
-    }
-
-    @EventSubscriber(eventClass = ObservationsAddedEvent.class)
-    @Override
-    public void respondTo(ObservationsAddedEvent event) {
-        //refresh();
-    }
-
-    @EventSubscriber(eventClass = ObservationsChangedEvent.class)
-    @Override
-    public void respondTo(ObservationsChangedEvent event) {
-        //refresh();
-    }
-
-    @EventSubscriber(eventClass = ObservationsRemovedEvent.class)
-    @Override
-    public void respondTo(ObservationsRemovedEvent event) {
-        //refresh();
-    }
-
-    private void refresh() {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                controller.refresh();
+            @Override
+            public void focusGained(FocusEvent e) {
+                refresh();
             }
+
         });
     }
 
+    /**
+     *
+     * @param event
+     */
+    @EventSubscriber(eventClass = ObservationsAddedEvent.class)
     @Override
-    public void respondTo(ObservationsSelectedEvent event) {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public void respondTo(ObservationsAddedEvent event) {
+        needsRefresh();
+
     }
 
+    /**
+     *
+     * @param event
+     */
+    @EventSubscriber(eventClass = ObservationsChangedEvent.class)
+    @Override
+    public void respondTo(ObservationsChangedEvent event) {
+        needsRefresh();
+    }
+
+    /**
+     *
+     * @param event
+     */
+    @EventSubscriber(eventClass = ObservationsRemovedEvent.class)
+    @Override
+    public void respondTo(ObservationsRemovedEvent event) {
+        needsRefresh();
+    }
+
+    /**
+     *
+     * @param event
+     */
     @EventSubscriber(eventClass = VideoArchiveChangedEvent.class)
     @Override
     public void respondTo(VideoArchiveChangedEvent event) {
         refresh();
     }
 
+    /**
+     *
+     * @param event
+     */
     @EventSubscriber(eventClass = VideoArchiveSelectedEvent.class)
     @Override
     public void respondTo(VideoArchiveSelectedEvent event) {
         refresh();
     }
 
+    /**
+     *
+     * @param event
+     */
     @EventSubscriber(eventClass = VideoFramesChangedEvent.class)
     @Override
     public void respondTo(VideoFramesChangedEvent event) {
-        //refresh();
+        needsRefresh();
+    }
+
+    private void refresh() {
+        controller.refresh();
+        getBtnRefresh().setIcon(noRefreshIcon);
+        refreshLabel.setText("                                                                    ");
+    }
+
+    private void needsRefresh() {
+        getBtnRefresh().setIcon(needsRefreshIcon);
+        refreshLabel.setText("Press the refresh button (in red) to synchronize with latest edits!!");
+    }
+
+    @Override
+    public void respondTo(ObservationsSelectedEvent event) {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 }

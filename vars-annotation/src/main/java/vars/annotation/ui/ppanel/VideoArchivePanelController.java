@@ -1,7 +1,7 @@
 /*
- * @(#)VideoArchiveSetEditorPanelController.java   2011.10.11 at 05:10:17 PDT
+ * @(#)VideoArchivePanelController.java   2013.10.02 at 03:52:57 PDT
  *
- * Copyright 2011 MBARI
+ * Copyright 2009 MBARI
  *
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -13,14 +13,21 @@
 
 
 
-package vars.annotation.ui.videoset;
+package vars.annotation.ui.ppanel;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
-import foxtrot.Job;
-import foxtrot.Worker;
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import org.bushe.swing.event.EventBus;
 import org.mbari.awt.AwtUtilities;
 import org.mbari.swing.LabeledSpinningDialWaitIndicator;
@@ -38,8 +45,6 @@ import vars.annotation.CameraDirections;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveDAO;
-import vars.annotation.VideoArchiveSet;
-import vars.annotation.VideoArchiveSetDAO;
 import vars.annotation.VideoFrame;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
@@ -52,6 +57,7 @@ import vars.annotation.ui.commandqueue.impl.ChangeCameraDirectionsCmd;
 import vars.annotation.ui.commandqueue.impl.RemoveAssociationsCmd;
 import vars.annotation.ui.commandqueue.impl.RemoveObservationsCmd;
 import vars.annotation.ui.commandqueue.impl.RenameObservationsCmd;
+import vars.annotation.ui.eventbus.VideoArchiveSelectedEvent;
 import vars.annotation.ui.table.JXObservationTable;
 import vars.annotation.ui.table.ObservationTableModel;
 import vars.knowledgebase.Concept;
@@ -61,29 +67,16 @@ import vars.shared.ui.LinkSelectionPanel;
 import vars.shared.ui.dialogs.ConceptNameSelectionDialog;
 import vars.shared.ui.dialogs.StandardDialog;
 
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
 /**
- * Created by IntelliJ IDEA.
- * User: brian
- * Date: Mar 2, 2010
- * Time: 5:24:37 PM
- * To change this template use File | Settings | File Templates.
+ * @author Brian Schlining
+ * @since 2013-10-02
  */
-public class VideoArchiveSetEditorPanelController {
+public class VideoArchivePanelController {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
     private AssociationSelectionDialog addAssociationDialog;
     private final MoveVideoFrameWithDialogAction moveAction;
-    private final VideoArchiveSetEditorPanel panel;
+    private final VideoArchiveEditorPanel panel;
     private AssociationSelectionDialog removeAssociationsDialog;
     private AssociationSelectionDialog renameAssociationsDialog;
     private ConceptNameSelectionDialog renameObservationsDialog;
@@ -95,7 +88,7 @@ public class VideoArchiveSetEditorPanelController {
      * @param panel
      * @param toolBelt
      */
-    public VideoArchiveSetEditorPanelController(VideoArchiveSetEditorPanel panel, ToolBelt toolBelt) {
+    public VideoArchivePanelController(VideoArchiveEditorPanel panel, ToolBelt toolBelt) {
         this.panel = panel;
         this.toolBelt = toolBelt;
         this.moveAction = new MoveVideoFrameWithDialogAction(AwtUtilities.getFrame(panel), toolBelt);
@@ -108,10 +101,6 @@ public class VideoArchiveSetEditorPanelController {
         AssociationSelectionDialog dialog = getAddAssociationDialog();
         dialog.setLinks(linkTemplates);
         dialog.setVisible(true);
-    }
-
-    protected ToolBelt getToolBelt() {
-        return  toolBelt;
     }
 
     protected void changeCameraDirectionsTo(CameraDirections direction) {
@@ -194,7 +183,7 @@ public class VideoArchiveSetEditorPanelController {
                 }
                 else {
                     log.debug("Unable to find Concept named '" + observation.getConceptName() +
-                            "' in the knowledgebase");
+                              "' in the knowledgebase");
                 }
 
                 conceptNames.add(observation.getConceptName());
@@ -286,7 +275,7 @@ public class VideoArchiveSetEditorPanelController {
     protected Collection<Observation> getObservations(boolean useSelectedOnly) {
         Collection<Observation> observations = new ArrayList<Observation>();
 
-        JXObservationTable myTable = panel.getTable();
+        JXObservationTable myTable = (JXObservationTable) Lookup.getObservationTableDispatcher().getValueObject();
         ObservationTableModel model = (ObservationTableModel) myTable.getModel();
         if (useSelectedOnly) {
             int[] rows = myTable.getSelectedRows();
@@ -425,7 +414,18 @@ public class VideoArchiveSetEditorPanelController {
         Collection<VideoFrame> videoFrames = getVideoFrames(true);
         moveAction.setVideoFrames(videoFrames);
         moveAction.doAction();
-        refresh();
+        // TODO moving videoframes leaves them in the ObservationTable even though they're moved
+        // - the bottom does not resolve the problem as it executes while the move dialog is displayed.
+        //   it needs to execute AFTER the move has been completed. Can we edit the eventbus
+        //   listener on the ObservationTable that responds to VideoFramesChangedEvent ?
+//        final Dispatcher dispatcher = Lookup.getVideoArchiveDispatcher();
+//        final VideoArchive videoArchive = (VideoArchive) dispatcher.getValueObject();
+//        VideoArchiveDAO videoArchiveDAO = toolBelt.getAnnotationDAOFactory().newVideoArchiveDAO();
+//        videoArchiveDAO.startTransaction();
+//        final VideoArchive refreshedVideoArchive = videoArchiveDAO.find(videoArchive);
+//        videoArchiveDAO.endTransaction();
+//        videoArchiveDAO.close();
+//        EventBus.publish(new VideoArchiveSelectedEvent(null, refreshedVideoArchive));
     }
 
     /**
@@ -433,58 +433,32 @@ public class VideoArchiveSetEditorPanelController {
      */
     protected void refresh() {
 
-        /*
-         * All observations that get added to the table, or that are currently
-         * in the table get added to this set and removed from the
-         * observationsInTable set. Then, observations left in the
-         * observationsInTable set are removed from the table and the
-         * observationsInTable variable is set to reference the new
-         * observationsStillInTable set. (this is the most efficient thing I
-         * could think of).
-         */
         WaitIndicator waitIndicator = new LabeledSpinningDialWaitIndicator(panel, "Refreshing ...");
-        Collection<Observation> selectedObservations = getObservations(true);
-        VideoArchiveSet videoArchiveSet = panel.getVideoArchiveSet();
 
-        JXObservationTable myTable = panel.getTable();
-        ObservationTableModel tableModel = (ObservationTableModel) myTable.getModel();
-        tableModel.clear();
+        VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
 
-        if (videoArchiveSet != null) {
+        if (videoArchive != null) {
             if (log.isDebugEnabled()) {
-                log.debug("Retrieving all video frames for " + videoArchiveSet);
+                log.debug("Retrieving all video frames for " + videoArchive);
             }
 
-
-            // Fetch data in background thread
-            final VideoArchiveSet vas = videoArchiveSet;
-            Collection<VideoFrame> videoFrames = (Collection<VideoFrame>) Worker.post(new Job() {
-
-                @Override
-                public Object run() {
-                    VideoArchiveSetDAO dao = toolBelt.getAnnotationDAOFactory().newVideoArchiveSetDAO();
-                    dao.startTransaction();
-                    VideoArchiveSet foundVas = dao.find(vas);    // Bring it into the transaction
-                    final Collection<VideoFrame> videoFrames = (foundVas == null)
-                        ? new ArrayList<VideoFrame>() : ImmutableList.copyOf(foundVas.getVideoFrames());
-                    dao.endTransaction();
-
-                    return videoFrames;
-                }
-            });
-
+            VideoArchiveDAO dao = toolBelt.getAnnotationDAOFactory().newVideoArchiveDAO();
+            dao.startTransaction();
+            videoArchive = dao.find(videoArchive);
 
             // repopulate the table and pull out parts need to set other UI components
-            Collection<String> names = new HashSet<String>();         // for ConceptComboBox
+            Collection <String> names = new HashSet<String>();         // for ConceptComboBox
             Collection<ILink> associations = new HashSet<ILink>();    // for associationComboBox
+            Collection<VideoFrame> videoFrames = videoArchive.getVideoFrames();
             for (VideoFrame videoFrame : videoFrames) {
                 final Collection<Observation> observations = ImmutableList.copyOf(videoFrame.getObservations());
                 for (Observation observation : observations) {
-                    myTable.addObservation(observation);
                     names.add(observation.getConceptName());
                     associations.addAll(observation.getAssociations());
                 }
             }
+            dao.endTransaction();
+            dao.close();
 
             // Update the conceptComboBox
             String[] namesArray = new String[names.size()];
@@ -492,15 +466,12 @@ public class VideoArchiveSetEditorPanelController {
             panel.getConceptComboBox().updateModel(namesArray);
 
             // Populate the Association combobox
-            SearchableComboBoxModel<ILink> model = (SearchableComboBoxModel<ILink>) panel.getAssociationComboBox()
-                .getModel();
+            SearchableComboBoxModel<ILink> model =
+                    (SearchableComboBoxModel<ILink>) panel.getAssociationComboBox().getModel();
             model.clear();
             model.addAll(associations);
         }
 
-        myTable.setSelectedObservations(selectedObservations);
-
-        //toolBelt.getPersistenceController().updateUI();
         waitIndicator.dispose();
 
     }
@@ -577,6 +548,7 @@ public class VideoArchiveSetEditorPanelController {
                             break;
                         }
                     }
+
                     return ok;
                 }
 
@@ -591,7 +563,7 @@ public class VideoArchiveSetEditorPanelController {
      * @param observations
      */
     protected void selectObservations(Collection<Observation> observations) {
-        JXObservationTable myTable = panel.getTable();
+        JXObservationTable myTable = (JXObservationTable) Lookup.getObservationTableDispatcher().getValueObject();
         Collection<Observation> allObservations = getObservations(false);
         allObservations.retainAll(observations);
         myTable.setSelectedObservations(allObservations);

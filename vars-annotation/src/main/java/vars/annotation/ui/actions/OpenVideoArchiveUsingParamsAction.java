@@ -87,7 +87,7 @@ public class OpenVideoArchiveUsingParamsAction extends ActionAdapter {
                 VideoArchive videoArchive = videoArchiveDAO.findOrCreateByParameters(platform, seqNumber, videoArchiveName);
                 Collection<VideoFrame> videoFrames = videoArchive.getVideoFrames(); // Load the videoFrames while the transaction is open
                 /*
-                 * Some JPA implementation may not loade the object unless it's touched.
+                 * Some JPA implementation may not loaded the object unless it's touched.
                  * So I'll give the lazy loaded objects some love here.
                  */
                 int i = 0;

@@ -27,6 +27,7 @@ import org.mbari.swing.SearchableTreePanel;
 import vars.CacheClearedEvent;
 import vars.CacheClearedListener;
 
+import vars.annotation.ui.ppanel.VideoArchiveEditorPanel;
 import vars.shared.ui.UIDecorator;
 import vars.shared.ui.tree.ConceptTreeCellRenderer;
 import vars.shared.ui.tree.ConceptTreeModel;
@@ -142,6 +143,7 @@ public class MiscTabsPanel extends javax.swing.JPanel {
         tabbedPane.add("Video Archive", new PVideoArchivePanel(toolbelt));
         tabbedPane.add("Physical Data", new PPhysicalDataPanel());
         tabbedPane.add("Camera Data", new PCameraDataPanel(toolbelt));
+        tabbedPane.add("Bulk Editor", new VideoArchiveEditorPanel(toolbelt));
         
     }
 
