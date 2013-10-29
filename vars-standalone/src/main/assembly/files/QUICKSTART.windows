@@ -3,12 +3,12 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-VARS 7.0 is configured to run on a 32-bit JVM only!!
+VARS 7.x is configured to run on a 32-bit JVM only!!
 
 In order for VARS to run on your system you will need to install the following 
 before installing VARS:
 
-    1) Java 1.7 (also known as Java 7)
+    1) Java 1.6 (x86) or Java 1.7 (x86)
     2) Quicktime for Java
 
 Installation Instructions for Prerequisites
@@ -23,7 +23,7 @@ II) Installing Quicktime for Java
     
     Go to http://www.apple.com/quicktime/download. Download and run the 
     installer. Installing iTunes will also install Quicktime for Java. The 
-    QuickTime installer should be run AFTER you have installed Java. 
+    QuickTime installer should be run AFTER you have installed Java.
      
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

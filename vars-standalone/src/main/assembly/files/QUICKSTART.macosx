@@ -2,18 +2,11 @@
 ~~  Prerequisites
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you are using VARS to annotate video tapes be aware that Apple computers do 
-not ship with built in serial ports. In order to fully use the Annotation 
-application you will need to install a serial port in order to talk to the VCR. 
-Their are several options for this, the easiest is using a USB Serial Port 
-adapter such as the USB PDA/Serial Adapter (GUC232A) from IOGEAR. Be sure to 
-install the correct driver too! Some video capture cards include an RS422 serial
-port that can be used by VARS.
+Mac OS X includes all the prerequisites needed for running VARS. However, if you
+find that VARS is unable to open a particular video codec, you may need to 
+install 3rd party video codecs. A good start is to install Perian 
+(http://www.perian.org/).
 
-NOTE: The serial port libraries included with VARS do not work with Java 6 on 
-Leopard. If you need to run Java 6 you will need to download the source code
-for RXTX and recompile it to target Java 6. If you don't know what that means, 
-stick with Java 5 on the Mac.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~  Running VARS

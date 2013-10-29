@@ -4,16 +4,19 @@ INSTALLING VARS ON MAC OS X
 ~~  Prerequisites
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you are using VARS to annotate video tapes be aware that Apple computers do 
-not ship with built in serial ports. In order to fully use the Annotation 
-application you will need to install a serial port in order to talk to the VCR. 
-Their are several options for this, the easiest is using a USB Serial Port 
-adapter such as the USB PDA/Serial Adapter (GUC232A) from IOGEAR. Be sure to 
-install the correct driver too! Some video capture cards include an RS422 serial
-port that can be used by VARS.
+Mac OS X includes all the prerequisites needed for running VARS. However, if you
+find that VARS is unable to open a particular video codec, you may need to 
+install 3rd party video codecs. A good start is to install Perian 
+(http://www.perian.org/).
 
-NOTE: The serial port libraries included with VARS have been tested on 10.7 
-(Lion) and 10.8 (Mountain Lion)
+Currently, VARS uses QuickTime for Java to play video files. QuickTime for Java 
+requires a 32-bit JVM (i.e Java 6 from Apple). Java 6 is included on all
+Macs, however, if you have installed Java 7 it may be used as the default Java.
+If Java 7 is the default, the VARS Annotation application will fail to run
+correctly. You can switch to Java 6 be executing the following command in the 
+terminal BEFORE starting the annotation application:
+
+    export JAVA_HOME=`/usr/libexec/java_home -v 1.6`
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

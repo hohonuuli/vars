@@ -32,6 +32,7 @@ import org.mbari.util.Dispatcher;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.dialogs.OpenVideoArchiveDialog;
 import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
+import vars.annotation.ui.dialogs.QTOpenVideoArchiveDialog;
 import vars.annotation.ui.eventbus.VideoArchiveSelectedEvent;
 
 /**
@@ -43,7 +44,7 @@ import vars.annotation.ui.eventbus.VideoArchiveSelectedEvent;
  */
 public class StatusLabelForVideoArchive extends StatusLabel {
 
-    private final OpenVideoArchiveDialog dialog;
+    private final QTOpenVideoArchiveDialog dialog;
 
     /**
      * Constructor for the StatusLabelForVideoArchive object
@@ -55,7 +56,7 @@ public class StatusLabelForVideoArchive extends StatusLabel {
         Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
         final Dispatcher videoArchiveDispatcher = Lookup.getVideoArchiveDispatcher();
 
-        dialog = new OpenVideoArchiveDialog(frame, toolBelt);
+        dialog = new QTOpenVideoArchiveDialog(frame, toolBelt);
         dialog.getOkayButton().addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 dialog.setVisible(false);
