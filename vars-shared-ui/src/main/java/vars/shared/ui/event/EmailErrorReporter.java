@@ -2,7 +2,6 @@ package vars.shared.ui.event;
 
 import org.apache.commons.mail.Email;
 import org.apache.commons.mail.HtmlEmail;
-import org.apache.commons.mail.SimpleEmail;
 import org.jdesktop.swingx.JXErrorPane;
 import org.jdesktop.swingx.error.ErrorInfo;
 import org.jdesktop.swingx.error.ErrorReporter;
@@ -34,21 +33,20 @@ public class EmailErrorReporter implements ErrorReporter {
     }
 
     private Logger log = LoggerFactory.getLogger(getClass());
-    private static final String DEFAULT_EMAIL = "unknown@vars.sourceforge.net";
-    private static final String DEFAULT_USER = "VARS";
+    private static final String DEFAULT_EMAIL = "brian@mbari.org";
+    private static final String DEFAULT_USER = "VARS Error Reporter";
     
     public void reportError(ErrorInfo errorInfo) throws NullPointerException {
 
         try {
 
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            UserAccount userAccount = (UserAccount) GlobalLookup.getUserAccountDispatcher().getValueObject();
 
             Email email = new HtmlEmail();
             email.setHostName("mbarimail.mbari.org");
-            email.addTo("brian@mbari.org");
-
-            UserAccount userAccount = (UserAccount) GlobalLookup.getUserAccountDispatcher().getValueObject();
             email.setFrom(getEmail(userAccount), getName(userAccount));
+            email.addTo("brian@mbari.org");
             email.setSubject("VARS Error Report: " + errorInfo.getTitle());
             email.setMsg("<html><body>" + df.format(new Date()) + "\n\n" +
                     errorInfo.getDetailedErrorMessage() + "</body></html>");
@@ -60,7 +58,6 @@ public class EmailErrorReporter implements ErrorReporter {
 
         Frame frame = AwtUtilities.getFrame(errorPane);
         frame.dispose();
-
 
     }
 

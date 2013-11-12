@@ -113,7 +113,6 @@ public class NonFatalErrorSubscriber implements EventTopicSubscriber {
     ImageIcon randomImage() {
             final List<String> images = new ArrayList<String>() {
                 {
-                    add("/vars/images/yellow-smile.jpg");
                     add("/vars/images/warning/60_Whoops.jpg");
                     add("/vars/images/warning/cartoonprogramming_thumb.jpg");
                     add("/vars/images/warning/epic-fail1.jpg");
@@ -128,9 +127,10 @@ public class NonFatalErrorSubscriber implements EventTopicSubscriber {
                     add("/vars/images/warning/Whoops-Not-a-firefly.jpg");
                     add("/vars/images/warning/whoops-too-many-cookies.jpg");
                     add("/vars/images/warning/Whoops.jpg");
-                    add("/vars/images/warning/xkcd_mimic_octopus.png");
                     add("/vars/images/warning/xkcd-free-will.png");
+                    add("/vars/images/warning/xkcd_mimic_octopus.png");
                     add("/vars/images/warning/yell-back.jpg");
+                    add("/vars/images/yellow-smile.jpg");
                 }
 
             };

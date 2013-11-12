@@ -262,11 +262,13 @@ public class AnnotationLayerUI<T extends JImageUrlCanvas> extends ImageFrameLaye
 
             String conceptName = getConcept().getPrimaryConceptName().getName();
             String user = ((UserAccount) Lookup.getUserAccountDispatcher().getValueObject()).getUserName();
-            Command command = new AddObservationToVideoFrameCmd(conceptName, dataCoordinator.getVideoFrame(), user,
-                point, true);
-            CommandEvent commandEvent = new CommandEvent(command);
-            EventBus.publish(commandEvent);
-
+            VideoFrame videoFrame = dataCoordinator.getVideoFrame();
+            if (videoFrame != null) {
+                Command command = new AddObservationToVideoFrameCmd(conceptName, dataCoordinator.getVideoFrame(), user,
+                        point, true);
+                CommandEvent commandEvent = new CommandEvent(command);
+                EventBus.publish(commandEvent);
+            }
         }
 
         void sendSelectionNotification(Collection<Observation> selectedObservations) {
