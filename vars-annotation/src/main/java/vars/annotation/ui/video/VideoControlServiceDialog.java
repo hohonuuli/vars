@@ -174,7 +174,7 @@ public class VideoControlServiceDialog extends StandardDialog {
                 ConnectionParameters connectionParameters = null;
                 switch (source) {
                 case RS422:
-                    videoControlService = new RSS422VideoControlService();
+                    videoControlService = new RS422VideoControlService();
                     connectionParameters = getRs422Panel();
                     break;
 

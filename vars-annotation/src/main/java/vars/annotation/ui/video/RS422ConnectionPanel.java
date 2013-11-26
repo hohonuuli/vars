@@ -16,6 +16,7 @@
 package vars.annotation.ui.video;
 
 import gnu.io.CommPortIdentifier;
+//import purejavacomm.CommPortIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +54,7 @@ public class RS422ConnectionPanel extends JPanel implements ConnectionParameters
             // RXTX can only be initialize on the JDK/OS it was compiled for. Here we'll catch
             // problems when it can't be loaded so that VARS will run gracefully degraded.
             try {
-                RSS422VideoControlService videoControlService = new RSS422VideoControlService();
+                RS422VideoControlService videoControlService = new RS422VideoControlService();
                 Set<CommPortIdentifier> cpis = videoControlService.findAvailableCommPorts();
                 for (CommPortIdentifier commPortIdentifier : cpis) {
                     comboBox.addItem(commPortIdentifier.getName());

@@ -15,7 +15,7 @@ import org.mbari.movie.Timecode
 import org.mbari.movie.VideoTimeBean
 import vars.annotation.CameraData
 import vars.annotation.ui.Lookup
-import vars.annotation.ui.video.RSS422VideoControlService
+import vars.annotation.ui.video.RS422VideoControlService
 import vars.shared.ui.video.ImageCaptureService
 
 class SimpaLoader {
@@ -63,7 +63,7 @@ class SimpaLoader {
         
         // Initialize video control service
         try {
-        def videoControlService = new RSS422VideoControlService()
+        def videoControlService = new RS422VideoControlService()
             videoControlService.connect(commport, 29.97D)
             vcr = videoControlService.vcr
         }
