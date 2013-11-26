@@ -16,9 +16,9 @@
 
 @interface AVFStillImageCapture : NSObject {}
 
-@property (nonatomic, retain) AVCaptureSession *session;
-@property (nonatomic, retain) AVCaptureStillImageOutput *stillImageOutput;
-@property (nonatomic,retain) AVCaptureDeviceInput *videoInput;
+@property (nonatomic, strong) AVCaptureSession *session;
+@property (nonatomic, strong) AVCaptureStillImageOutput *stillImageOutput;
+@property (nonatomic, strong) AVCaptureDeviceInput *videoInput;
 
 +(NSArray *) videoCaptureDevices;
 +(NSArray *) videoCaptureDevicesAsStrings;
