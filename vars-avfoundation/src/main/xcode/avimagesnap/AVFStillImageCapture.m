@@ -107,56 +107,6 @@
     }
 }
 
-/*-(void) saveStillImageToPath: (NSString *) path {
-    
-    AVCaptureConnection *captureConnection = nil;
-    
-    if (stillImageOutput != nil) {
-        captureConnection = [[stillImageOutput connections] objectAtIndex:0];
-    }
-    
-    if (captureConnection != nil) {
-        
-        [stillImageOutput captureStillImageAsynchronouslyFromConnection:captureConnection completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
-            
-            // --- Convert to a CGImageRef
-            // This FAILS and imageBuffer is NULL ... no idea why as it's straight from ALL of 
-            // Apples' samples.
-            CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(imageDataSampleBuffer);
-            
-            // Lock imageBuffer
-            CVPixelBufferLockBaseAddress(imageBuffer, 0);
-            
-            // Get info about image
-            uint8_t *baseAddress = (uint8_t *) CVPixelBufferGetBaseAddress(imageBuffer);
-            size_t bytesPerRow = CVPixelBufferGetBytesPerRow(imageBuffer);
-            size_t width = CVPixelBufferGetWidth(imageBuffer);
-            size_t height = CVPixelBufferGetHeight(imageBuffer);
-            
-            // Create a CGImageRef from CVImageBufferRef
-            CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-            CGContextRef newContext = CGBitmapContextCreate(baseAddress, width, height, 8, bytesPerRow, colorSpace, kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
-            CGImageRef newImage = CGBitmapContextCreateImage(newContext);
-            CGContextRelease(newContext);
-            CGColorSpaceRelease(colorSpace);
-            
-            // --- Write as PNG
-            CFURLRef url = (__bridge CFURLRef)[NSURL fileURLWithPath:path];
-            CGImageDestinationRef destination = CGImageDestinationCreateWithURL(url, kUTTypePNG, 1, NULL);
-            CGImageDestinationAddImage(destination, newImage, nil);
-            if (!CGImageDestinationFinalize(destination)) {
-                NSLog(@"Failed to write image to %@", path);
-            }
-            CFRelease(destination);
-            CGImageRelease(newImage);
-            
-            // Unlock imageBuffer
-            CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
-            
-        }];
-
-    }
-} */
 
 -(void) saveStillImageToPath:(NSString *)path {
     AVCaptureConnection *captureConnection = nil;
@@ -169,20 +119,14 @@
         
         [stillImageOutput captureStillImageAsynchronouslyFromConnection:captureConnection completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
             
-            // Save as JPG
-//            if (imageDataSampleBuffer != NULL) {
-//                NSLog(@"Saving %@", path);
-//                NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
-//                [imageData writeToFile:path atomically:YES];
-//            }
-            
             // Save as PNG
             if (imageDataSampleBuffer != NULL) {
                 NSLog(@"Saving %@", path);
                 NSData *jpgData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
+//                [jpgData writeToFile:path atomically:YES]; // Save as JPG
                 NSBitmapImageRep *bitmap = [NSBitmapImageRep imageRepWithData:jpgData];
                 NSData *pngData = [bitmap representationUsingType: NSPNGFileType properties:nil];
-                [pngData writeToFile:path atomically:YES];
+                [pngData writeToFile:path atomically:YES]; // Save as PNG
             }
         }];
     }

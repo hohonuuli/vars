@@ -7,19 +7,32 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		D38CB95B1843CAA5004EEC57 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D38CB95A1843CAA5004EEC57 /* AppKit.framework */; };
 		D396604B183D780B00A1FA6F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D396604A183D780B00A1FA6F /* main.m */; };
 		D396604D183D780B00A1FA6F /* avimagesnap.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = D396604C183D780B00A1FA6F /* avimagesnap.1 */; };
-		D396605A183D788100A1FA6F /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3966059183D788100A1FA6F /* AVFoundation.framework */; };
-		D396605C183D78B600A1FA6F /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D396605B183D78B600A1FA6F /* CoreFoundation.framework */; };
-		D396605E183D78CA00A1FA6F /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D396605D183D78CA00A1FA6F /* CoreMedia.framework */; };
-		D3966060183D803F00A1FA6F /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D396605F183D803F00A1FA6F /* ImageIO.framework */; };
 		D3AEA75E183ECB690069EDA3 /* AVFStillImageCapture.m in Sources */ = {isa = PBXBuildFile; fileRef = D3AEA75D183ECB690069EDA3 /* AVFStillImageCapture.m */; };
-		D3AEA7601840173C0069EDA3 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3AEA75F1840173C0069EDA3 /* CoreGraphics.framework */; };
-		D3AEA7621840177B0069EDA3 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3AEA7611840177B0069EDA3 /* CoreVideo.framework */; };
-		D3AEA7661840191A0069EDA3 /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3AEA7651840191A0069EDA3 /* CoreServices.framework */; };
-		D3AEA76A1840223F0069EDA3 /* JavaNativeFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3AEA7691840223F0069EDA3 /* JavaNativeFoundation.framework */; };
-		D3AEA76C184022820069EDA3 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3AEA76B184022820069EDA3 /* Cocoa.framework */; };
+		D3BAFD931843D3CC00AA2B52 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3BAFD921843D3CC00AA2B52 /* AppKit.framework */; };
+		D3BAFD961843D41200AA2B52 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3BAFD951843D41200AA2B52 /* AVFoundation.framework */; };
+		D3BAFD981843D42500AA2B52 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3BAFD971843D42500AA2B52 /* Cocoa.framework */; };
+		D3BAFD9A1843D43900AA2B52 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3BAFD991843D43900AA2B52 /* CoreFoundation.framework */; };
+		D3BAFD9C1843D44600AA2B52 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3BAFD9B1843D44600AA2B52 /* CoreGraphics.framework */; };
+		D3BAFD9E1843D45200AA2B52 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3BAFD9D1843D45200AA2B52 /* CoreMedia.framework */; };
+		D3BAFDA01843D46300AA2B52 /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3BAFD9F1843D46300AA2B52 /* CoreServices.framework */; };
+		D3BAFDA21843D47000AA2B52 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3BAFDA11843D47000AA2B52 /* CoreVideo.framework */; };
+		D3BAFDA41843D47D00AA2B52 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3BAFDA31843D47D00AA2B52 /* ImageIO.framework */; };
+		D3BAFDB918440F7900AA2B52 /* vars_avfoundation_AVFImageCaptureServiceImpl.h in Headers */ = {isa = PBXBuildFile; fileRef = D3BAFDB818440F7900AA2B52 /* vars_avfoundation_AVFImageCaptureServiceImpl.h */; };
+		D3BAFDBB18440F8500AA2B52 /* AVFStillImageCapture.m in Sources */ = {isa = PBXBuildFile; fileRef = D3AEA75D183ECB690069EDA3 /* AVFStillImageCapture.m */; };
+		D3BAFDBF1844103C00AA2B52 /* vars_avfoundation_AVFImageCaptureServiceImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = D3BAFDBE1844103C00AA2B52 /* vars_avfoundation_AVFImageCaptureServiceImpl.m */; };
+		D3BAFDC01844117E00AA2B52 /* JavaNativeFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3BAFDA51843D48F00AA2B52 /* JavaNativeFoundation.framework */; };
+		D3BAFDC11844118200AA2B52 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3BAFD9B1843D44600AA2B52 /* CoreGraphics.framework */; };
+		D3BAFDC21844118500AA2B52 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3BAFD921843D3CC00AA2B52 /* AppKit.framework */; };
+		D3BAFDC31844118800AA2B52 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3BAFD951843D41200AA2B52 /* AVFoundation.framework */; };
+		D3BAFDC41844118B00AA2B52 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3BAFD971843D42500AA2B52 /* Cocoa.framework */; };
+		D3BAFDC51844118E00AA2B52 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3BAFD991843D43900AA2B52 /* CoreFoundation.framework */; };
+		D3BAFDC61844119100AA2B52 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3BAFD9D1843D45200AA2B52 /* CoreMedia.framework */; };
+		D3BAFDC71844119400AA2B52 /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3BAFD9F1843D46300AA2B52 /* CoreServices.framework */; };
+		D3BAFDC81844119700AA2B52 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3BAFDA11843D47000AA2B52 /* CoreVideo.framework */; };
+		D3BAFDC91844119A00AA2B52 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3BAFDA31843D47D00AA2B52 /* ImageIO.framework */; };
+		D3BAFDCD18441D7F00AA2B52 /* JavaVM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3BAFDCC18441D7F00AA2B52 /* JavaVM.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -36,21 +49,25 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		D38CB95A1843CAA5004EEC57 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = ../../../../System/Library/Frameworks/AppKit.framework; sourceTree = "<group>"; };
 		D3966047183D780B00A1FA6F /* avimagesnap */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = avimagesnap; sourceTree = BUILT_PRODUCTS_DIR; };
 		D396604A183D780B00A1FA6F /* main.m */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		D396604C183D780B00A1FA6F /* avimagesnap.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = avimagesnap.1; sourceTree = "<group>"; };
-		D3966059183D788100A1FA6F /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = ../../../../System/Library/Frameworks/AVFoundation.framework; sourceTree = "<group>"; };
-		D396605B183D78B600A1FA6F /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = ../../../../System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<group>"; };
-		D396605D183D78CA00A1FA6F /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = ../../../../System/Library/Frameworks/CoreMedia.framework; sourceTree = "<group>"; };
-		D396605F183D803F00A1FA6F /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = ../../../../System/Library/Frameworks/ImageIO.framework; sourceTree = "<group>"; };
 		D3AEA75C183ECB690069EDA3 /* AVFStillImageCapture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AVFStillImageCapture.h; sourceTree = "<group>"; };
 		D3AEA75D183ECB690069EDA3 /* AVFStillImageCapture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AVFStillImageCapture.m; sourceTree = "<group>"; };
-		D3AEA75F1840173C0069EDA3 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = ../../../../System/Library/Frameworks/CoreGraphics.framework; sourceTree = "<group>"; };
-		D3AEA7611840177B0069EDA3 /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = ../../../../System/Library/Frameworks/CoreVideo.framework; sourceTree = "<group>"; };
-		D3AEA7651840191A0069EDA3 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = ../../../../System/Library/Frameworks/CoreServices.framework; sourceTree = "<group>"; };
-		D3AEA7691840223F0069EDA3 /* JavaNativeFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaNativeFoundation.framework; path = ../../../../System/Library/Frameworks/JavaVM.framework/Versions/A/Frameworks/JavaNativeFoundation.framework; sourceTree = "<group>"; };
-		D3AEA76B184022820069EDA3 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = ../../../../System/Library/Frameworks/Cocoa.framework; sourceTree = "<group>"; };
+		D3BAFD921843D3CC00AA2B52 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
+		D3BAFD951843D41200AA2B52 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = /System/Library/Frameworks/AVFoundation.framework; sourceTree = "<absolute>"; };
+		D3BAFD971843D42500AA2B52 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = ../../../../../../../../System/Library/Frameworks/Cocoa.framework; sourceTree = "<group>"; };
+		D3BAFD991843D43900AA2B52 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = ../../../../../../../../System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<group>"; };
+		D3BAFD9B1843D44600AA2B52 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = ../../../../../../../../System/Library/Frameworks/CoreGraphics.framework; sourceTree = "<group>"; };
+		D3BAFD9D1843D45200AA2B52 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = ../../../../../../../../System/Library/Frameworks/CoreMedia.framework; sourceTree = "<group>"; };
+		D3BAFD9F1843D46300AA2B52 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = ../../../../../../../../System/Library/Frameworks/CoreServices.framework; sourceTree = "<group>"; };
+		D3BAFDA11843D47000AA2B52 /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = ../../../../../../../../System/Library/Frameworks/CoreVideo.framework; sourceTree = "<group>"; };
+		D3BAFDA31843D47D00AA2B52 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = ../../../../../../../../System/Library/Frameworks/ImageIO.framework; sourceTree = "<group>"; };
+		D3BAFDA51843D48F00AA2B52 /* JavaNativeFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaNativeFoundation.framework; path = ../../../../../../../../System/Library/Frameworks/JavaVM.framework/Versions/A/Frameworks/JavaNativeFoundation.framework; sourceTree = "<group>"; };
+		D3BAFDB318440B6000AA2B52 /* libavfimagesnap.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libavfimagesnap.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		D3BAFDB818440F7900AA2B52 /* vars_avfoundation_AVFImageCaptureServiceImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vars_avfoundation_AVFImageCaptureServiceImpl.h; sourceTree = "<group>"; };
+		D3BAFDBE1844103C00AA2B52 /* vars_avfoundation_AVFImageCaptureServiceImpl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = vars_avfoundation_AVFImageCaptureServiceImpl.m; sourceTree = "<group>"; };
+		D3BAFDCC18441D7F00AA2B52 /* JavaVM.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaVM.framework; path = ../../../../../../../../System/Library/Frameworks/JavaVM.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,16 +75,33 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D3966060183D803F00A1FA6F /* ImageIO.framework in Frameworks */,
-				D396605E183D78CA00A1FA6F /* CoreMedia.framework in Frameworks */,
-				D3AEA76A1840223F0069EDA3 /* JavaNativeFoundation.framework in Frameworks */,
-				D396605C183D78B600A1FA6F /* CoreFoundation.framework in Frameworks */,
-				D3AEA7601840173C0069EDA3 /* CoreGraphics.framework in Frameworks */,
-				D3AEA76C184022820069EDA3 /* Cocoa.framework in Frameworks */,
-				D396605A183D788100A1FA6F /* AVFoundation.framework in Frameworks */,
-				D38CB95B1843CAA5004EEC57 /* AppKit.framework in Frameworks */,
-				D3AEA7661840191A0069EDA3 /* CoreServices.framework in Frameworks */,
-				D3AEA7621840177B0069EDA3 /* CoreVideo.framework in Frameworks */,
+				D3BAFD9C1843D44600AA2B52 /* CoreGraphics.framework in Frameworks */,
+				D3BAFDA21843D47000AA2B52 /* CoreVideo.framework in Frameworks */,
+				D3BAFD931843D3CC00AA2B52 /* AppKit.framework in Frameworks */,
+				D3BAFD9E1843D45200AA2B52 /* CoreMedia.framework in Frameworks */,
+				D3BAFDA01843D46300AA2B52 /* CoreServices.framework in Frameworks */,
+				D3BAFD981843D42500AA2B52 /* Cocoa.framework in Frameworks */,
+				D3BAFD961843D41200AA2B52 /* AVFoundation.framework in Frameworks */,
+				D3BAFD9A1843D43900AA2B52 /* CoreFoundation.framework in Frameworks */,
+				D3BAFDA41843D47D00AA2B52 /* ImageIO.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D3BAFDB018440B6000AA2B52 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D3BAFDC61844119100AA2B52 /* CoreMedia.framework in Frameworks */,
+				D3BAFDC11844118200AA2B52 /* CoreGraphics.framework in Frameworks */,
+				D3BAFDC21844118500AA2B52 /* AppKit.framework in Frameworks */,
+				D3BAFDC41844118B00AA2B52 /* Cocoa.framework in Frameworks */,
+				D3BAFDC71844119400AA2B52 /* CoreServices.framework in Frameworks */,
+				D3BAFDC51844118E00AA2B52 /* CoreFoundation.framework in Frameworks */,
+				D3BAFDC31844118800AA2B52 /* AVFoundation.framework in Frameworks */,
+				D3BAFDC91844119A00AA2B52 /* ImageIO.framework in Frameworks */,
+				D3BAFDCD18441D7F00AA2B52 /* JavaVM.framework in Frameworks */,
+				D3BAFDC01844117E00AA2B52 /* JavaNativeFoundation.framework in Frameworks */,
+				D3BAFDC81844119700AA2B52 /* CoreVideo.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -77,18 +111,9 @@
 		D396603E183D780B00A1FA6F = {
 			isa = PBXGroup;
 			children = (
+				D3BAFD941843D3FA00AA2B52 /* Frameworks */,
 				D3966049183D780B00A1FA6F /* avimagesnap */,
 				D3966048183D780B00A1FA6F /* Products */,
-				D38CB95A1843CAA5004EEC57 /* AppKit.framework */,
-				D3966059183D788100A1FA6F /* AVFoundation.framework */,
-				D3AEA76B184022820069EDA3 /* Cocoa.framework */,
-				D396605B183D78B600A1FA6F /* CoreFoundation.framework */,
-				D3AEA75F1840173C0069EDA3 /* CoreGraphics.framework */,
-				D396605D183D78CA00A1FA6F /* CoreMedia.framework */,
-				D3AEA7651840191A0069EDA3 /* CoreServices.framework */,
-				D3AEA7611840177B0069EDA3 /* CoreVideo.framework */,
-				D396605F183D803F00A1FA6F /* ImageIO.framework */,
-				D3AEA7691840223F0069EDA3 /* JavaNativeFoundation.framework */,
 			);
 			sourceTree = "<group>";
 		};
@@ -96,6 +121,7 @@
 			isa = PBXGroup;
 			children = (
 				D3966047183D780B00A1FA6F /* avimagesnap */,
+				D3BAFDB318440B6000AA2B52 /* libavfimagesnap.dylib */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -103,6 +129,8 @@
 		D3966049183D780B00A1FA6F /* avimagesnap */ = {
 			isa = PBXGroup;
 			children = (
+				D3BAFDBE1844103C00AA2B52 /* vars_avfoundation_AVFImageCaptureServiceImpl.m */,
+				D3BAFDB818440F7900AA2B52 /* vars_avfoundation_AVFImageCaptureServiceImpl.h */,
 				D396604A183D780B00A1FA6F /* main.m */,
 				D396604C183D780B00A1FA6F /* avimagesnap.1 */,
 				D3AEA75C183ECB690069EDA3 /* AVFStillImageCapture.h */,
@@ -111,7 +139,36 @@
 			path = avimagesnap;
 			sourceTree = "<group>";
 		};
+		D3BAFD941843D3FA00AA2B52 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				D3BAFD9B1843D44600AA2B52 /* CoreGraphics.framework */,
+				D3BAFD921843D3CC00AA2B52 /* AppKit.framework */,
+				D3BAFD951843D41200AA2B52 /* AVFoundation.framework */,
+				D3BAFD971843D42500AA2B52 /* Cocoa.framework */,
+				D3BAFD991843D43900AA2B52 /* CoreFoundation.framework */,
+				D3BAFD9D1843D45200AA2B52 /* CoreMedia.framework */,
+				D3BAFD9F1843D46300AA2B52 /* CoreServices.framework */,
+				D3BAFDA11843D47000AA2B52 /* CoreVideo.framework */,
+				D3BAFDA31843D47D00AA2B52 /* ImageIO.framework */,
+				D3BAFDA51843D48F00AA2B52 /* JavaNativeFoundation.framework */,
+				D3BAFDCC18441D7F00AA2B52 /* JavaVM.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		D3BAFDB118440B6000AA2B52 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D3BAFDB918440F7900AA2B52 /* vars_avfoundation_AVFImageCaptureServiceImpl.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
 		D3966046183D780B00A1FA6F /* avimagesnap */ = {
@@ -130,6 +187,23 @@
 			productName = avimagesnap;
 			productReference = D3966047183D780B00A1FA6F /* avimagesnap */;
 			productType = "com.apple.product-type.tool";
+		};
+		D3BAFDB218440B6000AA2B52 /* avfimagesnap */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D3BAFDB418440B6000AA2B52 /* Build configuration list for PBXNativeTarget "avfimagesnap" */;
+			buildPhases = (
+				D3BAFDAF18440B6000AA2B52 /* Sources */,
+				D3BAFDB018440B6000AA2B52 /* Frameworks */,
+				D3BAFDB118440B6000AA2B52 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = avfimagesnap;
+			productName = avfimagesnap;
+			productReference = D3BAFDB318440B6000AA2B52 /* libavfimagesnap.dylib */;
+			productType = "com.apple.product-type.library.dynamic";
 		};
 /* End PBXNativeTarget section */
 
@@ -153,6 +227,7 @@
 			projectRoot = "";
 			targets = (
 				D3966046183D780B00A1FA6F /* avimagesnap */,
+				D3BAFDB218440B6000AA2B52 /* avfimagesnap */,
 			);
 		};
 /* End PBXProject section */
@@ -164,6 +239,15 @@
 			files = (
 				D3AEA75E183ECB690069EDA3 /* AVFStillImageCapture.m in Sources */,
 				D396604B183D780B00A1FA6F /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D3BAFDAF18440B6000AA2B52 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D3BAFDBF1844103C00AA2B52 /* vars_avfoundation_AVFImageCaptureServiceImpl.m in Sources */,
+				D3BAFDBB18440F8500AA2B52 /* AVFStillImageCapture.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -241,21 +325,66 @@
 		D3966051183D780B00A1FA6F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				EXECUTABLE_PREFIX = "";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SYSTEM_LIBRARY_DIR)/Frameworks/JavaVM.framework/Versions/A/Frameworks",
 				);
+				LD_DYLIB_INSTALL_NAME = "";
+				MACH_O_TYPE = mh_execute;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SYMROOT = build;
+				VALID_ARCHS = x86_64;
 			};
 			name = Debug;
 		};
 		D3966052183D780B00A1FA6F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				EXECUTABLE_PREFIX = "";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SYSTEM_LIBRARY_DIR)/Frameworks/JavaVM.framework/Versions/A/Frameworks",
 				);
+				LD_DYLIB_INSTALL_NAME = "";
+				MACH_O_TYPE = mh_execute;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SYMROOT = build;
+				VALID_ARCHS = x86_64;
+			};
+			name = Release;
+		};
+		D3BAFDB518440B6000AA2B52 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				EXECUTABLE_PREFIX = lib;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SYSTEM_LIBRARY_DIR)/Frameworks/JavaVM.framework/Versions/A/Frameworks",
+					"/Users/brian/workspace/vars/vars-avfoundation/src/main/xcode",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		D3BAFDB618440B6000AA2B52 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SYSTEM_LIBRARY_DIR)/Frameworks/JavaVM.framework/Versions/A/Frameworks",
+					"/Users/brian/workspace/vars/vars-avfoundation/src/main/xcode",
+				);
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -280,6 +409,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		D3BAFDB418440B6000AA2B52 /* Build configuration list for PBXNativeTarget "avfimagesnap" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D3BAFDB518440B6000AA2B52 /* Debug */,
+				D3BAFDB618440B6000AA2B52 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};
