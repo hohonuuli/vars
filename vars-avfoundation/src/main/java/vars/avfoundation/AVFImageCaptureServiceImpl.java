@@ -15,8 +15,14 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 import java.util.prefs.Preferences;
+import static java.nio.file.StandardWatchEventKinds.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -33,6 +39,15 @@ public class AVFImageCaptureServiceImpl implements ImageCaptureService {
     private StandardDialog dialog;
     File tempDir = new File(System.getProperty("java.io.tmpdir"));
 
+    public AVFImageCaptureServiceImpl() {
+        try {
+            System.loadLibrary(LIBRARY_NAME);
+            log.info(LIBRARY_NAME + " was found on the java.library.path and loaded");
+        }
+        catch (UnsatisfiedLinkError e) {
+            extractAndLoadNativeLibraries();
+        }
+    }
 
     ////////////////////////
     // Start of Natives   //
@@ -94,15 +109,17 @@ public class AVFImageCaptureServiceImpl implements ImageCaptureService {
         if (!isStarted) {
             startDevice();
         }
+
         saveSnapshotToSpecifiedPath(file.getAbsolutePath());
-        // -- Reread file as image
+
+        // -- Read file as image
         BufferedImage image = null;
         try {
-            image = ImageIO.read(file);
-        } catch (IOException e) {
-            EventBus.publish(GlobalLookup.TOPIC_WARNING, "Failed to read png image from " +
-                    file.getAbsolutePath());
+            image = watchForAndReadNewImage(file);
+        } catch (Exception e) {
+            EventBus.publish(GlobalLookup.TOPIC_WARNING, e);
         }
+
         return image;
     }
 
@@ -119,10 +136,9 @@ public class AVFImageCaptureServiceImpl implements ImageCaptureService {
         // -- Reread file as image
         BufferedImage image = null;
         try {
-            image = ImageIO.read(tempFile);
-        } catch (IOException e) {
-            EventBus.publish(GlobalLookup.TOPIC_WARNING, "Failed to read temporary image from " +
-                    tempFile.getAbsolutePath());
+            image = watchForAndReadNewImage(tempFile);
+        } catch (Exception e) {
+            EventBus.publish(GlobalLookup.TOPIC_WARNING, e);
         }
         // -- Delete the temp file in the background
         Thread thread = new Thread(new Runnable() {
@@ -209,5 +225,40 @@ public class AVFImageCaptureServiceImpl implements ImageCaptureService {
                     "You will not be able to use AVFoundation to capture images");
         }
 
+    }
+
+    /**
+     * AVFoundation writes the image asynchronously. We need to block and watch for them to be created.
+     * Lame, but even using Java Future's forces us to block.
+     * @param file
+     * @return
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    private BufferedImage watchForAndReadNewImage(File file) throws IOException, InterruptedException {
+        BufferedImage image = null;
+        final Path parentDir = file.getParentFile().toPath();
+        final WatchService watchService = parentDir.getFileSystem().newWatchService();
+        final WatchKey watchKey = parentDir.register(watchService, ENTRY_CREATE, ENTRY_MODIFY);
+        for(int i = 0; i < 10; i++) {
+            final WatchKey wk = watchService.poll(1, TimeUnit.SECONDS);
+            if (wk != null) {
+                for (WatchEvent<?> event : wk.pollEvents()) {
+                    final Path changedPath = (Path) event.context();
+                    if (changedPath.endsWith(file.getName())) {
+                        break;
+                    }
+                }
+            }
+            if (file.exists()) {
+                break;
+            }
+        }
+        watchService.close();
+
+        if (file.exists()) {
+            image = ImageIO.read(file);
+        }
+        return image;
     }
 }

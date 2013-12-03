@@ -14,7 +14,7 @@ JNIEXPORT jobjectArray JNICALL Java_vars_avfoundation_AVFImageCaptureServiceImpl
 (JNIEnv *env, jobject clazz) {
     // Set up an autoreleasePool for the JNI method - ALWAYS INCLUDE
 	/*DON'T FORGET THIS LINE!!!*/
-	JNF_COCOA_ENTER(env);
+	//JNF_COCOA_ENTER(env);
 	
 	// Grab the array of NSStrings
 	NSArray *videoDevicesAsStrings = [AVFStillImageCapture videoCaptureDevicesAsStrings];
@@ -36,7 +36,7 @@ JNIEXPORT jobjectArray JNICALL Java_vars_avfoundation_AVFImageCaptureServiceImpl
 	
 	// Clean up the autoreleasePool for the JNI method - ALWAYS INCLUDE
 	/*DON'T FORGET THIS LINE AND A RETURN!!!*/
-	JNF_COCOA_EXIT(env);
+	//JNF_COCOA_EXIT(env);
 	return 0;
 };
 
@@ -49,7 +49,7 @@ JNIEXPORT jstring JNICALL Java_vars_avfoundation_AVFImageCaptureServiceImpl_star
 (JNIEnv *env, jobject clazz, jstring namedDevice) {
     // Set up an autoreleasePool for the JNI method - ALWAYS INCLUDE
 	/*DON'T FORGET THIS LINE!!!*/
-	JNF_COCOA_ENTER(env);
+	//JNF_COCOA_ENTER(env);
 	
 	// Convert the incoming Device Name to an NSString
 	NSString *device = JNFJavaToNSString(env, namedDevice);
@@ -65,7 +65,7 @@ JNIEXPORT jstring JNICALL Java_vars_avfoundation_AVFImageCaptureServiceImpl_star
 	
 	// Clean up the autoreleasePool for the JNI method - ALWAYS INCLUDE
 	/*DON'T FORGET THIS LINE AND A RETURN!!!*/
-	JNF_COCOA_EXIT(env);
+	//JNF_COCOA_EXIT(env);
 	return 0;
 };
 
@@ -78,7 +78,7 @@ JNIEXPORT jstring JNICALL Java_vars_avfoundation_AVFImageCaptureServiceImpl_save
 (JNIEnv *env, jobject clazz, jstring specifiedPath) {
     // Set up an autoreleasePool for the JNI method - ALWAYS INCLUDE
 	/*DON'T FORGET THIS LINE!!!*/
-	JNF_COCOA_ENTER(env);
+	//JNF_COCOA_ENTER(env);
 	
 	// Convert the incoming filename to an NSString
 	NSString *path = JNFJavaToNSString(env, specifiedPath);
@@ -95,7 +95,7 @@ JNIEXPORT jstring JNICALL Java_vars_avfoundation_AVFImageCaptureServiceImpl_save
 	
 	// Clean up the autoreleasePool for the JNI method - ALWAYS INCLUDE
 	/*DON'T FORGET THIS LINE AND A RETURN!!!*/
-	JNF_COCOA_EXIT(env);
+	//JNF_COCOA_EXIT(env);
 	return 0;
 };
 
@@ -106,12 +106,12 @@ JNIEXPORT jstring JNICALL Java_vars_avfoundation_AVFImageCaptureServiceImpl_save
  */
 JNIEXPORT void JNICALL Java_vars_avfoundation_AVFImageCaptureServiceImpl_stopSession
 (JNIEnv *env, jobject clazz) {
-    JNF_COCOA_ENTER(env);
+    //JNF_COCOA_ENTER(env);
 	
 	// [imageCapture dealloc]; // Don't need. This project is using ARC
     imageCapture = nil; // On deallocation the session will be terminated
 	
-	JNF_COCOA_EXIT(env);
+	//JNF_COCOA_EXIT(env);
 };
 
 

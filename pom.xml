@@ -47,6 +47,19 @@
         <tagsoup.version>1.2.1</tagsoup.version>
         <vcr4j.version>1.8.0</vcr4j.version>
 
+        <!-- Reporting plugins -->
+        <maven.checkstyle.plugin>2.7</maven.checkstyle.plugin>
+        <maven.cobertura.plugin>2.5.1</maven.cobertura.plugin>
+        <maven.doxia.module.markdown.version>1.3</maven.doxia.module.markdown.version>
+        <maven.javadoc.plugin>2.9</maven.javadoc.plugin>
+        <maven.jxr.plugin>2.3</maven.jxr.plugin>
+        <maven.pmd.plugin>2.7.1</maven.pmd.plugin>
+        <maven.project.info.reports.plugin>2.6</maven.project.info.reports.plugin>
+        <maven.site.plugin>3.2</maven.site.plugin>
+        <maven.sonar.plugin>3.3.1</maven.sonar.plugin>
+        <maven.surefire.plugin>2.12.4</maven.surefire.plugin>
+        <maven.taglist.plugin>2.4</maven.taglist.plugin>
+        <maven.versions.plugin>1.3.1</maven.versions.plugin>
     </properties>
     <modules>
         <module>vars-core</module>
@@ -330,30 +343,41 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.7</version>
                 <configuration>
+                    <aggregate>true</aggregate>
                     <detectLinks>true</detectLinks>
                     <links>
-                        <link>http://download.oracle.com/javase/6/docs/api/</link>
+                        <link>http://download.oracle.com/javase/7/docs/api/</link>
                     </links>
                 </configuration>
-                <reportSets>
+                <!-- reportSets>
                     <reportSet>
                         <id>aggregate</id>
                         <reports>
                             <report>aggregate</report>
                         </reports>
                     </reportSet>
-                </reportSets>
+                </reportSets -->
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>${maven.checkstyle.plugin}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>${maven.project.info.reports.plugin}</version>
+            </plugin>
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>taglist-maven-plugin</artifactId>
                 <configuration>
+                    <aggregate>true</aggregate>
                     <tags>
                         <tag>TODO</tag>
                         <tag>RxINC</tag>
@@ -366,18 +390,29 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jxr-plugin</artifactId>
+                <configuration>
+                    <aggregate>true</aggregate>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
+                <version>${maven.pmd.plugin}</version>
                 <configuration>
-                    <linkXref>true</linkXref>
-                    <targetJdk>1.6</targetJdk>
+                    <aggregate>true</aggregate>
+                    <sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
+                    <!-- The minimum tokens before a violation -->
+                    <minimumTokens>100</minimumTokens>
+                    <!-- Turn off if no xref report -->
+                    <linkXRef>true</linkXRef>
+                    <verbose>true</verbose>
+                    <targetJdk>${java.version}</targetJdk>
                     <rulesets>
-                        <ruleset>/rulesets/basic.xml</ruleset>
-                        <ruleset>/rulesets/imports.xml</ruleset>
+                        <ruleset>/rulesets/maven.xml</ruleset>
+                        <ruleset>/rulesets/migrating_to_junit4.xml</ruleset>
+                        <ruleset>/rulesets/design.xml</ruleset>
                         <ruleset>/rulesets/unusedcode.xml</ruleset>
-                        <ruleset>/rulesets/finalizers.xml</ruleset>
+                        <ruleset>/rulesets/typeresolution.xml</ruleset>
                     </rulesets>
                 </configuration>
             </plugin>
@@ -385,12 +420,15 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>jdepend-maven-plugin</artifactId>
             </plugin>
-            <!-- Java 6 64bit requires more memory to run tests -->
             <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <argLine>-Xmx1048M</argLine>
-                </configuration>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>findbugs-maven-plugin</artifactId>
+                <version>${maven.findbugs.plugin}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>${maven.versions.plugin}</version>
             </plugin>
         </plugins>
     </reporting>

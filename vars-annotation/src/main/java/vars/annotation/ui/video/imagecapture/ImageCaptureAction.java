@@ -243,4 +243,5 @@ public class ImageCaptureAction extends ActionAdapter {
         }
 
     }
+
 }
