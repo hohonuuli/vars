@@ -27,13 +27,8 @@
         <guice.version>3.0</guice.version>
         <jama.version>1.0.2</jama.version>
         <jansi.version>1.11</jansi.version>
-<<<<<<< HEAD
-        <jasypt.version>1.9.0</jasypt.version>
-        <javax.persistence.version>2.0.4.v201112161009</javax.persistence.version>
-=======
         <jasypt.version>1.9.1</jasypt.version>
         <javax.persistence.version>2.1.0</javax.persistence.version>
->>>>>>> 4e7d34e455b6719a2129a8faecb82e666cb2b8dc
         <javax.transaction.version>1.1</javax.transaction.version>
         <jgoodies.version>1.0.5</jgoodies.version>
         <jline.version>1.0</jline.version>
@@ -50,11 +45,7 @@
         <swingx.version>1.6.5-1</swingx.version>
         <swing.layout.version>1.0.3</swing.layout.version>
         <tagsoup.version>1.2.1</tagsoup.version>
-<<<<<<< HEAD
-        <vcr4j.version>1.7.5</vcr4j.version>
-=======
         <vcr4j.version>1.8.0</vcr4j.version>
->>>>>>> 4e7d34e455b6719a2129a8faecb82e666cb2b8dc
 
         <!-- Reporting plugins -->
         <maven.checkstyle.plugin>2.7</maven.checkstyle.plugin>
