@@ -16,11 +16,13 @@
 package vars.annotation.ui.video;
 
 import gnu.io.CommPortIdentifier;
+//import purejavacomm.CommPortIdentifier;
 import java.io.File;
 import java.util.Date;
 import java.util.Set;
 import javax.swing.JDialog;
-import org.mbari.comm.CommUtil;
+import org.mbari.vcr.rs422.CommUtil;
+//import org.mbari.vcr.purejavacomm.CommUtil;
 import org.mbari.movie.Timecode;
 import org.mbari.nativelib.Native;
 import org.mbari.util.NumberUtilities;
@@ -29,9 +31,7 @@ import org.mbari.vcr.IVCRTimecode;
 import org.mbari.vcr.IVCRUserbits;
 //import org.mbari.vcr.purejavacomm.VCR;
 import org.mbari.vcr.rs422.VCR;
-import org.mbari.vcr.timer.AnnotationMonitoringVCR;
 import org.mbari.vcr.timer.AnnotationQueueVCR;
-import org.mbari.vcr.timer.priority.AnnotationPQVCR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.VARSException;
@@ -44,9 +44,9 @@ import vars.shared.ui.video.VideoTime;
  *
  * @author brian
  */
-public class RSS422VideoControlService extends AbstractVideoControlService {
+public class RS422VideoControlService extends AbstractVideoControlService {
 
-    private static final Logger log = LoggerFactory.getLogger(RSS422VideoControlService.class);
+    private static final Logger log = LoggerFactory.getLogger(RS422VideoControlService.class);
     private double frameRate;
     private static final String LIBRARY_NAME = "rxtxSerial";
 
@@ -54,7 +54,7 @@ public class RSS422VideoControlService extends AbstractVideoControlService {
     /**
      * Constructs ...
      */
-    public RSS422VideoControlService() {
+    public RS422VideoControlService() {
         try {
             System.loadLibrary(LIBRARY_NAME);
             log.info(LIBRARY_NAME + " was found on the java.library.path and loaded");

@@ -4,7 +4,7 @@ import vars.ToolBox
 import org.slf4j.LoggerFactory
 import vars.annotation.ui.Lookup
 import vars.shared.ui.video.ImageCaptureService
-import vars.annotation.ui.video.RSS422VideoControlService
+import vars.annotation.ui.video.RS422VideoControlService
 import org.mbari.vcr.VCRAdapter
 import org.mbari.movie.Timecode
 import org.mbari.vcr.VCRUtil
@@ -61,7 +61,7 @@ class AutoFramegrabLoader {
 
         // Initialize video control service
         try {
-            def videoControlService = new RSS422VideoControlService()
+            def videoControlService = new RS422VideoControlService()
             videoControlService.connect(commport, 29.97D)
             vcr = videoControlService.vcr
         }

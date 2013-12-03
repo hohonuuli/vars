@@ -136,7 +136,7 @@ public class App {
         /*
          * Add a special eventQueue that toggles the cursor if the application is busy
          */
-        Toolkit.getDefaultToolkit().getSystemEventQueue().push(new WaitCursorEventQueue(500));
+        //Toolkit.getDefaultToolkit().getSystemEventQueue().push(new WaitCursorEventQueue(500));
 
         JFrame frame = getAnnotationFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

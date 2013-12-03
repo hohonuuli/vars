@@ -1,6 +1,12 @@
 *.class
+*.iml
+.DS_Store
 
 # Package Files #
 *.jar
 *.war
 *.ear
+
+# Maven Build Directory #
+target/
+.idea/

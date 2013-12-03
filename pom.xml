@@ -16,19 +16,24 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <commons.cli.version>1.2</commons.cli.version>
-        <commons.email.version>1.3.1</commons.email.version>
+        <commons.email.version>1.3.2</commons.email.version>
         <derby.version>10.10.1.1</derby.version>
         <eclipselink.version>2.4.1</eclipselink.version>
         <eventbus.version>1.4</eventbus.version>
         <expd.version>1.2.1</expd.version>
         <foxtrot.version>4.0</foxtrot.version>
-        <groovy.version>2.1.7</groovy.version>
+        <groovy.version>2.1.9</groovy.version>
         <guava.version>15.0</guava.version>
         <guice.version>3.0</guice.version>
         <jama.version>1.0.2</jama.version>
         <jansi.version>1.11</jansi.version>
+<<<<<<< HEAD
         <jasypt.version>1.9.0</jasypt.version>
         <javax.persistence.version>2.0.4.v201112161009</javax.persistence.version>
+=======
+        <jasypt.version>1.9.1</jasypt.version>
+        <javax.persistence.version>2.1.0</javax.persistence.version>
+>>>>>>> 4e7d34e455b6719a2129a8faecb82e666cb2b8dc
         <javax.transaction.version>1.1</javax.transaction.version>
         <jgoodies.version>1.0.5</jgoodies.version>
         <jline.version>1.0</jline.version>
@@ -40,13 +45,30 @@
         <postgresql.version>9.0-801.jdbc4</postgresql.version>
         <qtx4j.version>0.18</qtx4j.version>
         <sanselan.version>0.97</sanselan.version>
-        <scala.version>2.10.2</scala.version>
+        <scala.version>2.10.3</scala.version>
         <slf4j.version>1.7.5</slf4j.version>
         <swingx.version>1.6.5-1</swingx.version>
         <swing.layout.version>1.0.3</swing.layout.version>
         <tagsoup.version>1.2.1</tagsoup.version>
+<<<<<<< HEAD
         <vcr4j.version>1.7.5</vcr4j.version>
+=======
+        <vcr4j.version>1.8.0</vcr4j.version>
+>>>>>>> 4e7d34e455b6719a2129a8faecb82e666cb2b8dc
 
+        <!-- Reporting plugins -->
+        <maven.checkstyle.plugin>2.7</maven.checkstyle.plugin>
+        <maven.cobertura.plugin>2.5.1</maven.cobertura.plugin>
+        <maven.doxia.module.markdown.version>1.3</maven.doxia.module.markdown.version>
+        <maven.javadoc.plugin>2.9</maven.javadoc.plugin>
+        <maven.jxr.plugin>2.3</maven.jxr.plugin>
+        <maven.pmd.plugin>2.7.1</maven.pmd.plugin>
+        <maven.project.info.reports.plugin>2.6</maven.project.info.reports.plugin>
+        <maven.site.plugin>3.2</maven.site.plugin>
+        <maven.sonar.plugin>3.3.1</maven.sonar.plugin>
+        <maven.surefire.plugin>2.12.4</maven.surefire.plugin>
+        <maven.taglist.plugin>2.4</maven.taglist.plugin>
+        <maven.versions.plugin>1.3.1</maven.versions.plugin>
     </properties>
     <modules>
         <module>vars-core</module>
@@ -55,10 +77,11 @@
         <module>vars-query</module>
         <module>vars-knowledgebase</module>
         <module>vars-annotation</module>
+        <module>vars-avfoundation</module>
         <module>vars-qtkit</module>
         <module>vars-quicktime</module>
         <module>vars-standalone</module>
-    </modules>
+  </modules>
     <scm>
         <connection>scm:hg:https://vars-redux.googlecode.com/hg/</connection>
         <developerConnection>scm:hg:https://vars-redux.googlecode.com/hg/</developerConnection>
@@ -329,30 +352,41 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.7</version>
                 <configuration>
+                    <aggregate>true</aggregate>
                     <detectLinks>true</detectLinks>
                     <links>
-                        <link>http://download.oracle.com/javase/6/docs/api/</link>
+                        <link>http://download.oracle.com/javase/7/docs/api/</link>
                     </links>
                 </configuration>
-                <reportSets>
+                <!-- reportSets>
                     <reportSet>
                         <id>aggregate</id>
                         <reports>
                             <report>aggregate</report>
                         </reports>
                     </reportSet>
-                </reportSets>
+                </reportSets -->
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>${maven.checkstyle.plugin}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>${maven.project.info.reports.plugin}</version>
+            </plugin>
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>taglist-maven-plugin</artifactId>
                 <configuration>
+                    <aggregate>true</aggregate>
                     <tags>
                         <tag>TODO</tag>
                         <tag>RxINC</tag>
@@ -365,18 +399,29 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jxr-plugin</artifactId>
+                <configuration>
+                    <aggregate>true</aggregate>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
+                <version>${maven.pmd.plugin}</version>
                 <configuration>
-                    <linkXref>true</linkXref>
-                    <targetJdk>1.6</targetJdk>
+                    <aggregate>true</aggregate>
+                    <sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
+                    <!-- The minimum tokens before a violation -->
+                    <minimumTokens>100</minimumTokens>
+                    <!-- Turn off if no xref report -->
+                    <linkXRef>true</linkXRef>
+                    <verbose>true</verbose>
+                    <targetJdk>${java.version}</targetJdk>
                     <rulesets>
-                        <ruleset>/rulesets/basic.xml</ruleset>
-                        <ruleset>/rulesets/imports.xml</ruleset>
+                        <ruleset>/rulesets/maven.xml</ruleset>
+                        <ruleset>/rulesets/migrating_to_junit4.xml</ruleset>
+                        <ruleset>/rulesets/design.xml</ruleset>
                         <ruleset>/rulesets/unusedcode.xml</ruleset>
-                        <ruleset>/rulesets/finalizers.xml</ruleset>
+                        <ruleset>/rulesets/typeresolution.xml</ruleset>
                     </rulesets>
                 </configuration>
             </plugin>
@@ -384,12 +429,15 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>jdepend-maven-plugin</artifactId>
             </plugin>
-            <!-- Java 6 64bit requires more memory to run tests -->
             <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <argLine>-Xmx1048M</argLine>
-                </configuration>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>findbugs-maven-plugin</artifactId>
+                <version>${maven.findbugs.plugin}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>${maven.versions.plugin}</version>
             </plugin>
         </plugins>
     </reporting>

@@ -194,15 +194,9 @@ public class UIDataCoordinator implements UIEventSubscriber {
         selectedObservations.clear();
         if (_videoFrame == null) {
             videoFrame = null;
-
             EventBus.publish(new IAFRepaintEvent(this, this));
         }
         else {
-
-//                Worker.post(new Job() {
-//
-//                    @Override
-//                    public Object run() {
 
             VideoFrameDAO dao = annotationDAOFactory.newVideoFrameDAO();
             ObservationDAO obsDao = annotationDAOFactory.newObservationDAO(dao.getEntityManager());
@@ -219,11 +213,6 @@ public class UIDataCoordinator implements UIEventSubscriber {
             dao.endTransaction();
             dao.close();
             EventBus.publish(new IAFRepaintEvent(UIDataCoordinator.this, UIDataCoordinator.this));
-
-//                        return null;    //To change body of implemented methods use File | Settings | File Templates.
-//                    }
-//
-//                });
 
         }
 

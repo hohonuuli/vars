@@ -259,7 +259,8 @@ public class AnnotationFrameController implements PreferenceUpdater, UIEventSubs
                 hostName = InetAddress.getLocalHost().getHostName();
             }
             catch (UnknownHostException ex) {
-                throw new VARSException("Unable to get hostname", ex);
+                log.warn("Unable to get hostname, defaulting to 'localhost'.", ex);
+                hostName = "localhost";
             }
 
             String className = getClass().getCanonicalName();

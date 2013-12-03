@@ -23,7 +23,7 @@ public class VideoControlServiceFactory {
                 videoControlService.connect(host, port, frameRate);
             }
             else {
-                videoControlService = new RSS422VideoControlService();
+                videoControlService = new RS422VideoControlService();
                 videoControlService.connect(videoConnectionId, frameRate);
             }
         }
