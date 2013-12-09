@@ -7,10 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		D334711B184EA4C800568E79 /* AVFCocoaWindowController.h in Headers */ = {isa = PBXBuildFile; fileRef = D3347119184EA4C800568E79 /* AVFCocoaWindowController.h */; };
-		D334711C184EA4C800568E79 /* AVFCocoaWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = D334711A184EA4C800568E79 /* AVFCocoaWindowController.m */; };
 		D396604B183D780B00A1FA6F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D396604A183D780B00A1FA6F /* main.m */; };
 		D396604D183D780B00A1FA6F /* avimagesnap.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = D396604C183D780B00A1FA6F /* avimagesnap.1 */; };
+		D3975A69184FBAA0001A0C62 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3975A68184FBAA0001A0C62 /* AppKit.framework */; };
 		D3AEA75E183ECB690069EDA3 /* AVFStillImageCapture.m in Sources */ = {isa = PBXBuildFile; fileRef = D3AEA75D183ECB690069EDA3 /* AVFStillImageCapture.m */; };
 		D3BAFD931843D3CC00AA2B52 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3BAFD921843D3CC00AA2B52 /* AppKit.framework */; };
 		D3BAFD961843D41200AA2B52 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3BAFD951843D41200AA2B52 /* AVFoundation.framework */; };
@@ -51,12 +50,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		D3347118184EA48100568E79 /* AVFCocoaWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AVFCocoaWindow.xib; sourceTree = "<group>"; };
-		D3347119184EA4C800568E79 /* AVFCocoaWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AVFCocoaWindowController.h; sourceTree = "<group>"; };
-		D334711A184EA4C800568E79 /* AVFCocoaWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AVFCocoaWindowController.m; sourceTree = "<group>"; };
 		D3966047183D780B00A1FA6F /* avimagesnap */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = avimagesnap; sourceTree = BUILT_PRODUCTS_DIR; };
 		D396604A183D780B00A1FA6F /* main.m */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		D396604C183D780B00A1FA6F /* avimagesnap.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = avimagesnap.1; sourceTree = "<group>"; };
+		D3975A68184FBAA0001A0C62 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = ../../../../../../../../System/Library/Frameworks/AppKit.framework; sourceTree = "<group>"; };
 		D3AEA75C183ECB690069EDA3 /* AVFStillImageCapture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AVFStillImageCapture.h; sourceTree = "<group>"; };
 		D3AEA75D183ECB690069EDA3 /* AVFStillImageCapture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AVFStillImageCapture.m; sourceTree = "<group>"; };
 		D3BAFD921843D3CC00AA2B52 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
@@ -105,6 +102,7 @@
 				D3BAFDC31844118800AA2B52 /* AVFoundation.framework in Frameworks */,
 				D3BAFDC91844119A00AA2B52 /* ImageIO.framework in Frameworks */,
 				D3BAFDCD18441D7F00AA2B52 /* JavaVM.framework in Frameworks */,
+				D3975A69184FBAA0001A0C62 /* AppKit.framework in Frameworks */,
 				D3BAFDC01844117E00AA2B52 /* JavaNativeFoundation.framework in Frameworks */,
 				D3BAFDC81844119700AA2B52 /* CoreVideo.framework in Frameworks */,
 			);
@@ -140,9 +138,6 @@
 				D396604C183D780B00A1FA6F /* avimagesnap.1 */,
 				D3AEA75C183ECB690069EDA3 /* AVFStillImageCapture.h */,
 				D3AEA75D183ECB690069EDA3 /* AVFStillImageCapture.m */,
-				D3347118184EA48100568E79 /* AVFCocoaWindow.xib */,
-				D3347119184EA4C800568E79 /* AVFCocoaWindowController.h */,
-				D334711A184EA4C800568E79 /* AVFCocoaWindowController.m */,
 			);
 			path = avimagesnap;
 			sourceTree = "<group>";
@@ -150,6 +145,7 @@
 		D3BAFD941843D3FA00AA2B52 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D3975A68184FBAA0001A0C62 /* AppKit.framework */,
 				D3BAFD9B1843D44600AA2B52 /* CoreGraphics.framework */,
 				D3BAFD921843D3CC00AA2B52 /* AppKit.framework */,
 				D3BAFD951843D41200AA2B52 /* AVFoundation.framework */,
@@ -172,7 +168,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D334711B184EA4C800568E79 /* AVFCocoaWindowController.h in Headers */,
 				D3BAFDB918440F7900AA2B52 /* vars_avfoundation_AVFImageCaptureServiceImpl.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -256,7 +251,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				D3BAFDBF1844103C00AA2B52 /* vars_avfoundation_AVFImageCaptureServiceImpl.m in Sources */,
-				D334711C184EA4C800568E79 /* AVFCocoaWindowController.m in Sources */,
 				D3BAFDBB18440F8500AA2B52 /* AVFStillImageCapture.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
