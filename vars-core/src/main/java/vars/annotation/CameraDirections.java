@@ -9,7 +9,7 @@ package vars.annotation;
  */
 public enum CameraDirections {
 
-    ASCEND("ascend"), CRUISE("cruise"), DESCEND("descend"),
+    ASCEND("ascend"), CRUISE("cruise"), DESCEND("descend"), DIELTRANSECT("diel transect"),
     ENDTRANSECT("endtransect"), LAUNCH("launch"), STARTTRANSECT("starttransect"),
     STATIONARY("stationary"), TRANSECT("transect"), UNSPECIFIED("unspecified");
 
