@@ -15,7 +15,8 @@ import java.io.IOException;
 import java.net.URL;
 
 /**
- * Created by brian on 12/16/13.
+ * Created by brian on 12/16/13. Based on an example from
+ * http://docs.oracle.com/javafx/2/swing/swing-fx-interoperability.htm
  */
 public class JFXMovieFrame extends JFrame {
 
