@@ -16,9 +16,11 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.util.Duration;
+import org.mbari.awt.image.ImageUtilities;
 import org.mbari.movie.Timecode;
 
 import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -103,18 +105,16 @@ public class JFXMovieFrameController implements Initializable {
         }
     }
 
-    public void frameCapture() throws IOException {
+    public void frameCapture(File target) throws IOException {
+
         if (mediaView != null) {
             Platform.runLater(() -> {
                 WritableImage image = mediaView.snapshot(new SnapshotParameters(), null);
-                ZonedDateTime time = ZonedDateTime.now();
-                String timeString = DateTimeFormatter.ISO_INSTANT.format(time);
-                File file = new File("framegrab-" + timeString + ".png");
-                System.out.println("Saving image to " + file.getAbsolutePath());
+                System.out.println("Saving image to " + target.getAbsolutePath());
                 try {
-                    ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
+                    ImageUtilities.saveImage(SwingFXUtils.fromFXImage(image, null), target);
                 } catch (IOException e) {
-                    System.out.println("Failed to write " + file.getAbsolutePath());
+                    System.out.println("Failed to write " + target.getAbsolutePath());
                 }
             });
 
