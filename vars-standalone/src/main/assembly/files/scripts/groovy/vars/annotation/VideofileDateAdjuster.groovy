@@ -28,7 +28,7 @@ class VideofileDateAdjuster {
             videoArchive.videoFrames.each { VideoFrame vf ->
                 try {
                     def timecode = new Timecode(vf.timecode)
-                    vf.recordedDate = new Date(date.time + timecode.seconds / 1000)
+                    vf.recordedDate = new Date(date.time + (timecode.frames * timecode.frameRate * 1000L) as Long)
                 }
                 catch (Exception e) {
                     log.warn("Unable to parse timecode of ${vf.timecode}")
