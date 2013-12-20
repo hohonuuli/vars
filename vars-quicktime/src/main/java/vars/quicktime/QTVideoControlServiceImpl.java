@@ -90,7 +90,7 @@ public class QTVideoControlServiceImpl extends AbstractVideoControlService imple
             grabber.dispose();
         }
 
-        if ((args.length != 1) && !(args[0] instanceof String)) {
+        if ((args.length != 2) && !(args[0] instanceof String)) {
             throw new IllegalArgumentException("You didn't call this method correctly. The argument is the " +
                                                "string URL to the movie to open with QuickTime");
         }
