@@ -106,7 +106,7 @@ object ImageReferenceFixer {
         injector.getInstance(classOf[ToolBelt])
     }
 
-    val log = LoggerFactory.getLogger(classOf[ImageReferenceFixer]);
+    val log = LoggerFactory.getLogger(classOf[ImageReferenceFixer])
 
     /**
      * @return true if the url is a file url
