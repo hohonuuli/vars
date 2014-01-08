@@ -16,4 +16,12 @@ public class JFXOpenVideoArchiveDialogController {
     public void onBrowse(ActionEvent actionEvent) {
 
     }
+
+    public void onOpenByLocation(ActionEvent actionEvent) {
+
+    }
+
+    public void onOpenExisting(ActionEvent actionEvent) {
+
+    }
 }

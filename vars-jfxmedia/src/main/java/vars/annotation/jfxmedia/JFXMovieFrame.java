@@ -50,7 +50,7 @@ public class JFXMovieFrame extends JFrame {
     }
 
     private void initFX(JFXPanel panel) throws IOException {
-        URL controllerLocation = getClass().getResource("/fxml/Scene.fxml");
+        URL controllerLocation = getClass().getResource("/fxml/JFXMovieFrame.fxml");
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(controllerLocation);
         loader.setBuilderFactory(new JavaFXBuilderFactory());
@@ -67,7 +67,7 @@ public class JFXMovieFrame extends JFrame {
         if (controller == null) {
             getPanel(); // initFX;
         }
-        return controller;
+        return controller; // TODO this is not thread safe
     }
 
 }

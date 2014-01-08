@@ -73,6 +73,11 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>vars-jfxmedia</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>vars-quicktime</artifactId>
             <version>${project.version}</version>
         </dependency>

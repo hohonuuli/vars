@@ -17,14 +17,11 @@ package vars.quicktime;
 
 import java.awt.*;
 import java.io.File;
-import java.net.URL;
 import java.util.Date;
 import javax.swing.*;
 import org.mbari.framegrab.FakeGrabber;
 import org.mbari.framegrab.IGrabber;
 import org.mbari.movie.Timecode;
-import org.mbari.movie.VideoTimeBean;
-import org.mbari.qt.VideoStandard;
 import org.mbari.vcr.IVCR;
 import org.mbari.vcr.qt.TimeSource;
 import org.mbari.vcr.qt.VCRWithDisplay;

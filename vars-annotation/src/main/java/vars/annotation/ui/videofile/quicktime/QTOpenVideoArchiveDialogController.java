@@ -1,6 +1,7 @@
-package vars.annotation.ui.dialogs;
+package vars.annotation.ui.videofile.quicktime;
 
 import org.bushe.swing.event.EventBus;
+import org.mbari.util.Tuple2;
 import org.mbari.vcr.qt.TimeSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,8 +9,11 @@ import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveDAO;
 import vars.annotation.VideoFrame;
 import vars.annotation.ui.Lookup;
+import vars.annotation.ui.videofile.EmptyVideoPlayerController;
+import vars.annotation.ui.videofile.VideoPlayerController;
 import vars.quicktime.QTVideoControlServiceImpl;
 import vars.shared.ui.video.FakeImageCaptureServiceImpl;
+import vars.shared.ui.video.VideoControlService;
 
 import java.util.Collection;
 
@@ -22,7 +26,7 @@ public class QTOpenVideoArchiveDialogController {
         this.dialog = dialog;
     }
 
-    public VideoArchive openVideoArchive() {
+    public Tuple2<VideoArchive, VideoPlayerController> openVideoArchive() {
         VideoArchive videoArchive = null;
         if (dialog.getOpenByLocationRB().isSelected()) {
             // Check to see if it exists
@@ -51,20 +55,20 @@ public class QTOpenVideoArchiveDialogController {
         // Configure the ImageCaptureService and VideoControlServices
         String name = videoArchive.getName(); // For movies the name should be the URL
         TimeSource timeSource = (TimeSource) dialog.getTimeSourceComboBox().getSelectedItem();
+        VideoPlayerController videoPlayerController;
         try {
-            QTVideoControlServiceImpl videoControlService = new QTVideoControlServiceImpl();
+            QTController controller = new QTController();
+            QTVideoControlServiceImpl videoControlService = controller.getVideoControlService();
             videoControlService.connect(name, timeSource);
-            Lookup.getImageCaptureServiceDispatcher().setValueObject(videoControlService);
-            Lookup.getVideoControlServiceDispatcher().setValueObject(videoControlService);
+            videoPlayerController = controller;
         }
         catch (Exception e) {
-            Lookup.getImageCaptureServiceDispatcher().setValueObject(new FakeImageCaptureServiceImpl());
-            Lookup.getVideoControlServiceDispatcher().setValueObject(null);
+            videoPlayerController = new EmptyVideoPlayerController();
             EventBus.publish(Lookup.TOPIC_WARNING, "Failed to open " + videoArchive.getName() +
                     " with QuickTime.\n Check to make sure the file exists.");
         }
 
-        return videoArchive;
+        return new Tuple2<>(videoArchive, videoPlayerController);
 
     }
 

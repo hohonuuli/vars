@@ -29,10 +29,12 @@ import org.bushe.swing.event.annotation.AnnotationProcessor;
 import org.bushe.swing.event.annotation.EventSubscriber;
 import org.mbari.swing.SwingUtils;
 import org.mbari.util.Dispatcher;
+import org.mbari.util.Tuple2;
 import vars.annotation.VideoArchive;
-import vars.annotation.ui.dialogs.OpenVideoArchiveDialog;
 import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
-import vars.annotation.ui.dialogs.QTOpenVideoArchiveDialog;
+import vars.annotation.ui.videofile.VideoPlayerController;
+import vars.annotation.ui.videofile.VideoPlayerDialogUI;
+import vars.annotation.ui.videofile.quicktime.QTOpenVideoArchiveDialog;
 import vars.annotation.ui.eventbus.VideoArchiveSelectedEvent;
 
 /**
@@ -44,7 +46,7 @@ import vars.annotation.ui.eventbus.VideoArchiveSelectedEvent;
  */
 public class StatusLabelForVideoArchive extends StatusLabel {
 
-    private final QTOpenVideoArchiveDialog dialog;
+    private final VideoPlayerDialogUI dialog;
 
     /**
      * Constructor for the StatusLabelForVideoArchive object
@@ -56,14 +58,18 @@ public class StatusLabelForVideoArchive extends StatusLabel {
         Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
         final Dispatcher videoArchiveDispatcher = Lookup.getVideoArchiveDispatcher();
 
+
         dialog = new QTOpenVideoArchiveDialog(frame, toolBelt);
-        dialog.getOkayButton().addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                dialog.setVisible(false);
-                VideoArchive videoArchive = dialog.openVideoArchive();
-                VideoArchiveSelectedEvent event = new VideoArchiveSelectedEvent(this, videoArchive);
-                EventBus.publish(event);
-            }
+        dialog.onOkay((Void) -> {
+            dialog.setVisible(false);
+            //VideoArchive videoArchive = dialog.openVideoArchive();
+            Tuple2<VideoArchive, VideoPlayerController> t = dialog.openVideoArchive();
+            VideoArchive videoArchive = t.getA();
+            VideoPlayerController videoPlayerController = t.getB();
+            VideoArchiveSelectedEvent event = new VideoArchiveSelectedEvent(this, videoArchive);
+            Lookup.getImageCaptureServiceDispatcher().setValueObject(videoPlayerController.getImageCaptureService());
+            Lookup.getVideoControlServiceDispatcher().setValueObject(videoPlayerController.getVideoControlService());
+            EventBus.publish(event);
         });
 
         AnnotationProcessor.process(this); // Register with EventBus

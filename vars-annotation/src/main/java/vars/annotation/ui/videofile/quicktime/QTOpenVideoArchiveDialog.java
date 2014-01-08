@@ -1,4 +1,4 @@
-package vars.annotation.ui.dialogs;
+package vars.annotation.ui.videofile.quicktime;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -14,6 +14,7 @@ import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
 
 import javax.swing.*;
 
@@ -21,6 +22,7 @@ import org.mbari.awt.event.NonDigitConsumingKeyListener;
 import org.mbari.swing.SpinningDialWaitIndicator;
 import org.mbari.swing.WaitIndicator;
 import org.mbari.text.IgnoreCaseToStringComparator;
+import org.mbari.util.Tuple2;
 import org.mbari.vcr.qt.TimeSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +33,9 @@ import vars.ToolBelt;
 import vars.annotation.CameraDeployment;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.VARSProperties;
+import vars.annotation.ui.videofile.VideoPlayerController;
+import vars.annotation.ui.videofile.VideoPlayerDialogUI;
+import vars.quicktime.QTVideoControlServiceImpl;
 import vars.shared.ui.dialogs.StandardDialog;
 
 import javax.swing.DefaultComboBoxModel;
@@ -38,9 +43,8 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.text.Document;
 
-public class QTOpenVideoArchiveDialog extends StandardDialog {
+public class QTOpenVideoArchiveDialog extends StandardDialog implements VideoPlayerDialogUI {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
     private static final int RESPONSE_DELAY = 750;
@@ -65,6 +69,7 @@ public class QTOpenVideoArchiveDialog extends StandardDialog {
     private final Timer updateOkayTimer;
     private JLabel selectTimeSourcelbl;
     private JComboBox timeSourceComboBox;
+
 
 //    /**
 //     * Launch the application.
@@ -127,6 +132,13 @@ public class QTOpenVideoArchiveDialog extends StandardDialog {
             }
         });
         updateOkayStatus();
+    }
+
+    @Override
+    public void onOkay(Consumer<Void> fn) {
+        getOkayButton().addActionListener(actionEvent -> {
+            fn.accept(null);
+        });
     }
 
     protected ToolBelt getToolBelt() {
@@ -439,7 +451,7 @@ public class QTOpenVideoArchiveDialog extends StandardDialog {
         getOkayButton().setEnabled(enable);
     }
 
-    public VideoArchive openVideoArchive() {
+    public Tuple2<VideoArchive, VideoPlayerController> openVideoArchive() {
         return controller.openVideoArchive();
     }
 

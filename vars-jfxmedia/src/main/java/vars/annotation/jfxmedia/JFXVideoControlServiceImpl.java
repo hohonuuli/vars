@@ -1,15 +1,14 @@
 package vars.annotation.jfxmedia;
 
-import javafx.util.Duration;
-import org.mbari.movie.Timecode;
-import vars.VARSException;
-import vars.annotation.jfxmedia.vcr.VCR;
-import vars.shared.ui.video.*;
-
-import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.util.Date;
+import javafx.util.Duration;
+import javax.swing.*;
+import org.mbari.movie.Timecode;
+import vars.annotation.jfxmedia.vcr.VCR;
+import vars.shared.ui.video.*;
+import vars.VARSException;
 
 /**
  * Created by brian on 12/16/13.
