@@ -29,7 +29,8 @@ public interface VideoPlayerDialogUI {
 
     /**
      *
-     * @param fn A function that handles all the needed steps when the Okay button of the dialog is pressed
+     * @param fn A function that handles all the needed steps when the Okay button of the dialog is pressed. A reference
+     *           to <i>this</i> VideoPlayerDialogUI instance should be passed in.
      */
     void onOkay(Consumer<Void> fn);
 

@@ -16,15 +16,19 @@ public class QTAccessUI implements VideoPlayerAccessUI {
 
     @Override
     public VideoPlayerDialogUI getOpenDialog(Window parent, ToolBelt toolBelt) {
+
+        // dispose of old dialog if the parent window reference changes
         if (dialog != null && parent != currentParent) {
             dialog.dispose();
             dialog = null;
         }
 
+        // create new dialog if needed
         if (dialog == null) {
             dialog = new QTOpenVideoArchiveDialog(parent, toolBelt);
             currentParent = parent;
         }
+
         return dialog;
     }
 }

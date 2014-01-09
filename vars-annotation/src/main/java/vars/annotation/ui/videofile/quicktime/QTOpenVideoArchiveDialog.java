@@ -48,6 +48,7 @@ public class QTOpenVideoArchiveDialog extends StandardDialog implements VideoPla
 
     private final Logger log = LoggerFactory.getLogger(getClass());
     private static final int RESPONSE_DELAY = 750;
+    private static final Consumer<Void> DO_NOTHING_FUNCTION = (Void) -> {  };
     private final ButtonGroup buttonGroup = new ButtonGroup();
     private final ItemListener rbItemListener = new SelectedRBItemListener();
     private final QTOpenVideoArchiveDialogController controller;
@@ -69,6 +70,7 @@ public class QTOpenVideoArchiveDialog extends StandardDialog implements VideoPla
     private final Timer updateOkayTimer;
     private JLabel selectTimeSourcelbl;
     private JComboBox timeSourceComboBox;
+    private Consumer<Void> onOkayFunction = DO_NOTHING_FUNCTION;
 
 
 //    /**
@@ -120,6 +122,7 @@ public class QTOpenVideoArchiveDialog extends StandardDialog implements VideoPla
 
         initialize();
         getRootPane().setDefaultButton(getOkayButton());
+        getOkayButton().addActionListener(actionEvent -> onOkayFunction.accept(null)); // Execute onOkayFunction as ActionListener
         pack();
         toolBelt.getPersistenceCache().addCacheClearedListener(new CacheClearedListener() {
             public void afterClear(CacheClearedEvent evt) {
@@ -136,9 +139,7 @@ public class QTOpenVideoArchiveDialog extends StandardDialog implements VideoPla
 
     @Override
     public void onOkay(Consumer<Void> fn) {
-        getOkayButton().addActionListener(actionEvent -> {
-            fn.accept(null);
-        });
+        onOkayFunction = fn;
     }
 
     protected ToolBelt getToolBelt() {

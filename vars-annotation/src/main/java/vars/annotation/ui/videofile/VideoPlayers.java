@@ -1,6 +1,8 @@
 package vars.annotation.ui.videofile;
 
 import vars.annotation.ui.ToolBelt;
+import vars.annotation.ui.videofile.jfxmedia.JFXAccessUI;
+import vars.annotation.ui.videofile.quicktime.QTAccessUI;
 
 import java.awt.*;
 
@@ -11,8 +13,8 @@ import java.awt.*;
 public enum VideoPlayers {
 
     // TODO implement VideoPlayerAccessUI's
-    BUILTIN("Built-in", new EmptyVideoPlayerAccessUI()),
-    QT4J("QuickTime", new EmptyVideoPlayerAccessUI()),
+    BUILTIN("Built-in", new JFXAccessUI()),
+    QT4J("QuickTime", new QTAccessUI()),
     APPLE("Mac OS X", new EmptyVideoPlayerAccessUI());
 
     private final String name;

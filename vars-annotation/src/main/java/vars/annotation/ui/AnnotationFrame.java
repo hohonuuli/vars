@@ -321,7 +321,8 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
             toolBar.add(new PreferenceFrameButton());
             toolBar.add(new StatusLabelForPerson(toolBelt));
             // toolBar.add(new StatusLabelForVcr());
-            toolBar.add(new StatusLabelForVideoArchive(toolBelt));
+            //toolBar.add(new StatusLabelForVideoArchive(toolBelt));
+            toolBar.add(new StatusContainerForVideoPlayer(toolBelt));
 
             // Map in undo and redo keys
             InputMap inputMap = toolBar.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
