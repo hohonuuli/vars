@@ -48,7 +48,7 @@ public class QTOpenVideoArchiveDialog extends StandardDialog implements VideoPla
 
     private final Logger log = LoggerFactory.getLogger(getClass());
     private static final int RESPONSE_DELAY = 750;
-    private static final Consumer<Void> DO_NOTHING_FUNCTION = (Void) -> {  };
+    private static final Runnable DO_NOTHING_FUNCTION = () -> {  };
     private final ButtonGroup buttonGroup = new ButtonGroup();
     private final ItemListener rbItemListener = new SelectedRBItemListener();
     private final QTOpenVideoArchiveDialogController controller;
@@ -70,7 +70,7 @@ public class QTOpenVideoArchiveDialog extends StandardDialog implements VideoPla
     private final Timer updateOkayTimer;
     private JLabel selectTimeSourcelbl;
     private JComboBox timeSourceComboBox;
-    private Consumer<Void> onOkayFunction = DO_NOTHING_FUNCTION;
+    private Runnable onOkayFunction = DO_NOTHING_FUNCTION;
 
 
 //    /**
@@ -122,7 +122,7 @@ public class QTOpenVideoArchiveDialog extends StandardDialog implements VideoPla
 
         initialize();
         getRootPane().setDefaultButton(getOkayButton());
-        getOkayButton().addActionListener(actionEvent -> onOkayFunction.accept(null)); // Execute onOkayFunction as ActionListener
+        getOkayButton().addActionListener(actionEvent -> callOkayFunction()); // Execute onOkayFunction as ActionListener
         pack();
         toolBelt.getPersistenceCache().addCacheClearedListener(new CacheClearedListener() {
             public void afterClear(CacheClearedEvent evt) {
@@ -138,8 +138,18 @@ public class QTOpenVideoArchiveDialog extends StandardDialog implements VideoPla
     }
 
     @Override
-    public void onOkay(Consumer<Void> fn) {
+    public void onOkay(Runnable fn) {
         onOkayFunction = fn;
+    }
+
+    /**
+     * We need this methods since lambdas require 'closed over' parameters to be effectively final. Our 'onOkayFunction'
+     * is not final, so this indirection is required.
+     */
+    private void callOkayFunction() {
+        if (onOkayFunction != null) {
+            onOkayFunction.run();
+        }
     }
 
     protected ToolBelt getToolBelt() {

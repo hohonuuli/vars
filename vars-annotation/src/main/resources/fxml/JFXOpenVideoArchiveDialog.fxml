@@ -14,7 +14,7 @@
       <children>
         <RadioButton fx:id="rbOpenByLocation" mnemonicParsing="false" onAction="#onOpenByLocation" text="Open by Location" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.valignment="BOTTOM" />
         <Label text="Movie:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
-        <TextField fx:id="movieLocationView" prefWidth="372.0" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.rowIndex="1" />
+        <TextField fx:id="movieLocationView" prefWidth="372.0" promptText="Enter Movie Location" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.rowIndex="1" />
         <Button fx:id="browseButton" mnemonicParsing="false" onAction="#onBrowse" text="Browse" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="TOP" />
         <Label text="Camera Platform:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
         <ComboBox fx:id="cameraPlatformView" prefWidth="386.0" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.rowIndex="3">
@@ -27,7 +27,7 @@
           </items>
         </ComboBox>
         <Label text="Sequence Number:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="4" />
-        <TextField fx:id="sequenceNumberView" prefWidth="382.0" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.rowIndex="4" />
+        <TextField fx:id="sequenceNumberView" prefWidth="382.0" promptText="Enter Dive Number" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.rowIndex="4" />
         <RadioButton fx:id="rbOpenExisting" mnemonicParsing="false" onAction="#onOpenExisting" text="Open Existing" GridPane.columnIndex="0" GridPane.rowIndex="5" GridPane.valignment="BOTTOM" />
         <Label text="Select Name:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="6" />
         <ComboBox fx:id="selectNameView" prefWidth="386.0" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.rowIndex="6">

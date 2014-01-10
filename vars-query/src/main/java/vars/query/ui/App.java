@@ -232,8 +232,9 @@ public class App {
 
         /*
          * Add a special eventQueue that toggles the cursor if the application is busy
+         * NOTE: This causes problems on JDK8
          */
-          Toolkit.getDefaultToolkit().getSystemEventQueue().push(new WaitCursorEventQueue(500));
+          //Toolkit.getDefaultToolkit().getSystemEventQueue().push(new WaitCursorEventQueue(500));
     }
 
     /**

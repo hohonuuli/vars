@@ -145,7 +145,7 @@ public class StatusContainerForVideoPlayer extends JPanel {
                     final VideoPlayers videoPlayer = getSelectedVideoPlayer();
                     final VideoPlayerAccessUI accessUI = videoPlayer.getAccessUI();
                     final VideoPlayerDialogUI dialog = accessUI.getOpenDialog(frame, toolBelt);
-                    dialog.onOkay((Void) -> {
+                    dialog.onOkay(() -> {
                         dialog.setVisible(false);
                         Tuple2<VideoArchive, VideoPlayerController> t = dialog.openVideoArchive();
                         VideoArchive videoArchive = t.getA();

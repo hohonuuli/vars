@@ -6,7 +6,7 @@ import java.util.Date;
 import javafx.util.Duration;
 import javax.swing.*;
 import org.mbari.movie.Timecode;
-import vars.annotation.jfxmedia.vcr.VCR;
+import vars.annotation.ui.videofile.jfxmedia.vcr.VCR;
 import vars.shared.ui.video.*;
 import vars.VARSException;
 

@@ -6,8 +6,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.JavaFXBuilderFactory;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import org.mbari.util.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.annotation.VideoArchive;
+import vars.annotation.ui.videofile.VideoPlayerController;
+import vars.annotation.ui.videofile.VideoPlayerDialogUI;
 
 import javax.swing.*;
 import java.io.IOException;
@@ -23,7 +27,7 @@ public class JFXOpenVideoArchiveDialog extends JDialog implements VideoPlayerDia
     private final Logger log = LoggerFactory.getLogger(getClass());
 
     public JFXOpenVideoArchiveDialog() {
-        setContentPane(panel);
+        setContentPane(getPanel());
         pack();
     }
 
@@ -50,15 +54,24 @@ public class JFXOpenVideoArchiveDialog extends JDialog implements VideoPlayerDia
 
         Parent root = (Parent) loader.load(controllerLocation.openStream());
         controller = loader.getController();
+        controller.setDialog(this);
 
         Scene scene = new Scene(root);
         scene.getStylesheets().add("/styles/JFXOpenVideoArchiveDialog.css");
+        panel.setScene(scene);
     }
 
     public JFXOpenVideoArchiveDialogController getController() {
-        if (controller == null) {
-            getPanel(); // initFX
-        }
         return controller; // TODO this is not thread safe
+    }
+
+    @Override
+    public void onOkay(Runnable fn) {
+        getController().setOnOKFunction(fn);
+    }
+
+    @Override
+    public Tuple2<VideoArchive, VideoPlayerController> openVideoArchive() {
+        return null;
     }
 }
