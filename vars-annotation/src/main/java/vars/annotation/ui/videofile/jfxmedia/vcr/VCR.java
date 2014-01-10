@@ -1,4 +1,4 @@
-package vars.annotation.jfxmedia.vcr;
+package vars.annotation.ui.videofile.jfxmedia.vcr;
 
 /**
  * Created by brian on 12/16/13.

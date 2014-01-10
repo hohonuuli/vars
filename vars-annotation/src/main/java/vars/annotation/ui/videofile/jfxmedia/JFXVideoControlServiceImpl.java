@@ -1,4 +1,4 @@
-package vars.annotation.jfxmedia;
+package vars.annotation.ui.videofile.jfxmedia;
 
 import java.awt.*;
 import java.io.File;

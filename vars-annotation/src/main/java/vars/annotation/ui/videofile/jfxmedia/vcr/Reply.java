@@ -1,4 +1,4 @@
-package vars.annotation.jfxmedia.vcr;
+package vars.annotation.ui.videofile.jfxmedia.vcr;
 
 import javafx.collections.ObservableMap;
 import javafx.scene.media.MediaPlayer;

@@ -9,7 +9,7 @@
 <?import javafx.scene.media.*?>
 <?import javafx.scene.media.MediaView?>
 
-<BorderPane id="BorderPane" prefHeight="186.0" prefWidth="320.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="vars.annotation.jfxmedia.JFXMovieFrameController">
+<BorderPane id="BorderPane" prefHeight="186.0" prefWidth="320.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="vars.annotation.ui.videofile.jfxmedia.JFXMovieFrameController">
     <bottom>
         <VBox spacing="5.0">
             <TextField fx:id="timecodeTextField" alignment="CENTER" editable="false" prefWidth="-1.0" text="--:--:--:--" VBox.vgrow="NEVER" />

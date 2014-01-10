@@ -1,4 +1,4 @@
-package vars.annotation.jfxmedia;
+package vars.annotation.ui.videofile.jfxmedia;
 
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
@@ -10,21 +10,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.IOException;
 import java.net.URL;
 
 /**
- * Created by brian on 12/19/13.
+ * Created by brian on 12/16/13. Based on an example from
+ * http://docs.oracle.com/javafx/2/swing/swing-fx-interoperability.htm
  */
-public class JFXOpenVideoArchiveDialog extends JDialog {
+public class JFXMovieFrame extends JFrame {
 
     private JFXPanel panel;
-    private JFXOpenVideoArchiveDialogController controller;
+    private JFXMovieFrameController controller;
     private final Logger log = LoggerFactory.getLogger(getClass());
 
-    public JFXOpenVideoArchiveDialog() {
-        setContentPane(panel);
-        pack();
+    public JFXMovieFrame() throws HeadlessException {
+        setLayout(new BorderLayout());
+        add(getPanel());
+        setSize(480, 320);
     }
 
     public JFXPanel getPanel() {
@@ -42,8 +45,12 @@ public class JFXOpenVideoArchiveDialog extends JDialog {
         return panel;
     }
 
+    public void setMovieLocation(final String location) {
+        Platform.runLater(() -> controller.setMediaLocation(location));
+    }
+
     private void initFX(JFXPanel panel) throws IOException {
-        URL controllerLocation = getClass().getResource("/fxml/JFXOpenVideoArchiveDialog.fxml");
+        URL controllerLocation = getClass().getResource("/fxml/JFXMovieFrame.fxml");
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(controllerLocation);
         loader.setBuilderFactory(new JavaFXBuilderFactory());
@@ -52,13 +59,15 @@ public class JFXOpenVideoArchiveDialog extends JDialog {
         controller = loader.getController();
 
         Scene scene = new Scene(root);
-        scene.getStylesheets().add("/styles/JFXOpenVideoArchiveDialog.css");
+        scene.getStylesheets().add("/styles/JFXMovieFrame.css");
+        panel.setScene(scene);
     }
 
-    public JFXOpenVideoArchiveDialogController getController() {
+    public JFXMovieFrameController getController() {
         if (controller == null) {
-            getPanel(); // initFX
+            getPanel(); // initFX;
         }
         return controller; // TODO this is not thread safe
     }
+
 }

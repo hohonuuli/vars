@@ -1,4 +1,4 @@
-package vars.annotation.jfxmedia;
+package vars.annotation.ui.videofile.jfxmedia;
 
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
