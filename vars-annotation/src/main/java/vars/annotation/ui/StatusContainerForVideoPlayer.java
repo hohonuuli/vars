@@ -11,10 +11,7 @@ import org.mbari.vcr.timer.StatusMonitor;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
 import vars.annotation.ui.eventbus.VideoArchiveSelectedEvent;
-import vars.annotation.ui.videofile.VideoPlayerAccessUI;
-import vars.annotation.ui.videofile.VideoPlayerController;
-import vars.annotation.ui.videofile.VideoPlayerDialogUI;
-import vars.annotation.ui.videofile.VideoPlayers;
+import vars.annotation.ui.videofile.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -145,9 +142,11 @@ public class StatusContainerForVideoPlayer extends JPanel {
                     final VideoPlayers videoPlayer = getSelectedVideoPlayer();
                     final VideoPlayerAccessUI accessUI = videoPlayer.getAccessUI();
                     final VideoPlayerDialogUI dialog = accessUI.getOpenDialog(frame, toolBelt);
+
                     dialog.onOkay(() -> {
                         dialog.setVisible(false);
-                        Tuple2<VideoArchive, VideoPlayerController> t = dialog.openVideoArchive();
+                        final VideoParams videoParams = dialog.getVideoParams();
+                        Tuple2<VideoArchive, VideoPlayerController> t = accessUI.openMoviePlayer(videoParams);
                         VideoArchive videoArchive = t.getA();
                         VideoPlayerController videoPlayerController = t.getB();
                         VideoArchiveSelectedEvent event = new VideoArchiveSelectedEvent(this, videoArchive);

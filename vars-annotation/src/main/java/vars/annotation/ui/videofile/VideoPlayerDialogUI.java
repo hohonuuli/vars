@@ -2,10 +2,6 @@ package vars.annotation.ui.videofile;
 
 import org.mbari.util.Tuple2;
 import vars.annotation.VideoArchive;
-import vars.shared.ui.video.ImageCaptureService;
-import vars.shared.ui.video.VideoControlService;
-
-import java.util.function.Consumer;
 
 /**
  * Created by brian on 1/7/14.
@@ -29,8 +25,7 @@ public interface VideoPlayerDialogUI {
 
     /**
      *
-     * @param fn A function that handles all the needed steps when the Okay button of the dialog is pressed. A reference
-     *           to <i>this</i> VideoPlayerDialogUI instance should be passed in.
+     * @param fn A function that handles all the needed steps when the Okay button of the dialog is pressed.
      */
     void onOkay(Runnable fn);
 
@@ -40,4 +35,10 @@ public interface VideoPlayerDialogUI {
      * @return
      */
     Tuple2<VideoArchive, VideoPlayerController> openVideoArchive();
+
+    VideoParams getVideoParams();
+
+    void setSupportTimeSource(boolean s);
+    boolean getSupportTimeSource();
+
 }

@@ -9,14 +9,18 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import org.bushe.swing.event.EventBus;
 import org.mbari.text.IgnoreCaseToStringComparator;
+import org.mbari.util.Tuple2;
 import vars.annotation.CameraDeployment;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveDAO;
+import vars.annotation.VideoFrame;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.VARSProperties;
+import vars.annotation.ui.videofile.VideoPlayerController;
 
 import javax.swing.*;
 import java.io.File;
@@ -121,7 +125,8 @@ public class JFXOpenVideoArchiveDialogController {
         cameraPlatformView.setItems(listCameraPlatforms());
         // only allow digits to be typed
         sequenceNumberView.setOnKeyPressed(e -> {
-            if (!e.getCode().isDigitKey()) {
+            KeyCode k = e.getCode();
+            if (!k.isDigitKey() || k != KeyCode.BACK_SPACE || k != KeyCode.DELETE) {
                 e.consume();
             }
             updateView();
@@ -160,6 +165,7 @@ public class JFXOpenVideoArchiveDialogController {
             Platform.runLater(() -> {
                 selectNameView.setItems(obsNames);
                 isSelectNameViewInitialized = true;
+                selectNameView.getSelectionModel().select(0);
             });
         });
         lookupThread.run();
@@ -192,11 +198,54 @@ public class JFXOpenVideoArchiveDialogController {
     }
 
     private void toggleOpenSelection(boolean useExisting) {
-        movieLocationView.setDisable(!useExisting);
-        cameraPlatformView.setDisable(!useExisting);
-        browseButton.setDisable(!useExisting);
-        sequenceNumberView.setDisable(!useExisting);
-        selectNameView.setDisable(useExisting);
+        movieLocationView.setDisable(useExisting);
+        cameraPlatformView.setDisable(useExisting);
+        browseButton.setDisable(useExisting);
+        sequenceNumberView.setDisable(useExisting);
+        selectNameView.setDisable(!useExisting);
+    }
+
+    public Tuple2<VideoArchive, VideoPlayerController> openVideoArchive() {
+        VideoArchive videoArchive = null;
+        if (rbOpenByLocation.isSelected()) {
+            videoArchive = findByLocation(movieLocationView.getText());
+            if (videoArchive == null) {
+                videoArchive = createVideoArchive();
+            }
+        }
+        else {
+            videoArchive = findByLocation(selectNameView.getSelectionModel().getSelectedItem());
+        }
+
+        // Load the videoframes in a transaction
+        VideoArchiveDAO dao = toolBelt.getAnnotationDAOFactory().newVideoArchiveDAO();
+        dao.startTransaction();
+        videoArchive = dao.find(videoArchive) // Bring into transaction
+        @SuppressWarnings("unused")
+        Collection<VideoFrame> videoFrames = videoArchive.getVideoFrames();
+        for (VideoFrame videoFrame : videoFrames) {
+            videoFrame.getCameraData().getImageReference();
+        }
+        dao.endTransaction();
+
+        // Configure ImageCaptureService and VideoControlServices
+        String name = videoArchive.getName(); // For movies the name should be the URL
+        VideoPlayerController videoPlayerController;
+        try {
+            JFXController controller = new JFXController();
+        }
+    }
+
+    protected VideoArchive createVideoArchive() {
+        String location = movieLocationView.getText();
+        int sequenceNumber = Integer.parseInt(sequenceNumberView.getText());
+        String platform = cameraPlatformView.getSelectionModel().getSelectedItem();
+        VideoArchiveDAO dao = toolBelt.getAnnotationDAOFactory().newVideoArchiveDAO();
+        dao.startTransaction();
+        VideoArchive videoArchive = dao.findOrCreateByParameters(platform, sequenceNumber, location);
+        dao.endTransaction();
+        dao.close();
+        return videoArchive;
     }
 
     public Runnable getOnOKFunction() {

@@ -32,6 +32,7 @@ import org.mbari.util.Dispatcher;
 import org.mbari.util.Tuple2;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
+import vars.annotation.ui.videofile.VideoParams;
 import vars.annotation.ui.videofile.VideoPlayerController;
 import vars.annotation.ui.videofile.VideoPlayerDialogUI;
 import vars.annotation.ui.videofile.quicktime.QTOpenVideoArchiveDialog;
@@ -60,9 +61,10 @@ public class StatusLabelForVideoArchive extends StatusLabel {
 
 
         dialog = new QTOpenVideoArchiveDialog(frame, toolBelt);
-        dialog.onOkay((Void) -> {
+        dialog.onOkay(() -> {
             dialog.setVisible(false);
             //VideoArchive videoArchive = dialog.openVideoArchive();
+            VideoParams videoParams = dialog.getVideoParams();
             Tuple2<VideoArchive, VideoPlayerController> t = dialog.openVideoArchive();
             VideoArchive videoArchive = t.getA();
             VideoPlayerController videoPlayerController = t.getB();
@@ -109,6 +111,10 @@ public class StatusLabelForVideoArchive extends StatusLabel {
 
 
         });
+
+    }
+
+    private Runnable getOnOkayFn() {
 
     }
 

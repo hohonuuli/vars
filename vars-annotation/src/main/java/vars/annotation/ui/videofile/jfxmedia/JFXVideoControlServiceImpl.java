@@ -96,4 +96,5 @@ public class JFXVideoControlServiceImpl  extends AbstractVideoControlService imp
             }
         };
     }
+
 }

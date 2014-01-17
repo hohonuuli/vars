@@ -1,5 +1,6 @@
 package vars.annotation.ui.videofile.jfxmedia;
 
+import com.google.common.base.Preconditions;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.fxml.FXMLLoader;
@@ -10,10 +11,12 @@ import org.mbari.util.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.VideoArchive;
+import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.videofile.VideoPlayerController;
 import vars.annotation.ui.videofile.VideoPlayerDialogUI;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.IOException;
 import java.net.URL;
 
@@ -25,8 +28,14 @@ public class JFXOpenVideoArchiveDialog extends JDialog implements VideoPlayerDia
     private JFXPanel panel;
     private JFXOpenVideoArchiveDialogController controller;
     private final Logger log = LoggerFactory.getLogger(getClass());
+    // not used locally. But reference need to pass to controller which is created later.
+    private final ToolBelt toolBelt;
 
-    public JFXOpenVideoArchiveDialog() {
+
+    public JFXOpenVideoArchiveDialog(Window parent, final ToolBelt toolBelt) {
+        super(parent);
+        Preconditions.checkArgument(toolBelt != null, "ToolBelt can not be null");
+        this.toolBelt = toolBelt;
         setContentPane(getPanel());
         pack();
     }
@@ -55,6 +64,7 @@ public class JFXOpenVideoArchiveDialog extends JDialog implements VideoPlayerDia
         Parent root = (Parent) loader.load(controllerLocation.openStream());
         controller = loader.getController();
         controller.setDialog(this);
+        controller.setToolBelt(toolBelt);
 
         Scene scene = new Scene(root);
         scene.getStylesheets().add("/styles/JFXOpenVideoArchiveDialog.css");
