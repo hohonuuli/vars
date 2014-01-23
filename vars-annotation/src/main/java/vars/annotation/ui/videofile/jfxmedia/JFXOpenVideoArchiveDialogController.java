@@ -20,7 +20,9 @@ import vars.annotation.VideoFrame;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.VARSProperties;
+import vars.annotation.ui.videofile.EmptyVideoPlayerController;
 import vars.annotation.ui.videofile.VideoPlayerController;
+import vars.shared.ui.video.VideoControlService;
 
 import javax.swing.*;
 import java.io.File;
@@ -220,7 +222,7 @@ public class JFXOpenVideoArchiveDialogController {
         // Load the videoframes in a transaction
         VideoArchiveDAO dao = toolBelt.getAnnotationDAOFactory().newVideoArchiveDAO();
         dao.startTransaction();
-        videoArchive = dao.find(videoArchive) // Bring into transaction
+        videoArchive = dao.find(videoArchive); // Bring into transaction
         @SuppressWarnings("unused")
         Collection<VideoFrame> videoFrames = videoArchive.getVideoFrames();
         for (VideoFrame videoFrame : videoFrames) {
@@ -233,7 +235,17 @@ public class JFXOpenVideoArchiveDialogController {
         VideoPlayerController videoPlayerController;
         try {
             JFXController controller = new JFXController();
+            final VideoControlService videoControlService = controller.getVideoControlService();
+            videoControlService.connect(name);
+            videoPlayerController = controller;
         }
+        catch (Exception e) {
+            videoPlayerController = new EmptyVideoPlayerController();
+            EventBus.publish(Lookup.TOPIC_WARNING, "Failed to open " + videoArchive.getName() +
+                    " with JavaFX.\n Check to make sure the file exists.");
+        }
+
+        return new Tuple2<>(videoArchive, videoPlayerController);
     }
 
     protected VideoArchive createVideoArchive() {

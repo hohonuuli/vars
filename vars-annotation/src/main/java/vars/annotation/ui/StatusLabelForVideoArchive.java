@@ -114,9 +114,6 @@ public class StatusLabelForVideoArchive extends StatusLabel {
 
     }
 
-    private Runnable getOnOkayFn() {
-
-    }
 
     /**
      *

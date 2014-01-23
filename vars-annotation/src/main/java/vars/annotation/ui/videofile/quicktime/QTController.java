@@ -9,28 +9,21 @@ import javax.swing.*;
  * Created by brian on 1/6/14.
  */
 public class QTController implements VideoPlayerController {
-    private QTVideoControlServiceImpl controlService;
+    private QTVideoControlServiceImpl controlService = new QTVideoControlServiceImpl();;
 
     @Override
     public QTVideoControlServiceImpl getVideoControlService() {
-        return getControlService();
+        return controlService;
     }
 
     @Override
     public QTVideoControlServiceImpl getImageCaptureService() {
-        return getControlService();
+        return controlService;
     }
 
     @Override
     public String getMovieLocation() {
-        return null;
-    }
-
-    private QTVideoControlServiceImpl getControlService() {
-        if (controlService == null) {
-            controlService = new QTVideoControlServiceImpl();
-        }
-        return controlService;
+        return controlService.getConnectionName();
     }
 
     @Override

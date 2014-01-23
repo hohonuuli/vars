@@ -29,11 +29,14 @@ public class StatusContainerForVideoPlayer extends JPanel {
     private final StatusMonitor statusMonitor = new StatusMonitor();
     private JComboBox<String> videoPlayerComboBox;
     private StatusLabel statusLabel;
+    private VideoPlayers videoPlayers;
 
     public StatusContainerForVideoPlayer(final ToolBelt toolBelt) {
         super();
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+        videoPlayers = new VideoPlayers(toolBelt.getAnnotationDAOFactory());
         statusLabel = new StatusLabelForVideoPlayer(toolBelt);
+
         add(statusLabel);
         add(Box.createHorizontalStrut(20));
         add(new JLabel("Video Player:"));
@@ -48,7 +51,7 @@ public class StatusContainerForVideoPlayer extends JPanel {
     private JComboBox<String> getVideoPlayerComboBox() {
         if (videoPlayerComboBox == null) {
             videoPlayerComboBox = new JComboBox<>();
-            for (VideoPlayers v : VideoPlayers.values()) {
+            for (VideoPlayer v : videoPlayers.get()) {
                 videoPlayerComboBox.addItem(v.getName());
             }
         }
@@ -105,11 +108,11 @@ public class StatusContainerForVideoPlayer extends JPanel {
         statusLabel.setOk(ok);
     }
 
-    VideoPlayers getSelectedVideoPlayer() {
+    VideoPlayer getSelectedVideoPlayer() {
         JComboBox<String> cb = getVideoPlayerComboBox();
         String name = cb.getItemAt(cb.getSelectedIndex());
-        VideoPlayers videoPlayer = null;
-        for (VideoPlayers v: VideoPlayers.values()) {
+        VideoPlayer videoPlayer = null;
+        for (VideoPlayer v: videoPlayers.get()) {
             if (v.getName().equals(name)) {
                 videoPlayer = v;
                 break;
@@ -139,7 +142,7 @@ public class StatusContainerForVideoPlayer extends JPanel {
 
                     // Get the correct AccessUI. This provides a dialog to open a VideoArchive and a VideoPlayerController
                     // for a selected VideoPlayer module
-                    final VideoPlayers videoPlayer = getSelectedVideoPlayer();
+                    final VideoPlayer videoPlayer = getSelectedVideoPlayer();
                     final VideoPlayerAccessUI accessUI = videoPlayer.getAccessUI();
                     final VideoPlayerDialogUI dialog = accessUI.getOpenDialog(frame, toolBelt);
 

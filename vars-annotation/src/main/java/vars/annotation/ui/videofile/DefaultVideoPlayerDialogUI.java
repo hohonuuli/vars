@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import vars.CacheClearedEvent;
 import vars.CacheClearedListener;
 import vars.ToolBelt;
+import vars.VARSException;
 import vars.annotation.CameraDeployment;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.VARSProperties;
@@ -37,7 +38,7 @@ public class DefaultVideoPlayerDialogUI extends StandardDialog implements VideoP
     private static final Runnable DO_NOTHING_FUNCTION = () -> {  };
     private final ButtonGroup buttonGroup = new ButtonGroup();
     private final ItemListener rbItemListener = new SelectedRBItemListener();
-    private final VideoPlayerDialogController controller;
+    private final VideoPlayerAccessUI controller;
     private JPanel panel;
     private final ToolBelt toolBelt;
     private JLabel lblMovie;
@@ -76,7 +77,7 @@ public class DefaultVideoPlayerDialogUI extends StandardDialog implements VideoP
     /**
      * Create the dialog.
      */
-    public DefaultVideoPlayerDialogUI(final Window parent, final ToolBelt toolBelt, VideoPlayerDialogController controller) {
+    public DefaultVideoPlayerDialogUI(final Window parent, final ToolBelt toolBelt, VideoPlayerAccessUI controller) {
         super(parent);
         this.toolBelt = toolBelt;
         this.controller = controller;
@@ -450,7 +451,34 @@ public class DefaultVideoPlayerDialogUI extends StandardDialog implements VideoP
     }
 
     public Tuple2<VideoArchive, VideoPlayerController> openVideoArchive() {
-        return controller.openVideoArchive();
+        String platformName = (String) getCameraPlatformComboBox().getSelectedItem();
+        if (platformName != null && platformName.length() == 0) {
+            platformName = null;
+        }
+        Optional<String> platformOpt = Optional.ofNullable(platformName);
+
+        Optional<Integer> sequenceNumberOpt;
+        try {
+            Integer sn = Integer.parseInt(getSequenceNumberTextField().getText());
+            sequenceNumberOpt = Optional.of(sn);
+        }
+        catch (Exception e) {
+            sequenceNumberOpt = Optional.empty();
+        }
+
+        String movieLocation = getUrlTextField().getText();
+        if (movieLocation == null || movieLocation.trim().length() == 0) {
+            throw new VARSException("Unless you provide a movie location, VARS can't open the video file.");
+        }
+
+        Optional<TimeSource> timeSourceOpt = Optional.empty();
+        if (getSupportTimeSource()) {
+            timeSourceOpt = Optional.of((TimeSource) getTimeSourceComboBox().getSelectedItem());
+        }
+
+        VideoParams params = new VideoParams(getUrlTextField().getText(), platformOpt, sequenceNumberOpt,
+                timeSourceOpt);
+        return controller.openMoviePlayer(params);
     }
 
     class SelectedRBItemListener implements ItemListener {

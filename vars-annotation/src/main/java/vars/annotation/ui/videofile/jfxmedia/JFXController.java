@@ -9,24 +9,18 @@ import vars.shared.ui.video.VideoControlService;
  */
 public class JFXController implements VideoPlayerController {
 
-    private JFXVideoControlServiceImpl controlService;
+    private JFXVideoControlServiceImpl controlService = new JFXVideoControlServiceImpl();
 
     @Override
     public VideoControlService getVideoControlService() {
-        return getControlService();
+        return controlService;
     }
 
     @Override
     public ImageCaptureService getImageCaptureService() {
-        return getControlService();
-    }
-
-    private JFXVideoControlServiceImpl getControlService() {
-        if (controlService == null) {
-            controlService = new JFXVideoControlServiceImpl();
-        }
         return controlService;
     }
+
 
     @Override
     public String getMovieLocation() {

@@ -33,6 +33,7 @@ import vars.ToolBelt;
 import vars.annotation.CameraDeployment;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.VARSProperties;
+import vars.annotation.ui.videofile.VideoParams;
 import vars.annotation.ui.videofile.VideoPlayerController;
 import vars.annotation.ui.videofile.VideoPlayerDialogUI;
 import vars.quicktime.QTVideoControlServiceImpl;
@@ -502,5 +503,21 @@ public class QTOpenVideoArchiveDialog extends StandardDialog implements VideoPla
             timeSourceComboBox.setSelectedItem(TimeSource.AUTO);
         }
         return timeSourceComboBox;
+    }
+
+    // TODO this class is deprecated but we implemented these methods to satisfy compiler
+    @Override
+    public VideoParams getVideoParams() {
+        return null;
+    }
+
+    @Override
+    public void setSupportTimeSource(boolean s) {
+
+    }
+
+    @Override
+    public boolean getSupportTimeSource() {
+        return false;
     }
 }

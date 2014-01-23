@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.ToolBelt;
+import vars.annotation.ui.videofile.VideoParams;
 import vars.annotation.ui.videofile.VideoPlayerController;
 import vars.annotation.ui.videofile.VideoPlayerDialogUI;
 
@@ -83,5 +84,21 @@ public class JFXOpenVideoArchiveDialog extends JDialog implements VideoPlayerDia
     @Override
     public Tuple2<VideoArchive, VideoPlayerController> openVideoArchive() {
         return null;
+    }
+
+    // TODO this class is deprecated but we implemented these methods to satisfy compiler
+    @Override
+    public VideoParams getVideoParams() {
+        return null;
+    }
+
+    @Override
+    public void setSupportTimeSource(boolean s) {
+
+    }
+
+    @Override
+    public boolean getSupportTimeSource() {
+        return false;
     }
 }
