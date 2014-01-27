@@ -101,6 +101,7 @@ public class QTVideoControlServiceImpl extends AbstractVideoControlService imple
             grabber = vcr0.getGrabber();
             setVcr(vcr);
             setVideoControlInformation(new VideoControlInformationImpl(movieName, VideoControlStatus.CONNECTED));
+
         }
         catch (Exception e) {
             grabber = new FakeGrabber();

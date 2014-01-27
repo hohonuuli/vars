@@ -58,8 +58,10 @@ public class JFXVideoControlServiceImpl  extends AbstractVideoControlService imp
         String movieLocation = (String) args[0];
         try {
             movieFrame.setMovieLocation(movieLocation);
+            Thread.sleep(1000); // HACK! setMovieLocation has to set the movie location on JavaFX thread. We must wait
             setVcr(new VCR(movieFrame.getController().getMediaView().getMediaPlayer()));
             setVideoControlInformation(new VideoControlInformationImpl(movieLocation, VideoControlStatus.CONNECTED));
+            movieFrame.setVisible(true);
         }
         catch (Exception e) {
             setVcr(null);

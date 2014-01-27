@@ -45,6 +45,7 @@ public class JFXAccessUI extends AbstractAccessUI {
     public Tuple2<VideoArchive, VideoPlayerController> openMoviePlayer(VideoParams videoParams) {
         Optional<VideoArchive> videoArchiveOpt = findByLocation(videoParams.getMovieLocation());
         VideoArchive videoArchive = videoArchiveOpt.orElseGet(() -> createVideoArchive(videoParams));
+        controller.getVideoControlService().connect(videoArchive.getName());
         return new Tuple2<>(videoArchive, controller);
     }
 }

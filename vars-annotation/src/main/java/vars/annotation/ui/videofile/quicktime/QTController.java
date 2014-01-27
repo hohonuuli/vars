@@ -32,4 +32,5 @@ public class QTController implements VideoPlayerController {
             controlService.dispose();
         }
     }
+
 }

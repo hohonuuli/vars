@@ -5,27 +5,36 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.media.*?>
 <?import javafx.scene.media.MediaView?>
 
 <BorderPane id="BorderPane" prefHeight="186.0" prefWidth="320.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="vars.annotation.ui.videofile.jfxmedia.JFXMovieFrameController">
-    <bottom>
-        <VBox spacing="5.0">
-            <TextField fx:id="timecodeTextField" alignment="CENTER" editable="false" prefWidth="-1.0" text="--:--:--:--" VBox.vgrow="NEVER" />
-            <HBox VBox.vgrow="NEVER">
-                <Button id="button" defaultButton="true" mnemonicParsing="false" text="Button" HBox.hgrow="NEVER" />
-                <Slider fx:id="scrubber" max="10000.0" style="-fx-alignment: baseline-center;&#10;" HBox.hgrow="ALWAYS" />
-                <VBox.margin>
-                    <Insets />
-                </VBox.margin>
-            </HBox>
-            <BorderPane.margin>
-                <Insets bottom="10.0" left="10.0" right="10.0" />
-            </BorderPane.margin>
-        </VBox>
-    </bottom>
-    <center>
-        <MediaView fx:id="mediaView" fitHeight="40.0" fitWidth="100.0" preserveRatio="true" BorderPane.alignment="CENTER" />
-    </center>
+  <bottom>
+    <VBox spacing="5.0">
+      <TextField fx:id="timecodeTextField" alignment="CENTER" editable="false" prefWidth="-1.0" text="--:--:--:--" VBox.vgrow="NEVER" />
+      <HBox VBox.vgrow="NEVER">
+        <Button id="button" defaultButton="true" mnemonicParsing="false" text="" HBox.hgrow="NEVER">
+          <graphic>
+            <ImageView fx:id="buttonImage" fitHeight="0.0" fitWidth="0.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true">
+              <image>
+                <Image url="@../images/vcr/play.png" />
+              </image>
+            </ImageView>
+          </graphic>
+        </Button>
+        <Slider fx:id="scrubber" max="10000.0" style="-fx-alignment: baseline-center;&#10;" HBox.hgrow="ALWAYS" />
+        <VBox.margin>
+          <Insets />
+        </VBox.margin>
+      </HBox>
+      <BorderPane.margin>
+        <Insets bottom="10.0" left="10.0" right="10.0" />
+      </BorderPane.margin>
+    </VBox>
+  </bottom>
+  <center>
+    <MediaView fx:id="mediaView" fitHeight="40.0" fitWidth="100.0" preserveRatio="true" BorderPane.alignment="CENTER" />
+  </center>
 </BorderPane>

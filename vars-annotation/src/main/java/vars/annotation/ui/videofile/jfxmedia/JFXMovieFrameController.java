@@ -1,9 +1,9 @@
 package vars.annotation.ui.videofile.jfxmedia;
 
 import javafx.application.Platform;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableMap;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
@@ -11,6 +11,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -29,6 +31,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
 /**
+ * TODO scrubber does not work
+ *
+ * TODO fix teh play button
+ *
+ * TODO screen needs to resize to size of video when it's open.
+ *
+ * TODO add resizing of video based on user changing the frame size
+ *
  * Created by brian on 12/16/13.
  */
 public class JFXMovieFrameController implements Initializable {
@@ -46,6 +56,9 @@ public class JFXMovieFrameController implements Initializable {
 
     @FXML
     private Slider scrubber;
+
+    @FXML
+    private ImageView buttonImage;
 
     private MediaPlayer mediaPlayer;
     private final StringProperty timecodeProperty = new SimpleStringProperty("--:--:--:--");
@@ -90,6 +103,13 @@ public class JFXMovieFrameController implements Initializable {
 
 
         mediaPlayer.currentTimeProperty().addListener(timeListener);
+
+        mediaPlayer.onPlayingProperty().addListener(new ChangeListener<Runnable>() {
+            @Override
+            public void changed(ObservableValue<? extends Runnable> observableValue, Runnable runnable, Runnable runnable2) {
+
+            }
+        });
 
     }
 

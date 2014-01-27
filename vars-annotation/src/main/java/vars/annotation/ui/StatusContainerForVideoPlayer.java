@@ -152,7 +152,7 @@ public class StatusContainerForVideoPlayer extends JPanel {
                         Tuple2<VideoArchive, VideoPlayerController> t = accessUI.openMoviePlayer(videoParams);
                         VideoArchive videoArchive = t.getA();
                         VideoPlayerController videoPlayerController = t.getB();
-                        VideoArchiveSelectedEvent event = new VideoArchiveSelectedEvent(this, videoArchive);
+                        VideoArchiveChangedEvent event = new VideoArchiveChangedEvent(this, videoArchive);
                         Lookup.getImageCaptureServiceDispatcher().setValueObject(videoPlayerController.getImageCaptureService());
                         Lookup.getVideoControlServiceDispatcher().setValueObject(videoPlayerController.getVideoControlService());
                         EventBus.publish(event);

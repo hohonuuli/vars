@@ -1,6 +1,7 @@
 package vars.annotation.ui.videofile.quicktime;
 
 import org.mbari.util.Tuple2;
+import org.mbari.vcr.qt.TimeSource;
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.ToolBelt;
@@ -46,6 +47,8 @@ public class QTAccessUI extends AbstractAccessUI {
     public Tuple2<VideoArchive, VideoPlayerController> openMoviePlayer(VideoParams videoParams) {
         Optional<VideoArchive> videoArchiveOpt = findByLocation(videoParams.getMovieLocation());
         VideoArchive videoArchive = videoArchiveOpt.orElseGet(() -> createVideoArchive(videoParams));
+        controller.getVideoControlService().connect(videoParams.getMovieLocation(),
+                videoParams.getTimeSourceOpt().orElse(TimeSource.AUTO));
         return new Tuple2<>(videoArchive, controller);
     }
 }

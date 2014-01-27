@@ -21,7 +21,7 @@ public abstract class AbstractAccessUI implements VideoPlayerAccessUI {
         dao.startTransaction();
         VideoArchive videoArchive = dao.findByName(location);
         dao.endTransaction();
-        return Optional.of(videoArchive);
+        return Optional.ofNullable(videoArchive);
     }
 
     public VideoArchive createVideoArchive(VideoParams videoParams) {
