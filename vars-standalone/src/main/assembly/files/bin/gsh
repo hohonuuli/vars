@@ -1,50 +1,26 @@
-#!/bin/sh
-###############################################################################
-# $Id: $
-# GSH: Execute groovy script using the projects library directory.
+#!/usr/bin/env bash
 
-APP_HOME=`dirname "$0"`/..
-
-
-GSH_CLASSPATH=$APP_HOME/conf:${APP_HOME}/scripts/groovy:$APP_HOME/lib/*:$APP_HOME/lib/groovy-repl/*
-SCRIPT_PATH=$1
-GROOVY_CONF="$APP_HOME/conf/groovy-starter.conf"
-TOOLS_JAR="$JAVA_HOME/lib/tools.jar"
-STARTER_CLASSPATH="$APP_HOME/lib/groovy-repl/groovy-2.2.1.jar"
-
-if [ -z $1 ]; then
-    echo $FNAME " Starting Groovy shell"
-    exec ${JAVACMD:=java} -Xms16m -Xmx2048m \
-		 -Djava.library.path="${APP_HOME}/native" \
-         -Duser.timezone="UTC" \
-         -Dfile.encoding=UTF8 \
-         -classpath "$STARTER_CLASSPATH" \
-         -Dscript.name=org.codehaus.groovy.tools.shell.Main \
-         -Dprogram.name="VARS Groovy Shell" \
-         -Dgroovy.starter.conf="$GROOVY_CONF" \
-         -Dgroovy.home="$APP_HOME" \
-         -Dtools.jar="$TOOLS_JAR" \
-         org.codehaus.groovy.tools.GroovyStarter \
-         --main org.codehaus.groovy.tools.shell.Main \
-         --conf "$GROOVY_CONF" \
-         --classpath "$GSH_CLASSPATH" \
-         "$@"
+if [ -z $(which groovy) ]
+then
+  echo "You must install groovy first! Either via homebrew or from http://groovy.codehaus.org/"
 else
-    CLASS=$1
-    shift
-    exec ${JAVACMD:=java} -Xms16m -Xmx2048m \
-         -Djava.library.path="${APP_HOME}/native" \
-         -Duser.timezone="UTC" \
-         -Dfile.encoding=UTF8 \
-         -classpath "$STARTER_CLASSPATH" \
-         -Dscript.name="$CLASS" \
-         -Dprogram.name="$CLASS" \
-         -Dgroovy.starter.conf="$GROOVY_CONF" \
-         -Dgroovy.home="$APP_HOME" \
-         -Dtools.jar="$TOOLS_JAR" \
-         org.codehaus.groovy.tools.GroovyStarter 
-         --main groovy.ui.GroovyMain \          
-         --conf "$GROOVY_CONF" \
-         --classpath "$GSH_CLASSPATH"\
-         "$@"
+  APP_HOME=`dirname "$0"`/..
+
+  GSH_CLASSPATH=$APP_HOME/conf:${APP_HOME}/scripts/groovy:$APP_HOME/lib/*
+
+  if [ $# -eq 0 ]
+  then
+    groovysh -cp "$GSH_CLASSPATH" \
+             -Djava.library.path="${APP_HOME}/native" \
+             -Duser.timezone="UTC" \
+             -Dfile.encoding=UTF8
+  else
+    groovy -cp "$GSH_CLASSPATH" \
+           -Djava.library.path="${APP_HOME}/native" \
+           -Duser.timezone="UTC" \
+           -Dfile.encoding=UTF8 \
+           "$@"
+  fi
 fi
+
+

@@ -15,24 +15,19 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <commons.cli.version>1.2</commons.cli.version>
         <commons.email.version>1.3.2</commons.email.version>
         <derby.version>10.10.1.1</derby.version>
         <eclipselink.version>2.5.0</eclipselink.version>
         <eventbus.version>1.4</eventbus.version>
         <expd.version>1.2.1</expd.version>
         <foxtrot.version>4.0</foxtrot.version>
-        <!-- If you change Groovy version then edit gsh -->
-        <groovy.version>2.2.1</groovy.version>
         <guava.version>15.0</guava.version>
         <guice.version>3.0</guice.version>
         <jama.version>1.0.2</jama.version>
-        <jansi.version>1.11</jansi.version>
         <jasypt.version>1.9.1</jasypt.version>
         <javax.persistence.version>2.1.0</javax.persistence.version>
         <javax.transaction.version>1.1</javax.transaction.version>
         <jgoodies.version>1.0.5</jgoodies.version>
-        <jline.version>2.10</jline.version>
         <jtds.version>1.3.1</jtds.version>
         <junit.version>4.11</junit.version>
         <jxlayer.version>3.0.4.1</jxlayer.version> <!-- This version has SHA signatures stripped out -->
