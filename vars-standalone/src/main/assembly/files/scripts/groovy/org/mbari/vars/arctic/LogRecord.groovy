@@ -13,11 +13,15 @@ class LogRecord {
     def time
 
     LogRecord(conductivity, depth, latitude, longitude, temperature, time) {
+        if (!conductivity || !depth || !latitude || !longitude || !temperature || !time) {
+            throw new IllegalArgumentException("No argument can be null")
+        }
         this.conductivity = conductivity
         this.depth = depth
         this.latitude = latitude
         this.longitude = longitude
         this.temperature = temperature
         this.time = time
+
     }
 }

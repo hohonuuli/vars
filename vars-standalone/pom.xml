@@ -38,13 +38,13 @@
         <!--
             Groovy libs for shell
         -->
-        <dependency>
+        <!-- dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
             <version>${groovy.version}</version>
             <scope>runtime</scope>
-        </dependency>
-        <!-- dependency>
+        </dependency -->
+        <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy</artifactId>
             <version>${groovy.version}</version>
@@ -85,7 +85,13 @@
             <artifactId>jansi</artifactId>
             <version>${jansi.version}</version>
             <scope>runtime</scope>
-        </dependency -->
+        </dependency>
+        <dependency>
+            <groupId>org.fusesource.jansi</groupId>
+            <artifactId>jansi</artifactId>
+            <version>${jansi.version}</version>
+            <scope>runtime</scope>
+        </dependency>
 
         <!-- Used by scripts for sending emails -->
         <dependency>

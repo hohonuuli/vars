@@ -5,6 +5,7 @@ import org.mbari.movie.Timecode
 import org.slf4j.LoggerFactory
 import vars.annotation.VideoArchiveSetDAO
 import vars.annotation.VideoFrame
+import vars.ToolBox
 
 /**
  * Created by brian on 1/29/14.
@@ -15,9 +16,10 @@ class MergeData {
     final String videoArchiveName
     final offsetFrames = 29.97 * 5 // +/- 5 second offset
     final logRecords
+    final toolBox = new ToolBox()
 
     final convertVideoFrameToFrames = { videoFrame ->
-        def timecode = new Timecode(videoFrame.timeCode)
+        def timecode = new Timecode(videoFrame.timecode)
         timecode.frames
     }
 
@@ -70,7 +72,7 @@ class MergeData {
         }
     }
 
-    Map<VideoFrame, LogReader> update(Map data) {
+    Map<VideoFrame, LogRecord> update(Map data) {
         VideoArchiveSetDAO dao = toolBox.toolBelt.annotationDAOFactory.newVideoArchiveSetDAO()
         def newData = [:]
         dao.startTransaction()
@@ -90,6 +92,10 @@ class MergeData {
         dao.endTransaction()
         dao.close()
         return newData
+    }
+
+    Map<VideoFrame, LogRecord> apply() {
+        update(coallate())
     }
 
 

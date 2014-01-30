@@ -22,6 +22,7 @@
         <eventbus.version>1.4</eventbus.version>
         <expd.version>1.2.1</expd.version>
         <foxtrot.version>4.0</foxtrot.version>
+        <!-- If you change Groovy version then edit gsh -->
         <groovy.version>2.2.1</groovy.version>
         <guava.version>15.0</guava.version>
         <guice.version>3.0</guice.version>
