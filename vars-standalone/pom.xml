@@ -40,6 +40,12 @@
         -->
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>${groovy.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <!-- dependency>
+            <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy</artifactId>
             <version>${groovy.version}</version>
             <scope>runtime</scope>
@@ -79,7 +85,7 @@
             <artifactId>jansi</artifactId>
             <version>${jansi.version}</version>
             <scope>runtime</scope>
-        </dependency>
+        </dependency -->
 
         <!-- Used by scripts for sending emails -->
         <dependency>
