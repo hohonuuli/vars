@@ -10,8 +10,10 @@ class LogReader {
     static parseLatLon(String ddmm) {
         def d = null
         try {
-            def degrees = ddmm[0..1] as double
-            def minutes = ddmm[2..-1] as double
+
+            def idx = ddmm.indexOf(".")
+            def degrees = ddmm[0..(idx - 3)] as double
+            def minutes = ddmm[(idx - 2)..-1] as double
             d = degrees + minutes / 60.0
         }
         catch (Exception e) {
@@ -52,7 +54,7 @@ class LogReader {
                     def logRecord = new LogRecord(conductivity, depth, latitude, longitude, temperature,
                             time)
                     logRecords << logRecord
-                    
+
                 }
                 catch (Exception e) {
                     log.debug("Unable to parse: $line")
