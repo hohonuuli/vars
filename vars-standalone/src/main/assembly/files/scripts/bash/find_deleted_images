@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+
+# Create Log directory
+LOGHOME=$HOME/Library/Logs/VARS 
+mkdir -p $LOGHOME
+
+# FG is Framegrab root
+FG=/mbari/framegrabs
+
+# SFG is the week old framegrab root
+SNAPSHOTS=/mbari/framegrabs/.snapshot
+WEEK_OLD=$(ls $SNAPSHOTS | tail -7 | head -1)
+SFG=${SNAPSHOTS}/${WEEK_OLD}
+
+# Loop over directories, ignore sym links
+# Each directory corresponds to a platform/ROV
+for FDIR in ${FG}/*
+do
+  
+  if [ -h "$FDIR" ]; then
+    # do NOTHING. It's a symbolic link
+    echo "Not searching $FDIR"
+  else
+    
+    # munge up all the variables and names that we need.
+    CURRENT_SRC="$FDIR/images"
+    PLATFORM=$(basename "$FDIR")
+    OLD_SRC="${SFG}/$PLATFORM/images"
+    
+    CURRENT_TARGET="$LOGHOME/current-framegrabs-$PLATFORM.txt"
+    CURRENT_TARGET_CUT="$LOGHOME/current-framegrabs-$PLATFORM-cut.txt"
+    OLD_TARGET="$LOGHOME/weekold-framegrabs-$PLATFORM.txt"
+    OLD_TARGET_CUT="$LOGHOME/weekold-framegrabs-$PLATFORM-cut.txt"
+    DIFF_TARGET="$LOGHOME/diff-framegrabs-$PLATFORM.txt"
+    
+    echo "Creating and Comparing $CURRENT_TARGET and $OLD_TARGET"
+    
+    # Build a file with the full path name of every PNG file found in the framegrabs directory 
+    find "$CURRENT_SRC" -name "*.png" > "$CURRENT_TARGET"
+    find "$OLD_SRC" -name "*.png" > "$OLD_TARGET"
+    
+    # Chop off the first part of the paths so we have ROV_NAME/blah/blah/00_00_01_00.png 
+    # style names. This is VERY important!!
+    cut -d'/' -f4-30 "$CURRENT_TARGET" > "$CURRENT_TARGET_CUT"
+    cut -d'/' -f6-30 "$OLD_TARGET" > "$OLD_TARGET_CUT"
+
+    # Diff the files and get rid of the lines where the path was added (keep only deletions)
+    # strip lead character away too.
+    # NOTE: We only care about content in the //Atlas/framegrabs/[ROV]/images directory.
+    # We are ignoring the "stills" directory as Mike McCann's processes regularly delete
+    # files from them
+    diff "$OLD_TARGET_CUT" "$CURRENT_TARGET_CUT" | grep "^<." | grep "images" | sed s/"< "// > "$DIFF_TARGET"
+    
+    # If the file is NOT empty. Send an email
+    if [ -s "$DIFF_TARGET" ]; then
+      echo "This is a listing of images that were deleted from $CURRENT_SRC in the past week. Please verify that they were intentinally removed. If they were not, you can retrieve an archived copy from ${OLD_SRC}." | mail -s "Framegrab deletion report for ${FDIR}" -a "$DIFF_TARGET" brian@mbari.org videolabadmin@mbari.org
+    fi
+    echo "Done examining $CURRENT_SRC and $OLD_SRC"
+  fi
+done

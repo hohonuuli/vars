@@ -19,6 +19,8 @@ import java.nio.file.Path;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import java.util.prefs.Preferences;
@@ -131,15 +133,16 @@ public class AVFImageCaptureServiceImpl implements ImageCaptureService {
 
         // -- Save to temp file png.
         final File tempFile = new File(tempDir, LIBRARY_NAME + (new Date()).getTime() + ".png");
-        saveSnapshotToSpecifiedPath(tempFile.getAbsolutePath());
-
-        // -- Reread file as image
-        BufferedImage image = null;
-        try {
-            image = watchForAndReadNewImage(tempFile);
-        } catch (Exception e) {
-            EventBus.publish(GlobalLookup.TOPIC_WARNING, e);
-        }
+        Image image = capture(tempFile);
+//        saveSnapshotToSpecifiedPath(tempFile.getAbsolutePath());
+//
+//        // -- Reread file as image
+//        BufferedImage image = null;
+//        try {
+//            image = watchForAndReadNewImage(tempFile);
+//        } catch (Exception e) {
+//            EventBus.publish(GlobalLookup.TOPIC_WARNING, e);
+//        }
         // -- Delete the temp file in the background
         Thread thread = new Thread(new Runnable() {
             @Override
@@ -163,7 +166,31 @@ public class AVFImageCaptureServiceImpl implements ImageCaptureService {
         String originalVideoSrc = preferences.get(LIBRARY_NAME, "");
         if (dialog == null) {
             Frame frame = (Frame) GlobalLookup.getSelectedFrameDispatcher().getValueObject();
-            dialog = new AVFImageCaptureDialog(frame, videoDevicesAsStrings());
+
+            // --- start HACK: Always add "Blackmagic" to video device list (brian 2014-03-04)
+            // In Mac OS X 10.9.2, Blackmagic stopped showing up in the videodevice list
+            String[] listedDevices = videoDevicesAsStrings();
+            boolean hasBlackmagic = false;
+            for (String s: listedDevices) {    // Check if list contains Blackmagic
+                if (s.equals("Blackmagic")) {
+                    hasBlackmagic = true;
+                    break;
+                }
+            }
+
+            String[] devices;                  // If needed, a Blackmagic to list
+            if (!hasBlackmagic) {
+                devices = new String[listedDevices.length + 1];
+                System.arraycopy(listedDevices, 0, devices, 0, listedDevices.length);
+                devices[devices.length - 1] = "Blackmagic";
+            }
+            else {
+                devices = listedDevices;
+            }
+            Arrays.sort(devices);
+            // --- end HACK
+
+            dialog = new AVFImageCaptureDialog(frame, devices);
         }
         dialog.setVisible(true);
 
@@ -237,25 +264,16 @@ public class AVFImageCaptureServiceImpl implements ImageCaptureService {
      */
     private BufferedImage watchForAndReadNewImage(File file) throws IOException, InterruptedException {
         BufferedImage image = null;
-        final Path parentDir = file.getParentFile().toPath();
-        final WatchService watchService = parentDir.getFileSystem().newWatchService();
-        final WatchKey watchKey = parentDir.register(watchService, ENTRY_CREATE, ENTRY_MODIFY);
-        for(int i = 0; i < 10; i++) {
-            final WatchKey wk = watchService.poll(1, TimeUnit.SECONDS);
-            if (wk != null) {
-                for (WatchEvent<?> event : wk.pollEvents()) {
-                    final Path changedPath = (Path) event.context();
-                    if (changedPath.endsWith(file.getName())) {
-                        break;
-                    }
-                }
-            }
+        long timeoutNanos = 3000000000L; // 3 seconds
+        long elapsedNanos = 0L;
+        long startNanos = System.nanoTime();
+        while (elapsedNanos < timeoutNanos) {
             if (file.exists()) {
                 break;
             }
+            Thread.sleep(50L);
+            elapsedNanos = System.nanoTime() - startNanos;
         }
-        watchService.close();
-
         if (file.exists()) {
             image = ImageIO.read(file);
         }
