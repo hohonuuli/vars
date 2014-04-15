@@ -16,6 +16,7 @@
 package vars.shared.preferences;
 
 import com.google.inject.Inject;
+import java.awt.RenderingHints;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -28,6 +29,7 @@ import java.util.prefs.PreferencesFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.VARSException;
+import vars.shared.awt.AWTUtilities;
 import vars.shared.ui.GlobalLookup;
 
 /**
@@ -42,6 +44,7 @@ public class PreferencesService {
     private static final String PROP_AUTOCONNECT_VCR = "autoconnectVCR";
     private static final String PROP_IMAGETARGET = "imageTarget";
     private static final String PROP_IMAGETARGETMAPPING = "imageTargetMapping";
+    private static final String PROP_IMAGEINTERPOLATION = "imageInterpolation";
     private static final String PROP_VCR_URL = "vcrUrl";
     private File defaultImageTarget;
     private URL defaultImageTargetMapping;
@@ -87,6 +90,21 @@ public class PreferencesService {
             throw new VARSException("Failed to lookup default image target mapping", e);
         }
 
+    }
+    
+    /**
+     * @param username
+     * @param hostname
+     * @return A hint that can be used to set the image interpolation used by Java2D rendering.
+     */
+    public Object findImageInterpolation(String username, String hostname) {
+        Preferences preferences = hostPrefs(username, hostname);
+        Object value = RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
+        String key = preferences.get(PROP_IMAGEINTERPOLATION, value.toString());
+        if (AWTUtilities.IMAGE_INTERPOLATION_MAP.containsKey(key)) {
+            value = AWTUtilities.IMAGE_INTERPOLATION_MAP.get(key);
+        }
+        return value;
     }
 
     /**
@@ -250,6 +268,22 @@ public class PreferencesService {
         Preferences preferences = systemPrefs(hostname);
         preferences.put(PROP_AUTOCONNECT_VCR, a);
     }
+    
+    /**
+     * Store the type of image interpolation used for rendering framegrabs
+     * @param username
+     * @param hostname
+     * @param renderingHint The actual RenderingHint object. See RenderingHints 
+     *      { VALUE_INTERPOLATION_BICUBIC, VALUE_INTERPOLATION_BILINEAR, 
+     *       VALUE_INTERPOLATION_NEAREST_NEIGHBOR } for valid values.
+     */
+    public void persistImageInterpolation(String username, String hostname, Object renderingHint) {
+        Preferences preferences = hostPrefs(username, hostname);
+        if (AWTUtilities.IMAGE_INTERPOLATION_MAP.containsValue(renderingHint)) {
+            preferences.put(PROP_IMAGEINTERPOLATION, renderingHint.toString());
+        }
+    }
+    
     /**
      * Save the UDP VCR's information
      * @param username

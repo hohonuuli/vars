@@ -2,6 +2,7 @@ package vars.annotation.ui.eventbus;
 
 /**
  * @author Brian Schlining
+ * @param <A>
  * @since 2011-09-20
  */
 public class UIEvent<A> {

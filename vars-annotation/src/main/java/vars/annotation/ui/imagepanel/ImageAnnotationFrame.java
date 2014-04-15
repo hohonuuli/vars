@@ -51,6 +51,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import vars.annotation.ui.AnnotationImageCanvas;
 
 /**
  * Main class for this package. This class wires together all dependant classes with the controller.
@@ -59,9 +60,9 @@ import java.util.Set;
 public class ImageAnnotationFrame extends JFrame {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
-    private ButtonGroup layersButtonGroup = new ButtonGroup();
-    private List<ImageFrameLayerUI<JImageUrlCanvas>> layers = new ArrayList<ImageFrameLayerUI<JImageUrlCanvas>>();
-    private PropertyChangeListener imageChangeListener = new PropertyChangeListener() {
+    private final ButtonGroup layersButtonGroup = new ButtonGroup();
+    private final List<ImageFrameLayerUI<JImageUrlCanvas>> layers = new ArrayList<ImageFrameLayerUI<JImageUrlCanvas>>();
+    private final PropertyChangeListener imageChangeListener = new PropertyChangeListener() {
 
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
@@ -154,7 +155,7 @@ public class ImageAnnotationFrame extends JFrame {
 
     protected JImageUrlCanvas getImageCanvas() {
         if (imageCanvas == null) {
-            imageCanvas = new JImageUrlCanvas();
+            imageCanvas = new AnnotationImageCanvas();
             imageCanvas.addPropertyChangeListener(JImageCanvas.PROP_IMAGE, imageChangeListener);
         }
 

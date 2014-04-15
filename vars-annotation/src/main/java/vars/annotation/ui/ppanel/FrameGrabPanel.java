@@ -40,6 +40,7 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import vars.annotation.ui.AnnotationImageCanvas;
 
 /**
  * <p>
@@ -84,7 +85,7 @@ public class FrameGrabPanel extends javax.swing.JPanel {
 
     JImageUrlCanvas getImageCanvas() {
         if (imageCanvas == null) {
-            imageCanvas = new JImageUrlCanvas(getClass().getResource("/images/vars/annotation/no_image.jpg"));
+            imageCanvas = new AnnotationImageCanvas(getClass().getResource("/images/vars/annotation/no_image.jpg"));
             imageCanvas.setSize(getSize());
         }
 
