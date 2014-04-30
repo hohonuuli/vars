@@ -1,40 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import java.lang.*?>
-<?import java.util.*?>
 <?import javafx.geometry.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.media.*?>
-<?import javafx.scene.media.MediaView?>
 
-<BorderPane id="BorderPane" prefHeight="186.0" prefWidth="320.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="vars.annotation.ui.videofile.jfxmedia.JFXMovieFrameController">
-  <bottom>
-    <VBox spacing="5.0">
-      <TextField fx:id="timecodeTextField" alignment="CENTER" editable="false" prefWidth="-1.0" text="--:--:--:--" VBox.vgrow="NEVER" />
-      <HBox VBox.vgrow="NEVER">
-        <Button id="button" defaultButton="true" mnemonicParsing="false" text="" HBox.hgrow="NEVER">
-          <graphic>
-            <ImageView fx:id="buttonImage" fitHeight="0.0" fitWidth="0.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true">
-              <image>
-                <Image url="@../images/vcr/play.png" />
-              </image>
-            </ImageView>
-          </graphic>
-        </Button>
-        <Slider fx:id="scrubber" max="10000.0" style="-fx-alignment: baseline-center;&#10;" HBox.hgrow="ALWAYS" />
-        <VBox.margin>
-          <Insets />
-        </VBox.margin>
-      </HBox>
-      <BorderPane.margin>
-        <Insets bottom="10.0" left="10.0" right="10.0" />
-      </BorderPane.margin>
-    </VBox>
-  </bottom>
-  <center>
-    <MediaView fx:id="mediaView" fitHeight="40.0" fitWidth="100.0" preserveRatio="true" BorderPane.alignment="CENTER" />
-  </center>
-</BorderPane>
+<AnchorPane id="anchorPane" fx:id="anchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vars.annotation.ui.videofile.jfxmedia.JFXMovieFrameController">
+<children><MediaView fx:id="mediaView" layoutX="200.0" layoutY="14.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" /><HBox alignment="CENTER" layoutX="14.0" layoutY="286.0" prefHeight="100.0" prefWidth="575.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
+<padding>
+<Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+</padding>
+<children><Button id="playButton" fx:id="playButton" mnemonicParsing="false" text="&gt;" /><Label text="   " /><Slider id="scrubber" fx:id="scrubber" maxWidth="1.7976931348623157E308" minWidth="50.0" HBox.hgrow="ALWAYS" /><TextField id="timecodeTextField" fx:id="timecodeTextField" alignment="CENTER" editable="false" text="--:--:--:--" HBox.hgrow="NEVER" /><Label text=" / " /><TextField id="maxTimecodeTextField" fx:id="maxTimecodeTextField" alignment="CENTER" text="--:--:--:--" />
+</children></HBox>
+</children></AnchorPane>

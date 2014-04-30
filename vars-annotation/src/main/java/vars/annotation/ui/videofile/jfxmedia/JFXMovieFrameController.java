@@ -1,7 +1,13 @@
 package vars.annotation.ui.videofile.jfxmedia;
 
+/**
+ * Created by brian on 4/29/14.
+ */
 import javafx.application.Platform;
-import javafx.beans.property.*;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableMap;
@@ -9,11 +15,11 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.SnapshotParameters;
+import javafx.scene.control.Button;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
@@ -21,64 +27,48 @@ import javafx.util.Duration;
 import org.mbari.awt.image.ImageUtilities;
 import org.mbari.movie.Timecode;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
-/**
- * TODO scrubber does not work
- *
- * TODO fix teh play button
- *
- * TODO screen needs to resize to size of video when it's open.
- *
- * TODO add resizing of video based on user changing the frame size
- *
- * Created by brian on 12/16/13.
- */
 public class JFXMovieFrameController implements Initializable {
 
     public static final Double DEFAULT_FRAME_RATE = 30D;
 
     @FXML
-    private TextField timecodeTextField;
+    private AnchorPane anchorPane;
 
-    /**
-     * To get the mediaPlayer just call mediaView.getMediaPlayer()
-     */
     @FXML
-    private MediaView mediaView;
+    private TextField maxTimecodeTextField;
 
     @FXML
     private Slider scrubber;
 
     @FXML
-    private ImageView buttonImage;
+    private MediaView mediaView;
 
-    private MediaPlayer mediaPlayer;
-    private final StringProperty timecodeProperty = new SimpleStringProperty("--:--:--:--");
+    @FXML
+    private TextField timecodeTextField;
+
+    @FXML
+    private Button playButton;
+
+    private volatile MediaPlayer mediaPlayer;
     private final Timecode timecode = new Timecode();
-    private ChangeListener<Duration> timeListener = null;
+    private Duration duration;
 
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        timecodeTextField.textProperty().bind(timecodeProperty);
+    public void initialize(URL location, ResourceBundle resources) {
+    }
+
+    public AnchorPane getAnchorPane() {
+        return anchorPane;
     }
 
     public MediaView getMediaView() {
         return mediaView;
     }
-
-    public TextField getTimecodeTextField() {
-        return timecodeTextField;
-    }
-
-    public Slider getScrubber() { return scrubber; }
 
     public void setMediaLocation(String mediaLocation) {
         resetMediaView();
@@ -88,26 +78,56 @@ public class JFXMovieFrameController implements Initializable {
         timecode.setFrameRate((Double) metadata.getOrDefault("framerate", DEFAULT_FRAME_RATE));
         mediaPlayer = new MediaPlayer(media);
         mediaView.setMediaPlayer(mediaPlayer);
-        mediaView.setFitHeight(media.getHeight());
-        mediaView.setFitWidth(media.getWidth());
 
-        scrubber.setMin(0);
-        scrubber.setMax(media.getDuration().toSeconds());
+        // ---  Configure play button
+        playButton.setOnAction((e) -> {
+            MediaPlayer.Status status = mediaPlayer.getStatus();
+            System.out.println(status);
+            if (status == MediaPlayer.Status.UNKNOWN ||  status == MediaPlayer.Status.HALTED) {
+                // Do nothing
+                return;
+            }
 
-        timeListener = (ChangeListener<Duration>) (observableValue, duration, duration2) -> {
-            double frames = duration2.toSeconds() * timecode.getFrameRate();
-            timecode.setFrames(frames);
-            timecodeProperty.setValue(timecode.toString());
-            scrubber.adjustValue(duration2.toSeconds());
-        };
+            if (status == MediaPlayer.Status.PLAYING) {
+                mediaPlayer.pause();
+            }
+            else if (status == MediaPlayer.Status.PAUSED || status == MediaPlayer.Status.READY ||
+                    status == MediaPlayer.Status.STOPPED) {
+                mediaPlayer.play();
+            }
 
+        });
 
-        mediaPlayer.currentTimeProperty().addListener(timeListener);
-
-        mediaPlayer.onPlayingProperty().addListener(new ChangeListener<Runnable>() {
+        // --- Configure MediaPlayer
+        mediaPlayer.currentTimeProperty().addListener(new InvalidationListener() {
             @Override
-            public void changed(ObservableValue<? extends Runnable> observableValue, Runnable runnable, Runnable runnable2) {
+            public void invalidated(Observable observable) {
+                updateValues();
+            }
+        });
 
+        mediaPlayer.setOnPlaying(() -> { playButton.setText("||"); });
+
+        mediaPlayer.setOnPaused(() -> { playButton.setText(">"); });
+
+        mediaPlayer.setOnReady(() -> {
+            duration = mediaPlayer.getMedia().getDuration();
+            Timecode tc = new Timecode(duration.toSeconds() * timecode.getFrameRate());
+            maxTimecodeTextField.setText(tc.toString());
+            updateValues();
+        });
+
+
+        mediaPlayer.setOnEndOfMedia(() -> { playButton.setText(">"); });
+
+        // --- Configure Scrubber
+        scrubber.valueProperty().addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable observable) {
+                if (scrubber.isValueChanging()) {
+                    // multiply duration by percentage calculated by slider position
+                    mediaPlayer.seek(duration.multiply(scrubber.getValue() / 100D));
+                }
             }
         });
 
@@ -115,9 +135,6 @@ public class JFXMovieFrameController implements Initializable {
 
     private void resetMediaView() {
         if (mediaPlayer != null) {
-            if (timeListener != null) {
-                mediaPlayer.currentTimeProperty().removeListener(timeListener);
-            }
             mediaPlayer.stop();
             mediaView.setMediaPlayer(null);
             mediaPlayer.dispose();
@@ -134,6 +151,7 @@ public class JFXMovieFrameController implements Initializable {
                 try {
                     ImageUtilities.saveImage(SwingFXUtils.fromFXImage(image, null), target);
                 } catch (IOException e) {
+                    // TODO fix exception handling
                     System.out.println("Failed to write " + target.getAbsolutePath());
                 }
             });
@@ -141,4 +159,19 @@ public class JFXMovieFrameController implements Initializable {
         }
     }
 
+    protected  void updateValues() {
+        if (timecodeTextField != null && scrubber != null && mediaPlayer != null) {
+            Platform.runLater(() -> {
+                Duration currentTime = mediaPlayer.getCurrentTime();
+                double frames = currentTime.toSeconds() * timecode.getFrameRate();
+                timecode.setFrames(frames);
+                timecodeTextField.setText(timecode.toString());
+                scrubber.setDisable(duration.isUnknown());
+                if (!scrubber.isDisabled() && duration.greaterThan(Duration.ZERO) && !scrubber.isValueChanging()) {
+                    scrubber.setValue(currentTime.divide(duration.toMillis()).toMillis() * 100D);
+                }
+            });
+        }
+    }
 }
+
