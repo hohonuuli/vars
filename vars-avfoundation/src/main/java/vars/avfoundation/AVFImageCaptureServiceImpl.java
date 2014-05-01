@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.VARSException;
 import vars.shared.ui.GlobalLookup;
+import vars.shared.ui.ImageUtilities;
 import vars.shared.ui.dialogs.StandardDialog;
 import vars.shared.ui.video.ImageCaptureException;
 import vars.shared.ui.video.ImageCaptureService;
@@ -115,7 +116,7 @@ public class AVFImageCaptureServiceImpl implements ImageCaptureService {
         // -- Read file as image
         BufferedImage image = null;
         try {
-            image = watchForAndReadNewImage(file);
+            image = ImageUtilities.watchForAndReadNewImage(file);
         } catch (Exception e) {
             EventBus.publish(GlobalLookup.TOPIC_WARNING, e);
         }
@@ -136,7 +137,7 @@ public class AVFImageCaptureServiceImpl implements ImageCaptureService {
         // -- Reread file as image
         BufferedImage image = null;
         try {
-            image = watchForAndReadNewImage(tempFile);
+            image = ImageUtilities.watchForAndReadNewImage(tempFile);
         } catch (Exception e) {
             EventBus.publish(GlobalLookup.TOPIC_WARNING, e);
         }
@@ -227,38 +228,4 @@ public class AVFImageCaptureServiceImpl implements ImageCaptureService {
 
     }
 
-    /**
-     * AVFoundation writes the image asynchronously. We need to block and watch for them to be created.
-     * Lame, but even using Java Future's forces us to block.
-     * @param file
-     * @return
-     * @throws IOException
-     * @throws InterruptedException
-     */
-    private BufferedImage watchForAndReadNewImage(File file) throws IOException, InterruptedException {
-        BufferedImage image = null;
-        final Path parentDir = file.getParentFile().toPath();
-        final WatchService watchService = parentDir.getFileSystem().newWatchService();
-        final WatchKey watchKey = parentDir.register(watchService, ENTRY_CREATE, ENTRY_MODIFY);
-        for(int i = 0; i < 10; i++) {
-            final WatchKey wk = watchService.poll(1, TimeUnit.SECONDS);
-            if (wk != null) {
-                for (WatchEvent<?> event : wk.pollEvents()) {
-                    final Path changedPath = (Path) event.context();
-                    if (changedPath.endsWith(file.getName())) {
-                        break;
-                    }
-                }
-            }
-            if (file.exists()) {
-                break;
-            }
-        }
-        watchService.close();
-
-        if (file.exists()) {
-            image = ImageIO.read(file);
-        }
-        return image;
-    }
 }

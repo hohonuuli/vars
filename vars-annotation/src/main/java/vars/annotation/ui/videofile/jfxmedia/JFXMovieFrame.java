@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.io.IOException;
 import java.net.URL;
 
@@ -61,6 +63,13 @@ public class JFXMovieFrame extends JFrame {
         Scene scene = new Scene(root);
         scene.getStylesheets().add("/styles/JFXMovieFrame.css");
         panel.setScene(scene);
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                Dimension d = e.getComponent().getSize();
+                controller.getAnchorPane().setPrefWidth(d.getWidth() - 10);
+            }
+        });
     }
 
     public JFXMovieFrameController getController() {

@@ -27,6 +27,7 @@ import javafx.util.Duration;
 import org.mbari.awt.image.ImageUtilities;
 import org.mbari.movie.Timecode;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -142,8 +143,9 @@ public class JFXMovieFrameController implements Initializable {
         }
     }
 
-    public void frameCapture(File target) throws IOException {
+    public BufferedImage frameCapture(File target) throws IOException, InterruptedException {
 
+        BufferedImage bufferedImage = null;
         if (mediaView != null) {
             Platform.runLater(() -> {
                 WritableImage image = mediaView.snapshot(new SnapshotParameters(), null);
@@ -156,7 +158,12 @@ public class JFXMovieFrameController implements Initializable {
                 }
             });
 
+            Thread.sleep(400L);
+            bufferedImage = vars.shared.ui.ImageUtilities.watchForAndReadNewImage(target);
+
         }
+
+        return bufferedImage;
     }
 
     protected  void updateValues() {

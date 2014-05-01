@@ -234,9 +234,8 @@ public class JFXOpenVideoArchiveDialogController {
         String name = videoArchive.getName(); // For movies the name should be the URL
         VideoPlayerController videoPlayerController;
         try {
-            JFXController controller = new JFXController();
-            final VideoControlService videoControlService = controller.getVideoControlService();
-            videoControlService.connect(name);
+            JFXVideoControlServiceImpl controller = new JFXVideoControlServiceImpl();
+            controller.connect(name);
             videoPlayerController = controller;
         }
         catch (Exception e) {

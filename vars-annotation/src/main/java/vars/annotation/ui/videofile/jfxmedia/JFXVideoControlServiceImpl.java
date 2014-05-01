@@ -5,7 +5,17 @@ import java.io.File;
 import java.util.Date;
 import javafx.util.Duration;
 import javax.swing.*;
+
+import org.bushe.swing.event.EventBus;
 import org.mbari.movie.Timecode;
+import org.mbari.util.IObserver;
+import org.mbari.vcr.IVCR;
+import org.mbari.vcr.IVCRState;
+import org.mbari.vcr.IVCRTimecode;
+import org.mbari.vcr.VCRTimecodeAdapter;
+import org.mbari.vcr.timer.AnnotationQueueVCR;
+import vars.annotation.ui.Lookup;
+import vars.annotation.ui.videofile.VideoPlayerController;
 import vars.annotation.ui.videofile.jfxmedia.vcr.VCR;
 import vars.shared.ui.video.*;
 import vars.VARSException;
@@ -13,9 +23,15 @@ import vars.VARSException;
 /**
  * Created by brian on 12/16/13.
  */
-public class JFXVideoControlServiceImpl  extends AbstractVideoControlService implements ImageCaptureService {
+public class JFXVideoControlServiceImpl  extends AbstractVideoControlService
+        implements ImageCaptureService, VideoPlayerController {
 
     private JFXMovieFrame movieFrame = new JFXMovieFrame();
+
+
+    private final JFXTimecode vcrTimcode = new JFXTimecode();
+    private final JFXState vcrState = new JFXState();
+
 
     public JFXVideoControlServiceImpl() {
         movieFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
@@ -28,7 +44,14 @@ public class JFXVideoControlServiceImpl  extends AbstractVideoControlService imp
 
     @Override
     public Image capture(File file) throws ImageCaptureException {
-        return null;
+        Image image = null;
+        try {
+           image = movieFrame.getController().frameCapture(file);
+        }
+        catch (Exception e) {
+            EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+        }
+        return image;
     }
 
     @Override
@@ -39,7 +62,7 @@ public class JFXVideoControlServiceImpl  extends AbstractVideoControlService imp
 
     @Override
     public void dispose() {
-
+        // TODO ???
     }
 
     @Override
@@ -58,8 +81,9 @@ public class JFXVideoControlServiceImpl  extends AbstractVideoControlService imp
         String movieLocation = (String) args[0];
         try {
             movieFrame.setMovieLocation(movieLocation);
-            Thread.sleep(1000); // HACK! setMovieLocation has to set the movie location on JavaFX thread. We must wait
-            setVcr(new VCR(movieFrame.getController().getMediaView().getMediaPlayer()));
+            Thread.sleep(1500); // HACK! setMovieLocation has to set the movie location on JavaFX thread. We must wait
+            IVCR vcr = new AnnotationQueueVCR(new VCR(movieFrame.getController().getMediaView().getMediaPlayer()));
+            setVcr(vcr);
             setVideoControlInformation(new VideoControlInformationImpl(movieLocation, VideoControlStatus.CONNECTED));
             movieFrame.setVisible(true);
         }
@@ -99,4 +123,40 @@ public class JFXVideoControlServiceImpl  extends AbstractVideoControlService imp
         };
     }
 
+    @Override
+    public VideoControlService getVideoControlService() {
+        return this;
+    }
+
+    @Override
+    public ImageCaptureService getImageCaptureService() {
+        return this;
+    }
+
+    @Override
+    public String getMovieLocation() {
+        return movieFrame.getController().getMediaView().getMediaPlayer().getMedia().getSource();
+    }
+
+    @Override
+    public void close() {
+        // TODO ???
+    }
+
+    @Override
+    public IVCRTimecode getVcrTimecode() {
+        return vcrTimcode;
+    }
+
+    @Override
+    public IVCRState getVcrState() {
+        return vcrState;
+    }
+
+    @Override
+    public void setVcr(IVCR vcr) {
+        vcrTimcode.setVCR(vcr);
+        vcrState.setVcr(vcr);
+        super.setVcr(vcr);
+    }
 }

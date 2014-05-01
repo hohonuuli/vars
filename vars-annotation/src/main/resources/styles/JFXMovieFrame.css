@@ -6,7 +6,14 @@
 #timecodeTextField {
     -fx-background-color: #000000;
     -fx-text-fill: textcolor;
-    -fx-font-size: 300%;
+    -fx-font-size: 100%;
+    -fx-font-family: monospace;
+}
+
+#maxTimecodeTextField {
+    -fx-background-color: #000000;
+    -fx-text-fill: textcolor;
+    -fx-font-size: 100%;
     -fx-font-family: monospace;
 }
 
@@ -15,9 +22,9 @@
 }
 
 #scrubber {
-    -fx-alignment: bottom-center;
+    /* -fx-alignment: bottom-center; */
 }
 
 #button {
-    -fx-padding: 0px 10px 0px 10px;
+    /* -fx-padding: 0px 10px 0px 10px; */
 }

@@ -22,7 +22,9 @@ public class State extends VCRStateAdapter {
 
     @Override
     public boolean isJogging() {
-        return vcr.getMediaPlayer().getCurrentRate() > 0.0;
+        // jog is when you are not playing but still moving forward
+        double rate = vcr.getMediaPlayer().getCurrentRate();
+        return rate > 0.0 &&  Math.abs(1D - rate) > 0.0001;
     }
 
     @Override
@@ -32,7 +34,7 @@ public class State extends VCRStateAdapter {
 
     @Override
     public boolean isShuttling() {
-        return vcr.getMediaPlayer().getCurrentRate() > 0.0;
+        return vcr.getMediaPlayer().getCurrentRate() > 1.0;
     }
 
     @Override

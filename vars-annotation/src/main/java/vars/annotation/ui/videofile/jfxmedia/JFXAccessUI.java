@@ -18,7 +18,7 @@ public class JFXAccessUI extends AbstractAccessUI {
 
     private VideoPlayerDialogUI dialog;
     private Window currentParent;
-    private JFXController controller = new JFXController();
+    private JFXVideoControlServiceImpl controller = new JFXVideoControlServiceImpl();
 
     @Inject
     public JFXAccessUI(AnnotationDAOFactory daoFactory) {
