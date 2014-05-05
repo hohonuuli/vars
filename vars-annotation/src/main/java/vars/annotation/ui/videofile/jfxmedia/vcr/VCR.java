@@ -14,7 +14,9 @@ import org.mbari.vcr.VCRAdapter;
 
 public class VCR extends VCRAdapter {
 
-    public static final Double DEFAULT_FRAME_RATE = 30D;
+    public static final double DEFAULT_FRAME_RATE = 30D;
+    public static final double FAST_FORWARD_RATE = 5D;
+    public static final double MAX_RATE = 8D; // According to JavaFX docs this is the max rate
 
     private final MediaPlayer mediaPlayer;
 
@@ -34,13 +36,16 @@ public class VCR extends VCRAdapter {
             timecode.setFrames(frames);
         };
         mediaPlayer.currentTimeProperty().addListener(timeListener);
-
+        triggerStateNotification();
     }
 
     @Override
     public void shuttleForward(int speed) {
-        double rate = speed / 256D * 3;
+        double rate = speed / 255D * MAX_RATE;
+        mediaPlayer.setRate(rate);
+        mediaPlayer.play();
         super.shuttleForward(speed);
+        triggerStateNotification();
     }
 
     @Override
@@ -55,11 +60,14 @@ public class VCR extends VCRAdapter {
     @Override
     public void pause() {
         mediaPlayer.pause();
+        triggerStateNotification();
     }
 
     @Override
     public void play() {
+        mediaPlayer.setRate(1.0);
         mediaPlayer.play();
+        triggerStateNotification();
     }
 
 
@@ -72,11 +80,42 @@ public class VCR extends VCRAdapter {
     @Override
     public void stop() {
         mediaPlayer.pause();
+        triggerStateNotification();
     }
 
     @Override
     public void disconnect() {
         mediaPlayer.currentTimeProperty().removeListener(timeListener);
         super.disconnect();
+        triggerStateNotification();
+    }
+
+    @Override
+    public void fastForward() {
+        mediaPlayer.setRate(FAST_FORWARD_RATE);
+        mediaPlayer.play();
+        super.fastForward();
+        triggerStateNotification();
+    }
+
+    public void triggerStateNotification() {
+        State state = (State) getVcrState();
+        state.notifyObserversFX();
+    }
+
+    @Override
+    public void requestStatus() {
+        super.requestStatus();
+        triggerStateNotification();
+    }
+
+    @Override
+    public void seekTimecode(Timecode timecode) {
+        Timecode currentTimecode = getVcrTimecode().getTimecode();
+        double millis = timecode.getFrames() / currentTimecode.getFrameRate() * 1000D;
+        Duration duration = new Duration(millis);
+        mediaPlayer.seek(duration);
+        super.seekTimecode(timecode);
+        triggerStateNotification();
     }
 }

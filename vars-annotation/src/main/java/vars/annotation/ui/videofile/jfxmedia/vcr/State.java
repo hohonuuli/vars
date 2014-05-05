@@ -8,6 +8,7 @@ import org.mbari.vcr.VCRStateAdapter;
 public class State extends VCRStateAdapter {
 
     private final VCR vcr;
+    private static final double eps = 0.01;
 
     public State(VCR vcr) {
         this.vcr = vcr;
@@ -17,24 +18,23 @@ public class State extends VCRStateAdapter {
 
     @Override
     public boolean isFastForwarding() {
-        return vcr.getMediaPlayer().getCurrentRate() > 1.0;
+        return Math.abs(VCR.FAST_FORWARD_RATE - vcr.getMediaPlayer().getCurrentRate()) <= eps;
     }
 
     @Override
     public boolean isJogging() {
         // jog is when you are not playing but still moving forward
-        double rate = vcr.getMediaPlayer().getCurrentRate();
-        return rate > 0.0 &&  Math.abs(1D - rate) > 0.0001;
+        return isShuttling();
     }
 
     @Override
     public boolean isPlaying() {
-        return vcr.getMediaPlayer().getCurrentRate() == 1.0;
+        return Math.abs(1D - vcr.getMediaPlayer().getCurrentRate()) <= eps;
     }
 
     @Override
     public boolean isShuttling() {
-        return vcr.getMediaPlayer().getCurrentRate() > 1.0;
+        return vcr.getMediaPlayer().getCurrentRate() > 0.0 && Math.abs(1D - vcr.getMediaPlayer().getRate()) > eps;
     }
 
     @Override
@@ -49,7 +49,7 @@ public class State extends VCRStateAdapter {
 
     @Override
     public boolean isStopped() {
-        return vcr.getMediaPlayer().getCurrentRate() == 0.0;
+        return Math.abs(0D - vcr.getMediaPlayer().getCurrentRate()) <= eps;
     }
 
     @Override
@@ -61,4 +61,13 @@ public class State extends VCRStateAdapter {
     public boolean isConnected() {
         return true;
     }
+
+    /**
+     * Allow the JavaFX VCR implementation to trigger a state notification
+     */
+    protected void notifyObserversFX() {
+        notifyObservers();
+    }
+
+
 }

@@ -24,9 +24,14 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.util.Duration;
+import org.bushe.swing.event.EventBus;
 import org.mbari.awt.image.ImageUtilities;
 import org.mbari.movie.Timecode;
+import vars.annotation.ui.Lookup;
 
+import javax.swing.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -55,12 +60,30 @@ public class JFXMovieFrameController implements Initializable {
     @FXML
     private Button playButton;
 
+    private JFrame frame;
     private volatile MediaPlayer mediaPlayer;
     private final Timecode timecode = new Timecode();
     private Duration duration;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+    }
+
+    /**
+     * This needs to be called immediately after the object is intilized
+     * @param frame The frame that contains the JavaFX node
+     */
+    protected void setFrame(final JFrame frame) {
+        this.frame = frame;
+        frame.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                Platform.runLater(() -> {
+                    getMediaView().setFitWidth(frame.getWidth());
+                    getMediaView().setFitHeight(frame.getHeight());
+                });
+            }
+        });
     }
 
     public AnchorPane getAnchorPane() {
@@ -112,10 +135,12 @@ public class JFXMovieFrameController implements Initializable {
         mediaPlayer.setOnPaused(() -> { playButton.setText(">"); });
 
         mediaPlayer.setOnReady(() -> {
-            duration = mediaPlayer.getMedia().getDuration();
+            Media m = mediaPlayer.getMedia();
+            duration = m.getDuration();
             Timecode tc = new Timecode(duration.toSeconds() * timecode.getFrameRate());
             maxTimecodeTextField.setText(tc.toString());
             updateValues();
+            SwingUtilities.invokeLater(() -> frame.setSize(m.getWidth(), m.getHeight()));
         });
 
 
@@ -158,8 +183,34 @@ public class JFXMovieFrameController implements Initializable {
                 }
             });
 
-            Thread.sleep(400L);
-            bufferedImage = vars.shared.ui.ImageUtilities.watchForAndReadNewImage(target);
+            /*
+                We are writing the image asynchronously (i.e. Platform.runLater()). Since we're not using any RX
+                frameworks, we have to poll the image to see if it's done being written. If we try to read it while
+                it's in a partially written state then we will get:
+
+                java.lang.IndexOutOfBoundsException: null
+                    at java.io.RandomAccessFile.readBytes(Native Method) ~[na:1.8.0_05]
+                    at java.io.RandomAccessFile.read(RandomAccessFile.java:349) ~[na:1.8.0_05]
+                    at javax.imageio.stream.FileImageInputStream.read(FileImageInputStream.java:117) ~[na:1.8.0_05]
+                    at ...
+
+             */
+            Exception failure = null;
+            for (int i = 0; i < 8; i++) {
+                Thread.sleep(400L);
+                try {
+                    bufferedImage = vars.shared.ui.ImageUtilities.watchForAndReadNewImage(target);
+                    break;
+                }
+                catch (IndexOutOfBoundsException e) {
+                    failure = e;
+                }
+            }
+
+            if (bufferedImage == null && failure != null) {
+                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, failure);
+            }
+
 
         }
 

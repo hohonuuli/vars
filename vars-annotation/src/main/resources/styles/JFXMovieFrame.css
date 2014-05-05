@@ -6,14 +6,14 @@
 #timecodeTextField {
     -fx-background-color: #000000;
     -fx-text-fill: textcolor;
-    -fx-font-size: 100%;
+    -fx-font-size: 140%;
     -fx-font-family: monospace;
 }
 
 #maxTimecodeTextField {
     -fx-background-color: #000000;
     -fx-text-fill: textcolor;
-    -fx-font-size: 100%;
+    -fx-font-size: 140%;
     -fx-font-family: monospace;
 }
 

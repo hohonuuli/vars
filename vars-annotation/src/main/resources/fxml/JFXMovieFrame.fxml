@@ -7,10 +7,10 @@
 <?import javafx.scene.media.*?>
 
 <AnchorPane id="anchorPane" fx:id="anchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vars.annotation.ui.videofile.jfxmedia.JFXMovieFrameController">
-<children><MediaView fx:id="mediaView" layoutX="200.0" layoutY="14.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" /><HBox alignment="CENTER" layoutX="14.0" layoutY="286.0" prefHeight="100.0" prefWidth="575.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
+<children><MediaView fx:id="mediaView" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" /><HBox alignment="CENTER" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
 <padding>
 <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
 </padding>
-<children><Button id="playButton" fx:id="playButton" mnemonicParsing="false" text="&gt;" /><Label text="   " /><Slider id="scrubber" fx:id="scrubber" maxWidth="1.7976931348623157E308" minWidth="50.0" HBox.hgrow="ALWAYS" /><TextField id="timecodeTextField" fx:id="timecodeTextField" alignment="CENTER" editable="false" text="--:--:--:--" HBox.hgrow="NEVER" /><Label text=" / " /><TextField id="maxTimecodeTextField" fx:id="maxTimecodeTextField" alignment="CENTER" text="--:--:--:--" />
+<children><Button id="playButton" fx:id="playButton" mnemonicParsing="false" text="&gt;" /><Label text="   " /><Slider id="scrubber" fx:id="scrubber" maxWidth="1.7976931348623157E308" minWidth="50.0" HBox.hgrow="ALWAYS" /><TextField id="timecodeTextField" fx:id="timecodeTextField" alignment="CENTER" editable="false" text="--:--:--:--" HBox.hgrow="NEVER" /><Label text=" / " /><TextField id="maxTimecodeTextField" fx:id="maxTimecodeTextField" alignment="CENTER" text="--:--:--:--" HBox.hgrow="NEVER" />
 </children></HBox>
 </children></AnchorPane>

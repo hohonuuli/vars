@@ -6,8 +6,13 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.JavaFXBuilderFactory;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaException;
+import javafx.scene.media.MediaPlayer;
+import org.bushe.swing.event.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.annotation.ui.Lookup;
 
 import javax.swing.*;
 import java.awt.*;
@@ -30,6 +35,7 @@ public class JFXMovieFrame extends JFrame {
         setLayout(new BorderLayout());
         add(getPanel());
         setSize(480, 320);
+        setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
     }
 
     public JFXPanel getPanel() {
@@ -48,7 +54,14 @@ public class JFXMovieFrame extends JFrame {
     }
 
     public void setMovieLocation(final String location) {
-        Platform.runLater(() -> controller.setMediaLocation(location));
+        Platform.runLater(() -> {
+            try {
+                controller.setMediaLocation(location);
+            }
+            catch (MediaException e) {
+                EventBus.publish(Lookup.TOPIC_WARNING, "Unable to open the file at " + location + "using the Built-in (JavaFX) player");
+            }
+        });
     }
 
     private void initFX(JFXPanel panel) throws IOException {
@@ -59,17 +72,12 @@ public class JFXMovieFrame extends JFrame {
 
         Parent root = (Parent) loader.load(controllerLocation.openStream());
         controller = loader.getController();
+        controller.setFrame(this);
 
         Scene scene = new Scene(root);
         scene.getStylesheets().add("/styles/JFXMovieFrame.css");
         panel.setScene(scene);
-        addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent e) {
-                Dimension d = e.getComponent().getSize();
-                controller.getAnchorPane().setPrefWidth(d.getWidth() - 10);
-            }
-        });
+
     }
 
     public JFXMovieFrameController getController() {

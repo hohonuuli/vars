@@ -138,13 +138,12 @@ public class MiscTabsPanel extends javax.swing.JPanel {
 
     private void initTabs() {
         tabbedPane.add("Frame-grab", new FrameGrabPanel(toolbelt));
+        tabbedPane.add("Bulk Editor", new VideoArchiveEditorPanel(toolbelt));
         tabbedPane.add("Knowledge Base", getTreePanel());
         tabbedPane.add("Observation", new PObservationPanel(toolbelt));
         tabbedPane.add("Video Archive", new PVideoArchivePanel(toolbelt));
         tabbedPane.add("Physical Data", new PPhysicalDataPanel());
         tabbedPane.add("Camera Data", new PCameraDataPanel(toolbelt));
-        tabbedPane.add("Bulk Editor", new VideoArchiveEditorPanel(toolbelt));
-        
     }
 
     private void resizeHandler(final java.awt.event.ComponentEvent evt) {

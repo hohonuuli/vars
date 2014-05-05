@@ -82,10 +82,12 @@ public class JFXVideoControlServiceImpl  extends AbstractVideoControlService
         try {
             movieFrame.setMovieLocation(movieLocation);
             Thread.sleep(1500); // HACK! setMovieLocation has to set the movie location on JavaFX thread. We must wait
-            IVCR vcr = new AnnotationQueueVCR(new VCR(movieFrame.getController().getMediaView().getMediaPlayer()));
+            VCR fxVcr = new VCR(movieFrame.getController().getMediaView().getMediaPlayer());
+            IVCR vcr = new AnnotationQueueVCR(fxVcr);
             setVcr(vcr);
             setVideoControlInformation(new VideoControlInformationImpl(movieLocation, VideoControlStatus.CONNECTED));
             movieFrame.setVisible(true);
+            ((VCR) fxVcr).triggerStateNotification();
         }
         catch (Exception e) {
             setVcr(null);
@@ -102,9 +104,7 @@ public class JFXVideoControlServiceImpl  extends AbstractVideoControlService
 
     @Override
     public void seek(String timecode) {
-        Timecode tc = new Timecode(timecode);
-        double seconds = tc.getFrames() * tc.getFrameRate();
-        movieFrame.getController().getMediaView().getMediaPlayer().seek(Duration.seconds(seconds));
+        getVcr().seekTimecode(new Timecode(timecode));
     }
 
     @Override
