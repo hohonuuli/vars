@@ -1,8 +1,14 @@
 ## AVFoundation
+## Notes for Video file playback interface
 
 https://developer.apple.com/av-foundation/
-
+http://www.raywenderlich.com/13418/how-to-play-record-edit-videos-in-ios
+http://www.raywenderlich.com/13418/how-to-play-record-edit-videos-in-ios
 http://www.slideshare.net/invalidname/capturing-stills-sounds-and-scenes-with-av-foundation
+http://maniacdev.com/2013/03/source-code-examples-covering-avfoundation-video-basics-and-how-to-create-a-video-editor
+http://www.slideshare.net/invalidname/capturing-stills-sounds-and-scenes-with-av-foundation
+
+http://maniacdev.com/2013/03/source-code-examples-covering-avfoundation-video-basics-and-how-to-create-a-video-editor
 
 http://www.raywenderlich.com/30200/avfoundation-tutorial-adding-overlays-and-animations-to-videos
 
@@ -17,6 +23,7 @@ http://stackoverflow.com/questions/10123045/cocoa-whats-the-equivalent-of-a-uivi
 http://n0tablog.wordpress.com/2009/02/09/controlling-vlc-via-rc-remote-control-interface-using-a-unix-domain-socket-and-no-programming/
 
 https://wiki.videolan.org/Interfaces
+https://developer.apple.com/library/ios/DOCUMENTATION/AudioVideo/Conceptual/AVFoundationPG/Articles/02_Playback.html
 
 https://sites.google.com/site/sachinkagarwal/home/code-snippets/remote-controlling-vlc-player
 
