@@ -137,13 +137,6 @@ public class AVFImageCaptureServiceImpl implements ImageCaptureService {
         Image image = capture(tempFile);
         saveSnapshotToSpecifiedPath(tempFile.getAbsolutePath());
 
-        // -- Reread file as image
-        BufferedImage image = null;
-        try {
-            image = ImageUtilities.watchForAndReadNewImage(tempFile);
-        } catch (Exception e) {
-            EventBus.publish(GlobalLookup.TOPIC_WARNING, e);
-        }
         // -- Delete the temp file in the background
         Thread thread = new Thread(new Runnable() {
             @Override

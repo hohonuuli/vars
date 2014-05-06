@@ -333,7 +333,7 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
             toolBar.add(new UndoButton());
             toolBar.add(new RedoButton());
             toolBar.add(new RefreshButton(toolBelt));
-            toolBar.add(new VideoArchiveSetEditorButton(toolBelt));
+            // toolBar.add(new VideoArchiveSetEditorButton(toolBelt));
             toolBar.add(new PreferenceFrameButton());
             toolBar.add(new StatusLabelForPerson(toolBelt));
             // toolBar.add(new StatusLabelForVcr());

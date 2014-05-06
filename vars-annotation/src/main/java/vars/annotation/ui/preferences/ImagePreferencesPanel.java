@@ -235,7 +235,7 @@ public class ImagePreferencesPanel extends JPanel implements PreferenceUpdater {
             						.addComponent(getImageTargetMappingTextField(), GroupLayout.DEFAULT_SIZE, 305, Short.MAX_VALUE)
             						.addComponent(getImageFormatComboBox(), 0, 305, Short.MAX_VALUE)
             						.addComponent(getImageInterpComboBox(), 0, 305, Short.MAX_VALUE))))
-                            .addComponent(getDefaultsButton()))
+                            .addComponent(getDefaultsButton())
             			.addContainerGap())
             );
             groupLayout.setVerticalGroup(
