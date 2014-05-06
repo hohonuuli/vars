@@ -58,22 +58,5 @@
                 <include>org.scala-lang:jline</include>
             </includes>
         </dependencySet>
-        <dependencySet>
-            <outputDirectory>lib/groovy-repl</outputDirectory>
-            <unpack>false</unpack>
-            <scope>runtime</scope>
-            <includes>
-                <include>org.codehaus.groovy:groovy</include>
-                <include>org.codehaus.groovy:groovy-console</include>
-                <include>org.codehaus.groovy:groovy-groovysh</include>
-                <include>org.codehaus.groovy:groovy-xml</include>
-                <include>org.codehaus.groovy:groovy-sql</include>
-                <include>org.codehaus.groovy:groovy-swing</include>
-                <include>org.codehaus.groovy:groovy-templates</include>
-                <include>commons-cli:commons-cli</include>
-                <include>jline:jline</include>
-                <include>org.fusesource.jansi:jansi</include>
-            </includes>
-        </dependencySet>
     </dependencySets>
 </assembly>

@@ -35,6 +35,7 @@ public class PreferenceFrameButton extends FancyButton {
         setToolTipText("Edit Preferences");
         setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/24px/preferences.png")));
         addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 getPreferencesFrame().setVisible(true);
             }
@@ -42,6 +43,7 @@ public class PreferenceFrameButton extends FancyButton {
 
         // Turn button off if no UserAccount is open
         Lookup.getUserAccountDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 setEnabled(evt.getNewValue() != null);
             }
@@ -61,6 +63,7 @@ public class PreferenceFrameButton extends FancyButton {
              * ImagePreferencePanel
              */
             Lookup.getUserAccountDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
+                @Override
                 public void propertyChange(PropertyChangeEvent evt) {
                     UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
                     preferencesFrame.setUserAccount(userAccount);

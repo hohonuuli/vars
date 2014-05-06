@@ -20,6 +20,8 @@ import java.nio.file.Path;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import java.util.prefs.Preferences;
@@ -132,6 +134,7 @@ public class AVFImageCaptureServiceImpl implements ImageCaptureService {
 
         // -- Save to temp file png.
         final File tempFile = new File(tempDir, LIBRARY_NAME + (new Date()).getTime() + ".png");
+        Image image = capture(tempFile);
         saveSnapshotToSpecifiedPath(tempFile.getAbsolutePath());
 
         // -- Reread file as image
@@ -164,7 +167,31 @@ public class AVFImageCaptureServiceImpl implements ImageCaptureService {
         String originalVideoSrc = preferences.get(LIBRARY_NAME, "");
         if (dialog == null) {
             Frame frame = (Frame) GlobalLookup.getSelectedFrameDispatcher().getValueObject();
-            dialog = new AVFImageCaptureDialog(frame, videoDevicesAsStrings());
+
+            // --- start HACK: Always add "Blackmagic" to video device list (brian 2014-03-04)
+            // In Mac OS X 10.9.2, Blackmagic stopped showing up in the videodevice list
+            String[] listedDevices = videoDevicesAsStrings();
+            boolean hasBlackmagic = false;
+            for (String s: listedDevices) {    // Check if list contains Blackmagic
+                if (s.equals("Blackmagic")) {
+                    hasBlackmagic = true;
+                    break;
+                }
+            }
+
+            String[] devices;                  // If needed, a Blackmagic to list
+            if (!hasBlackmagic) {
+                devices = new String[listedDevices.length + 1];
+                System.arraycopy(listedDevices, 0, devices, 0, listedDevices.length);
+                devices[devices.length - 1] = "Blackmagic";
+            }
+            else {
+                devices = listedDevices;
+            }
+            Arrays.sort(devices);
+            // --- end HACK
+
+            dialog = new AVFImageCaptureDialog(frame, devices);
         }
         dialog.setVisible(true);
 

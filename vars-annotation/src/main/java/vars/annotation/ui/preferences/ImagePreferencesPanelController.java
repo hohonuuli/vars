@@ -20,12 +20,15 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.prefs.PreferencesFactory;
+import javax.swing.JComboBox;
 import javax.swing.JTextField;
 import org.bushe.swing.event.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.UserAccount;
 import vars.annotation.ui.Lookup;
+import vars.annotation.ui.eventbus.ImageInterpolationChangedEvent;
+import vars.shared.awt.AWTUtilities;
 import vars.shared.preferences.PreferenceUpdater;
 import vars.shared.preferences.PreferencesService;
 
@@ -53,12 +56,16 @@ public class ImagePreferencesPanelController implements PreferenceUpdater {
 
     /**
      */
+    @Override
     public void persistPreferences() {
         final UserAccount userAccount = panel.getUserAccount();
+        final String username = userAccount.getUserName();
+        final String hostname = preferencesService.getHostname();
         final JTextField imageTargetTextField = panel.getImageTargetTextField();
         final JTextField imageTargetMappingTextField = panel.getImageTargetMappingTextField();
+        final JComboBox<String> imageInterpComboxBox = panel.getImageInterpComboBox();
 
-        // Parse and set the imageTarget
+        // --- Parse and set the imageTarget
         File imageTarget = new File(imageTargetTextField.getText());
         if (!imageTarget.exists() && !imageTarget.canWrite()) {
             EventBus.publish(Lookup.TOPIC_WARNING,
@@ -66,9 +73,9 @@ public class ImagePreferencesPanelController implements PreferenceUpdater {
                                  ", that you specified is not valid");
         }
 
-        preferencesService.persistImageTarget(userAccount.getUserName(), preferencesService.getHostname(), imageTarget);
+        preferencesService.persistImageTarget(username, hostname, imageTarget);
 
-        // Parse and set the imageTargetMapping
+        // --- Parse and set the imageTargetMapping
         URL imageMappingTarget = null;
         try {
             imageMappingTarget = new URL(imageTargetMappingTextField.getText());
@@ -82,22 +89,32 @@ public class ImagePreferencesPanelController implements PreferenceUpdater {
             return;
         }
 
-        preferencesService.persistImageTargetMapping(userAccount.getUserName(), preferencesService.getHostname(),
+        preferencesService.persistImageTargetMapping(username, hostname,
                 imageMappingTarget);
-
+        
+        // --- Parse and set the imageInterpolation
+        String interpHint = (String) imageInterpComboxBox.getSelectedItem();
+        Object hint = AWTUtilities.IMAGE_INTERPOLATION_MAP.get(interpHint);
+        if (hint != null) {
+            preferencesService.persistImageInterpolation(username, hostname, hint);
+            EventBus.publish(new ImageInterpolationChangedEvent(this, hint));
+        }
     }
 
     protected void setUserAccount(UserAccount userAccount) {
-        File imageTarget = preferencesService.findImageTarget(userAccount.getUserName(),
-            preferencesService.getHostname());
-        URL imageTargetMapping = preferencesService.findImageTargetMapping(userAccount.getUserName(),
-                preferencesService.getHostname());
+        String username = userAccount.getUserName();
+        String hostname = preferencesService.getHostname();
+        File imageTarget = preferencesService.findImageTarget(username, hostname);
+        URL imageTargetMapping = preferencesService.findImageTargetMapping(username, 
+               hostname);
+        Object imageInterp = preferencesService.findImageInterpolation(username, hostname);
         try {
             panel.getImageTargetTextField().setText(imageTarget.getCanonicalPath());
         } catch (IOException ex) {
             panel.getImageTargetTextField().setText("");
         }
         panel.getImageTargetMappingTextField().setText(imageTargetMapping.toExternalForm());
+        panel.getImageInterpComboBox().setSelectedItem(imageInterp.toString());
     }
 
     protected void persistDefaults() {

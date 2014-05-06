@@ -5,8 +5,6 @@ import java.beans.PropertyChangeListener;
 import java.util.Arrays;
 
 import org.bushe.swing.event.EventBus;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import vars.MiscDAOFactory;
 import vars.UserAccount;

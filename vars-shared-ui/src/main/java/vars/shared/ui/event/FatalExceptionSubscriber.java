@@ -124,6 +124,8 @@ public class FatalExceptionSubscriber implements EventTopicSubscriber<Exception>
                 add("Some bugs have names\nOthers inscruitable numbers\nYours has not even that.");
                 add("Riddle for student\nWhat error is so fatal\nIt has no message");
                 add("Technical support\nWould be a flowing source of\nSweet commiseration.");
+                add("Something you entered\ntranscended parameters\nSo much is unknown.");
+                add("Your data was big\nIt might be very useful\nBut now it is gone.");
             }
         };
 
@@ -138,6 +140,7 @@ public class FatalExceptionSubscriber implements EventTopicSubscriber<Exception>
                 add("/vars/images/fatal/202.jpg");
                 add("/vars/images/fatal/2010-01-04-null-pointer-exception.png");
                 add("/vars/images/fatal/1204185247268.jpg");
+                add("/vars/images/fatal/actualbug.jpg");
                 add("/vars/images/fatal/bug.png");
                 add("/vars/images/fatal/catchAllTheErrors-615x461.png");
                 add("/vars/images/fatal/epic-fail4.jpg");

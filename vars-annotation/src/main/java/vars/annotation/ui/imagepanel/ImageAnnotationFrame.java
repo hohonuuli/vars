@@ -52,6 +52,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import vars.annotation.ui.AnnotationImageCanvas;
 
 /**
  * Main class for this package. This class wires together all dependant classes with the controller.

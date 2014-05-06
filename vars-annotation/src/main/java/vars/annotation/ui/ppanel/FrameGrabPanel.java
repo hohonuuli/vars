@@ -41,6 +41,7 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import vars.annotation.ui.AnnotationImageCanvas;
 
 /**
  * <p>

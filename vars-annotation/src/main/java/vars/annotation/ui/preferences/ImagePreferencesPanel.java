@@ -15,6 +15,7 @@
 
 package vars.annotation.ui.preferences;
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.UserAccount;
@@ -29,6 +30,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.prefs.PreferencesFactory;
+import vars.shared.awt.AWTUtilities;
 
 /**
  *
@@ -52,7 +54,7 @@ public class ImagePreferencesPanel extends JPanel implements PreferenceUpdater {
     private JComboBox imageInterpComboBox;
     private JButton defaultsButton;
     private UserAccount userAccount;
-
+    
     /**
      * Create the panel
      *
@@ -88,6 +90,7 @@ public class ImagePreferencesPanel extends JPanel implements PreferenceUpdater {
             btnOpenVideoSettings = new JButton("Open Video Settings");
             btnOpenVideoSettings.addActionListener(new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     ImageCaptureService imageCaptureService = (ImageCaptureService) Lookup
                         .getImageCaptureServiceDispatcher().getValueObject();
@@ -129,7 +132,7 @@ public class ImagePreferencesPanel extends JPanel implements PreferenceUpdater {
 
         return imageFormatLabel;
     }
-
+    
     protected JComboBox<String> getImageInterpComboBox() {
                 if (imageInterpComboBox == null) {
                         imageInterpComboBox = new JComboBox(AWTUtilities.IMAGE_INTERPOLATION_MAP.keySet().toArray());
@@ -207,50 +210,59 @@ public class ImagePreferencesPanel extends JPanel implements PreferenceUpdater {
     }
 
     private void initialize() throws Exception {
+            
+            
             final javax.swing.GroupLayout groupLayout = new javax.swing.GroupLayout((JComponent) this);
             groupLayout.setHorizontalGroup(
-                groupLayout.createParallelGroup(Alignment.LEADING)
-                    .addGroup(groupLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-                            .addGroup(groupLayout.createSequentialGroup()
-                                .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-                                    .addComponent(getImageWebAccessLabel())
-                                    .addComponent(getSaveImagesToLabel())
-                                    .addComponent(getImageFormatLabel()))
-                                .addPreferredGap(ComponentPlacement.RELATED)
-                                .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-                                    .addGroup(groupLayout.createSequentialGroup()
-                                        .addComponent(getImageTargetTextField(), javax.swing.GroupLayout.DEFAULT_SIZE, 218, Short.MAX_VALUE)
-                                        .addPreferredGap(ComponentPlacement.RELATED)
-                                        .addComponent(getBrowseButton()))
-                                    .addComponent(getImageTargetMappingTextField(), javax.swing.GroupLayout.DEFAULT_SIZE, 312, Short.MAX_VALUE)
-                                    .addComponent(getImageFormatComboBox(), 0, 312, Short.MAX_VALUE)))
-                            .addComponent(getBtnOpenVideoSettings())
+            	groupLayout.createParallelGroup(Alignment.LEADING)
+            		.addGroup(groupLayout.createSequentialGroup()
+            			.addContainerGap()
+            			.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+            				.addComponent(getBtnOpenVideoSettings())
+            				.addComponent(getDefaultsButton())
+            				.addGroup(groupLayout.createSequentialGroup()
+            					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+            						.addComponent(getImageWebAccessLabel())
+            						.addComponent(getSaveImagesToLabel())
+            						.addComponent(getImageFormatLabel())
+            						.addComponent(imageInterpLabel))
+            					.addPreferredGap(ComponentPlacement.RELATED)
+            					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+            						.addGroup(groupLayout.createSequentialGroup()
+            							.addComponent(getImageTargetTextField(), GroupLayout.DEFAULT_SIZE, 211, Short.MAX_VALUE)
+            							.addPreferredGap(ComponentPlacement.RELATED)
+            							.addComponent(getBrowseButton()))
+            						.addComponent(getImageTargetMappingTextField(), GroupLayout.DEFAULT_SIZE, 305, Short.MAX_VALUE)
+            						.addComponent(getImageFormatComboBox(), 0, 305, Short.MAX_VALUE)
+            						.addComponent(getImageInterpComboBox(), 0, 305, Short.MAX_VALUE))))
                             .addComponent(getDefaultsButton()))
-                        .addContainerGap())
+            			.addContainerGap())
             );
             groupLayout.setVerticalGroup(
-                groupLayout.createParallelGroup(Alignment.LEADING)
-                    .addGroup(groupLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-                            .addComponent(getSaveImagesToLabel())
-                            .addComponent(getBrowseButton())
-                            .addComponent(getImageTargetTextField(), javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(ComponentPlacement.RELATED)
-                        .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-                            .addComponent(getImageWebAccessLabel())
-                            .addComponent(getImageTargetMappingTextField(), javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(ComponentPlacement.RELATED)
-                        .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-                            .addComponent(getImageFormatLabel())
-                            .addComponent(getImageFormatComboBox(), javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(ComponentPlacement.RELATED)
-                        .addComponent(getDefaultsButton())
-                        .addPreferredGap(ComponentPlacement.RELATED)
-                        .addComponent(getBtnOpenVideoSettings())
-                        .addContainerGap(133, Short.MAX_VALUE))
+            	groupLayout.createParallelGroup(Alignment.LEADING)
+            		.addGroup(groupLayout.createSequentialGroup()
+            			.addContainerGap()
+            			.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+            				.addComponent(getSaveImagesToLabel())
+            				.addComponent(getBrowseButton())
+            				.addComponent(getImageTargetTextField(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+            			.addPreferredGap(ComponentPlacement.RELATED)
+            			.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+            				.addComponent(getImageWebAccessLabel())
+            				.addComponent(getImageTargetMappingTextField(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+            			.addPreferredGap(ComponentPlacement.RELATED)
+            			.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+            				.addComponent(getImageFormatLabel())
+            				.addComponent(getImageFormatComboBox(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+            			.addPreferredGap(ComponentPlacement.RELATED)
+            			.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+            				.addComponent(imageInterpLabel)
+            				.addComponent(getImageInterpComboBox(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+            			.addPreferredGap(ComponentPlacement.RELATED, 94, Short.MAX_VALUE)
+            			.addComponent(getDefaultsButton())
+            			.addPreferredGap(ComponentPlacement.RELATED)
+            			.addComponent(getBtnOpenVideoSettings())
+            			.addContainerGap())
             );
             setLayout(groupLayout);
     }

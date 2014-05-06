@@ -22,10 +22,10 @@ do
     echo "Not searching $FDIR"
   else
     
-    # munge up all the variables and names that we need
-    CURRENT_SRC="$FDIR"
+    # munge up all the variables and names that we need.
+    CURRENT_SRC="$FDIR/images"
     PLATFORM=$(basename "$FDIR")
-    OLD_SRC="${SFG}/$PLATFORM"
+    OLD_SRC="${SFG}/$PLATFORM/images"
     
     CURRENT_TARGET="$LOGHOME/current-framegrabs-$PLATFORM.txt"
     CURRENT_TARGET_CUT="$LOGHOME/current-framegrabs-$PLATFORM-cut.txt"
@@ -46,7 +46,10 @@ do
 
     # Diff the files and get rid of the lines where the path was added (keep only deletions)
     # strip lead character away too.
-    diff "$OLD_TARGET_CUT" "$CURRENT_TARGET_CUT" | grep "^<." | sed s/"< "// > "$DIFF_TARGET"
+    # NOTE: We only care about content in the //Atlas/framegrabs/[ROV]/images directory.
+    # We are ignoring the "stills" directory as Mike McCann's processes regularly delete
+    # files from them
+    diff "$OLD_TARGET_CUT" "$CURRENT_TARGET_CUT" | grep "^<." | grep "images" | sed s/"< "// > "$DIFF_TARGET"
     
     # If the file is NOT empty. Send an email
     if [ -s "$DIFF_TARGET" ]; then
