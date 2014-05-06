@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.Observation;
 import vars.annotation.VideoFrame;
+import vars.annotation.ui.AnnotationImageCanvas;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
 import vars.annotation.ui.imagepanel.ImageAnnotationFrame;
@@ -84,7 +85,7 @@ public class FrameGrabPanel extends javax.swing.JPanel {
 
     JImageUrlCanvas getImageCanvas() {
         if (imageCanvas == null) {
-            imageCanvas = new JImageUrlCanvas(getClass().getResource("/images/vars/annotation/no_image.jpg"));
+            imageCanvas = new AnnotationImageCanvas(getClass().getResource("/images/vars/annotation/no_image.jpg"));
             imageCanvas.setSize(getSize());
         }
 

@@ -38,7 +38,7 @@ import java.util.prefs.PreferencesFactory;
  */
 public class ImagePreferencesPanel extends JPanel implements PreferenceUpdater {
 
-    private final Logger log = LoggerFactory.getLogger(ImagePreferencesPanel.class);
+    private final Logger log = LoggerFactory.getLogger(getClass());
     private JButton browseButton;
     private JButton btnOpenVideoSettings;
     private final ImagePreferencesPanelController controller;
@@ -48,6 +48,8 @@ public class ImagePreferencesPanel extends JPanel implements PreferenceUpdater {
     private JTextField imageTargetTextField;
     private JLabel imageWebAccessLabel;
     private JLabel saveImagesToLabel;
+    private JLabel imageInterpLabel = new JLabel("Image Interpolation:");
+    private JComboBox imageInterpComboBox;
     private JButton defaultsButton;
     private UserAccount userAccount;
 
@@ -63,8 +65,8 @@ public class ImagePreferencesPanel extends JPanel implements PreferenceUpdater {
         try {
             initialize();
         }
-        catch (Throwable e) {
-            e.printStackTrace();
+        catch (Exception e) {
+            log.warn("Failed to initialize!", e);
         }
     }
 
@@ -127,6 +129,14 @@ public class ImagePreferencesPanel extends JPanel implements PreferenceUpdater {
 
         return imageFormatLabel;
     }
+
+    protected JComboBox<String> getImageInterpComboBox() {
+                if (imageInterpComboBox == null) {
+                        imageInterpComboBox = new JComboBox(AWTUtilities.IMAGE_INTERPOLATION_MAP.keySet().toArray());
+                        imageInterpComboBox.setSelectedIndex(0);
+                    }
+                return imageInterpComboBox;
+            }
 
     /**
      * @return
