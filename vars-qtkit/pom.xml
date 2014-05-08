@@ -5,11 +5,11 @@
     <parent>
         <groupId>vars-redux</groupId>
         <artifactId>vars-redux</artifactId>
-        <version>8.0.0</version>
+        <version>8.0.1-SNAPSHOT</version>
     </parent>
     <groupId>vars-redux</groupId>
     <artifactId>vars-qtkit</artifactId>
-    <version>8.0.0</version>
+    <version>8.0.1-SNAPSHOT</version>
     <name>vars-qtkit</name>
     <url>http://maven.apache.org</url>
     <properties>
