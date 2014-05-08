@@ -1,11 +1,13 @@
 package vars.annotation.ui.videofile.jfxmedia;
 
+import org.bushe.swing.event.EventBus;
 import org.mbari.util.Tuple2;
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.VideoArchive;
+import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
+import vars.annotation.ui.video.DoNothingVideoControlService;
 import vars.annotation.ui.videofile.*;
-import vars.annotation.ui.videofile.quicktime.QTOpenVideoArchiveDialog;
 
 import javax.inject.Inject;
 import java.awt.*;

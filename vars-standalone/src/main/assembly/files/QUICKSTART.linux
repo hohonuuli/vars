@@ -1,0 +1,52 @@
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~  Prerequisites
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Please read INSTALL.linux
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~  Running VARS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+NOTE: If you're reading this I'm assuming you've already downloaded VARS and 
+extracted the zip file to a directory. For this documentation, the directory
+containing VARS will be called 'VARS_HOME'
+
+Step 1:
+    Locate the directory VARS_HOME/bin. This contains all the batch files need 
+to run the different VARS applications.
+
+Step 2: 
+    Start the "Terminal" application. It's located in Applications->Utilities->Terminal
+
+Step 3:
+    In the terminal type: 
+        cd VARS_HOME/bin
+    Remember to replace VARS_HOME with the full path to the VARS directory.
+
+Step 4:
+    The 1st time you run VARS you need to tell the Mac that VARS_HOME contains 
+executable files. To do this, in the terminal type:
+        chmod u+x *
+
+Step 5:
+    Start the database from the Terminal by typing:
+        ./derbystart
+
+Step 6: 
+    If this is your 1st time running VARS, you will need to create a user 
+account. Otherwise you can skip this step. To create a user account:
+        1) In the terminal type: ./knowledgebase
+        2) When asked if you want to create an administrator account, click "Yes"
+        3) Enter a login name and password
+
+Step 7:
+    To start the Annotation application, in the terminal type: ./annotation
+
+Step 5:
+    To start the Query application, in the terminal type: ./query
+
+Cleaning up:
+    When you're fininished you can stop the database server by typing:
+        ./derbystop

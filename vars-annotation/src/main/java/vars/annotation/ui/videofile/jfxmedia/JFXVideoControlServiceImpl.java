@@ -9,10 +9,7 @@ import javax.swing.*;
 import org.bushe.swing.event.EventBus;
 import org.mbari.movie.Timecode;
 import org.mbari.util.IObserver;
-import org.mbari.vcr.IVCR;
-import org.mbari.vcr.IVCRState;
-import org.mbari.vcr.IVCRTimecode;
-import org.mbari.vcr.VCRTimecodeAdapter;
+import org.mbari.vcr.*;
 import org.mbari.vcr.timer.AnnotationQueueVCR;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.videofile.VideoPlayerController;
@@ -74,7 +71,7 @@ public class JFXVideoControlServiceImpl  extends AbstractVideoControlService
     public void connect(Object... args) {
         disconnect();
         if ((args.length != 1) && (args[0] instanceof String)) {
-            throw new IllegalArgumentException("YOu didn't call this method correctly. The argument is the " +
+            throw new IllegalArgumentException("You didn't call this method correctly. The argument is the " +
                     "string URL to the movie to open with JavaFX");
         }
 
@@ -90,9 +87,9 @@ public class JFXVideoControlServiceImpl  extends AbstractVideoControlService
             ((VCR) fxVcr).triggerStateNotification();
         }
         catch (Exception e) {
-            setVcr(null);
+            setVcr(new VCRAdapter());
             setVideoControlInformation(new VideoControlInformationImpl(movieLocation, VideoControlStatus.ERROR));
-            throw new VARSException("Failed to open " + movieLocation + " with JavaFX", e);
+            //throw new VARSException("Failed to open " + movieLocation + " with JavaFX", e);
         }
 
     }

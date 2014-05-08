@@ -1,0 +1,37 @@
+INSTALLING VARS ON MAC OS X    
+    
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~  Prerequisites
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In order for VARS to run on your system you will need to install the following 
+before installing VARS:
+
+    1) Java Development Kit 8 (x64). 
+
+Installation Instructions for Prerequisites
+
+I) Installing Java
+
+   You can download Java for Linux from 
+   http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html. 
+   Simply download the installer and run it.
+
+Currently, VARS uses JavaFX media to play video files. JavaFX is bundled with 
+Java 8.
+
+NOTE: VARS has been tested only on Ubuntu 13.10 and 14.04 using Oracle's JDK 8. 
+
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~  Running VARS for the first time
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+'Out-of-the-box', VARS is configured to run against a bundled database server. 
+This server is suitable for testing and small deployments. Other than installing 
+the prerequisites, no configuration is necessary to start VARS.
+
+When you are ready to run VARS for the first time, start the Knowledgebase 
+application (using the command: knowledgebase). This will prompt you to create an 
+administrator account for controlling modifications to the VARS knowledgebase.

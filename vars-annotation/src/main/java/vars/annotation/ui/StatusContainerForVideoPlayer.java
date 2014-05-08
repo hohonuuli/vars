@@ -18,6 +18,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
+import java.util.Optional;
 
 /**
  * DEVELOPER NOTE: Based off of StatusLabelForVideoArchive. Refer to that class if things aren't working.
