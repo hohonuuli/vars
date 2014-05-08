@@ -3,7 +3,7 @@
 VARS_HOME=`dirname "$0"`/..
 VARS_CLASSPATH=$VARS_HOME/conf:$VARS_HOME/lib/*
 
-${JAVACMD:=java} -d32 -Xms16m -Xmx512m \
+${JAVACMD:=java} -Xms16m -Xmx512m \
          -Duser.timezone=UTC \
          -Dfile.encoding=UTF8 \
          -classpath "$VARS_CLASSPATH" \

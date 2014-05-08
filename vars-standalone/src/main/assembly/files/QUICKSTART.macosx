@@ -2,10 +2,7 @@
 ~~  Prerequisites
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Mac OS X includes all the prerequisites needed for running VARS. However, if you
-find that VARS is unable to open a particular video codec, you may need to 
-install 3rd party video codecs. A good start is to install Perian 
-(http://www.perian.org/).
+Please read INSTALL.macosx
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

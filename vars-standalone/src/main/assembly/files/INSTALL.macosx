@@ -4,19 +4,26 @@ INSTALLING VARS ON MAC OS X
 ~~  Prerequisites
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Mac OS X includes all the prerequisites needed for running VARS. However, if you
-find that VARS is unable to open a particular video codec, you may need to 
-install 3rd party video codecs. A good start is to install Perian 
-(http://www.perian.org/).
+In order for VARS to run on your system you will need to install the following 
+before installing VARS:
 
-Currently, VARS uses QuickTime for Java to play video files. QuickTime for Java 
-requires a 32-bit JVM (i.e Java 6 from Apple). Java 6 is included on all
-Macs, however, if you have installed Java 7 it may be used as the default Java.
-If Java 7 is the default, the VARS Annotation application will fail to run
-correctly. You can switch to Java 6 be executing the following command in the 
-terminal BEFORE starting the annotation application:
+    1) Mac OS X 10.8 or 10.9
+    2) Java Development Kit 8 (x64). 
 
-    export JAVA_HOME=`/usr/libexec/java_home -v 1.6`
+Installation Instructions for Prerequisites
+
+I) Installing Java
+
+   You can download Java for Mac OS X from 
+   http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html. 
+   Simply download the installer and run it.
+
+Currently, VARS uses JavaFX media to play video files. JavaFX is bundled with 
+Java 8. If you have several versions of Java installed on your Mac, you can
+specify Java 8 by executing the following command in the terminal BEFORE 
+starting the annotation application:
+
+    export JAVA_HOME=`/usr/libexec/java_home -v 1.8`
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -28,5 +35,5 @@ This server is suitable for testing and small deployments. Other than installing
 the prerequisites, no configuration is necessary to start VARS.
 
 When you are ready to run VARS for the first time, start the Knowledgebase 
-application (using varsKb or knowledgebase). This will prompt you to create an 
+application (using the command: knowledgebase). This will prompt you to create an 
 administrator account for controlling modifications to the VARS knowledgebase.
