@@ -11,7 +11,6 @@
 
 int main(int argc, const char * argv[]) {
     
-    //NSApplicationLoad(); // Is this needed?
     NSArray *deviceNames = [AVFStillImageCapture videoCaptureDevicesAsStrings];
     AVFStillImageCapture *imageCapture = [[AVFStillImageCapture alloc] init];
     [imageCapture setupCaptureSessionUsingNamedDevice:[deviceNames objectAtIndex:0]];
