@@ -15,17 +15,17 @@
 
 package vars.annotation.ui;
 
+import com.google.common.collect.Lists;
 import com.google.inject.Injector;
 import foxtrot.Job;
 import foxtrot.Worker;
 import java.awt.Toolkit;
+import java.util.Collection;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.Vector;
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
+import javax.swing.*;
+
 import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.EventSubscriber;
 import org.bushe.swing.event.EventTopicSubscriber;
@@ -45,6 +45,8 @@ import vars.shared.ui.event.LoggingEventSubscriber;
 import vars.shared.ui.event.NonFatalErrorSubscriber;
 import vars.shared.ui.event.WarningSubscriber;
 import vars.shared.ui.video.ImageCaptureService;
+import vars.shared.util.ActiveAppBeacon;
+import vars.shared.util.ActiveAppPinger;
 
 /**
  *
@@ -54,7 +56,7 @@ public class App {
 
     private AnnotationFrame annotationFrame;
     private final ToolBelt toolBelt;
-    
+
     /**
      * The App gets garbage collected shortly after startup. To
      * hang on to the EventTopicSubscribers we store them in a static list. This
@@ -64,15 +66,28 @@ public class App {
     private static final List<EventSubscriber> GC_PREVENTION_EVENTS = new Vector<EventSubscriber>();
 
     /**
+     * For VCR's, we only want one instance of VARS running as the first instance owns the
+     * serial ports and the framecapture card.
+     */
+    public static final Collection<Integer> BEACON_PORTS = Lists.newArrayList(4002, 4121, 5097, 6238, 6609,
+            7407, 8169, 9069, 9669, 16569);
+    public static final String BEACON_MESSAGE = "VARS Annotation";
+    private static ActiveAppBeacon activeAppBeacon;
+
+    /**
      * Constructs ...
      */
     public App() {
 
         final ImageIcon mbariLogo =
-            new ImageIcon(getClass().getResource("/annotation-splash.png"));
+                new ImageIcon(getClass().getResource("/annotation-splash.png"));
         final SplashFrame splashFrame = new SplashFrame(mbariLogo);
-        splashFrame.setMessage(" Initializing configuration ...");
         splashFrame.setVisible(true);
+        splashFrame.setMessage(" Starting application beacon ...");
+        activeAppBeacon = new ActiveAppBeacon(BEACON_PORTS, BEACON_MESSAGE);
+
+        splashFrame.setMessage(" Initializing configuration ...");
+
 
         final Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
         toolBelt = injector.getInstance(ToolBelt.class);
@@ -112,14 +127,14 @@ public class App {
 
         // Connect to the ImageCaptureService
         Lookup.getImageCaptureServiceDispatcher().setValueObject(injector.getInstance(ImageCaptureService.class));
-        
+
         // Configure EventBus
         EventTopicSubscriber fatalErrorSubscriber = new FatalExceptionSubscriber(getAnnotationFrame());
         EventTopicSubscriber nonFatalErrorSubscriber = new NonFatalErrorSubscriber(getAnnotationFrame());
-        EventTopicSubscriber warningSubscriber = new WarningSubscriber(getAnnotationFrame());       
+        EventTopicSubscriber warningSubscriber = new WarningSubscriber(getAnnotationFrame());
         EventTopicSubscriber exitSubscriber = new ExitTopicSubscriber();
         EventSubscriber loggingSubscriber = new LoggingEventSubscriber();
-        
+
         GC_PREVENTION.add(fatalErrorSubscriber);
         GC_PREVENTION.add(nonFatalErrorSubscriber);
         GC_PREVENTION.add(warningSubscriber);
@@ -193,7 +208,6 @@ public class App {
         GlobalLookup.getSettingsDirectory();
 
         try {
-
             // Set System L&F
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         }
@@ -201,17 +215,24 @@ public class App {
             LoggerFactory.getLogger(App.class).warn("Failed to set system look and feel", e);
         }
 
-        try {
-            SwingUtilities.invokeLater(new Runnable() {
-
-                public void run() {
-                    new App();
-                }
-
-            });
+        /*
+         * Check that VARS is not already running
+         */
+        if (ActiveAppPinger.pingAll(BEACON_PORTS, BEACON_MESSAGE)) {
+            JOptionPane.showMessageDialog(null, "An instance of the VARS Annotation application is already running. Exiting ...");
         }
-        catch (Throwable e) {
-            LoggerFactory.getLogger(App.class).warn("An error occurred on startup", e);
+        else {
+            try {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        new App();
+                    }
+                });
+            }
+            catch (Throwable e) {
+                LoggerFactory.getLogger(App.class).warn("An error occurred on startup", e);
+            }
         }
+
     }
 }
