@@ -217,7 +217,7 @@ public class AnnotationPersistenceServiceImpl extends QueryableImpl implements A
                 "WHERE va.videoArchiveName = '" + videoArchive.getName() + "' AND " +
                 "obs.ConceptName = '" + conceptName + "' AND " +
                 "ass.LinkName = 'identity-reference' AND " +
-                "ass.linkValue = " + referenceNumber;
+                "ass.linkValue = '" + referenceNumber + "'";
 
         QueryFunction<Collection<Long>> queryFunction = new QueryFunction<Collection<Long>>() {
             @Override

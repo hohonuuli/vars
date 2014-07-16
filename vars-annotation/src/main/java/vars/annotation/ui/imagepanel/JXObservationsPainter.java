@@ -44,7 +44,7 @@ public class JXObservationsPainter<T extends JImageUrlCanvas> extends AbstractJX
     private Set<Observation> observations = Collections.synchronizedSet(new HashSet<Observation>());
     private final boolean drawConceptName;
     private final boolean drawTimecode;
-    private final MarkerStyle markerStyle;
+    private IMarkerStyle markerStyle;
 
     /**
      * Constructs ...
@@ -53,10 +53,19 @@ public class JXObservationsPainter<T extends JImageUrlCanvas> extends AbstractJX
      * @param drawConceptName
      * @param drawTimecode
      */
-    public JXObservationsPainter(MarkerStyle markerStyle, boolean drawConceptName, boolean drawTimecode) {
+    public JXObservationsPainter(IMarkerStyle markerStyle, boolean drawConceptName, boolean drawTimecode) {
         this.markerStyle = markerStyle;
         this.drawTimecode = drawTimecode;
         this.drawConceptName = drawConceptName;
+    }
+
+    public IMarkerStyle getMarkerStyle() {
+        return markerStyle;
+    }
+
+    public void setMarkerStyle(IMarkerStyle markerStyle) {
+        this.markerStyle = markerStyle;
+        setDirty(true);
     }
 
     /**
@@ -84,11 +93,11 @@ public class JXObservationsPainter<T extends JImageUrlCanvas> extends AbstractJX
                     int x = componentPoint.x;
                     int y = componentPoint.y;
 
-                    g2.setStroke(markerStyle.stroke);
-                    g2.setPaint(markerStyle.color);
+                    g2.setStroke(markerStyle.getStroke());
+                    g2.setPaint(markerStyle.getColor());
 
                     // Draw the annotation
-                    int armLength = markerStyle.armLength;
+                    int armLength = markerStyle.getArmLength();
                     GeneralPath gp = new GeneralPath();
                     gp.moveTo(x - armLength, y - armLength);
                     gp.lineTo(x + armLength, y + armLength);
@@ -97,7 +106,7 @@ public class JXObservationsPainter<T extends JImageUrlCanvas> extends AbstractJX
                     g2.draw(gp);
 
                     // Write the concept name
-                    g2.setFont(markerStyle.font);
+                    g2.setFont(markerStyle.getFont());
                     if (drawConceptName) {
                         x = x + 5;
                         g2.drawString(observation.getConceptName(), x, y);
