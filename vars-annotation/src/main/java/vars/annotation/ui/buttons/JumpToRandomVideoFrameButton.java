@@ -91,11 +91,13 @@ public class JumpToRandomVideoFrameButton extends JFancyButton {
                     jumpableObservations.addAll(observations);
                 }
             }
-            Random random = new Random();
-            int r = random.nextInt(jumpableObservations.size());
-            Observation selectedObservation = jumpableObservations.get(r);
-            JXObservationTable myTable = (JXObservationTable) Lookup.getObservationTableDispatcher().getValueObject();
-            myTable.setSelectedObservation(selectedObservation);
+            if (jumpableObservations.size() > 0) {
+                Random random = new Random();
+                int r = random.nextInt(jumpableObservations.size());
+                Observation selectedObservation = jumpableObservations.get(r);
+                JXObservationTable myTable = (JXObservationTable) Lookup.getObservationTableDispatcher().getValueObject();
+                myTable.setSelectedObservation(selectedObservation);
+            }
 
         }
     }
