@@ -6,6 +6,7 @@ import org.mbari.awt.event.ActionAdapter;
 import org.mbari.swing.JFancyButton;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
+import vars.annotation.VideoFrame;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.eventbus.ObservationsAddedEvent;
 import vars.annotation.ui.eventbus.ObservationsRemovedEvent;
@@ -15,6 +16,9 @@ import vars.annotation.ui.table.JXObservationTable;
 import vars.annotation.ui.table.ObservationTableModel;
 
 import javax.swing.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Random;
 
 /**
@@ -27,20 +31,7 @@ public class JumpToRandomVideoFrameButton extends JFancyButton {
         setAction(new ActionAdapter() {
             @Override
             public void doAction() {
-                JXObservationTable myTable = (JXObservationTable) Lookup.getObservationTableDispatcher().getValueObject();
-                ObservationTableModel model = (ObservationTableModel) myTable.getModel();
-                int n = model.getRowCount();
-                if (n > 1) {
-                    int i = myTable.getSelectedRow();
-                    Random random = new Random();
-                    int r = i;
-                    while (i == r) {
-                        r = random.nextInt(n);
-                    }
-                    Observation obs = myTable.getObservationAt(r);
-                    myTable.setSelectedObservation(obs);
-                }
-
+                jump();
             }
         });
         setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/random_button.png")));
@@ -72,5 +63,40 @@ public class JumpToRandomVideoFrameButton extends JFancyButton {
         JXObservationTable myTable = (JXObservationTable) Lookup.getObservationTableDispatcher().getValueObject();
         boolean enabled = myTable.getRowCount() > 2;
         setEnabled(enabled);
+    }
+
+//    private void jump() {
+//        JXObservationTable myTable = (JXObservationTable) Lookup.getObservationTableDispatcher().getValueObject();
+//        ObservationTableModel model = (ObservationTableModel) myTable.getModel();
+//        int n = model.getRowCount();
+//        if (n > 1) {
+//            int i = myTable.getSelectedRow();
+//            Random random = new Random();
+//            int r = i;
+//            while (i == r) {
+//                r = random.nextInt(n);
+//            }
+//            Observation obs = myTable.getObservationAt(r);
+//            myTable.setSelectedObservation(obs);
+//        }
+//    }
+
+    private void jump() {
+        VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+        if (videoArchive != null) {
+            List<Observation> jumpableObservations = new ArrayList<Observation>();
+            for (VideoFrame vf : videoArchive.getVideoFrames()) {
+                Collection<Observation> observations = vf.getObservations();
+                if (observations.size() == 1) {
+                    jumpableObservations.addAll(observations);
+                }
+            }
+            Random random = new Random();
+            int r = random.nextInt(jumpableObservations.size());
+            Observation selectedObservation = jumpableObservations.get(r);
+            JXObservationTable myTable = (JXObservationTable) Lookup.getObservationTableDispatcher().getValueObject();
+            myTable.setSelectedObservation(selectedObservation);
+
+        }
     }
 }

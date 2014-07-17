@@ -61,6 +61,7 @@ public class MeasurementLayerSettingsBuilder<T extends JImageUrlCanvas> implemen
         // -- Checkbox to draw not selected observations in the same videoframe
         layerUI.addPainter(notSelectedObservationsPainter);
         panel.add(getShowNotSelectedCheckBox());
+        panel.add(Box.createHorizontalStrut(20));
 
         // --- Checkbox to draw observations with same identity reference
         panel.add(getShowPainterCheckBox());

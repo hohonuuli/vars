@@ -15,12 +15,13 @@
 
 package vars.annotation.ui.imagepanel;
 
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import javax.swing.BoxLayout;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.swing.*;
+
 import org.mbari.swing.JImageUrlCanvas;
 
 /**
@@ -37,6 +38,7 @@ public class AreaMeasurementLayerSettingsBuilder<T extends JImageUrlCanvas> impl
     private final MultiLayerUI<T> layerUI;
     private final JPanel panel;
     private JCheckBox showNotSelectedCheckBox;
+    //private JButton showColorChooserButton;
 
     /**
      * Constructs ...
@@ -51,26 +53,50 @@ public class AreaMeasurementLayerSettingsBuilder<T extends JImageUrlCanvas> impl
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 
         // --- CheckBox to draw not selected annotations
-        showNotSelectedCheckBox = new JCheckBox();
-        showNotSelectedCheckBox.setText("Show All Area Measurements");
-        showNotSelectedCheckBox.setSelected(false);
-        showNotSelectedCheckBox.addItemListener(new ItemListener() {
-
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (showNotSelectedCheckBox.isSelected()) {
-                    AreaMeasurementLayerSettingsBuilder.this.layerUI.addPainter(notSelectedAreaMeasurementsPainter);
-                }
-                else {
-                    AreaMeasurementLayerSettingsBuilder.this.layerUI.removePainter(notSelectedAreaMeasurementsPainter);
-                }
-            }
-
-        });
-        showNotSelectedCheckBox.setSelected(false);
-        panel.add(showNotSelectedCheckBox);
+        panel.add(getShowNotSelectedCheckBox());
 
     }
+
+    protected JCheckBox getShowNotSelectedCheckBox() {
+        if (showNotSelectedCheckBox == null) {
+            showNotSelectedCheckBox = new JCheckBox();
+            showNotSelectedCheckBox.setText("Show All Area Measurements");
+            showNotSelectedCheckBox.setSelected(false);
+            showNotSelectedCheckBox.addItemListener(new ItemListener() {
+
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    if (showNotSelectedCheckBox.isSelected()) {
+                        AreaMeasurementLayerSettingsBuilder.this.layerUI.addPainter(notSelectedAreaMeasurementsPainter);
+                    }
+                    else {
+                        AreaMeasurementLayerSettingsBuilder.this.layerUI.removePainter(notSelectedAreaMeasurementsPainter);
+                    }
+                }
+
+            });
+            showNotSelectedCheckBox.setSelected(false);
+        }
+        return showNotSelectedCheckBox;
+    }
+
+//    protected JButton getShowColorChooserButton() {
+//        if (showColorChooserButton == null) {
+//            showColorChooserButton = new JButton("Select Color");
+//            showColorChooserButton.setToolTipText("Select related observations color");
+//            showColorChooserButton.addActionListener(new ActionListener() {
+//                @Override
+//                public void actionPerformed(ActionEvent e) {
+//                    IMarkerStyle markerStyle = notSelectedAreaMeasurementsPainter.getMarkerStyle();
+//                    Color color = JColorChooser.showDialog(panel, "Choose related observations color", markerStyle.getColor());
+//                    markerStyle = new MarkerStyleBean(color, markerStyle.getArmLength(), markerStyle.getFont(), markerStyle.getStroke());
+//                    identityReferencePainter.setMarkerStyle(markerStyle);
+//
+//                }
+//            });
+//        }
+//        return showColorChooserButton;
+//    }
 
     /**
      */
