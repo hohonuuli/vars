@@ -31,6 +31,26 @@
                 </excludes>
             </resource>
         </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.5</version>
+                <configuration>
+                    <archive>
+                        <index>true</index>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                        </manifest>
+                        <manifestEntries>
+                            <Application-Name>VARS Annotation</Application-Name>
+                            <Permissions>all-permissions</Permissions>
+                            <url>${project.url}</url>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
     <!--
     DEPENDENCIES
@@ -182,4 +202,5 @@
             </properties>
         </profile>
     </profiles>
+
 </project>

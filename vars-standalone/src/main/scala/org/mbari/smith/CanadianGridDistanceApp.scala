@@ -65,12 +65,14 @@ object CanadianGridDistanceApp {
 
   def write(distances: Iterable[(Association, Double)], file: File) {
     val writer = new BufferedWriter(new FileWriter(file))
-    writer.write("VideoArchiveName\tTimecode\tRecordedDate\tConceptName\tLatitude\tLongitude\tDepth\tMeasurementLength\tComment\tAssociation\tImage\n")
+    writer.write("VideoArchiveName\tTimecode\tRecordedDate\tConceptName\tLatitude\tLongitude\tDepth\tMeasurementLength\tComment\tAssociation\tImage\tObserver\tObservationID\n")
     for ((ass, dist) <- distances) {
       val obs = ass.getObservation
       val vf = obs.getVideoFrame
       val va = vf.getVideoArchive
       val meas = Measurement.fromLink(ass)
+      val observer = obs.getObserver
+      val observationID = obs.getPrimaryKey
 
       val date = if (vf.getRecordedDate == null) "" else dateFormat.format(vf.getRecordedDate)
       val img = if (vf.getCameraData == null) "" else vf.getCameraData.getImageReference
@@ -78,7 +80,7 @@ object CanadianGridDistanceApp {
         case None => (Double.NaN, Double.NaN, Double.NaN)
         case Some(p) => (p.getLatitude, p.getLongitude, p.getDepth)
       }
-      val line = s"${va.getName}\t${vf.getTimecode}\t$date\t${obs.getConceptName}\t$lat\t$lon\t$depth\t$dist\t${meas.getComment}\t$ass\t$img\n"
+      val line = s"${va.getName}\t${vf.getTimecode}\t$date\t${obs.getConceptName}\t$lat\t$lon\t$depth\t$dist\t${meas.getComment}\t$ass\t$img\t$observer\t$observationID\n"
       writer.write(line)
     }
     writer.close()
