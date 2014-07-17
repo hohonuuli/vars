@@ -5,14 +5,20 @@
 
 package vars.annotation.ui.buttons.simple;
 
+
+import vars.annotation.ui.ToolBelt;
+
+import javax.inject.Inject;
+
 /**
  *
  * @author brian
  */
 public class AnemoneButton extends QuickConceptButton {
 
-    public AnemoneButton() {
-        super("Anemone", "/images/simple/anemone.jpg");
+    @Inject
+    public AnemoneButton(ToolBelt toolBelt) {
+        super("Anemone", "/images/simple/anemone.jpg", toolBelt);
     }
     
 }

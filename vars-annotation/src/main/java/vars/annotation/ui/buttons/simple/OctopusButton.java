@@ -5,14 +5,19 @@
 
 package vars.annotation.ui.buttons.simple;
 
+import vars.annotation.ui.ToolBelt;
+
+import javax.inject.Inject;
+
 /**
  *
  * @author brian
  */
 public class OctopusButton extends QuickConceptButton {
 
-    public OctopusButton() {
-        super("Octopus", "/images/simple/octopus.jpg");
+    @Inject
+    public OctopusButton(ToolBelt toolBelt) {
+        super("Octopus", "/images/simple/octopus.jpg", toolBelt);
     }
     
 }

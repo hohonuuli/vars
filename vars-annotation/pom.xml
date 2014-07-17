@@ -128,17 +128,25 @@
             </properties>
         </profile>
         <profile>
+            <id>openhouse</id>
+            <properties>
+                <environment>openhouse</environment>
+            </properties>
+        </profile>
+        <profile>
             <id>pgtest</id>
             <properties>
                 <environment>pgtest</environment>
             </properties>
         </profile>
+
         <profile>
             <id>rc</id>
             <properties>
                 <environment>rc</environment>
             </properties>
         </profile>
+
         <profile>
             <id>shore</id>
             <properties>

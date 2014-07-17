@@ -5,14 +5,19 @@
 
 package vars.annotation.ui.buttons.simple;
 
+import vars.annotation.ui.ToolBelt;
+
+import javax.inject.Inject;
+
 /**
  *
  * @author brian
  */
 public class CydippidButton extends QuickConceptButton {
 
-    public CydippidButton() {
-        super("Cydippid", "/images/simple/Cydippid.jpg");
+    @Inject
+    public CydippidButton(ToolBelt toolBelt) {
+        super("Cydippid", "/images/simple/Cydippid.jpg", toolBelt);
     }
     
 }

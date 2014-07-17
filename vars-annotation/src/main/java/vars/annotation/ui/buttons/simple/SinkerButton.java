@@ -5,14 +5,19 @@
 
 package vars.annotation.ui.buttons.simple;
 
+import vars.annotation.ui.ToolBelt;
+
+import javax.inject.Inject;
+
 /**
  *
  * @author brian
  */
 public class SinkerButton extends QuickConceptButton {
 
-    public SinkerButton() {
-        super("Sinker", "/images/simple/sinker.jpg");
+    @Inject
+    public SinkerButton(ToolBelt toolBelt) {
+        super("Sinker", "/images/simple/sinker.jpg", toolBelt);
     }
     
 }

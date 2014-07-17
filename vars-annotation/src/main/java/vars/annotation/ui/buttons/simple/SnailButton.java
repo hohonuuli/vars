@@ -5,14 +5,19 @@
 
 package vars.annotation.ui.buttons.simple;
 
+import vars.annotation.ui.ToolBelt;
+
+import javax.inject.Inject;
+
 /**
  *
  * @author brian
  */
 public class SnailButton extends QuickConceptButton {
 
-    public SnailButton() {
-        super("Snail", "/images/simple/snail.jpg");
+    @Inject
+    public SnailButton(ToolBelt toolBelt) {
+        super("Snail", "/images/simple/snail.jpg", toolBelt);
     }
     
 }

@@ -17,18 +17,17 @@ import vars.annotation.ui.ToolBelt;
  * @author brian
  */
 public class QuickConceptButton extends PropButton {
-    
-    /** This is static just for convenience, set once use everwhere ;-) */
-    private static ToolBelt toolBelt;
+
+    private ToolBelt toolBelt;
     
     
     /**
      *      Constructor
      */
-    public QuickConceptButton(String concept, String iconResource) {
+    public QuickConceptButton(String concept, String iconResource, ToolBelt toolBelt) {
         super();
         if (toolBelt == null) {
-            throw new IllegalStateException("A ToolBelt object has not been set with the static method 'setToolBelt'");
+            throw new IllegalStateException("The ToolBelt argument can not be null");
         }
         setAction(new NewObservationUsingConceptNameAction(toolBelt, concept));
         setIcon(new ImageIcon(getClass().getResource(iconResource)));
@@ -39,14 +38,6 @@ public class QuickConceptButton extends PropButton {
     }
 
 
-    public static ToolBelt getToolBelt() {
-        return toolBelt;
-    }
-
-
-    public static void setToolBelt(ToolBelt toolBelt) {
-        QuickConceptButton.toolBelt = toolBelt;
-    }
     
 }
 

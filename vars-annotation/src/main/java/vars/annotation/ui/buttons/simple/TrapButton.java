@@ -5,14 +5,19 @@
 
 package vars.annotation.ui.buttons.simple;
 
+import vars.annotation.ui.ToolBelt;
+
+import javax.inject.Inject;
+
 /**
  *
  * @author brian
  */
 public class TrapButton extends QuickConceptButton {
 
-    public TrapButton() {
-        super("Trap", "/images/simple/trap.jpg");
+    @Inject
+    public TrapButton(ToolBelt toolBelt) {
+        super("Trap", "/images/simple/trap.jpg", toolBelt);
     }
     
 }

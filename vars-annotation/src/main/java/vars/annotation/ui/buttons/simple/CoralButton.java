@@ -5,14 +5,19 @@
 
 package vars.annotation.ui.buttons.simple;
 
+import vars.annotation.ui.ToolBelt;
+
+import javax.inject.Inject;
+
 /**
  *
  * @author brian
  */
 public class CoralButton extends QuickConceptButton {
 
-    public CoralButton() {
-        super("Soft Coral", "/images/simple/coral.jpg");
+    @Inject
+    public CoralButton(ToolBelt toolBelt) {
+        super("Soft Coral", "/images/simple/coral.jpg", toolBelt);
     }
     
 }

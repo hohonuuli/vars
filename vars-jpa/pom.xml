@@ -172,6 +172,32 @@
             </dependencies>
         </profile>
         <profile>
+            <id>openhouse</id>
+            <properties>
+                <environment>openhouse</environment>
+            </properties>
+            <dependencies>
+                <!-- JDBC Driver -->
+                <dependency>
+                    <groupId>org.apache.derby</groupId>
+                    <artifactId>derbyclient</artifactId>
+                    <version>${derby.version}</version>
+                </dependency>
+                <!-- Database engine -->
+                <dependency>
+                    <groupId>org.apache.derby</groupId>
+                    <artifactId>derby</artifactId>
+                    <version>${derby.version}</version>
+                </dependency>
+                <!-- Network server control -->
+                <dependency>
+                    <groupId>org.apache.derby</groupId>
+                    <artifactId>derbynet</artifactId>
+                    <version>${derby.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
             <id>rc</id>
             <properties>
                 <environment>rc</environment>

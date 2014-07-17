@@ -5,14 +5,19 @@
 
 package vars.annotation.ui.buttons.simple;
 
+import vars.annotation.ui.ToolBelt;
+
+import javax.inject.Inject;
+
 /**
  *
  * @author brian
  */
 public class SkateButton extends QuickConceptButton {
 
-    public SkateButton() {
-        super("Skate", "/images/simple/skate.jpg");
+    @Inject
+    public SkateButton(ToolBelt toolBelt) {
+        super("Skate", "/images/simple/skate.jpg", toolBelt);
     }
     
 }

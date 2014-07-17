@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.AnnotationPersistenceService;
 import vars.annotation.Observation;
+import vars.annotation.ui.buttons.simple.QuickConceptButton;
 import vars.annotation.ui.eventbus.ExitTopicSubscriber;
 import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
 import vars.knowledgebase.Concept;
@@ -137,7 +138,6 @@ public class App {
          * Add a special eventQueue that toggles the cursor if the application is busy
          */
         //Toolkit.getDefaultToolkit().getSystemEventQueue().push(new WaitCursorEventQueue(500));
-
         JFrame frame = getAnnotationFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Lookup.getApplicationFrameDispatcher().setValueObject(frame);

@@ -5,14 +5,19 @@
 
 package vars.annotation.ui.buttons.simple;
 
+import vars.annotation.ui.ToolBelt;
+
+import javax.inject.Inject;
+
 /**
  *
  * @author brian
  */
 public class SeapenButton extends QuickConceptButton {
 
-    public SeapenButton() {
-        super("Seapen", "/images/simple/Seapen.jpg");
+    @Inject
+    public SeapenButton(ToolBelt toolBelt) {
+        super("Seapen", "/images/simple/Seapen.jpg", toolBelt);
     }
     
 }

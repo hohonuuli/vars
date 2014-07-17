@@ -5,14 +5,19 @@
 
 package vars.annotation.ui.buttons.simple;
 
+import vars.annotation.ui.ToolBelt;
+
+import javax.inject.Inject;
+
 /**
  *
  * @author brian
  */
 public class JellyButton extends QuickConceptButton {
 
-    public JellyButton() {
-        super("Jelly", "/images/simple/jelly.jpg");
+    @Inject
+    public JellyButton(ToolBelt toolBelt) {
+        super("Jelly", "/images/simple/jelly.jpg", toolBelt);
     }
     
 }

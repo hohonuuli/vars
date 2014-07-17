@@ -5,14 +5,19 @@
 
 package vars.annotation.ui.buttons.simple;
 
+import vars.annotation.ui.ToolBelt;
+
+import javax.inject.Inject;
+
 /**
  *
  * @author brian
  */
 public class RayButton extends QuickConceptButton {
 
-    public RayButton() {
-        super("Ray", "/images/simple/Ray.jpg");
+    @Inject
+    public RayButton(ToolBelt toolBelt) {
+        super("Ray", "/images/simple/Ray.jpg", toolBelt);
     }
     
 }
