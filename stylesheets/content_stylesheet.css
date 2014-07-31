@@ -1,8 +1,9 @@
 .inner {
-    width: 90% !important;
+    width: auto !important;
+    padding: 30px;
 }
 
 #main-content {
-    width: 90% !important;
+    width: auto; !important;
     float: none !important;
 }
