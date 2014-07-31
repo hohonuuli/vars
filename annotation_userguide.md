@@ -24,8 +24,9 @@ This guide provides basic instructions for starting and using the VARS Annotatio
 
 ## Video Controls
 The interface includes a VCR control panel. This panel was designed for use with VCR's but works _mostly_ as expected with video files.  
+
 <p align="center">
-    <img src="annotation_vcr_control.jpg" />
+    <img src="images/annotation_vcr_control.jpg" />
 </p>
 
 ## Adding and Modifying Annotations
