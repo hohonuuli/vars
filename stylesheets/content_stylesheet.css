@@ -8,3 +8,7 @@
     float: none !important;
     padding: 30px;
 }
+
+ol {
+    padding-left: 20;
+}
