@@ -2,3 +2,7 @@
 layout: default
 title: VARS Knowledgebase Application
 ---
+
+The core of the system is a extensible knowledge database of biological, geological and technical terms used to describe deep-sea research conducted by the institute. This database is comprised of objects, which are identifiable things—for example, Atolla wyvillei jelly, fault, myctophid fish, gas vent, or suction sampler. The knowledge base also contains associations, which serve as descriptors (such as blue, large, juvenile, or active) that can be associated with the objects being analyzed. The taxonomic data can be viewed in alphabetic or hierarchical order and is accompanied by descriptive information that serves as a marine reference guide for system users. The hierarchical information allows for consistent, rapid classification and description and complex querying of objects observed on video.
+
+The Knowledgebase application allows science personnel to easily add, view, and edit information contained in the knowledgebase. To ensure consistency, all amendments must be authorized by a knowledge base manager. Functioning as an encyclopedia, the knowledgebase is used with the annotation application to characterize video observations in a consistent fashion. At MBARI we have over 5,000 terms in our database; the VARS download contains a subset of our knowledgebase. You can easily customize the terms in the knowledgebase to suit your research.
