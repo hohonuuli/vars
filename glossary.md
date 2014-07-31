@@ -35,7 +35,7 @@ __concept__ - Name of physical object in observation. Must match a concept enter
 
 __Copy Anno__ - Short for _copy annotation_. A button that creates a new observation row with the same concept (and associations) as the highlighte row but at the current video time code.
 
-__Copt TC__ - Short for _copy timecode_. A button that creates a new row in the observation table with the same time code and concept as the highlighted row. You can then change the concept. Useful for situations with more than one object in a frame (grab).
+__Copy TC__ - Short for _copy timecode_. A button that creates a new row in the observation table with the same time code and concept as the highlighted row. You can then change the concept. Useful for situations with more than one object in a frame (grab).
 
 __D__ - A button that adds an association indicating a _dense population_.
 
@@ -62,33 +62,33 @@ __keyboard shortcuts__ - The following shortcuts may be used, instead of clickin
     <tbody>
         <tr>
             <td>Create a new observation</td>
-            <td>__ctrl+N__</td>
-            <td>__cmd+N__</td>
+            <td>ctrl+N</td>
+            <td>cmd+N</td>
         </tr>
         <tr>
-            <td>Copy timecode/td>
-            <td>__ctrl+D__</td>
-            <td>__cmd+D__</td>
+            <td>Copy timecode</td>
+            <td>ctrl+D</td>
+            <td>cmd+D</td>
         </tr>
         <tr>
             <td>Capture a framegrab</td>
-            <td>__ctrl+F__</td>
-            <td>__cmd+F__</td>
+            <td>ctrl+F</td>
+            <td>cmd+F</td>
         </tr>
         <tr>
             <td>Delete selected observations</td>
-            <td>__ctrl+delete__</td>
-            <td>__cmd+delete__</td>
+            <td>ctrl+delete</td>
+            <td>cmd+delete</td>
         </tr>
         <tr>
             <td>Scroll up one row</td>
-            <td>__ctrl+up_arrow__</td>
-            <td>__cmd+up_arrow__</td>
+            <td>ctrl+up_arrow</td>
+            <td>cmd+up_arrow</td>
         </tr>
         <tr>
             <td>Scroll down one row</td>
-            <td>__ctrl+down_arrow__</td>
-            <td>__cmd+down_arrow__</td>
+            <td>ctrl+down_arrow</td>
+            <td>cmd+down_arrow</td>
         </tr>
     </tbody>
 </table>
