@@ -1,10 +1,7 @@
 ---
 layout: default
-title: VARS Bird's eye View
+title: A Bird’s-eye View of the VARS System
 ---
-# Overview
-
-## A Bird's-eye View of the VARS System
 
 The Video Annotation and Reference System (VARS), consisting of software and hardware, was developed to facilitate the creation, storage, and retrieval of video annotation records from the ROV dive tapes.
 
