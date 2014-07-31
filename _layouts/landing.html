@@ -1,0 +1,31 @@
+{% include landing_head.html %}
+
+    <header>
+      <div class="inner">
+        <h1><a href="index.html">VARS</a></h1>
+        <h2>{{ page.title }}</h2>
+        <a href="https://github.com/hohonuuli/vars" class="button"><small>View project on</small>GitHub</a>
+      </div>
+    </header>
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          {{ content }}
+        </section>
+        <aside id="sidebar">
+          <a href="https://github.com/hohonuuli/vars/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/hohonuuli/vars/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/hohonuuli/vars"></a> is maintained by <a href="https://github.com/hohonuuli">Brian Schliing</a>.</p>
+
+        </aside>
+      </div>
+    </div>
+
+{% include foot.html %}
