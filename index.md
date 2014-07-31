@@ -9,6 +9,10 @@ Originally designed for annotating underwater video, VARS can be applied to any 
 
 ## Documentation
 - [An Overview of VARS](vars_overview.html)
+- VARS Applications
+    - [Annotation](annotation.html)
+    - [Knowledgebase](knowledgebase.html)
+    - [Query](query.html)
 
 ## Resources
 - [MBARI-VARS Group](https://groups.google.com/forum/#!forum/mbari-vars)

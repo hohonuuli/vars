@@ -18,7 +18,7 @@ The core of the system is a extensible knowledge database of biological, geologi
 
 The Knowledgebase application allows science personnel to easily add, view, and edit information contained in the knowledgebase. To ensure consistency, all amendments must be authorized by a knowledge base manager. Functioning as an encyclopedia, the knowledgebase is used with the annotation application to characterize video observations in a consistent fashion. At MBARI we have over 5,000 terms in our database; the VARS download contains a subset of our knowledgebase. You can easily customize the terms in the knowledgebase to suit your research.
 
-[Documentation and instruction for VARS Knowledgebase Application](knowledgebase.html)
+[Knowledgebase App Documentation](knowledgebase.html)
 
 
 ## VARS Annotation
@@ -27,11 +27,11 @@ The Annotation application allows researchers on the ships to make annotations o
 
 The instructions and documentation on these pages are presented for those who might be using the interface on a cruise or doing research in the MBARI video lab.
 
-[Documentation and instruction for VARS Annotation Application](annotation.html)
+[Annotation App Documentation](annotation.html)
 
 
 ## VARS Query
 
 The VARS Query allows easy access to information from a video annotation database. Complex queries can be made by constraining temporal, spatial, or physical parameters (for example: season, location, or depth). The VARS Query references the knowledgebase (described above). Using the query tool, users can identify the location of video sequences or access other information recorded during ROV research dives.
 
-[Documentation and instruction for VARS Query Application](query.html)
+[Query App Documentation](query.html)
