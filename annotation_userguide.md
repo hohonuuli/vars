@@ -13,5 +13,5 @@ This guide provides basic instructions for starting and using the VARS Annotatio
 ## Logging In
 
 1. To annotate in VARS you will need a VARS user account. If this is the very first time that VARS is being launched on a new database, you will need to create an admin account. Please see the [Knowledgebase User Guide](knowledgebase_userguide.html) for instruction on creating an admin account. If you just need to create a non-admin user account, do the following:
-  1. Click on __User:__ on the toolbar. <img width="100" src="images/annotation_app2.png">
-  2. In the login dialog that appears, click on _Create a new user account_. <img width="100" src="images/annotation_app_userlogin2.png">
+    1. Click on __User:__ on the toolbar. <img width="100" src="images/annotation_app2.png">
+    2. In the login dialog that appears, click on _Create a new user account_. <img width="100" src="images/annotation_app_userlogin2.png">
