@@ -20,4 +20,4 @@ This guide provides basic instructions for starting and using the VARS Annotatio
     2. In the movie dialog that appears, you can choose to browse to a new movie or open one that had previously been annotated.
         - To browse to a new movie, select the _Open by Location_ check box. Then browse to or enter a URL to a movie. You __must__ also select a _camera platform_ and enter a _sequence number_.
         - To open a previously annotated move, select the _Open Existing_ checkbox. Then select the name of the file you'd like to annotated.
-        - [<img width="100" src="images/annotation_moviedialog.png">](images/annotation_moviedialog.png)
+        - [<img width="100" src="images/annotation_moviedialog.png">](images/annotation_app_moviedialog.png)
