@@ -13,13 +13,16 @@ __Annotation Mode__  - Select the annotation mode: _Outline_ or _Detail_. This c
 
 __association__ - Descriptor(s) for physical object in observation. The descriptor must match an association entered in the knowledge base, or it will not be recognized by VARS.
 
-__buttons__ - The buttons in the middle of the interface have various purposes. Some are action buttons (green or red) and some are annotation buttons (blue).  
+__buttons__ - The buttons in the middle of the interface have various purposes. Some are action buttons (green or red) and some are annotation buttons (blue). 
+
 <p align="center"><img src="images/annotation_buttons.jpg"></p>
 
 __C__ - Button that adds an association indicating a close-up view.
 
 __Camera Data tab__ - Shows details of the camera settings for the selected entry. 
+
 <p align="center"><img src="images/annotation_cameradata_tab.jpg"></p>
+
 - __Direction__ - Indicates the direction that the ROV is moving (ascend, cruise, descent, endtransect, launch, starttransect, stationary, transect). Default value when starting a new video set is descend. The direction in an existing entry can be edited by clicking on the Edit button.
 - __Name__ -Displays the name of the camera that recorded the observation. Almost all annotations are associated with main camera. Other available names are aux-camera, bioluminescent-camera, color-bars, main camera, sit-camera, and still-photo-camera.
 - __Zoom__ - Displays the current value which, for this purpose, indicates the relative distance from an object. At MBARI, the units are in millimeters (mm) and values generally range from -200 to 1000.
