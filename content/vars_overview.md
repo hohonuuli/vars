@@ -1,4 +1,5 @@
 ---
+layout: default
 title: VARS Bird's eye View
 ---
 # Overview
