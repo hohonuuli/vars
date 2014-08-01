@@ -38,5 +38,5 @@ The interface includes a VCR control panel. This panel was designed for use with
 3. For faster annotations see information below about a __custom icon panel__.
 
 <p align="center">
-    [<img width="400" src="images/annotation_app4.png" />](images/annotation_app4.png)
+    <a href="images/annotation_app4.png"><img width="400" src="images/annotation_app4.png" /></a>
 </p>
