@@ -30,3 +30,13 @@ The interface includes a VCR control panel. This panel was designed for use with
 </p>
 
 ## Adding and Modifying Annotations
+
+### Adding an Annotation
+
+1. Click on the __New_ button (or ctrl+n / cmd+n). A new line will be created in the observation table with the default object in the observation column and with the current VCR timecode.
+2. Type the concept name in the editor and press __Enter__. The new concept name will be updated in the observation table.
+3. For faster annotations see information below about a __custom icon panel__.
+
+<p align="center">
+    [<img width="400" src="images/annotation_app4.png" />](images/annotation_app4.png)
+</p>
