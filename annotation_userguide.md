@@ -105,3 +105,34 @@ An alternative method of adding an association is to use the blue 'quick annotat
 
 __NOTE__: VARS has undo / redo buttons on the toolbar in case you delete observations you meant to keep. You can undo the last 25 operations in VARS.
 
+### Deleting an Association from an Observation
+
+1. Highlight the observation row to be edited, so that the associations for that observation will appear in the concept editor.
+2. In the editor, highlight the association to be deleted.
+3. Click the red __X__ (Remove Association) button and the association will disappear from the concept editor or the observation table.
+
+<p align="center">
+    <a href="images/annotation_app9.png"><img width="400" src="images/annotation_app9.png" /></a>
+</p>
+
+## Custom Icon Tabs
+
+If you do a lot of annotations, setting up a custom icon tab (in the panel area across the bottom of the interface) allows adding new observations quickly. For this panel, each _icon_ is really a word—specifically the name of a concept. For efficient annotation, you can create separate tabs for different types of dives, such as Geology or Midwater, and populate each with the names of commonly observed objects in those categories.
+
+### Creating Custom Icon Tabs
+
+1. To create an icon tab, click on the __New__ button at the right of the icon panel.
+2. At the prompt, name the new tab.
+3. Click on the __Knowledge Base__ tab in the upper right hand corner of the interface. 
+4. In the search box, type the name of the object that you would like to add to the tab. (The first name in the hierarchy with those letters will be highlighted.) 
+5. Press __Enter__ until the correct object is highlighted.
+6. Click on the name, and drag it onto the tab that you created. The name is now an icon.
+7. Continue adding icons as needed.
+8. Organize the icons by dragging them around within the tabs.
+9. To delete a icon (concept) from a tab, right-click on the icon, and select __Delete__ from the drop-down menu.
+10. To locate a concept in an icon tab within the knowledge base tree (for reference), right-click on the icon in the panel, and select __Find in knowledgebase__ tree from the drop-down menu. The concept will be highlighted in its correct position in the knowledge base.
+
+<p align="center">
+    <a href="images/annotation_app10.png"><img width="400" src="images/annotation_app10.png" /></a>
+</p>
+
