@@ -136,3 +136,11 @@ If you do a lot of annotations, setting up a custom icon tab (in the panel area 
     <a href="images/annotation_app10.png"><img width="400" src="images/annotation_app10.png" /></a>
 </p>
 
+### Adding Observations using Icons
+
+1.  Click on the icon with the name of the concept to be added. The observation will be added to the table along with the current VCR time code.
+
+## Contacts
+
+For addition help with the VARS annotation interface please use the [MBARI-VARS Google Group](https://groups.google.com/forum/#!forum/mbari-vars)
+
