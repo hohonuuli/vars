@@ -12,7 +12,7 @@ This guide provides basic instructions for starting and using the VARS Annotatio
 
 ## Logging in and Opening a Video
 
-- __Login to VARS__. To annotate in VARS you will need a VARS user account. If this is the very first time that VARS is being launched on a new database, you will need to create an admin account. Please see the [Knowledgebase User Guide](knowledgebase_userguide.html) for instruction on creating an admin account. If you just need to create a non-admin user account, do the following:
+- __Creating a user account__. To annotate in VARS you will need a VARS user account. If this is the very first time that VARS is being launched on a new database, you will need to create an admin account. Please see the [Knowledgebase User Guide](knowledgebase_userguide.html) for instruction on creating an admin account. If you just need to create a non-admin user account, do the following:
     1. Click on __User:__ on the toolbar.
     2. In the login dialog that appears, click on _Create a new user account_. 
 
@@ -23,6 +23,10 @@ This guide provides basic instructions for starting and using the VARS Annotatio
     <a href="images/annotation_app_userlogin2.png"><img width="200" src="images/annotation_app_userlogin2.png" /></a>
 </p>
 
+- __Login to VARS__. If you already have a user account you can simply log in to VARS.
+    1. Click on __User:__ on the toolbar
+    2. In the login dialog that appears select or type your user name and click the __OK__ button
+
 
 - __Open a movie file__.  
     1. Click on the __Video:__ on the toolbar[<img width="100" src="images/annotation_app3.png">](images/annotation_app3.png)
@@ -30,6 +34,13 @@ This guide provides basic instructions for starting and using the VARS Annotatio
         - To browse to a new movie, select the _Open by Location_ check box. Then browse to or enter a URL to a movie. You __must__ also select a _camera platform_ and enter a _sequence number_.
         - To open a previously annotated move, select the _Open Existing_ checkbox. Then select the name of the file you'd like to annotated.
         - [<img width="100" src="images/annotation_app_moviedialog.png">](images/annotation_app_moviedialog.png)
+
+<p align="center">
+    <a href="images/annotation_app3.png"><img width="400" src="images/annotation_app3.png" /></a>
+</p>
+<p align="center">
+    <a href="images/annotation_app_moviedialog.png"><img width="200" src="images/annotation_app_moviedialog.png" /></a>
+</p>
 
 ## Video Controls
 The interface includes a VCR control panel. This panel was designed for use with VCR's but works _mostly_ as expected with video files.  
