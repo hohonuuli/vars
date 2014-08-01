@@ -33,10 +33,38 @@ The interface includes a VCR control panel. This panel was designed for use with
 
 ### Adding an Annotation
 
-1. Click on the __New_ button (or ctrl+n / cmd+n). A new line will be created in the observation table with the default object in the observation column and with the current VCR timecode.
+1. Click on the __New__ button (or ctrl+n / cmd+n). A new line will be created in the observation table with the default object in the observation column and with the current VCR timecode.
 2. Type the concept name in the editor and press __Enter__. The new concept name will be updated in the observation table.
 3. For faster annotations see information below about a __custom icon panel__.
 
 <p align="center">
     <a href="images/annotation_app4.png"><img width="400" src="images/annotation_app4.png" /></a>
+</p>
+
+### Adding an Annotation with a Frame Grab
+
+1. To create an annotation associated with a frame grab, click the frame grab (__F__) button (or ctrl+f / cmd+f ).
+2. The framegrab will be displayed in the upper right corner of the user interface, under the __Frame-grab__ tab. By default, the concept physical-object will be entered in the observation column. The __F__ button in the __FG/S__ column of the observation table will be highlighted in green, indicating there is a frame grab associated with this observation.
+3. To give the annotation a more specific name (concept), type the concept in the concept editor (located just under the observation table), and press __Enter__.
+
+<p align="center">
+    <a href="images/annotation_app5.png"><img width="400" src="images/annotation_app5.png" /></a>
+</p>
+
+### Adding an association to an observation
+
+An _association_ is a structured descriptor that provides additional information about an annotation. For example, color of the item, behavior such as swimming or eating, resting on some substrate, etc.
+
+1. Select a row in the annotation table.
+2. In the concept editor click on the green __+__ button.
+3. In the association search box, type part of the association you wish to search for and press enter. 
+4. You can continue to press enter to scroll through additional matches.
+5. Press the green __+__ button again to add teh association. The association editor will automatically close.
+
+<p align="center">
+    <a href="images/annotation_app6.png"><img width="400" src="images/annotation_app6.png" /></a>
+</p>
+
+<p align="center">
+    <a href="images/annotation_app7.png"><img width="400" src="images/annotation_app7.png" /></a>
 </p>
