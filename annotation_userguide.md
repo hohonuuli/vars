@@ -12,16 +12,19 @@ This guide provides basic instructions for starting and using the VARS Annotatio
 
 ## Logging in and Opening a Video
 
-1. __Login to VARS__. To annotate in VARS you will need a VARS user account. If this is the very first time that VARS is being launched on a new database, you will need to create an admin account. Please see the [Knowledgebase User Guide](knowledgebase_userguide.html) for instruction on creating an admin account. If you just need to create a non-admin user account, do the following:
-    1. Click on __User:__ on the toolbar. [<img width="100" src="images/annotation_app2.png">](images/annotation_app2.png)
-    2. In the login dialog that appears, click on _Create a new user account_. [<img width="100" src="images/annotation_app_userlogin2.png">](images/annotation_app_userlogin2.png)
+- __Login to VARS__. To annotate in VARS you will need a VARS user account. If this is the very first time that VARS is being launched on a new database, you will need to create an admin account. Please see the [Knowledgebase User Guide](knowledgebase_userguide.html) for instruction on creating an admin account. If you just need to create a non-admin user account, do the following:
+    1. Click on __User:__ on the toolbar.
+    2. In the login dialog that appears, click on _Create a new user account_. 
+
 <p align="center">
-    <a href="images/annotation_app_userlogin2.png"><img width="400" src="images/annotation_app_userlogin2.png" /></a>
+    <a href="images/annotation_app2.png"><img width="400" src="images/annotation_app2.png" /></a>
 </p>
 <p align="center">
-    <a href="images/annotation_app5.png"><img width="400" src="images/annotation_app5.png" /></a>
+    <a href="images/annotation_app_userlogin2.png"><img width="200" src="images/annotation_app_userlogin2.png" /></a>
 </p>
-2. __Open a movie file__.  
+
+
+- __Open a movie file__.  
     1. Click on the __Video:__ on the toolbar[<img width="100" src="images/annotation_app3.png">](images/annotation_app3.png)
     2. In the movie dialog that appears, you can choose to browse to a new movie or open one that had previously been annotated.
         - To browse to a new movie, select the _Open by Location_ check box. Then browse to or enter a URL to a movie. You __must__ also select a _camera platform_ and enter a _sequence number_.
