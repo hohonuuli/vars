@@ -142,5 +142,7 @@ If you do a lot of annotations, setting up a custom icon tab (in the panel area 
 
 ## Contacts
 
-For addition help with the VARS annotation interface please use the [MBARI-VARS Google Group](https://groups.google.com/forum/#!forum/mbari-vars)
+For addition help with the VARS annotation interface please use the [MBARI-VARS Google Group](https://groups.google.com/forum/#!forum/mbari-vars), or email mbari-vars at googlegroups dot com. 
+
+For help with technical details or issues, contact [Brian Schlining](http://www.mbari.org/staff/brian/)
 
