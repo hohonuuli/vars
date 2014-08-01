@@ -52,6 +52,8 @@ The interface includes a VCR control panel. This panel was designed for use with
 
 ## Adding and Modifying Annotations
 
+__NOTE__ we use the terms __observation__ and __annotation__ interchangable in the documentation below. 
+
 ### Adding an Annotation
 
 1. Click on the __New__ button (or ctrl+n / cmd+n). A new line will be created in the observation table with the default object in the observation column and with the current VCR timecode.
@@ -72,7 +74,7 @@ The interface includes a VCR control panel. This panel was designed for use with
     <a href="images/annotation_app5.png"><img width="400" src="images/annotation_app5.png" /></a>
 </p>
 
-### Adding an association to an observation
+### Adding an Association to an Observation
 
 An _association_ is a structured descriptor that provides additional information about an annotation. For example, color of the item, behavior such as swimming or eating, resting on some substrate, etc.
 
@@ -80,7 +82,7 @@ An _association_ is a structured descriptor that provides additional information
 2. In the concept editor click on the green __+__ button.
 3. In the association search box, type part of the association you wish to search for and press enter. 
 4. You can continue to press enter to scroll through additional matches.
-5. Press the green __+__ button again to add teh association. The association editor will automatically close.
+5. Press the green __+__ button again to add the association. The association editor will automatically close.
 
 <p align="center">
     <a href="images/annotation_app6.png"><img width="400" src="images/annotation_app6.png" /></a>
@@ -89,3 +91,17 @@ An _association_ is a structured descriptor that provides additional information
 <p align="center">
     <a href="images/annotation_app7.png"><img width="400" src="images/annotation_app7.png" /></a>
 </p>
+
+An alternative method of adding an association is to use the blue 'quick annotation' buttons.
+
+<p align="center">
+    <a href="images/annotation_app8.png"><img width="400" src="images/annotation_app8.png" /></a>
+</p>
+
+### Deleting an Observation
+
+1. Select an observation to be deleted.
+2. Click the __Delete__ button (or use ctrl-delete / cmd-delete)
+
+__NOTE__: VARS has undo / redo buttons on the toolbar in case you delete observations you meant to keep. You can undo the last 25 operations in VARS.
+
