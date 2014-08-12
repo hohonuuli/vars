@@ -39,8 +39,7 @@ Once you've initialize a database, you will need to create the database tables t
 VARS will need to be modified to recognize your database.
 
 1. Find and download the JDBC driver for your version of postgreSQL from [http://jdbc.postgresql.org/](http://jdbc.postgresql.org/). (JDBC type 4 driver is best). Just download the driver and drop it into VARS_HOME/lib.
-2. Note the following information. The default port for PostgreSQL is 5432 unless you changed it in postgresql.conf. The host is the either the fully qualified name or the IP address of the computer running PostgreSQL. Either the name or the IP address wil work.  
-<pre><code>
+2. Note the following information. The default port for PostgreSQL is 5432 unless you changed it in postgresql.conf. The host is the either the fully qualified name or the IP address of the computer running PostgreSQL. Either the name or the IP address wil work. <pre><code>
 JDBC URL: jdbc:postgresql://HOST:PORT/DATABASE [varies with your computer]  
 USERNAME: ??? [probably will be 'varsuser' if you followed the directions above]  
 PASSWORD: ??? [From above]  
