@@ -33,7 +33,7 @@ git checkout videofile-jdk8
 mvn install -P dev
 ```
 
-## To Run the Build Application
+## To Run the Built Application
 
 1. Extract the zip file, _vars/vars-standalone/target/vars-standalone-[VERSION]-scripting.zip_.
 2. Open a Terminal or Command Prompt, in the directory created by extracting the zip file. Then `cd bin` to be in the correct directory.
