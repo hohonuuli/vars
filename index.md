@@ -17,6 +17,7 @@ Originally designed for annotating underwater video, VARS can be applied to any 
 ## Developer Documentation
 - [Building VARS](developer_build.html)
 - [Setting up a Custom Database](developer_database.html)
+- [Database Schema](developer_datastructure.html)
 
 ## Resources
 - [MBARI-VARS Group](https://groups.google.com/forum/#!forum/mbari-vars)
