@@ -38,28 +38,30 @@ Once you've initialize a database, you will need to create the database tables t
 
 VARS will need to be modified to recognize your database.
 
-1. Find and download the JDBC driver for your version of postgreSQL from [http://jdbc.postgresql.org/](http://jdbc.postgresql.org/). (JDBC type 4 driver is best). Just download the driver and drop it into VARS_HOME/lib.
-2. Note the following information. The default port for PostgreSQL is 5432 unless you changed it in postgresql.conf. The host is the either the fully qualified name or the IP address of the computer running PostgreSQL. Either the name or the IP address wil work. <pre>
+<ol> 
+<li>Find and download the JDBC driver for your version of postgreSQL from [http://jdbc.postgresql.org/](http://jdbc.postgresql.org/). (JDBC type 4 driver is best). Just download the driver and drop it into VARS_HOME/lib.</li>
+<li>Note the following information. The default port for PostgreSQL is 5432 unless you changed it in postgresql.conf. The host is the either the fully qualified name or the IP address of the computer running PostgreSQL. Either the name or the IP address wil work. <pre>
 JDBC URL: jdbc:postgresql://HOST:PORT/DATABASE [varies with your computer]  
 USERNAME: ??? [probably will be 'varsuser' if you followed the directions above]  
 PASSWORD: ??? [From above]  
 DRIVER NAME: org.postgresql.Driver  
-</pre>
-3. Make a temp directory somewhere to work in:  
-`mkdir tempdir;cd tempdir`
-4. Copy the vars-jpa-XXX.jar from VARS_HOME/lib into the tempdir.  
-`cp $VARS_HOME/lib/vars-jpa-6.0.2.jar tempdir`
-5. Unzip the vars-jpa jar. [JAR files are just zip files with a different extension].  
-`cd tempdir; mkdir trashme; unzip vars-jpa-6.0.2.jar -d trashme`
-6. Edit the following files:  <pre>
+</pre></li>
+<li>Make a temp directory somewhere to work in:  
+`mkdir tempdir;cd tempdir`</li>
+<li>Copy the vars-jpa-XXX.jar from VARS_HOME/lib into the tempdir.  
+`cp $VARS_HOME/lib/vars-jpa-6.0.2.jar tempdir`</li>
+<li>Unzip the vars-jpa jar. [JAR files are just zip files with a different extension].  
+`cd tempdir; mkdir trashme; unzip vars-jpa-6.0.2.jar -d trashme`</li>
+<li>Edit the following files:  <pre>
 trashme/annotation-jdbc.properties  
 trashme/knowledgebase-jdbc.properties  
 trashme/query-jdbc.properties  
 trashme/META-INF/persistence.xml  
-</pre>
-7. Inside each of these files are lines that specify the jdbc-url, username, password, and driver name of the databases. Edit them as appropriate. If you've munged the VARS and VARS_KB tables into a single database [which is what these directions assume] then you'll only have one url to use everywhere, otherwise be mindful of which database you point at. For example, annotation-jdbc.properties and query-jdbc.properties should point at the VARS database. The knowedgebase-jdbc.properties file should point at the VARS_KB database. persistence.xml has several XML blocks named 'persistence-unit' in it. The ones named 'vars-jpa-knowledgebase', and 'vars-jpa-misc' should point at VARS_KB. 'vars-jpa-annotation' should point at the VARS database. You don't care about the 'vars-jpa-test' persistence unit.
-8. Once you've made edits you need to jar everything back up.  <pre>
+</pre></li>
+<li>Inside each of these files are lines that specify the jdbc-url, username, password, and driver name of the databases. Edit them as appropriate. If you've munged the VARS and VARS_KB tables into a single database [which is what these directions assume] then you'll only have one url to use everywhere, otherwise be mindful of which database you point at. For example, annotation-jdbc.properties and query-jdbc.properties should point at the VARS database. The knowedgebase-jdbc.properties file should point at the VARS_KB database. persistence.xml has several XML blocks named 'persistence-unit' in it. The ones named 'vars-jpa-knowledgebase', and 'vars-jpa-misc' should point at VARS_KB. 'vars-jpa-annotation' should point at the VARS database. You don't care about the 'vars-jpa-test' persistence unit.</li>
+<li>Once you've made edits you need to jar everything back up.  <pre>
   # Assuming you're still in tempdir
   jar -cvf vars-jpa-6.0.2-postgresql.jar -C trashme *
-</pre>
+</pre></li>
+</ol>
 This will create a new jar named vars-jpa-6.0.2-postgresql.jar. Delete VARS_HOME/lib/vars-jpa-6.0.2.jar and replace it with your new jar (VARS will automatically pick up the changes when you start it
