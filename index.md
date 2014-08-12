@@ -7,12 +7,15 @@ The Video Annotation and Reference System (VARS) is a suite of tools developed b
 
 Originally designed for annotating underwater video, VARS can be applied to any video dataset that requires constrained, searchable annotations.
 
-## Documentation
+## User Documentation
 - [An Overview of VARS](vars_overview.html)
 - VARS Applications
     - [Annotation](annotation.html)
     - [Knowledgebase](knowledgebase.html)
     - [Query](query.html)
+
+## Developer Documentatino
+
 
 ## Resources
 - [MBARI-VARS Group](https://groups.google.com/forum/#!forum/mbari-vars)
