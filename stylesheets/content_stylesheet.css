@@ -1,18 +1,14 @@
 .inner {
-    width: auto !important;
+    /*width: auto !important;*/
     padding: 30px;
 }
 
 #main-content {
-    width: auto !important;
+    /*width: auto !important;*/
     /* float: none !important; */
     padding: 30px;
 }
 
 ol {
     padding-left: 20px !important;
-}
-
-#inner {
-    padding-right: 30px;
 }
