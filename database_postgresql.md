@@ -47,11 +47,11 @@ PASSWORD: ??? [From above]
 DRIVER NAME: org.postgresql.Driver  
 </pre></li>
 <li>Make a temp directory somewhere to work in:  
-`mkdir tempdir;cd tempdir`</li>
-<li>Copy the vars-jpa-XXX.jar from VARS_HOME/lib into the tempdir.  
-`cp $VARS_HOME/lib/vars-jpa-6.0.2.jar tempdir`</li>
-<li>Unzip the vars-jpa jar. [JAR files are just zip files with a different extension].  
-`cd tempdir; mkdir trashme; unzip vars-jpa-6.0.2.jar -d trashme`</li>
+<code>mkdir tempdir;cd tempdir`</code></li>
+<li>Copy the vars-jpa-XXX.jar from VARS_HOME/lib into the tempdir.<br>
+<code>cp $VARS_HOME/lib/vars-jpa-6.0.2.jar tempdir</code></li>
+<li>Unzip the vars-jpa jar. [JAR files are just zip files with a different extension].  <br>
+<code>cd tempdir; mkdir trashme; unzip vars-jpa-6.0.2.jar -d trashme</code></li>
 <li>Edit the following files:  <pre>
 trashme/annotation-jdbc.properties  
 trashme/knowledgebase-jdbc.properties  
