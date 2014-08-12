@@ -3,6 +3,14 @@ layout: default
 title: VARS - Setting up PostgreSQL
 ---
 
+```
+JDBC URL: jdbc:postgresql://HOST:PORT/DATABASE [varies with your computer]  
+USERNAME: ??? [probably will be 'varsuser' if you followed the directions above]  
+PASSWORD: ??? [From above]  
+DRIVER NAME: org.postgresql.Driver  
+```
+
+
 VARS can run on most database servers. Below is the documentation to setup VARS to run on [PostgreSQL](http://www.postgresql.org/)
 
 ## Installing PostgreSQL
