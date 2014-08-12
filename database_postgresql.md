@@ -41,10 +41,10 @@ VARS will need to be modified to recognize your database.
 1. Find and download the JDBC driver for your version of postgreSQL from [http://jdbc.postgresql.org/](http://jdbc.postgresql.org/). (JDBC type 4 driver is best). Just download the driver and drop it into VARS_HOME/lib.
 2. Note the following information. The default port for PostgreSQL is 5432 unless you changed it in postgresql.conf. The host is the either the fully qualified name or the IP address of the computer running PostgreSQL. Either the name or the IP address wil work.  
 ```
-JDBC URL: jdbc:postgresql://HOST:PORT/DATABASE [varies with your computer]
-USERNAME: ??? [probably will be 'varsuser' if you followed the directions above]
-PASSWORD: ??? [From above]
-DRIVER NAME: org.postgresql.Driver
+JDBC URL: jdbc:postgresql://HOST:PORT/DATABASE [varies with your computer]  
+USERNAME: ??? [probably will be 'varsuser' if you followed the directions above]  
+PASSWORD: ??? [From above]  
+DRIVER NAME: org.postgresql.Driver  
 ```
 3. Make a temp directory somewhere to work in:  
 `mkdir tempdir;cd tempdir`
@@ -54,10 +54,10 @@ DRIVER NAME: org.postgresql.Driver
 `cd tempdir; mkdir trashme; unzip vars-jpa-6.0.2.jar -d trashme`
 6. Edit the following files:  
 ```
-trashme/annotation-jdbc.properties
-trashme/knowledgebase-jdbc.properties
-trashme/query-jdbc.properties
-trashme/META-INF/persistence.xml
+trashme/annotation-jdbc.properties  
+trashme/knowledgebase-jdbc.properties  
+trashme/query-jdbc.properties  
+trashme/META-INF/persistence.xml  
 ```
 7. Inside each of these files are lines that specify the jdbc-url, username, password, and driver name of the databases. Edit them as appropriate. If you've munged the VARS and VARS_KB tables into a single database [which is what these directions assume] then you'll only have one url to use everywhere, otherwise be mindful of which database you point at. For example, annotation-jdbc.properties and query-jdbc.properties should point at the VARS database. The knowedgebase-jdbc.properties file should point at the VARS_KB database. persistence.xml has several XML blocks named 'persistence-unit' in it. The ones named 'vars-jpa-knowledgebase', and 'vars-jpa-misc' should point at VARS_KB. 'vars-jpa-annotation' should point at the VARS database. You don't care about the 'vars-jpa-test' persistence unit.
 8. Once you've made edits you need to jar everything back up.  
