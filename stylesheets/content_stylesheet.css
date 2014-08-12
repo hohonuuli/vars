@@ -5,7 +5,7 @@
 
 #main-content {
     width: auto !important;
-    float: none !important;
+    /* float: none !important; */
     padding: 30px;
 }
 
