@@ -14,25 +14,25 @@ The annotaiton and knowldegebase databases can be hosted in different databases 
 ### UML Diagram
 
 <p align="center">
-    [<img width="600" src="images/developer_AnnotationClasses.gif" />](images/developer_AnnotationClasses.gif)
+    <a href="images/developer_AnnotationClasses.gif"><img width="600" src="images/developer_AnnotationClasses.gif" /></a>
 </p>
 
 ### ER Diagram
 
 <p align="center">
-    [<img width="600" src="images/developer_AnnotationER.gif" />](images/developer_AnnotationER.gif)
+    <a href="images/developer_AnnotationER.gif"><img width="600" src="images/developer_AnnotationER.gif" /></a>
 </p>
 
 ## Knowledgebase Schema
 
 <p align="center">
-    [<img width="600" src="images/developer_KnowledgebaseClasses.gif" />](images/developer_KnowledgebaseClasses.gif)
+    <a href="images/developer_KnowledgebaseClasses.gif"><img width="600" src="images/developer_KnowledgebaseClasses.gif" /></a>
 </p>
 
 ### ER Diagram
 
 <p align="center">
-    [<img width="600" src="images/developer_KnowledgebaseER.gif" />](images/developer_KnowledgebaseER.gif)
+    <a href="images/developer_KnowledgebaseER.gif"><img width="600" src="images/developer_KnowledgebaseER.gif" /></a>
 </p>
 
 
