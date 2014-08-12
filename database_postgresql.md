@@ -46,7 +46,7 @@ USERNAME: ??? [probably will be 'varsuser' if you followed the directions above]
 PASSWORD: ??? [From above]  
 DRIVER NAME: org.postgresql.Driver  
 </pre></li>
-<li>Make a temp directory somewhere to work in:  
+<li>Make a temp directory somewhere to work in:  <br>
 <code>mkdir tempdir;cd tempdir`</code></li>
 <li>Copy the vars-jpa-XXX.jar from VARS_HOME/lib into the tempdir.<br>
 <code>cp $VARS_HOME/lib/vars-jpa-6.0.2.jar tempdir</code></li>
