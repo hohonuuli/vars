@@ -34,11 +34,11 @@ import org.mbari.swing.JImageUrlCanvas;
  */
 public class AreaMeasurementLayerSettingsBuilder<T extends JImageUrlCanvas> implements UISettingsBuilder {
 
-    private JXPainter<T> notSelectedAreaMeasurementsPainter = new JXNotSelectedAreaMeasurementPainter<T>();
+    private JXAreaMeasurementPainter<T> notSelectedAreaMeasurementsPainter = new JXNotSelectedAreaMeasurementPainter<T>();
     private final MultiLayerUI<T> layerUI;
     private final JPanel panel;
     private JCheckBox showNotSelectedCheckBox;
-    //private JButton showColorChooserButton;
+    private JButton showColorChooserButton;
 
     /**
      * Constructs ...
@@ -54,6 +54,7 @@ public class AreaMeasurementLayerSettingsBuilder<T extends JImageUrlCanvas> impl
 
         // --- CheckBox to draw not selected annotations
         panel.add(getShowNotSelectedCheckBox());
+        panel.add(getShowColorChooserButton());
 
     }
 
@@ -80,23 +81,22 @@ public class AreaMeasurementLayerSettingsBuilder<T extends JImageUrlCanvas> impl
         return showNotSelectedCheckBox;
     }
 
-//    protected JButton getShowColorChooserButton() {
-//        if (showColorChooserButton == null) {
-//            showColorChooserButton = new JButton("Select Color");
-//            showColorChooserButton.setToolTipText("Select related observations color");
-//            showColorChooserButton.addActionListener(new ActionListener() {
-//                @Override
-//                public void actionPerformed(ActionEvent e) {
-//                    IMarkerStyle markerStyle = notSelectedAreaMeasurementsPainter.getMarkerStyle();
-//                    Color color = JColorChooser.showDialog(panel, "Choose related observations color", markerStyle.getColor());
-//                    markerStyle = new MarkerStyleBean(color, markerStyle.getArmLength(), markerStyle.getFont(), markerStyle.getStroke());
-//                    identityReferencePainter.setMarkerStyle(markerStyle);
-//
-//                }
-//            });
-//        }
-//        return showColorChooserButton;
-//    }
+    protected JButton getShowColorChooserButton() {
+        if (showColorChooserButton == null) {
+            showColorChooserButton = new JButton("Select Color");
+            showColorChooserButton.setToolTipText("Select background area measurements color");
+            showColorChooserButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    Color color = JColorChooser.showDialog(panel, "Select background area measurements color",
+                            notSelectedAreaMeasurementsPainter.getPaint());
+                    notSelectedAreaMeasurementsPainter.setPaint(color);
+
+                }
+            });
+        }
+        return showColorChooserButton;
+    }
 
     /**
      */
