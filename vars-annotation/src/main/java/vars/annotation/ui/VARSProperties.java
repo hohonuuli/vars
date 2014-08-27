@@ -25,10 +25,12 @@ import vars.annotation.ui.Lookup;
 /**
  * Retrieve VARS properties. Most of the properties are configured in the file 'vars.properties'. However,
  * Some can be overridden on the command line with the -D switch. This class first checks the System properties
- * for a given property, if it's not foudn there it then checks the vars.properties file.
+ * for a given property, if it's not found there it then checks the annotation-app.properties file.
  * @author brian
  */
 public class VARSProperties {
+
+    private static final ResourceBundle bundle = ResourceBundle.getBundle(Lookup.RESOURCE_BUNDLE, Locale.US);
     
     /**
      * Stores cameraplatform, ship pairs. For example a vars.properties file with
@@ -69,16 +71,19 @@ public class VARSProperties {
      * The URL on a web server that corresponds to imageArchiveDirectory
      */
     private static String imageArchiveURL;
+
+    /**
+     * If true, the recordedDate column is shown in the Annotation App
+     */
+    private static boolean showRecordedDateInTable;
     
-            
-    
+
     static {
         /*
          * Fetch all the keys from the vars.properties file and look for the 
          * cameraplatform keys. Sort by name.
          */
         platforms = new HashMap<String, String>();
-        ResourceBundle bundle = ResourceBundle.getBundle(Lookup.RESOURCE_BUNDLE, Locale.US);
         Enumeration<String> keys = bundle.getKeys();
         while (keys.hasMoreElements()) {
             String key = keys.nextElement();
@@ -152,10 +157,20 @@ public class VARSProperties {
             imageArchiveURL = getProperty("image.archive.url");
         }
         catch (MissingResourceException e) {
-            log.info("The property 'image.archive.url' was not found in + " + Lookup.RESOURCE_BUNDLE);
+            log.info("The property 'image.archive.url' was not found in " + Lookup.RESOURCE_BUNDLE);
+        }
+
+        try {
+            showRecordedDateInTable = Boolean.parseBoolean(getProperty("show.recorded.date"));
+        }
+        catch (MissingResourceException e) {
+            log.info("The property 'show.recorded.date' was not found in " + Lookup.RESOURCE_BUNDLE);
+        }
+        catch (Exception e) {
+            log.info("Expected 'true' or 'false' for 'show.recorded.date in " + Lookup.RESOURCE_BUNDLE +
+                    " but found " + getProperty("show.recorded.date"));
         }
         
-
     }
     
     private VARSProperties() {
@@ -163,8 +178,8 @@ public class VARSProperties {
     }
     
     /**
-     * This method checks the system properties for a giving line first, in case any were set at the command line.
-     * If none are found it trys to get them from the vars.properties file.
+     * This method checks the system properties for a given property first, in case any were set at the command line.
+     * If none are found it tries to get them from the annotation-app.properties file.
      * 
      * @param key The key to search for
      * @return The property for the key
@@ -173,7 +188,6 @@ public class VARSProperties {
     private static String getProperty(String key) {
         String property = System.getProperty(key);
         if (property == null) {
-            ResourceBundle bundle = ResourceBundle.getBundle("vars", Locale.US);
             property = bundle.getString(key);
         }
         if (log.isDebugEnabled()) {
@@ -259,6 +273,10 @@ public class VARSProperties {
     
     public static String getImageArchiveDirectory() {
         return imageArchiveDirectory;
+    }
+
+    public static boolean getShowRecordedDateInTable() {
+        return showRecordedDateInTable;
     }
     
     

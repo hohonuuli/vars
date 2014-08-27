@@ -15,6 +15,8 @@
 
 package vars.annotation.ui.table;
 
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 import javax.swing.table.TableColumn;
@@ -24,6 +26,7 @@ import vars.annotation.CameraData;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoFrame;
+import vars.annotation.ui.Lookup;
 
 /**
  *
@@ -31,7 +34,7 @@ import vars.annotation.VideoFrame;
  */
 public class JXObservationTableColumnModel extends DefaultTableColumnModelExt {
 
-    private boolean miniView = false;
+    private boolean imageView = false;
 
     /**
      * Constructs ...
@@ -45,41 +48,44 @@ public class JXObservationTableColumnModel extends DefaultTableColumnModelExt {
         addColumn(new FGSColumn());
         addColumn(new ObserverColumn());
         addColumn(new CameraDirectionColumn());
-        addColumn(new VideoArchiveNameColumn());
-        addColumn(new NotesColumn());
+        addColumn(new RecordedDateColumn());
+
     }
+
 
     /**
      * Set the state of the view. Full view includes all available columns.
      * 'Mini-view' hides teh notes columne and teh VideoArchviveNameColumn. The
      * miniview is used in the annotation editor, the full view is used in
      * the videoarchiveSetEditorPanel.
-     * 
-     * @param miniView
+     *
+     * @param imageView
      */
-    public void setMiniView(boolean miniView) {
-        this.miniView = miniView;
+    public void setImageView(boolean imageView) {
+        this.imageView = imageView;
         List<TableColumn> columns = getColumns(true);
         for (TableColumn tableColumn : columns) {
+
             if (tableColumn instanceof ValueColumn) {
                 ValueColumn valueColumn = (ValueColumn) tableColumn;
                 String id = (String) valueColumn.getIdentifier();
-                if (id != null && (id.equalsIgnoreCase(VideoArchiveNameColumn.ID) ||
-                        id.equalsIgnoreCase(NotesColumn.ID))) {
-                    valueColumn.setVisible(!miniView);
+                if (id != null) {
+                    if (id.equalsIgnoreCase(RecordedDateColumn.ID)) {
+                        valueColumn.setVisible(imageView);
+                    }
                 }
             }
         }
     }
 
-    public boolean isMiniView() {
-        return miniView;
+    public boolean isImageView() {
+        return imageView;
     }
 
- 
+
     public class AssociationColumn extends ValueColumn {
 
- 
+
         public final static int COLUMN_INDEX = 2;
 
         /**
@@ -363,7 +369,7 @@ public class JXObservationTableColumnModel extends DefaultTableColumnModelExt {
 
     public class ObservationColumn extends ValueColumn {
 
-  
+
         public final static int COLUMN_INDEX = 1;
 
         /**
@@ -489,6 +495,46 @@ public class JXObservationTableColumnModel extends DefaultTableColumnModelExt {
         public void setValue(final Observation observation, final Object value) {
 
             // TODO implement this if needed
+        }
+    }
+
+    public class RecordedDateColumn extends ValueColumn {
+
+        public final static int COLUMN_INDEX = 6;
+
+        /**
+         * Table identifier. Useful for locating a column in a table
+         */
+        public final static String ID = "Recorded Date";
+
+        public final DateFormat dateFormat = Lookup.DATE_FORMAT_UTC;
+
+        public RecordedDateColumn() {
+            super(ID, COLUMN_INDEX, 180);
+            setIdentifier(ID);
+            setResizable(false);
+            setHeaderValue(ID);
+        }
+
+        @Override
+        public Class getColumnClass() {
+            return String.class;
+        }
+
+        @Override
+        public Object getValue(Observation observation) {
+            Date date = observation.getVideoFrame().getRecordedDate();
+            return date == null ? "    -  -     :  :   " : dateFormat.format(date);
+        }
+
+        @Override
+        public boolean isSortable() {
+            return true;
+        }
+
+        @Override
+        public void setValue(Observation observation, Object value) {
+            // DO Nothing
         }
     }
 

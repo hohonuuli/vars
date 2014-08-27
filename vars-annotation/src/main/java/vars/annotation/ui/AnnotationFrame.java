@@ -44,7 +44,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -53,7 +52,6 @@ import com.google.common.collect.Sets;
 import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.annotation.AnnotationProcessor;
 import org.bushe.swing.event.annotation.EventSubscriber;
-import org.mbari.util.Dispatcher;
 import org.mbari.vcr.IVCR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +59,6 @@ import vars.DAO;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoFrame;
-import vars.annotation.VideoFrameDAO;
 import vars.annotation.ui.buttons.RedoButton;
 import vars.annotation.ui.buttons.UndoButton;
 import vars.annotation.ui.cbpanel.ConceptButtonPanel;
@@ -228,7 +225,7 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
         if (table == null) {
             table = new JXObservationTable();
             table.setFocusable(false);    // The row editor panel should get focus NOT the table
-            ((JXObservationTableColumnModel) table.getColumnModel()).setMiniView(true);
+            ((JXObservationTableColumnModel) table.getColumnModel()).setImageView(VARSProperties.getShowRecordedDateInTable());
 
             // Map Mask+UP-ARROW Key Stroke
             String upTable = "up-table";
