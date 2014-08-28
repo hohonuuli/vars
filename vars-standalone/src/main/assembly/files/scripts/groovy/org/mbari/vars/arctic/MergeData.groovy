@@ -39,7 +39,7 @@ class MergeData {
         logRecords = LogReader.read(logFile)
     }
 
-    Map<VideoFrame, LogRecord> coallate() {
+    Map<VideoFrame, LogRecord> collate() {
         def dao = toolBox.toolBelt.annotationDAOFactory.newVideoArchiveDAO()
         dao.startTransaction()
         def videoArchive = dao.findByName(videoArchiveName)
@@ -50,9 +50,9 @@ class MergeData {
         dao.endTransaction()
         dao.close()
         log.info("Found ${videoFrames?.size()} videoFrames")
-        def coallatedData = [:]
+        def collatedData = [:]
         try {
-            coallatedData = CoallateFunction.coallate(videoFrames, convertVideoFrameToFrames,
+            collatedData = CoallateFunction.coallate(videoFrames, convertVideoFrameToFrames,
                 logRecords, convertLogRecordToFrames, offsetFrames)
         }
         catch (Exception e) {
@@ -70,6 +70,7 @@ class MergeData {
                     end time:\t${fileDates[-1]}
             """.stripIndent(), e)
         }
+        return collatedData
     }
 
     Map<VideoFrame, LogRecord> update(Map data) {
@@ -95,7 +96,7 @@ class MergeData {
     }
 
     Map<VideoFrame, LogRecord> apply() {
-        update(coallate())
+        update(collate())
     }
 
 
