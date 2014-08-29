@@ -7,38 +7,43 @@ import vars.annotation.VideoArchiveSetDAO
 import vars.annotation.VideoFrame
 import vars.ToolBox
 
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
+
 /**
  * Created by brian on 1/29/14.
  */
-class MergeData {
+class MergeDataByDate {
     private final log = LoggerFactory.getLogger(getClass())
     final File logFile
     final String videoArchiveName
-    final offsetFrames = 29.97 * 5 // +/- 5 second offset
+    final offsetMillis = 5000L // +/- 5 second offset
     final logRecords
     final toolBox = new ToolBox()
-    final logStartDate
+    final badDate = new Date(0)
+    final Date logStartDate
 
-    final convertVideoFrameToFrames = { videoFrame ->
-        def timecode = new Timecode(videoFrame.timecode)
-        timecode.frames
+    final convertVideoFrameToMillis = { VideoFrame videoFrame ->
+        def date = videoFrame.recordedDate
+        date == null ? badDate.time : date.time
     }
 
-    final convertLogRecordToFrames = { LogRecord lr ->
+    final convertLogRecordToMillis = { LogRecord lr ->
         def t = lr.time
-        def frames = Double.MAX_VALUE
+        def millisecs = Long.MAX_VALUE
         if (t) {
             def timecode = new Timecode("${t}:00")
-            frames = timecode.frames
+            millisecs = logStartDate.time + (timecode.frames / timecode.frameRate * 1000L)
         }
-        return frames
+        return millisecs
     }
 
-    MergeData(String videoArchiveName, File logFile) {
+    MergeDataByDate(String videoArchiveName, File logFile) {
         this.logFile = logFile
         this.videoArchiveName = videoArchiveName
         logRecords = LogReader.read(logFile)
-        logStartDate = LogReader.readDate(logFile)
+        this.logStartDate = LogReader.readDate(logFile)
     }
 
     Map<VideoFrame, LogRecord> collate() {
@@ -54,8 +59,8 @@ class MergeData {
         log.info("Found ${videoFrames?.size()} videoFrames")
         def collatedData = [:]
         try {
-            collatedData = CoallateFunction.coallate(videoFrames, convertVideoFrameToFrames,
-                    logRecords, convertLogRecordToFrames, offsetFrames)
+            collatedData = CoallateFunction.coallate(videoFrames, convertVideoFrameToMillis,
+                    logRecords, convertLogRecordToMillis, offsetMillis)
         }
         catch (Exception e) {
             def annoDates = videoFrames.collect {it.timecode} findAll { it != null } sort()
@@ -81,11 +86,7 @@ class MergeData {
         dao.startTransaction()
         data.each { VideoFrame videoFrame, LogRecord datum ->
 
-
             videoFrame = dao.find(videoFrame)
-
-            def timecode = new Timecode(videoFrame.timecode)
-            videoFrame.recordedDate = new Date(logStartDate.time + (timecode.frames / timecode.frameRate * 1000L) as Long)
 
             def physicalData = videoFrame.physicalData
             physicalData.depth = datum.depth

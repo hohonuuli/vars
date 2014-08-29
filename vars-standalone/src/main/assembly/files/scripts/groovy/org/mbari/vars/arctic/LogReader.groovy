@@ -2,6 +2,8 @@ package org.mbari.vars.arctic
 
 import org.slf4j.LoggerFactory
 
+import java.text.SimpleDateFormat
+
 /**
  * Created by brian on 1/29/14.
  */
@@ -62,6 +64,30 @@ class LogReader {
             }
         }
         return logRecords
+    }
+
+    /**
+     * Extracts the date from the header of the Arctic ROV log files
+     * @param file
+     * @return
+     */
+    static readDate(File file) {
+        def date = null
+        BufferedReader reader = file.newReader()
+        def line = reader.readLine()
+        def ok = true
+        while (line) {
+            if (line.startsWith("#Date")) {
+                def p = line.split(" ").collect { it.trim() }
+                def df = new SimpleDateFormat("MM/d/yyyy")
+                df.setTimeZone(TimeZone.getTimeZone("UTC"))
+                date = df.parse(p[-1])
+                break;
+            }
+            line = reader.readLine()
+        }
+        reader.close()
+        return date
     }
 
 }
