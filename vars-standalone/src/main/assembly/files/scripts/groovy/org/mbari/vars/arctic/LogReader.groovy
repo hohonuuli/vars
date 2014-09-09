@@ -47,16 +47,14 @@ class LogReader {
             else {
                 try {
                     def p = line.split(",") as List
-                    def conductivity = parseDouble(p[1])
-                    def temperature = parseDouble(p[2])
-                    def depth = parseDouble(p[3])
-                    def time = p[4]
-                    def latitude = parseLatLon(p[6])
-                    def longitude = parseLatLon(p[7])
-                    def logRecord = new LogRecord(conductivity, depth, latitude, longitude, temperature,
-                            time)
-                    logRecords << logRecord
-
+                    // Line gets parsed according to the number of fields in it
+                    if (p.size() == 8) {
+                        logRecords << readShortLine(p)
+                    } else if (p.size() == 12) {
+                        logRecords << readLongLine(p)
+                    } else {
+                        log.debug("Unable to parse: $line")
+                    }
                 }
                 catch (Exception e) {
                     log.debug("Unable to parse: $line")
@@ -64,6 +62,42 @@ class LogReader {
             }
         }
         return logRecords
+    }
+
+    /**
+     * $(HEADER),C,T,D,TIME(CTD),HDG,LAT,LONG, (I *think)
+     * 0         1 2 3 4         5   6   7
+     *
+     * @param file
+     * @return
+     */
+    private static LogRecord readShortLine(List<String> p) {
+        def conductivity = parseDouble(p[1])
+        def temperature = parseDouble(p[2])
+        def depth = parseDouble(p[3])
+        def time = p[4]
+        def latitude = parseLatLon(p[6])
+        def longitude = parseLatLon(p[7])
+        return new LogRecord(conductivity, depth, latitude, longitude, temperature,
+                time)
+    }
+
+    /**
+     * $(HEADER),C,T,D,TIME(CTD),SAL,TIME(GPS),HDG,DEPTH,LAT,LONG,SPEED
+     * 0         1 2 3 4         5   6         7   8     9   10   11
+     *
+     * @param file
+     * @return
+     */
+    private static LogRecord readLongLine(List<String> p) {
+        def conductivity = parseDouble(p[1])
+        def temperature = parseDouble(p[2])
+        def depth = parseDouble(p[3])
+        def time = p[6]
+        def latitude = parseLatLon(p[9])
+        def longitude = parseLatLon(p[10])
+        return new LogRecord(conductivity, depth, latitude, longitude, temperature,
+                time)
     }
 
     /**
@@ -75,7 +109,6 @@ class LogReader {
         def date = null
         BufferedReader reader = file.newReader()
         def line = reader.readLine()
-        def ok = true
         while (line) {
             if (line.startsWith("#Date")) {
                 def p = line.split(" ").collect { it.trim() }
