@@ -9,10 +9,12 @@ def endDate = args.size() > 1 ? df.parse(args[1]) : new Date()
 
 def toolBox = new ToolBox()
 def historyDao = toolBox.toolBelt.knowledgebaseDAOFactory.newHistoryDAO()
-def approvedHistories = historyDao.findApprovedHistories()
+def approvedHistories = historyDao.findApprovedHistories().toList
 approvedHistories = approvedHistories.findAll { h ->
     h.processedDate >= startDate && h.processedDate <= endDate
 }
+approvedHistories.sort { h -> h?.conceptMetadata?.concept?.primaryConceptName?.name?.toUpperCase() }
+
 
 def userAccountDao = toolBox.toolBelt.miscDAOFactory.newUserAccountDAO()
 def admins = userAccountDao.findAllByRole(UserAccountRoles.ADMINISTRATOR.toString())
