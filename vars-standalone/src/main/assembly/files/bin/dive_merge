@@ -15,4 +15,4 @@ DIVE=$2
 HD=$3
 
 echo [VARS] Executing VARS merge with EXPD for dive: $ROV $DIVE [isHD=$HD]
-`dirname "$0"`/gsh -e "def m = new org.mbari.vars.integration.MergeEXPDAnnotations2('$ROV', $DIVE, $HD); m.apply(vars.integration..MergeType.PRAGMATIC)"
+`dirname "$0"`/gsh -e "def m = new org.mbari.vars.integration.MergeEXPDAnnotations2('$ROV', $DIVE, $HD); m.apply(vars.integration.MergeType.PRAGMATIC)"

@@ -28,6 +28,7 @@ import org.mbari.expd.actions.CoallateByTimecodeFunction;
 import org.mbari.expd.actions.CoallateFunction;
 import org.mbari.expd.jdbc.DAOFactoryImpl;
 import org.mbari.expd.jdbc.UberDatumImpl;
+import org.mbari.ocean.Seawater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.DAO;
@@ -422,6 +423,14 @@ public class MergeEXPDAnnotations2 implements MergeFunction<Map<VideoFrame, Uber
             NavigationDatum navigationDatum = uberDatum.getNavigationDatum();
 
             if (navigationDatum != null) {
+                // HACK Used to addrees JIRA: VARS-661
+                // try {
+                //   double depth = Seawater.depth(ctdDatum.getPressure(), navigationDatum.getLatitude());
+                //   physicalData.setDepth((float) depth);
+                // }
+                // catch (Exception e) {
+                //     log.warn("Hack failed: {}", e);
+                // }
                 physicalData.setDepth(navigationDatum.getDepth());
                 physicalData.setLatitude(navigationDatum.getLatitude());
                 physicalData.setLogDate(navigationDatum.getDate());
