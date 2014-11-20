@@ -39,14 +39,18 @@ public class AreaMeasurementLayerSettingsBuilder<T extends JImageUrlCanvas> impl
     private final JPanel panel;
     private JCheckBox showNotSelectedCheckBox;
     private JButton showColorChooserButton;
+    private JButton showHLineDialogButton;
+    private JXHorizontalLinePainterDialog horizontalLinePainterDialog;
 
     /**
      * Constructs ...
      *
      * @param layerUI
      */
-    public AreaMeasurementLayerSettingsBuilder(MultiLayerUI<T> layerUI) {
+    public AreaMeasurementLayerSettingsBuilder(AreaMeasurementLayerUI2<T> layerUI) {
         this.layerUI = layerUI;
+        horizontalLinePainterDialog = new JXHorizontalLinePainterDialog(layerUI.getHorizontalLinePainter());
+        horizontalLinePainterDialog.pack();
 
         // --- Configure Panel
         panel = new JPanel();
@@ -55,6 +59,7 @@ public class AreaMeasurementLayerSettingsBuilder<T extends JImageUrlCanvas> impl
         // --- CheckBox to draw not selected annotations
         panel.add(getShowNotSelectedCheckBox());
         panel.add(getShowColorChooserButton());
+        panel.add(getShowHLineDialogButton());
 
     }
 
@@ -96,6 +101,20 @@ public class AreaMeasurementLayerSettingsBuilder<T extends JImageUrlCanvas> impl
             });
         }
         return showColorChooserButton;
+    }
+
+    protected JButton getShowHLineDialogButton() {
+        if (showHLineDialogButton == null) {
+            showHLineDialogButton = new JButton("Add Lines");
+            showHLineDialogButton.setToolTipText("Add horizonal lines");
+            showHLineDialogButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    horizontalLinePainterDialog.setVisible(true);
+                }
+            });
+        }
+        return showHLineDialogButton;
     }
 
     /**

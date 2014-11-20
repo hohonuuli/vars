@@ -32,7 +32,7 @@
         <junit.version>4.11</junit.version>
         <jxlayer.version>3.0.4.1</jxlayer.version> <!-- This version has SHA signatures stripped out -->
         <logback.version>1.1.2</logback.version>
-        <mbarix4j.version>1.9.2</mbarix4j.version>
+        <mbarix4j.version>1.9.3-SNAPSHOT</mbarix4j.version>
         <postgresql.version>9.0-801.jdbc4</postgresql.version>
         <qtx4j.version>0.18</qtx4j.version>
         <sanselan.version>0.97</sanselan.version>

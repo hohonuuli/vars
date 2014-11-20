@@ -116,7 +116,7 @@ public class ImageAnnotationFrame extends JFrame {
 
     protected AreaMeasurementLayerUI2<JImageUrlCanvas> getAreaMeasurementLayerUI() {
         if (areaMeasurementLayerUI == null) {
-            areaMeasurementLayerUI = new AreaMeasurementLayerUI2<JImageUrlCanvas>(controller.getToolBelt());
+            areaMeasurementLayerUI = new AreaMeasurementLayerUI2<JImageUrlCanvas>(controller.getToolBelt(), getImageCanvas());
         }
 
         return areaMeasurementLayerUI;

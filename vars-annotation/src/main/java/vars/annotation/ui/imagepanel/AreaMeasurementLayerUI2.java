@@ -35,6 +35,7 @@ import org.bushe.swing.event.annotation.EventSubscriber;
 import org.jdesktop.jxlayer.JXLayer;
 import org.mbari.awt.AwtUtilities;
 import org.mbari.geometry.Point2D;
+import org.mbari.swing.JImageCanvas;
 import org.mbari.swing.JImageUrlCanvas;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,6 +71,7 @@ public class AreaMeasurementLayerUI2<T extends JImageUrlCanvas> extends ImageFra
     private JXPainter<T> notSelectedObservationsPainter = new JXNotSelectedObservationsPainter<T>(MarkerStyle.FAINT);
     private JXPainter<T> selectedObservationsPainter = new JXSelectedObservationsPainter<T>(MarkerStyle.NOTSELECTED);
     private JXPainter<T> selectedAreaMeasurementPainter = new JXSelectedAreaMeasurementPainter<T>();
+    private JXHorizontalLinePainter<T> horizontalLinePainter;
     private Logger log = LoggerFactory.getLogger(getClass());
 
     /** Collection of pointsIC to be used to create the AreaMeasurement in image pixels */
@@ -122,7 +124,8 @@ public class AreaMeasurementLayerUI2<T extends JImageUrlCanvas> extends ImageFra
      *
      * @param toolBelt
      */
-    public AreaMeasurementLayerUI2(ToolBelt toolBelt) {
+    public AreaMeasurementLayerUI2(ToolBelt toolBelt, JImageCanvas imageCanvas) {
+        horizontalLinePainter = new JXHorizontalLinePainter<T>(imageCanvas);
         setDisplayName("Area");
         setSettingsBuilder(new AreaMeasurementLayerSettingsBuilder<T>(this));
         this.toolBelt = toolBelt;
@@ -132,6 +135,8 @@ public class AreaMeasurementLayerUI2<T extends JImageUrlCanvas> extends ImageFra
         addPainter(notSelectedObservationsPainter);
         addPainter(selectedObservationsPainter);
         addPainter(selectedAreaMeasurementPainter);
+        addPainter(horizontalLinePainter);
+
     }
 
     /**
@@ -318,5 +323,9 @@ public class AreaMeasurementLayerUI2<T extends JImageUrlCanvas> extends ImageFra
         Observation oldObservation = this.observation;
         this.observation = observation;
         resetUI();
+    }
+
+    public JXHorizontalLinePainter<T> getHorizontalLinePainter() {
+        return horizontalLinePainter;
     }
 }
