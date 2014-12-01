@@ -41,7 +41,6 @@ public class JXObservationTableColumnModel extends DefaultTableColumnModelExt {
      */
     public JXObservationTableColumnModel() {
         super();
-
         addColumn(new TimeCodeColumn());
         addColumn(new ObservationColumn());
         addColumn(new AssociationColumn());
@@ -49,7 +48,13 @@ public class JXObservationTableColumnModel extends DefaultTableColumnModelExt {
         addColumn(new ObserverColumn());
         addColumn(new CameraDirectionColumn());
         addColumn(new RecordedDateColumn());
+    }
 
+    public JXObservationTableColumnModel(boolean showVideoArchiveName) {
+        this();
+        if (showVideoArchiveName) {
+            addColumn(new VideoArchiveNameColumn());
+        }
     }
 
 
@@ -304,7 +309,7 @@ public class JXObservationTableColumnModel extends DefaultTableColumnModelExt {
 
     class NotesColumn extends ValueColumn {
 
-        public final static int COLUMN_INDEX = 7;
+        public final static int COLUMN_INDEX = 8;
 
         /**
          * Table identifier. Useful for locating a column in a table
@@ -617,7 +622,7 @@ public class JXObservationTableColumnModel extends DefaultTableColumnModelExt {
         /**
          *  Description of the Field
          */
-        public final static int COLUMN_INDEX = 6;
+        public final static int COLUMN_INDEX = 7;
 
         /**
          * Table identifier. Useful for locating a column in a table

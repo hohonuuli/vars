@@ -110,6 +110,16 @@
             <version>${scala.version}</version>
             <scope>runtime</scope>
         </dependency>
+
+        <!--
+            Scalar for doing the damn overlays
+        -->
+        <dependency>
+            <groupId>org.imgscalr</groupId>
+            <artifactId>imgscalr-lib</artifactId>
+            <version>${scalr.version}</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>

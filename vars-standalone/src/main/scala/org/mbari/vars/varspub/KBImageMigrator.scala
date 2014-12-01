@@ -9,6 +9,7 @@ import java.nio.file.{Files, Paths, Path}
 import javax.imageio.ImageIO
 
 import com.google.inject.Injector
+import org.imgscalr.Scalr
 import org.mbari.awt.image.ImageUtilities
 import org.mbari.io.FileUtilities
 import org.mbari.net.URLUtilities
@@ -39,7 +40,7 @@ class KBImageMigrator(target: Path, overlayImageURL: URL, webpath: String = "htt
     val medias = c.getConceptMetadata.getMedias.asScala.filter(_.getType == Media.TYPE_IMAGE)
     for {
       m <- medias
-      p <- remap(m)
+      p <- toTargetPath(m)
       i <- waterwark(m, overlayImage)
     } {
       if (!Files.exists(p.getParent)) {
@@ -49,7 +50,7 @@ class KBImageMigrator(target: Path, overlayImageURL: URL, webpath: String = "htt
     }
   }
 
-  def remap(media: Media): Option[Path] = {
+  def toTargetPath(media: Media): Option[Path] = {
     val source = media.getUrl
     val idx = source.indexOf(webpath)
     val subpath = if (idx >= 0) Some(source.substring(webpath.size))
@@ -64,25 +65,17 @@ class KBImageMigrator(target: Path, overlayImageURL: URL, webpath: String = "htt
 
       // Add watermark image
       val v = image.getWidth * overlayPercentWidth / overlay.getWidth
-      val so = scaleOverlay(v, overlay)
+      val so = WatermarkUtilities.scaleOverlay(v, overlay)
       val x = round(image.getWidth * 0.05).toInt
-      val y = round(image.getHeight * 0.95 - so.getHeight).toInt
+      val y = round(image.getHeight * 0.85 - so.getHeight).toInt
       g2.setComposite(alphaComposite)
       g2.drawImage(so, x, y, null)
+      g2.dispose()
 
       image
     }.toOption
   }
 
-  def scaleOverlay(scaleValue: Double, overlay: BufferedImage): BufferedImage = {
-    val w = ceil(overlay.getWidth * scaleValue).toInt
-    val h = ceil(overlay.getHeight * scaleValue).toInt
-    val scaledOverlay = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB)
-    val transform = new AffineTransform()
-    transform.scale(scaleValue, scaleValue)
-    val scaleOp = new AffineTransformOp(transform, AffineTransformOp.TYPE_NEAREST_NEIGHBOR)
-    scaleOp.filter(overlay, scaledOverlay)
-  }
 
 }
 

@@ -352,7 +352,7 @@ public class VideoArchiveSetEditorPanel extends JPanel implements UIEventSubscri
 
     protected JXObservationTable getTable() {
         if (table == null) {
-            table = new JXObservationTable();
+            table = new JXObservationTable(true);
 
             // When a new row is selected we want to deselect whatever was in the
             // CameraDirectionCB
