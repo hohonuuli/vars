@@ -49,6 +49,7 @@ public class AVFImageCaptureServiceImpl implements ImageCaptureService {
         catch (UnsatisfiedLinkError e) {
             extractAndLoadNativeLibraries();
         }
+        stopDevice();
     }
 
     ////////////////////////
@@ -134,15 +135,7 @@ public class AVFImageCaptureServiceImpl implements ImageCaptureService {
         // -- Save to temp file png.
         final File tempFile = new File(tempDir, LIBRARY_NAME + (new Date()).getTime() + ".png");
         Image image = capture(tempFile);
-//        saveSnapshotToSpecifiedPath(tempFile.getAbsolutePath());
-//
-//        // -- Reread file as image
-//        BufferedImage image = null;
-//        try {
-//            image = watchForAndReadNewImage(tempFile);
-//        } catch (Exception e) {
-//            EventBus.publish(GlobalLookup.TOPIC_WARNING, e);
-//        }
+
         // -- Delete the temp file in the background
         Thread thread = new Thread(new Runnable() {
             @Override
@@ -178,7 +171,7 @@ public class AVFImageCaptureServiceImpl implements ImageCaptureService {
                 }
             }
 
-            String[] devices;                  // If needed, a Blackmagic to list
+            String[] devices;                  // If needed, add Blackmagic to list
             if (!hasBlackmagic) {
                 devices = new String[listedDevices.length + 1];
                 System.arraycopy(listedDevices, 0, devices, 0, listedDevices.length);
@@ -211,6 +204,7 @@ public class AVFImageCaptureServiceImpl implements ImageCaptureService {
                     videoSource + "' is already opened");
         }
         else if (!videoSource.isEmpty()) {
+            log.debug("Starting image capture service, {}, using {}", getClass().getName(), videoSource);
             startSessionWithNamedDevice(videoSource);
             isStarted = true;
         }
@@ -220,6 +214,7 @@ public class AVFImageCaptureServiceImpl implements ImageCaptureService {
     }
 
     private void stopDevice() {
+        log.debug("Stopping image capture service, {}", getClass().getName());
         stopSession();
         isStarted = false;
     }
