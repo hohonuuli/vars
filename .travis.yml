@@ -16,7 +16,7 @@ after_success:
 
 branches:
   only:
-    - default
+    - develop
 
 notifications:
   email:
