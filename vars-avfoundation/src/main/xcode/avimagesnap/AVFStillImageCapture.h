@@ -20,10 +20,10 @@
 @property (nonatomic, strong) AVCaptureStillImageOutput *stillImageOutput;
 @property (nonatomic, strong) AVCaptureDeviceInput *videoInput;
 
-+(NSArray *) videoCaptureDevices;
-+(NSArray *) videoCaptureDevicesAsStrings;
-+(AVCaptureDevice *) videoCaptureDeviceNamed: (NSString *)name;
-
+-(NSArray *) videoCaptureDevices;
+-(NSArray *) videoCaptureDevicesAsStrings;
+-(AVCaptureDevice *) videoCaptureDeviceNamed: (NSString *)name;
+-(void) initSession;
 -(void) setupCaptureSessionUsingNamedDevice: (NSString *) name;
 -(void) saveStillImageToPath: (NSString *) path;
 

@@ -5,6 +5,12 @@
 
 AVFStillImageCapture *imageCapture = nil;
 
+void initImageCapture() {
+    if (imageCapture == nil) {
+        imageCapture = [[AVFStillImageCapture alloc] init];
+    }
+}
+
 /*
  * Class:     vars_avfoundation_AVFImageCaptureServiceImpl
  * Method:    videoDevicesAsStrings
@@ -12,12 +18,11 @@ AVFStillImageCapture *imageCapture = nil;
  */
 JNIEXPORT jobjectArray JNICALL Java_vars_avfoundation_AVFImageCaptureServiceImpl_videoDevicesAsStrings
 (JNIEnv *env, jobject clazz) {
-    // Set up an autoreleasePool for the JNI method - ALWAYS INCLUDE
-	/*DON'T FORGET THIS LINE!!!*/
-	//JNF_COCOA_ENTER(env);
+    
+    initImageCapture();
 	
 	// Grab the array of NSStrings
-	NSArray *videoDevicesAsStrings = [AVFStillImageCapture videoCaptureDevicesAsStrings];
+	NSArray *videoDevicesAsStrings = [imageCapture videoCaptureDevicesAsStrings];
 	
 	// Look for the class for Java String
 	jclass stringClass = (*env)->FindClass(env, "Ljava/lang/String;");
@@ -33,11 +38,7 @@ JNIEXPORT jobjectArray JNICALL Java_vars_avfoundation_AVFImageCaptureServiceImpl
 	
 	// Return the result
 	return result;
-	
-	// Clean up the autoreleasePool for the JNI method - ALWAYS INCLUDE
-	/*DON'T FORGET THIS LINE AND A RETURN!!!*/
-	//JNF_COCOA_EXIT(env);
-	return 0;
+
 };
 
 /*
@@ -47,26 +48,17 @@ JNIEXPORT jobjectArray JNICALL Java_vars_avfoundation_AVFImageCaptureServiceImpl
  */
 JNIEXPORT jstring JNICALL Java_vars_avfoundation_AVFImageCaptureServiceImpl_startSessionWithNamedDevice
 (JNIEnv *env, jobject clazz, jstring namedDevice) {
-    // Set up an autoreleasePool for the JNI method - ALWAYS INCLUDE
-	/*DON'T FORGET THIS LINE!!!*/
-	//JNF_COCOA_ENTER(env);
 	
 	// Convert the incoming Device Name to an NSString
 	NSString *device = JNFJavaToNSString(env, namedDevice);
     
-    if (imageCapture == nil) {
-        imageCapture = [[AVFStillImageCapture alloc] init];
-    }
+    initImageCapture();
 
     [imageCapture setupCaptureSessionUsingNamedDevice: device];
 	
 	// Convert the filename back to jstring for return
 	return JNFNSToJavaString(env, device);
 	
-	// Clean up the autoreleasePool for the JNI method - ALWAYS INCLUDE
-	/*DON'T FORGET THIS LINE AND A RETURN!!!*/
-	//JNF_COCOA_EXIT(env);
-	return 0;
 };
 
 /*
@@ -76,9 +68,6 @@ JNIEXPORT jstring JNICALL Java_vars_avfoundation_AVFImageCaptureServiceImpl_star
  */
 JNIEXPORT jstring JNICALL Java_vars_avfoundation_AVFImageCaptureServiceImpl_saveSnapshotToSpecifiedPath
 (JNIEnv *env, jobject clazz, jstring specifiedPath) {
-    // Set up an autoreleasePool for the JNI method - ALWAYS INCLUDE
-	/*DON'T FORGET THIS LINE!!!*/
-	//JNF_COCOA_ENTER(env);
 	
 	// Convert the incoming filename to an NSString
 	NSString *path = JNFJavaToNSString(env, specifiedPath);
@@ -92,11 +81,7 @@ JNIEXPORT jstring JNICALL Java_vars_avfoundation_AVFImageCaptureServiceImpl_save
 	
 	// Convert the filename back to jstring for return
 	return JNFNSToJavaString(env, path);
-	
-	// Clean up the autoreleasePool for the JNI method - ALWAYS INCLUDE
-	/*DON'T FORGET THIS LINE AND A RETURN!!!*/
-	//JNF_COCOA_EXIT(env);
-	return 0;
+
 };
 
 /*
@@ -106,12 +91,9 @@ JNIEXPORT jstring JNICALL Java_vars_avfoundation_AVFImageCaptureServiceImpl_save
  */
 JNIEXPORT void JNICALL Java_vars_avfoundation_AVFImageCaptureServiceImpl_stopSession
 (JNIEnv *env, jobject clazz) {
-    //JNF_COCOA_ENTER(env);
 	
 	// [imageCapture dealloc]; // Don't need. This project is using ARC
     imageCapture = nil; // On deallocation the session will be terminated
-	
-	//JNF_COCOA_EXIT(env);
 };
 
 

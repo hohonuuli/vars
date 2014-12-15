@@ -19,7 +19,8 @@
 @synthesize stillImageOutput;
 
 
-+(NSArray *) videoCaptureDevices {
+-(NSArray *) videoCaptureDevices {
+    [self initSession];
     NSArray *devices = [AVCaptureDevice devices];
     NSMutableArray *videoDevices = [NSMutableArray array];
     for (AVCaptureDevice *device in devices) {
@@ -30,7 +31,8 @@
     return videoDevices;
 };
 
-+(NSArray *) videoCaptureDevicesAsStrings {
+-(NSArray *) videoCaptureDevicesAsStrings {
+    [self initSession];
     NSArray *videoDevices = [self videoCaptureDevices];
     NSMutableArray *localizedNames = [NSMutableArray array];
     for (AVCaptureDevice *device in videoDevices) {
@@ -39,7 +41,8 @@
     return localizedNames;
 };
 
-+(AVCaptureDevice *) videoCaptureDeviceNamed: (NSString *)name {
+-(AVCaptureDevice *) videoCaptureDeviceNamed: (NSString *)name {
+    [self initSession];
     AVCaptureDevice *namedDevice = nil;
     NSArray *videoDevices = [self videoCaptureDevices];
     for (AVCaptureDevice *device in videoDevices) {
@@ -54,13 +57,17 @@
     return namedDevice;
 };
 
--(void)  setupCaptureSessionUsingNamedDevice: (NSString *) name {
-    
+-(void) initSession {
     if (session == nil) {
         session = [[AVCaptureSession alloc] init];
         session.sessionPreset = AVCaptureSessionPresetPhoto;
         [session startRunning];
     }
+}
+
+-(void)  setupCaptureSessionUsingNamedDevice: (NSString *) name {
+    
+    [self initSession];
     
     if (session != nil) {
 
@@ -76,7 +83,7 @@
             stillImageOutput = nil;
         }
         
-        AVCaptureDevice *device = [AVFStillImageCapture videoCaptureDeviceNamed:name];
+        AVCaptureDevice *device = [self videoCaptureDeviceNamed:name];
         if (device != nil) {
             NSError *error = nil;
             videoInput = [AVCaptureDeviceInput deviceInputWithDevice:device error:&error];
@@ -104,7 +111,6 @@
         if (stillImageOutput != nil) {
             captureConnection = [[stillImageOutput connections] objectAtIndex:0];
             [stillImageOutput captureStillImageAsynchronouslyFromConnection:captureConnection completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
-                
                 [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
             }];
         }
