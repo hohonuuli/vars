@@ -49,7 +49,8 @@ public class AVFImageCaptureServiceImpl implements ImageCaptureService {
         catch (UnsatisfiedLinkError e) {
             extractAndLoadNativeLibraries();
         }
-        stopDevice();
+        // HACK: The 1st call to videoDevicesAsStrings returns empty. 2nd call is OK
+        videoDevicesAsStrings();
     }
 
     ////////////////////////
@@ -162,27 +163,28 @@ public class AVFImageCaptureServiceImpl implements ImageCaptureService {
 
             // --- start HACK: Always add "Blackmagic" to video device list (brian 2014-03-04)
             // In Mac OS X 10.9.2, Blackmagic stopped showing up in the videodevice list
-            String[] listedDevices = videoDevicesAsStrings();
-            boolean hasBlackmagic = false;
-            for (String s: listedDevices) {    // Check if list contains Blackmagic
-                if (s.equals("Blackmagic")) {
-                    hasBlackmagic = true;
-                    break;
-                }
-            }
+            // String[] listedDevices = videoDevicesAsStrings();
+            // boolean hasBlackmagic = false;
+            // for (String s: listedDevices) {    // Check if list contains Blackmagic
+            //     if (s.equals("Blackmagic")) {
+            //         hasBlackmagic = true;
+            //         break;
+            //     }
+            // }
 
-            String[] devices;                  // If needed, add Blackmagic to list
-            if (!hasBlackmagic) {
-                devices = new String[listedDevices.length + 1];
-                System.arraycopy(listedDevices, 0, devices, 0, listedDevices.length);
-                devices[devices.length - 1] = "Blackmagic";
-            }
-            else {
-                devices = listedDevices;
-            }
-            Arrays.sort(devices);
+            // String[] devices;                  // If needed, add Blackmagic to list
+            // if (!hasBlackmagic) {
+            //     devices = new String[listedDevices.length + 1];
+            //     System.arraycopy(listedDevices, 0, devices, 0, listedDevices.length);
+            //     devices[devices.length - 1] = "Blackmagic";
+            // }
+            // else {
+            //     devices = listedDevices;
+            // }
+            // Arrays.sort(devices);
             // --- end HACK
 
+            String[] devices = videoDevicesAsStrings();
             dialog = new AVFImageCaptureDialog(frame, devices);
         }
         dialog.setVisible(true);

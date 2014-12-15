@@ -8,6 +8,7 @@ AVFStillImageCapture *imageCapture = nil;
 void initImageCapture() {
     if (imageCapture == nil) {
         imageCapture = [[AVFStillImageCapture alloc] init];
+        [imageCapture initSession];
     }
 }
 
