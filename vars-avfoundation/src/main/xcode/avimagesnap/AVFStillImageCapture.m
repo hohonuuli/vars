@@ -43,9 +43,13 @@
     AVCaptureDevice *namedDevice = nil;
     NSArray *videoDevices = [self videoCaptureDevices];
     for (AVCaptureDevice *device in videoDevices) {
+        NSLog(@"Examining video capture device '%@'", [device localizedName]);
         if ([[device localizedName] isEqualToString:name]) {
             namedDevice = device;
         }
+    }
+    if (namedDevice == Nil) {
+        NSLog(@"Did not find avideo input named '%@'", name);
     }
     return namedDevice;
 };
@@ -59,7 +63,7 @@
     }
     
     if (session != nil) {
-        
+
         [session beginConfiguration];
 
         if (videoInput != nil) {
@@ -93,6 +97,7 @@
         }
         
         [session commitConfiguration];
+
         
         // First framegrab on DeckLink is always black. So just grab one and don't do anything with it.
         AVCaptureConnection *captureConnection = nil;
@@ -133,7 +138,23 @@
 }
 
 -(void) dealloc {
+
+    [session beginConfiguration];
+
+    if (videoInput != nil) {
+        [session removeInput:videoInput];
+        videoInput = nil;
+    }
+    
+    if (stillImageOutput != nil) {
+        [session removeOutput:stillImageOutput];
+        stillImageOutput = nil;
+    }
+
+    [session commitConfiguration];
+
     [session stopRunning];
+    
 }
 
 @end

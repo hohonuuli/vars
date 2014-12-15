@@ -12,9 +12,9 @@
     </appender>
 
     <logger name="vars.jpa.TransactionLogger" level="INFO" />
-    <logger name="org.mbari.vcr" level="WARN" />
+    <logger name="org.mbari.vcr.rs422.VCR" level="WARN" />
 
-    <root level="DEBUG">
+    <root level="INFO">
         <appender-ref ref="CONSOLE"/>
     </root>
 
