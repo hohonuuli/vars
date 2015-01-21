@@ -50,9 +50,12 @@ public class MeasurementLayerUIDemo {
         final JImageUrlCanvas label = new JImageUrlCanvas(url);
 
         // Create JXLayer
-        MeasurementLayerUI<JImageUrlCanvas> layerUI = new MeasurementLayerUI<JImageUrlCanvas>(toolBelt);
+        MeasurementLayerUI<JImageUrlCanvas> layerUI = new MeasurementLayerUI<JImageUrlCanvas>(toolBelt,
+                new CommonPainters<JImageUrlCanvas>(new JXHorizontalLinePainter<JImageUrlCanvas>(label),
+                new JXCrossHairPainter<JImageUrlCanvas>()));
         JXLayer<JImageUrlCanvas> layer = new JXLayer<JImageUrlCanvas>(label);
         layer.setUI(layerUI);
+
 
 //        frame.addComponentListener(new ComponentAdapter() {
 //

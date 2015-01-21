@@ -84,6 +84,8 @@ public class ImageAnnotationFrame extends JFrame {
     private MeasurementLayerUI<JImageUrlCanvas> measurementLayerUI;
     private JPanel settingsPanel;
     private JToolBar toolBar;
+    private CommonPainters<JImageUrlCanvas> commonPainters;
+
 
     /**
      * Create the frame
@@ -95,6 +97,7 @@ public class ImageAnnotationFrame extends JFrame {
         dataCoordinator = new UIDataCoordinator(toolBelt.getAnnotationDAOFactory());
 
         // --- Build UI Layers
+
         layers.add(getAnnotationLayerUI());
         layers.add(getMeasurementLayerUI());
         layers.add(getAreaMeasurementLayerUI());
@@ -103,12 +106,22 @@ public class ImageAnnotationFrame extends JFrame {
         initialize();
     }
 
+    private CommonPainters<JImageUrlCanvas> getCommonPainters() {
+        if (commonPainters == null) {
+            commonPainters = new CommonPainters<JImageUrlCanvas>(
+                    new JXHorizontalLinePainter<JImageUrlCanvas>(getImageCanvas()),
+                    new JXCrossHairPainter<JImageUrlCanvas>());
+        }
+        return commonPainters;
+    }
+
     /**
      * @return
      */
     protected AnnotationLayerUI getAnnotationLayerUI() {
         if (annotationLayerUI == null) {
-            annotationLayerUI = new AnnotationLayerUI<JImageUrlCanvas>(controller.getToolBelt(), dataCoordinator);
+            annotationLayerUI = new AnnotationLayerUI<JImageUrlCanvas>(controller.getToolBelt(),
+                    dataCoordinator, getCommonPainters());
         }
 
         return annotationLayerUI;
@@ -116,7 +129,8 @@ public class ImageAnnotationFrame extends JFrame {
 
     protected AreaMeasurementLayerUI2<JImageUrlCanvas> getAreaMeasurementLayerUI() {
         if (areaMeasurementLayerUI == null) {
-            areaMeasurementLayerUI = new AreaMeasurementLayerUI2<JImageUrlCanvas>(controller.getToolBelt(), getImageCanvas());
+            areaMeasurementLayerUI = new AreaMeasurementLayerUI2<JImageUrlCanvas>(controller.getToolBelt(),
+                    getImageCanvas(), getCommonPainters());
         }
 
         return areaMeasurementLayerUI;
@@ -177,12 +191,14 @@ public class ImageAnnotationFrame extends JFrame {
 
     protected MeasurementLayerUI<JImageUrlCanvas> getMeasurementLayerUI() {
         if (measurementLayerUI == null) {
-            measurementLayerUI = new MeasurementLayerUI<JImageUrlCanvas>(controller.getToolBelt());
+            measurementLayerUI = new MeasurementLayerUI<JImageUrlCanvas>(controller.getToolBelt(),
+                    getCommonPainters());
             measurementLayerUI.addMeasurementCompletedListener(controller);
         }
 
         return measurementLayerUI;
     }
+
 
     /**
      * @return

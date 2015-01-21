@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CopyOnWriteArraySet;
 import javax.swing.SwingUtilities;
 import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.annotation.AnnotationProcessor;
@@ -67,7 +66,7 @@ public class AreaMeasurementLayerUI2<T extends JImageUrlCanvas> extends ImageFra
 
     //extends CrossHairLayerUI<T> {
 
-    private JXPainter<T> crossHairPainter = new JXCrossHairPainter<T>();
+    //private JXPainter<T> crossHairPainter = new JXCrossHairPainter<T>();
     private JXPainter<T> notSelectedObservationsPainter = new JXNotSelectedObservationsPainter<T>(MarkerStyle.FAINT);
     private JXPainter<T> selectedObservationsPainter = new JXSelectedObservationsPainter<T>(MarkerStyle.NOTSELECTED);
     private JXPainter<T> selectedAreaMeasurementPainter = new JXSelectedAreaMeasurementPainter<T>();
@@ -124,18 +123,20 @@ public class AreaMeasurementLayerUI2<T extends JImageUrlCanvas> extends ImageFra
      *
      * @param toolBelt
      */
-    public AreaMeasurementLayerUI2(ToolBelt toolBelt, JImageCanvas imageCanvas) {
-        horizontalLinePainter = new JXHorizontalLinePainter<T>(imageCanvas);
+    public AreaMeasurementLayerUI2(ToolBelt toolBelt, JImageCanvas imageCanvas,
+                                   CommonPainters<T> commonPainters) {
+        super(commonPainters);
+        horizontalLinePainter = commonPainters.getHorizontalLinePainter();
         setDisplayName("Area");
         setSettingsBuilder(new AreaMeasurementLayerSettingsBuilder<T>(this));
         this.toolBelt = toolBelt;
         AnnotationProcessor.process(this);
         setObservation(null);
-        addPainter(crossHairPainter);
+        //addPainter(crossHairPainter);
         addPainter(notSelectedObservationsPainter);
         addPainter(selectedObservationsPainter);
         addPainter(selectedAreaMeasurementPainter);
-        addPainter(horizontalLinePainter);
+        //addPainter(horizontalLinePainter);
 
     }
 
@@ -144,7 +145,7 @@ public class AreaMeasurementLayerUI2<T extends JImageUrlCanvas> extends ImageFra
     @Override
     public void clearPainters() {
         super.clearPainters();
-        addPainter(crossHairPainter);
+        //addPainter(crossHairPainter);
     }
 
     /**

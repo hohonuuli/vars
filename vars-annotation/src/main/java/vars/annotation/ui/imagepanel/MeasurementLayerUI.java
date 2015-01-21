@@ -57,7 +57,7 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends ImageFrameLay
 
     /** The diameter of the start of measurement marker */
     private static final int markerDiameter = 10;
-    private final JXPainter<T> crossHairPainter = new JXCrossHairPainter<T>();
+    //private final JXPainter<T> crossHairPainter = new JXCrossHairPainter<T>();
     private final JXPainter<T> selectedObservationPainter = new JXSelectedObservationsPainter<T>(
         MarkerStyle.SELECTED_FAINT);
 
@@ -126,11 +126,12 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends ImageFrameLay
      *
      * @param toolBelt
      */
-    public MeasurementLayerUI(ToolBelt toolBelt) {
+    public MeasurementLayerUI(ToolBelt toolBelt, CommonPainters<T> commonPainters) {
+        super(commonPainters);
         setDisplayName("Distance");
         setSettingsBuilder(new MeasurementLayerSettingsBuilder<T>(this, toolBelt.getAnnotationPersistenceService()));
         this.toolBelt = toolBelt;
-        addPainter(crossHairPainter);
+        //addPainter(crossHairPainter);
         addPainter(selectedObservationPainter);
         AnnotationProcessor.process(this);
     }
@@ -150,7 +151,7 @@ public class MeasurementLayerUI<T extends JImageUrlCanvas> extends ImageFrameLay
     @Override
     public void clearPainters() {
         super.clearPainters();
-        addPainter(crossHairPainter);
+        //addPainter(crossHairPainter);
         addPainter(selectedObservationPainter);
     }
 
