@@ -8,13 +8,8 @@ import javax.swing.JComponent;
 import java.util.Collection;
 
 /**
- * Container for painters that are used by each MultiLayerUI. JXPainters can't be shared,
- * if they are only the one that was added first to a component will get drawn, the others
- * will do nothing. As a workaround, we store distinct painters that replicate the same
- * functionality, one painter for each LayerUI.
- *
- * The CommonPainters class responds to events tossed onto the EventBus. Use events to
- * update properties of each JXPainter.
+ * Container for painters that are used by each MultiLayerUI. Painters can be shared between each
+ * LayerUI.
  *
  * @author Brian Schlining
  * @since 2015-01-21T13:13:00

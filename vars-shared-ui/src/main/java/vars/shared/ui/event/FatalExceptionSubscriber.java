@@ -121,7 +121,7 @@ public class FatalExceptionSubscriber implements EventTopicSubscriber<Exception>
                 add("ABORTED effort:\nClose all that you have.\nYou ask way too much.");
                 add("The knowledgebase crashed.\nI am the Blue Screen of Death.\nNo one hears your screams.");
                 add("No-one can tell\nwhat God or Heaven will do\nIf you divide by zero.");
-                add("Some bugs have names\nOthers inscruitable numbers\nYours has not even that.");
+                add("Some bugs have names\nOthers inscrutable numbers\nYours has not even that.");
                 add("Riddle for student\nWhat error is so fatal\nIt has no message");
                 add("Technical support\nWould be a flowing source of\nSweet commiseration.");
                 add("Something you entered\ntranscended parameters\nSo much is unknown.");
