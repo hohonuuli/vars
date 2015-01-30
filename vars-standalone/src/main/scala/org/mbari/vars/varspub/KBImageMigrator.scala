@@ -1,24 +1,20 @@
 package org.mbari.vars.varspub
 
-import java.awt.geom.AffineTransform
+
+import com.google.inject.Injector
+import java.awt.image.{BufferedImage}
 import java.awt.{AlphaComposite, Graphics2D}
-import java.awt.image.{AffineTransformOp, BufferedImage}
 import java.io.File
 import java.net.URL
 import java.nio.file.{Files, Paths, Path}
 import javax.imageio.ImageIO
-
-import com.google.inject.Injector
-import org.imgscalr.Scalr
-import org.mbari.awt.image.ImageUtilities
-import org.mbari.io.FileUtilities
-import org.mbari.net.URLUtilities
+import org.slf4j.LoggerFactory
 import scala.collection.JavaConverters._
 import scala.math._
+import scala.sys.process._
+import scala.util.Try
 import vars.knowledgebase.ui.{Lookup, ToolBelt}
 import vars.knowledgebase.{Media, Concept}
-
-import scala.util.Try
 
 /**
  *
@@ -29,6 +25,9 @@ import scala.util.Try
 class KBImageMigrator(target: Path, overlayImageURL: URL, webpath: String = "http://dsg.mbari.org/images/dsg/",
                       overlayPercentWidth: Double = 0.4)(implicit toolBelt: ToolBelt) {
 
+  private[this] val log = LoggerFactory.getLogger(getClass)
+  private[this] val useExiftool = WatermarkUtilities.canUseExiftool()
+  private[this] val year = "2015"
   private[this] val conceptDao = toolBelt.getKnowledgebaseDAOFactory.newConceptDAO()
 
   private[this] val overlayImage = ImageIO.read(overlayImageURL)
@@ -46,7 +45,7 @@ class KBImageMigrator(target: Path, overlayImageURL: URL, webpath: String = "htt
       if (!Files.exists(p.getParent)) {
         Files.createDirectories(p.getParent)
       }
-      ImageUtilities.saveImage(i, p.toFile)
+      WatermarkUtilities.saveImage(i, p.toFile, () => addExif(c, p))
     }
   }
 
@@ -76,6 +75,21 @@ class KBImageMigrator(target: Path, overlayImageURL: URL, webpath: String = "htt
     }.toOption
   }
 
+  def addExif(concept: Concept, path: Path): Unit = {
+    if (useExiftool) {
+      val cmd = Seq("exiftool",
+          s"-Comment=Representative image for ${concept.getPrimaryConceptName.getName}",
+          s"-Copyright=Copyright ${year} Monterey Bay Aquarium Research Institute",
+          path.toString)
+      try {
+        cmd.!!
+      }
+      catch {
+        case e: Exception => log.info(s"Failed to add EXIF to ${path}")
+      }
+    }
+  }
+
 
 }
 
@@ -89,7 +103,7 @@ object KBImageMigrator {
     if (args.size != 2) {
       println(
         """
-          | Process all concept media images and watermark them with an overlay
+          | Process all concept media images and watermark them with an overlay for the external DSG
           |
           | Usage:
           |   KBImageMigrator [target] [overlay]
@@ -97,7 +111,11 @@ object KBImageMigrator {
           | Inputs:
           |   target = the root directory to write the new images to
           |   overlay = the path to the overlay image that will be watermarked onto all images
+          |
+          | Example: KbImageMigrator(Array(
+          |
         """.stripMargin)
+      return
     }
 
     val target = Paths.get(args(0))

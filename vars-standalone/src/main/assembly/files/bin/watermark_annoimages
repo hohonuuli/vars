@@ -5,7 +5,7 @@
 # how to use it.
 
 # Example:
-# watermark_kbimages ~/Desktop/kbimages/dsg ~/Desktop/kbimages/overlay.png
+# watermark_annoimages ~/Desktop/annoimages/framegrabs ~/Desktop/kbimages/overlay.png
 
 VARS_HOME=$(cd $(dirname "$0")/..; pwd)
 VARS_CLASSPATH=$VARS_HOME/conf:$VARS_HOME/lib/*
@@ -14,4 +14,4 @@ ${JAVACMD:=java} -Xms16m -Xmx512m \
          -Duser.timezone=UTC \
          -Dfile.encoding=UTF8 \
          -classpath "$VARS_CLASSPATH" \
-         org.mbari.vars.varspub.KBImageMigrator "$@"
+         org.mbari.vars.varspub.AnnoImageMigrator "$@"
