@@ -11,7 +11,10 @@
         <name>Monterey Bay Aquarium Research Institute</name>
         <url>http://www.mbari.org</url>
     </organization>
-    <url>http://code.google.com/p/vars-redux/</url>
+    <url>https://github.com/hohonuuli/vars</url>
+	<prerequisites>
+	    <maven>3.0.4</maven>
+    </prerequisites>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
@@ -174,11 +177,10 @@
                 <configuration>
                     <archive>
                         <addMavenDescriptor>true</addMavenDescriptor>
-                        <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
                         <manifest>
-                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                        </manifest>
+-                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+-                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+-                        </manifest>
                         <manifestEntries>
                             <environment>${environment}</environment>
                             <url>${pom.url}</url>
