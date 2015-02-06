@@ -19,6 +19,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <commons.email.version>1.3.3</commons.email.version>
+        <commons.imaging.version>1.0-SNAPSHOT</commons.imaging.version>
         <derby.version>10.10.2.0</derby.version>
         <eclipselink.version>2.5.2</eclipselink.version>
         <eventbus.version>1.4</eventbus.version>

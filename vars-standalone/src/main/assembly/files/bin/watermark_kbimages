@@ -14,4 +14,4 @@ ${JAVACMD:=java} -Xms16m -Xmx512m \
          -Duser.timezone=UTC \
          -Dfile.encoding=UTF8 \
          -classpath "$VARS_CLASSPATH" \
-         org.mbari.vars.varspub.KBImageMigrator "$@"
+         org.mbari.vars.varspub.KBImageMigrator2 "$@"
