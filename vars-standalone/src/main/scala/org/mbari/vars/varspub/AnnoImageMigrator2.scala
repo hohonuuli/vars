@@ -46,7 +46,7 @@ class AnnoImageMigrator2(target: Path,
     extends Runnable {
 
   private[this] val now = new Date()
-  private[this] val log = LoggerFactory.getLogger(classOf[AnnoImageMigrator])
+  private[this] val log = LoggerFactory.getLogger(getClass)
   private[this] val timestampFormat = {
     val f = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss")
     f.setTimeZone(TimeZone.getTimeZone("UTC"))
@@ -342,9 +342,7 @@ object AnnoImageMigrator2 {
       val injector = Lookup.getGuiceInjectorDispatcher.getValueObject.asInstanceOf[Injector]
       injector.getInstance(classOf[ToolBelt])
     }
-    val imageMigrator = new AnnoImageMigrator(target, overlayImageURL)
-    val msg = if (imageMigrator.useExiftool) "Found 'exiftool' on this system" else "No 'exiftool' on this system"
-    logger.info(msg)
+    val imageMigrator = new AnnoImageMigrator2(target, overlayImageURL)
     imageMigrator.run()
 
   }
