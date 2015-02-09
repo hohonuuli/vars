@@ -343,7 +343,11 @@
             <name>JBoss Repository</name>
             <url>http://repository.jboss.org/nexus/content/groups/public-jboss/</url>
         </repository>
-
+        <repository>
+            <id>Apache-snapshots</id>
+            <name>Apache Development Snapshot Repository</name>
+            <url>http://repository.apache.org/content/repositories/snapshots/</url>
+        </repository>
     </repositories>
     <reporting>
         <plugins>
