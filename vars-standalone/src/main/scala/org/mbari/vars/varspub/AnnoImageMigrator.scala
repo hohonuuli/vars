@@ -66,7 +66,7 @@ class AnnoImageMigrator(target: Path, overlayImageURL: URL, pathKey: String = "f
   def run(): Unit = {
     for {
       (e, i) <- mapURLs()
-      p <- toTargetPath(e, i) if (i != null)
+      p <- toTargetPath(e, i) if i != null
     } {
 
       try {
@@ -249,7 +249,7 @@ class AnnoImageMigrator(target: Path, overlayImageURL: URL, pathKey: String = "f
 
       val cmd = Seq("exiftool",
         s"-CameraLabel=${vas.getPlatformName}",
-        f"-Comment=Image captured from a video camera mounted on underwater remotely operated vehicle ${vas.getPlatformName} on dive number $dives. The original MBARI video tape number is ${va.getName}. This image is from timecode ${vf.getTimecode} $dateTimeStrForComment. The recorded edited location and environmental measurements at time of capture are Lat=$latitude%.7f  Lon=$longitude%.7f  Depth=$altitude%.1f m  Temp=$temperature%.3f C  Sal=$salinity%.3f PSU  Oxy=$oxygen%.3f ml/l. The Video Annotation and Reference system annotations for this image is/are $conceptStr.",
+        f"-UserComment=Image captured from a video camera mounted on underwater remotely operated vehicle ${vas.getPlatformName} on dive number $dives. The original MBARI video tape number is ${va.getName}. This image is from timecode ${vf.getTimecode} $dateTimeStrForComment. The recorded edited location and environmental measurements at time of capture are Lat=$latitude%.7f  Lon=$longitude%.7f  Depth=$altitude%.1f m  Temp=$temperature%.3f C  Sal=$salinity%.3f PSU  Oxy=$oxygen%.3f ml/l. The Video Annotation and Reference system annotations for this image is/are $conceptStr.",
         s"-CreateDate=$createDateStr",
         s"-DateTimeOriginal=$dateTimeOriginalStr",
         f"-GPSAltitude=${altitude}%.1f",

@@ -71,6 +71,11 @@
             <artifactId>sanselan</artifactId>
             <version>${sanselan.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-imaging</artifactId>
+            <version>${commons.imaging.version}</version>
+        </dependency>
 
         <!-- Need for loading SIMPA -->
         <dependency>
