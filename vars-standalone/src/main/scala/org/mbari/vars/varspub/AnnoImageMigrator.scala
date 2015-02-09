@@ -66,7 +66,7 @@ class AnnoImageMigrator(target: Path, overlayImageURL: URL, pathKey: String = "f
   def run(): Unit = {
     for {
       (e, i) <- mapURLs()
-      p <- toTargetPath(e, i)
+      p <- toTargetPath(e, i) if (i != null)
     } {
 
       try {
