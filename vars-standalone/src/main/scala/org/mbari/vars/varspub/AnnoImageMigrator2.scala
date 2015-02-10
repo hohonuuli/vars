@@ -223,12 +223,12 @@ class AnnoImageMigrator2(target: Path,
     // Use recorded date, if not available use now as a placeholder
     val dateTimeOriginal = Option(vf.getRecordedDate).getOrElse(now)
 
-    val altitude: Float = Option(pd.getDepth.floatValue()).getOrElse(0F)
-    val latitude: Double = Option(pd.getLatitude.doubleValue()).getOrElse(0D)
-    val longitude: Double = Option(pd.getLongitude.doubleValue()).getOrElse(0D)
-    val temperature: Float = Option(pd.getTemperature.floatValue()).getOrElse(-999F)
-    val salinity: Float = Option(pd.getSalinity.floatValue()).getOrElse(-999F)
-    val oxygen: Float = Option(pd.getOxygen.floatValue()).getOrElse(-999F)
+    val altitude: Float = Try(pd.getDepth.floatValue()).getOrElse(0F)
+    val latitude: Double = Try(pd.getLatitude.doubleValue()).getOrElse(0D)
+    val longitude: Double = Try(pd.getLongitude.doubleValue()).getOrElse(0D)
+    val temperature: Float = Try(pd.getTemperature.floatValue()).getOrElse(-999F)
+    val salinity: Float = Try(pd.getSalinity.floatValue()).getOrElse(-999F)
+    val oxygen: Float = Try(pd.getOxygen.floatValue()).getOrElse(-999F)
 
     val dateTimeStrForComment = Option(vf.getRecordedDate).map("and time " + timestampFormat.format(_)).getOrElse("")
     val yearsString = yearFormat.format(dateTimeOriginal)
@@ -243,9 +243,9 @@ class AnnoImageMigrator2(target: Path,
         s"vehicle ${vas.getPlatformName} on dive number $dives. The original MBARI video " +
         s"tape number is ${va.getName}. This image is from timecode ${vf.getTimecode} " +
         s"$dateTimeStrForComment. The recorded edited location and environmental " +
-        s"measurements at time of capture are Lat=$latitude%.7f  Lon=$longitude%.7f  " +
-        s"Depth=$altitude%.1f m  Temp=$temperature%.3f C  Sal=$salinity%.3f PSU  " +
-        s"Oxy=$oxygen%.3f ml/l. The Video Annotation and Reference system annotations for" +
+        f"measurements at time of capture are Lat=$latitude%.7f  Lon=$longitude%.7f  " +
+        f"Depth=$altitude%.1f m  Temp=$temperature%.3f C  Sal=$salinity%.3f PSU  " +
+        f"Oxy=$oxygen%.3f ml/l. The Video Annotation and Reference system annotations for" +
         s" this image is/are $conceptStr.",
       createDate,
       dateTimeOriginal,
