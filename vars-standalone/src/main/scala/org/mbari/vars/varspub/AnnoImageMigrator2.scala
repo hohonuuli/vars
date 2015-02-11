@@ -80,7 +80,12 @@ class AnnoImageMigrator2(target: Path,
           os.write(jpegBytes)
           os.close()
         })
-        log.debug(s"Prepped image from $i to $p for external release")
+        log.debug(s"""
+          | Prepped image for external release:
+          | \tInternal: $i
+          | \tExternal: $e
+          | \tTarget  : $p
+          | """.stripMargin)
       } catch {
         case e: Exception => log.debug("Failed to watermark {}", e)
       }
