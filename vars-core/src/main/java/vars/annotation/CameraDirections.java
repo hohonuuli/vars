@@ -11,7 +11,8 @@ public enum CameraDirections {
 
     ASCEND("ascend"), CRUISE("cruise"), DESCEND("descend"), DIELTRANSECT("diel transect"),
     ENDTRANSECT("endtransect"), LAUNCH("launch"), STARTTRANSECT("starttransect"),
-    STATIONARY("stationary"), TRANSECT("transect"), UNSPECIFIED("unspecified");
+    STATIONARY("stationary"), TRANSECT("transect"), OFFTRANSECT("off transect"),
+    UNSPECIFIED("unspecified");
 
     private final String direction;
 
