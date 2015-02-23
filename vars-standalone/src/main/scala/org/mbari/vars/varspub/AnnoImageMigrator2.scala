@@ -85,7 +85,7 @@ class AnnoImageMigrator2(target: Path,
           | \tExternal: $e
           | \tTarget  : $p""".stripMargin)
       } catch {
-        case e: Exception => log.debug("Failed to watermark {}", e)
+        case e: Exception => log.debug(s"Failed to watermark $i", e)
       }
     }
   }
@@ -113,17 +113,19 @@ class AnnoImageMigrator2(target: Path,
 
     if (externalImageExists) None
     else {
-      val idx = internal.toLowerCase.indexOf(pathKey.toLowerCase)
-      val parts = internal.substring(idx + pathKey.size).split("/")
+      Try {
+        val idx = internal.toLowerCase.indexOf(pathKey.toLowerCase)
+        val parts = internal.substring(idx + pathKey.size).split("/")
 
-      // TODO: externalTarget doesn't always seem to map correctly
-      val externalTarget = Paths.get(target.toString, parts: _*)
-      val externalDir = externalTarget.getParent
-      if (Files.notExists(externalDir)) {
-        log.info("Creating {}", externalDir)
-        Files.createDirectories(externalDir)
-      }
-      Some(externalTarget)
+        // TODO: externalTarget doesn't always seem to map correctly
+        val externalTarget = Paths.get(target.toString, parts: _*)
+        val externalDir = externalTarget.getParent
+        if (Files.notExists(externalDir)) {
+          log.info("Creating {}", externalDir)
+          Files.createDirectories(externalDir)
+        }
+        Some(externalTarget)
+      } getOrElse(None) // TODO this swalows exceptions. Need to report them
     }
   }
 
