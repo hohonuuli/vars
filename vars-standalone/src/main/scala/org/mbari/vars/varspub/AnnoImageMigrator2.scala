@@ -3,10 +3,10 @@ package org.mbari.vars.varspub
 import java.awt.image.BufferedImage
 import java.io._
 import java.net.URL
-import java.nio.file.{Files, Paths, Path}
-import java.sql.{ResultSet, DriverManager}
+import java.nio.file.{ Files, Paths, Path }
+import java.sql.{ ResultSet, DriverManager }
 import java.text.SimpleDateFormat
-import java.util.{TimeZone, Date}
+import java.util.{ TimeZone, Date }
 import javax.imageio.ImageIO
 
 import com.google.inject.Injector
@@ -14,15 +14,15 @@ import org.apache.commons.imaging.Imaging
 import org.apache.commons.imaging.common.RationalNumber
 import org.apache.commons.imaging.formats.jpeg.JpegImageMetadata
 import org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter
-import org.apache.commons.imaging.formats.tiff.constants.{GpsTagConstants, TiffTagConstants, TiffEpTagConstants, ExifTagConstants}
+import org.apache.commons.imaging.formats.tiff.constants.{ GpsTagConstants, TiffTagConstants, TiffEpTagConstants, ExifTagConstants }
 import org.apache.commons.imaging.formats.tiff.write.TiffOutputSet
 import org.slf4j.LoggerFactory
 import vars.annotation.ui.ToolBelt
-import vars.knowledgebase.ui.{Lookup}
+import vars.knowledgebase.ui.{ Lookup }
 
 import scala.collection.mutable
 import scala.math._
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 import scala.collection.JavaConverters._
 
 /**
@@ -40,10 +40,10 @@ import scala.collection.JavaConverters._
  * @since 2014-11-21T11:01:00
  */
 class AnnoImageMigrator2(target: Path,
-                         overlayImageURL: URL,
-                         pathKey: String = "framegrabs",
-                        overlayPercentWidth: Double = 0.4)(implicit toolBelt: ToolBelt)
-    extends Runnable {
+  overlayImageURL: URL,
+  pathKey: String = "framegrabs",
+  overlayPercentWidth: Double = 0.4)(implicit toolBelt: ToolBelt)
+  extends Runnable {
 
   private[this] val now = new Date()
   private[this] val log = LoggerFactory.getLogger(getClass)
@@ -74,19 +74,21 @@ class AnnoImageMigrator2(target: Path,
 
       try {
         val image = ImageIO.read(new URL(i))
-        watermark(image, overlayImage).foreach( image => {
+        watermark(image, overlayImage).foreach(image => {
           val jpegBytes = addExif(i, image)
           val os = new BufferedOutputStream(new FileOutputStream(p.toFile))
           os.write(jpegBytes)
           os.close()
         })
-      }
-      catch {
-        case e: Exception => log.info("Failed to watermark {}", e)
+        log.debug(s"""Prepped image for external release:
+          | \tInternal: $i
+          | \tExternal: $e
+          | \tTarget  : $p""".stripMargin)
+      } catch {
+        case e: Exception => log.debug("Failed to watermark {}", e)
       }
     }
   }
-
 
   /**
    * Maps the URL's to a fully-qualified path that a watermarked image will
@@ -98,14 +100,24 @@ class AnnoImageMigrator2(target: Path,
    *         the image already exists (so there's no need to updated it)
    */
   private def toTargetPath(external: String, internal: String): Option[Path] = {
-    val externalURL = new URL(external)
-    if (WatermarkUtilities.imageExistsAt(externalURL)) None
+
+    // True if the image alreay exists on the external web server  
+    // If an external URL is bogus this will also return True so that no copy is attempted  
+    val externalImageExists: Boolean = Try {
+      val externalURL = new URL(external)
+      WatermarkUtilities.imageExistsAt(externalURL)
+    } match {
+      case Success(a) => a
+      case Failure(_) => true
+    }
+
+    if (externalImageExists) None
     else {
       val idx = internal.toLowerCase.indexOf(pathKey.toLowerCase)
       val parts = internal.substring(idx + pathKey.size).split("/")
 
       // TODO: externalTarget doesn't always seem to map correctly
-      val externalTarget = Paths.get(target.toString, parts:_*)
+      val externalTarget = Paths.get(target.toString, parts: _*)
       val externalDir = externalTarget.getParent
       if (Files.notExists(externalDir)) {
         log.info("Creating {}", externalDir)
@@ -214,21 +226,21 @@ class AnnoImageMigrator2(target: Path,
 
     // Use the earliest observation date in the videoframe. If none are available will use now as a placeholder
     val createDate = Try(vf.getObservations
-        .asScala
-        .map(_.getObservationDate)
-        .sortBy(_.getTime)
-        .head)
-        .getOrElse(now)
+      .asScala
+      .map(_.getObservationDate)
+      .sortBy(_.getTime)
+      .head)
+      .getOrElse(now)
 
     // Use recorded date, if not available use now as a placeholder
     val dateTimeOriginal = Option(vf.getRecordedDate).getOrElse(now)
 
-    val altitude: Float = Option(pd.getDepth.floatValue()).getOrElse(0F)
-    val latitude: Double = Option(pd.getLatitude.doubleValue()).getOrElse(0D)
-    val longitude: Double = Option(pd.getLongitude.doubleValue()).getOrElse(0D)
-    val temperature: Float = Option(pd.getTemperature.floatValue()).getOrElse(-999F)
-    val salinity: Float = Option(pd.getSalinity.floatValue()).getOrElse(-999F)
-    val oxygen: Float = Option(pd.getOxygen.floatValue()).getOrElse(-999F)
+    val altitude: Float = Try(pd.getDepth.floatValue()).getOrElse(0F)
+    val latitude: Double = Try(pd.getLatitude.doubleValue()).getOrElse(0D)
+    val longitude: Double = Try(pd.getLongitude.doubleValue()).getOrElse(0D)
+    val temperature: Float = Try(pd.getTemperature.floatValue()).getOrElse(-999F)
+    val salinity: Float = Try(pd.getSalinity.floatValue()).getOrElse(-999F)
+    val oxygen: Float = Try(pd.getOxygen.floatValue()).getOrElse(-999F)
 
     val dateTimeStrForComment = Option(vf.getRecordedDate).map("and time " + timestampFormat.format(_)).getOrElse("")
     val yearsString = yearFormat.format(dateTimeOriginal)
@@ -240,13 +252,13 @@ class AnnoImageMigrator2(target: Path,
     }).mkString("'", ",", "'")
 
     Option(ExifInfo("Image captured from a video camera mounted on underwater remotely operated " +
-        s"vehicle ${vas.getPlatformName} on dive number $dives. The original MBARI video " +
-        s"tape number is ${va.getName}. This image is from timecode ${vf.getTimecode} " +
-        s"$dateTimeStrForComment. The recorded edited location and environmental " +
-        s"measurements at time of capture are Lat=$latitude%.7f  Lon=$longitude%.7f  " +
-        s"Depth=$altitude%.1f m  Temp=$temperature%.3f C  Sal=$salinity%.3f PSU  " +
-        s"Oxy=$oxygen%.3f ml/l. The Video Annotation and Reference system annotations for" +
-        s" this image is/are $conceptStr.",
+      s"vehicle ${vas.getPlatformName} on dive number $dives. The original MBARI video " +
+      s"tape number is ${va.getName}. This image is from timecode ${vf.getTimecode} " +
+      s"$dateTimeStrForComment. The recorded edited location and environmental " +
+      f"measurements at time of capture are Lat=$latitude%.7f  Lon=$longitude%.7f  " +
+      f"Depth=$altitude%.1f m  Temp=$temperature%.3f C  Sal=$salinity%.3f PSU  " +
+      f"Oxy=$oxygen%.3f ml/l. The Video Annotation and Reference system annotations for" +
+      s" this image is/are $conceptStr.",
       createDate,
       dateTimeOriginal,
       altitude,
@@ -254,7 +266,6 @@ class AnnoImageMigrator2(target: Path,
       longitude))
 
   }
-
 
   /**
    * Create a Map of [external image URL] -> [internal image URL] for all annotation images
@@ -300,20 +311,16 @@ class AnnoImageMigrator2(target: Path,
     urls
   }
 
-
-
   /**
    * Watermark and image
    * @param image The bufferedimage to modify
    * @param overlay The overlay to use
    * @return The watermarked image, None is returned if the watermarking fails
    */
-  private def watermark(image: BufferedImage, overlay: BufferedImage) : Option[BufferedImage] =
-      Try(WatermarkUtilities.addWatermarkImage(image, overlay, overlayPercentWidth)).toOption
-
+  private def watermark(image: BufferedImage, overlay: BufferedImage): Option[BufferedImage] =
+    Try(WatermarkUtilities.addWatermarkImage(image, overlay, overlayPercentWidth)).toOption
 
 }
-
 
 object AnnoImageMigrator2 {
 
@@ -347,12 +354,11 @@ object AnnoImageMigrator2 {
 
   }
 
-
 }
 
 case class ExifInfo(userComment: String,
-                       createDate: Date,
-                       dateTimeOriginal: Date,
-                       gpsAltitude: Float,
-                       gpsLatitude: Double,
-                       gpsLongitude: Double)
+  createDate: Date,
+  dateTimeOriginal: Date,
+  gpsAltitude: Float,
+  gpsLatitude: Double,
+  gpsLongitude: Double)

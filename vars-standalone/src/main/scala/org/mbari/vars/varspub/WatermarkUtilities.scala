@@ -90,7 +90,7 @@ object WatermarkUtilities {
    * @return true if an image was found at the URL, false otherwise
    */
   def imageExistsAt(url: URL): Boolean = {
-    log.info("Attempting to read image at {}", url)
+    log.debug("Attempting to read image at {}", url)
     Try {
       val inputStream = url.openStream()
       val buf = Array.ofDim[Byte](6)
@@ -98,7 +98,7 @@ object WatermarkUtilities {
       inputStream.close()
       true
     } getOrElse {
-      log.info("Failed to read {}", url)
+      log.debug("Failed to read {}", url)
       false
     }
   }
