@@ -346,7 +346,7 @@
         <repository>
             <id>Apache-snapshots</id>
             <name>Apache Development Snapshot Repository</name>
-            <url>http://repository.apache.org/content/repositories/snapshots/</url>
+            <url>https://repository.apache.org/content/repositories/snapshots/</url>
         </repository>
     </repositories>
     <reporting>
