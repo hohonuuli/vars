@@ -1,6 +1,6 @@
 package org.mbari.biauv.integration
 
-import reflect.BeanProperty
+import scala.beans.BeanProperty
 import scala.collection.JavaConversions._
 
 /**
