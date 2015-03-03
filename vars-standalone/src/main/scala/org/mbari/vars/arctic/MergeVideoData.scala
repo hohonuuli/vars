@@ -5,7 +5,7 @@ import java.io.File
 import java.util.{TimeZone, Date}
 
 import com.google.inject.Injector
-import org.mbari.math.Collator
+import org.mbari.math.{FastCollator, Collator}
 import org.mbari.movie.Timecode
 import org.slf4j.LoggerFactory
 import vars.annotation.VideoFrame
@@ -32,7 +32,7 @@ class MergeVideoData(videoFrames: Iterable[VideoFrame], logRecords: Iterable[Ful
 
 
   def collate(): Seq[(VideoFrame, Option[FullLogRecord])] = {
-    val collated = Collator(videoFrames, videoFrameToSeconds, logRecords, logRecordToSeconds, 15)
+    val collated = FastCollator(videoFrames, videoFrameToSeconds, logRecords, logRecordToSeconds, 15)
     if (log.isDebugEnabled) {
       val (good, bad) = collated.map(_._2).partition(_.isDefined)
       log.debug(s"Of ${logRecords.size} log lines , ${good.size} matched videoframes by date. ${bad.size} videoframe had no matching log data.")
@@ -45,8 +45,14 @@ class MergeVideoData(videoFrames: Iterable[VideoFrame], logRecords: Iterable[Ful
     dao.startTransaction()
     val ys = for {
       (videoFrame, logRecord) <- xs
-      r <- logRecord
     } yield {
+
+      // Set existing values to null if no match is found
+      val r = logRecord match {
+        case Some(lr) => lr
+        case None => MergeVideoData.NullLogRecord
+      }
+
       val vf = dao.find(videoFrame)
       val pd = vf.getPhysicalData
       // HACK! Call into Java to allow setting of null Float and Double values
@@ -66,11 +72,12 @@ class MergeVideoData(videoFrames: Iterable[VideoFrame], logRecords: Iterable[Ful
 
 
 /**
- * file:/Volumes/VARSMissionData/2012/Arctic/Dive_7_8_9/2012_Arctic_dive_7.mp4 "/Volumes/VARSMissionData/2012/Arctic/Arctic2012 data/9_28_2012/Dive7_log.csv" "2012-09-28 00:00:00"
  */
 object MergeVideoData {
 
   private[this] val log = LoggerFactory.getLogger(getClass)
+
+  val NullLogRecord = RawLogRecord(None, None, None, None, None, "")
 
   def lookupVideoFrames(videoArchiveName: String): Iterable[VideoFrame] = {
     val dao = toolbelt.getAnnotationDAOFactory.newVideoArchiveDAO()
@@ -93,7 +100,7 @@ object MergeVideoData {
     injector.getInstance(classOf[ToolBelt])
   }
 
-  def apply(videoArchiveName: String, logFile: File, startDate: Date) = {
+  def apply(videoArchiveName: String, logFile: File, startDate: Date): Unit = {
     val raw = CSVLogReader(logFile)
     val full = MergeUtilities.toFullLogRecords(raw, startDate)
     val videoFrames = lookupVideoFrames(videoArchiveName)

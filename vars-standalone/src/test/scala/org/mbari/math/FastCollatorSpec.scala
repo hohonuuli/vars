@@ -3,27 +3,28 @@ package org.mbari.math
 import java.util.Date
 
 import org.junit.runner.RunWith
+import org.scalatest.{Matchers, FlatSpec}
 import org.scalatest.junit.JUnitRunner
-import org.scalatest.{FlatSpec, Matchers}
 
 /**
  *
  *
  * @author Brian Schlining
- * @since 2015-02-25T15:02:00
+ * @since 2015-03-02T16:27:00
  */
+
 @RunWith(classOf[JUnitRunner])
-class CollatorSpec extends FlatSpec with Matchers {
+class FastCollatorSpec extends FlatSpec with Matchers {
 
 
-  "Collator" should "collate doubles" in {
+  "FastCollator" should "collate doubles" in {
 
     val a = Array[Double](10, 20, 30, 40, 50, 60)
     val b = a.map(_ + 4)
 
     def fn(v: Double) = v
 
-    val actual = Collator(a, fn, b, fn, 5).toArray
+    val actual = FastCollator(a, fn, b, fn, 5).toArray
 
     val expected = a.zip(b.map(Option(_)))
 
@@ -39,7 +40,7 @@ class CollatorSpec extends FlatSpec with Matchers {
     def fnA(v: Int) = v.toDouble
     def fnB(v: Double) = v
 
-    val actual = Collator(a, fnA, b, fnB, 1).toArray
+    val actual = FastCollator(a, fnA, b, fnB, 1).toArray
 
     val expected = Array[(Int, Option[Double])](1 -> Some(1D),
       3 -> None,
@@ -63,11 +64,11 @@ class CollatorSpec extends FlatSpec with Matchers {
     def fnA(v: Int) = v.toDouble
     def fnB(v: Double) = v
 
-    val actual = Collator(a, fnA, b, fnB, 5).toArray
+    val actual = FastCollator(a, fnA, b, fnB, 5).toArray
 
     val expected = Array[(Int, Option[Double])](1 -> Some(1D),
       3 -> Some(1D),
-      4 -> Some(7D),
+      4 -> Some(1D),
       5 -> Some(7D),
       6 -> Some(7D),
       20 -> Some(21D),
@@ -84,7 +85,7 @@ class CollatorSpec extends FlatSpec with Matchers {
     val b = a.map(_.toDouble + 4)
 
     // Coallating numeric values does not require conversion functions
-    val actual = Collator(a, b, 5).toArray
+    val actual = FastCollator(a, b, 5).toArray
 
     val expected = a.zip(b.map(Option(_)))
 
@@ -96,7 +97,7 @@ class CollatorSpec extends FlatSpec with Matchers {
     val d0 = (1424910349953L to (1424910349953L + dt * 10) by dt).map(t => TestBean(new Date(t)))
     val d1 = d0.tail
     def fn(t: TestBean) = t.date.getTime.toDouble
-    val actual = Collator(d0, fn, d1, fn, dt / 3)
+    val actual = FastCollator(d0, fn, d1, fn, dt / 3)
     actual.head._2 should be(None)
   }
 

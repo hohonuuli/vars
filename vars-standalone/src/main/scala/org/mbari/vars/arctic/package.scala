@@ -10,6 +10,7 @@ import java.util.Date
  */
 package object arctic {
 
+
   trait LogRecord {
     def salinity: Option[Float]
     def temperature: Option[Float]
@@ -40,5 +41,7 @@ package object arctic {
                            longitude: Option[Double],
                            gpsTime: String,
                            gpsDate: Date) extends LogRecord
+
+  case class SimplePosition(time: Date, latitude: Double, longitude: Double)
 
 }

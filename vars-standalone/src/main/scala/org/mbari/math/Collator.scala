@@ -31,6 +31,7 @@ object Collator {
   }
 
 
+  // TODO: Switch to using binary search
   def apply[A, B](d0: Iterable[A], fn0: A => Double,
                   d1: Iterable[B], fn1: B => Double,
                   tolerance: Double): Seq[(A, Option[B])] = {
