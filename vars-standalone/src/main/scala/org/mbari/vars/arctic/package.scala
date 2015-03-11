@@ -44,4 +44,6 @@ package object arctic {
 
   case class SimplePosition(time: Date, latitude: Double, longitude: Double)
 
+
+
 }

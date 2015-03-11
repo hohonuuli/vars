@@ -28,7 +28,7 @@ object CSVLogReader {
 
   private def parseFloat(s: String): Option[Float] = Try(s.toFloat).toOption
 
-  def lineToLogRecord(line: String): Option[RawLogRecord] = Try {
+  def parseLine(line: String): Option[RawLogRecord] = Try {
 
     // 0         1 2 3 4         5   6         7   8     9   10   11
     // $(HEADER),C,T,D,TIME(CTD),SAL,TIME(GPS),HDG,DEPTH,LAT,LONG,SPEED
@@ -45,7 +45,7 @@ object CSVLogReader {
   def apply(file: File): Seq[RawLogRecord] = {
     val source = Source.fromFile(file)
     val lines = source.getLines()
-    val records = lines.filter(!_.startsWith("#")).flatMap(lineToLogRecord)
+    val records = lines.filter(!_.startsWith("#")).flatMap(parseLine)
     val rs = records.toSeq
     //source.close() // Do NOT close before evaluating records. (THey're lazy)
     rs

@@ -79,7 +79,7 @@ class MergeUtilitiesSpec extends FlatSpec with Matchers {
     val df = GlobalLookup.DATE_FORMAT_UTC
     val startDate = df.parse("2012-09-28 12:34:56")
     val records = MergeUtilities.toFullLogRecords(
-      lines.split('\n').flatMap(CSVLogReader.lineToLogRecord(_)), startDate)
+      lines.split('\n').flatMap(CSVLogReader.parseLine(_)), startDate)
 
     records(0).gpsDate should be(df.parse("2012-09-28 23:21:20"))
     records(1).gpsDate should be(df.parse("2012-09-28 23:21:21"))
