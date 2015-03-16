@@ -17,5 +17,6 @@ class MergeVideoDataSpec extends FlatSpec with Matchers {
 
   "MergeVideoData" should "get the correct dates from the log file" in {
 
+
   }
 }

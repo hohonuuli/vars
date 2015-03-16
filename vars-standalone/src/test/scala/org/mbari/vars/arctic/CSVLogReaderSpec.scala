@@ -15,7 +15,7 @@ class CSVLogReaderSpec extends FlatSpec with Matchers with PrivateMethodTester {
 
   val parseLatLon = PrivateMethod[Option[Double]]('parseLatLon)
   val parseFloat = PrivateMethod[Option[Float]]('parseFloat)
-  val lineToLogRecord = PrivateMethod[Option[RawLogRecord]]('lineToLogRecord)
+  //val lineToLogRecord = PrivateMethod[Option[RawLogRecord]]('lineToLogRecord)
 
 
   "CVSLogReader" should "parse that funky position format" in {
@@ -45,7 +45,8 @@ class CSVLogReaderSpec extends FlatSpec with Matchers with PrivateMethodTester {
 
   it should "parse a logs line correctly" in {
     val line = "$MINIROV_SHIP,26.785400,-1.280400,136.354000,17:25:02,33.323200,00:22:24,343.22,144,7050.0172,13506.9040,00.1"
-    val actual = CSVLogReader invokePrivate lineToLogRecord(line)
+    //val actual = CSVLogReader invokePrivate lineToLogRecord(line)
+    val actual = CSVLogReader.parseLine(line)
     actual should not be (None)
     val r = actual.get
     r.salinity should not be (None)
@@ -65,7 +66,8 @@ class CSVLogReaderSpec extends FlatSpec with Matchers with PrivateMethodTester {
 
   it should "return None when parsing an invalid line" in {
     val line = "$EVENT,36,9/28/2012 5:52:31 PM,#ME,cobble"
-    val actual = CSVLogReader invokePrivate lineToLogRecord(line)
+    //val actual = CSVLogReader invokePrivate lineToLogRecord(line)
+    val actual = CSVLogReader.parseLine(line)
     actual should be (None)
   }
 
@@ -105,9 +107,10 @@ class CSVLogReaderSpec extends FlatSpec with Matchers with PrivateMethodTester {
 
 
   it should "process multiple lines correctly" in {
-    val records = lines.split('\n').map(l => CSVLogReader invokePrivate lineToLogRecord(l))
+    //val records = lines.split('\n').map(l => CSVLogReader invokePrivate lineToLogRecord(l))
+    val records = lines.split('\n').map(l => CSVLogReader.parseLine(l))
     records.size should be (32)                // 32 lines total
-    records.filter(_.isDefined) should be (29) // 2 lines are empty and should map to null
+    records.filter(_.isDefined).size should be (30) // 2 lines are empty and should map to null
   }
 
 

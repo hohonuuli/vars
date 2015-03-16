@@ -11,7 +11,8 @@ import java.util.Date
 package object arctic {
 
 
-  trait LogRecord {
+
+  trait ILogRecord {
     def salinity: Option[Float]
     def temperature: Option[Float]
     def depth: Option[Float]
@@ -20,12 +21,21 @@ package object arctic {
     def gpsTime: String
   }
 
+  /**
+   *
+   * @param salinity psu
+   * @param temperature C
+   * @param depth Preferable in meters
+   * @param latitude Decimal lat +n/-s
+   * @param longitude Decimal long -W/+E
+   * @param gpsTime Time as string formated as HH:mm:ss
+   */
   case class RawLogRecord(salinity: Option[Float],
                           temperature: Option[Float],
                           depth: Option[Float],
                           latitude: Option[Double],
                           longitude: Option[Double],
-                          gpsTime: String) extends LogRecord {
+                          gpsTime: String) extends ILogRecord {
 
     def asFullLogRecord(gpsDate: Date): FullLogRecord = FullLogRecord(salinity,
         temperature, depth, latitude, longitude, gpsTime, gpsDate)
@@ -40,10 +50,10 @@ package object arctic {
                            latitude: Option[Double],
                            longitude: Option[Double],
                            gpsTime: String,
-                           gpsDate: Date) extends LogRecord
+                           gpsDate: Date) extends ILogRecord
+
 
   case class SimplePosition(time: Date, latitude: Double, longitude: Double)
-
 
 
 }

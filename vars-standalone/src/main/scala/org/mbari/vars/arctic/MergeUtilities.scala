@@ -24,7 +24,7 @@ object MergeUtilities {
    * @param records The log records to check
    * @return A sequences of indexes where the rollover occurred
    */
-  def findClockRollover(records: Iterable[RawLogRecord]): Seq[Int] = {
+  def findClockRollover(records: Iterable[ILogRecord]): Seq[Int] = {
 
     // Returns rollovers in reverse order. Remember to flip the returned array!!
     def findRollovers(xs: Array[Double], accum: List[Int] = Nil, i: Int = 0): Seq[Int] = {
