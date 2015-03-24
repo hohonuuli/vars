@@ -196,7 +196,7 @@ class AnnoImageMigrator2(target: Path,
     gpsDirectory.removeField(GpsTagConstants.GPS_TAG_GPS_PROCESSING_METHOD)
     gpsDirectory.add(GpsTagConstants.GPS_TAG_GPS_PROCESSING_METHOD, "MANUAL")
 
-    WatermarkUtilities.addExif(jpegBytes, outputSet)
+    WatermarkUtilities.addExifAsJPG(jpegBytes, outputSet)
 
   }
 

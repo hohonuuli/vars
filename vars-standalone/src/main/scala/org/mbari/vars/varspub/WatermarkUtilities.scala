@@ -4,7 +4,8 @@ import java.awt.{AlphaComposite, Graphics2D}
 import java.awt.image.{RenderedImage, BufferedImage}
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream, File, IOException}
 import java.net.URL
-import javax.imageio.ImageIO
+import javax.imageio.metadata.IIOMetadataNode
+import javax.imageio.{IIOImage, ImageTypeSpecifier, ImageIO}
 
 import org.apache.commons.imaging.Imaging
 import org.apache.commons.imaging.formats.jpeg.JpegImageMetadata
@@ -103,13 +104,26 @@ object WatermarkUtilities {
     }
   }
 
-  def toJpegByteArray(image: BufferedImage): Array[Byte] = {
-    // -- Convert BufferedImage to a jpeg in a byte array
+  /**
+   * Convert a buffered image to an array of bytes in JPEG format
+   * @param image
+   * @return
+   */
+  def toJpegByteArray(image: BufferedImage): Array[Byte] = toImageByteArray(image, "jpg")
+
+  /**
+   * Convert a buffered image to an array of bytes in PNG format
+   * @param image
+   * @return
+   */
+  def toPngByteArray(image: BufferedImage): Array[Byte] = toImageByteArray(image, "png")
+
+  def toImageByteArray(image: BufferedImage, format: String): Array[Byte] = {
     val os0 = new ByteArrayOutputStream
-    ImageIO.write(image, "jpg", os0)
-    val jpegBytes = os0.toByteArray
+    ImageIO.write(image, format, os0)
+    val imageBytes = os0.toByteArray
     os0.close()
-    jpegBytes
+    imageBytes
   }
 
   def getOrCreateOutputSet(jpegBytes: Array[Byte]): TiffOutputSet = {
@@ -124,7 +138,13 @@ object WatermarkUtilities {
     outputSet
   }
 
-  def addExif(jpegBytes: Array[Byte], outputSet: TiffOutputSet): Array[Byte] = {
+  /**
+   * Add EXIF metadata to a JPG image for storing metadata.
+   * @param jpegBytes an image formatted as JPG bytes.
+   * @param outputSet Contains the metadata to write
+   * @return An image representation as as JPG bytes with metadata added.
+   */
+  def addExifAsJPG(jpegBytes: Array[Byte], outputSet: TiffOutputSet): Array[Byte] = {
     val os1 = new ByteArrayOutputStream
     val is1 = new ByteArrayInputStream(jpegBytes)
     (new ExifRewriter).updateExifMetadataLossless(is1, os1, outputSet)
@@ -132,6 +152,50 @@ object WatermarkUtilities {
     os1.close()
     is1.close()
     jpegWithExifBytes
+  }
+
+  /**
+   * Add iTXt nodes to a PNG image for storing metadata. Accepted keywords are found at
+   * http://www.w3.org/TR/PNG/#11textinfo
+   *
+   * @param image The bufferedimage to add metadata to
+   * @param txt A key-value map of metadata. See http://www.w3.org/TR/PNG/#11textinfo for
+   *            predefined keywords
+   * @return A byte array in PNG format
+   */
+  def addMetadataAsPNG(image: BufferedImage, txt: Map[String, String]): Array[Byte] = {
+    // http://www.w3.org/TR/PNG/#11textinfo
+    // https://stackoverflow.com/questions/6495518/writing-image-metadata-in-java-preferably-png
+    val writer = ImageIO.getImageWritersByFormatName("png").next()
+    val writeParam = writer.getDefaultWriteParam
+    val typeSpecifier = ImageTypeSpecifier.createFromBufferedImageType(BufferedImage.TYPE_INT_RGB)
+
+    // Add metadata
+    val metadata = writer.getDefaultImageMetadata(typeSpecifier, writeParam)
+
+    // I include notes to write tEXt nodes instead
+    val text = new IIOMetadataNode("iTXt")               // new IIOMetadataNode("tEXt")
+    for ((key, value) <- txt) {
+      val textEntry = new IIOMetadataNode("iTXtEntry")   // new IIOMetadataNode("tEXtEntry")
+      textEntry.setAttribute("keyword", key)
+      textEntry.setAttribute("text", value)              // textEntry.setAttribute("value", value)
+      textEntry.setAttribute("compressionFlag", "FALSE") // Comment out for tEXt
+      textEntry.setAttribute("compressionMethod", "0")   // Comment out for tEXt
+      textEntry.setAttribute("languageTag", "en-US")     // Comment out for tEXt
+      textEntry.setAttribute("translatedKeyword", key)   // Comment out for tEXt
+      text.appendChild(textEntry)
+    }
+
+    val root = new IIOMetadataNode("javax_imageio_png_1.0")
+    root.appendChild(text)
+    metadata.mergeTree("javax_imageio_png_1.0", root)
+
+    // write image
+    val os = new ByteArrayOutputStream()
+    val stream = ImageIO.createImageOutputStream(os)
+    writer.setOutput(stream)
+    writer.write(metadata, new IIOImage(image, null, metadata), writeParam)
+    os.toByteArray
   }
 
 }
