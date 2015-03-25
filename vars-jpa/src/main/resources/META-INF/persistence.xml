@@ -22,7 +22,7 @@
             <property name="javax.persistence.jdbc.password" value="${KNOWLEDGEBASE_JDBC_PASSWORD}"/>
             <property name="eclipselink.cache.type.default" value="Weak" />
             <property name="eclipselink.cache.shared.default" value="false"/>
-            <property name="eclipselink.logging.level" value="CONFIG"/>
+            <property name="eclipselink.logging.level" value="INFO"/>
             <property name="eclipselink.weaving" value="static" />
             <!-- <property name="eclipselink.jdbc.bind-parameters" value="false"/> -->
         </properties>
@@ -48,7 +48,7 @@
             <!-- property name="eclipselink.cache.type.default" value="NONE" / -->
             <!-- property name="eclipselink.cache.shared.default" value="false"/ -->
             <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
-            <property name="eclipselink.logging.level" value="CONFIG"/>
+            <property name="eclipselink.logging.level" value="INFO"/>
             <property name="eclipselink.weaving" value="static" />
             <!-- <property name="eclipselink.jdbc.bind-parameters" value="false"/> -->
         </properties>
@@ -66,7 +66,7 @@
             <property name="javax.persistence.jdbc.password" value="${MISC_JDBC_PASSWORD}"/>
             <property name="eclipselink.cache.type.default" value="Weak" />
             <property name="eclipselink.cache.shared.default" value="false"/>
-            <property name="eclipselink.logging.level" value="CONFIG"/>
+            <property name="eclipselink.logging.level" value="INFO"/>
             <property name="eclipselink.weaving" value="static" />
             <!-- <property name="eclipselink.jdbc.bind-parameters" value="false"/> -->
         </properties>
@@ -99,10 +99,9 @@
             <property name="javax.persistence.jdbc.user" value="sa"/>
             <property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.ClientDriver"/>
             <property name="javax.persistence.jdbc.password" value=""/>
-            <property name="eclipselink.logging.level" value="FINE"/>
 
             <!-- Logging -->
-            <property name="eclipselink.logging.level" value="CONFIG" />
+            <property name="eclipselink.logging.level" value="FINE"/>
             <property name="eclipselink.logging.timestamp" value="false" />
             <property name="eclipselink.logging.session" value="false" />
             <property name="eclipselink.logging.thread" value="false" />

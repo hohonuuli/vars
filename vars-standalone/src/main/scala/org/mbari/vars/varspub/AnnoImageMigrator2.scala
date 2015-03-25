@@ -115,7 +115,7 @@ class AnnoImageMigrator2(target: Path,
     else {
       Try {
         val idx = internal.toLowerCase.indexOf(pathKey.toLowerCase)
-        val parts = internal.substring(idx + pathKey.size).split("/")
+        val parts = internal.substring(idx + pathKey.size).split("/").map(_.replace("%20", " "))
 
         // TODO: externalTarget doesn't always seem to map correctly
         val externalTarget = Paths.get(target.toString, parts: _*)
@@ -286,7 +286,7 @@ class AnnoImageMigrator2(target: Path,
         |FROM
         |  CameraData
         |WHERE
-        |  StillImageURL IS NOT NULL
+        |  StillImageURL LIKE 'http%'
         |ORDER BY
         |  id DESC
       """.stripMargin)

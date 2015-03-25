@@ -15,3 +15,7 @@ ${JAVACMD:=java} -Xms16m -Xmx512m \
          -Dfile.encoding=UTF8 \
          -classpath "$VARS_CLASSPATH" \
          org.mbari.vars.varspub.AnnoImageMigrator2 "$@"
+
+
+IMAGE_DIR=$1
+echo "Newly watermarked VARS framegrabs are in $IMAGE_DIR. Please copy them to eione:/var/www/website/framegrabs" | mail -s "TODO: Copy framegrabs to Eione" brian@mbari.org

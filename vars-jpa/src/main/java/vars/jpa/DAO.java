@@ -42,6 +42,7 @@ public class DAO implements vars.DAO, EntityManagerAspect {
 
     protected final Logger log = LoggerFactory.getLogger(getClass());
     private final EntityManager entityManager;
+    private final String JDBC_URL_KEY = "javax.persistence.jdbc.url";
 
     /**
      *
@@ -59,6 +60,12 @@ public class DAO implements vars.DAO, EntityManagerAspect {
     @Inject
     public DAO(final EntityManager entityManager) {
         this.entityManager = entityManager;
+        if (log.isInfoEnabled() && entityManager != null) {
+            Map<String, Object> m = entityManager.getProperties();
+            if (m.containsKey(JDBC_URL_KEY)) {
+                log.info("Connecting to {}", m.get(JDBC_URL_KEY));
+            }
+        }
     }
 
     /**
