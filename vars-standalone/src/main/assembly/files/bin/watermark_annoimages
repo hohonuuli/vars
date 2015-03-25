@@ -18,4 +18,6 @@ ${JAVACMD:=java} -Xms16m -Xmx512m \
 
 
 IMAGE_DIR=$1
-echo "Newly watermarked VARS framegrabs are in $IMAGE_DIR. Please copy them to eione:/var/www/website/framegrabs" | mail -s "TODO: Copy framegrabs to Eione" brian@mbari.org
+IMAGE_USER=$(whoami)
+IMAGE_HOST=$(hostname)
+echo "Newly watermarked VARS framegrabs are available at ${IMAGE_USER}@${IMAGE_HOST}:$IMAGE_DIR. Please copy them to eione.mbari.org:/var/www/website/framegrabs" | mail -s "TODO: Copy framegrabs to Eione" brian@mbari.org
