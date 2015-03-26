@@ -66,11 +66,13 @@ class KBImageMigrator2(target: Path, overlayImageURL: URL, webpath: String = "ht
       }
 
       try {
+
+
         val bytes = if (path.getFileName.toString.toLowerCase.endsWith(".png")) {
-          addText(c, image)
+          addText(c, image, Option(media.getCredit))
         }
         else {
-          addExif(c, image)
+          addExif(c, image, Option(media.getCredit))
         }
 
         val os = new BufferedOutputStream(new FileOutputStream(path.toFile))
@@ -116,20 +118,25 @@ class KBImageMigrator2(target: Path, overlayImageURL: URL, webpath: String = "ht
    * @param image Java representation of the image
    * @return A JPG image as a byte array. Just write it out!!
    */
-  def addExif(concept: Concept, image: BufferedImage): Array[Byte] = {
+  def addExif(concept: Concept, image: BufferedImage, credit: Option[String]): Array[Byte] = {
     val jpegBytes = WatermarkUtilities.toJpegByteArray(image)
     val outputSet = WatermarkUtilities.getOrCreateOutputSet(jpegBytes)
 
-    val exifDirectory = outputSet.getOrCreateExifDirectory()
-    exifDirectory.removeField(ExifTagConstants.EXIF_TAG_USER_COMMENT)
-    exifDirectory.add(ExifTagConstants.EXIF_TAG_USER_COMMENT,
-      s"Representative image for ${concept.getPrimaryConceptName.getName}")
+    credit.foreach(s => {
+      val exifDirectory = outputSet.getOrCreateExifDirectory()
+      exifDirectory.removeField(ExifTagConstants.EXIF_TAG_USER_COMMENT)
+      exifDirectory.add(ExifTagConstants.EXIF_TAG_USER_COMMENT, s)
+    })
 
     val rootDirectory = outputSet.getOrCreateRootDirectory()
 
     rootDirectory.removeField(TiffTagConstants.TIFF_TAG_COPYRIGHT)
     rootDirectory.add(TiffTagConstants.TIFF_TAG_COPYRIGHT,
       s"Copyright ${yearFormat.format(now)} Monterey Bay Aquarium Research Institute")
+
+    rootDirectory.removeField(TiffTagConstants.TIFF_TAG_IMAGE_DESCRIPTION)
+    rootDirectory.add(TiffTagConstants.TIFF_TAG_IMAGE_DESCRIPTION,
+      s"Representative image for ${concept.getPrimaryConceptName.getName}")
 
     WatermarkUtilities.addExifAsJPG(jpegBytes, outputSet)
   }
@@ -140,9 +147,9 @@ class KBImageMigrator2(target: Path, overlayImageURL: URL, webpath: String = "ht
    * @param image Java representation of the image
    * @return A PNG image as a byte array. Just write it out!!
    */
-  def addText(concept: Concept, image: BufferedImage): Array[Byte] = {
-    val text = Map("Comment" -> s"Representative image for ${concept.getPrimaryConceptName.getName}",
-        "Copyright" -> s"Copyright ${yearFormat.format(now)} Monterey Bay Aquarium Research Institute")
+  def addText(concept: Concept, image: BufferedImage, credit: Option[String]): Array[Byte] = {
+    val text = Map("Description" -> s"Representative image for ${concept.getPrimaryConceptName.getName}",
+        "Copyright" -> s"Copyright ${yearFormat.format(now)} Monterey Bay Aquarium Research Institute") ++ credit.map("Source" -> _)
     WatermarkUtilities.addMetadataAsPNG(image, text)
   }
 
