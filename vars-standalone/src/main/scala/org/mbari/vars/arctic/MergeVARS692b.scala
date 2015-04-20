@@ -1,26 +1,26 @@
 package org.mbari.vars.arctic
 
 import java.io.File
-import java.text.SimpleDateFormat
-import java.util.TimeZone
+import java.util.{TimeZone, Date}
 
 import org.slf4j.LoggerFactory
 import vars.shared.ui.GlobalLookup
+
+import scala.util.{Failure, Success, Try}
 
 /**
  *
  *
  * @author Brian Schlining
- * @since 2015-03-02T14:15:00
+ * @since 2015-04-20T10:59:00
  */
-object MergeVARS688Dive6 {
+object MergeVARS692b {
 
   private[this] val log = LoggerFactory.getLogger(getClass)
-  private[this] val dateFormat = new SimpleDateFormat("HH:mm:ss")
 
-  def apply(videoArchiveName: String, logFile: File, year: Int): Unit = {
-    val simple = SpecialCSVLogReader1(logFile, year)
-    val full = MergeUtilities.toFullLogRecords(simple)
+  def apply(videoArchiveName: String, logFile: File, startYear: Int): Unit = {
+    val raw = SpecialShipLogReader2(logFile, startYear)
+    val full = MergeUtilities.toFullLogRecords(raw)
     val videoFrames = MergeVideoData.lookupVideoFrames(videoArchiveName).filter(_.getRecordedDate != null)
 
     if (log.isDebugEnabled) {
@@ -49,7 +49,7 @@ object MergeVARS688Dive6 {
       println(
         """
           | Usage:
-          |  MergeVARS688Dive6 [videoArchiveName] [logFile] [year]
+          |  MergeVARS692b [videoArchiveName] [logFile] [year]
           |
           | Inputs:
           |  videoArchiveName: The name, as stored in VARS, of the video archive
@@ -57,15 +57,15 @@ object MergeVARS688Dive6 {
           |
           |  logFile: The full path to the log file to use for the merge
           |
-          |  year: The year of the data within the logfile
+          |  year: The start date of the video in yyyy
         """.stripMargin)
       return
     }
     val videoArchiveName = args(0)
     val logFile = new File(args(1))
     val year = args(2).toInt
+
     apply(videoArchiveName, logFile, year)
-
   }
-}
 
+}
