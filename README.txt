@@ -2,25 +2,19 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In order to build VARS you will need to have the following installed:
-	1) Java 6 (https://jdk6.dev.java.net/)
-	2) Maven 2 or 3 (http://maven.apache.org)
-	
-VARS also requires that QuickTime for Java to be installed in order to run
-the annotation application. However, you do not need QuickTime to compile VARS.
-QuickTime for Java is included by default on Mac OS X. On Windows, you will need
-to install it. You can download if from http://developer.apple.com/quicktime/. 
-Alternatively, it is installed when you install iTunes.
+	1) Java 8 (http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
+	2) Maven 3 (http://maven.apache.org)
 	
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 FETCHING THE SOURCE CODE
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The VARS source code is stored in a Mercurial repository. Instructions for 
+The VARS source code is stored in a Git repository. Instructions for 
 obtaining the VARS source code can be found at 
-http://code.google.com/p/vars-redux/source/checkout. 
+https://github.com/hohonuuli/vars. 
 For those familiar with hg, the checkout command is:
     
-    hg clone https://vars-redux.googlecode.com/hg/ vars-redux
+    git clone https://github.com/hohonuuli/vars.git
     
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 YOUR FIRST BUILD
@@ -35,21 +29,21 @@ attempt to build VARS and get errors. You may need to fetch the source code for
 the modules and build and install them into your local repository. The related
 modules can be found at:
 
-    # MBARIX4J at http://code.google.com/p/mbarix4j/
+    # MBARIX4J at https://github.com/hohonuuli/mbarix4j
     # Execute the following commands to build and install in your local maven repository
-    svn checkout http://mbarix4j.googlecode.com/svn/trunk/ mbarix4j
+    git clone https://github.com/hohonuuli/mbarix4j.git
     cd mbarix4j
     mvn install
     
-    # VCR4J at http://code.google.com/p/vcr4j/
+    # VCR4J at https://github.com/hohonuuli/vcr4j
     # Execute the following commands to build and install in your local maven repository
-    svn checkout http://vcr4j.googlecode.com/svn/trunk/ vcr4j
+    git clone https://github.com/hohonuuli/vcr4j.git
     cd vcr4j
     mvn install
 
-    # QTX4J at http://code.google.com/p/qtx4j/
+    # QTX4J at https://github.com/hohonuuli/qtx4j
     # Execute the following commands to build and install in your local maven repository
-    svn checkout http://qtx4j.googlecode.com/svn/trunk/ qtx4j
+    git clone https://github.com/hohonuuli/qtx4j.git
     cd qtx4j
     mvn install
     
@@ -70,9 +64,9 @@ To Build VARS, run the following command on the command line:
 	mvn clean install -P dev
 
 A standalone application will be built to  
-vars-redux/vars-standalone/target/vars-standalone-[VERSION]-scripting.zip.
+vars/vars-standalone/target/vars-standalone-[VERSION]-scripting.zip.
 
 The 'environment' variable specifies what database you are targeting, for most
-folks that will be 'dev'. i
+folks that will be 'dev'.
 
 

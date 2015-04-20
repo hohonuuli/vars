@@ -25,7 +25,7 @@ import java.awt.Stroke;
  * @author Brian Schlining
  * @since 2011-08-30
  */
-public enum MarkerStyle {
+public enum MarkerStyle implements IMarkerStyle {
 
     FAINT(new Color(126, 126, 126, 180), new Font("Sans Serif", Font.PLAIN, 10), 6,
             new BasicStroke(2)),
@@ -38,6 +38,7 @@ public enum MarkerStyle {
     SELECTED_FAINT(new Color(0, 126, 0, 180), new Font("Sans Serif", Font.PLAIN, 10), 7,
             new BasicStroke(3));
 
+
     final int armLength;
     final Color color;
     final Font font;
@@ -48,5 +49,21 @@ public enum MarkerStyle {
         this.font = font;
         this.armLength = armLength;
         this.stroke = stroke;
+    }
+
+    public int getArmLength() {
+        return armLength;
+    }
+
+    public Color getColor() {
+        return color;
+    }
+
+    public Font getFont() {
+        return font;
+    }
+
+    public Stroke getStroke() {
+        return stroke;
     }
 }

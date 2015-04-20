@@ -32,6 +32,7 @@ public class GlobalLookup {
      */
     public static final DateFormat DATE_FORMAT_UTC = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
+
     /**
      * Formats the dates using whatever the local timezone is. TImezone info
      * is displayed by this formatter

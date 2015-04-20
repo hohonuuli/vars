@@ -17,6 +17,7 @@ package vars.annotation.ui.imagepanel;
 
 import javax.swing.JComponent;
 
+
 /**
  * Base class for LayerUI's that sit on top of the ImageAnnotationFrame
  *
@@ -29,6 +30,14 @@ public abstract class ImageFrameLayerUI<T extends JComponent> extends MultiLayer
 
     private String displayName;
     private UISettingsBuilder settingsBuilder;
+    private final CommonPainters<T> commonPainters;
+
+    public ImageFrameLayerUI(CommonPainters<T> commonPainters) {
+        this.commonPainters = commonPainters;
+        for (JXPainter<T> p : commonPainters.getPainters()) {
+            addPainter(p);
+        }
+    }
 
     /**
      */
@@ -36,6 +45,9 @@ public abstract class ImageFrameLayerUI<T extends JComponent> extends MultiLayer
     public void clearPainters() {
         super.clearPainters();
         settingsBuilder.clearPainters();
+        for (JXPainter<T> p : commonPainters.getPainters()) {
+            addPainter(p);
+        }
     }
 
     /**
@@ -51,6 +63,7 @@ public abstract class ImageFrameLayerUI<T extends JComponent> extends MultiLayer
     public UISettingsBuilder getSettingsBuilder() {
         return settingsBuilder;
     }
+
 
     /**
      * Subclasses can override if they need to reset the state of the UI.

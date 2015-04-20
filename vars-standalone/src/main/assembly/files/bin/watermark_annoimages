@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+# Generates watermarked copies of all images referenced in the VARS 
+# knowledgebase. Just run without arguments for instructions on 
+# how to use it.
+
+# Example:
+# watermark_annoimages ~/Desktop/annoimages/framegrabs ~/Desktop/kbimages/overlay.png
+
+VARS_HOME=$(cd $(dirname "$0")/..; pwd)
+VARS_CLASSPATH=$VARS_HOME/conf:$VARS_HOME/lib/*
+
+${JAVACMD:=java} -Xms16m -Xmx512m \
+         -Duser.timezone=UTC \
+         -Dfile.encoding=UTF8 \
+         -classpath "$VARS_CLASSPATH" \
+         org.mbari.vars.varspub.AnnoImageMigrator2 "$@"
+
+
+IMAGE_DIR=$1
+IMAGE_USER=$(whoami)
+IMAGE_HOST=$(hostname)
+echo "Newly watermarked VARS framegrabs are available at ${IMAGE_USER}@${IMAGE_HOST}:$IMAGE_DIR. Please copy them to eione.mbari.org:/var/www/website/framegrabs" | mail -s "TODO: Copy framegrabs to Eione" brian@mbari.org

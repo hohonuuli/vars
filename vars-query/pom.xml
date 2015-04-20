@@ -44,6 +44,42 @@
             <version>${eventbus.version}</version>
         </dependency>
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.5</version>
+                <configuration>
+                    <archive>
+                        <index>true</index>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                        </manifest>
+                        <manifestEntries>
+                            <Application-Name>VARS Query</Application-Name>
+                            <Permissions>all-permissions</Permissions>
+                            <url>${project.url}</url>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.2.1</version>
+                <configuration>
+                    <executable>java</executable>
+                    <arguments>
+                        <argument>-Djava.library.path=${project.build.directory}/lib</argument>
+                        <argument>-classpath</argument>
+                        <classpath/>
+                        <argument>vars.query.ui.App</argument>
+                    </arguments>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
 
 

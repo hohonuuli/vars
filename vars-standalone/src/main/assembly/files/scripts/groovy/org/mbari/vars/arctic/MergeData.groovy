@@ -17,7 +17,6 @@ class MergeData {
     final offsetFrames = 29.97 * 5 // +/- 5 second offset
     final logRecords
     final toolBox = new ToolBox()
-    final logStartDate
 
     final convertVideoFrameToFrames = { videoFrame ->
         def timecode = new Timecode(videoFrame.timecode)
@@ -38,7 +37,6 @@ class MergeData {
         this.logFile = logFile
         this.videoArchiveName = videoArchiveName
         logRecords = LogReader.read(logFile)
-        logStartDate = LogReader.readDate(logFile)
     }
 
     Map<VideoFrame, LogRecord> collate() {
@@ -55,7 +53,7 @@ class MergeData {
         def collatedData = [:]
         try {
             collatedData = CoallateFunction.coallate(videoFrames, convertVideoFrameToFrames,
-                    logRecords, convertLogRecordToFrames, offsetFrames)
+                logRecords, convertLogRecordToFrames, offsetFrames)
         }
         catch (Exception e) {
             def annoDates = videoFrames.collect {it.timecode} findAll { it != null } sort()
@@ -81,11 +79,7 @@ class MergeData {
         dao.startTransaction()
         data.each { VideoFrame videoFrame, LogRecord datum ->
 
-
             videoFrame = dao.find(videoFrame)
-
-            def timecode = new Timecode(videoFrame.timecode)
-            videoFrame.recordedDate = new Date(logStartDate.time + (timecode.frames / timecode.frameRate * 1000L) as Long)
 
             def physicalData = videoFrame.physicalData
             physicalData.depth = datum.depth

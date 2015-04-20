@@ -11,33 +11,41 @@
         <name>Monterey Bay Aquarium Research Institute</name>
         <url>http://www.mbari.org</url>
     </organization>
-    <url>http://code.google.com/p/vars-redux/</url>
+    <url>https://github.com/hohonuuli/vars</url>
+	<prerequisites>
+	    <maven>3.0.4</maven>
+    </prerequisites>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <commons.email.version>1.3.2</commons.email.version>
-        <derby.version>10.10.1.1</derby.version>
-        <eclipselink.version>2.5.0</eclipselink.version>
+        <commons.email.version>1.3.3</commons.email.version>
+        <commons.imaging.version>1.0-SNAPSHOT</commons.imaging.version>
+        <derby.version>10.10.2.0</derby.version>
+        <eclipselink.version>2.5.2</eclipselink.version>
         <eventbus.version>1.4</eventbus.version>
         <expd.version>1.2.1</expd.version>
         <foxtrot.version>4.0</foxtrot.version>
-        <guava.version>15.0</guava.version>
+        <guava.version>17.0</guava.version>
         <guice.version>3.0</guice.version>
         <jama.version>1.0.2</jama.version>
-        <jasypt.version>1.9.1</jasypt.version>
+        <jasypt.version>1.9.2</jasypt.version>
         <javax.persistence.version>2.1.0</javax.persistence.version>
         <javax.transaction.version>1.1</javax.transaction.version>
         <jgoodies.version>1.0.5</jgoodies.version>
+        <jline.version>2.11</jline.version>
         <jtds.version>1.3.1</jtds.version>
         <junit.version>4.11</junit.version>
         <jxlayer.version>3.0.4.1</jxlayer.version> <!-- This version has SHA signatures stripped out -->
-        <logback.version>1.0.13</logback.version>
-        <mbarix4j.version>1.9.2</mbarix4j.version>
+        <logback.version>1.1.2</logback.version>
+        <mbarix4j.version>1.9.3-SNAPSHOT</mbarix4j.version>
         <postgresql.version>9.0-801.jdbc4</postgresql.version>
         <qtx4j.version>0.18</qtx4j.version>
         <sanselan.version>0.97</sanselan.version>
-        <scala.version>2.10.3</scala.version>
-        <slf4j.version>1.7.5</slf4j.version>
+        <scala.version>2.11.5</scala.version>
+        <scala.version.major>2.11</scala.version.major>
+        <scalatest.version>2.2.4</scalatest.version>
+        <scalr.version>4.2</scalr.version>
+        <slf4j.version>1.7.7</slf4j.version>
         <swingx.version>1.6.5-1</swingx.version>
         <swing.layout.version>1.0.3</swing.layout.version>
         <tagsoup.version>1.2.1</tagsoup.version>
@@ -174,11 +182,10 @@
                 <configuration>
                     <archive>
                         <addMavenDescriptor>true</addMavenDescriptor>
-                        <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
                         <manifest>
-                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                        </manifest>
+-                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+-                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+-                        </manifest>
                         <manifestEntries>
                             <environment>${environment}</environment>
                             <url>${pom.url}</url>
@@ -308,7 +315,7 @@
         <repository>
             <id>mbari-maven-repository</id>
             <name>MBARI Maven Repository</name>
-            <url>http://mbari-maven-repository.googlecode.com/svn/repository/</url>
+            <url>https://mbari-maven-repository.googlecode.com/svn/repository/</url>
         </repository>
         <repository>
             <id>eclipselink</id>
@@ -340,7 +347,11 @@
             <name>JBoss Repository</name>
             <url>http://repository.jboss.org/nexus/content/groups/public-jboss/</url>
         </repository>
-
+        <repository>
+            <id>Apache-snapshots</id>
+            <name>Apache Development Snapshot Repository</name>
+            <url>https://repository.apache.org/content/repositories/snapshots/</url>
+        </repository>
     </repositories>
     <reporting>
         <plugins>

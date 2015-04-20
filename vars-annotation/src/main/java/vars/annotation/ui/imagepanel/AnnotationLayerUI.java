@@ -53,7 +53,7 @@ import java.util.HashSet;
  */
 public class AnnotationLayerUI<T extends JImageUrlCanvas> extends ImageFrameLayerUI<T> {
 
-    private JXCrossHairPainter<T> crossHairPainter = new JXCrossHairPainter<T>();
+    //private JXCrossHairPainter<T> crossHairPainter = new JXCrossHairPainter<T>();
     private JXPainter<T> selectedObservationsPainter = new JXSelectedObservationsPainter<T>();
 
     /**
@@ -84,7 +84,9 @@ public class AnnotationLayerUI<T extends JImageUrlCanvas> extends ImageFrameLaye
      * @param toolBelt
      * @param dataCoordinator
      */
-    public AnnotationLayerUI(ToolBelt toolBelt, UIDataCoordinator dataCoordinator) {
+    public AnnotationLayerUI(ToolBelt toolBelt, UIDataCoordinator dataCoordinator,
+                             CommonPainters<T> commonPainters) {
+        super(commonPainters);
         setDisplayName("Annotate");
         setSettingsBuilder(new AnnotationLayerSettingsBuilder<T>(this));
         this.toolBelt = toolBelt;
@@ -99,7 +101,7 @@ public class AnnotationLayerUI<T extends JImageUrlCanvas> extends ImageFrameLaye
     public void clearPainters() {
         super.clearPainters();
         addPainter(selectedObservationsPainter);
-        addPainter(crossHairPainter);
+        //addPainter(crossHairPainter);
     }
 
     /**

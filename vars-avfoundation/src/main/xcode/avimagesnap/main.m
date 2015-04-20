@@ -11,8 +11,10 @@
 
 int main(int argc, const char * argv[]) {
     
-    NSArray *deviceNames = [AVFStillImageCapture videoCaptureDevicesAsStrings];
+    //NSApplicationLoad(); // Is this needed?
     AVFStillImageCapture *imageCapture = [[AVFStillImageCapture alloc] init];
+    NSArray *deviceNames = [imageCapture videoCaptureDevicesAsStrings];
+    
     [imageCapture setupCaptureSessionUsingNamedDevice:[deviceNames objectAtIndex:0]];
     @autoreleasepool {        
         for (int i = 0; i < 5; i++) {

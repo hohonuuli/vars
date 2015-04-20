@@ -19,7 +19,8 @@
 @synthesize stillImageOutput;
 
 
-+(NSArray *) videoCaptureDevices {
+-(NSArray *) videoCaptureDevices {
+    [self initSession];
     NSArray *devices = [AVCaptureDevice devices];
     NSMutableArray *videoDevices = [NSMutableArray array];
     for (AVCaptureDevice *device in devices) {
@@ -30,7 +31,8 @@
     return videoDevices;
 };
 
-+(NSArray *) videoCaptureDevicesAsStrings {
+-(NSArray *) videoCaptureDevicesAsStrings {
+    [self initSession];
     NSArray *videoDevices = [self videoCaptureDevices];
     NSMutableArray *localizedNames = [NSMutableArray array];
     for (AVCaptureDevice *device in videoDevices) {
@@ -39,27 +41,36 @@
     return localizedNames;
 };
 
-+(AVCaptureDevice *) videoCaptureDeviceNamed: (NSString *)name {
+-(AVCaptureDevice *) videoCaptureDeviceNamed: (NSString *)name {
+    [self initSession];
     AVCaptureDevice *namedDevice = nil;
     NSArray *videoDevices = [self videoCaptureDevices];
     for (AVCaptureDevice *device in videoDevices) {
+        NSLog(@"Examining video capture device '%@'", [device localizedName]);
         if ([[device localizedName] isEqualToString:name]) {
             namedDevice = device;
         }
     }
+    if (namedDevice == Nil) {
+        NSLog(@"Did not find avideo input named '%@'", name);
+    }
     return namedDevice;
 };
 
--(void)  setupCaptureSessionUsingNamedDevice: (NSString *) name {
-    
+-(void) initSession {
     if (session == nil) {
         session = [[AVCaptureSession alloc] init];
         session.sessionPreset = AVCaptureSessionPresetPhoto;
         [session startRunning];
     }
+}
+
+-(void)  setupCaptureSessionUsingNamedDevice: (NSString *) name {
+    
+    [self initSession];
     
     if (session != nil) {
-        
+
         [session beginConfiguration];
 
         if (videoInput != nil) {
@@ -72,7 +83,7 @@
             stillImageOutput = nil;
         }
         
-        AVCaptureDevice *device = [AVFStillImageCapture videoCaptureDeviceNamed:name];
+        AVCaptureDevice *device = [self videoCaptureDeviceNamed:name];
         if (device != nil) {
             NSError *error = nil;
             videoInput = [AVCaptureDeviceInput deviceInputWithDevice:device error:&error];
@@ -93,13 +104,13 @@
         }
         
         [session commitConfiguration];
+
         
         // First framegrab on DeckLink is always black. So just grab one and don't do anything with it.
         AVCaptureConnection *captureConnection = nil;
         if (stillImageOutput != nil) {
             captureConnection = [[stillImageOutput connections] objectAtIndex:0];
             [stillImageOutput captureStillImageAsynchronouslyFromConnection:captureConnection completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
-                
                 [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
             }];
         }
@@ -133,7 +144,23 @@
 }
 
 -(void) dealloc {
+
+    [session beginConfiguration];
+
+    if (videoInput != nil) {
+        [session removeInput:videoInput];
+        videoInput = nil;
+    }
+    
+    if (stillImageOutput != nil) {
+        [session removeOutput:stillImageOutput];
+        stillImageOutput = nil;
+    }
+
+    [session commitConfiguration];
+
     [session stopRunning];
+    
 }
 
 @end

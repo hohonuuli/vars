@@ -27,14 +27,14 @@ class DateAdjuster {
 
             def toCalendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"))
             toCalendar.setTime(date)
-            def fromCalendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"))
+            //def fromCalendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"))
 
 
             videoArchive.videoFrames.each { VideoFrame vf ->
                 try {
                     def timecode = new Timecode(vf.timecode)
                     def recordedDate = vf.recordedDate
-                    fromCalendar.setTime(recordedDate)
+                    //fromCalendar.setTime(recordedDate)
 //                toCalendar.set(Calendar.HOUR_OF_DAY, fromCalendar.get(Calendar.HOUR_OF_DAY))
 //                toCalendar.set(Calendar.MINUTE, fromCalendar.get(Calendar.MINUTE))
 //                toCalendar.set(Calendar.SECOND, fromCalendar.get(Calendar.SECOND))

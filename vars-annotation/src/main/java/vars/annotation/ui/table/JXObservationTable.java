@@ -45,8 +45,12 @@ public class JXObservationTable extends JXTable implements ObservationTable {
      * Constructs ...
      */
     public JXObservationTable() {
+        this(false);
+    }
+
+    public JXObservationTable(boolean showVideoArchiveName) {
         super();
-        final TableColumnModel tableColumnModel = new JXObservationTableColumnModel();
+        TableColumnModel tableColumnModel = new JXObservationTableColumnModel(showVideoArchiveName);
         final TableModel model = new JXObservationTableModel(tableColumnModel);
         final JTableHeader aTableHeader = new JXTableHeader(tableColumnModel);
         aTableHeader.setReorderingAllowed(false);

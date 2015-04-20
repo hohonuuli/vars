@@ -12,6 +12,9 @@ import org.mbari.expd.UberDatum
 import vars.RawSQLQueryFunction
 import vars.integration.MergeType
 
+/**
+ * @deprecated
+ */
 class DatabaseUtility {
 
     final log = LoggerFactory.getLogger(DatabaseUtility.class)
@@ -369,6 +372,7 @@ class DatabaseUtility {
  * Support class for listMissingStillImages method. Pulls URLs from the
  * supplied queue and checks to see if the file exists. If not then
  * it adds the ULR to the badUrls collection.
+ * @deprecated
  */
 class ImageChecker implements Runnable {
 

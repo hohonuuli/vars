@@ -1,6 +1,6 @@
 package org.mbari.biauv.integration
 
-import reflect.BeanProperty
+import scala.beans.BeanProperty
 
 /**
  *  Describes the record being stored. Also includes a reference to the data

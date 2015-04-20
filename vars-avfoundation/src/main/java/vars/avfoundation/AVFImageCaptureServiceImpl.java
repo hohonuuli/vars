@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.VARSException;
 import vars.shared.ui.GlobalLookup;
-import vars.shared.ui.ImageUtilities;
 import vars.shared.ui.dialogs.StandardDialog;
 import vars.shared.ui.video.ImageCaptureException;
 import vars.shared.ui.video.ImageCaptureService;
@@ -50,6 +49,8 @@ public class AVFImageCaptureServiceImpl implements ImageCaptureService {
         catch (UnsatisfiedLinkError e) {
             extractAndLoadNativeLibraries();
         }
+        // HACK: The 1st call to videoDevicesAsStrings returns empty. 2nd call is OK
+        videoDevicesAsStrings();
     }
 
     ////////////////////////
@@ -118,7 +119,7 @@ public class AVFImageCaptureServiceImpl implements ImageCaptureService {
         // -- Read file as image
         BufferedImage image = null;
         try {
-            image = ImageUtilities.watchForAndReadNewImage(file);
+            image = watchForAndReadNewImage(file);
         } catch (Exception e) {
             EventBus.publish(GlobalLookup.TOPIC_WARNING, e);
         }
@@ -163,27 +164,28 @@ public class AVFImageCaptureServiceImpl implements ImageCaptureService {
 
             // --- start HACK: Always add "Blackmagic" to video device list (brian 2014-03-04)
             // In Mac OS X 10.9.2, Blackmagic stopped showing up in the videodevice list
-            String[] listedDevices = videoDevicesAsStrings();
-            boolean hasBlackmagic = false;
-            for (String s: listedDevices) {    // Check if list contains Blackmagic
-                if (s.equals("Blackmagic")) {
-                    hasBlackmagic = true;
-                    break;
-                }
-            }
+            // String[] listedDevices = videoDevicesAsStrings();
+            // boolean hasBlackmagic = false;
+            // for (String s: listedDevices) {    // Check if list contains Blackmagic
+            //     if (s.equals("Blackmagic")) {
+            //         hasBlackmagic = true;
+            //         break;
+            //     }
+            // }
 
-            String[] devices;                  // If needed, a Blackmagic to list
-            if (!hasBlackmagic) {
-                devices = new String[listedDevices.length + 1];
-                System.arraycopy(listedDevices, 0, devices, 0, listedDevices.length);
-                devices[devices.length - 1] = "Blackmagic";
-            }
-            else {
-                devices = listedDevices;
-            }
-            Arrays.sort(devices);
+            // String[] devices;                  // If needed, add Blackmagic to list
+            // if (!hasBlackmagic) {
+            //     devices = new String[listedDevices.length + 1];
+            //     System.arraycopy(listedDevices, 0, devices, 0, listedDevices.length);
+            //     devices[devices.length - 1] = "Blackmagic";
+            // }
+            // else {
+            //     devices = listedDevices;
+            // }
+            // Arrays.sort(devices);
             // --- end HACK
 
+            String[] devices = videoDevicesAsStrings();
             dialog = new AVFImageCaptureDialog(frame, devices);
         }
         dialog.setVisible(true);
@@ -205,6 +207,7 @@ public class AVFImageCaptureServiceImpl implements ImageCaptureService {
                     videoSource + "' is already opened");
         }
         else if (!videoSource.isEmpty()) {
+            log.debug("Starting image capture service, {}, using {}", getClass().getName(), videoSource);
             startSessionWithNamedDevice(videoSource);
             isStarted = true;
         }
@@ -214,6 +217,7 @@ public class AVFImageCaptureServiceImpl implements ImageCaptureService {
     }
 
     private void stopDevice() {
+        log.debug("Stopping image capture service, {}", getClass().getName());
         stopSession();
         isStarted = false;
     }
@@ -248,4 +252,29 @@ public class AVFImageCaptureServiceImpl implements ImageCaptureService {
 
     }
 
+    /**
+     * AVFoundation writes the image asynchronously. We need to block and watch for them to be created.
+     * Lame, but even using Java Future's forces us to block.
+     * @param file
+     * @return
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    private BufferedImage watchForAndReadNewImage(File file) throws IOException, InterruptedException {
+        BufferedImage image = null;
+        long timeoutNanos = 3000000000L; // 3 seconds
+        long elapsedNanos = 0L;
+        long startNanos = System.nanoTime();
+        while (elapsedNanos < timeoutNanos) {
+            if (file.exists()) {
+                break;
+            }
+            Thread.sleep(50L);
+            elapsedNanos = System.nanoTime() - startNanos;
+        }
+        if (file.exists()) {
+            image = ImageIO.read(file);
+        }
+        return image;
+    }
 }

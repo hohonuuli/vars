@@ -15,12 +15,13 @@
 
 package vars.annotation.ui.imagepanel;
 
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import javax.swing.BoxLayout;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.swing.*;
+
 import org.mbari.swing.JImageUrlCanvas;
 
 /**
@@ -33,43 +34,87 @@ import org.mbari.swing.JImageUrlCanvas;
  */
 public class AreaMeasurementLayerSettingsBuilder<T extends JImageUrlCanvas> implements UISettingsBuilder {
 
-    private JXPainter<T> notSelectedAreaMeasurementsPainter = new JXNotSelectedAreaMeasurementPainter<T>();
+    private JXAreaMeasurementPainter<T> notSelectedAreaMeasurementsPainter = new JXNotSelectedAreaMeasurementPainter<T>();
     private final MultiLayerUI<T> layerUI;
     private final JPanel panel;
     private JCheckBox showNotSelectedCheckBox;
+    private JButton showColorChooserButton;
+    private JButton showHLineDialogButton;
+    private JXHorizontalLinePainterDialog horizontalLinePainterDialog;
 
     /**
      * Constructs ...
      *
      * @param layerUI
      */
-    public AreaMeasurementLayerSettingsBuilder(MultiLayerUI<T> layerUI) {
+    public AreaMeasurementLayerSettingsBuilder(AreaMeasurementLayerUI2<T> layerUI) {
         this.layerUI = layerUI;
+        horizontalLinePainterDialog = new JXHorizontalLinePainterDialog(layerUI.getHorizontalLinePainter());
+        horizontalLinePainterDialog.pack();
 
         // --- Configure Panel
         panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 
         // --- CheckBox to draw not selected annotations
-        showNotSelectedCheckBox = new JCheckBox();
-        showNotSelectedCheckBox.setText("Show All Area Measurements");
-        showNotSelectedCheckBox.setSelected(false);
-        showNotSelectedCheckBox.addItemListener(new ItemListener() {
+        panel.add(getShowNotSelectedCheckBox());
+        panel.add(getShowColorChooserButton());
+        panel.add(getShowHLineDialogButton());
 
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (showNotSelectedCheckBox.isSelected()) {
-                    AreaMeasurementLayerSettingsBuilder.this.layerUI.addPainter(notSelectedAreaMeasurementsPainter);
+    }
+
+    protected JCheckBox getShowNotSelectedCheckBox() {
+        if (showNotSelectedCheckBox == null) {
+            showNotSelectedCheckBox = new JCheckBox();
+            showNotSelectedCheckBox.setText("Show All Area Measurements");
+            showNotSelectedCheckBox.setSelected(false);
+            showNotSelectedCheckBox.addItemListener(new ItemListener() {
+
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    if (showNotSelectedCheckBox.isSelected()) {
+                        AreaMeasurementLayerSettingsBuilder.this.layerUI.addPainter(notSelectedAreaMeasurementsPainter);
+                    }
+                    else {
+                        AreaMeasurementLayerSettingsBuilder.this.layerUI.removePainter(notSelectedAreaMeasurementsPainter);
+                    }
                 }
-                else {
-                    AreaMeasurementLayerSettingsBuilder.this.layerUI.removePainter(notSelectedAreaMeasurementsPainter);
+
+            });
+            showNotSelectedCheckBox.setSelected(false);
+        }
+        return showNotSelectedCheckBox;
+    }
+
+    protected JButton getShowColorChooserButton() {
+        if (showColorChooserButton == null) {
+            showColorChooserButton = new JButton("Select Color");
+            showColorChooserButton.setToolTipText("Select background area measurements color");
+            showColorChooserButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    Color color = JColorChooser.showDialog(panel, "Select background area measurements color",
+                            notSelectedAreaMeasurementsPainter.getPaint());
+                    notSelectedAreaMeasurementsPainter.setPaint(color);
+
                 }
-            }
+            });
+        }
+        return showColorChooserButton;
+    }
 
-        });
-        showNotSelectedCheckBox.setSelected(false);
-        panel.add(showNotSelectedCheckBox);
-
+    protected JButton getShowHLineDialogButton() {
+        if (showHLineDialogButton == null) {
+            showHLineDialogButton = new JButton("Add Lines");
+            showHLineDialogButton.setToolTipText("Add horizonal lines");
+            showHLineDialogButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    horizontalLinePainterDialog.setVisible(true);
+                }
+            });
+        }
+        return showHLineDialogButton;
     }
 
     /**

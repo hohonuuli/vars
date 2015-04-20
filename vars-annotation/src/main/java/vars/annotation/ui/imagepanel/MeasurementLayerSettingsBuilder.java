@@ -18,9 +18,10 @@ package vars.annotation.ui.imagepanel;
 import org.mbari.swing.JImageUrlCanvas;
 import vars.annotation.AnnotationPersistenceService;
 
-import javax.swing.BoxLayout;
-import javax.swing.JCheckBox;
-import javax.swing.JPanel;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
@@ -32,12 +33,13 @@ import java.awt.event.ItemListener;
  */
 public class MeasurementLayerSettingsBuilder<T extends JImageUrlCanvas> implements UISettingsBuilder {
 
-    private final JXPainter<T> identityReferencePainter;
+    private final JXObservationsPainter<T> identityReferencePainter;
     private final MultiLayerUI<T> layerUI;
-    private final JXPainter<T> notSelectedObservationsPainter;
+    private final JXObservationsPainter<T> notSelectedObservationsPainter;
     private final JPanel panel;
-    private final JCheckBox showNotSelectedCheckBox;
-    private final JCheckBox showPainterCheckBox;
+    private JCheckBox showNotSelectedCheckBox;
+    private JCheckBox showPainterCheckBox;
+    private JButton showColorChooserButton;
 
     /**
      * Constructs ...
@@ -57,51 +59,86 @@ public class MeasurementLayerSettingsBuilder<T extends JImageUrlCanvas> implemen
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 
         // -- Checkbox to draw not selected observations in the same videoframe
-        showNotSelectedCheckBox = new JCheckBox();
-        showNotSelectedCheckBox.setText("Show Observations in Same Video Frame");
-        showNotSelectedCheckBox.setSelected(true);
-        showNotSelectedCheckBox.addItemListener(new ItemListener() {
-
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (showNotSelectedCheckBox.isSelected()) {
-                    MeasurementLayerSettingsBuilder.this.layerUI.addPainter(notSelectedObservationsPainter);
-                }
-                else {
-                    MeasurementLayerSettingsBuilder.this.layerUI.removePainter(notSelectedObservationsPainter);
-                }
-            }
-
-        });
         layerUI.addPainter(notSelectedObservationsPainter);
-        panel.add(showNotSelectedCheckBox);
+        panel.add(getShowNotSelectedCheckBox());
+        panel.add(Box.createHorizontalStrut(20));
 
         // --- Checkbox to draw observations with same identity reference
-        showPainterCheckBox = new JCheckBox();
-        showPainterCheckBox.setText("Show Related Observations");
-        showPainterCheckBox.setSelected(false);
-        showPainterCheckBox.addItemListener(new ItemListener() {
+        panel.add(getShowPainterCheckBox());
 
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (showPainterCheckBox.isSelected()) {
-                    MeasurementLayerSettingsBuilder.this.layerUI.addPainter(identityReferencePainter);
-                }
-                else {
-                    MeasurementLayerSettingsBuilder.this.layerUI.removePainter(identityReferencePainter);
-                }
-            }
-        });
-        showPainterCheckBox.setSelected(false);
-        panel.add(showPainterCheckBox);
+        // --- Button to adjust color of identityReferencePainter
+        panel.add(getShowColorChooserButton());
 
+    }
+
+    protected JCheckBox getShowPainterCheckBox() {
+        if (showPainterCheckBox == null) {
+            showPainterCheckBox = new JCheckBox();
+            showPainterCheckBox.setText("Show Related Observations");
+            showPainterCheckBox.setSelected(false);
+            showPainterCheckBox.addItemListener(new ItemListener() {
+
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    if (showPainterCheckBox.isSelected()) {
+                        MeasurementLayerSettingsBuilder.this.layerUI.addPainter(identityReferencePainter);
+                    } else {
+                        MeasurementLayerSettingsBuilder.this.layerUI.removePainter(identityReferencePainter);
+                    }
+                }
+            });
+            showPainterCheckBox.setSelected(false);
+            showPainterCheckBox.setToolTipText("Shows observations with the same identity-reference from other videoframes");
+        }
+        return showPainterCheckBox;
+    }
+
+    protected  JCheckBox getShowNotSelectedCheckBox() {
+        if (showNotSelectedCheckBox == null) {
+            showNotSelectedCheckBox = new JCheckBox();
+            showNotSelectedCheckBox.setText("Show Observations in Same Video Frame");
+            showNotSelectedCheckBox.setSelected(true);
+            showNotSelectedCheckBox.addItemListener(new ItemListener() {
+
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    if (showNotSelectedCheckBox.isSelected()) {
+                        MeasurementLayerSettingsBuilder.this.layerUI.addPainter(notSelectedObservationsPainter);
+                    }
+                    else {
+                        MeasurementLayerSettingsBuilder.this.layerUI.removePainter(notSelectedObservationsPainter);
+                    }
+                    getShowColorChooserButton().setEnabled(showNotSelectedCheckBox.isSelected());
+                }
+
+            });
+        }
+        return showNotSelectedCheckBox;
+    }
+
+    protected JButton getShowColorChooserButton() {
+        if (showColorChooserButton == null) {
+            showColorChooserButton = new JButton("Select Color");
+            showColorChooserButton.setToolTipText("Select related observations color");
+            showColorChooserButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    IMarkerStyle markerStyle = identityReferencePainter.getMarkerStyle();
+                    Color color = JColorChooser.showDialog(panel, "Choose related observations color", markerStyle.getColor());
+                    markerStyle = new MarkerStyleBean(color, markerStyle.getArmLength(), markerStyle.getFont(), markerStyle.getStroke());
+                    identityReferencePainter.setMarkerStyle(markerStyle);
+
+                }
+            });
+        }
+        return showColorChooserButton;
     }
 
     /**
      */
     @Override
     public void clearPainters() {
-        if (showPainterCheckBox.isSelected()) {
+        if (getShowPainterCheckBox().isSelected()) {
             layerUI.addPainter(identityReferencePainter);
         }
         else {

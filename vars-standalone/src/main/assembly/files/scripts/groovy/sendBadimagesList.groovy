@@ -1,7 +1,8 @@
 import org.apache.commons.mail.SimpleEmail
+import vars.annotation.DatabaseUtility2
 
-
-def badUrls = DbTools.listMissingStillImages()
+def db = new DatabaseUtility2()
+def badUrls = db.listMissingStillImages()
 def admins = UserAccountDAO.instance.findAdmins()
 
 def email = new SimpleEmail()

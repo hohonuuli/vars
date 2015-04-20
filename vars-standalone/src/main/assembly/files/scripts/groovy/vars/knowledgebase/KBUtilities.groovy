@@ -22,6 +22,7 @@ class KBUtilities {
 
     static showConceptsByRank(rank) {
         def concepts = findConceptsByRank(rank)
+        concepts.sort { it.primaryConceptName.name }
         println("-" * 72)
         println("Found ${concepts.size()} concepts with a rank of '${rank}'")
         concepts.each { c ->

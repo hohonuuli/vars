@@ -46,6 +46,8 @@ import vars.shared.ui.event.LoggingEventSubscriber;
 import vars.shared.ui.event.NonFatalErrorSubscriber;
 import vars.shared.ui.event.WarningSubscriber;
 import vars.shared.ui.video.FakeImageCaptureServiceImpl;
+import vars.shared.util.ActiveAppBeacon;
+import vars.shared.util.ActiveAppPinger;
 
 /**
  *
@@ -65,6 +67,15 @@ public class App {
     private static final List<EventSubscriber> GC_PREVENTION_EVENTS = new Vector<EventSubscriber>();
 
     /**
+     * For VCR's, we only want one instance of VARS running as the first instance owns the
+     * serial ports and the framecapture card.
+     */
+    public static final Collection<Integer> BEACON_PORTS = Lists.newArrayList(4002, 4121, 5097, 6238, 6609,
+            7407, 8169, 9069, 9669, 16569);
+    public static final String BEACON_MESSAGE = "VARS Annotation";
+    private static ActiveAppBeacon activeAppBeacon;
+
+    /**
      * Constructs ...
      */
     public App() {
@@ -72,6 +83,10 @@ public class App {
         final ImageIcon mbariLogo =
             new ImageIcon(getClass().getResource("/annotation-splash.png"));
         final SplashFrame splashFrame = new SplashFrame(mbariLogo);
+        splashFrame.setVisible(true);
+        splashFrame.setMessage(" Starting application beacon ...");
+        activeAppBeacon = new ActiveAppBeacon(BEACON_PORTS, BEACON_MESSAGE);
+
         splashFrame.setMessage(" Initializing configuration ...");
         splashFrame.setVisible(true);
 
@@ -112,7 +127,7 @@ public class App {
         Lookup.getSelectedObservationsDispatcher().setValueObject(new Vector<Observation>());
 
         // Connect to the ImageCaptureService
-        //Lookup.getImageCaptureServiceDispatcher().setValueObject(injector.getInstance(ImageCaptureService.class));
+        Lookup.getImageCaptureServiceDispatcher().setValueObject(injector.getInstance(ImageCaptureService.class));
         Lookup.getImageCaptureServiceDispatcher().setValueObject(new FakeImageCaptureServiceImpl());
         
         // Configure EventBus
@@ -202,17 +217,24 @@ public class App {
             LoggerFactory.getLogger(App.class).warn("Failed to set system look and feel", e);
         }
 
-        try {
-            SwingUtilities.invokeLater(new Runnable() {
-
-                public void run() {
-                    new App();
-                }
-
-            });
+        /*
+         * Check that VARS is not already running
+         */
+        if (ActiveAppPinger.pingAll(BEACON_PORTS, BEACON_MESSAGE)) {
+            JOptionPane.showMessageDialog(null, "An instance of the VARS Annotation application is already running. Exiting ...");
         }
-        catch (Throwable e) {
-            LoggerFactory.getLogger(App.class).warn("An error occurred on startup", e);
+        else {
+            try {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        new App();
+                    }
+                });
+            }
+            catch (Throwable e) {
+                LoggerFactory.getLogger(App.class).warn("An error occurred on startup", e);
+            }
         }
+
     }
 }

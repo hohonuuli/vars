@@ -150,7 +150,7 @@ class TripodLoader {
                 }
             }
         }
-        return images.findAll { it.toUpperCase().endsWith("JPG")}
+        return images.findAll { i -> i.toUpperCase().endsWith("JPG") || i.toUpperCase().endsWith("PNG")}
     }
 
 

@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CopyOnWriteArraySet;
 import javax.swing.SwingUtilities;
 import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.annotation.AnnotationProcessor;
@@ -35,6 +34,7 @@ import org.bushe.swing.event.annotation.EventSubscriber;
 import org.jdesktop.jxlayer.JXLayer;
 import org.mbari.awt.AwtUtilities;
 import org.mbari.geometry.Point2D;
+import org.mbari.swing.JImageCanvas;
 import org.mbari.swing.JImageUrlCanvas;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,10 +66,11 @@ public class AreaMeasurementLayerUI2<T extends JImageUrlCanvas> extends ImageFra
 
     //extends CrossHairLayerUI<T> {
 
-    private JXPainter<T> crossHairPainter = new JXCrossHairPainter<T>();
+    //private JXPainter<T> crossHairPainter = new JXCrossHairPainter<T>();
     private JXPainter<T> notSelectedObservationsPainter = new JXNotSelectedObservationsPainter<T>(MarkerStyle.FAINT);
     private JXPainter<T> selectedObservationsPainter = new JXSelectedObservationsPainter<T>(MarkerStyle.NOTSELECTED);
     private JXPainter<T> selectedAreaMeasurementPainter = new JXSelectedAreaMeasurementPainter<T>();
+    private JXHorizontalLinePainter<T> horizontalLinePainter;
     private Logger log = LoggerFactory.getLogger(getClass());
 
     /** Collection of pointsIC to be used to create the AreaMeasurement in image pixels */
@@ -122,16 +123,21 @@ public class AreaMeasurementLayerUI2<T extends JImageUrlCanvas> extends ImageFra
      *
      * @param toolBelt
      */
-    public AreaMeasurementLayerUI2(ToolBelt toolBelt) {
+    public AreaMeasurementLayerUI2(ToolBelt toolBelt, JImageCanvas imageCanvas,
+                                   CommonPainters<T> commonPainters) {
+        super(commonPainters);
+        horizontalLinePainter = commonPainters.getHorizontalLinePainter();
         setDisplayName("Area");
         setSettingsBuilder(new AreaMeasurementLayerSettingsBuilder<T>(this));
         this.toolBelt = toolBelt;
         AnnotationProcessor.process(this);
         setObservation(null);
-        addPainter(crossHairPainter);
+        //addPainter(crossHairPainter);
         addPainter(notSelectedObservationsPainter);
         addPainter(selectedObservationsPainter);
         addPainter(selectedAreaMeasurementPainter);
+        //addPainter(horizontalLinePainter);
+
     }
 
     /**
@@ -139,7 +145,7 @@ public class AreaMeasurementLayerUI2<T extends JImageUrlCanvas> extends ImageFra
     @Override
     public void clearPainters() {
         super.clearPainters();
-        addPainter(crossHairPainter);
+        //addPainter(crossHairPainter);
     }
 
     /**
@@ -318,5 +324,9 @@ public class AreaMeasurementLayerUI2<T extends JImageUrlCanvas> extends ImageFra
         Observation oldObservation = this.observation;
         this.observation = observation;
         resetUI();
+    }
+
+    public JXHorizontalLinePainter<T> getHorizontalLinePainter() {
+        return horizontalLinePainter;
     }
 }

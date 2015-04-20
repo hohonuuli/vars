@@ -44,7 +44,7 @@
                 <exclude>org.scala-lang:scala-compiler</exclude>
                 <exclude>org.scala-lang:scala-reflect</exclude>
                 <exclude>org.scala-lang:scalap</exclude>
-                <exclude>org.scala-lang:jline</exclude>
+                <exclude>jline:jline</exclude>
             </excludes>
         </dependencySet>
         <dependencySet>
@@ -55,7 +55,7 @@
                 <include>org.scala-lang:scala-compiler</include>
                 <include>org.scala-lang:scala-reflect</include>
                 <include>org.scala-lang:scalap</include>
-                <include>org.scala-lang:jline</include>
+                <include>jline:jline</include>
             </includes>
         </dependencySet>
     </dependencySets>

@@ -5,6 +5,13 @@
 
 AVFStillImageCapture *imageCapture = nil;
 
+void initImageCapture() {
+    if (imageCapture == nil) {
+        imageCapture = [[AVFStillImageCapture alloc] init];
+        [imageCapture initSession];
+    }
+}
+
 /*
  * Class:     vars_avfoundation_AVFImageCaptureServiceImpl
  * Method:    videoDevicesAsStrings
@@ -12,9 +19,11 @@ AVFStillImageCapture *imageCapture = nil;
  */
 JNIEXPORT jobjectArray JNICALL Java_vars_avfoundation_AVFImageCaptureServiceImpl_videoDevicesAsStrings
 (JNIEnv *env, jobject clazz) {
+    
+    initImageCapture();
 	
 	// Grab the array of NSStrings
-	NSArray *videoDevicesAsStrings = [AVFStillImageCapture videoCaptureDevicesAsStrings];
+	NSArray *videoDevicesAsStrings = [imageCapture videoCaptureDevicesAsStrings];
 	
 	// Look for the class for Java String
 	jclass stringClass = (*env)->FindClass(env, "Ljava/lang/String;");
@@ -30,7 +39,7 @@ JNIEXPORT jobjectArray JNICALL Java_vars_avfoundation_AVFImageCaptureServiceImpl
 	
 	// Return the result
 	return result;
-	
+
 };
 
 /*
@@ -44,9 +53,7 @@ JNIEXPORT jstring JNICALL Java_vars_avfoundation_AVFImageCaptureServiceImpl_star
 	// Convert the incoming Device Name to an NSString
 	NSString *device = JNFJavaToNSString(env, namedDevice);
     
-    if (imageCapture == nil) {
-        imageCapture = [[AVFStillImageCapture alloc] init];
-    }
+    initImageCapture();
 
     [imageCapture setupCaptureSessionUsingNamedDevice: device];
 	
@@ -75,7 +82,7 @@ JNIEXPORT jstring JNICALL Java_vars_avfoundation_AVFImageCaptureServiceImpl_save
 	
 	// Convert the filename back to jstring for return
 	return JNFNSToJavaString(env, path);
-	
+
 };
 
 /*
@@ -88,7 +95,6 @@ JNIEXPORT void JNICALL Java_vars_avfoundation_AVFImageCaptureServiceImpl_stopSes
 	
 	// [imageCapture dealloc]; // Don't need. This project is using ARC
     imageCapture = nil; // On deallocation the session will be terminated
-	
 };
 
 

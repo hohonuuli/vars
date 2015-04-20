@@ -59,7 +59,7 @@ public class JXAreaMeasurementPainter<T extends JImageUrlCanvas> extends Abstrac
     /** Need a synchronized collection */
     private final Collection<AreaMeasurementPath> areaMeasurementPaths = new CopyOnWriteArrayList<AreaMeasurementPath>();
     private final Font lineFont;
-    private final Color paint;
+    private Color paint;
     private final Stroke stroke;
 
     /**
@@ -173,5 +173,13 @@ public class JXAreaMeasurementPainter<T extends JImageUrlCanvas> extends Abstrac
         AreaMeasurementPath(AreaMeasurement areaMeasurement) {
             this.areaMeasurement = areaMeasurement;
         }
+    }
+
+    public Color getPaint() {
+        return paint;
+    }
+
+    public void setPaint(Color paint) {
+        this.paint = paint;
     }
 }

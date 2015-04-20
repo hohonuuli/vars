@@ -71,6 +71,11 @@
             <artifactId>sanselan</artifactId>
             <version>${sanselan.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-imaging</artifactId>
+            <version>${commons.imaging.version}</version>
+        </dependency>
 
         <!-- Need for loading SIMPA -->
         <dependency>
@@ -94,6 +99,12 @@
         </dependency>
         <dependency>
             <groupId>org.scala-lang</groupId>
+            <artifactId>scala-reflect</artifactId>
+            <version>${scala.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.scala-lang</groupId>
             <artifactId>scala-compiler</artifactId>
             <version>${scala.version}</version>
             <scope>runtime</scope>
@@ -105,10 +116,26 @@
             <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>org.scala-lang</groupId>
+            <groupId>jline</groupId>
             <artifactId>jline</artifactId>
-            <version>${scala.version}</version>
+            <version>${jline.version}</version>
             <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.scalatest</groupId>
+            <artifactId>scalatest_${scala.version.major}</artifactId>
+            <version>${scalatest.version}</version>
+        </dependency>
+
+        <!--
+            Scalar for doing the damn overlays
+        -->
+        <dependency>
+            <groupId>org.imgscalr</groupId>
+            <artifactId>imgscalr-lib</artifactId>
+            <version>${scalr.version}</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
@@ -142,20 +169,13 @@
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
-                <version>3.1.5</version>
+                <version>3.2.0</version>
                 <executions>
                     <execution>
                         <goals>
                             <goal>compile</goal>
                             <goal>testCompile</goal>
                         </goals>
-                        <configuration>
-                            <args>
-                                <arg>-make:transitive</arg>
-                                <arg>-dependencyfile</arg>
-                                <arg>${project.build.directory}/.scala_dependencies</arg>
-                            </args>
-                        </configuration>
                     </execution>
                 </executions>
                 <configuration>
@@ -166,6 +186,37 @@
                     <useZincServer>true</useZincServer>
                 </configuration>
             </plugin>
+
+            <!--
+                Run scalatest Specs during testing
+            -->
+            <!--<plugin>-->
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-surefire-plugin</artifactId>-->
+                <!--<configuration>-->
+                    <!--<includes>-->
+                        <!--<include>**/*Spec.*</include>-->
+                    <!--</includes>-->
+                <!--</configuration>-->
+            <!--</plugin>-->
+            <plugin>
+                <groupId>org.scalatest</groupId>
+                <artifactId>scalatest-maven-plugin</artifactId>
+                <version>1.0</version>
+                <configuration>
+                    <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+                    <junitxml>.</junitxml>
+                    <filereports>WDF TestSuite.txt</filereports>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>test</id>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
@@ -174,7 +225,7 @@
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
-                <version>3.1.5</version>
+                <version>3.2.0</version>
             </plugin>
         </plugins>
     </reporting>
