@@ -15,17 +15,17 @@
 
 package vars.annotation.ui;
 
+import com.google.common.collect.Lists;
 import com.google.inject.Injector;
 import foxtrot.Job;
 import foxtrot.Worker;
 import java.awt.Toolkit;
+import java.util.Collection;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.Vector;
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
+import javax.swing.*;
+
 import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.EventSubscriber;
 import org.bushe.swing.event.EventTopicSubscriber;
@@ -56,7 +56,7 @@ import vars.shared.util.ActiveAppPinger;
 public class App {
 
     private AnnotationFrame annotationFrame;
-    private final ToolBelt toolBelt;
+    private ToolBelt toolBelt;
     
     /**
      * The App gets garbage collected shortly after startup. To
@@ -91,8 +91,19 @@ public class App {
         splashFrame.setVisible(true);
 
         final Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
-        toolBelt = injector.getInstance(ToolBelt.class);
+        try {
+            toolBelt = injector.getInstance(ToolBelt.class);
+        }
+        catch (Exception e) {
+            Exception ex = new RuntimeException("Initialization failed. Perhaps VARS can't connect to the database", e);
+            (new FatalExceptionSubscriber(null)).onEvent(Lookup.TOPIC_FATAL_ERROR, ex);
+        }
 
+        // HACK - For failed initialization... e.g. Database isn't running.
+        // Hate putting a system exit call in constructor. But it works.
+        if (toolBelt == null) {
+            System.exit(-1);
+        }
 
         /*
          *  Verify that the database connection is working. If it's not, show
@@ -111,7 +122,7 @@ public class App {
         /*
          * Preload the knowledgebase in the Foxtrot worker thread!!
          */
-        splashFrame.setMessage(" Preloading knowledgebase ... be patient");
+        splashFrame.setMessage(" Pre-loading knowledgebase ... be patient");
         Worker.post(new Job() {
 
             @Override
@@ -127,7 +138,7 @@ public class App {
         Lookup.getSelectedObservationsDispatcher().setValueObject(new Vector<Observation>());
 
         // Connect to the ImageCaptureService
-        Lookup.getImageCaptureServiceDispatcher().setValueObject(injector.getInstance(ImageCaptureService.class));
+        //Lookup.getImageCaptureServiceDispatcher().setValueObject(injector.getInstance(ImageCaptureService.class));
         Lookup.getImageCaptureServiceDispatcher().setValueObject(new FakeImageCaptureServiceImpl());
         
         // Configure EventBus
@@ -225,11 +236,7 @@ public class App {
         }
         else {
             try {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        new App();
-                    }
-                });
+                SwingUtilities.invokeLater(() -> new App());
             }
             catch (Throwable e) {
                 LoggerFactory.getLogger(App.class).warn("An error occurred on startup", e);

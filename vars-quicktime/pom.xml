@@ -4,7 +4,7 @@
     <parent>
         <artifactId>vars-redux</artifactId>
         <groupId>vars-redux</groupId>
-        <version>8.0.1-SNAPSHOT</version>
+        <version>8.0.1</version>
     </parent>
     <artifactId>vars-quicktime</artifactId>
     <name>vars-quicktime</name>

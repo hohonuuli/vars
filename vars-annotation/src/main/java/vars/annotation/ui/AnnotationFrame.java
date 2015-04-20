@@ -31,20 +31,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.ActionMap;
-import javax.swing.BoxLayout;
-import javax.swing.InputMap;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTable;
-import javax.swing.JToolBar;
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -230,7 +217,9 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
         if (table == null) {
             table = new JXObservationTable();
             table.setFocusable(false);    // The row editor panel should get focus NOT the table
-            ((JXObservationTableColumnModel) table.getColumnModel()).setMiniView(true);
+            //((JXObservationTableColumnModel) table.getColumnModel()).setMiniView(true);
+            ((JXObservationTableColumnModel) table.getColumnModel()).setImageView(VARSProperties.getShowRecordedDateInTable());
+
 
             // Map Mask+UP-ARROW Key Stroke
             String upTable = "up-table";
