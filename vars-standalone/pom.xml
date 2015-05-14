@@ -176,6 +176,19 @@
                             <goal>compile</goal>
                             <goal>testCompile</goal>
                         </goals>
+                        <configuration>
+                            <scalaVersion>${scala.version}</scalaVersion>
+                            <encoding>${project.build.sourceEncoding}</encoding>
+                            <args>
+                                <!-- DON'T USE OPTIMISE!! It causes the build to fail -->
+                                <!-- arg>-optimise</arg -->
+                                <arg>-unchecked</arg>
+                                <arg>-deprecation</arg>
+                                <arg>-feature</arg>
+                                <arg>-language:implicitConversions</arg>
+                                <!--<arg>-Xfatal-warnings</arg>-->
+                            </args>
+                        </configuration>
                     </execution>
                 </executions>
                 <configuration>

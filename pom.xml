@@ -41,7 +41,7 @@
         <postgresql.version>9.0-801.jdbc4</postgresql.version>
         <qtx4j.version>0.18</qtx4j.version>
         <sanselan.version>0.97</sanselan.version>
-        <scala.version>2.11.5</scala.version>
+        <scala.version>2.11.6</scala.version>
         <scala.version.major>2.11</scala.version.major>
         <scalatest.version>2.2.4</scalatest.version>
         <scalr.version>4.2</scalr.version>
@@ -160,8 +160,8 @@
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                 </configuration>
             </plugin>
             <!-- Create source jars when deploying -->
@@ -314,7 +314,8 @@
         <repository>
             <id>mbari-maven-repository</id>
             <name>MBARI Maven Repository</name>
-            <url>https://mbari-maven-repository.googlecode.com/svn/repository/</url>
+            <url>http://dsg.mbari.org/mbari-maven-repository/repository/</url>
+            <!-- url>https://mbari-maven-repository.googlecode.com/svn/repository/</url -->
         </repository>
         <repository>
             <id>eclipselink</id>
