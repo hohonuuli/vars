@@ -4,7 +4,7 @@
     <parent>
         <artifactId>vars-redux</artifactId>
         <groupId>vars-redux</groupId>
-        <version>7.0.5-SNAPSHOT</version>
+        <version>7.1.0-SNAPSHOT</version>
     </parent>
     <artifactId>vars-annotation</artifactId>
     <name>vars-annotation</name>
@@ -35,7 +35,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.5</version>
+                <version>${maven.jar.plugin}</version>
                 <configuration>
                     <archive>
 						<manifestEntries>
@@ -49,7 +49,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>1.2.1</version>
+                <version>${codehaus.exec.plugin}</version>
                 <configuration>
                     <executable>java</executable>
                     <arguments>
@@ -94,16 +94,6 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>vars-avfoundation</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>vars-qtkit</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>vars-quicktime</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

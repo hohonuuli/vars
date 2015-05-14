@@ -483,8 +483,8 @@ public class OpenVideoArchiveDialog extends StandardDialog {
         if (sequenceNumberByNameTextField == null) {
             sequenceNumberByNameTextField = new JTextField();
             sequenceNumberByNameTextField.setColumns(10);
-            tapeNumberTextField.addKeyListener(new NonDigitConsumingKeyListener());
-            tapeNumberTextField.addKeyListener(new KeyAdapter() {
+            sequenceNumberByNameTextField.addKeyListener(new NonDigitConsumingKeyListener());
+            sequenceNumberByNameTextField.addKeyListener(new KeyAdapter() {
                 @Override
                 public void keyReleased(KeyEvent e) {
                     if (e.getKeyCode() == KeyEvent.VK_ENTER) {
