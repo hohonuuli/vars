@@ -13,6 +13,13 @@
             <groupId>org.mbari</groupId>
             <artifactId>qtx4j</artifactId>
             <version>${qtx4j.version}</version>
+            <exclusions>
+                <!-- No development is done on qtx4j anymore. It uses an old versio of vcr4j -->
+                <exclusion>
+                    <groupId>org.mbari</groupId>
+                    <artifactId>vcr4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.mbari</groupId>

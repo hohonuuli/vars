@@ -48,7 +48,6 @@ import vars.CacheClearedEvent;
 import vars.CacheClearedListener;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveDAO;
-import vars.annotation.VideoFrame;
 import vars.annotation.ui.PersistenceController;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.VARSProperties;
@@ -75,8 +74,8 @@ public class OpenVideoArchiveDialog extends StandardDialog {
 
     private final ButtonGroup buttonGroup = new ButtonGroup();
     private final ItemListener rbItemListener = new SelectedRBItemListener();
-    private JComboBox cameraPlatformComboBox;
-    private JComboBox existingNamesComboBox;
+    private JComboBox<String> cameraPlatformComboBox;
+    private JComboBox<String> existingNamesComboBox;
     private boolean loadExistingNames = true;
     private JCheckBox hdCheckBox;
     private JLabel lblCameraPlatform;
@@ -91,10 +90,12 @@ public class OpenVideoArchiveDialog extends StandardDialog {
     private JPanel panel;
     private JTextField sequenceNumberTextField;
     private JTextField tapeNumberTextField;
+    private JComboBox<String> cameraPlatformByNameComboBox;
 
     private enum OpenType { BY_PARAMS, BY_NAME, EXISTING; }
 
     private final ToolBelt toolBelt;
+    private JTextField sequenceNumberByNameTextField;
 
     /**
      * Constructs ...
@@ -117,18 +118,27 @@ public class OpenVideoArchiveDialog extends StandardDialog {
         });
     }
 
-    private JComboBox getCameraPlatformComboBox() {
+    private JComboBox<String> getCameraPlatformComboBox() {
         if (cameraPlatformComboBox == null) {
-            cameraPlatformComboBox = new JComboBox();
-            cameraPlatformComboBox.setModel(new DefaultComboBoxModel(listCameraPlatforms()));
+            cameraPlatformComboBox = new JComboBox<String>();
+            cameraPlatformComboBox.setModel(new DefaultComboBoxModel<String>(listCameraPlatforms()));
         }
 
         return cameraPlatformComboBox;
     }
 
-    private JComboBox getExistingNamesComboBox() {
+    private JComboBox<String> getCameraPlatformByNameComboBox() {
+        if (cameraPlatformByNameComboBox == null) {
+            cameraPlatformByNameComboBox = new JComboBox<String>();
+            cameraPlatformByNameComboBox.setModel(new DefaultComboBoxModel<String>(listCameraPlatforms()));
+        }
+
+        return cameraPlatformByNameComboBox;
+    }
+
+    private JComboBox<String> getExistingNamesComboBox() {
         if (existingNamesComboBox == null) {
-            existingNamesComboBox = new JComboBox();
+            existingNamesComboBox = new JComboBox<String>();
         }
 
         return existingNamesComboBox;
@@ -206,7 +216,7 @@ public class OpenVideoArchiveDialog extends StandardDialog {
             openByNameRB = new JRadioButton("Open by Name");
             openByNameRB.setName(OpenType.BY_NAME.name());
             openByNameRB.addItemListener(rbItemListener);
-            openByNameRB.setEnabled(false); // TODO have to look into implementing this. there are some gotchas
+            //openByNameRB.setEnabled(false); // TODO have to look into implementing this. there are some gotchas
         }
 
         return openByNameRB;
@@ -230,12 +240,12 @@ public class OpenVideoArchiveDialog extends StandardDialog {
             openExistingRB.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     if (loadExistingNames) {
-                        JComboBox comboBox = getExistingNamesComboBox();
+                        JComboBox<String> comboBox = getExistingNamesComboBox();
                         WaitIndicator waitIndicator = new SpinningDialWaitIndicator(comboBox);
                         List<String> names = toolBelt.getAnnotationPersistenceService().findAllVideoArchiveNames();
                         String[] van = new String[names.size()];
                         names.toArray(van);
-                        comboBox.setModel(new DefaultComboBoxModel(van));
+                        comboBox.setModel(new DefaultComboBoxModel<String>(van));
                         waitIndicator.dispose();
                         loadExistingNames = false;
                     }
@@ -249,6 +259,10 @@ public class OpenVideoArchiveDialog extends StandardDialog {
     private JPanel getPanel() {
             if (panel == null) {
                     panel = new JPanel();
+                    
+                    JLabel cameraByNameLabel = new JLabel("Camera Platform:");
+                    JLabel sequenceNumberByNameLabel = new JLabel("Sequence Number:");
+                    
                     GroupLayout groupLayout = new GroupLayout(panel);
                     groupLayout.setHorizontalGroup(
                     	groupLayout.createParallelGroup(Alignment.LEADING)
@@ -256,32 +270,40 @@ public class OpenVideoArchiveDialog extends StandardDialog {
                     			.addContainerGap()
                     			.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
                     				.addComponent(getOpenByPlatformRB())
+                    				.addComponent(getOpenByNameRB())
                     				.addGroup(groupLayout.createSequentialGroup()
-                    					.addGap(29)
                     					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-                    						.addComponent(getLblSequenceNumber())
-                    						.addComponent(getLblCameraPlatform())
-                    						.addComponent(getLblTapeNumber()))
-                    					.addPreferredGap(ComponentPlacement.RELATED)
-                    					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-                    						.addComponent(getHdCheckBox())
-                    						.addComponent(getCameraPlatformComboBox(), 0, 325, Short.MAX_VALUE)
-                    						.addComponent(getSequenceNumberTextField(), GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE)
-                    						.addComponent(getTapeNumberTextField(), GroupLayout.DEFAULT_SIZE, 286, Short.MAX_VALUE)))
-                    				.addGroup(groupLayout.createSequentialGroup()
-                    					.addGap(29)
-                    					.addComponent(getLblName())
-                    					.addGap(83)
-                    					.addComponent(getNameTextField(), GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE))
-                    				.addGroup(groupLayout.createSequentialGroup()
-                    					.addComponent(getOpenByNameRB())
-                    					.addPreferredGap(ComponentPlacement.RELATED, 314, Short.MAX_VALUE))
-                    				.addGroup(groupLayout.createSequentialGroup()
-                    					.addGap(29)
-                    					.addComponent(getLblSelectName())
-                    					.addGap(42)
-                    					.addComponent(getExistingNamesComboBox(), 0, 325, Short.MAX_VALUE))
-                    				.addComponent(getOpenExistingRB()))
+                    						.addComponent(getOpenExistingRB())
+                    						.addGroup(groupLayout.createSequentialGroup()
+                    							.addGap(29)
+                    							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+                    								.addComponent(cameraByNameLabel)
+                    								.addComponent(getLblName())
+                    								.addComponent(sequenceNumberByNameLabel)))
+                    						.addGroup(groupLayout.createSequentialGroup()
+                    							.addGap(29)
+                    							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+                    								.addComponent(getLblCameraPlatform())
+                    								.addComponent(getLblSequenceNumber())
+                    								.addComponent(getLblTapeNumber())))
+                    						.addGroup(groupLayout.createSequentialGroup()
+                    							.addGap(29)
+                    							.addComponent(getLblSelectName())))
+                    					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
+                    						.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
+                    							.addGap(18)
+                    							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+                    								.addComponent(getCameraPlatformByNameComboBox(), 0, 185, Short.MAX_VALUE)
+                    								.addComponent(getNameTextField(), Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE)
+                    								.addComponent(getSequenceNumberByNameTextField(), GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE)
+                    								.addComponent(getExistingNamesComboBox(), 0, 185, Short.MAX_VALUE)))
+                    						.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
+                    							.addGap(18)
+                    							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+                    								.addComponent(getSequenceNumberTextField(), GroupLayout.DEFAULT_SIZE, 185, Short.MAX_VALUE)
+                    								.addComponent(getTapeNumberTextField(), GroupLayout.DEFAULT_SIZE, 185, Short.MAX_VALUE)
+                    								.addComponent(getCameraPlatformComboBox(), 0, 185, Short.MAX_VALUE)
+                    								.addComponent(getHdCheckBox()))))))
                     			.addContainerGap())
                     );
                     groupLayout.setVerticalGroup(
@@ -297,8 +319,8 @@ public class OpenVideoArchiveDialog extends StandardDialog {
                     			.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
                     				.addComponent(getLblSequenceNumber())
                     				.addComponent(getSequenceNumberTextField(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                    			.addPreferredGap(ComponentPlacement.RELATED)
-                    			.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+                    			.addPreferredGap(ComponentPlacement.UNRELATED)
+                    			.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
                     				.addComponent(getLblTapeNumber())
                     				.addComponent(getTapeNumberTextField(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                     			.addPreferredGap(ComponentPlacement.RELATED)
@@ -307,14 +329,23 @@ public class OpenVideoArchiveDialog extends StandardDialog {
                     			.addComponent(getOpenByNameRB())
                     			.addPreferredGap(ComponentPlacement.RELATED)
                     			.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-                    				.addComponent(getLblName())
-                    				.addComponent(getNameTextField(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                    				.addComponent(getNameTextField(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    				.addComponent(getLblName()))
+                    			.addPreferredGap(ComponentPlacement.RELATED)
+                    			.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+                    				.addComponent(getCameraPlatformByNameComboBox(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    				.addComponent(cameraByNameLabel))
+                    			.addPreferredGap(ComponentPlacement.RELATED)
+                    			.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+                    				.addComponent(sequenceNumberByNameLabel)
+                    				.addComponent(getSequenceNumberByNameTextField(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                     			.addPreferredGap(ComponentPlacement.RELATED)
                     			.addComponent(getOpenExistingRB())
                     			.addPreferredGap(ComponentPlacement.RELATED)
                     			.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
                     				.addComponent(getLblSelectName())
-                    				.addComponent(getExistingNamesComboBox(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+                    				.addComponent(getExistingNamesComboBox(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                    			.addContainerGap(60, Short.MAX_VALUE))
                     );
                     panel.setLayout(groupLayout);
 
@@ -357,7 +388,7 @@ public class OpenVideoArchiveDialog extends StandardDialog {
     }
 
     protected void initialize() {
-        setPreferredSize(new Dimension(475, 400));
+        setPreferredSize(new Dimension(475, 475));
         getOkayButton().addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 setVisible(false);
@@ -406,8 +437,10 @@ public class OpenVideoArchiveDialog extends StandardDialog {
         switch (openType) {
         case BY_NAME:
         {
-            String name = getNameTextField().getText();
-            videoArchive = dao.findByName(name);
+            String videoArchiveName = getNameTextField().getText();
+            int sequenceNumber = Integer.parseInt(getSequenceNumberByNameTextField().getText());
+            String platform = (String) getCameraPlatformComboBox().getSelectedItem();
+            videoArchive = dao.findOrCreateByParameters(platform, sequenceNumber, videoArchiveName);
             break;
         }
         case BY_PARAMS:
@@ -446,7 +479,26 @@ public class OpenVideoArchiveDialog extends StandardDialog {
     }
 
 
-    /**
+    private JTextField getSequenceNumberByNameTextField() {
+        if (sequenceNumberByNameTextField == null) {
+            sequenceNumberByNameTextField = new JTextField();
+            sequenceNumberByNameTextField.setColumns(10);
+            tapeNumberTextField.addKeyListener(new NonDigitConsumingKeyListener());
+            tapeNumberTextField.addKeyListener(new KeyAdapter() {
+                @Override
+                public void keyReleased(KeyEvent e) {
+                    if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                        getOkayButton().doClick();
+                    }
+                    super.keyReleased(e);
+                }
+            });
+        }
+		return sequenceNumberByNameTextField;
+	}
+
+
+	/**
      *
      * @author brian
      *
@@ -467,9 +519,14 @@ public class OpenVideoArchiveDialog extends StandardDialog {
                 boolean nameTF = false;
                 boolean existingNamesCB = false;
                 boolean tapeNumberTF = false;
+
+                boolean cameraPlatformByNameCB = false;
+                boolean sequenceNumberByNameTF = false;
                 switch (openType) {
                 case BY_NAME:
                     nameTF = true;
+                    cameraPlatformByNameCB = true;
+                    sequenceNumberByNameTF = true;
                     break;
                 case BY_PARAMS:
                     cameraPlatformCB = true;
@@ -489,6 +546,8 @@ public class OpenVideoArchiveDialog extends StandardDialog {
                 getSequenceNumberTextField().setEnabled(sequenceNumberTF);
                 getHdCheckBox().setEnabled(hdChckB);
                 getNameTextField().setEnabled(nameTF);
+                getCameraPlatformByNameComboBox().setEnabled(cameraPlatformByNameCB);
+                getSequenceNumberByNameTextField().setEnabled(sequenceNumberByNameTF);
                 getExistingNamesComboBox().setEnabled(existingNamesCB);
                 getTapeNumberTextField().setEnabled(tapeNumberTF);
 
