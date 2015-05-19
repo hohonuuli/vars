@@ -25,22 +25,25 @@ WHERE
       )
       OR (
         ConceptName IN (
-         'Bathyteuthis',
-         'Bathyteuthis abyssicola',
-         'Bathyteuthis berryi',
-         'Grimalditeuthis',
-         'Grimalditeuthis',
-         'Grimalditeuthis bonpland',
-         'Octopoteuthis',
-         'Octopoteuthis deletron',
-         'Planctoteuthis',
-         'Planctoteuthis danae',
-         'Planctoteuthis oligobessa'
-        ) AND
-        Observer = 'sbush'
+         'Ctenophora',
+         'Cydippida',
+         'Xenoturbellida',
+         'Xenoturbellidae',
+         'Xenoturbella',
+         'Xenophyophorea',
+         'Psamminida',
+         'Psamminidae',
+         'Mystery Mollusc'
+        )
       )
     )
   )
+GO
+
+UPDATE
+  CameraData
+SET
+  direction = NULL
 GO
 
 UPDATE
