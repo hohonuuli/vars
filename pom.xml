@@ -88,7 +88,7 @@
         <module>vars-annotation</module>
         <module>vars-avfoundation</module>
         <!--<module>vars-qtkit</module>-->
-        <!--<module>vars-quicktime</module>-->
+        <module>vars-quicktime</module>
         <module>vars-standalone</module>
   </modules>
     <scm>
