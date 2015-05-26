@@ -1,7 +1,6 @@
 package vars.query.ui.db;
 
 import org.mbari.awt.event.ActionAdapter;
-import org.mbari.sql.IQueryable;
 import org.mbari.sql.QueryResults;
 import org.mbari.util.ExceptionHandler;
 import org.mbari.util.ExceptionHandlerSupport;
@@ -41,6 +40,7 @@ public class QueryActionImpl extends ActionAdapter implements QueryAction {
     private boolean showBasicPhylogeny;
     private boolean showFullPhylogeny;
     private boolean showHierarchy;
+    private boolean showAssociationPerColumn;
 
     private final String coalesceKey;
 
@@ -53,7 +53,7 @@ public class QueryActionImpl extends ActionAdapter implements QueryAction {
      * @param knowledgebaseDAOFactory
      */
     public QueryActionImpl(final QueryExecutor queryExecutor, KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
-        this(queryExecutor, knowledgebaseDAOFactory, false, false, false);
+        this(queryExecutor, knowledgebaseDAOFactory, false, false, false, false);
     }
 
     /**
@@ -66,12 +66,13 @@ public class QueryActionImpl extends ActionAdapter implements QueryAction {
      * @param showFullPhylogeny
      */
     public QueryActionImpl(final QueryExecutor queryExecutor, KnowledgebaseDAOFactory knowledgebaseDAOFactory,
-            boolean showHiearchy, boolean showBasicPhylogeny, boolean showFullPhylogeny) {
+            boolean showHiearchy, boolean showBasicPhylogeny, boolean showFullPhylogeny, boolean showAssociationPerColumn) {
         this.queryExecutor = queryExecutor;
         this.queryResultsDecorator = new QueryResultsDecorator(knowledgebaseDAOFactory);
         this.showHierarchy = showHiearchy;
         this.showBasicPhylogeny = showBasicPhylogeny;
         this.showFullPhylogeny = showFullPhylogeny;
+        this.showAssociationPerColumn = showAssociationPerColumn;
 
         ResourceBundle bundle = ResourceBundle.getBundle("query-app", Locale.US);
         coalesceKey = bundle.getString("queryresults.coalesce.key");
@@ -135,6 +136,10 @@ public class QueryActionImpl extends ActionAdapter implements QueryAction {
 
                     if (showHierarchy) {
                         queryResultsDecorator.addHierarchy(queryResults);
+                    }
+
+                    if (showAssociationPerColumn) {
+                        AssociationColumnRemapper.apply(queryResults);
                     }
 
                     // Either show Full or Basic phylogeny. Basic is a subset of full

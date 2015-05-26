@@ -81,6 +81,7 @@ public class SearchPanel extends JPanel {
     private JCheckBox cbFullPhylogeny;
     private JCheckBox cbHierarchy;
     private JCheckBox cbPhylogeny;
+    private JCheckBox cbAssociationPerColumn;
     private ActionAdapter clearAction;
     private final Timer delayTimer;
     private final Injector injector;
@@ -182,6 +183,7 @@ public class SearchPanel extends JPanel {
             allPanel.add(getCbHierarchy());
             allPanel.add(getCbPhylogeny());
             allPanel.add(getCbFullPhylogeny());
+            allPanel.add(getCbAssociationPerColumn());
         }
 
         return allPanel;
@@ -255,6 +257,15 @@ public class SearchPanel extends JPanel {
         }
 
         return cbPhylogeny;
+    }
+
+    protected JCheckBox getCbAssociationPerColumn() {
+        if (cbAssociationPerColumn == null) {
+            cbAssociationPerColumn = new JCheckBox();
+            cbAssociationPerColumn.setText("Categorize Associations into columns");
+            cbAssociationPerColumn.setToolTipText("Categorize associations by link-name into distinct columns");
+        }
+        return cbAssociationPerColumn;
     }
 
     private ActionAdapter getClearAction() {
