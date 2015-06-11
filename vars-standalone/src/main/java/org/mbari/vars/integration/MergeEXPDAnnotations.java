@@ -22,10 +22,10 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Collections2;
 import com.google.inject.Injector;
 import org.mbari.expd.*;
-import org.mbari.expd.actions.CoallateByAlternateTimecodeFunction;
-import org.mbari.expd.actions.CoallateByDateFunction;
-import org.mbari.expd.actions.CoallateByTimecodeFunction;
-import org.mbari.expd.actions.CoallateFunction;
+import org.mbari.expd.actions.CollateByAlternateTimecodeFunction;
+import org.mbari.expd.actions.CollateByDateFunction;
+import org.mbari.expd.actions.CollateByTimecodeFunction;
+import org.mbari.expd.actions.CollateFunction;
 import org.mbari.expd.jdbc.DAOFactoryImpl;
 import org.mbari.expd.jdbc.UberDatumImpl;
 import org.slf4j.Logger;
@@ -295,7 +295,7 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
     private Map<VideoFrame, UberDatum> mergeByDate(Collection<VideoFrame> vfc, Collection<UberDatum> udc) {
 
         // Merge by Date
-        CoallateFunction<Date> f1 = new CoallateByDateFunction();
+        CollateFunction<Date> f1 = new CollateByDateFunction();
 
         // Extract the dates from the video frames
         Collection<Date> d = Collections2.transform(vfc, new Function<VideoFrame, Date>() {
@@ -322,7 +322,7 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
     private Map<VideoFrame, UberDatum> mergeByTimecode(Collection<VideoFrame> vfc, Collection<UberDatum> udc) {
 
         // Make sure we're using the correct merge function for HD and Beta
-        CoallateFunction<String> f2 = useHD ? new CoallateByAlternateTimecodeFunction() : new CoallateByTimecodeFunction();
+        CollateFunction<String> f2 = useHD ? new CollateByAlternateTimecodeFunction() : new CollateByTimecodeFunction();
 
         Collection<String> d = Collections2.transform(vfc, new Function<VideoFrame, String>() {
             public String apply(VideoFrame from) {
