@@ -4,7 +4,7 @@
     <groupId>vars-redux</groupId>
     <artifactId>vars-redux</artifactId>
     <packaging>pom</packaging>
-    <version>8.0.1</version>
+    <version>8.1-SNAPSHOT</version>
     <name>vars-redux</name>
     <inceptionYear>2002</inceptionYear>
     <organization>
@@ -89,6 +89,7 @@
         <module>vars-avfoundation</module>
         <!--<module>vars-qtkit</module>-->
         <module>vars-quicktime</module>
+        <module>vars-vlcj</module>
         <module>vars-standalone</module>
   </modules>
     <scm>
