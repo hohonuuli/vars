@@ -1,0 +1,51 @@
+#!/usr/bin/env scalas
+
+/*
+ Dump out merge info for a dive
+*/
+
+/***
+scalaVersion := "2.11.6"
+
+libraryDependencies ++= Seq(
+  "org.mbari" % "expd-core" % "1.3.0-SNAPSHOT",
+  "org.mbari" % "expd-jdbc" % "1.3.0-SNAPSHOT")
+
+resolvers in ThisBuild ++= Seq(Resolver.mavenLocal,
+ "mbari-maven-repository" at "https://mbari-maven-repository.googlecode.com/svn/repository")
+
+*/
+
+
+import java.text.SimpleDateFormat
+import java.util.TimeZone
+import org.mbari.expd.jdbc._
+import scala.collection.JavaConverters._
+
+
+args.foreach(println)
+val rov = "Doc Ricketts"
+val diveNumber = args(0).toInt
+
+val daoFactory = new DAOFactoryImpl
+val diveDao = daoFactory.newDiveDAO()
+val dive = diveDao.findByPlatformAndDiveNumber(rov, diveNumber)
+
+val uDao = daoFactory.newUberDatumDAO()
+val data = uDao.fetchData(dive, true, 7.5).asScala
+
+val df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+df.setTimeZone(TimeZone.getTimeZone("UTC"))
+
+println("CAMERA_DATE\tTIMECODE\tALTERNATE_TIMECODE\tCTD_DATE\tCTD_PRESSURE\tNAV_DATE\tNAV_DEPTH")
+data.foreach { d =>
+  val d0 = d.getCameraDatum.getDate
+  val tc1 = d.getCameraDatum.getTimecode
+  val tc2 = d.getCameraDatum.getAlternativeTimecode
+
+  val d1 = d.getCtdDatum.getPressure
+  val d2 = d.getNavigationDatum.getDepth
+  val t1 = d.getCtdDatum.getDate
+  val t2 = d.getNavigationDatum.getDate
+  println(s"$d0\t$tc1\t$tc2\t${df.format(t1)}\t$d1\t${df.format(t2)}\t$d2")
+}

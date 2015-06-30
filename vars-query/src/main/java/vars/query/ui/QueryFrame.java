@@ -235,9 +235,12 @@ public class QueryFrame extends JFrame {
                             getSearchPanel().getCbAllInterpretations().isSelected(),
                             getSearchPanel().getCbAllAssociations().isSelected(),
                             queryPersistenceService.getAnnotationQueryable());
-                    QueryAction queryAction = new QueryActionImpl(queryExecutor, knowledgebaseDAOFactory,
-                            getSearchPanel().getCbHierarchy().isSelected(), getSearchPanel().getCbPhylogeny().isSelected(),
-                             getSearchPanel().getCbFullPhylogeny().isSelected());
+                    QueryAction queryAction = new QueryActionImpl(queryExecutor,
+                            knowledgebaseDAOFactory,
+                            getSearchPanel().getCbHierarchy().isSelected(),
+                            getSearchPanel().getCbPhylogeny().isSelected(),
+                            getSearchPanel().getCbFullPhylogeny().isSelected(),
+                            getSearchPanel().getCbAssociationPerColumn().isSelected());
 
                     /*
                      * This generates the UI components for a QueryAction such

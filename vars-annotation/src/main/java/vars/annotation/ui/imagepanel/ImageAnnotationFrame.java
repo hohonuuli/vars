@@ -33,18 +33,15 @@ import vars.knowledgebase.Concept;
 import vars.shared.ui.AllConceptNamesComboBox;
 import vars.shared.ui.ConceptNameComboBox;
 
-import javax.swing.ButtonGroup;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JToolBar;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Image;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -86,6 +83,8 @@ public class ImageAnnotationFrame extends JFrame {
     private JPanel settingsPanel;
     private JToolBar toolBar;
     private CommonPainters<JImageUrlCanvas> commonPainters;
+
+    private JLabel pixelLabel;
 
 
     /**
@@ -207,6 +206,7 @@ public class ImageAnnotationFrame extends JFrame {
     protected JToolBar getToolBar() {
         if (toolBar == null) {
             toolBar = new JToolBar();
+            toolBar.add(getPixelLabel());
             toolBar.add(getComboBox());
 
             // --- Add buttons to select the correct LayerUI
@@ -236,6 +236,24 @@ public class ImageAnnotationFrame extends JFrame {
         }
 
         return toolBar;
+    }
+
+    public JLabel getPixelLabel() {
+        if (pixelLabel == null) {
+            pixelLabel = new JLabel("    ,     ");
+            pixelLabel.setPreferredSize(new Dimension(200, 35));
+            final JImageCanvas ic = getImageCanvas();
+            ic.addMouseMotionListener(new MouseMotionAdapter() {
+                @Override
+                public void mouseMoved(MouseEvent e) {
+                    Point cp = e.getPoint();
+                    Point2D ip = ic.convertToImage(cp);
+                    String text = String.format("%4d, %4d", Math.round(ip.getX()), Math.round(ip.getY()));
+                    pixelLabel.setText("Current X, Y: " + text);
+                }
+            });
+        }
+        return pixelLabel;
     }
 
     /**

@@ -1,5 +1,6 @@
 package org.mbari.vars.arctic
 
+import java.text.SimpleDateFormat
 import java.util.{Calendar, TimeZone, GregorianCalendar, Date}
 
 import org.mbari.math.Matlib
@@ -13,6 +14,7 @@ import org.mbari.movie.Timecode
  */
 object MergeUtilities {
 
+  private[this] val dateFormat = new SimpleDateFormat("HH:mm:ss")
 
 
   /**
@@ -79,4 +81,20 @@ object MergeUtilities {
 
     rs.flatten
   }
+
+  /**
+   * Simple mapping that does not look for GMT rollover.
+   *
+   * @param simple
+   * @return
+   */
+  def toFullLogRecords(simple: Seq[SimplePosition]): Seq[FullLogRecord] =
+    simple.map(s =>
+      FullLogRecord(None,
+        None,
+        None,
+        Option(s.latitude),
+        Option(s.longitude),
+        dateFormat.format(s.time),
+        s.time))
 }

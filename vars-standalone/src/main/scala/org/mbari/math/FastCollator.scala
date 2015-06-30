@@ -1,6 +1,5 @@
 package org.mbari.math
 
-import org.mbari.math.Collator._
 import org.slf4j.LoggerFactory
 
 /**
