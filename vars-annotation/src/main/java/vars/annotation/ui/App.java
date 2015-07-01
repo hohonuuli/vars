@@ -138,7 +138,6 @@ public class App {
         Lookup.getSelectedObservationsDispatcher().setValueObject(new Vector<Observation>());
 
         // Connect to the ImageCaptureService
-        //Lookup.getImageCaptureServiceDispatcher().setValueObject(injector.getInstance(ImageCaptureService.class));
         Lookup.getImageCaptureServiceDispatcher().setValueObject(new FakeImageCaptureServiceImpl());
         
         // Configure EventBus
@@ -160,10 +159,6 @@ public class App {
         EventBus.subscribe(Lookup.TOPIC_EXIT, exitSubscriber);
         EventBus.subscribe(VideoArchiveChangedEvent.class, loggingSubscriber);
 
-        /*
-         * Add a special eventQueue that toggles the cursor if the application is busy
-         */
-        //Toolkit.getDefaultToolkit().getSystemEventQueue().push(new WaitCursorEventQueue(500));
         JFrame frame = getAnnotationFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Lookup.getApplicationFrameDispatcher().setValueObject(frame);

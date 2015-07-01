@@ -1,6 +1,6 @@
 package org.mbari.vars.arctic
 
-import org.mbari.math.CoallateFunction
+import org.mbari.math.CollateFunction
 import org.mbari.movie.Timecode
 import org.slf4j.LoggerFactory
 import vars.annotation.VideoArchiveSetDAO
@@ -52,7 +52,7 @@ class MergeData {
         log.info("Found ${videoFrames?.size()} videoFrames")
         def collatedData = [:]
         try {
-            collatedData = CoallateFunction.coallate(videoFrames, convertVideoFrameToFrames,
+            collatedData = CollateFunction.coallate(videoFrames, convertVideoFrameToFrames,
                 logRecords, convertLogRecordToFrames, offsetFrames)
         }
         catch (Exception e) {

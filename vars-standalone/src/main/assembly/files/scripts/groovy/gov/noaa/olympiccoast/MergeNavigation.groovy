@@ -6,7 +6,6 @@ import vars.integration.MergeFunction.MergeType
 import org.mbari.movie.Timecode
 import java.text.SimpleDateFormat
 import vars.ToolBox
-import org.mbari.math.CoallateFunction
 import org.slf4j.LoggerFactory
 import vars.annotation.VideoArchiveSetDAO
 
@@ -134,7 +133,7 @@ class MergeNavigation implements MergeFunction<Map<VideoFrame, NavigationDatum>>
             println("${it.recordedDate} = ${convertVideoFrameToMillisecs(it)}")   
         } */
         
-//        def coallatedData = CoallateFunction.coallate(videoFrames, convertVideoFrameToMillisecs,
+//        def coallatedData = CollateFunction.coallate(videoFrames, convertVideoFrameToMillisecs,
 //                navigationData, convertNavigationDatumToMillisecs, offsetMillisecs)
 
         // Convert navigation time to frames and get nearest to videoFrame

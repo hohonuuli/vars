@@ -1,4 +1,4 @@
-import vars.annotation.DatabaseUtility2
+import vars.annotation.DatabaseUtility
 
 /*
    This script fetches all frame grab URLS in VARS and checks that the link 
@@ -9,7 +9,7 @@ import vars.annotation.DatabaseUtility2
 // Brian Schlining
 // 2014-12-04
 
-def du = new DatabaseUtility2()
+def du = new DatabaseUtility()
 def missingImages = du.listMissingStillImages().sort { it.toExternalForm() }
 def dao = du.toolBox.toolBelt.annotationDAOFactory.newDAO()
 def sql = """

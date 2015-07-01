@@ -125,7 +125,7 @@ class AnnoImageMigrator2(target: Path,
           Files.createDirectories(externalDir)
         }
         Some(externalTarget)
-      } getOrElse(None) // TODO this swalows exceptions. Need to report them
+      } getOrElse(None) // TODO this swallows exceptions. Need to report them
     }
   }
 

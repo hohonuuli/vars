@@ -50,14 +50,6 @@ public class ChangeTimeCodeFrame extends TimeCodeSelectionFrame {
     public ChangeTimeCodeFrame(ToolBelt toolBelt) {
         this.toolBelt = toolBelt;
         AnnotationProcessor.process(this); // Create EventBus Proxy
-
-//        final Dispatcher dispatcher = Lookup.getSelectedObservationsDispatcher();
-//        dispatcher.addPropertyChangeListener(new PropertyChangeListener() {
-//            public void propertyChange(PropertyChangeEvent evt) {
-//                update(evt.getNewValue());
-//            }
-//        });
-
     }
 
     /**
@@ -122,7 +114,7 @@ public class ChangeTimeCodeFrame extends TimeCodeSelectionFrame {
         int second = 0;
         int frame = 0;
 
-        if ((obs != null) && (obs.size() == 1)) {
+        if (obs.size() == 1) {
 
 
             final VideoFrame vf = obs.iterator().next().getVideoFrame();

@@ -61,7 +61,6 @@ public class StatusLabelForVideoArchive extends StatusLabel {
         dialog = new JFXOpenVideoArchiveDialog(frame, toolBelt);
         dialog.onOkay(() -> {
             dialog.setVisible(false);
-            //VideoArchive videoArchive = dialog.openVideoArchive();
             VideoParams videoParams = dialog.getVideoParams();
             Tuple2<VideoArchive, VideoPlayerController> t = dialog.openVideoArchive();
             VideoArchive videoArchive = t.getA();

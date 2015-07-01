@@ -1,15 +1,11 @@
 package org.mbari.vars.arctic
 
-import org.mbari.math.CoallateFunction
+import org.mbari.math.CollateFunction
 import org.mbari.movie.Timecode
 import org.slf4j.LoggerFactory
 import vars.annotation.VideoArchiveSetDAO
 import vars.annotation.VideoFrame
 import vars.ToolBox
-
-import java.time.Instant
-import java.time.ZoneId
-import java.time.ZonedDateTime
 
 /**
  * Created by brian on 1/29/14.
@@ -59,7 +55,7 @@ class MergeDataByDate {
         log.info("Found ${videoFrames?.size()} videoFrames")
         def collatedData = [:]
         try {
-            collatedData = CoallateFunction.coallate(videoFrames, convertVideoFrameToMillis,
+            collatedData = CollateFunction.coallate(videoFrames, convertVideoFrameToMillis,
                     logRecords, convertLogRecordToMillis, offsetMillis)
         }
         catch (Exception e) {

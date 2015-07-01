@@ -6,10 +6,11 @@ import org.slf4j.LoggerFactory
  *
  * @author Brian Schlining
  * @since Aug 31, 2010
+ * @deprecated
  */
-class CoallateFunction {
+class CollateFunction {
 
-    private static final log = LoggerFactory.getLogger(CoallateFunction.getClass())
+    private static final log = LoggerFactory.getLogger(CollateFunction.getClass())
 
     static final DO_NOTHING_CLOSURE = { it }
 
