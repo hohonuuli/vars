@@ -7,6 +7,8 @@ import javafx.stage.WindowEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -132,6 +134,19 @@ public class JavaFX {
         }
         else {
             Platform.runLater(r);
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+        System.setProperty("VLC_PLUGIN_PATH", "/Applications/VLC.app/Contents/MacOS/plugins/");
+        System.setProperty("jna.library.path", "/Applications/VLC.app/Contents/MacOS/lib/");
+        String a = args[0];
+        if (a.startsWith("http:")) {
+            namedWindow(a).thenAccept(Stage::show);
+        }
+        else {
+            File f = new File(a);
+            namedWindow(f.toURI().toURL().toExternalForm()).thenAccept(Stage::show);
         }
     }
 
