@@ -36,8 +36,6 @@ import org.mbari.awt.layout.WrappingFlowLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.ui.buttons.*;
-import vars.annotation.ui.video.ImageCaptureAction;
-import vars.annotation.ui.video.SwingImageCaptureAction;
 
 /**
  * <p> This panel contains buttons for actions that can modify the contents of the

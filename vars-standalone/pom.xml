@@ -77,18 +77,6 @@
             <version>${commons.imaging.version}</version>
         </dependency>
 
-        <!-- Need for loading SIMPA -->
-        <!--<dependency>-->
-            <!--<groupId>${project.groupId}</groupId>-->
-            <!--<artifactId>vars-quicktime</artifactId>-->
-            <!--<version>${project.version}</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.mbari</groupId>-->
-            <!--<artifactId>qtx4j</artifactId>-->
-            <!--<version>${qtx4j.version}</version>-->
-        <!--</dependency>-->
-
         <!--
             Scala related classes
         -->

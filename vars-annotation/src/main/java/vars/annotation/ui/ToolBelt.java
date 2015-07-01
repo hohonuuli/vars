@@ -22,7 +22,6 @@ import vars.PersistenceCacheProvider;
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.AnnotationFactory;
 import vars.annotation.AnnotationPersistenceService;
-import vars.annotation.ui.commandqueue.impl.LocalVideoArchiveCache;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.KnowledgebasePersistenceService;
@@ -34,7 +33,6 @@ import vars.query.QueryPersistenceService;
 public class ToolBelt extends vars.ToolBelt {
 
     private final PersistenceController persistenceController;
-    private final LocalVideoArchiveCache localVideoArchiveCache;
 
     /**
      * Constructs ...
@@ -49,7 +47,6 @@ public class ToolBelt extends vars.ToolBelt {
      * @param annotationPersistenceService
      * @param knowledgebasePersistenceService
      * @param queryPersistenceService
-     * @param localVideoArchiveCache
      */
     @Inject
     public ToolBelt(AnnotationDAOFactory annotationDAOFactory,
@@ -61,13 +58,11 @@ public class ToolBelt extends vars.ToolBelt {
                     PersistenceCacheProvider persistenceCacheProvider,
                     AnnotationPersistenceService annotationPersistenceService,
                     KnowledgebasePersistenceService knowledgebasePersistenceService,
-                    QueryPersistenceService queryPersistenceService,
-                    LocalVideoArchiveCache localVideoArchiveCache) {
+                    QueryPersistenceService queryPersistenceService) {
         super(annotationDAOFactory, annotationFactory, knowledgebaseDAOFactory, knowledgebaseFactory, miscDAOFactory,
               miscFactory, persistenceCacheProvider, annotationPersistenceService, knowledgebasePersistenceService,
               queryPersistenceService);
         this.persistenceController = new PersistenceController(this);
-        this.localVideoArchiveCache = localVideoArchiveCache;
     }
 
     /**
@@ -77,7 +72,4 @@ public class ToolBelt extends vars.ToolBelt {
         return persistenceController;
     }
 
-    public LocalVideoArchiveCache getLocalVideoArchiveCache() {
-        return localVideoArchiveCache;
-    }
 }

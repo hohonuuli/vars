@@ -244,7 +244,7 @@ public class QueryPersistenceServiceImpl implements QueryPersistenceService {
             }
         };
 
-        String query = "SELECT DISTINCT " + columnName + " FROM Annotations";
+        String query = "SELECT DISTINCT count(" + columnName + ") FROM Annotations";
 
         return (Integer) annoQueryable.executeQueryFunction(query, queryFunction);
 
