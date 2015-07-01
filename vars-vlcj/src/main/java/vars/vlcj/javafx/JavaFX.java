@@ -8,12 +8,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 /**
  * @author Brian Schlining
@@ -137,16 +137,35 @@ public class JavaFX {
         }
     }
 
+    /**
+     * A demo url to try: http://devimages.apple.com.edgekey.net/streaming/examples/bipbop_4x3/bipbop_4x3_variant.m3u8
+     *
+     * My local test files on external SSD:
+     *  - /Volumes/LBD2/i2map/4k_ProRes_HQ_original.mov (playback is jerky)
+     *  - /Volumes/LBD2/i2map/h264_test.mp4 (decent playback)
+     *  - /Volumes/LBD2/i2map/h265_test.mp4 (actually seems really good)
+     *
+     * @param args
+     * @throws Exception
+     */
     public static void main(String[] args) throws Exception {
         System.setProperty("VLC_PLUGIN_PATH", "/Applications/VLC.app/Contents/MacOS/plugins/");
         System.setProperty("jna.library.path", "/Applications/VLC.app/Contents/MacOS/lib/");
         String a = args[0];
+
+        Consumer<VideoStage> fn = videoStage -> {
+            videoStage.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, evt -> {
+                System.exit(0);
+            });
+            videoStage.show();
+        };
+
         if (a.startsWith("http:")) {
-            namedWindow(a).thenAccept(Stage::show);
+            namedWindow(a).thenAccept(fn);
         }
         else {
             File f = new File(a);
-            namedWindow(f.toURI().toURL().toExternalForm()).thenAccept(Stage::show);
+            namedWindow(f.getAbsolutePath()).thenAccept(fn);
         }
     }
 
