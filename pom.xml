@@ -37,7 +37,7 @@
         <junit.version>4.12</junit.version>
         <jxlayer.version>3.0.4.1</jxlayer.version> <!-- This version has SHA signatures stripped out -->
         <logback.version>1.1.3</logback.version>
-        <mbarix4j.version>1.9.3-SNAPSHOT</mbarix4j.version>
+        <mbarix4j.version>1.9.3</mbarix4j.version>
         <postgresql.version>9.0-801.jdbc4</postgresql.version>
         <qtx4j.version>0.18</qtx4j.version>
         <sanselan.version>0.97</sanselan.version>
@@ -87,8 +87,6 @@
         <module>vars-knowledgebase</module>
         <module>vars-annotation</module>
         <module>vars-avfoundation</module>
-        <!--<module>vars-qtkit</module>-->
-        <module>vars-quicktime</module>
         <module>vars-vlcj</module>
         <module>vars-standalone</module>
   </modules>
@@ -372,6 +370,14 @@
             <id>Apache-snapshots</id>
             <name>Apache Development Snapshot Repository</name>
             <url>https://repository.apache.org/content/repositories/snapshots/</url>
+        </repository>
+        <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>central</id>
+            <name>bintray</name>
+            <url>http://jcenter.bintray.com</url>
         </repository>
     </repositories>
     <reporting>

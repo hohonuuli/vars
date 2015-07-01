@@ -24,7 +24,7 @@ public class VideoPlayers {
     public VideoPlayers(AnnotationDAOFactory daoFactory) {
         List<VideoPlayer> vps = new ArrayList<>();
         buildVideoPlayer("Built-in", () -> new JFXAccessUI(daoFactory)).ifPresent(vps::add);
-        buildVideoPlayer("QuickTime", () -> new QTAccessUI(daoFactory)).ifPresent(vps::add);
+        //buildVideoPlayer("QuickTime", () -> new QTAccessUI(daoFactory)).ifPresent(vps::add);
         //buildVideoPlayer("Mac OS X", () -> new AVFAccessUI(daoFactory)).ifPresent(vps::add);
         playerList = ImmutableList.copyOf(vps);
     }

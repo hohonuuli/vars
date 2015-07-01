@@ -17,8 +17,6 @@ package vars.annotation.ui;
 
 import java.awt.Frame;
 import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
@@ -35,7 +33,7 @@ import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
 import vars.annotation.ui.videofile.VideoParams;
 import vars.annotation.ui.videofile.VideoPlayerController;
 import vars.annotation.ui.videofile.VideoPlayerDialogUI;
-import vars.annotation.ui.videofile.quicktime.QTOpenVideoArchiveDialog;
+import vars.annotation.ui.videofile.jfxmedia.JFXOpenVideoArchiveDialog;
 import vars.annotation.ui.eventbus.VideoArchiveSelectedEvent;
 
 /**
@@ -60,7 +58,7 @@ public class StatusLabelForVideoArchive extends StatusLabel {
         final Dispatcher videoArchiveDispatcher = Lookup.getVideoArchiveDispatcher();
 
 
-        dialog = new QTOpenVideoArchiveDialog(frame, toolBelt);
+        dialog = new JFXOpenVideoArchiveDialog(frame, toolBelt);
         dialog.onOkay(() -> {
             dialog.setVisible(false);
             //VideoArchive videoArchive = dialog.openVideoArchive();

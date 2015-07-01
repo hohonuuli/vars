@@ -1,7 +1,6 @@
 package vars.annotation.ui.videofile.quicktime;
 
 import org.mbari.util.Tuple2;
-import org.mbari.vcr.qt.TimeSource;
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.ToolBelt;
@@ -13,12 +12,13 @@ import java.util.Optional;
 
 /**
  * Created by brian on 1/7/14.
+ * @deprecated
  */
 public class QTAccessUI extends AbstractAccessUI {
 
     private VideoPlayerDialogUI dialog;
     private Window currentParent;
-    private QTController controller = new QTController();
+    //private QTController controller = new QTController();
 
     @Inject
     public QTAccessUI(AnnotationDAOFactory daoFactory) {
@@ -45,10 +45,11 @@ public class QTAccessUI extends AbstractAccessUI {
 
     @Override
     public Tuple2<VideoArchive, VideoPlayerController> openMoviePlayer(VideoParams videoParams) {
-        Optional<VideoArchive> videoArchiveOpt = findByLocation(videoParams.getMovieLocation());
-        VideoArchive videoArchive = videoArchiveOpt.orElseGet(() -> createVideoArchive(videoParams));
-        controller.getVideoControlService().connect(videoParams.getMovieLocation(),
-                videoParams.getTimeSourceOpt().orElse(TimeSource.AUTO));
-        return new Tuple2<>(videoArchive, controller);
+//        Optional<VideoArchive> videoArchiveOpt = findByLocation(videoParams.getMovieLocation());
+//        VideoArchive videoArchive = videoArchiveOpt.orElseGet(() -> createVideoArchive(videoParams));
+//        controller.getVideoControlService().connect(videoParams.getMovieLocation(),
+//                videoParams.getTimeSourceOpt().orElse(TimeSource.AUTO));
+//        return new Tuple2<>(videoArchive, controller);
+        throw new UnsupportedOperationException("VARS is dropping direct QuickTime support");
     }
 }

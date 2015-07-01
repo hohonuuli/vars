@@ -1,6 +1,5 @@
 package vars.annotation.ui.videofile;
 
-import org.mbari.vcr.qt.TimeSource;
 
 import java.util.Optional;
 

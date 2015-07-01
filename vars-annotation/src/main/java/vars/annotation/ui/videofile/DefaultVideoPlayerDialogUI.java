@@ -6,7 +6,6 @@ import org.mbari.swing.WaitIndicator;
 import org.mbari.text.IgnoreCaseToStringComparator;
 import org.mbari.util.Tuple2;
 import org.mbari.util.Tuple3;
-import org.mbari.vcr.qt.TimeSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.CacheClearedEvent;
