@@ -121,7 +121,7 @@ public class VideoStage extends Stage {
 
         PixelWriter pixelWriter = null;
 
-        private PixelWriter getPW() {
+        private PixelWriter getPixelWriter() {
             if (pixelWriter == null) {
                 pixelWriter = writableImage.getPixelWriter();
             }
@@ -137,7 +137,7 @@ public class VideoStage extends Stage {
                 Memory nativeBuffer = mediaPlayer.lock()[0];
                 try {
                     ByteBuffer byteBuffer = nativeBuffer.getByteBuffer(0, nativeBuffer.size());
-                    getPW().setPixels(0, 0, bufferFormat.getWidth(), bufferFormat.getHeight(), pixelFormat, byteBuffer, bufferFormat.getPitches()[0]);
+                    getPixelWriter().setPixels(0, 0, bufferFormat.getWidth(), bufferFormat.getHeight(), pixelFormat, byteBuffer, bufferFormat.getPitches()[0]);
                 } finally {
                     mediaPlayer.unlock();
                 }
