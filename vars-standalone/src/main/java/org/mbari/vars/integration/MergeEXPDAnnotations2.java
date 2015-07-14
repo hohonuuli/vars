@@ -21,6 +21,8 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.inject.Injector;
 import java.util.*;
+import java.util.stream.Collectors;
+
 import org.mbari.expd.*;
 import org.mbari.expd.actions.CollateByAlternateTimecodeFunction;
 import org.mbari.expd.actions.CollateByDateFunction;
@@ -162,24 +164,25 @@ public class MergeEXPDAnnotations2 implements MergeFunction<Map<VideoFrame, Uber
     private Map<VideoFrame, UberDatum> coallatePragmatic() {
 
         // Merge annotations with bogus dates by timecode
-        Collection<VideoFrame> bogusDates = Collections2.filter(videoFrames, new Predicate<VideoFrame>() {
-
-            public boolean apply(VideoFrame input) {
-                Date date = input.getRecordedDate();
-
-                return (date == null) || date.before(dive.getStartDate()) || date.after(dive.getEndDate());
-            }
-
-        });
+        List<VideoFrame> bogusDates = videoFrames.stream()
+                .filter(input -> {
+                    Date date = input.getRecordedDate();
+                    return (date == null) || date.before(dive.getStartDate()) || date.after(dive.getEndDate());
+                })
+                .collect(Collectors.toList());
 
         log.debug(Joiner.on(", ").join(bogusDates));
 
-        Map<VideoFrame, UberDatum> merged = mergeByTimecode(bogusDates, uberData);
-
-        // Merge outstanding ones by timecode
         Collection<VideoFrame> leftovers = new ArrayList<VideoFrame>(videoFrames);
-
-        leftovers.removeAll(merged.keySet());
+        Map<VideoFrame, UberDatum> merged = new HashMap<>();
+        try {
+            merged = mergeByTimecode(bogusDates, uberData);
+            leftovers.removeAll(merged.keySet());
+        }
+        catch (Exception e) {
+            log.warn("Failed to merge " + bogusDates.size() + " annotations with bad dates by timecode", e);
+            leftovers.remove(bogusDates);
+        }
 
         if (leftovers.size() > 0) {
             merged.putAll(mergeByDate(leftovers, uberData));
@@ -306,13 +309,9 @@ public class MergeEXPDAnnotations2 implements MergeFunction<Map<VideoFrame, Uber
         CollateFunction<String> f2 = useHD
                 ? new CollateByAlternateTimecodeFunction() : new CollateByTimecodeFunction();
 
-        Collection<String> d = Collections2.transform(vfc, new Function<VideoFrame, String>() {
-
-            public String apply(VideoFrame from) {
-                return from.getTimecode();
-            }
-
-        });
+        List<String> d = vfc.stream()
+                .map(VideoFrame::getTimecode)
+                .collect(Collectors.toList());
 
         final Map<String, UberDatum> r2 = f2.apply(d, udc, (long) offsetSecs * 1000);
 
