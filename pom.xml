@@ -84,6 +84,7 @@
         <module>vars-jpa</module>
         <module>vars-shared-ui</module>
         <module>vars-query</module>
+        <module>vars-queryfx</module>
         <module>vars-knowledgebase</module>
         <module>vars-annotation</module>
         <module>vars-avfoundation</module>

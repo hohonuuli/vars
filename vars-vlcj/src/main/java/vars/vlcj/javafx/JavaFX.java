@@ -11,6 +11,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -28,7 +29,7 @@ public class JavaFX {
 
     // Used to launch the application before running any test
     private static final CountDownLatch launchLatch = new CountDownLatch(1);
-    private static Map<String, VideoStage> namedWindows = new HashMap<>();
+    private static Map<String, VideoStage> namedWindows = new ConcurrentHashMap<>();
 
     /**
      * JavaFX requires one and only one Application instance per JVM. This class
