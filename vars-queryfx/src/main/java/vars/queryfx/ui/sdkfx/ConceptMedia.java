@@ -2,6 +2,7 @@ package vars.queryfx.ui.sdkfx;
 
 import com.google.common.base.Preconditions;
 import com.guigarage.sdk.util.Media;
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -12,7 +13,7 @@ import javafx.scene.image.Image;
 import org.fxmisc.easybind.EasyBind;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptName;
-import vars.queryfx.controllers.QueryService;
+import vars.queryfx.QueryService;
 
 import java.util.stream.Collectors;
 
@@ -63,13 +64,16 @@ public class ConceptMedia implements Media {
     }
 
     private synchronized void updateDescription() {
-        String primaryName = concept.get().getPrimaryConceptName().getName();
-        String commaSeparated = queryService.findDescendantNames(concept.get())
-                .stream()
-                .map(ConceptName::getName)
-                .filter(s -> !s.equals(primaryName))
-                .collect(Collectors.joining(", "));
-        description.set(commaSeparated);
+        final String primaryName = concept.get().getPrimaryConceptName().getName();
+        queryService.findDescendantNamesAsStrings(primaryName).thenAccept(list -> {
+            Platform.runLater(() -> {
+                String commaSeparated = list.stream()
+                        .filter(s -> !s.equals(primaryName))
+                        .collect(Collectors.joining(", "));
+                description.set(commaSeparated);
+            });
+
+        });
     }
 
     @Override

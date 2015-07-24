@@ -7,7 +7,7 @@ package vars.queryfx.messages;
 public class FatalExceptionMsg extends AbstractExceptionMsg  {
 
 
-    public FatalExceptionMsg(String msg, Exception exception) {
+    public FatalExceptionMsg(String msg, Throwable exception) {
         super(msg, exception);
     }
 

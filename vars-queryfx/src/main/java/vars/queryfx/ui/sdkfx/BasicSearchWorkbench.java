@@ -4,7 +4,6 @@ import com.guigarage.sdk.action.Action;
 import com.guigarage.sdk.container.WorkbenchView;
 import com.guigarage.sdk.footer.ActionFooter;
 import com.guigarage.sdk.list.MediaList;
-import com.guigarage.sdk.util.Media;
 import javafx.collections.ObservableList;
 import vars.queryfx.ui.AppIcons;
 

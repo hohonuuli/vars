@@ -5,6 +5,7 @@ import com.google.inject.Injector;
 import com.guigarage.sdk.Application;
 import com.guigarage.sdk.action.Action;
 import com.guigarage.sdk.container.WorkbenchView;
+import javafx.application.Platform;
 import javafx.scene.paint.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +13,7 @@ import vars.queryfx.Lookup;
 import vars.queryfx.RXEventBus;
 import vars.queryfx.ToolBelt;
 import vars.queryfx.ui.sdkfx.BasicSearchWorkbench;
-import vars.shared.javafx.materialdesign.Workbench;
+import vars.queryfx.ui.sdkfx.ConceptConstraintsWorkbench;
 import vars.shared.ui.GlobalLookup;
 
 import java.util.Date;
@@ -32,6 +33,7 @@ public class App {
     private final ToolBelt toolBelt;
     private Application application;
     private BasicSearchWorkbench basicSearchWorkbench;
+    private ConceptConstraintsWorkbench conceptConstraintsWorkbench;
 
     public App(ToolBelt toolBelt) {
         Preconditions.checkArgument(toolBelt != null);
@@ -52,6 +54,7 @@ public class App {
 
             //application.addMenuEntry(new Action(AppIcons.GEARS, "Customize Results", () -> showCustomizeResults(app)));
 
+            showBasicSearch(application);
         }
         return application;
     }
@@ -60,7 +63,13 @@ public class App {
         WorkbenchView view = getBasicSearchWorkbench();
         app.setWorkbench(view);
         app.clearGlobalActions();
-        app.addGlobalAction(new Action(AppIcons.PLUS, () -> {}));
+        app.addGlobalAction(new Action(AppIcons.PLUS, () -> showConceptConstraintsWorkBench(app)));
+    }
+
+    protected void showConceptConstraintsWorkBench(Application app) {
+        app.clearGlobalActions();
+        WorkbenchView view = getConceptConstraintsWorkbench(app);
+        app.setWorkbench(view);
     }
 
     protected BasicSearchWorkbench getBasicSearchWorkbench()  {
@@ -69,6 +78,17 @@ public class App {
         }
         return basicSearchWorkbench;
     }
+
+    protected ConceptConstraintsWorkbench getConceptConstraintsWorkbench(Application app) {
+        if (conceptConstraintsWorkbench == null) {
+            conceptConstraintsWorkbench = new ConceptConstraintsWorkbench(
+                    toolBelt.getQueryService(), toolBelt.getExecutor());
+            conceptConstraintsWorkbench.getFormLayout().addActions(new Action(AppIcons.TRASH, "Cancel", () -> showBasicSearch(app)),
+                    new Action("Apply"));
+        }
+        return conceptConstraintsWorkbench;
+    }
+
 
 
     /**
@@ -109,7 +129,9 @@ public class App {
 
 
         App app = new App(toolBelt);
+        app.getApplication().setPrefSize(400, 800);
         app.getApplication().show();
+
     }
 
 }

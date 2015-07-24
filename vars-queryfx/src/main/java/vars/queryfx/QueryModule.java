@@ -2,10 +2,20 @@ package vars.queryfx;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;
+import javafx.fxml.JavaFXBuilderFactory;
+import javafx.util.BuilderFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.jpa.VarsJpaModule;
+import vars.knowledgebase.ConceptDAO;
+import vars.knowledgebase.ConceptNameDAO;
+import vars.knowledgebase.jpa.ConceptDAOImpl;
+import vars.knowledgebase.jpa.ConceptNameDAOImpl;
 import vars.queryfx.config.Resource;
+
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ForkJoinPool;
 
 
 /**
@@ -30,5 +40,8 @@ public class QueryModule implements Module {
 
     public void configure(Binder binder) {
         binder.install(new VarsJpaModule(annotationPersistenceUnit, knowledgebasePersistenceUnit, miscPersistenceUnit));
+        binder.bind(BuilderFactory.class).to(JavaFXBuilderFactory.class);
+        binder.bind(Executor.class).to(ForkJoinPool.class);
+        binder.bind(QueryService.class).to(QueryServiceImpl.class);
     }
 }

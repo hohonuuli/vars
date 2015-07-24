@@ -13,7 +13,12 @@ import vars.query.QueryPersistenceService;
 
 import com.google.inject.Inject;
 
+import java.util.concurrent.Executor;
+
 public class ToolBelt extends vars.ToolBelt {
+
+    private final QueryService queryService;
+    private final Executor executor;
 
     @Inject
     public ToolBelt(AnnotationDAOFactory annotationDAOFactory,
@@ -24,11 +29,22 @@ public class ToolBelt extends vars.ToolBelt {
                     PersistenceCacheProvider persistenceCacheProvider,
                     AnnotationPersistenceService annotationPersistenceService,
                     KnowledgebasePersistenceService knowledgebasePersistenceService,
-                    QueryPersistenceService queryPersistenceService) {
+                    QueryPersistenceService queryPersistenceService,
+                    QueryService queryService,
+                    Executor executor) {
         super(annotationDAOFactory, annotationFactory, knowledgebaseDAOFactory,
                 knowledgebaseFactory, miscDAOFactory, miscFactory,
                 persistenceCacheProvider, annotationPersistenceService,
                 knowledgebasePersistenceService, queryPersistenceService);
+        this.queryService = queryService;
+        this.executor = executor;
     }
 
+    public QueryService getQueryService() {
+        return queryService;
+    }
+
+    public Executor getExecutor() {
+        return executor;
+    }
 }

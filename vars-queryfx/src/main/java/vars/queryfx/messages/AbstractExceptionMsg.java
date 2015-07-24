@@ -7,9 +7,9 @@ package vars.queryfx.messages;
 public abstract class AbstractExceptionMsg implements StatusMsg {
 
     private final String msg;
-    private final Exception exception;
+    private final Throwable exception;
 
-    public AbstractExceptionMsg(String msg, Exception exception) {
+    public AbstractExceptionMsg(String msg, Throwable exception) {
         this.exception = exception;
         this.msg = msg;
     }
