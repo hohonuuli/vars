@@ -60,7 +60,6 @@ public class App {
             application = new Application();
 
             application.setTitle("VARS Query");
-            application.setStopCallback(() -> System.exit(0));
             application.addToolbarItem(new Action(AppIcons.PLAY, "Run Search"));
 
             application.setBaseColor(new Color(0x1B / 255D, 0x4D / 255D, 0x93 / 255D, 1));
@@ -171,7 +170,8 @@ public class App {
 
 
         App app = new App(toolBelt);
-        app.getApplication().setPrefSize(400, 800);
+        app.getApplication().setPrefSize(500, 800);
+        app.getApplication().setStopCallback(() -> System.exit(0));
         app.getApplication().show();
 
     }
