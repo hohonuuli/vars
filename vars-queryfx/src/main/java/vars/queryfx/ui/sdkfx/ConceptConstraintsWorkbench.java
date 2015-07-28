@@ -14,6 +14,7 @@ import javafx.scene.input.KeyCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.ILink;
+import vars.LinkBean;
 import vars.LinkUtilities;
 import vars.queryfx.Lookup;
 import vars.queryfx.QueryService;
@@ -294,7 +295,19 @@ public class ConceptConstraintsWorkbench extends WorkbenchView {
     }
 
     private ConceptSelection getConceptSelection(String name) {
+        String linkNameP = linkNameRow.getEditor().getText();
+        List<String> toConceptP = toConceptRow.getEditor().getItems();
+        String linkValueP = linkValueRow.getEditor().getText();
+
+        String linkName = linkNameP == null || linkNameP.isEmpty() ? Lookup.WILD_CARD : linkNameP;
+        String toConcept = toConceptP.isEmpty() ? Lookup.WILD_CARD : toConceptP.get(0);
+        String linkValue = linkValueP == null || linkValueP.isEmpty() ? Lookup.WILD_CARD : linkValueP;
+
+
+        ILink link = new LinkBean(linkName, toConcept, linkValue);
+
         return new ConceptSelection(name,
+                link,
                 extendToParentRow.getEditor().isSelected(),
                 extendToSiblingsRow.getEditor().isSelected(),
                 extendToChildrenRow.getEditor().isSelected(),

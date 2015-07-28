@@ -12,8 +12,15 @@ import org.slf4j.LoggerFactory;
 import vars.queryfx.Lookup;
 import vars.queryfx.RXEventBus;
 import vars.queryfx.ToolBelt;
+import vars.queryfx.beans.ConceptSelection;
+import vars.queryfx.beans.ResolvedConceptSelection;
+import vars.queryfx.messages.NewConceptSelectionMsg;
+import vars.queryfx.messages.NewResolvedConceptSelectionMsg;
+import vars.queryfx.ui.controllers.AppController;
 import vars.queryfx.ui.sdkfx.BasicSearchWorkbench;
 import vars.queryfx.ui.sdkfx.ConceptConstraintsWorkbench;
+import vars.queryfx.ui.sdkfx.ConceptMedia;
+import vars.queryfx.ui.sdkfx.CustomizeResultsWorkbench;
 import vars.shared.ui.GlobalLookup;
 
 import java.util.Date;
@@ -32,17 +39,26 @@ public class App {
     private static Logger log;
     private final ToolBelt toolBelt;
     private Application application;
+    private final AppController appController;
     private BasicSearchWorkbench basicSearchWorkbench;
     private ConceptConstraintsWorkbench conceptConstraintsWorkbench;
+    private CustomizeResultsWorkbench customizeResultsWorkbench;
 
     public App(ToolBelt toolBelt) {
         Preconditions.checkArgument(toolBelt != null);
+        this.appController = new AppController(toolBelt.getQueryService(), eventBus);
         this.toolBelt = toolBelt;
+
+        eventBus.toObserverable()
+                .filter(msg -> msg instanceof NewResolvedConceptSelectionMsg)
+                .map(msg -> (NewResolvedConceptSelectionMsg) msg)
+                .subscribe(msg -> addResolvedConceptSelection(msg.getResolvedConceptSelection()));
     }
 
-    private Application getApplication() {
+    protected Application getApplication() {
         if (application == null) {
             application = new Application();
+
             application.setTitle("VARS Query");
             application.setStopCallback(() -> System.exit(0));
             application.addToolbarItem(new Action(AppIcons.PLAY, "Run Search"));
@@ -52,7 +68,7 @@ public class App {
 
             //application.addMenuEntry(new Action(AppIcons.SEARCH_PLUS, "Advanced Search", () -> showAdvancedSearch(app)));
 
-            //application.addMenuEntry(new Action(AppIcons.GEARS, "Customize Results", () -> showCustomizeResults(app)));
+            application.addMenuEntry(new Action(AppIcons.GEARS, "Customize Results", () -> showCustomizeResults(application)));
 
             showBasicSearch(application);
         }
@@ -72,6 +88,12 @@ public class App {
         app.setWorkbench(view);
     }
 
+    protected void showCustomizeResults(Application app) {
+        app.clearGlobalActions();
+        WorkbenchView view = getCustomizeResultsWorkbench();
+        app.setWorkbench(view);
+    }
+
     protected BasicSearchWorkbench getBasicSearchWorkbench()  {
         if (basicSearchWorkbench == null) {
             basicSearchWorkbench = new BasicSearchWorkbench();
@@ -84,9 +106,29 @@ public class App {
             conceptConstraintsWorkbench = new ConceptConstraintsWorkbench(
                     toolBelt.getQueryService(), toolBelt.getExecutor());
             conceptConstraintsWorkbench.getFormLayout().addActions(new Action(AppIcons.TRASH, "Cancel", () -> showBasicSearch(app)),
-                    new Action("Apply"));
+                    new Action(AppIcons.PLUS, "Apply", () -> {
+                        ConceptSelection conceptSelection = conceptConstraintsWorkbench.getConceptSelection();
+                        eventBus.send(new NewConceptSelectionMsg(conceptSelection));
+                        showBasicSearch(app);
+                    }));
         }
         return conceptConstraintsWorkbench;
+    }
+
+    protected CustomizeResultsWorkbench getCustomizeResultsWorkbench() {
+        if (customizeResultsWorkbench == null) {
+            customizeResultsWorkbench = new CustomizeResultsWorkbench();
+        }
+        return customizeResultsWorkbench;
+    }
+
+    private void addResolvedConceptSelection(ResolvedConceptSelection rcs) {
+
+        Platform.runLater(() -> {
+            BasicSearchWorkbench bsw = getBasicSearchWorkbench();
+            ConceptMedia conceptMedia = new ConceptMedia(rcs);
+            bsw.getConceptMedia().add(conceptMedia);
+        });
     }
 
 

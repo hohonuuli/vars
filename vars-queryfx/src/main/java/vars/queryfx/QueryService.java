@@ -3,7 +3,10 @@ package vars.queryfx;
 import vars.ILink;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptName;
+import vars.queryfx.beans.ConceptSelection;
+import vars.queryfx.beans.ResolvedConceptSelection;
 
+import java.net.URL;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -41,6 +44,10 @@ public interface QueryService {
     CompletableFuture<List<ILink>> findAllLinks();
 
     //CompletableFuture<List<ILink>> findLinksByLinkName(String linkName);
+
+    CompletableFuture<ResolvedConceptSelection> resolveConceptSelection(ConceptSelection conceptSelection);
+
+    CompletableFuture<Optional<URL>> resolveImageURL(String conceptName);
 }
 
 /*

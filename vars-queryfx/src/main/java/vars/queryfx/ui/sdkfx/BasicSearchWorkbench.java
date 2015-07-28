@@ -4,7 +4,9 @@ import com.guigarage.sdk.action.Action;
 import com.guigarage.sdk.container.WorkbenchView;
 import com.guigarage.sdk.footer.ActionFooter;
 import com.guigarage.sdk.list.MediaList;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import vars.queryfx.beans.ConceptSelection;
 import vars.queryfx.ui.AppIcons;
 
 /**
@@ -14,6 +16,7 @@ import vars.queryfx.ui.AppIcons;
 public class BasicSearchWorkbench extends WorkbenchView {
 
     private final MediaList<ConceptMedia> mediaList = new MediaList<>();
+    private final ObservableList<ConceptSelection> conceptSelections = FXCollections.observableArrayList();
 
     public BasicSearchWorkbench() {
         ActionFooter footer = new ActionFooter();
@@ -26,4 +29,6 @@ public class BasicSearchWorkbench extends WorkbenchView {
     public ObservableList<ConceptMedia> getConceptMedia() {
         return mediaList.getItems();
     }
+
+
 }

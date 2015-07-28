@@ -2,14 +2,21 @@ package vars.queryfx;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import vars.ILink;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
+import vars.knowledgebase.Media;
 import vars.query.QueryPersistenceService;
+import vars.queryfx.beans.ConceptSelection;
+import vars.queryfx.beans.ResolvedConceptSelection;
 
 import javax.inject.Inject;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -31,6 +38,8 @@ public class QueryServiceImpl implements QueryService {
     private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
     private final Function<Concept, Collection<String>> asNames = c ->
             c.getConceptNames().stream().map(ConceptName::getName).collect(Collectors.toList());
+
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
 
     @Inject
@@ -151,4 +160,33 @@ public class QueryServiceImpl implements QueryService {
         return CompletableFuture.supplyAsync(() ->
                 new ArrayList<>(queryPersistenceService.findByConceptNames(conceptNames)), executor);
     }
+
+    @Override
+    public CompletableFuture<ResolvedConceptSelection> resolveConceptSelection(ConceptSelection conceptSelection) {
+        return findConceptNamesAsStrings(conceptSelection.getConceptName(),
+                conceptSelection.isExtendToParent(),
+                conceptSelection.isExtendToSiblings(),
+                conceptSelection.isExtendToChildren(),
+                conceptSelection.isExtendToDescendants())
+                .thenApply(list -> new ResolvedConceptSelection(conceptSelection, list));
+    }
+
+    @Override
+    public CompletableFuture<Optional<URL>> resolveImageURL(String conceptName) {
+        return findConcept(conceptName).thenApply(co ->
+                co.flatMap(c -> {
+                    Media primaryImage = c.getConceptMetadata().getPrimaryImage();
+                    Optional<URL> url = Optional.empty();
+                    if (primaryImage != null) {
+                        try {
+                            url = Optional.ofNullable(new URL(primaryImage.getUrl()));
+                        }
+                        catch (MalformedURLException e) {
+                            log.info("Invalid URL for '" + conceptName + "': " + primaryImage.getUrl());
+                        }
+                    }
+                    return url;
+                }));
+    }
 }
+

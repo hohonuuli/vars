@@ -1,5 +1,7 @@
 package vars.queryfx.beans;
 
+import vars.ILink;
+
 /**
  * @author Brian Schlining
  * @since 2015-07-22T11:38:00
@@ -8,15 +10,17 @@ public class ConceptSelection {
 
     private final String conceptName;
 
-    private final boolean extendToParents;
+    private final boolean extendToParent;
     private final boolean extendToSiblings;
     private final boolean extendToChildren;
     private final boolean extendToDescendants;
+    private final ILink link;
 
-    public ConceptSelection(String conceptName, boolean extendToParents, boolean extendToSiblings,
+    public ConceptSelection(String conceptName, ILink link, boolean extendToParent, boolean extendToSiblings,
                             boolean extendToChildren, boolean extendToDescendants) {
         this.conceptName = conceptName;
-        this.extendToParents = extendToParents;
+        this.link = link;
+        this.extendToParent = extendToParent;
         this.extendToSiblings = extendToSiblings;
         this.extendToChildren = extendToChildren;
         this.extendToDescendants = extendToDescendants;
@@ -34,19 +38,23 @@ public class ConceptSelection {
         return extendToDescendants;
     }
 
-    public boolean isExtendToParents() {
-        return extendToParents;
+    public boolean isExtendToParent() {
+        return extendToParent;
     }
 
     public boolean isExtendToSiblings() {
         return extendToSiblings;
     }
 
+    public ILink getLink() {
+        return link;
+    }
+
     @Override
     public String toString() {
         return "ConceptSelection{" +
                 "conceptName='" + conceptName + '\'' +
-                ", extendToParents=" + extendToParents +
+                ", extendToParent=" + extendToParent +
                 ", extendToSiblings=" + extendToSiblings +
                 ", extendToChildren=" + extendToChildren +
                 ", extendToDescendants=" + extendToDescendants +

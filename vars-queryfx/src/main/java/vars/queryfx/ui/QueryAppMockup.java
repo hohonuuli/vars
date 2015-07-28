@@ -30,11 +30,9 @@ public class QueryAppMockup {
         /*
           Log uncaught Exceptions
          */
-        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-            public void uncaughtException(Thread thread, Throwable e) {
-                Logger log = LoggerFactory.getLogger(thread.getClass());
-                log.error("Exception in thread [" + thread.getName() + "]", e);
-            }
+        Thread.setDefaultUncaughtExceptionHandler((thread, e) -> {
+            Logger log = LoggerFactory.getLogger(thread.getClass());
+            log.error("Exception in thread [" + thread.getName() + "]", e);
         });
 
         final Logger mainLog = getLog();

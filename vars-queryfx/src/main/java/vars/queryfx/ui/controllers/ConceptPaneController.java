@@ -72,6 +72,7 @@ public class ConceptPaneController implements Initializable {
 
     public ConceptSelection getConceptSelection() {
         return new ConceptSelection(conceptComboBox.getValue(),
+                Lookup.WILD_CARD_LINK,
                 parentCheckBox.isSelected(),
                 siblingsCheckBox.isSelected(),
                 childrenCheckBox.isSelected(),

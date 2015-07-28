@@ -2,18 +2,15 @@ package vars.queryfx.ui.sdkfx;
 
 import com.google.common.base.Preconditions;
 import com.guigarage.sdk.util.Media;
-import javafx.application.Platform;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.image.Image;
-import org.fxmisc.easybind.EasyBind;
+import vars.LinkUtilities;
 import vars.knowledgebase.Concept;
-import vars.knowledgebase.ConceptName;
-import vars.queryfx.QueryService;
+import vars.queryfx.Lookup;
+import vars.queryfx.beans.ResolvedConceptSelection;
 
 import java.util.stream.Collectors;
 
@@ -23,9 +20,9 @@ import java.util.stream.Collectors;
  */
 public class ConceptMedia implements Media {
 
-    private QueryService queryService;
 
-    private ObjectProperty<Concept> concept = new SimpleObjectProperty<>();
+    private final ResolvedConceptSelection conceptSelection;
+    private Concept concept;
 
     private StringProperty title = new SimpleStringProperty();
 
@@ -33,48 +30,34 @@ public class ConceptMedia implements Media {
 
     private ObjectProperty<Image> image = new SimpleObjectProperty<>();
 
-    private BooleanProperty extendToParent = new SimpleBooleanProperty();
-    private BooleanProperty extendToSiblings = new SimpleBooleanProperty();
-    private BooleanProperty extendToChildren = new SimpleBooleanProperty();
-    private BooleanProperty extendToDescendants = new SimpleBooleanProperty();
-
-    public ConceptMedia(QueryService queryService, Concept _concept, boolean _extendToParent,
-                        boolean _extendToSiblings, boolean _extendToChildren,
-                        boolean _extendToDescendants) {
-        Preconditions.checkArgument(queryService != null, "MISSING QueryService!!");
-        Preconditions.checkArgument(_concept != null, "Concept arg can not be null");
-        this.queryService = queryService;
-        extendToParent.set(_extendToParent);
-        extendToSiblings.set(_extendToSiblings);
-        extendToDescendants.set(_extendToDescendants);
-        extendToChildren.set(_extendToChildren);
+    public ConceptMedia(ResolvedConceptSelection conceptSelection) {
+        Preconditions.checkArgument(conceptSelection != null, "Concept arg can not be null");
+        this.conceptSelection = conceptSelection;
         init();
-        updateDescription();
     }
 
     private void init() {
-        title.bind(EasyBind.map(this.concept, c -> c.getPrimaryConceptName().getName()));
-        image.bind(EasyBind.map(this.concept,
-                c -> new Image(c.getConceptMetadata().getPrimaryImage().getUrl(), true)));
 
-        extendToParent.addListener((obs, oldVal, newVal) -> updateDescription());
-        extendToSiblings.addListener((obs, oldVal, newVal) -> updateDescription());
-        extendToChildren.addListener((obs, oldVal, newVal) -> updateDescription());
-        extendToDescendants.addListener((obs, oldVal, newVal) -> updateDescription());
+        String titleString = conceptSelection.getConceptName();
+        if (!LinkUtilities.formatAsString(conceptSelection.getLink())
+                .equals(LinkUtilities.formatAsString(Lookup.WILD_CARD_LINK))) {
+            titleString = titleString + " | " + LinkUtilities.formatAsString(conceptSelection.getLink());
+        }
+
+        title.set(titleString);
+
+        String desc = conceptSelection.getConcepts().stream()
+                .filter(s -> !s.equals(conceptSelection.getConceptName()))
+                .collect(Collectors.joining(", "));
+
+        description.set(desc);
+
+        image.set(conceptSelection.getImage());
+
+
     }
 
-    private synchronized void updateDescription() {
-        final String primaryName = concept.get().getPrimaryConceptName().getName();
-        queryService.findDescendantNamesAsStrings(primaryName).thenAccept(list -> {
-            Platform.runLater(() -> {
-                String commaSeparated = list.stream()
-                        .filter(s -> !s.equals(primaryName))
-                        .collect(Collectors.joining(", "));
-                description.set(commaSeparated);
-            });
 
-        });
-    }
 
     @Override
     public StringProperty descriptionProperty() {
