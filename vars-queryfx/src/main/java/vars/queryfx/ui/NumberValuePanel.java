@@ -1,8 +1,6 @@
 package vars.queryfx.ui;
 
 import com.guigarage.sdk.util.MaterialDesignButton;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -13,7 +11,7 @@ import javafx.scene.input.KeyCode;
  * @author Brian Schlining
  * @since 2015-07-27T21:20:00
  */
-public class NumberValuePanel extends ValuePanel {
+public class NumberValuePanel extends AbstractValuePanel {
 
     private TextField minTextField;
     private TextField maxTextField;
@@ -43,6 +41,7 @@ public class NumberValuePanel extends ValuePanel {
                     e.consume();
                 }
             });
+
         }
         return minTextField;
     }
@@ -69,14 +68,14 @@ public class NumberValuePanel extends ValuePanel {
     protected Button getScanButton() {
         if (scanButton == null) {
             scanButton = new MaterialDesignButton("Scan");
-            scanButton.setTooltip(new Tooltip("Retrieve minimum and maximum " +
-                    getValueName() + " values"));
+//            scanButton.setTooltip(new Tooltip("Retrieve minimum and maximum " +
+//                    getValueName() + " values"));
         }
         return scanButton;
     }
 
-    public void setOnScan(EventHandler<ActionEvent> event) {
-        scanButton.setOnAction(event);
+    public void setOnScan(Runnable runnable) {
+        scanButton.setOnAction(eventHandler -> runnable.run());
     }
 
     public String getMinValue() {

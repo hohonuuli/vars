@@ -17,6 +17,7 @@ import vars.queryfx.beans.ResolvedConceptSelection;
 import vars.queryfx.messages.NewConceptSelectionMsg;
 import vars.queryfx.messages.NewResolvedConceptSelectionMsg;
 import vars.queryfx.ui.controllers.AppController;
+import vars.queryfx.ui.sdkfx.AdvancedSearchWorkbench;
 import vars.queryfx.ui.sdkfx.BasicSearchWorkbench;
 import vars.queryfx.ui.sdkfx.ConceptConstraintsWorkbench;
 import vars.queryfx.ui.sdkfx.ConceptMedia;
@@ -43,6 +44,7 @@ public class App {
     private BasicSearchWorkbench basicSearchWorkbench;
     private ConceptConstraintsWorkbench conceptConstraintsWorkbench;
     private CustomizeResultsWorkbench customizeResultsWorkbench;
+    private AdvancedSearchWorkbench advancedSearchWorkbench;
 
     public App(ToolBelt toolBelt) {
         Preconditions.checkArgument(toolBelt != null);
@@ -65,7 +67,7 @@ public class App {
             application.setBaseColor(new Color(0x1B / 255D, 0x4D / 255D, 0x93 / 255D, 1));
             application.addMenuEntry(new Action(AppIcons.SEARCH, "Basic Search", () -> showBasicSearch(application)));
 
-            //application.addMenuEntry(new Action(AppIcons.SEARCH_PLUS, "Advanced Search", () -> showAdvancedSearch(app)));
+            application.addMenuEntry(new Action(AppIcons.SEARCH_PLUS, "Advanced Search", () -> showAdvancedSearch(application)));
 
             application.addMenuEntry(new Action(AppIcons.GEARS, "Customize Results", () -> showCustomizeResults(application)));
 
@@ -79,6 +81,12 @@ public class App {
         app.setWorkbench(view);
         app.clearGlobalActions();
         app.addGlobalAction(new Action(AppIcons.PLUS, () -> showConceptConstraintsWorkBench(app)));
+    }
+
+    protected void showAdvancedSearch(Application app) {
+        app.clearGlobalActions();
+        WorkbenchView view = getAdvancedSearchWorkbench();
+        app.setWorkbench(view);
     }
 
     protected void showConceptConstraintsWorkBench(Application app) {
@@ -119,6 +127,13 @@ public class App {
             customizeResultsWorkbench = new CustomizeResultsWorkbench();
         }
         return customizeResultsWorkbench;
+    }
+
+    protected AdvancedSearchWorkbench getAdvancedSearchWorkbench() {
+        if (advancedSearchWorkbench == null) {
+            advancedSearchWorkbench = new AdvancedSearchWorkbench(toolBelt.getQueryService());
+        }
+        return advancedSearchWorkbench;
     }
 
     private void addResolvedConceptSelection(ResolvedConceptSelection rcs) {
@@ -170,6 +185,7 @@ public class App {
 
 
         App app = new App(toolBelt);
+        Lookup.setApp(app);
         app.getApplication().setPrefSize(500, 800);
         app.getApplication().setStopCallback(() -> System.exit(0));
         app.getApplication().show();

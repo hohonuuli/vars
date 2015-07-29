@@ -8,7 +8,9 @@ import vars.queryfx.beans.ResolvedConceptSelection;
 
 import java.net.URL;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
@@ -48,6 +50,14 @@ public interface QueryService {
     CompletableFuture<ResolvedConceptSelection> resolveConceptSelection(ConceptSelection conceptSelection);
 
     CompletableFuture<Optional<URL>> resolveImageURL(String conceptName);
+
+    CompletableFuture<Map<String, String>> getAnnotationViewMetadata();
+
+    CompletableFuture<Collection<?>> getAnnotationViewsUniqueValuesForColumn(String columnName);
+
+    CompletableFuture<List<Number>> getAnnotationViewsMinAndMaxForColumn(String columnName);
+
+    CompletableFuture<List<Date>> getAnnotationViewsMinAndMaxDatesforColumn(String columnName);
 }
 
 /*

@@ -15,6 +15,14 @@ import vars.knowledgebase.SimpleConceptNameBean;
 import vars.queryfx.ui.App;
 import vars.shared.ui.GlobalLookup;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.TimeZone;
+
 /**
  * @author Brian Schlining
  * @since 2015-07-17T16:47:00
@@ -33,8 +41,8 @@ public class Lookup extends GlobalLookup {
     private static Injector injector;
     private static App app;
     private static Config config;
-    private static Object injectorLock = new Object() {};
-    private static Object configLock = new Object() {};
+    private static final Object injectorLock = new Object() {};
+    private static final Object configLock = new Object() {};
 
     public static Injector getInjector() {
         synchronized (injectorLock) {
@@ -50,7 +58,7 @@ public class Lookup extends GlobalLookup {
         return app;
     }
 
-    protected static void setApp(App app) {
+    public static void setApp(App app) {
         Preconditions.checkArgument(app != null);
         Lookup.app = app;
     }
@@ -62,6 +70,12 @@ public class Lookup extends GlobalLookup {
             }
         }
         return config;
+    }
+
+    public static ZonedDateTime getAnnotationStartDate() {
+        Config config = getConfig();
+        String startDate = config.getString("vars.annotation.start.date");
+        return ZonedDateTime.ofInstant(Instant.parse(startDate), ZoneId.of("UTC"));
     }
 
 

@@ -2,6 +2,7 @@ package vars.queryfx;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import org.mbari.sql.QueryResults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.ILink;
@@ -19,8 +20,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -187,6 +190,58 @@ public class QueryServiceImpl implements QueryService {
                     }
                     return url;
                 }));
+    }
+
+    @Override
+    public CompletableFuture<Map<String, String>> getAnnotationViewMetadata() {
+        return CompletableFuture.supplyAsync(queryPersistenceService::getMetaData);
+    }
+
+    @Override
+    public CompletableFuture<Collection<?>> getAnnotationViewsUniqueValuesForColumn(String columnName) {
+        return CompletableFuture.supplyAsync(() -> queryPersistenceService.getUniqueValuesByColumn(columnName));
+    }
+
+    @Override
+    public CompletableFuture<List<Number>> getAnnotationViewsMinAndMaxForColumn(String columnName) {
+        final String sql = "SELECT MIN(" + columnName + ") AS minValue, MAX(" + columnName +
+                ") AS maxValue FROM Annotations WHERE " + columnName + " IS NOT NULL";
+
+        return CompletableFuture.supplyAsync(() -> {
+
+            List<Number> minMax = new ArrayList<>();
+            try {
+                QueryResults queryResults = queryPersistenceService.executeQuery(sql);
+                minMax.add((Number) queryResults.getResults("minValue").get(0));
+                minMax.add((Number) queryResults.getResults("maxValue").get(0));
+            }
+            catch (Exception e) {
+                log.error("An error occurred while executing the SQL statement: '" + sql + "'", e);
+            }
+
+            return minMax;
+        });
+    }
+
+    @Override
+    public CompletableFuture<List<Date>> getAnnotationViewsMinAndMaxDatesforColumn(String columnName) {
+        final String sql = "SELECT MIN(" + columnName + ") AS minValue, MAX(" + columnName +
+                ") AS maxValue FROM Annotations WHERE " + columnName + " IS NOT NULL";
+
+        return CompletableFuture.supplyAsync(() -> {
+
+            List<Date> minMax = new ArrayList<>();
+            try {
+                QueryResults queryResults = queryPersistenceService.executeQuery(sql);
+                minMax.add((Date) queryResults.getResults("minValue").get(0));
+                minMax.add((Date) queryResults.getResults("maxValue").get(0));
+            }
+            catch (Exception e) {
+                log.error("An error occurred while executing the SQL statement: '" + sql + "'", e);
+            }
+
+            return minMax;
+        });
     }
 }
 

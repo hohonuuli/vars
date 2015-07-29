@@ -15,6 +15,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <easybind.version>1.0.3</easybind.version>
+        <jfxtras.version>8.0-r3</jfxtras.version>
         <sdkfx.version>0.1-SNAPSHOT</sdkfx.version>
     </properties>
     <dependencies>
@@ -56,6 +57,11 @@
             <groupId>org.fxmisc.easybind</groupId>
             <artifactId>easybind</artifactId>
             <version>${easybind.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jfxtras</groupId>
+            <artifactId>jfxtras-controls</artifactId>
+            <version>${jfxtras.version}</version>
         </dependency>
     </dependencies>
 </project>

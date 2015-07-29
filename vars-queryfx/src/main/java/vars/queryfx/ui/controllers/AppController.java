@@ -1,7 +1,9 @@
 package vars.queryfx.ui.controllers;
 
+import com.typesafe.config.Config;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
+import vars.queryfx.Lookup;
 import vars.queryfx.QueryService;
 import vars.queryfx.RXEventBus;
 import vars.queryfx.beans.ConceptSelection;
@@ -10,6 +12,8 @@ import vars.queryfx.messages.NewConceptSelectionMsg;
 import vars.queryfx.messages.NewResolvedConceptSelectionMsg;
 
 import java.net.URL;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -50,6 +54,6 @@ public class AppController {
                 .thenAccept(rcs -> eventBus.send(new NewResolvedConceptSelectionMsg(rcs)));
 
     }
-
+    
 
 }
