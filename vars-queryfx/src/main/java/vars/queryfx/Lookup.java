@@ -8,20 +8,16 @@ import com.typesafe.config.ConfigFactory;
 import vars.ILink;
 import vars.LinkBean;
 import vars.knowledgebase.Concept;
-import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.ConceptNameTypes;
 import vars.knowledgebase.SimpleConceptBean;
 import vars.knowledgebase.SimpleConceptNameBean;
 import vars.queryfx.ui.App;
 import vars.shared.ui.GlobalLookup;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.TimeZone;
+
 
 /**
  * @author Brian Schlining

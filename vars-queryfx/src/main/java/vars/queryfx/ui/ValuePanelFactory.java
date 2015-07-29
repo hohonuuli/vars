@@ -43,7 +43,7 @@ public class ValuePanelFactory {
         valuePanel.setOnScan(() -> {
             queryService.getAnnotationViewsUniqueValuesForColumn(name).thenAccept(c -> {
                 Collection<String> values = (Collection<String>) c;
-                valuePanel.setSelectedValues(values);
+                valuePanel.setValues(values);
             });
         });
         return valuePanel;

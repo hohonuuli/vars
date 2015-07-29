@@ -1,8 +1,6 @@
 package vars.queryfx.ui.sdkfx;
 
 import com.guigarage.sdk.container.WorkbenchView;
-import com.guigarage.sdk.form.EditorFormRow;
-import com.guigarage.sdk.form.FormLayout;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigObject;
 import javafx.application.Platform;
@@ -29,23 +27,21 @@ import java.util.stream.Collectors;
  * @author Brian Schlining
  * @since 2015-07-28T12:39:00
  */
-public class AdvancedSearchWorkbench extends WorkbenchView {
+public class AdvancedSearchWorkbenchA extends WorkbenchView {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
     private ObservableList<AbstractValuePanel> valuePanels = FXCollections.observableArrayList();
 
     private final QueryService queryService;
-    private final FormLayout formLayout;
 
+    VBox root = new VBox();
 
-    public AdvancedSearchWorkbench(QueryService queryService) {
+    public AdvancedSearchWorkbenchA(QueryService queryService) {
         this.queryService = queryService;
-        this.formLayout = new FormLayout();
         initialize();
-
         ScrollPane scrollPane = new javafx.scene.control.ScrollPane();
-        scrollPane.setContent(formLayout);
+        scrollPane.setContent(root);
         scrollPane.setFitToWidth(true);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
@@ -72,7 +68,7 @@ public class AdvancedSearchWorkbench extends WorkbenchView {
                         }
                     }
                 }
-                groupPanels();
+                root.getChildren().setAll(groupPanels());
                 configureDefaultReturns();
             });
         });
@@ -83,7 +79,7 @@ public class AdvancedSearchWorkbench extends WorkbenchView {
         return new ArrayList<>(valuePanels);
     }
 
-    private void groupPanels() {
+    private List<Node> groupPanels() {
         List<Node> panels = new ArrayList<>();
 
         Config config = Lookup.getConfig();
@@ -95,25 +91,28 @@ public class AdvancedSearchWorkbench extends WorkbenchView {
 
         Set<String> groupNames = groups.keySet();
         for (String name : groupNames) {
-            formLayout.addHeader(name);
+            VBox vbox = new VBox();
+            vbox.setStyle("-fx-border-color: black");
             List<String> columns = groupsConfig.getStringList(name);
             List<AbstractValuePanel> matchingVps = vps.stream()
                     .filter(vp -> columns.contains(vp.getValueName()))
                     .sorted((vp1, vp2) ->
                             vp1.getValueName().toUpperCase().compareTo(vp2.getValueName().toUpperCase()))
                     .collect(Collectors.toList());
-
-            matchingVps.stream().forEach(vp ->
-                        formLayout.add(new EditorFormRow<>(vp.getTitle(), vp)));
-
+            vbox.getChildren().setAll(matchingVps);
+            vbox.getChildren().add(0, new Label(name));
+            panels.add(vbox);
             used.addAll(matchingVps);
         }
 
         vps.removeAll(used);
         if (!vps.isEmpty()) {
-            formLayout.addHeader("Other");
-            vps.stream().forEach(vp -> formLayout.add(new EditorFormRow<>(vp.getTitle(), vp)));
+            VBox vbox = new VBox();
+            vbox.getChildren().setAll(vps);
+            panels.add(vbox);
         }
+
+        return panels;
 
     }
 

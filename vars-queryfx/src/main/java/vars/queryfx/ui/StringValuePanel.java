@@ -8,6 +8,8 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,15 +45,16 @@ public class StringValuePanel extends AbstractValuePanel {
                         }
                     });
             listView.itemsProperty().addListener((obs, oldVal, newVal) -> {
-                int visibleRows = 7;
+                int visibleRows = 6;
                 if (newVal.size() > 20) {
-                    visibleRows = 14;
+                    visibleRows = 10;
                 }
                 else if (newVal.size() == 0) {
                     visibleRows = 3;
                 }
                 listView.prefHeightProperty().set(getTextField().getHeight() * visibleRows);
             });
+            HBox.setHgrow(listView, Priority.ALWAYS);
         }
         return listView;
     }
@@ -62,6 +65,7 @@ public class StringValuePanel extends AbstractValuePanel {
             textField.textProperty().addListener((obs, oldVal, newVal) -> {
                 enableConstraint.set(newVal != null && !newVal.isEmpty());
             });
+            HBox.setHgrow(textField, Priority.ALWAYS);
         }
         return textField;
     }
@@ -83,8 +87,8 @@ public class StringValuePanel extends AbstractValuePanel {
             else {
                 node = getTextField();
             }
-            getChildren().remove(3);
-            getChildren().add(3, node);
+            getChildren().remove(2);
+            getChildren().add(2, node);
         });
     }
 
@@ -102,7 +106,7 @@ public class StringValuePanel extends AbstractValuePanel {
         return list;
     }
 
-    public void setSelectedValues(Collection<String> values) {
+    public void setValues(Collection<String> values) {
         getListView().getItems().clear();
         getListView().getItems().addAll(values);
     }

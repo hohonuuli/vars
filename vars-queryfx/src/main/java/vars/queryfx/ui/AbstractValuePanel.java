@@ -2,6 +2,7 @@ package vars.queryfx.ui;
 
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 
 import java.util.regex.Matcher;
@@ -18,14 +19,14 @@ public abstract class AbstractValuePanel extends HBox {
     private CheckBox returnCheckBox;
     private final String valueName;
     private String title;
-    private Label label;
 
     public AbstractValuePanel(String valueName) {
         this.valueName = valueName;
-        label = new Label(getTitle());
         constrainCheckBox = new CheckBox();
+        constrainCheckBox.setTooltip(new Tooltip("constrain"));
         returnCheckBox = new CheckBox();
-        getChildren().addAll(label, returnCheckBox, constrainCheckBox);
+        returnCheckBox.setTooltip(new Tooltip("return"));
+        getChildren().addAll(returnCheckBox, constrainCheckBox);
     }
 
     public boolean isReturned() {

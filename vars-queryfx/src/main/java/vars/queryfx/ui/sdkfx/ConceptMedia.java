@@ -73,4 +73,8 @@ public class ConceptMedia implements Media {
     public ObjectProperty<Image> imageProperty() {
         return image;
     }
+
+    public ResolvedConceptSelection getConceptSelection() {
+        return conceptSelection;
+    }
 }

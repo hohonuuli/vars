@@ -6,6 +6,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 
 /**
  * @author Brian Schlining
@@ -41,7 +43,7 @@ public class NumberValuePanel extends AbstractValuePanel {
                     e.consume();
                 }
             });
-
+            HBox.setHgrow(minTextField, Priority.ALWAYS);
         }
         return minTextField;
     }
@@ -61,6 +63,7 @@ public class NumberValuePanel extends AbstractValuePanel {
                     e.consume();
                 }
             });
+            HBox.setHgrow(maxTextField, Priority.ALWAYS);
         }
         return maxTextField;
     }

@@ -16,18 +16,24 @@ public class ResultsCustomization {
     */
 
     private final boolean concurrentObservations;
+    private final boolean relatedAssociations;
     private final boolean conceptHierarchy;
     private final boolean basicPhylogeny;
     private final boolean detailedPhylogeny;
     private final boolean categorizeAssociations;
 
-    public ResultsCustomization(boolean basicPhylogeny, boolean concurrentObservations,
-            boolean conceptHierarchy, boolean detailedPhylogeny, boolean categorizeAssociations) {
+    public ResultsCustomization(boolean basicPhylogeny,
+            boolean concurrentObservations,
+            boolean relatedAssociations,
+            boolean conceptHierarchy,
+            boolean detailedPhylogeny,
+            boolean categorizeAssociations) {
         this.basicPhylogeny = basicPhylogeny;
         this.concurrentObservations = concurrentObservations;
         this.conceptHierarchy = conceptHierarchy;
         this.detailedPhylogeny = detailedPhylogeny;
         this.categorizeAssociations = categorizeAssociations;
+        this.relatedAssociations = relatedAssociations;
     }
 
     public boolean isBasicPhylogeny() {
@@ -48,5 +54,9 @@ public class ResultsCustomization {
 
     public boolean isDetailedPhylogeny() {
         return detailedPhylogeny;
+    }
+
+    public boolean isRelatedAssociations() {
+        return relatedAssociations;
     }
 }
