@@ -10,10 +10,14 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import vars.queryfx.ui.db.IConstraint;
+import vars.queryfx.ui.db.InConstraint;
+import vars.queryfx.ui.db.LikeConstraint;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Brian Schlining
@@ -109,5 +113,19 @@ public class StringValuePanel extends AbstractValuePanel {
     public void setValues(Collection<String> values) {
         getListView().getItems().clear();
         getListView().getItems().addAll(values);
+    }
+
+    public Optional<IConstraint> getConstraint() {
+        List<String> selectedValues = getSelectedValues();
+        Optional<IConstraint> constraint = Optional.empty();
+        if (isConstrained() && !selectedValues.isEmpty()) {
+            if (getToggleButton().isSelected()) {
+                constraint = Optional.of(new InConstraint(getValueName(), selectedValues));
+            }
+            else {
+                constraint = Optional.of(new LikeConstraint(getValueName(), selectedValues.get(0)));
+            }
+        }
+        return constraint;
     }
 }

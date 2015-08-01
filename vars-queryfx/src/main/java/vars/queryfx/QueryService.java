@@ -7,6 +7,8 @@ import vars.queryfx.beans.ConceptSelection;
 import vars.queryfx.beans.ResolvedConceptSelection;
 
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -30,6 +32,9 @@ public interface QueryService {
      * @return
      */
     CompletableFuture<List<String>> findDescendantNamesAsStrings(String conceptName);
+
+
+    CompletableFuture<List<Concept>> findAncestors(String conceptName);
 
     CompletableFuture<Optional<Concept>> findConcept(String name);
 
@@ -58,6 +63,8 @@ public interface QueryService {
     CompletableFuture<List<Number>> getAnnotationViewsMinAndMaxForColumn(String columnName);
 
     CompletableFuture<List<Date>> getAnnotationViewsMinAndMaxDatesforColumn(String columnName);
+
+    Connection getAnnotationConnection() throws SQLException;
 }
 
 /*

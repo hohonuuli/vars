@@ -42,7 +42,7 @@ public class ResolvedConceptSelection extends ConceptSelection {
     }
 
     public List<String> getConcepts() {
-        return concepts;
+        return new ArrayList<>(concepts);
     }
 
     public Image getImage() {

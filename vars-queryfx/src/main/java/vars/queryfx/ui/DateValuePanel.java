@@ -5,10 +5,14 @@ import javafx.beans.value.ChangeListener;
 import javafx.scene.control.Button;
 import jfxtras.scene.control.LocalDateTimePicker;
 import vars.queryfx.Lookup;
+import vars.queryfx.ui.db.DateBoundsConstraint;
+import vars.queryfx.ui.db.IConstraint;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Date;
+import java.util.Optional;
 
 /**
  * @author Brian Schlining
@@ -64,5 +68,12 @@ public class DateValuePanel extends AbstractValuePanel {
 
     public void setOnScan(Runnable runnable) {
         scanButton.setOnAction(eh -> runnable.run());
+    }
+
+    @Override
+    public Optional<IConstraint> getConstraint() {
+        return Optional.of(new DateBoundsConstraint(getValueName(),
+                new Date(getStartDate().toInstant().toEpochMilli()),
+                new Date(getEndDate().toInstant().toEpochMilli())));
     }
 }

@@ -7,7 +7,11 @@ import com.guigarage.sdk.list.MediaList;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import vars.queryfx.beans.ConceptSelection;
+import vars.queryfx.beans.ResolvedConceptSelection;
 import vars.queryfx.ui.AppIcons;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Brian Schlining
@@ -30,5 +34,10 @@ public class BasicSearchWorkbench extends WorkbenchView {
         return mediaList.getItems();
     }
 
+    public List<ResolvedConceptSelection> getConceptSelections() {
+        return getConceptMedia().stream()
+                .map(ConceptMedia::getConceptSelection)
+                .collect(Collectors.toList());
+    }
 
 }

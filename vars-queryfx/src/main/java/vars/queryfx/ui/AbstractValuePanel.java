@@ -4,7 +4,9 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
+import vars.queryfx.ui.db.IConstraint;
 
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -63,4 +65,6 @@ public abstract class AbstractValuePanel extends HBox {
     protected CheckBox getReturnCheckBox() {
         return returnCheckBox;
     }
+
+    public abstract Optional<IConstraint> getConstraint();
 }

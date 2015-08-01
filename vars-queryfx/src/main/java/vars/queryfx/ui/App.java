@@ -13,10 +13,16 @@ import vars.queryfx.Lookup;
 import vars.queryfx.RXEventBus;
 import vars.queryfx.ToolBelt;
 import vars.queryfx.beans.ConceptSelection;
+import vars.queryfx.beans.QueryParams;
 import vars.queryfx.beans.ResolvedConceptSelection;
+import vars.queryfx.beans.ResultsCustomization;
+import vars.queryfx.messages.ExecuteSearchMsg;
+import vars.queryfx.messages.Msg;
 import vars.queryfx.messages.NewConceptSelectionMsg;
+import vars.queryfx.messages.NewQueryResultsMsg;
 import vars.queryfx.messages.NewResolvedConceptSelectionMsg;
 import vars.queryfx.ui.controllers.AppController;
+import vars.queryfx.ui.db.ConceptConstraint;
 import vars.queryfx.ui.sdkfx.AdvancedSearchWorkbench;
 import vars.queryfx.ui.sdkfx.BasicSearchWorkbench;
 import vars.queryfx.ui.sdkfx.ConceptConstraintsWorkbench;
@@ -25,7 +31,9 @@ import vars.queryfx.ui.sdkfx.CustomizeResultsWorkbench;
 import vars.shared.ui.GlobalLookup;
 
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -62,7 +70,7 @@ public class App {
             application = new Application();
 
             application.setTitle("VARS Query");
-            application.addToolbarItem(new Action(AppIcons.PLAY, "Run Search"));
+            application.addToolbarItem(new Action(AppIcons.PLAY, "Run Search", () -> doSearch()));
 
             application.setBaseColor(new Color(0x1B / 255D, 0x4D / 255D, 0x93 / 255D, 1));
             application.addMenuEntry(new Action(AppIcons.SEARCH, "Basic Search", () -> showBasicSearch(application)));
@@ -74,6 +82,16 @@ public class App {
             showBasicSearch(application);
         }
         return application;
+    }
+
+    protected void doSearch() {
+        final List<ConceptConstraint> conceptConstraints = getBasicSearchWorkbench().getConceptSelections().stream()
+                .map(ConceptConstraint::new)
+                .collect(Collectors.toList());
+        final QueryParams queryParams = getAdvancedSearchWorkbench().getQueryParams();
+        final ResultsCustomization resultsCustomization = getCustomizeResultsWorkbench().getResultsCustomization();
+        Msg msg = new ExecuteSearchMsg(conceptConstraints, queryParams.getQueryReturns(), queryParams.getQueryConstraints(), resultsCustomization);
+        eventBus.send(msg);
     }
 
     protected void showBasicSearch(Application app) {

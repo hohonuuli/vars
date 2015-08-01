@@ -8,6 +8,12 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import vars.queryfx.ui.db.IConstraint;
+import vars.queryfx.ui.db.MaxConstraint;
+import vars.queryfx.ui.db.MinConstraint;
+import vars.queryfx.ui.db.MinMaxConstraint;
+
+import java.util.Optional;
 
 /**
  * @author Brian Schlining
@@ -95,5 +101,31 @@ public class NumberValuePanel extends AbstractValuePanel {
 
     public void setMaxValue(Number max) {
         getMaxTextField().setText(max.toString());
+    }
+
+    @Override
+    public Optional<IConstraint> getConstraint() {
+        Double min = null;
+        Double max = null;
+        try {
+            min = Double.parseDouble(getMinValue());
+        }
+        catch (Exception e) {}
+        try {
+            max = Double.parseDouble(getMaxValue());
+        }
+        catch (Exception e) {}
+
+        IConstraint constraint = null;
+        if (min != null && max != null) {
+            constraint = new MinMaxConstraint(getValueName(), min, max);
+        }
+        else if (min == null && max != null) {
+            constraint = new MaxConstraint(getValueName(), max);
+        }
+        else if (min != null) {
+            constraint = new MinConstraint(getValueName(), min);
+        }
+        return Optional.ofNullable(constraint);
     }
 }

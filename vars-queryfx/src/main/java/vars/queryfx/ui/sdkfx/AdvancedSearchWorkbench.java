@@ -8,20 +8,20 @@ import com.typesafe.config.ConfigObject;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.Node;
-import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.VBox;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.queryfx.Lookup;
 import vars.queryfx.QueryService;
+import vars.queryfx.beans.QueryParams;
 import vars.queryfx.ui.AbstractValuePanel;
 import vars.queryfx.ui.ValuePanelFactory;
+import vars.queryfx.ui.db.IConstraint;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -84,7 +84,6 @@ public class AdvancedSearchWorkbench extends WorkbenchView {
     }
 
     private void groupPanels() {
-        List<Node> panels = new ArrayList<>();
 
         Config config = Lookup.getConfig();
         ConfigObject groups = config.getObject("vars.query.column.groups");
@@ -125,6 +124,20 @@ public class AdvancedSearchWorkbench extends WorkbenchView {
                 valuePanel.setReturned(true);
             }
         }
+    }
+
+    public QueryParams getQueryParams() {
+        List<AbstractValuePanel> vps = getValuePanels();
+        List<String> returnedColumns = vps.stream()
+                .filter(AbstractValuePanel::isReturned)
+                .map(AbstractValuePanel::getValueName)
+                .collect(Collectors.toList());
+        List<IConstraint> constraints = vps.stream()
+                .map(AbstractValuePanel::getConstraint)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+        return new QueryParams(returnedColumns, constraints);
     }
 
 

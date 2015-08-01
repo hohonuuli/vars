@@ -18,8 +18,11 @@ import vars.queryfx.beans.ResolvedConceptSelection;
 import javax.inject.Inject;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -243,5 +246,36 @@ public class QueryServiceImpl implements QueryService {
             return minMax;
         });
     }
+
+    @Override
+    public Connection getAnnotationConnection() throws SQLException {
+        return queryPersistenceService.getAnnotationQueryable().getConnection();
+    }
+
+    /**
+     *
+     * @param conceptName The concept whos ancestorw we will look up
+     * @return A list of ancestors from the root down to, and including, the named concept
+     */
+    @Override
+    public CompletableFuture<List<Concept>> findAncestors(String conceptName) {
+        return CompletableFuture.supplyAsync(() -> {
+            List<Concept> names = new ArrayList<Concept>();
+            ConceptDAO conceptDAO = knowledgebaseDAOFactory.newConceptDAO();
+            conceptDAO.startTransaction();
+            Concept concept = conceptDAO.findByName(conceptName);
+            if (concept != null) {
+                while (concept != null) {
+                    names.add(concept);
+                    concept = concept.getParentConcept();
+                }
+            }
+            conceptDAO.endTransaction();
+            Collections.reverse(names);
+            return names;
+        }, executor);
+    }
+
+
 }
 

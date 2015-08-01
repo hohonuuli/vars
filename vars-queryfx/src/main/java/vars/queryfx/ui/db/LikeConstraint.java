@@ -1,5 +1,8 @@
 package vars.queryfx.ui.db;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
 /**
  * @author Brian Schlining
  * @since 2015-07-29T13:16:00
@@ -15,8 +18,9 @@ public class LikeConstraint implements IConstraint<String> {
     }
 
     @Override
-    public String getPreparedStatementBindingValues() {
-        return "%" + value + "%";
+    public int bind(PreparedStatement statement, int idx) throws SQLException {
+        statement.setString(idx, '%' + value + '%');
+        return idx + 1;
     }
 
     @Override
