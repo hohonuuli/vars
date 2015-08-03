@@ -39,6 +39,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 
 /**
  * @author Brian Schlining
@@ -48,11 +49,13 @@ public class AppController {
 
     private final QueryService queryService;
     private final RXEventBus eventBus;
+    private final Executor excutor;
     private final Logger log = LoggerFactory.getLogger(getClass());
 
-    public AppController(QueryService queryService, RXEventBus eventBus) {
+    public AppController(QueryService queryService, RXEventBus eventBus, Executor executor) {
         this.queryService = queryService;
         this.eventBus = eventBus;
+        this.excutor = executor;
 
         eventBus.toObserverable()
                 .filter(msg -> msg instanceof NewConceptSelectionMsg)
@@ -146,7 +149,7 @@ public class AppController {
             catch (SQLException e) {
                 throw new VARSException("Failed to execute prepared statement", e);
             }
-        });
+        }, excutor);
 
     }
 
