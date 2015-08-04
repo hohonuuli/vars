@@ -280,13 +280,9 @@ public class MergeEXPDAnnotations2 implements MergeFunction<Map<VideoFrame, Uber
         CollateFunction<Date> f1 = new CollateByDateFunction();
 
         // Extract the dates from the video frames
-        Collection<Date> d = Collections2.transform(vfc, new Function<VideoFrame, Date>() {
-
-            public Date apply(VideoFrame from) {
-                return from.getRecordedDate();
-            }
-
-        });
+        List<Date> d = vfc.stream()
+                .map(VideoFrame::getRecordedDate)
+                .collect(Collectors.toList());
 
         final Map<Date, UberDatum> r1 = f1.apply(d, udc, (long) offsetSecs * 1000);
 
