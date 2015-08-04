@@ -364,8 +364,9 @@ public class MergeEXPDAnnotations2 implements MergeFunction<Map<VideoFrame, Uber
                     uberDatum.getCameraDatum().getAlternativeTimecode() + " - " +
                     uberDatum.getCameraDatum().getDate();
 
-            log.debug(videoFrame.getTimecode() + " : " + videoFrame.getRecordedDate() + " :NAV: " + nav + " :CAM: " +
-                    cam);
+            String vf = videoFrame.getRecordedDate() == null ? "MISSING" :  videoFrame.getRecordedDate().toInstant().toString();
+
+            log.debug(videoFrame.getTimecode() + " : " + vf + " :NAV: " + nav + " :CAM: " + cam);
 
             videoFrame = dao.find(videoFrame);
             if (mergeHistory.getVideoArchiveSetID() == null || mergeHistory.getVideoArchiveSetID() < 0) {
@@ -444,18 +445,23 @@ public class MergeEXPDAnnotations2 implements MergeFunction<Map<VideoFrame, Uber
                 badNavDataCount++;
             }
 
-            // ---- Update date 
+            // ---- Update date
+            Date date = null;
             switch (mergeType) {
                 case PESSIMISTIC:
                     mergeHistory.setDateSource("EXPD");
 
                     // Change dates to ones found in EXPD
-                    if ((navigationDatum == null) || (navigationDatum.getDate() == null)) {
-                        videoFrame.setRecordedDate(null);
-                        fixedDateCount++;
+                    if (navigationDatum != null) {
+                        date = navigationDatum.getDate();
                     }
-                    else if (!navigationDatum.getDate().equals(recordedDate)) {
-                        videoFrame.setRecordedDate(navigationDatum.getDate());
+
+                    if ((date == null) && (cameraDatum != null)) {
+                        date = cameraDatum.getDate();
+                    }
+
+                    if (recordedDate == null || !recordedDate.equals(date)) {
+                        videoFrame.setRecordedDate(date);
                         fixedDateCount++;
                     }
 
@@ -465,7 +471,6 @@ public class MergeEXPDAnnotations2 implements MergeFunction<Map<VideoFrame, Uber
                     if ((recordedDate == null) || recordedDate.before(dive.getStartDate()) ||
                             recordedDate.after(dive.getEndDate())) {
 
-                        Date date = null;
                         if (navigationDatum != null) {
                             date = navigationDatum.getDate();
                         }

@@ -10,7 +10,7 @@ public class MergeEXPDAnnotations2Demo {
 
 
     public static void main(String[] args) {
-        MergeEXPDAnnotations2 m = new MergeEXPDAnnotations2("Ventana", 148, false);
+        MergeEXPDAnnotations2 m = new MergeEXPDAnnotations2("Ventana", 150, false);
         m.apply(MergeType.PESSIMISTIC);
     }
 }
