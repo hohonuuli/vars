@@ -22,7 +22,7 @@ public class CoalescingDecorator {
 
         final Map<String, List<Object>> resultsMap = queryResults.copyData();
         Map<String, Map<Integer, Set<Object>>> duplicateMap = new HashMap<>();
-        List keyColumn = queryResults.getValues(key);
+        List keyColumn = resultsMap.get(key);
         Object[] objects = keyColumn.toArray(new Object[keyColumn.size()]);
         for (int row0 = 0; row0 < objects.length; row0++) {
             Object object = objects[row0];

@@ -34,8 +34,8 @@ public class QueryResults {
         Map.Entry<String, List<Object>> firstEntry = data.entrySet().iterator().next();
         rows = firstEntry.getValue().size();
         for (Map.Entry<String, List<Object>> entry : data.entrySet()) {
-            Preconditions.checkArgument(entry.getValue().size() == rows, "Expected column have " +
-                    rows + " elements. Found" + entry.getValue().size());
+            Preconditions.checkArgument(entry.getValue().size() == rows, "Expected column to have " +
+                    rows + " elements. Found " + entry.getValue().size());
         }
 
         // --- Set data

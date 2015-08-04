@@ -93,6 +93,8 @@ public class AppController {
     }
 
     protected void executeSearch(ExecuteSearchMsg msg) {
+        // TODO create a stage that shows elapse time. Reuse it to display results.
+
         runQuery(msg.getQueryReturns(),
                 msg.getConceptConstraints(),
                 msg.getQueryConstraints(),
@@ -125,15 +127,15 @@ public class AppController {
                 psg.bind(preparedStatement, conceptConstraints, queryConstraints);
                 QueryResults queryResults = QueryResults.fromResultSet(preparedStatement.executeQuery());
 
+                if (resultsCustomization.isCategorizeAssociations()) {
+                    queryResults = AssociationColumnRemappingDecorator.apply(queryResults);
+                }
+
                 queryResults = CoalescingDecorator.coalesce(queryResults, "ObservationID_FK");
 
                 QueryResultsDecorator queryResultsDecorator = new QueryResultsDecorator(queryService);
                 if (resultsCustomization.isConceptHierarchy()) {
                     queryResults = queryResultsDecorator.addHierarchy(queryResults);
-                }
-
-                if (resultsCustomization.isCategorizeAssociations()) {
-                    queryResults = AssociationColumnRemappingDecorator.apply(queryResults);
                 }
 
                 if (resultsCustomization.isDetailedPhylogeny()) {
