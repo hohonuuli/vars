@@ -1,6 +1,5 @@
 package vars.queryfx.ui.controllers;
 
-import com.typesafe.config.Config;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.TableView;
@@ -10,12 +9,9 @@ import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.VARSException;
-import vars.queryfx.Lookup;
 import vars.queryfx.QueryService;
 import vars.queryfx.RXEventBus;
 import vars.queryfx.beans.ConceptSelection;
-import vars.queryfx.beans.QueryParams;
-import vars.queryfx.beans.ResolvedConceptSelection;
 import vars.queryfx.beans.ResultsCustomization;
 import vars.queryfx.messages.ExecuteSearchMsg;
 import vars.queryfx.messages.NewConceptSelectionMsg;
@@ -25,6 +21,7 @@ import vars.queryfx.ui.QueryResultsTableView;
 import vars.queryfx.ui.db.ConceptConstraint;
 import vars.queryfx.ui.db.IConstraint;
 import vars.queryfx.ui.db.PreparedStatementGenerator;
+import vars.queryfx.ui.db.SQLStatementGenerator;
 import vars.queryfx.ui.db.results.AssociationColumnRemappingDecorator;
 import vars.queryfx.ui.db.results.CoalescingDecorator;
 import vars.queryfx.ui.db.results.QueryResults;
@@ -34,8 +31,6 @@ import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -49,13 +44,17 @@ public class AppController {
 
     private final QueryService queryService;
     private final RXEventBus eventBus;
-    private final Executor excutor;
+    private final Executor executor;
+    private final QueryResultsUIController uiController;
+
     private final Logger log = LoggerFactory.getLogger(getClass());
 
     public AppController(QueryService queryService, RXEventBus eventBus, Executor executor) {
         this.queryService = queryService;
         this.eventBus = eventBus;
-        this.excutor = executor;
+        this.executor = executor;
+        this.uiController = new QueryResultsUIController(eventBus);
+
 
         eventBus.toObserverable()
                 .filter(msg -> msg instanceof NewConceptSelectionMsg)
@@ -65,12 +64,8 @@ public class AppController {
         eventBus.toObserverable()
                 .filter(msg -> msg instanceof ExecuteSearchMsg)
                 .map(msg -> (ExecuteSearchMsg) msg)
-                .subscribe(msg -> executeSearch(msg));
+                .subscribe(this::executeSearch);
 
-        eventBus.toObserverable()
-                .filter(msg -> msg instanceof NewQueryResultsMsg)
-                .map(msg -> (NewQueryResultsMsg) msg)
-                .subscribe(msg -> showQueryResults(msg));
     }
 
     protected void addConceptSelection(ConceptSelection conceptSelection) {
@@ -95,13 +90,25 @@ public class AppController {
     protected void executeSearch(ExecuteSearchMsg msg) {
         // TODO create a stage that shows elapse time. Reuse it to display results.
 
-        runQuery(msg.getQueryReturns(),
+
+        SQLStatementGenerator sqlGen = new SQLStatementGenerator();
+        String sql = sqlGen.getSQLStatement(msg.getQueryReturns(),
                 msg.getConceptConstraints(),
                 msg.getQueryConstraints(),
-                msg.getResultsCustomization()).thenAccept(queryResults -> {
+                msg.getResultsCustomization());
+        log.debug("Executing: " + sql);
+        System.out.println(sql);
 
-            eventBus.send(new NewQueryResultsMsg(queryResults));
-        });
+        CompletableFuture<Stage> stageF = uiController.newQueryStage();
+
+        CompletableFuture<QueryResults> queryResultsF = runQuery(msg.getQueryReturns(),
+                msg.getConceptConstraints(),
+                msg.getQueryConstraints(),
+                msg.getResultsCustomization());
+
+        stageF.thenAcceptBothAsync(queryResultsF, (stage, queryResults) ->
+                eventBus.send(new NewQueryResultsMsg(stage, queryResults, Optional.of(sql))), executor);
+
     }
 
     public CompletableFuture<QueryResults> runQuery(List<String> queryReturns,
@@ -151,20 +158,8 @@ public class AppController {
             catch (SQLException e) {
                 throw new VARSException("Failed to execute prepared statement", e);
             }
-        }, excutor);
+        }, executor);
 
     }
-
-    protected void showQueryResults(NewQueryResultsMsg msg) {
-        Platform.runLater(() -> {
-            TableView<String[]> tableView = QueryResultsTableView.newTableView(msg.getQueryResults());
-            BorderPane borderPane = new BorderPane(tableView);
-            Scene scene = new Scene(borderPane);
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.show();
-        });
-    }
-
 
 }

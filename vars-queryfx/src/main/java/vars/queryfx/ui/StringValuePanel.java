@@ -29,7 +29,6 @@ public class StringValuePanel extends AbstractValuePanel {
     private ListView<String> listView;
     private TextField textField;
     private ToggleButton toggleButton;
-    private BooleanProperty enableConstraint = new SimpleBooleanProperty(false);
 
     public StringValuePanel(String valueName) {
         super(valueName);
@@ -45,7 +44,7 @@ public class StringValuePanel extends AbstractValuePanel {
                     .getSelectedItems()
                     .addListener((ListChangeListener.Change<? extends String> c) -> {
                         if (listView.getSelectionModel().getSelectedItems().size() > 0) {
-                            enableConstraint.set(true);
+                            getConstrainCheckBox().setSelected(true);
                         }
                     });
             listView.itemsProperty().addListener((obs, oldVal, newVal) -> {
@@ -67,7 +66,7 @@ public class StringValuePanel extends AbstractValuePanel {
         if (textField == null) {
             textField = new TextField();
             textField.textProperty().addListener((obs, oldVal, newVal) -> {
-                enableConstraint.set(newVal != null && !newVal.isEmpty());
+                getConstrainCheckBox().setSelected(newVal != null && !newVal.isEmpty());
             });
             HBox.setHgrow(textField, Priority.ALWAYS);
         }

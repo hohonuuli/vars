@@ -80,6 +80,7 @@ public class App {
             application.addMenuEntry(new Action(AppIcons.GEARS, "Customize Results", () -> showCustomizeResults(application)));
 
             showBasicSearch(application);
+            getAdvancedSearchWorkbench(); // If we don't call this returns are not initialized on the first query
         }
         return application;
     }
@@ -204,7 +205,7 @@ public class App {
 
         App app = new App(toolBelt);
         Lookup.setApp(app);
-        app.getApplication().setPrefSize(500, 800);
+        app.getApplication().setPrefSize(800, 800);
         app.getApplication().setStopCallback(() -> System.exit(0));
         app.getApplication().show();
 

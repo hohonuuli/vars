@@ -44,7 +44,10 @@ public class InConstraint implements IConstraint<List<String>> {
             return columnName + " = '" + values.get(0) + "'";
         }
         else {
-            return columnName + " IN (" + values.stream().collect(Collectors.joining(", ", "'", "'")) + ")";
+            return columnName + " IN " +
+                    values.stream()
+                            .map(s -> "'" + s + "'")
+                            .collect(Collectors.joining(", ", "(", ")"));
         }
     }
 
@@ -54,8 +57,10 @@ public class InConstraint implements IConstraint<List<String>> {
             return columnName + " = ?";
         }
         else {
-            return columnName + " IN (" +
-                    values.stream().map(s -> "?").collect(Collectors.joining(", ")) + ")";
+            return columnName + " IN " +
+                    values.stream()
+                            .map(s -> "?")
+                            .collect(Collectors.joining(", ", "(", ")"));
         }
     }
 }
