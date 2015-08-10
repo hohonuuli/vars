@@ -261,6 +261,8 @@ WHERE
     WHERE
       cn.ConceptName IN (
         'Xenoturbellida', 
+        'Xenoturbellidae',
+        'Xenoturbella',  
         'Mertensia', 
         'Lyroctenidae', 
         'Lyrocteis', 
@@ -298,6 +300,8 @@ WHERE
     WHERE
       cn.ConceptName IN (
         'Xenoturbellida', 
+        'Xenoturbellidae',
+        'Xenoturbella',  
         'Lyroctenidae',
         'Mertensia', 
         'Lyroctenidae', 
