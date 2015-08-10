@@ -1,6 +1,9 @@
 package vars.queryfx.messages;
 
+import javafx.stage.Stage;
 import vars.queryfx.ui.db.results.QueryResults;
+
+import java.util.Optional;
 
 /**
  * @author Brian Schlining
@@ -8,13 +11,29 @@ import vars.queryfx.ui.db.results.QueryResults;
  */
 public class NewQueryResultsMsg implements Msg {
 
+    private final Stage stage;
     private final QueryResults queryResults;
+    private final Optional<String> sql;
 
-    public NewQueryResultsMsg(QueryResults queryResults) {
+    public NewQueryResultsMsg(Stage stage, QueryResults queryResults, Optional<String> sql) {
+        this.stage = stage;
         this.queryResults = queryResults;
+        this.sql = sql;
+    }
+
+    public NewQueryResultsMsg(Stage stage, QueryResults queryResults) {
+        this(stage, queryResults, Optional.empty());
     }
 
     public QueryResults getQueryResults() {
         return queryResults;
+    }
+
+    public Stage getStage() {
+        return stage;
+    }
+
+    public Optional<String> getSql() {
+        return sql;
     }
 }
