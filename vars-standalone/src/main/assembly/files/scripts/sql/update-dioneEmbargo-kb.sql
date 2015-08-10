@@ -261,7 +261,6 @@ WHERE
     WHERE
       cn.ConceptName IN (
         'Xenoturbellida', 
-        'Lyroctenidae',
         'Mertensia', 
         'Lyroctenidae', 
         'Lyrocteis', 
@@ -282,6 +281,8 @@ WHERE
         'Tuscarilla campanella',
         'Tuscarora')
   )
+
+GO
 
 DELETE FROM
   LinkRealization 
@@ -319,6 +320,8 @@ WHERE
         'Tuscarora')
   )
 
+GO
+
 
 -- Change Media references to external link ---------------------------
 UPDATE 
@@ -329,9 +332,13 @@ WHERE
   Url NOT LIKE 'http://dsg.mbari.org/images/dsg/external/%' AND 
   Url LIKE 'http://dsg.mbari.org/images/dsg/%'
 
+GO
+
 
 -- Remove all internal comments ---------------------------------------
 DELETE FROM 
   LinkRealization 
 WHERE 
   LinkName = 'internal-video-lab-only-comment'
+
+GO

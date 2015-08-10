@@ -80,6 +80,8 @@ WHERE
        (ChiefScientist LIKE '%Vrijenhoek%' OR ChiefScientist LIKE '%Clague%')
   )
 
+GO
+
 -- Delete Midwater lab's transect data --------------------------------
 DELETE FROM
   Observation
@@ -103,6 +105,8 @@ WHERE
        cpd.ChiefScientist LIKE '%hunt%' OR
        cpd.ChiefScientist LIKE '%hamner%')
   )
+  
+GO
 
 -- Remove Camera directions -------------------------------------------
 UPDATE
