@@ -1,11 +1,12 @@
-
+-- --------------------------------------------------------------------
 -- DELETE branches of concepts
+-- --------------------------------------------------------------------
 
--- Xenophyophoroidea --------------------------------------------------
+-- Mystery Mollusc --------------------------------------------------
 DECLARE @conceptId bigint
 
 DECLARE MyCursor CURSOR FOR
-  SELECT ConceptID_FK FROM ConceptName WHERE ConceptName = 'Xenophyophoroidea'
+  SELECT ConceptID_FK FROM ConceptName WHERE ConceptName = 'Mystery Mollusc'
 
 OPEN MyCursor
 FETCH NEXT FROM MyCursor into @conceptId
@@ -31,162 +32,37 @@ DEALLOCATE MyCursor
 
 GO
 
-
--- DELETE Media and LinkRealizations from concepts
-
--- Xenoturbellida -----------------------------------------------------
+-- Llyria --------------------------------------------------
 DECLARE @conceptId bigint
 
-DECLARE MyCursor CURSOR FOR 
-  SELECT ConceptID_FK FROM ConceptName WHERE ConceptName = 'Xenoturbellida' 
-
-OPEN MyCursor 
-FETCH NEXT FROM MyCursor into @conceptId 
-WHILE @@FETCH_STATUS = 0 
-BEGIN 
-    PRINT @conceptId 
-    FETCH NEXT FROM MyCursor INTO @conceptId 
-
-    -- Drop ConceptNames first 
-    DELETE FROM ConceptName WHERE id IN (SELECT cn.id FROM Concept AS c LEFT JOIN 
-      ConceptName AS cn ON cn.ConceptID_FK = c.id WHERE c.ParentConceptID_FK = @conceptId) 
-
-    -- Drop Concepts 
-    DELETE FROM Concept WHERE ParentConceptID_FK = @conceptId 
-
-    DELETE FROM ConceptName WHERE ConceptID_FK =@conceptId 
-
-    DELETE FROM Concept WHERE id = @conceptId 
-     
-END 
-CLOSE MyCursor 
-DEALLOCATE MyCursor 
-
-GO 
-
-
-
--- Mystery Mollusc ----------------------------------------------------
-DECLARE @conceptId bigint 
-
-DECLARE MyCursor CURSOR FOR 
-  SELECT ConceptID_FK FROM ConceptName WHERE ConceptName = 'Mystery Mollusc'
-
-OPEN MyCursor 
-FETCH NEXT FROM MyCursor into @conceptId 
-WHILE @@FETCH_STATUS = 0 
-BEGIN 
-    PRINT @conceptId 
-    FETCH NEXT FROM MyCursor INTO @conceptId 
-
-    -- Drop ConceptNames first 
-    DELETE FROM ConceptName WHERE id IN (SELECT cn.id FROM Concept AS c LEFT JOIN 
-      ConceptName AS cn ON cn.ConceptID_FK = c.id WHERE c.ParentConceptID_FK = @conceptId) 
-
-    -- Drop Concepts 
-    DELETE FROM Concept WHERE ParentConceptID_FK = @conceptId 
-
-    DELETE FROM ConceptName WHERE ConceptID_FK = @conceptId
-
-    DELETE FROM Concept WHERE id = @conceptId 
-     
-END 
-CLOSE MyCursor 
-DEALLOCATE MyCursor 
-
-GO
-
--- Cydippida 2 --------------------------------------------------------
-DECLARE @conceptId bigint 
-
-DECLARE MyCursor CURSOR FOR 
-  SELECT ConceptID_FK FROM ConceptName WHERE ConceptName = 'Cydippida 2'
-
-OPEN MyCursor 
-FETCH NEXT FROM MyCursor into @conceptId 
-WHILE @@FETCH_STATUS = 0 
-BEGIN 
-    PRINT @conceptId 
-    FETCH NEXT FROM MyCursor INTO @conceptId 
-
-    -- Drop ConceptNames first 
-    DELETE FROM ConceptName WHERE id IN (SELECT cn.id FROM Concept AS c LEFT JOIN 
-      ConceptName AS cn ON cn.ConceptID_FK = c.id WHERE c.ParentConceptID_FK = @conceptId) 
-
-    -- Drop Concepts 
-    DELETE FROM Concept WHERE ParentConceptID_FK = @conceptId 
-
-    DELETE FROM ConceptName WHERE ConceptID_FK =@conceptId 
-
-    DELETE FROM Concept WHERE id = @conceptId 
-     
-END 
-CLOSE MyCursor 
-DEALLOCATE MyCursor 
-
-GO
-
--- Llyria -------------------------------------------------------------
-DECLARE @conceptId bigint 
-
-DECLARE MyCursor CURSOR FOR 
+DECLARE MyCursor CURSOR FOR
   SELECT ConceptID_FK FROM ConceptName WHERE ConceptName = 'Llyria'
 
-OPEN MyCursor 
-FETCH NEXT FROM MyCursor into @conceptId 
-WHILE @@FETCH_STATUS = 0 
-BEGIN 
-    PRINT @conceptId 
-    FETCH NEXT FROM MyCursor INTO @conceptId 
+OPEN MyCursor
+FETCH NEXT FROM MyCursor into @conceptId
+WHILE @@FETCH_STATUS = 0
+  BEGIN
+    PRINT @conceptId
+    FETCH NEXT FROM MyCursor INTO @conceptId
 
-    -- Drop ConceptNames first 
-    DELETE FROM ConceptName WHERE id IN (SELECT cn.id FROM Concept AS c LEFT JOIN 
-      ConceptName AS cn ON cn.ConceptID_FK = c.id WHERE c.ParentConceptID_FK = @conceptId) 
+    -- Drop ConceptNames first
+    DELETE FROM ConceptName WHERE id IN (SELECT cn.id FROM Concept AS c LEFT JOIN
+      ConceptName AS cn ON cn.ConceptID_FK = c.id WHERE c.ParentConceptID_FK = @conceptId)
 
-    -- Drop Concepts 
-    DELETE FROM Concept WHERE ParentConceptID_FK = @conceptId 
+    -- Drop Concepts
+    DELETE FROM Concept WHERE ParentConceptID_FK = @conceptId
 
-    DELETE FROM ConceptName WHERE ConceptID_FK =@conceptId 
+    DELETE FROM ConceptName WHERE ConceptID_FK =@conceptId
 
-    DELETE FROM Concept WHERE id = @conceptId 
-     
-END 
-CLOSE MyCursor 
-DEALLOCATE MyCursor 
+    DELETE FROM Concept WHERE id = @conceptId
 
-GO
-
--- Mertensia ----------------------------------------------------------
-DECLARE @conceptId bigint 
-
-DECLARE MyCursor CURSOR FOR 
-  SELECT ConceptID_FK FROM ConceptName WHERE ConceptName = 'Mertensia'
-
-OPEN MyCursor 
-FETCH NEXT FROM MyCursor into @conceptId 
-WHILE @@FETCH_STATUS = 0 
-BEGIN 
-    PRINT @conceptId 
-    FETCH NEXT FROM MyCursor INTO @conceptId 
-
-    -- Drop ConceptNames first 
-    DELETE FROM ConceptName WHERE id IN (SELECT cn.id FROM Concept AS c LEFT JOIN 
-      ConceptName AS cn ON cn.ConceptID_FK = c.id WHERE c.ParentConceptID_FK = @conceptId) 
-
-    -- Drop Concepts 
-    DELETE FROM Concept WHERE ParentConceptID_FK = @conceptId 
-
-    DELETE FROM ConceptName WHERE ConceptID_FK =@conceptId 
-
-    DELETE FROM Concept WHERE id = @conceptId 
-     
-END 
-CLOSE MyCursor 
-DEALLOCATE MyCursor 
+  END
+CLOSE MyCursor
+DEALLOCATE MyCursor
 
 GO
 
--- Platyctenida sp. 1 -------------------------------------------------
+-- Platyctenida --------------------------------------------------
 DECLARE @conceptId bigint
 
 DECLARE MyCursor CURSOR FOR
@@ -216,67 +92,7 @@ DEALLOCATE MyCursor
 
 GO
 
--- Lyroctenidae -------------------------------------------------------
-DECLARE @conceptId bigint
-
-DECLARE MyCursor CURSOR FOR
-  SELECT ConceptID_FK FROM ConceptName WHERE ConceptName = 'Lyroctenidae'
-
-OPEN MyCursor
-FETCH NEXT FROM MyCursor into @conceptId
-WHILE @@FETCH_STATUS = 0
-  BEGIN
-    PRINT @conceptId
-    FETCH NEXT FROM MyCursor INTO @conceptId
-
-    -- Drop ConceptNames first
-    DELETE FROM ConceptName WHERE id IN (SELECT cn.id FROM Concept AS c LEFT JOIN
-      ConceptName AS cn ON cn.ConceptID_FK = c.id WHERE c.ParentConceptID_FK = @conceptId)
-
-    -- Drop Concepts
-    DELETE FROM Concept WHERE ParentConceptID_FK = @conceptId
-
-    DELETE FROM ConceptName WHERE ConceptID_FK =@conceptId
-
-    DELETE FROM Concept WHERE id = @conceptId
-
-  END
-CLOSE MyCursor
-DEALLOCATE MyCursor
-
-GO
-
--- Tjalfiellidae ------------------------------------------------------
-DECLARE @conceptId bigint
-
-DECLARE MyCursor CURSOR FOR
-  SELECT ConceptID_FK FROM ConceptName WHERE ConceptName = 'Tjalfiellidae'
-
-OPEN MyCursor
-FETCH NEXT FROM MyCursor into @conceptId
-WHILE @@FETCH_STATUS = 0
-  BEGIN
-    PRINT @conceptId
-    FETCH NEXT FROM MyCursor INTO @conceptId
-
-    -- Drop ConceptNames first
-    DELETE FROM ConceptName WHERE id IN (SELECT cn.id FROM Concept AS c LEFT JOIN
-      ConceptName AS cn ON cn.ConceptID_FK = c.id WHERE c.ParentConceptID_FK = @conceptId)
-
-    -- Drop Concepts
-    DELETE FROM Concept WHERE ParentConceptID_FK = @conceptId
-
-    DELETE FROM ConceptName WHERE ConceptID_FK =@conceptId
-
-    DELETE FROM Concept WHERE id = @conceptId
-
-  END
-CLOSE MyCursor
-DEALLOCATE MyCursor
-
-GO
-
--- Thalassocalycida sp. 1 ----------------------------------------------------------
+-- Thalassocalycida sp. 1 --------------------------------------------------
 DECLARE @conceptId bigint
 
 DECLARE MyCursor CURSOR FOR
@@ -306,7 +122,37 @@ DEALLOCATE MyCursor
 
 GO
 
--- Aegina sp. 1 ----------------------------------------------------------
+-- Intacta --------------------------------------------------
+DECLARE @conceptId bigint
+
+DECLARE MyCursor CURSOR FOR
+  SELECT ConceptID_FK FROM ConceptName WHERE ConceptName = 'Intacta'
+
+OPEN MyCursor
+FETCH NEXT FROM MyCursor into @conceptId
+WHILE @@FETCH_STATUS = 0
+  BEGIN
+    PRINT @conceptId
+    FETCH NEXT FROM MyCursor INTO @conceptId
+
+    -- Drop ConceptNames first
+    DELETE FROM ConceptName WHERE id IN (SELECT cn.id FROM Concept AS c LEFT JOIN
+      ConceptName AS cn ON cn.ConceptID_FK = c.id WHERE c.ParentConceptID_FK = @conceptId)
+
+    -- Drop Concepts
+    DELETE FROM Concept WHERE ParentConceptID_FK = @conceptId
+
+    DELETE FROM ConceptName WHERE ConceptID_FK =@conceptId
+
+    DELETE FROM Concept WHERE id = @conceptId
+
+  END
+CLOSE MyCursor
+DEALLOCATE MyCursor
+
+GO
+
+-- Aegina sp. 1 --------------------------------------------------
 DECLARE @conceptId bigint
 
 DECLARE MyCursor CURSOR FOR
@@ -336,11 +182,11 @@ DEALLOCATE MyCursor
 
 GO
 
--- Erenna sp. A -------------------------------------------------------
+-- Erenna sp. 1 --------------------------------------------------
 DECLARE @conceptId bigint
 
 DECLARE MyCursor CURSOR FOR
-  SELECT ConceptID_FK FROM ConceptName WHERE ConceptName = 'Erenna sp. A'
+  SELECT ConceptID_FK FROM ConceptName WHERE ConceptName = 'Erenna sp. 1'
 
 OPEN MyCursor
 FETCH NEXT FROM MyCursor into @conceptId
@@ -396,35 +242,83 @@ DEALLOCATE MyCursor
 
 GO
 
--- Tuscaroridae -------------------------------------------------------
-DECLARE @conceptId bigint
 
-DECLARE MyCursor CURSOR FOR
-  SELECT ConceptID_FK FROM ConceptName WHERE ConceptName = 'Tuscaroridae'
+-- --------------------------------------------------------------------
+-- DELETE Media and LinkRealizations from concepts
+-- --------------------------------------------------------------------
 
-OPEN MyCursor
-FETCH NEXT FROM MyCursor into @conceptId
-WHILE @@FETCH_STATUS = 0
-  BEGIN
-    PRINT @conceptId
-    FETCH NEXT FROM MyCursor INTO @conceptId
+DELETE FROM
+  Media 
+WHERE
+  ConceptDelegateID_FK IN ( 
+    SELECT
+      cd.id 
+    FROM
+      ConceptDelegate AS cd LEFT JOIN 
+      Concept AS C ON cd.ConceptID_FK = C.id RIGHT JOIN 
+      Media AS M ON M.ConceptDelegateID_FK = cd.id RIGHT JOIN 
+      ConceptName AS cn ON cn.ConceptID_FK = C.id 
+    WHERE
+      cn.ConceptName IN (
+        'Xenoturbellida', 
+        'Lyroctenidae',
+        'Mertensia', 
+        'Lyroctenidae', 
+        'Lyrocteis', 
+        'Tjalfiellidae', 
+        'Tjalfiella', 
+        'Tjalfiella tristoma', 
+        'Tuscaroridae',
+        'Tuscarantha',
+        'Tuscarantha luciae',
+        'Tuscarantha braueri',
+        'Tuscaretta',
+        'Tuscaretta globosa',
+        'Tuscaridium',
+        'Tuscaridium cygneum',
+        'Tuscarilla',
+        'Tuscarilla nationalis',
+        'Tuscarilla similis',
+        'Tuscarilla campanella',
+        'Tuscarora')
+  )
 
-    -- Drop ConceptNames first
-    DELETE FROM ConceptName WHERE id IN (SELECT cn.id FROM Concept AS c LEFT JOIN
-      ConceptName AS cn ON cn.ConceptID_FK = c.id WHERE c.ParentConceptID_FK = @conceptId)
+DELETE FROM
+  LinkRealization 
+WHERE
+  ConceptDelegateID_FK IN ( 
+    SELECT
+      cd.id 
+    FROM
+      ConceptDelegate AS cd LEFT JOIN 
+      Concept AS C ON cd.ConceptID_FK = C.id RIGHT JOIN 
+      Media AS M ON M.ConceptDelegateID_FK = cd.id RIGHT JOIN 
+      ConceptName AS cn ON cn.ConceptID_FK = C.id 
+    WHERE
+      cn.ConceptName IN (
+        'Xenoturbellida', 
+        'Lyroctenidae',
+        'Mertensia', 
+        'Lyroctenidae', 
+        'Lyrocteis', 
+        'Tjalfiellidae', 
+        'Tjalfiella', 
+        'Tjalfiella tristoma', 
+        'Tuscaroridae',
+        'Tuscarantha',
+        'Tuscarantha luciae',
+        'Tuscarantha braueri',
+        'Tuscaretta',
+        'Tuscaretta globosa',
+        'Tuscaridium',
+        'Tuscaridium cygneum',
+        'Tuscarilla',
+        'Tuscarilla nationalis',
+        'Tuscarilla similis',
+        'Tuscarilla campanella',
+        'Tuscarora')
+  )
 
-    -- Drop Concepts
-    DELETE FROM Concept WHERE ParentConceptID_FK = @conceptId
-
-    DELETE FROM ConceptName WHERE ConceptID_FK =@conceptId
-
-    DELETE FROM Concept WHERE id = @conceptId
-
-  END
-CLOSE MyCursor
-DEALLOCATE MyCursor
-
-GO
 
 -- Change Media references to external link ---------------------------
 UPDATE 
