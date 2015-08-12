@@ -9,7 +9,7 @@ def endDate = args.size() > 1 ? df.parse(args[1]) : new Date()
 
 def toolBox = new ToolBox()
 def historyDao = toolBox.toolBelt.knowledgebaseDAOFactory.newHistoryDAO()
-def approvedHistories = historyDao.findApprovedHistories().toList
+def approvedHistories = historyDao.findApprovedHistories().toList()
 approvedHistories = approvedHistories.findAll { h ->
     h.processedDate >= startDate && h.processedDate <= endDate
 }

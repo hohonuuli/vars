@@ -10,7 +10,6 @@ import org.mbari.expd.DAOFactory;
 import org.mbari.expd.jdbc.ExpdModule;
 import org.mbari.vars.integration.MergeHistoryDAOImpl;
 import org.mbari.vars.integration.MergeStatusDAOImpl;
-import vars.annotation.ui.*;
 import vars.annotation.ui.ToolBelt;
 import vars.integration.MergeHistoryDAO;
 import vars.integration.MergeStatusDAO;
