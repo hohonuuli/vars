@@ -61,7 +61,7 @@ public class App {
     public App(ToolBelt toolBelt) {
         Preconditions.checkArgument(toolBelt != null);
         this.appController = new AppController(toolBelt.getQueryService(), eventBus, toolBelt.getExecutor());
-        this.saveResultsController = new SaveResultsController(eventBus);
+        this.saveResultsController = new SaveResultsController(eventBus, toolBelt.getExecutor());
         this.toolBelt = toolBelt;
 
         eventBus.toObserverable()

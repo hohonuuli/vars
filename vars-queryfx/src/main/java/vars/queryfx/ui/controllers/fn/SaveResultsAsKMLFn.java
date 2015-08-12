@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.TimeZone;
+import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
 /**
@@ -38,57 +39,69 @@ public class SaveResultsAsKMLFn {
     }};
 
     private final QueryResults queryResults;
+    private final Executor executor;
 
-    public SaveResultsAsKMLFn(File target, QueryResults queryResults, Optional<String> sql) {
+    public SaveResultsAsKMLFn(Executor executor, File target, QueryResults queryResults, Optional<String> sql) {
+        this.executor = executor;
         this.target = target;
         this.queryResults = queryResults;
         this.sql = sql;
     }
 
-    public void apply() throws IOException {
-        final BufferedWriter out = new BufferedWriter(new FileWriter(target));
+    public void apply()  {
+        executor.execute(() -> {
 
-        // Write header
-        out.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-        out.write("<!-- " + new Date() + " -->");
-        sql.ifPresent(s -> {
             try {
-                out.write("<!-- QUERY: " + s + " -->");
+                final BufferedWriter out = new BufferedWriter(new FileWriter(target));
+
+                // Write header
+                out.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+                out.write("<!-- " + new Date() + " -->");
+                sql.ifPresent(s -> {
+                    try {
+                        out.write("<!-- QUERY: " + s + " -->");
+                    }
+                    catch (IOException e) {
+                        // We can swallow this without significant consequence
+                    }
+                });
+                out.write("<kml xmlns=\"http://earth.google.com/kml/2.1\">\n");
+                out.write("  <Document>\n");
+                out.write("    <Style id=\"highlightPlacemark\"><IconStyle><Icon>\n");
+                out.write("      <href>http://maps.google.com/mapfiles/kml/paddle/purple-blank.png</href>\n");
+                out.write("    </Icon></IconStyle></Style>\n");
+                out.write("    <Style id=\"normalPlacemark\"><IconStyle><Icon>\n");
+                out.write("      <href>http://maps.google.com/mapfiles/kml/paddle/blu-blank.png</href>\n");
+                out.write("    </Icon></IconStyle></Style>\n");
+                out.write("    <StyleMap id=\"varsStyleMap\">\n");
+                out.write("      <Pair><key>normal</key><styleUrl>#normalPlacemark</styleUrl></Pair>\n");
+                out.write("      <Pair><key>highlight</key><styleUrl>#highlightPlacemark</styleUrl></Pair>\n");
+                out.write("    </StyleMap>\n");
+                out.write("    <Style id=\"highlightPhotoPlacemark\"><IconStyle><Icon>\n");
+                out.write("      <href>http://maps.google.com/mapfiles/kml/paddle/purple-square.png</href>\n");
+                out.write("    </Icon></IconStyle></Style>\n");
+                out.write("    <Style id=\"normalPhotoPlacemark\"><IconStyle><Icon>\n");
+                out.write("      <href>http://maps.google.com/mapfiles/kml/paddle/blu-square.png</href>\n");
+                out.write("    </Icon></IconStyle></Style>\n");
+                out.write("    <StyleMap id=\"varsPhotoStyleMap\">\n");
+                out.write("      <Pair><key>normal</key><styleUrl>#normalPhotoPlacemark</styleUrl></Pair>\n");
+                out.write("      <Pair><key>highlight</key><styleUrl>#highlightPhotoPlacemark</styleUrl></Pair>\n");
+                out.write("    </StyleMap>\n");
+
+                // Write Placemarks
+                queryResultsToPlacemarks(out);
+
+                // Write footer
+                out.write("  </Document>\n");
+                out.write("</kml>\n");
+                out.close();
             }
             catch (IOException e) {
-                // We can swallow this without significant consequence
+                log.warn("Failed to save KML to " +target.getAbsolutePath());
             }
+
         });
-        out.write("<kml xmlns=\"http://earth.google.com/kml/2.1\">\n");
-        out.write("  <Document>\n");
-        out.write("    <Style id=\"highlightPlacemark\"><IconStyle><Icon>\n");
-        out.write("      <href>http://maps.google.com/mapfiles/kml/paddle/purple-blank.png</href>\n");
-        out.write("    </Icon></IconStyle></Style>\n");
-        out.write("    <Style id=\"normalPlacemark\"><IconStyle><Icon>\n");
-        out.write("      <href>http://maps.google.com/mapfiles/kml/paddle/blu-blank.png</href>\n");
-        out.write("    </Icon></IconStyle></Style>\n");
-        out.write("    <StyleMap id=\"varsStyleMap\">\n");
-        out.write("      <Pair><key>normal</key><styleUrl>#normalPlacemark</styleUrl></Pair>\n");
-        out.write("      <Pair><key>highlight</key><styleUrl>#highlightPlacemark</styleUrl></Pair>\n");
-        out.write("    </StyleMap>\n");
-        out.write("    <Style id=\"highlightPhotoPlacemark\"><IconStyle><Icon>\n");
-        out.write("      <href>http://maps.google.com/mapfiles/kml/paddle/purple-square.png</href>\n");
-        out.write("    </Icon></IconStyle></Style>\n");
-        out.write("    <Style id=\"normalPhotoPlacemark\"><IconStyle><Icon>\n");
-        out.write("      <href>http://maps.google.com/mapfiles/kml/paddle/blu-square.png</href>\n");
-        out.write("    </Icon></IconStyle></Style>\n");
-        out.write("    <StyleMap id=\"varsPhotoStyleMap\">\n");
-        out.write("      <Pair><key>normal</key><styleUrl>#normalPhotoPlacemark</styleUrl></Pair>\n");
-        out.write("      <Pair><key>highlight</key><styleUrl>#highlightPhotoPlacemark</styleUrl></Pair>\n");
-        out.write("    </StyleMap>\n");
 
-        // Write Placemarks
-        queryResultsToPlacemarks(out);
-
-        // Write footer
-        out.write("  </Document>\n");
-        out.write("</kml>\n");
-        out.close();
     }
 
     /**

@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.mbari.util.Tuple2;
@@ -16,6 +17,7 @@ import vars.queryfx.messages.NewQueryResultsMsg;
 import vars.queryfx.messages.NonFatalExceptionMsg;
 import vars.queryfx.messages.SaveAsKMLMsg;
 import vars.queryfx.messages.SaveAsTextMsg;
+import vars.queryfx.messages.SaveImagesMsg;
 import vars.queryfx.ui.QueryResultsTableView;
 import vars.queryfx.ui.db.SQLStatementGenerator;
 import vars.queryfx.ui.db.results.QueryResults;
@@ -99,6 +101,8 @@ public class QueryResultsUIController {
             });
 
             ToolBar toolBar = new ToolBar();
+            ProgressIndicator progressIndicator = new ProgressIndicator(0);
+            progressIndicator.setVisible(false);
             Button saveButton = new MaterialDesignButton("Save");
             saveButton.setOnAction(v -> {
                 FileChooser fileChooser = new FileChooser();
@@ -119,7 +123,21 @@ public class QueryResultsUIController {
                 }
             });
             Button saveImagesButton = new MaterialDesignButton("Save Images");
-            toolBar.getItems().addAll(saveButton, saveKMLButton, saveImagesButton);
+            saveImagesButton.setOnAction(v -> {
+                DirectoryChooser dirChooser = new DirectoryChooser();
+                dirChooser.setTitle("Select directory to save images into");
+                File saveDir = dirChooser.showDialog(stage);
+                if (saveDir != null) {
+                    eventBus.send(new SaveImagesMsg(saveDir, queryResults,
+                            (Double d) -> Platform.runLater(() -> {
+                                boolean showProgress = d > 0;
+                                saveImagesButton.setDisable(showProgress);
+                                progressIndicator.setVisible(showProgress);
+                                progressIndicator.setProgress(d);
+                            })));
+                }
+            });
+            toolBar.getItems().addAll(saveButton, saveKMLButton, saveImagesButton, progressIndicator);
             borderPane.setTop(toolBar);
 
             Scene scene = new Scene(borderPane);

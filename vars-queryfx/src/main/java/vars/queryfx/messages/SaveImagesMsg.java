@@ -1,11 +1,10 @@
 package vars.queryfx.messages;
 
-import javafx.stage.Stage;
 import vars.queryfx.ui.db.results.QueryResults;
 
-import javax.swing.text.html.Option;
 import java.io.File;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 /**
  * @author Brian Schlining
@@ -14,16 +13,16 @@ import java.util.Optional;
 public class SaveImagesMsg {
     private final File targetDir;
     private final QueryResults queryResults;
-    private final Optional<Stage> stageOpt;
+    private final Consumer<Double> progressFn;
 
-    public SaveImagesMsg(File targetDir, QueryResults queryResults, Optional<Stage> stageOpt) {
+    public SaveImagesMsg(File targetDir, QueryResults queryResults, Consumer<Double> progressFn) {
         this.queryResults = queryResults;
         this.targetDir = targetDir;
-        this.stageOpt = stageOpt;
+        this.progressFn = progressFn;
     }
 
     public SaveImagesMsg(File targetDir, QueryResults queryResults) {
-        this(targetDir, queryResults, Optional.empty());
+        this(targetDir, queryResults, (Double d) -> {});
     }
 
     public QueryResults getQueryResults() {
@@ -34,7 +33,7 @@ public class SaveImagesMsg {
         return targetDir;
     }
 
-    public Optional<Stage> getStageOpt() {
-        return stageOpt;
+    public Consumer<Double> getProgressFn() {
+        return progressFn;
     }
 }
