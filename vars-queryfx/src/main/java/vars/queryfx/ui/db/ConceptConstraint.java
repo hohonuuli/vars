@@ -103,7 +103,8 @@ public class ConceptConstraint implements IConstraint<ResolvedConceptSelection> 
 
         if (!conceptNames.isEmpty()) {
             String cns = conceptNames.stream()
-                    .collect(Collectors.joining(", ", "'", "'"));
+                    .map(s -> "'" + s + "'")
+                    .collect(Collectors.joining(", "));
 
             sb.append("(ConceptName IN (");
             sb.append(cns);

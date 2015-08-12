@@ -22,14 +22,17 @@ import vars.queryfx.messages.NewConceptSelectionMsg;
 import vars.queryfx.messages.NewQueryResultsMsg;
 import vars.queryfx.messages.NewResolvedConceptSelectionMsg;
 import vars.queryfx.ui.controllers.AppController;
+import vars.queryfx.ui.controllers.SaveResultsController;
 import vars.queryfx.ui.db.ConceptConstraint;
 import vars.queryfx.ui.sdkfx.AdvancedSearchWorkbench;
 import vars.queryfx.ui.sdkfx.BasicSearchWorkbench;
 import vars.queryfx.ui.sdkfx.ConceptConstraintsWorkbench;
 import vars.queryfx.ui.sdkfx.ConceptMedia;
 import vars.queryfx.ui.sdkfx.CustomizeResultsWorkbench;
+import vars.shared.javafx.application.ImageFX;
 import vars.shared.ui.GlobalLookup;
 
+import java.awt.*;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -49,6 +52,7 @@ public class App {
     private final ToolBelt toolBelt;
     private Application application;
     private final AppController appController;
+    private final SaveResultsController saveResultsController;
     private BasicSearchWorkbench basicSearchWorkbench;
     private ConceptConstraintsWorkbench conceptConstraintsWorkbench;
     private CustomizeResultsWorkbench customizeResultsWorkbench;
@@ -57,6 +61,7 @@ public class App {
     public App(ToolBelt toolBelt) {
         Preconditions.checkArgument(toolBelt != null);
         this.appController = new AppController(toolBelt.getQueryService(), eventBus, toolBelt.getExecutor());
+        this.saveResultsController = new SaveResultsController(eventBus);
         this.toolBelt = toolBelt;
 
         eventBus.toObserverable()
@@ -205,6 +210,7 @@ public class App {
 
         App app = new App(toolBelt);
         Lookup.setApp(app);
+        ImageFX.setIsJavaFXRunning(true);
         app.getApplication().setPrefSize(800, 800);
         app.getApplication().setStopCallback(() -> System.exit(0));
         app.getApplication().show();

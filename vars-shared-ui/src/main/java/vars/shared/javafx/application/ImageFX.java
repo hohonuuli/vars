@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.shared.javafx.stage.ImageStage;
 
+import java.net.URL;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -28,7 +29,7 @@ public class ImageFX {
     private static int TIMEOUT = 5000;
     private static final Logger log = LoggerFactory.getLogger(ImageFX.class);
 
-    private static Application myApp;
+    private static boolean isJavaFXRunning = false;
 
     // Used to launch the application before running any test
     private static final CountDownLatch launchLatch = new CountDownLatch(1);
@@ -46,7 +47,7 @@ public class ImageFX {
 
         @Override
         public void init() throws Exception {
-            ImageFX.myApp = this;
+            isJavaFXRunning = true;
         }
 
         @Override
@@ -58,23 +59,13 @@ public class ImageFX {
 
         @Override
         public void stop() throws Exception {
-            ImageFX.myApp = null;
+            isJavaFXRunning = false;
             super.stop();
         }
     }
 
-    /**
-     * If you are using this from an already running JavaFX Application. You'll
-     * need to set the parent app so that it doesn't try to create one for you.
-     *
-     * @param app The JavaFX application
-     */
-    public static void setJavaFXApplication(Application app) {
-        myApp = app;
-    }
-
-    public static Application getJavaFXApplication() {
-        return myApp;
+    public static void setIsJavaFXRunning(boolean isJavaFXRunning) {
+        ImageFX.isJavaFXRunning = isJavaFXRunning;
     }
 
     /**
@@ -82,7 +73,7 @@ public class ImageFX {
      * before we try to start opening new Stages.
      */
     private static void startJavaFX() {
-        if (myApp == null) {
+        if (isJavaFXRunning == false) {
             new Thread(() -> {
                 try {
                     Application.launch(MyApp.class, "");
@@ -117,6 +108,7 @@ public class ImageFX {
                 isF.thenAccept(imageStageFuture::complete);
             } catch (Exception e) {
                 // TODO Set a failed to load image
+                imageStageFuture.completeExceptionally(e);
                 log.warn("Failed to open " + imageLocation, e);
             }
         });

@@ -8,17 +8,29 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.mbari.util.Tuple2;
 import vars.queryfx.RXEventBus;
 import vars.queryfx.messages.NewQueryResultsMsg;
+import vars.queryfx.messages.NonFatalExceptionMsg;
+import vars.queryfx.messages.SaveAsKMLMsg;
+import vars.queryfx.messages.SaveAsTextMsg;
 import vars.queryfx.ui.QueryResultsTableView;
 import vars.queryfx.ui.db.SQLStatementGenerator;
 import vars.queryfx.ui.db.results.QueryResults;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 /**
  * Created by brian on 8/5/15.
@@ -78,16 +90,34 @@ public class QueryResultsUIController {
             tabPane.getTabs().add(resultsTab);
 
             sql.ifPresent(s -> {
+                String text = createMetadataString(queryResults, sql);
                 Tab queryTab = new Tab("Query");
                 queryTab.setClosable(false);
-                TextArea textArea = new TextArea(s);
+                TextArea textArea = new TextArea(text);
                 queryTab.setContent(new BorderPane(textArea));
                 tabPane.getTabs().add(queryTab);
             });
 
             ToolBar toolBar = new ToolBar();
             Button saveButton = new MaterialDesignButton("Save");
+            saveButton.setOnAction(v -> {
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.setInitialFileName("vars_query.txt");
+                File saveFile = fileChooser.showSaveDialog(stage);
+                if (saveFile != null) {
+                    eventBus.send(new SaveAsTextMsg(saveFile, queryResults, sql));
+                }
+
+            });
             Button saveKMLButton = new MaterialDesignButton("Save KML");
+            saveKMLButton.setOnAction(v -> {
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.setInitialFileName("vars_query.kml");
+                File saveFile = fileChooser.showSaveDialog(stage);
+                if (saveFile != null) {
+                    eventBus.send(new SaveAsKMLMsg(saveFile, queryResults, sql));
+                }
+            });
             Button saveImagesButton = new MaterialDesignButton("Save Images");
             toolBar.getItems().addAll(saveButton, saveKMLButton, saveImagesButton);
             borderPane.setTop(toolBar);
@@ -98,6 +128,21 @@ public class QueryResultsUIController {
         });
 
     }
+
+    public String createMetadataString(QueryResults queryResults, Optional<String> sql) {
+        StringBuilder text = new StringBuilder(Instant.now().toString());
+
+        sql.ifPresent(s -> {
+            text.append("\n\n")
+                    .append("DATABASE\n\t").append("\n")
+                    .append("QUERY\n\t")
+                    .append(s).append("\n\n")
+                    .append("TOTAL RECORDS: ").append(queryResults.getRows());
+        });
+
+        return text.toString();
+    }
+
 
 
 }

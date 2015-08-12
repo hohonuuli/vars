@@ -1,6 +1,7 @@
 package vars.queryfx.ui.db.results;
 
 import com.google.common.base.Preconditions;
+import org.mbari.util.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 /**
@@ -59,8 +61,28 @@ public class QueryResults {
 
     }
 
+    public Tuple2<List<String>, List<String[]>> toRowOrientedData() {
+        List<String[]> data = new ArrayList<>();
+        int rows = getRows();
+        int cols = getColumns();
+        for (int r = 0; r < rows; r++) {
+            data.add(new String[cols]);
+        }
+
+        List<String> columnNames = new ArrayList<>(getColumnNames());
+        for (int c = 0; c < cols; c++) {
+            List d = getValues(columnNames.get(c));
+            for (int r = 0; r < rows; r++) {
+                Object val = d.get(r);
+                String s = val == null ? "" : val.toString();
+                data.get(r)[c] = s;
+            }
+        }
+        return new Tuple2<>(columnNames, data);
+    }
+
     public Set<String> getColumnNames() {
-        return new HashSet<>(resultsMap.keySet());
+        return new TreeSet<>(resultsMap.keySet());
     }
 
     public int getRows() {

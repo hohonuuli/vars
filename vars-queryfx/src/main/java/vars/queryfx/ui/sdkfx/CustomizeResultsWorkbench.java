@@ -52,8 +52,8 @@ public class CustomizeResultsWorkbench extends WorkbenchView {
 
     public ResultsCustomization getResultsCustomization() {
         return new ResultsCustomization(basicPhylogenyCheckbox.getEditor().isSelected(),
-                relatedAssociationsCheckbox.getEditor().isSelected(),
                 concurrentObservationsCheckbox.getEditor().isSelected(),
+                relatedAssociationsCheckbox.getEditor().isSelected(),
                 conceptHierarchyCheckbox.getEditor().isSelected(),
                 detailedPhylogenyCheckbox.getEditor().isSelected(),
                 categorizeAssociationsCheckbox.getEditor().isSelected());
