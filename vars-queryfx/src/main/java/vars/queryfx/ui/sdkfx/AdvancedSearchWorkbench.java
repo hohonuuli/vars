@@ -13,12 +13,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.queryfx.Lookup;
 import vars.queryfx.QueryService;
+import vars.queryfx.RXEventBus;
 import vars.queryfx.beans.QueryParams;
+import vars.queryfx.messages.FatalExceptionMsg;
 import vars.queryfx.ui.AbstractValuePanel;
 import vars.queryfx.ui.ValuePanelFactory;
 import vars.queryfx.ui.db.IConstraint;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -36,11 +39,13 @@ public class AdvancedSearchWorkbench extends WorkbenchView {
     private ObservableList<AbstractValuePanel> valuePanels = FXCollections.observableArrayList();
 
     private final QueryService queryService;
+    private final RXEventBus eventBus;
     private final FormLayout formLayout;
 
 
-    public AdvancedSearchWorkbench(QueryService queryService) {
+    public AdvancedSearchWorkbench(QueryService queryService, RXEventBus eventBus) {
         this.queryService = queryService;
+        this.eventBus = eventBus;
         this.formLayout = new FormLayout();
         initialize();
 
@@ -53,7 +58,15 @@ public class AdvancedSearchWorkbench extends WorkbenchView {
     }
 
     public void initialize() {
-        queryService.getAnnotationViewMetadata().thenAccept(metadata -> {
+        queryService.getAnnotationViewMetadata().handle((map, ex) -> {
+            if (map != null) {
+                return map;
+            }
+            else {
+                eventBus.send(new FatalExceptionMsg("Could not read annotations view in database", ex));
+                return new HashMap<String, String>();
+            }
+        }).thenAccept(metadata -> {
             Platform.runLater(() -> {
                 ValuePanelFactory factory = new ValuePanelFactory(queryService);
                 for (Map.Entry<String, String> entry : metadata.entrySet()) {

@@ -1,5 +1,6 @@
 package vars.queryfx.ui.sdkfx;
 
+import com.google.common.collect.Lists;
 import com.guigarage.sdk.action.Action;
 import com.guigarage.sdk.container.WorkbenchView;
 import com.guigarage.sdk.form.EditorFormRow;
@@ -18,7 +19,9 @@ import vars.LinkBean;
 import vars.LinkUtilities;
 import vars.queryfx.Lookup;
 import vars.queryfx.QueryService;
+import vars.queryfx.RXEventBus;
 import vars.queryfx.beans.ConceptSelection;
+import vars.queryfx.messages.FatalExceptionMsg;
 import vars.shared.javafx.scene.control.AutoCompleteComboBoxListener;
 
 import javax.inject.Inject;
@@ -52,6 +55,7 @@ public class ConceptConstraintsWorkbench extends WorkbenchView {
     private EditorFormRow<TextField> linkValueRow = new EditorFormRow<>("value", new TextField());
 
 
+    private final RXEventBus eventBus;
     private final Executor executor;
     private final QueryService queryService;
     private volatile CompletableFuture<List<ILink>> runningFuture;
@@ -59,9 +63,10 @@ public class ConceptConstraintsWorkbench extends WorkbenchView {
     private final Logger log = LoggerFactory.getLogger(getClass());
 
     @Inject
-    public ConceptConstraintsWorkbench(QueryService queryService, Executor executor) {
+    public ConceptConstraintsWorkbench(QueryService queryService, Executor executor, RXEventBus eventBus) {
         this.queryService = queryService;
         this.executor = executor;
+        this.eventBus = eventBus;
         linksForConceptSelection.add(Lookup.WILD_CARD_LINK);
 
         // --- Do Layout
@@ -112,7 +117,17 @@ public class ConceptConstraintsWorkbench extends WorkbenchView {
         if (conceptRow == null) {
             final ComboBox<String> conceptComboBox = new ComboBox<>();
             conceptRow = new EditorFormRow<>("named", conceptComboBox);
-            queryService.findAllConceptNamesAsStrings().thenAccept(names -> {
+            queryService.findAllConceptNamesAsStrings().handle((names, ex) -> {
+                if (names != null) {
+                    return names;
+                }
+                else {
+                    eventBus.send(new FatalExceptionMsg("Failed to look up concepts from database", ex));
+                    List<String> ls = new ArrayList<>();
+                    ls.add(Lookup.WILD_CARD);
+                    return ls;
+                }
+            }).thenAccept(names -> {
                 Platform.runLater(() -> {
                     conceptComboBox.setEditable(false);
                     conceptComboBox.setPromptText("Loading ...");
@@ -131,6 +146,7 @@ public class ConceptConstraintsWorkbench extends WorkbenchView {
                     new AutoCompleteComboBoxListener<>(conceptComboBox);
                 });
             });
+
         }
         return conceptRow;
     }

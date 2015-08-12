@@ -13,4 +13,12 @@ public abstract class AbstractExceptionMsg implements StatusMsg {
         this.exception = exception;
         this.msg = msg;
     }
+
+    public Throwable getException() {
+        return exception;
+    }
+
+    public String getMsg() {
+        return msg;
+    }
 }

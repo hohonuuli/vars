@@ -15,6 +15,7 @@ import vars.queryfx.config.Resource;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
 
 
@@ -33,15 +34,23 @@ public class QueryModule implements Module {
 
     public QueryModule() {
         Resource resource = new Resource(Lookup.getConfig());
+        log.info(resource.getConfig().toString());
         annotationPersistenceUnit = resource.findByKey("vars.annotation.persistence.unit").get();
         knowledgebasePersistenceUnit = resource.findByKey("vars.knowledgebase.persistence.unit").get();
         miscPersistenceUnit = resource.findByKey("vars.misc.persistence.unit").get();
+//        annotationPersistenceUnit = "vars-jpa-annotation";
+//        knowledgebasePersistenceUnit = "vars-jpa-knowledgebase";
+//        miscPersistenceUnit = "vars-jpa-misc";
     }
 
     public void configure(Binder binder) {
         binder.install(new VarsJpaModule(annotationPersistenceUnit, knowledgebasePersistenceUnit, miscPersistenceUnit));
         binder.bind(BuilderFactory.class).to(JavaFXBuilderFactory.class);
-        binder.bind(Executor.class).to(ForkJoinPool.class);
-        binder.bind(QueryService.class).to(QueryServiceImpl.class);
+        binder.bind(QueryService.class).to(QueryServiceImpl.class).asEagerSingleton();
+
+        // Fork join pool causes problems in java web start
+        //binder.bind(Executor.class).to(ForkJoinPool.class).asEagerSingleton();
+        Executor executor = Executors.newCachedThreadPool();
+        binder.bind(Executor.class).toInstance(executor);
     }
 }

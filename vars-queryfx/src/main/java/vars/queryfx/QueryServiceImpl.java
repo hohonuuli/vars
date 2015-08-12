@@ -174,12 +174,12 @@ public class QueryServiceImpl implements QueryService {
                 conceptSelection.isExtendToSiblings(),
                 conceptSelection.isExtendToChildren(),
                 conceptSelection.isExtendToDescendants())
-                .thenApply(list -> new ResolvedConceptSelection(conceptSelection, list));
+                .thenApplyAsync(list -> new ResolvedConceptSelection(conceptSelection, list), executor);
     }
 
     @Override
     public CompletableFuture<Optional<URL>> resolveImageURL(String conceptName) {
-        return findConcept(conceptName).thenApply(co ->
+        return findConcept(conceptName).thenApplyAsync(co ->
                 co.flatMap(c -> {
                     Media primaryImage = c.getConceptMetadata().getPrimaryImage();
                     Optional<URL> url = Optional.empty();
@@ -192,17 +192,17 @@ public class QueryServiceImpl implements QueryService {
                         }
                     }
                     return url;
-                }));
+                }), executor);
     }
 
     @Override
     public CompletableFuture<Map<String, String>> getAnnotationViewMetadata() {
-        return CompletableFuture.supplyAsync(queryPersistenceService::getMetaData);
+        return CompletableFuture.supplyAsync(queryPersistenceService::getMetaData, executor);
     }
 
     @Override
     public CompletableFuture<Collection<?>> getAnnotationViewsUniqueValuesForColumn(String columnName) {
-        return CompletableFuture.supplyAsync(() -> queryPersistenceService.getUniqueValuesByColumn(columnName));
+        return CompletableFuture.supplyAsync(() -> queryPersistenceService.getUniqueValuesByColumn(columnName), executor);
     }
 
     @Override
@@ -223,7 +223,7 @@ public class QueryServiceImpl implements QueryService {
             }
 
             return minMax;
-        });
+        }, executor);
     }
 
     @Override
@@ -244,7 +244,7 @@ public class QueryServiceImpl implements QueryService {
             }
 
             return minMax;
-        });
+        }, executor);
     }
 
     @Override

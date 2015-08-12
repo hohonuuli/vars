@@ -36,7 +36,7 @@ public class Lookup extends GlobalLookup {
 
     private static Injector injector;
     private static App app;
-    private static Config config;
+    private static Config config = ConfigFactory.load(appConfig);
     private static final Object injectorLock = new Object() {};
     private static final Object configLock = new Object() {};
 

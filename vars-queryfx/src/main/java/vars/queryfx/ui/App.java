@@ -16,7 +16,9 @@ import vars.queryfx.beans.ConceptSelection;
 import vars.queryfx.beans.QueryParams;
 import vars.queryfx.beans.ResolvedConceptSelection;
 import vars.queryfx.beans.ResultsCustomization;
+import vars.queryfx.messages.AbstractExceptionMsg;
 import vars.queryfx.messages.ExecuteSearchMsg;
+import vars.queryfx.messages.FatalExceptionMsg;
 import vars.queryfx.messages.Msg;
 import vars.queryfx.messages.NewConceptSelectionMsg;
 import vars.queryfx.messages.NewQueryResultsMsg;
@@ -33,6 +35,8 @@ import vars.shared.javafx.application.ImageFX;
 import vars.shared.ui.GlobalLookup;
 
 import java.awt.*;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -68,6 +72,11 @@ public class App {
                 .filter(msg -> msg instanceof NewResolvedConceptSelectionMsg)
                 .map(msg -> (NewResolvedConceptSelectionMsg) msg)
                 .subscribe(msg -> addResolvedConceptSelection(msg.getResolvedConceptSelection()));
+
+        eventBus.toObserverable()
+                .filter(msg -> msg instanceof AbstractExceptionMsg)
+                .map(msg -> (AbstractExceptionMsg) msg)
+                .subscribe(msg -> log.error(msg.getMsg(), msg.getException()));
     }
 
     protected Application getApplication() {
@@ -135,7 +144,7 @@ public class App {
     protected ConceptConstraintsWorkbench getConceptConstraintsWorkbench(Application app) {
         if (conceptConstraintsWorkbench == null) {
             conceptConstraintsWorkbench = new ConceptConstraintsWorkbench(
-                    toolBelt.getQueryService(), toolBelt.getExecutor());
+                    toolBelt.getQueryService(), toolBelt.getExecutor(), eventBus);
             conceptConstraintsWorkbench.getFormLayout().addActions(new Action(AppIcons.TRASH, "Cancel", () -> showBasicSearch(app)),
                     new Action(AppIcons.PLUS, "Apply", () -> {
                         ConceptSelection conceptSelection = conceptConstraintsWorkbench.getConceptSelection();
@@ -155,7 +164,7 @@ public class App {
 
     protected AdvancedSearchWorkbench getAdvancedSearchWorkbench() {
         if (advancedSearchWorkbench == null) {
-            advancedSearchWorkbench = new AdvancedSearchWorkbench(toolBelt.getQueryService());
+            advancedSearchWorkbench = new AdvancedSearchWorkbench(toolBelt.getQueryService(), eventBus);
         }
         return advancedSearchWorkbench;
     }
@@ -206,6 +215,16 @@ public class App {
 
         Injector injector = Lookup.getInjector();
         ToolBelt toolBelt = injector.getInstance(ToolBelt.class);
+
+        // Check that we can connect to the database. JDBC driver doesn't seem to get initialize
+        // correctly in Java Webstart unless we do this.
+        try {
+            Connection connection = toolBelt.getQueryService().getAnnotationConnection();
+            connection.close();
+        }
+        catch (SQLException e) {
+            getLog().error("Failed to connect to annotation database", e);
+        }
 
 
         App app = new App(toolBelt);
