@@ -38,9 +38,6 @@ public class QueryModule implements Module {
         annotationPersistenceUnit = resource.findByKey("vars.annotation.persistence.unit").get();
         knowledgebasePersistenceUnit = resource.findByKey("vars.knowledgebase.persistence.unit").get();
         miscPersistenceUnit = resource.findByKey("vars.misc.persistence.unit").get();
-//        annotationPersistenceUnit = "vars-jpa-annotation";
-//        knowledgebasePersistenceUnit = "vars-jpa-knowledgebase";
-//        miscPersistenceUnit = "vars-jpa-misc";
     }
 
     public void configure(Binder binder) {

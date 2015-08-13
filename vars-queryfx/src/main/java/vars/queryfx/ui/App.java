@@ -218,6 +218,7 @@ public class App {
 
         // Check that we can connect to the database. JDBC driver doesn't seem to get initialize
         // correctly in Java Webstart unless we do this.
+        // TODO (20150712 brian) after switch away from ForkJoinPool this may no longer be needed
         try {
             Connection connection = toolBelt.getQueryService().getAnnotationConnection();
             connection.close();
