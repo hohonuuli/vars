@@ -35,7 +35,7 @@ public class DateValuePanel extends AbstractValuePanel {
     private LocalDateTimePicker getEndPicker() {
         if (endPicker == null) {
             endPicker = new LocalDateTimePicker(LocalDateTime.now());
-            endPicker.localDateTimeProperty().addListener(changeListener);
+            //endPicker.localDateTimeProperty().addListener(changeListener);
         }
         return endPicker;
     }
@@ -43,7 +43,7 @@ public class DateValuePanel extends AbstractValuePanel {
     private LocalDateTimePicker getStartPicker() {
         if (startPicker == null) {
             startPicker = new LocalDateTimePicker(Lookup.getAnnotationStartDate().toLocalDateTime());
-            startPicker.localDateTimeProperty().addListener(changeListener);
+            //startPicker.localDateTimeProperty().addListener(changeListener);
         }
         return startPicker;
     }
