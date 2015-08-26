@@ -4,6 +4,7 @@
 # export PATH=$PATH:/opt/groovy/bin
 # export JAVA_HOME=/usr/java/latest
 # export JAVACMD=$JAVA_HOME/bin/java
+# IMPORTANT!! Under the groovy installation verify that startGroovy passes -Duser.timezone="UTC" flag
 
 if [ -z $(which groovy) ]
 then
