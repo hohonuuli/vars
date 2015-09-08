@@ -283,17 +283,17 @@ DELETE FROM
 WHERE
   ConceptDelegateID_FK IN ( 
     SELECT
-      cd.id 
+      cd.id
     FROM
-      ConceptDelegate AS cd LEFT JOIN 
-      Concept AS C ON cd.ConceptID_FK = C.id RIGHT JOIN 
-      Media AS M ON M.ConceptDelegateID_FK = cd.id RIGHT JOIN 
-      ConceptName AS cn ON cn.ConceptID_FK = C.id 
+      ConceptName AS cn RIGHT JOIN
+      Concept AS C ON C.id = cn.ConceptID_FK RIGHT JOIN
+      ConceptDelegate AS cd  ON cd.ConceptID_FK = C.id
     WHERE
       cn.ConceptName IN (
         'Xenoturbellida', 
         'Xenoturbellidae',
         'Xenoturbella',  
+        'Lyroctenidae',
         'Mertensia', 
         'Lyroctenidae', 
         'Lyrocteis', 
@@ -322,12 +322,11 @@ DELETE FROM
 WHERE
   ConceptDelegateID_FK IN ( 
     SELECT
-      cd.id 
+      cd.id
     FROM
-      ConceptDelegate AS cd LEFT JOIN 
-      Concept AS C ON cd.ConceptID_FK = C.id RIGHT JOIN 
-      Media AS M ON M.ConceptDelegateID_FK = cd.id RIGHT JOIN 
-      ConceptName AS cn ON cn.ConceptID_FK = C.id 
+      ConceptName AS cn RIGHT JOIN
+      Concept AS C ON C.id = cn.ConceptID_FK RIGHT JOIN
+      ConceptDelegate AS cd  ON cd.ConceptID_FK = C.id
     WHERE
       cn.ConceptName IN (
         'Xenoturbellida', 
