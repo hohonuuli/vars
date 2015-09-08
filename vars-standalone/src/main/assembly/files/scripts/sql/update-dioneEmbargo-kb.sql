@@ -217,7 +217,7 @@ GO
 DECLARE @conceptId bigint
 
 DECLARE MyCursor CURSOR FOR
-  SELECT ConceptID_FK FROM ConceptName WHERE ConceptName = 'Erenna sp. 1'
+  SELECT ConceptID_FK FROM ConceptName WHERE ConceptName = 'Erenna sp. A'
 
 OPEN MyCursor
 FETCH NEXT FROM MyCursor into @conceptId
