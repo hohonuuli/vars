@@ -2,6 +2,37 @@
 -- DELETE branches of concepts
 -- --------------------------------------------------------------------
 
+
+-- Cydippida 2 ------------------------------------------------------
+DECLARE @conceptId bigint
+
+DECLARE MyCursor CURSOR FOR
+  SELECT ConceptID_FK FROM ConceptName WHERE ConceptName = 'Cydippida 2'
+
+OPEN MyCursor
+FETCH NEXT FROM MyCursor into @conceptId
+WHILE @@FETCH_STATUS = 0
+  BEGIN
+    PRINT @conceptId
+    FETCH NEXT FROM MyCursor INTO @conceptId
+
+    -- Drop ConceptNames first
+    DELETE FROM ConceptName WHERE id IN (SELECT cn.id FROM Concept AS c LEFT JOIN
+      ConceptName AS cn ON cn.ConceptID_FK = c.id WHERE c.ParentConceptID_FK = @conceptId)
+
+    -- Drop Concepts
+    DELETE FROM Concept WHERE ParentConceptID_FK = @conceptId
+
+    DELETE FROM ConceptName WHERE ConceptID_FK =@conceptId
+
+    DELETE FROM Concept WHERE id = @conceptId
+
+  END
+CLOSE MyCursor
+DEALLOCATE MyCursor
+
+GO
+
 -- Mystery Mollusc --------------------------------------------------
 DECLARE @conceptId bigint
 
