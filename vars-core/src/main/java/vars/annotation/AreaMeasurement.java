@@ -13,23 +13,21 @@
 
 
 
-package vars.annotation.ui.imagepanel;
+package vars.annotation;
 
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import org.mbari.geometry.Point2D;
 import vars.ILink;
 import vars.LinkBean;
-import vars.annotation.Association;
-import vars.annotation.Observation;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Bean class for holding information about an AreaMeasurement
@@ -39,29 +37,14 @@ import java.util.List;
  */
 public class AreaMeasurement {
 
-    /**
-     *
-     */
+    /** Standard linkname for area measurements */
     public static final String AREA_MEASUREMENT_LINKNAME = "area measurement coordinates [x0 y0 ... xn yn; comment]";
 
     /** Filter for the distance measurement association */
-    public static final Predicate<Association> IS_AREA_MEASUREMENT_PREDICATE = new Predicate<Association>() {
-
-        @Override
-        public boolean apply(Association input) {
-            return AREA_MEASUREMENT_LINKNAME.equalsIgnoreCase(input.getLinkName());
-        }
-    };
+    public static final Predicate<ILink> IS_AREA_MEASUREMENT_PREDICATE = input -> AREA_MEASUREMENT_LINKNAME.equalsIgnoreCase(input.getLinkName());
 
     /** Transform to convert association to measurements */
-    public static final Function<ILink, AreaMeasurement> LINK_TO_AREA_MEASUREMENT_TRANSFORM = new Function<ILink,
-        AreaMeasurement>() {
-
-        @Override
-        public AreaMeasurement apply(ILink input) {
-            return AreaMeasurement.fromLink(input);
-        }
-    };
+    public static final Function<ILink, AreaMeasurement> LINK_TO_AREA_MEASUREMENT_TRANSFORM = input -> AreaMeasurement.fromLink(input);
     private String comment;
     private final List<Point2D<Integer>> coordinates;
 
@@ -152,12 +135,10 @@ public class AreaMeasurement {
      *      list is returned if their are no AreaMeasurements within the observation
      */
     public static Collection<AreaMeasurement> fromObservation(Observation observation) {
-        Collection<Association> associations = Collections2.filter(observation.getAssociations(),
-            IS_AREA_MEASUREMENT_PREDICATE);
-        Collection<AreaMeasurement> measurements = Collections2.transform(associations,
-            LINK_TO_AREA_MEASUREMENT_TRANSFORM);
-
-        return new ArrayList<AreaMeasurement>(measurements);
+        return observation.getAssociations().stream()
+                .filter(IS_AREA_MEASUREMENT_PREDICATE)
+                .map(LINK_TO_AREA_MEASUREMENT_TRANSFORM)
+                .collect(Collectors.toList());
     }
 
     /**

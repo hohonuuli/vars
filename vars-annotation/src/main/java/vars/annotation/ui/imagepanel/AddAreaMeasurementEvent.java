@@ -15,6 +15,7 @@
 
 package vars.annotation.ui.imagepanel;
 
+import vars.annotation.AreaMeasurement;
 import vars.annotation.Observation;
 
 /**

@@ -1,7 +1,6 @@
 package org.mbari.smith
 
-import vars.annotation.{Association, VideoFrame}
-import vars.annotation.ui.imagepanel.AreaMeasurement
+import vars.annotation.{AreaMeasurement, Association, VideoFrame}
 import java.awt.Polygon
 import java.net.URL
 import javax.imageio.ImageIO
@@ -31,7 +30,7 @@ object CanadianGrid {
   }
 
   /**
-   * Calculates the actual area of an [[vars.annotation.ui.imagepanel.AreaMeasurement]]. The units
+   * Calculates the actual area of an [[AreaMeasurement]]. The units
    * of the area are the square of the same units as the [[org.mbari.smith.Camera]] height
    * @param areaMeasurement The measurement to convert
    * @param imageWidth The width of the image in pixels
@@ -133,7 +132,7 @@ case class VirtualPolygon(areaMeasurement: AreaMeasurement, polygon: Polygon)
 object VirtualPolygon {
 
   /**
-   * Converts an [[vars.annotation.ui.imagepanel.AreaMeasurement]] to a [[java.awt.Polygon]].
+   * Converts an [[AreaMeasurement]] to a [[java.awt.Polygon]].
    * This polygon has vertices defined as pixel coordinates.
    *
    * @param areaMeasurement

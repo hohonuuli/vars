@@ -28,12 +28,13 @@ import java.awt.geom.Point2D;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import javax.swing.JComponent;
+
 import org.jdesktop.jxlayer.JXLayer;
 import org.mbari.swing.JImageUrlCanvas;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.ILink;
+import vars.annotation.AreaMeasurement;
 import vars.annotation.Association;
 
 /**
@@ -115,16 +116,21 @@ public class JXAreaMeasurementPainter<T extends JImageUrlCanvas> extends Abstrac
      */
     public void setAssociations(Collection<Association> associations) {
         areaMeasurementPaths.clear();
-        Collection<Association> amAssociations = Collections2.filter(associations,
-            AreaMeasurement.IS_AREA_MEASUREMENT_PREDICATE);
-        for (Association association : amAssociations) {
-            try {
-                areaMeasurementPaths.add(associationTransform.apply(association));
-            }
-            catch (Exception e) {
-                log.warn("Unable to parse coordinates from the association, " + association);
-            }
-        }
+        associations.stream()
+                .filter(AreaMeasurement.IS_AREA_MEASUREMENT_PREDICATE)
+                .map(associationTransform::apply)
+                .forEach(areaMeasurementPaths::add);
+
+//        Collection<Association> amAssociations = Collections2.filter(associations,
+//            AreaMeasurement.IS_AREA_MEASUREMENT_PREDICATE);
+//        for (Association association : amAssociations) {
+//            try {
+//                areaMeasurementPaths.add(associationTransform.apply(association));
+//            }
+//            catch (Exception e) {
+//                log.warn("Unable to parse coordinates from the association, " + association);
+//            }
+//        }
     }
 
     private void updateAreaMeasurementPath(AreaMeasurementPath areaMeasurementPath, JXLayer<? extends T> jxl) {

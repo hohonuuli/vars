@@ -1,7 +1,8 @@
 package org.mbari.smith
 
+import vars.annotation.AreaMeasurement
+
 import scala.collection.JavaConverters._
-import vars.annotation.ui.imagepanel.AreaMeasurement
 
 import java.awt.Polygon
 import java.lang.{Double => JDouble}

@@ -1,6 +1,6 @@
 package org.mbari.vars
 
-import vars.annotation.ui.imagepanel.AreaMeasurement
+import vars.annotation.AreaMeasurement
 
 /**
  * Converts AreaMeasurement annotations into actual area measurements. This processor makes the

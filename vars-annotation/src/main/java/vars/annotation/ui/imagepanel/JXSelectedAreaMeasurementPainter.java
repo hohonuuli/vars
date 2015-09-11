@@ -4,6 +4,7 @@ import com.google.common.collect.Collections2;
 import org.bushe.swing.event.annotation.AnnotationProcessor;
 import org.bushe.swing.event.annotation.EventSubscriber;
 import org.mbari.swing.JImageUrlCanvas;
+import vars.annotation.AreaMeasurement;
 import vars.annotation.Association;
 import vars.annotation.Observation;
 
@@ -15,6 +16,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Brian Schlining
@@ -39,8 +41,9 @@ public class JXSelectedAreaMeasurementPainter<A extends JImageUrlCanvas> extends
             associations.addAll(obs.getAssociations());
         }
 
-        Collection<Association> amAssociations =
-                Collections2.filter(associations, AreaMeasurement.IS_AREA_MEASUREMENT_PREDICATE);
+        Collection<Association> amAssociations = associations.stream()
+                .filter(AreaMeasurement.IS_AREA_MEASUREMENT_PREDICATE)
+                .collect(Collectors.toList());
         setAssociations(amAssociations);
     }
 

@@ -19,15 +19,17 @@ import com.google.common.collect.Collections2;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.bushe.swing.event.annotation.AnnotationProcessor;
 import org.bushe.swing.event.annotation.EventSubscriber;
 import org.mbari.swing.JImageUrlCanvas;
+import vars.annotation.AreaMeasurement;
 import vars.annotation.Association;
 import vars.annotation.Observation;
 
@@ -63,8 +65,9 @@ public class JXNotSelectedAreaMeasurementPainter<A extends JImageUrlCanvas> exte
             associations.addAll(obs.getAssociations());
         }
 
-        Collection<Association> amAssociations = Collections2.filter(associations,
-            AreaMeasurement.IS_AREA_MEASUREMENT_PREDICATE);
+        Collection<Association> amAssociations =  associations.stream()
+                .filter(AreaMeasurement.IS_AREA_MEASUREMENT_PREDICATE)
+                .collect(Collectors.toList());
         setAssociations(amAssociations);
     }
 }

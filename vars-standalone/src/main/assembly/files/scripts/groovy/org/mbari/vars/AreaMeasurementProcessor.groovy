@@ -1,12 +1,11 @@
 package org.mbari.vars
 
 import org.mbari.geometry.Point2D
-import org.mbari.vars.AbstractAreaMeasurementProcessor
 
 import javax.imageio.ImageIO
 import org.mbari.smith.Camera
 import org.mbari.smith.Pixel
-import vars.annotation.ui.imagepanel.AreaMeasurement
+import vars.annotation.AreaMeasurement
 
 /**
  * Converts AreaMeasurement annotations into actual area measurements. This processor makes the

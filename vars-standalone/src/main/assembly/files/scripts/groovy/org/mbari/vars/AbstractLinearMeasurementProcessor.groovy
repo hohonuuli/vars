@@ -1,7 +1,6 @@
 package org.mbari.vars
 
 import vars.LinkBean
-import vars.annotation.ui.imagepanel.AreaMeasurement
 import vars.annotation.ui.imagepanel.Measurement
 
 /**

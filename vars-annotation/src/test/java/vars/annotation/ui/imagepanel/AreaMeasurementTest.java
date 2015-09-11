@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.mbari.geometry.Point2D;
 import vars.ILink;
 import vars.LinkBean;
+import vars.annotation.AreaMeasurement;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -39,6 +39,7 @@ import org.mbari.swing.JImageUrlCanvas;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.ToolBelt;
+import vars.annotation.AreaMeasurement;
 import vars.annotation.Observation;
 
 

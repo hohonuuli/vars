@@ -19,6 +19,7 @@ import com.google.common.collect.ImmutableList;
 import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.annotation.AnnotationProcessor;
 import org.bushe.swing.event.annotation.EventSubscriber;
+import vars.annotation.AreaMeasurement;
 import vars.annotation.Observation;
 import vars.annotation.VideoFrame;
 import vars.annotation.ui.ToolBelt;

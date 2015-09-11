@@ -6,8 +6,7 @@ import java.lang.{Double => JDouble}
 import java.net.URL
 
 import scala.util.{Failure, Success, Try}
-import vars.annotation.ui.imagepanel.AreaMeasurement
-import vars.annotation.Association
+import vars.annotation.{AreaMeasurement, Association}
 import java.io.{FileWriter, BufferedWriter, File}
 import org.mbari.geometry.Point2D
 

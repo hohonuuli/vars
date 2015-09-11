@@ -1,7 +1,7 @@
 package org.mbari.vars.tripod
 
 import vars.LinkBean
-import vars.annotation.ui.imagepanel.AreaMeasurement
+import vars.annotation.AreaMeasurement
 
 import java.awt.Polygon
 
