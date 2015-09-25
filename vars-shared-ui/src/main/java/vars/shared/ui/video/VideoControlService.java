@@ -2,7 +2,7 @@ package vars.shared.ui.video;
 
 import javax.swing.JDialog;
 
-import org.mbari.vcr.IVCR;
+import org.mbari.vcr4j.IVCR;
 
 public interface VideoControlService extends IVCR {
     

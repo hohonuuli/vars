@@ -17,14 +17,13 @@ package vars.annotation.ui.video;
 
 import java.util.Date;
 import javax.swing.JDialog;
-import org.mbari.movie.Timecode;
 import org.mbari.util.NumberUtilities;
-import org.mbari.vcr.IVCR;
-import org.mbari.vcr.IVCRTimecode;
-import org.mbari.vcr.IVCRUserbits;
-import org.mbari.vcr.timer.AnnotationMonitoringVCR;
-import org.mbari.vcr.timer.AnnotationQueueVCR;
-import org.mbari.vcr.udp01.VCR;
+import org.mbari.vcr4j.IVCR;
+import org.mbari.vcr4j.IVCRTimecode;
+import org.mbari.vcr4j.IVCRUserbits;
+import org.mbari.vcr4j.time.Timecode;
+import org.mbari.vcr4j.timer.AnnotationQueueVCR;
+import org.mbari.vcr4j.udp01.VCR;
 import vars.VARSException;
 import vars.shared.ui.video.AbstractVideoControlService;
 import vars.shared.ui.video.VideoControlStatus;
@@ -103,7 +102,9 @@ public class UDPVideoControlService extends AbstractVideoControlService {
         IVCRUserbits vcrUserbits = vcr.getVcrUserbits();
 
         final Timecode timecode = vcrTimecode.getTimecode();
-        timecode.setFrameRate(frameRate);
+        final Timecode updatedTimecode = new Timecode(timecode.getFrames(), frameRate);
+        vcrTimecode.timecodeProperty().set(updatedTimecode);
+        //timecode.setFrameRate(frameRate);
 
         // Convert userbits from byte[]->long->Date
         final int epicSeconds = NumberUtilities.toInt(vcrUserbits.getUserbits(), true);

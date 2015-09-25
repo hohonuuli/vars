@@ -5,14 +5,14 @@
 
 package vars.shared.ui.video;
 
-import org.mbari.movie.Timecode;
-import org.mbari.vcr.IVCR;
-import org.mbari.vcr.IVCRError;
-import org.mbari.vcr.IVCRReply;
-import org.mbari.vcr.IVCRState;
-import org.mbari.vcr.IVCRTimecode;
-import org.mbari.vcr.IVCRUserbits;
-import org.mbari.vcr.VCRAdapter;
+import org.mbari.vcr4j.IVCR;
+import org.mbari.vcr4j.IVCRError;
+import org.mbari.vcr4j.IVCRReply;
+import org.mbari.vcr4j.IVCRState;
+import org.mbari.vcr4j.IVCRTimecode;
+import org.mbari.vcr4j.IVCRUserbits;
+import org.mbari.vcr4j.VCRAdapter;
+import org.mbari.vcr4j.time.Timecode;
 
 /**
  * Abstract class that delegates calls to an underlying VCR implementation. Ensures

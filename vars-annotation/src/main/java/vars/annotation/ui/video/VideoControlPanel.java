@@ -18,8 +18,8 @@ package vars.annotation.ui.video;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import org.mbari.util.Dispatcher;
-import org.mbari.vcr.IVCR;
-import org.mbari.vcr.ui.VCRPanel;
+import org.mbari.vcr4j.IVCR;
+import org.mbari.vcr4j.ui.VCRPanel;
 
 import vars.annotation.ui.Lookup;
 import vars.shared.ui.video.VideoControlService;

@@ -23,8 +23,8 @@ import java.awt.event.ActionListener;
 import java.util.Collection;
 import org.mbari.movie.Timecode;
 import org.mbari.util.Dispatcher;
-import org.mbari.vcr.ui.TimeCodeSelectionFrame;
-import org.mbari.vcr.ui.TimeSelectPanel;
+import org.mbari.vcr4j.ui.TimeCodeSelectionFrame;
+import org.mbari.vcr4j.ui.TimeSelectPanel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.Observation;
@@ -75,7 +75,6 @@ public class ChangeTimeCodeFrame extends TimeCodeSelectionFrame {
      *  Gets the okActionListener attribute of the ChangeTimeCodeFrame object
      *
      * @return  The okActionListener value
-     * @see org.mbari.vcr.ui.TimeCodeSelectionFrame#getOkActionListener()
      */
     public ActionListener getOkActionListener() {
         if (okActionListener == null) {

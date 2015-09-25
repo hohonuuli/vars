@@ -15,7 +15,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "115"
             endingLineNumber = "115"
-            landmarkName = "-saveStillImageToPath:"
+            landmarkName = "-setupCaptureSessionUsingNamedDevice:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
@@ -30,9 +30,7 @@
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "111"
-            endingLineNumber = "111"
-            landmarkName = "Java_vars_avfoundation_AVFImageCaptureServiceImpl_stopSession()"
-            landmarkType = "7">
+            endingLineNumber = "111">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy

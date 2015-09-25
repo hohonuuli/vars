@@ -15,30 +15,30 @@
 
 package vars.annotation.ui.video;
 
-import gnu.io.CommPortIdentifier;
+//import org.mbari.vcr.purejavacomm.CommUtil;
+//import org.mbari.vcr.purejavacomm.VCR;
 //import purejavacomm.CommPortIdentifier;
+import gnu.io.CommPortIdentifier;
 import java.io.File;
 import java.util.Date;
 import java.util.Set;
 import javax.swing.JDialog;
-import org.mbari.vcr.rs422.CommUtil;
-//import org.mbari.vcr.purejavacomm.CommUtil;
-import org.mbari.movie.Timecode;
 import org.mbari.nativelib.Native;
 import org.mbari.util.NumberUtilities;
-import org.mbari.vcr.IVCR;
-import org.mbari.vcr.IVCRTimecode;
-import org.mbari.vcr.IVCRUserbits;
-//import org.mbari.vcr.purejavacomm.VCR;
-import org.mbari.vcr.rs422.VCR;
-import org.mbari.vcr.timer.AnnotationQueueVCR;
+import org.mbari.vcr4j.IVCR;
+import org.mbari.vcr4j.IVCRTimecode;
+import org.mbari.vcr4j.IVCRUserbits;
+import org.mbari.vcr4j.rs422.CommUtil;
+import org.mbari.vcr4j.rs422.VCR;
+import org.mbari.vcr4j.time.Timecode;
+import org.mbari.vcr4j.timer.AnnotationQueueVCR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.VARSException;
 import vars.annotation.ui.Lookup;
 import vars.shared.ui.video.AbstractVideoControlService;
 import vars.shared.ui.video.VideoControlStatus;
 import vars.shared.ui.video.VideoTime;
+import vars.VARSException;
 
 /**
  *
@@ -186,7 +186,10 @@ public class RS422VideoControlService extends AbstractVideoControlService {
         IVCRUserbits vcrUserbits = vcr.getVcrUserbits();
 
         final Timecode timecode = vcrTimecode.getTimecode();
-        timecode.setFrameRate(frameRate);
+        // FIXME VTC and LTC seem to be giving different values. Don't need values below.
+        //final Timecode updatedTimecode = new Timecode(timecode.getFrames(), frameRate);
+        //vcrTimecode.timecodeProperty().set(updatedTimecode);
+        //timecode.setFrameRate(frameRate);
 
         // Convert userbits from byte[]->long->Date
 
@@ -207,7 +210,7 @@ public class RS422VideoControlService extends AbstractVideoControlService {
 
         // TODO Start a timer and listen for valid checksums. If a valid one
         // occurs reset the time. If timer ends throw a VideoControlException
-        getVcr().seekTimecode(new Timecode(timecode, frameRate));
+        getVcr().seekTimecode(new Timecode(timecode));
     }
 
     String bytArrayToHex(byte[] a) {

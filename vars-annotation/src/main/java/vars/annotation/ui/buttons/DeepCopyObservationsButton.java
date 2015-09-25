@@ -15,9 +15,6 @@
 
 package vars.annotation.ui.buttons;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.Collection;
 import java.util.Collections;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
@@ -26,9 +23,8 @@ import javax.swing.KeyStroke;
 import org.bushe.swing.event.annotation.AnnotationProcessor;
 import org.bushe.swing.event.annotation.EventSubscriber;
 import org.mbari.swing.SwingUtils;
-import org.mbari.vcr.IVCR;
+import org.mbari.vcr4j.IVCR;
 import vars.UserAccount;
-import vars.annotation.Observation;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.actions.DeepCopyObservationsAction;

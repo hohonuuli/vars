@@ -52,7 +52,7 @@ import com.google.common.collect.Sets;
 import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.annotation.AnnotationProcessor;
 import org.bushe.swing.event.annotation.EventSubscriber;
-import org.mbari.vcr.IVCR;
+import org.mbari.vcr4j.IVCR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.DAO;

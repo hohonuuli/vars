@@ -14,7 +14,7 @@ public class VideoControlServiceFactory {
     public static VideoControlService newVideoControlService(String videoConnectionId) {
         VideoControlService videoControlService = null;
         try {
-            Double frameRate = Double.valueOf(29.97);
+            Double frameRate = 29.97;
             if (videoConnectionId.contains(":")) {
                 videoControlService = new UDPVideoControlService();
                 String[] parts = videoConnectionId.split(":");
