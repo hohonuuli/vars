@@ -1,5 +1,4 @@
 import vars.ToolBox
-import vars.annotation.ui.ToolBelt
 
 import java.text.SimpleDateFormat
 

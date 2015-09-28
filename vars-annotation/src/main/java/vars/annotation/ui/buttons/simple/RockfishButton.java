@@ -5,14 +5,19 @@
 
 package vars.annotation.ui.buttons.simple;
 
+import vars.annotation.ui.ToolBelt;
+
+import javax.inject.Inject;
+
 /**
  *
  * @author brian
  */
 public class RockfishButton extends QuickConceptButton {
 
-    public RockfishButton() {
-        super("Rockfish", "/images/simple/rockfish.jpg");
+    @Inject
+    public RockfishButton(ToolBelt toolBelt) {
+        super("Rockfish", "/images/simple/rockfish.jpg", toolBelt);
     }
     
 }

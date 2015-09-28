@@ -126,6 +126,7 @@ public class FatalExceptionSubscriber implements EventTopicSubscriber<Exception>
                 add("Technical support\nWould be a flowing source of\nSweet commiseration.");
                 add("Something you entered\ntranscended parameters\nSo much is unknown.");
                 add("Your data was big\nIt might be very useful\nBut now it is gone.");
+                add("In a wired world\n distractions consume ones thoughts\n... mindfulness returns");
             }
         };
 

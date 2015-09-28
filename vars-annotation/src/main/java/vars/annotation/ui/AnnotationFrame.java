@@ -53,12 +53,15 @@ import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.annotation.AnnotationProcessor;
 import org.bushe.swing.event.annotation.EventSubscriber;
 import org.mbari.vcr4j.IVCR;
+import org.mbari.util.Dispatcher;
+import org.mbari.vcr.IVCR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.DAO;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoFrame;
+import vars.annotation.VideoFrameDAO;
 import vars.annotation.ui.buttons.RedoButton;
 import vars.annotation.ui.buttons.UndoButton;
 import vars.annotation.ui.cbpanel.ConceptButtonPanel;
@@ -80,6 +83,7 @@ import vars.annotation.ui.table.ObservationTable;
 import vars.annotation.ui.table.ObservationTableModel;
 import vars.annotation.ui.video.VideoControlPanel;
 import vars.annotation.ui.videoset.VideoArchiveSetEditorButton;
+import vars.shared.ui.video.VideoControlService;
 
 /**
  *
@@ -100,6 +104,7 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
     private QuickControlsPanel quickControlsPanel;
     private RowEditorPanel rowEditorPanel;
     private JXObservationTable table;
+    private JPopupMenu tablePopupMenu;
     private JScrollPane tableScrollPane;
     private JToolBar toolBar;
     private final ToolBelt toolBelt;
@@ -225,7 +230,9 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
         if (table == null) {
             table = new JXObservationTable();
             table.setFocusable(false);    // The row editor panel should get focus NOT the table
+            //((JXObservationTableColumnModel) table.getColumnModel()).setMiniView(true);
             ((JXObservationTableColumnModel) table.getColumnModel()).setImageView(VARSProperties.getShowRecordedDateInTable());
+
 
             // Map Mask+UP-ARROW Key Stroke
             String upTable = "up-table";
@@ -290,12 +297,41 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
                 }
             });
 
+            /*
+             * Right-click popup menu
+             */
+            table.setComponentPopupMenu(getTablePopupMenu());
 
             Lookup.getObservationTableDispatcher().setValueObject(table);
 
         }
 
         return table;
+    }
+
+    protected JPopupMenu getTablePopupMenu() {
+        if (tablePopupMenu == null) {
+            tablePopupMenu = new JPopupMenu();
+            JMenuItem seekItem = new JMenuItem("Seek to this timecode");
+            tablePopupMenu.add(seekItem);
+            Lookup.getSelectedObservationsDispatcher().addPropertyChangeListener((evt) -> {
+                Collection<Observation> observations = (Collection<Observation>) evt.getNewValue();
+                seekItem.setEnabled(observations.size() == 1);
+            });
+
+            seekItem.addActionListener((e) -> {
+                VideoControlService vcr = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
+                if (vcr != null) {
+                    // Get selected annotation
+                    Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+                    if (observations.size() == 1) {
+                        Observation obs = observations.iterator().next();
+                        vcr.seek(obs.getVideoFrame().getTimecode());
+                    }
+                }
+            });
+        }
+        return tablePopupMenu;
     }
 
     protected JScrollPane getTableScrollPane() {
@@ -314,11 +350,12 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
             toolBar.add(new UndoButton());
             toolBar.add(new RedoButton());
             toolBar.add(new RefreshButton(toolBelt));
-            toolBar.add(new VideoArchiveSetEditorButton(toolBelt));
+            // toolBar.add(new VideoArchiveSetEditorButton(toolBelt));
             toolBar.add(new PreferenceFrameButton());
             toolBar.add(new StatusLabelForPerson(toolBelt));
-            toolBar.add(new StatusLabelForVcr());
-            toolBar.add(new StatusLabelForVideoArchive(toolBelt));
+            // toolBar.add(new StatusLabelForVcr());
+            //toolBar.add(new StatusLabelForVideoArchive(toolBelt));
+            toolBar.add(new StatusContainerForVideoPlayer(toolBelt));
 
             // Map in undo and redo keys
             InputMap inputMap = toolBar.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);

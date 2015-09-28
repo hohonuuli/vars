@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.AnnotationPersistenceService;
 import vars.annotation.Observation;
+import vars.annotation.ui.buttons.simple.QuickConceptButton;
 import vars.annotation.ui.eventbus.ExitTopicSubscriber;
 import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
 import vars.knowledgebase.Concept;
@@ -44,7 +45,7 @@ import vars.shared.ui.event.FatalExceptionSubscriber;
 import vars.shared.ui.event.LoggingEventSubscriber;
 import vars.shared.ui.event.NonFatalErrorSubscriber;
 import vars.shared.ui.event.WarningSubscriber;
-import vars.shared.ui.video.ImageCaptureService;
+import vars.shared.ui.video.FakeImageCaptureServiceImpl;
 import vars.shared.util.ActiveAppBeacon;
 import vars.shared.util.ActiveAppPinger;
 
@@ -55,8 +56,8 @@ import vars.shared.util.ActiveAppPinger;
 public class App {
 
     private AnnotationFrame annotationFrame;
-    private final ToolBelt toolBelt;
-
+    private ToolBelt toolBelt;
+    
     /**
      * The App gets garbage collected shortly after startup. To
      * hang on to the EventTopicSubscribers we store them in a static list. This
@@ -80,18 +81,29 @@ public class App {
     public App() {
 
         final ImageIcon mbariLogo =
-                new ImageIcon(getClass().getResource("/annotation-splash.png"));
+            new ImageIcon(getClass().getResource("/annotation-splash.png"));
         final SplashFrame splashFrame = new SplashFrame(mbariLogo);
         splashFrame.setVisible(true);
         splashFrame.setMessage(" Starting application beacon ...");
         activeAppBeacon = new ActiveAppBeacon(BEACON_PORTS, BEACON_MESSAGE);
 
         splashFrame.setMessage(" Initializing configuration ...");
-
+        splashFrame.setVisible(true);
 
         final Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
-        toolBelt = injector.getInstance(ToolBelt.class);
+        try {
+            toolBelt = injector.getInstance(ToolBelt.class);
+        }
+        catch (Exception e) {
+            Exception ex = new RuntimeException("Initialization failed. Perhaps VARS can't connect to the database", e);
+            (new FatalExceptionSubscriber(null)).onEvent(Lookup.TOPIC_FATAL_ERROR, ex);
+        }
 
+        // HACK - For failed initialization... e.g. Database isn't running.
+        // Hate putting a system exit call in constructor. But it works.
+        if (toolBelt == null) {
+            System.exit(-1);
+        }
 
         /*
          *  Verify that the database connection is working. If it's not, show
@@ -110,7 +122,7 @@ public class App {
         /*
          * Preload the knowledgebase in the Foxtrot worker thread!!
          */
-        splashFrame.setMessage(" Preloading knowledgebase ... be patient");
+        splashFrame.setMessage(" Pre-loading knowledgebase ... be patient");
         Worker.post(new Job() {
 
             @Override
@@ -126,15 +138,15 @@ public class App {
         Lookup.getSelectedObservationsDispatcher().setValueObject(new Vector<Observation>());
 
         // Connect to the ImageCaptureService
-        Lookup.getImageCaptureServiceDispatcher().setValueObject(injector.getInstance(ImageCaptureService.class));
-
+        Lookup.getImageCaptureServiceDispatcher().setValueObject(new FakeImageCaptureServiceImpl());
+        
         // Configure EventBus
         EventTopicSubscriber fatalErrorSubscriber = new FatalExceptionSubscriber(getAnnotationFrame());
         EventTopicSubscriber nonFatalErrorSubscriber = new NonFatalErrorSubscriber(getAnnotationFrame());
-        EventTopicSubscriber warningSubscriber = new WarningSubscriber(getAnnotationFrame());
+        EventTopicSubscriber warningSubscriber = new WarningSubscriber(getAnnotationFrame());       
         EventTopicSubscriber exitSubscriber = new ExitTopicSubscriber();
         EventSubscriber loggingSubscriber = new LoggingEventSubscriber();
-
+        
         GC_PREVENTION.add(fatalErrorSubscriber);
         GC_PREVENTION.add(nonFatalErrorSubscriber);
         GC_PREVENTION.add(warningSubscriber);
@@ -146,11 +158,6 @@ public class App {
         EventBus.subscribe(Lookup.TOPIC_WARNING, warningSubscriber);
         EventBus.subscribe(Lookup.TOPIC_EXIT, exitSubscriber);
         EventBus.subscribe(VideoArchiveChangedEvent.class, loggingSubscriber);
-
-        /*
-         * Add a special eventQueue that toggles the cursor if the application is busy
-         */
-        //Toolkit.getDefaultToolkit().getSystemEventQueue().push(new WaitCursorEventQueue(500));
 
         JFrame frame = getAnnotationFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -208,6 +215,7 @@ public class App {
         GlobalLookup.getSettingsDirectory();
 
         try {
+
             // Set System L&F
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         }
@@ -223,11 +231,7 @@ public class App {
         }
         else {
             try {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        new App();
-                    }
-                });
+                SwingUtilities.invokeLater(() -> new App());
             }
             catch (Throwable e) {
                 LoggerFactory.getLogger(App.class).warn("An error occurred on startup", e);

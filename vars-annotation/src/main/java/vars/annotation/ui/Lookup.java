@@ -97,113 +97,81 @@ public class Lookup extends GlobalLookup {
 
     static {
 
-        getApplicationDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
-
-            public void propertyChange(PropertyChangeEvent evt) {
-                if ((evt.getNewValue() != null) && !(evt.getNewValue() instanceof App)) {
-                    throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
-                            ", EXPECTED: " + App.class.getName());
-                }
-            }
-
-        });
-
-        getApplicationFrameDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
-
-            public void propertyChange(PropertyChangeEvent evt) {
-                if ((evt.getNewValue() != null) && !(evt.getNewValue() instanceof AnnotationFrame)) {
-                    throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
-                            ", EXPECTED: " + AnnotationFrame.class.getName());
-                }
-            }
-
-        });
-
-        getCameraDirectionDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
-
-            public void propertyChange(PropertyChangeEvent evt) {
-                if ((evt.getNewValue() != null) && !(evt.getNewValue() instanceof CameraDirections)) {
-                    throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
-                            ", EXPECTED: " + CameraDirections.class.getName());
-                }
+        getApplicationDispatcher().addPropertyChangeListener(evt -> {
+            if ((evt.getNewValue() != null) && !(evt.getNewValue() instanceof App)) {
+                throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
+                        ", EXPECTED: " + App.class.getName());
             }
         });
 
-        getGuiceInjectorDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
-
-            public void propertyChange(PropertyChangeEvent evt) {
-                if ((evt.getNewValue() != null) && !(evt.getNewValue() instanceof Injector)) {
-                    throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
-                            ", EXPECTED: " + Injector.class.getName());
-                }
+        getApplicationFrameDispatcher().addPropertyChangeListener(evt -> {
+            if ((evt.getNewValue() != null) && !(evt.getNewValue() instanceof AnnotationFrame)) {
+                throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
+                        ", EXPECTED: " + AnnotationFrame.class.getName());
             }
-
         });
 
-        getPreferencesDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
-
-            public void propertyChange(PropertyChangeEvent evt) {
-                if ((evt.getNewValue() != null) && !(evt.getNewValue() instanceof Preferences)) {
-                    throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
-                            ", EXPECTED: " + Preferences.class.getName());
-                }
+        getCameraDirectionDispatcher().addPropertyChangeListener(evt -> {
+            if ((evt.getNewValue() != null) && !(evt.getNewValue() instanceof CameraDirections)) {
+                throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
+                        ", EXPECTED: " + CameraDirections.class.getName());
             }
-
         });
 
-
-        getVideoArchiveDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
-
-            public void propertyChange(PropertyChangeEvent evt) {
-                if ((evt.getNewValue() != null) && !(evt.getNewValue() instanceof VideoArchive)) {
-                    throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
-                            ", EXPECTED: " + VideoArchive.class.getName());
-                }
-                else {
-                    log.info("Using " + evt.getNewValue());
-                }
+        getGuiceInjectorDispatcher().addPropertyChangeListener(evt -> {
+            if ((evt.getNewValue() != null) && !(evt.getNewValue() instanceof Injector)) {
+                throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
+                        ", EXPECTED: " + Injector.class.getName());
             }
+        });
 
+        getPreferencesDispatcher().addPropertyChangeListener(evt -> {
+            if ((evt.getNewValue() != null) && !(evt.getNewValue() instanceof Preferences)) {
+                throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
+                        ", EXPECTED: " + Preferences.class.getName());
+            }
         });
 
 
-        getVideoControlServiceDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
+        getVideoArchiveDispatcher().addPropertyChangeListener(evt -> {
+            if ((evt.getNewValue() != null) && !(evt.getNewValue() instanceof VideoArchive)) {
+                throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
+                        ", EXPECTED: " + VideoArchive.class.getName());
+            }
+            else {
+                log.info("Using " + evt.getNewValue());
+            }
+        });
 
-            public void propertyChange(PropertyChangeEvent evt) {
-                if ((evt.getNewValue() != null) && !(evt.getNewValue() instanceof VideoControlService)) {
-                    throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
-                            ", EXPECTED: " + VideoControlService.class.getName());
-                }
-                else {
-                    log.info("Using " + evt.getNewValue());
-                    VideoControlService oldService = (VideoControlService) evt.getOldValue();
-                    if (oldService != null) {
-                        oldService.disconnect();
-                    }
+
+        getVideoControlServiceDispatcher().addPropertyChangeListener(evt -> {
+            if ((evt.getNewValue() != null) && !(evt.getNewValue() instanceof VideoControlService)) {
+                throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
+                        ", EXPECTED: " + VideoControlService.class.getName());
+            }
+            else {
+                log.info("Using " + evt.getNewValue());
+                VideoControlService oldService = (VideoControlService) evt.getOldValue();
+                if (oldService != null) {
+                    oldService.disconnect();
                 }
             }
         });
 
-        getImageCaptureServiceDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
-
-            public void propertyChange(PropertyChangeEvent evt) {
-                if ((evt.getNewValue() != null) && !(evt.getNewValue() instanceof ImageCaptureService)) {
-                    throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
-                            ", EXPECTED: " + ImageCaptureService.class.getName());
-                }
-                else {
-                    log.info("Using " + evt.getNewValue());
-                }
+        getImageCaptureServiceDispatcher().addPropertyChangeListener(evt -> {
+            if ((evt.getNewValue() != null) && !(evt.getNewValue() instanceof ImageCaptureService)) {
+                throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
+                        ", EXPECTED: " + ImageCaptureService.class.getName());
+            }
+            else {
+                log.info("Using " + evt.getNewValue());
             }
         });
 
-        getObservationTableDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
-
-            public void propertyChange(PropertyChangeEvent evt) {
-                if ((evt.getNewValue() != null) && !(evt.getNewValue() instanceof ObservationTable)) {
-                    throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
-                            ", EXPECTED: " + ObservationTable.class.getName());
-                }
+        getObservationTableDispatcher().addPropertyChangeListener(evt -> {
+            if ((evt.getNewValue() != null) && !(evt.getNewValue() instanceof ObservationTable)) {
+                throw new IllegalArgumentException("SUPPLIED: " + evt.getNewValue().getClass().getName() +
+                        ", EXPECTED: " + ObservationTable.class.getName());
             }
         });
 
@@ -211,19 +179,16 @@ public class Lookup extends GlobalLookup {
          * When a UserAccount is sent to this topic on event bus make sure the preferences
          * get updated in the preferences dispatcher
          */
-        getUserAccountDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
-
-            public void propertyChange(PropertyChangeEvent evt) {
-                UserAccount userAccount = (UserAccount) evt.getNewValue();
-                if (userAccount == null) {
-                    getPreferencesDispatcher().setValueObject(null);
-                }
-                else {
-                    Injector injector = (Injector) getGuiceInjectorDispatcher().getValueObject();
-                    VarsUserPreferencesFactory factory = injector.getInstance(VarsUserPreferencesFactory.class);
-                    Preferences prefs = factory.userRoot(userAccount.getUserName());
-                    getPreferencesDispatcher().setValueObject(prefs);
-                }
+        getUserAccountDispatcher().addPropertyChangeListener(evt -> {
+            UserAccount userAccount = (UserAccount) evt.getNewValue();
+            if (userAccount == null) {
+                getPreferencesDispatcher().setValueObject(null);
+            }
+            else {
+                Injector injector = (Injector) getGuiceInjectorDispatcher().getValueObject();
+                VarsUserPreferencesFactory factory = injector.getInstance(VarsUserPreferencesFactory.class);
+                Preferences prefs = factory.userRoot(userAccount.getUserName());
+                getPreferencesDispatcher().setValueObject(prefs);
             }
         });
 

@@ -5,14 +5,19 @@
 
 package vars.annotation.ui.buttons.simple;
 
+import vars.annotation.ui.ToolBelt;
+
+import javax.inject.Inject;
+
 /**
  *
  * @author brian
  */
 public class KelpButton extends QuickConceptButton {
 
-    public KelpButton() {
-        super("Kelp", "/images/simple/Kelp.jpg");
+    @Inject
+    public KelpButton(ToolBelt toolBelt) {
+        super("Kelp", "/images/simple/Kelp.jpg", toolBelt);
     }
     
 }

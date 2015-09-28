@@ -60,7 +60,7 @@ import vars.query.QueryPersistenceService;
  *
  * @author Brian Schlining
  */
-public class SearchPanel extends JPanel {
+public class  SearchPanel extends JPanel {
 
     private static final int RESPONSE_DELAY = 750;
     private JButton addButton = null;

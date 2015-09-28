@@ -33,7 +33,6 @@ import vars.UserAccount;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.Lookup;
 
-import vars.annotation.ui.video.ImageCaptureAction;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.video.SwingImageCaptureAction;
 import vars.shared.ui.DoNothingAction;

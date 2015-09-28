@@ -5,17 +5,7 @@ Load OCNMS navigation data into VARS.
 @since 2011-01-25
 
 */
-import vars.integration.MergeFunction
-import vars.annotation.VideoFrame
-import vars.integration.MergeFunction.MergeType
-import org.mbari.movie.Timecode
-import java.text.SimpleDateFormat
-import vars.ToolBox
-import org.mbari.math.CoallateFunction
-import org.slf4j.LoggerFactory
-import vars.annotation.VideoArchiveSetDAO
 import gov.noaa.olympiccoast.MergeNavigation
-import gov.noaa.olympiccoast.NavigationReader
 
 // Parse Arguments
 

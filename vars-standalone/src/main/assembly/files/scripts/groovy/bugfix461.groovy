@@ -7,7 +7,7 @@
 import vars.integration.MergeType
 import vars.shared.ui.GlobalLookup
 import vars.annotation.VideoArchiveSetDAO
-import org.mbari.vars.integration.MergeEXPDAnnotations2
+import org.mbari.vars.integration.MergeEXPDAnnotations
 import org.slf4j.LoggerFactory
 
 def df = GlobalLookup.DATE_FORMAT_UTC
@@ -27,7 +27,7 @@ needsRemerge.each { videoArchiveSet ->
         def sequenceNumber = videoArchiveSet?.cameraDeployments?.iterator()?.next()?.sequenceNumber
         if (platform && sequenceNumber) {
             def isHD = videoArchives.findAll { it.name.endsWith('HD') } isEmpty()
-            def fn = new MergeEXPDAnnotations2(platform, sequenceNumber, isHD)
+            def fn = new MergeEXPDAnnotations(platform, sequenceNumber, isHD)
             fn.apply(MergeType.PESSIMISTIC)
         }
     }

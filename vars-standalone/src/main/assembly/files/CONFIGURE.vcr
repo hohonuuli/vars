@@ -1,0 +1,46 @@
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~  Configuring your professional VCR for use with VARS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+VARS is designed to operate with VCR's that support Sony's 9-pin (RS-422) 
+protocol. In order to VARS to function correctly you will need to adjust a few 
+settings on the VCR. 
+
+By default, VCR's do not allow remote control; VARS will not be able to control 
+a VCR unless remote control is enabled. To enable remote control there is 
+typically a 'Remote' switch on the front of the VCR, this should be turned on.
+
+In addition, VARS can write UTC time directly onto the video tape. This assumes 
+that the computer running VARS has the correct time for your timezone set. The 
+time is written to the 'userbits' of the videotape (refer to your VCR's 
+documentation about userbits). The benefit of writing time to the tape is that 
+when the tape is annotated using VARS later on, VARS reads the time off the tape
+and stores the moment in time that you recorded the video for a particular 
+annotation. This is EXTREMELY important when trying to integrate other data, 
+such as location of the camera, later on. To enable this feature, the remote 
+switch on the VCR needs to be enabled (see above) and several other setting will
+need to be performed. These settings vary depending on your make and model of 
+VCR. Here are the instructions for 2 of the VCR's that we use at MBARI:
+
+SONY DVW-A500 DECK CONFIGURATION
+    1) Connect serial cable to "Remote 1-IN(9P)" connector.
+    2) On the Sub control panel: (pull handles out, look on top edge)
+        Set "TC GENERATOR" switches to "INT" and PRESET"
+    3) On the System set-up panel: (pull handles out, tilt up, look behind)
+        Set "TC" to "AUTO"
+        Set "TC GENERATOR" to "REC RUN", "NDF", "VITC, ON", "ID PRESET, OFF"
+
+PANASONIC AJ-HD2000 DECK CONFIGURATION
+    1) Connect serial cable to "Remote 1-IN(9P)" connector.
+    2) From Home (you may need to press the home button), Press 4 on the number 
+       pad to bring up TC/CHR menu. Set the following:
+        SOURCE = INT, 
+        TC SLAVE = AUTO, 
+        UB SLAVE = OFF, 
+        RUN MD = REC RUN, 
+        DF MD = OFF
+    3) From Home, Press 5 (SET UP)
+        Press F11 (Panel) then F11 again (REMOTE OP MAP)
+    Set MAP MODE = ALL
+    
+    

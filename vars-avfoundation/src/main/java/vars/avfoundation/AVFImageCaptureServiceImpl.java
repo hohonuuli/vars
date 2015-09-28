@@ -136,6 +136,7 @@ public class AVFImageCaptureServiceImpl implements ImageCaptureService {
         // -- Save to temp file png.
         final File tempFile = new File(tempDir, LIBRARY_NAME + (new Date()).getTime() + ".png");
         Image image = capture(tempFile);
+        saveSnapshotToSpecifiedPath(tempFile.getAbsolutePath());
 
         // -- Delete the temp file in the background
         Thread thread = new Thread(new Runnable() {

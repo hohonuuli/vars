@@ -1,9 +1,8 @@
 package gov.noaa.olympiccoast
 
 import vars.annotation.VideoFrame
-import org.mbari.movie.Timecode
 import vars.ToolBox
-import org.mbari.math.CoallateFunction
+import org.mbari.math.CollateFunction
 import org.slf4j.LoggerFactory
 import vars.annotation.VideoArchiveSetDAO
 
@@ -50,7 +49,7 @@ class MergeCtd {
         dao.endTransaction()
         dao.close()
         log.info("Found ${videoFrames?.size()} videoFrames")
-        def coallatedData = CoallateFunction.coallate(videoFrames, convertVideoFrameToMillisecs,
+        def coallatedData = CollateFunction.coallate(videoFrames, convertVideoFrameToMillisecs,
                 ctdData, convertCtdDatumToMillisecs, offsetMillisecs)
         log.info("Merge Resulted in ${coallatedData?.size()} records")
         return coallatedData

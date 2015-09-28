@@ -4,7 +4,7 @@
     <parent>
         <artifactId>vars-redux</artifactId>
         <groupId>vars-redux</groupId>
-        <version>7.1.0-SNAPSHOT</version>
+        <version>8.1-SNAPSHOT</version>
     </parent>
     <artifactId>vars-annotation</artifactId>
     <name>vars-annotation</name>
@@ -119,12 +119,6 @@
             <artifactId>jama</artifactId>
             <version>${jama.version}</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>${project.groupId}</groupId>-->
-            <!--<artifactId>vars-quicktime</artifactId>-->
-            <!--<version>${project.version}</version>-->
-            <!--<scope>runtime</scope>-->
-        <!--</dependency>-->
     </dependencies>
     <!--
     PROFILES
@@ -149,17 +143,25 @@
             </properties>
         </profile>
         <profile>
+            <id>openhouse</id>
+            <properties>
+                <environment>openhouse</environment>
+            </properties>
+        </profile>
+        <profile>
             <id>pgtest</id>
             <properties>
                 <environment>pgtest</environment>
             </properties>
         </profile>
+
         <profile>
             <id>rc</id>
             <properties>
                 <environment>rc</environment>
             </properties>
         </profile>
+
         <profile>
             <id>shore</id>
             <properties>

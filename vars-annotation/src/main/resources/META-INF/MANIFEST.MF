@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Application-Name: VARS Annotation
+Implementation-Title: vars-annotation
+Implementation-Vendor: Monterey Bay Aquarium Research Institute
+Implementation-Vendor-Id: vars-redux
+Permissions: all-permissions
+Require-Capability: osgi.ee;filter:="(&(osgi.ee=JavaSE)(version=1.7))"
+Specification-Title: vars-annotation
+Specification-Vendor: Monterey Bay Aquarium Research Institute
+url: https://github.com/hohonuuli/vars/vars-annotation

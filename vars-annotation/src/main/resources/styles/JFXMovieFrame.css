@@ -1,0 +1,30 @@
+.root {
+    textcolor: #FF0000;
+    -fx-background-color: #000000;
+}
+
+#timecodeTextField {
+    -fx-background-color: #000000;
+    -fx-text-fill: textcolor;
+    -fx-font-size: 140%;
+    -fx-font-family: monospace;
+}
+
+#maxTimecodeTextField {
+    -fx-background-color: #000000;
+    -fx-text-fill: textcolor;
+    -fx-font-size: 140%;
+    -fx-font-family: monospace;
+}
+
+#mediaView {
+    -fx-background-color: #000000;
+}
+
+#scrubber {
+    /* -fx-alignment: bottom-center; */
+}
+
+#button {
+    /* -fx-padding: 0px 10px 0px 10px; */
+}

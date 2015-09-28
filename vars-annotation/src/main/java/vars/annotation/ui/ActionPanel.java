@@ -30,12 +30,12 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
+
+import com.google.inject.Injector;
 import org.mbari.awt.layout.WrappingFlowLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.ui.buttons.*;
-import vars.annotation.ui.video.ImageCaptureAction;
-import vars.annotation.ui.video.SwingImageCaptureAction;
 
 /**
  * <p> This panel contains buttons for actions that can modify the contents of the
@@ -99,11 +99,15 @@ public class ActionPanel extends JPanel {
         ResourceBundle bundle = ResourceBundle.getBundle(Lookup.RESOURCE_BUNDLE, Locale.US);
         Enumeration<String> enumeration = bundle.getKeys();
         Map<String, JButton> map = new TreeMap<String, JButton>();
+        Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
         while (enumeration.hasMoreElements()) {
             String element = enumeration.nextElement();
             if (element.startsWith("actionpanel.button")) {
                 try {
-                    map.put(element, (JButton) Class.forName(bundle.getString(element)).newInstance());
+                    Class clazz = Class.forName(bundle.getString(element));
+                    JButton button = (JButton) injector.getInstance(clazz);
+                    map.put(element, button);
+                    //map.put(element, (JButton) Class.forName(bundle.getString(element)).newInstance());
                 }
                 catch (Exception ex) {
                     log.warn("Unable to add button class specified by '" + element + "' in vars-annotation.properties",

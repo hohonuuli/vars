@@ -85,16 +85,14 @@ public class ClearDatabaseCacheAction extends ActionAdapter {
                      * Reopen the VideoArchive
                      */
                     if (name != null) {
-                        Thread thread = new Thread(new Runnable() {
+                        Thread thread = new Thread(() -> {
+                            VideoArchiveDAO dao = toolBelt.getAnnotationDAOFactory().newVideoArchiveDAO();
+                            dao.startTransaction();
+                            VideoArchive refreshedVideoArchive = dao.findByName(name);
+                            dao.endTransaction();
+                            dao.close();
+                            EventBus.publish(new VideoArchiveSelectedEvent(null, refreshedVideoArchive));
 
-                            public void run() {
-                                VideoArchiveDAO dao = toolBelt.getAnnotationDAOFactory().newVideoArchiveDAO();
-                                dao.startTransaction();
-                                VideoArchive refreshedVideoArchive = dao.findByName(name);
-                                dao.endTransaction();
-                                dao.close();
-                                EventBus.publish(new VideoArchiveSelectedEvent(null, refreshedVideoArchive));
-                            }
                         }, "Clear cache thread");
 
                         thread.start();

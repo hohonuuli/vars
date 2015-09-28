@@ -126,19 +126,6 @@ public class AnnotationFrameController implements PreferenceUpdater, UIEventSubs
             }
         });
 
-        // When new observations are selected we need to persist changes to the old
-        // observations to the database, then redraw them in the UI
-//        Lookup.getSelectedObservationsDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
-//            public void propertyChange(PropertyChangeEvent evt) {
-//                PersistenceController persistenceController = toolBelt.getPersistenceController();
-//                Collection<Observation> oldObservations = (Collection<Observation>) evt.getOldValue();
-//                if (oldObservations != null) {
-//                    oldObservations = new ArrayList<Observation>(oldObservations);
-//                    oldObservations = persistenceController.updateAndValidate(oldObservations);
-//                    EventBus.publish(new ObservationsChangedEvent(annotationFrame, oldObservations));
-//                }
-//            }
-//        });
 
         // When preferences change (i.e. when a new user logs in) we need save
         // the old preferences into the database and load the new ones

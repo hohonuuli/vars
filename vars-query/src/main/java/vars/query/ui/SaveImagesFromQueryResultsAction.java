@@ -48,25 +48,11 @@ public class SaveImagesFromQueryResultsAction extends ActionAdapter {
     private static final long serialVersionUID = 2601526373243226798L;
     private static final Logger log = LoggerFactory.getLogger(SaveImagesFromQueryResultsAction.class);
 
-    //~--- fields -------------------------------------------------------------
 
-    /**
-	 * @uml.property  name="action"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
     private final SaveFramegrabsAction action = new SaveFramegrabsAction();
-    /**
-	 * @uml.property  name="chooser"
-	 * @uml.associationEnd  
-	 */
     private JFileChooser chooser;
-    /**
-	 * @uml.property  name="queryResultsFrame"
-	 * @uml.associationEnd  
-	 */
     private QueryResultsFrame queryResultsFrame;
 
-    //~--- methods ------------------------------------------------------------
 
     /**
      *     @see org.mbari.awt.event.IAction#doAction()
@@ -88,13 +74,6 @@ public class SaveImagesFromQueryResultsAction extends ActionAdapter {
         }
     }
 
-    //~--- get methods --------------------------------------------------------
-
-    /**
-	 * <p><!-- Method description --></p>
-	 * @return
-	 * @uml.property  name="chooser"
-	 */
     private JFileChooser getChooser() {
         if (chooser == null) {
             chooser = new JFileChooser();
@@ -122,7 +101,7 @@ public class SaveImagesFromQueryResultsAction extends ActionAdapter {
                 if (obj != null) {
                     String s = obj.toString();
                     String sUpper = s.toUpperCase();
-                    if (sUpper.startsWith("HTTP")) {
+                    if (sUpper.startsWith("HTTP") || sUpper.startsWith("FILE")) {
                         if (sUpper.endsWith(".PNG") ||
                                 sUpper.endsWith(".JPG") ||
                                 sUpper.endsWith(".JPEG") ||
@@ -146,13 +125,6 @@ public class SaveImagesFromQueryResultsAction extends ActionAdapter {
         return (URL[]) urlList.toArray(new URL[urlList.size()]);
     }
 
-    //~--- set methods --------------------------------------------------------
-
-    /**
-	 * <p><!-- Method description --></p>
-	 * @param  queryResultsFrame
-	 * @uml.property  name="queryResultsFrame"
-	 */
     public void setQueryResultsFrame(QueryResultsFrame queryResultsFrame) {
         this.queryResultsFrame = queryResultsFrame;
     }

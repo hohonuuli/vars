@@ -68,7 +68,7 @@ public class ImagePreferencesPanel extends JPanel implements PreferenceUpdater {
             initialize();
         }
         catch (Exception e) {
-           log.warn("Failed to initialize!", e);
+            log.warn("Failed to initialize!", e);
         }
     }
 
@@ -134,12 +134,12 @@ public class ImagePreferencesPanel extends JPanel implements PreferenceUpdater {
     }
     
     protected JComboBox<String> getImageInterpComboBox() {
-        if (imageInterpComboBox == null) {
-            imageInterpComboBox = new JComboBox(AWTUtilities.IMAGE_INTERPOLATION_MAP.keySet().toArray());
-            imageInterpComboBox.setSelectedIndex(0);
-        }
-        return imageInterpComboBox;
-    }
+                if (imageInterpComboBox == null) {
+                        imageInterpComboBox = new JComboBox(AWTUtilities.IMAGE_INTERPOLATION_MAP.keySet().toArray());
+                        imageInterpComboBox.setSelectedIndex(0);
+                    }
+                return imageInterpComboBox;
+            }
 
     /**
      * @return
@@ -235,6 +235,7 @@ public class ImagePreferencesPanel extends JPanel implements PreferenceUpdater {
             						.addComponent(getImageTargetMappingTextField(), GroupLayout.DEFAULT_SIZE, 305, Short.MAX_VALUE)
             						.addComponent(getImageFormatComboBox(), 0, 305, Short.MAX_VALUE)
             						.addComponent(getImageInterpComboBox(), 0, 305, Short.MAX_VALUE))))
+                            .addComponent(getDefaultsButton())
             			.addContainerGap())
             );
             groupLayout.setVerticalGroup(

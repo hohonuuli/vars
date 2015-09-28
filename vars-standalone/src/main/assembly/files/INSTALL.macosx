@@ -4,16 +4,26 @@ INSTALLING VARS ON MAC OS X
 ~~  Prerequisites
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you are using VARS to annotate video tapes be aware that Apple computers do 
-not ship with built in serial ports. In order to fully use the Annotation 
-application you will need to install a serial port in order to talk to the VCR. 
-Their are several options for this, the easiest is using a USB Serial Port 
-adapter such as the USB PDA/Serial Adapter (GUC232A) from IOGEAR. Be sure to 
-install the correct driver too! Some video capture cards include an RS422 serial
-port that can be used by VARS.
+In order for VARS to run on your system you will need to install the following 
+before installing VARS:
 
-NOTE: The serial port libraries included with VARS have been tested on 10.7 
-(Lion) and 10.8 (Mountain Lion)
+    1) Mac OS X 10.8 or 10.9
+    2) Java Development Kit 8 (x64). 
+
+Installation Instructions for Prerequisites
+
+I) Installing Java
+
+   You can download Java for Mac OS X from 
+   http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html. 
+   Simply download the installer and run it.
+
+Currently, VARS uses JavaFX media to play video files. JavaFX is bundled with 
+Java 8. If you have several versions of Java installed on your Mac, you can
+specify Java 8 by executing the following command in the terminal BEFORE 
+starting the annotation application:
+
+    export JAVA_HOME=`/usr/libexec/java_home -v 1.8`
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -25,5 +35,5 @@ This server is suitable for testing and small deployments. Other than installing
 the prerequisites, no configuration is necessary to start VARS.
 
 When you are ready to run VARS for the first time, start the Knowledgebase 
-application (using varsKb or knowledgebase). This will prompt you to create an 
+application (using the command: knowledgebase). This will prompt you to create an 
 administrator account for controlling modifications to the VARS knowledgebase.
