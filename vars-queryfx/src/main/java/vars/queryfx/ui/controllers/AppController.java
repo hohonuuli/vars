@@ -88,8 +88,6 @@ public class AppController {
     }
 
     protected void executeSearch(ExecuteSearchMsg msg) {
-        // TODO create a stage that shows elapse time. Reuse it to display results.
-
 
         SQLStatementGenerator sqlGen = new SQLStatementGenerator();
         String sql = sqlGen.getSQLStatement(msg.getQueryReturns(),

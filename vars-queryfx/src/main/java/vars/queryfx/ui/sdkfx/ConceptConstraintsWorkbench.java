@@ -116,7 +116,7 @@ public class ConceptConstraintsWorkbench extends WorkbenchView {
     private EditorFormRow<ComboBox<String>> getConceptRow() {
         if (conceptRow == null) {
             final ComboBox<String> conceptComboBox = new ComboBox<>();
-            conceptRow = new EditorFormRow<>("named", conceptComboBox);
+
             queryService.findAllConceptNamesAsStrings().handle((names, ex) -> {
                 if (names != null) {
                     return names;
@@ -146,6 +146,7 @@ public class ConceptConstraintsWorkbench extends WorkbenchView {
                     new AutoCompleteComboBoxListener<>(conceptComboBox);
                 });
             });
+            conceptRow = new EditorFormRow<>("named", conceptComboBox);
 
         }
         return conceptRow;

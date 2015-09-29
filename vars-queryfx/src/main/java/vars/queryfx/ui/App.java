@@ -82,6 +82,7 @@ public class App {
     protected Application getApplication() {
         if (application == null) {
             application = new Application();
+            application.addStylesheet(getClass().getResource("/vars/queryfx/queryfx.css").toExternalForm());
 
             application.setTitle("VARS Query");
             application.addToolbarItem(new Action(AppIcons.PLAY, "Run Search", () -> doSearch()));

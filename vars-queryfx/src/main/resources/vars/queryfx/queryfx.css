@@ -1,0 +1,45 @@
+.toggle-button {
+    -fx-border-color: null;
+    -fx-background-color: -fx-lightest-color;
+    -fx-background-radius: 2px;
+    -fx-font-size: 14px;
+}
+
+.toggle-button .text {
+    -fx-fill: white;
+}
+
+.toggle-button:hover {
+    -fx-background-color: -fx-basic-color;
+}
+
+.toggle-button:hover .text{
+    -fx-fill: white;
+}
+
+.toggle-button:selected {
+    -fx-background-color: -fx-darkest-color;
+}
+
+.arrow-button {
+    -fx-border-color: null;
+    -fx-background-color: white;
+    -fx-background-radius: 2px;
+    -fx-font-size: 14px;
+}
+
+/*.arrow-button .text {*/
+    /*-fx-fill: white;*/
+/*}*/
+
+.arrow-button:hover {
+    -fx-background-color: -fx-lightest-color;
+}
+
+/*.arrow-button:hover .text{*/
+    /*-fx-fill: white;*/
+/*}*/
+
+.arrow-button:selected {
+    -fx-background-color: white;
+}
