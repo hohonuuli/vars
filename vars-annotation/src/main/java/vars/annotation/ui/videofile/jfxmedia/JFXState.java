@@ -1,9 +1,9 @@
 package vars.annotation.ui.videofile.jfxmedia;
 
 import org.mbari.util.IObserver;
-import org.mbari.vcr.IVCR;
-import org.mbari.vcr.IVCRState;
-import org.mbari.vcr.VCRStateAdapter;
+import org.mbari.vcr4j.IVCR;
+import org.mbari.vcr4j.IVCRState;
+import org.mbari.vcr4j.VCRStateAdapter;
 
 /**
  * Created by brian on 5/1/14.

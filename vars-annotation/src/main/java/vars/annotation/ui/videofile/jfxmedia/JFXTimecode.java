@@ -1,14 +1,15 @@
 package vars.annotation.ui.videofile.jfxmedia;
 
-import org.mbari.movie.Timecode;
+import javafx.beans.value.ChangeListener;
 import org.mbari.util.IObserver;
-import org.mbari.vcr.IVCR;
-import org.mbari.vcr.VCRTimecodeAdapter;
+import org.mbari.vcr4j.IVCR;
+import org.mbari.vcr4j.VCRTimecodeAdapter;
+import org.mbari.vcr4j.time.Timecode;
 
 /**
  * Because we keep reusing JFXVideoControlServiceImpl as THE vcr control, (rather than disposing of it
  * everytime we open a new movie) mayn UI parts bind/observe it only when it's first created.
- * So in order for things to be properly updated we needa proxy timecode that UI parts can bind to
+ * So in order for things to be properly updated we need a proxy timecode that UI parts can bind to
  * and still get correctly updated when we switch out the underlying VCR control instance (using
  * jfxmedia.vcr.VCR)
  *
@@ -17,22 +18,15 @@ import org.mbari.vcr.VCRTimecodeAdapter;
 public class JFXTimecode extends VCRTimecodeAdapter {
 
     private IVCR vcr;
-    private IObserver observer = (obj, changeCode) ->  {
-        if (obj != null && obj instanceof Timecode) {
-            Timecode that = (Timecode) obj;
-            timecode.setFrameRate(that.getFrameRate());
-            timecode.setFrames(that.getFrames());
-        }
-    };
 
 
     protected void setVCR(IVCR vcr) {
-        if (this.vcr != null && this.vcr != vcr) {
-            this.vcr.getVcrTimecode().getTimecode().removeObserver(observer);
+        if (timecodeProperty.isBound()) {
+            timecodeProperty.unbind();
         }
 
         if (vcr != null) {
-            vcr.getVcrTimecode().getTimecode().addObserver(observer);
+            timecodeProperty.bind(vcr.getVcrTimecode().timecodeProperty());
         }
         this.vcr = vcr;
     }

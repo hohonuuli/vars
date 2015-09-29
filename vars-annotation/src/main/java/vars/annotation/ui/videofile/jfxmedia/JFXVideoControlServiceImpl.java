@@ -3,19 +3,16 @@ package vars.annotation.ui.videofile.jfxmedia;
 import java.awt.*;
 import java.io.File;
 import java.util.Date;
-import javafx.util.Duration;
 import javax.swing.*;
 
 import org.bushe.swing.event.EventBus;
-import org.mbari.movie.Timecode;
-import org.mbari.util.IObserver;
-import org.mbari.vcr.*;
-import org.mbari.vcr.timer.AnnotationQueueVCR;
+import org.mbari.vcr4j.*;
+import org.mbari.vcr4j.time.Timecode;
+import org.mbari.vcr4j.timer.AnnotationQueueVCR;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.videofile.VideoPlayerController;
 import vars.annotation.ui.videofile.jfxmedia.vcr.VCR;
 import vars.shared.ui.video.*;
-import vars.VARSException;
 
 /**
  * Created by brian on 12/16/13.
@@ -24,11 +21,8 @@ public class JFXVideoControlServiceImpl  extends AbstractVideoControlService
         implements ImageCaptureService, VideoPlayerController {
 
     private JFXMovieFrame movieFrame = new JFXMovieFrame();
-
-
     private final JFXTimecode vcrTimcode = new JFXTimecode();
     private final JFXState vcrState = new JFXState();
-
 
     public JFXVideoControlServiceImpl() {
         movieFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);

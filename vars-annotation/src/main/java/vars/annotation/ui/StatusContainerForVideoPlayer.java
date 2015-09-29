@@ -7,7 +7,7 @@ import org.bushe.swing.event.annotation.EventSubscriber;
 import org.mbari.swing.SwingUtils;
 import org.mbari.util.Dispatcher;
 import org.mbari.util.Tuple2;
-import org.mbari.vcr.timer.StatusMonitor;
+import org.mbari.vcr4j.timer.StatusMonitor;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
 import vars.annotation.ui.eventbus.VideoArchiveSelectedEvent;

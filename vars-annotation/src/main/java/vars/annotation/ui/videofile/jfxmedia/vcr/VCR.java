@@ -5,16 +5,20 @@ package vars.annotation.ui.videofile.jfxmedia.vcr;
  */
 
 import javafx.beans.value.ChangeListener;
-import javafx.collections.ObservableMap;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
-import org.mbari.movie.Timecode;
-import org.mbari.vcr.VCRAdapter;
+import org.mbari.vcr4j.VCRAdapter;
+import org.mbari.vcr4j.time.Timecode;
 
 
 public class VCR extends VCRAdapter {
 
-    public static final double DEFAULT_FRAME_RATE = 30D;
+    /**
+     * To best handle proxies. We use fractional seconds as frames. This lets us swap videos
+     * and likely be close enough (1/100th sec) to the actual frame of interest between
+     * alternate proxies.
+     */
+    public static final double DEFAULT_FRAME_RATE = 100D;
     public static final double FAST_FORWARD_RATE = 5D;
     public static final double MAX_RATE = 8D; // According to JavaFX docs this is the max rate
 
@@ -28,12 +32,16 @@ public class VCR extends VCRAdapter {
         vcrReply = new Reply(this);
 
         // Bind timecode
-        final Timecode timecode = getVcrReply().getVcrTimecode().getTimecode();
-        final ObservableMap<String,Object> metadata = mediaPlayer.getMedia().getMetadata();
-        timecode.setFrameRate((Double) metadata.getOrDefault("framerate", DEFAULT_FRAME_RATE));
+        //final Timecode timecode = getVcrReply().getVcrTimecode().getTimecode();
+        //final ObservableMap<String,Object> metadata = mediaPlayer.getMedia().getMetadata();
+        //Double frameRate = (Double) metadata.getOrDefault("framerate", DEFAULT_FRAME_RATE);
+        //timecode.setFrameRate((Double) metadata.getOrDefault("framerate", DEFAULT_FRAME_RATE));
+        //vcrReply.getVcrTimecode()
+
         timeListener = (observableValue, oldDuration, newDuration) -> {
-            double frames = newDuration.toSeconds() * timecode.getFrameRate();
-            timecode.setFrames(frames);
+            double frames = newDuration.toSeconds() * VCR.DEFAULT_FRAME_RATE;
+            Timecode timecode = new Timecode(frames, VCR.DEFAULT_FRAME_RATE);
+            vcrReply.getVcrTimecode().timecodeProperty().set(timecode);
         };
         mediaPlayer.currentTimeProperty().addListener(timeListener);
         triggerStateNotification();

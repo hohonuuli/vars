@@ -1,6 +1,6 @@
 package vars.annotation.ui.videofile.jfxmedia.vcr;
 
-import org.mbari.vcr.VCRStateAdapter;
+import org.mbari.vcr4j.VCRStateAdapter;
 
 /**
  * Created by brian on 12/16/13.

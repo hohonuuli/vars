@@ -22,14 +22,11 @@ import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.VARSProperties;
 import vars.annotation.ui.videofile.EmptyVideoPlayerController;
 import vars.annotation.ui.videofile.VideoPlayerController;
-import vars.shared.ui.video.VideoControlService;
 
 import javax.swing.*;
 import java.io.File;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.*;
-import java.util.function.Consumer;
 
 /**
  * Created by brian on 12/19/13.
