@@ -31,13 +31,6 @@ public class VCR extends VCRAdapter {
 
         vcrReply = new Reply(this);
 
-        // Bind timecode
-        //final Timecode timecode = getVcrReply().getVcrTimecode().getTimecode();
-        //final ObservableMap<String,Object> metadata = mediaPlayer.getMedia().getMetadata();
-        //Double frameRate = (Double) metadata.getOrDefault("framerate", DEFAULT_FRAME_RATE);
-        //timecode.setFrameRate((Double) metadata.getOrDefault("framerate", DEFAULT_FRAME_RATE));
-        //vcrReply.getVcrTimecode()
-
         timeListener = (observableValue, oldDuration, newDuration) -> {
             double frames = newDuration.toSeconds() * VCR.DEFAULT_FRAME_RATE;
             Timecode timecode = new Timecode(frames, VCR.DEFAULT_FRAME_RATE);
