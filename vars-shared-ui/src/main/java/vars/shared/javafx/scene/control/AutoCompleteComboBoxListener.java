@@ -85,11 +85,13 @@ public class AutoCompleteComboBoxListener<T> implements EventHandler<KeyEvent> {
                 || event.getCode() == KeyCode.ESCAPE) {
             if (!list.isEmpty()) {
                 comboBox.getEditor().setText(transform.apply(list.get(0)));
+                comboBox.getSelectionModel().select(0);
+                comboBox.hide();
             }
             else {
                 comboBox.getEditor().setText(text);
             }
-            comboBox.hide();
+
         }
         else {
             comboBox.getEditor().setText(text);
