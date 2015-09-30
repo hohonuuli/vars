@@ -18,7 +18,7 @@
 }
 
 .toggle-button:selected {
-    -fx-background-color: -fx-darkest-color;
+    -fx-background-color: -fx-darker-color;
 }
 
 .arrow-button {
@@ -42,4 +42,8 @@
 
 .arrow-button:selected {
     -fx-background-color: white;
+}
+
+.date-field {
+    -fx-padding: 10 20 10 20;
 }
