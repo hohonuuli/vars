@@ -17,6 +17,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.Date;
 import java.util.Optional;
 
@@ -29,47 +31,52 @@ public class DateValuePanel extends AbstractValuePanel {
     private LocalDateTimeTextField startControl;
     private LocalDateTimeTextField endControl;
     private ChangeListener<LocalDateTime> changeListener = (obs, oldVal, newVal) ->
-        getConstrainCheckBox().setSelected(true);
+            getConstrainCheckBox().setSelected(!oldVal.isEqual(newVal));
     private Button scanButton = new MaterialDesignButton("Scan");
 
 
     public DateValuePanel(String valueName) {
         super(valueName);
         Region spacer = new Region();
-        spacer.setMinWidth(Region.USE_PREF_SIZE);
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-
-        getChildren().addAll(getStartControl(), spacer, getEndControl(), scanButton);
+        spacer.setMinWidth(20);
+        HBox.setHgrow(spacer, Priority.NEVER);
+        Region btnSpacer = new Region();
+        btnSpacer.setMinWidth(10);
+        HBox.setHgrow(btnSpacer, Priority.NEVER);
+        getChildren().addAll(getStartControl(), spacer, getEndControl(), btnSpacer, scanButton);
+        getConstrainCheckBox().setSelected(false);
     }
 
     private LocalDateTimeTextField getEndControl() {
         if (endControl == null) {
-            LocalDateTime dt = LocalDateTime.now();
+            LocalDateTime dt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
             endControl = new LocalDateTimeTextField(dt);
             endControl.parseErrorCallbackProperty().set(p -> {
                 endControl.setLocalDateTime(dt);
                 return null;
             });
-            //endControl.localDateTimeProperty().addListener(changeListener);
             endControl.setDateTimeFormatter(DateTimeFormatter.ISO_DATE_TIME);
             endControl.setId("date-field");
             HBox.setHgrow(endControl, Priority.ALWAYS);
+
+            endControl.localDateTimeProperty().addListener(changeListener);
         }
         return endControl;
     }
 
     private LocalDateTimeTextField getStartControl() {
         if (startControl == null) {
-            LocalDateTime dt = Lookup.getAnnotationStartDate().toLocalDateTime();
+            LocalDateTime dt = Lookup.getAnnotationStartDate().toLocalDateTime().truncatedTo(ChronoUnit.MINUTES);
             startControl = new LocalDateTimeTextField(dt);
             startControl.parseErrorCallbackProperty().set( p -> {
                 startControl.setLocalDateTime(dt);
                 return null;
             });
-            //startControl.localDateTimeProperty().addListener(changeListener);
             startControl.setDateTimeFormatter(DateTimeFormatter.ISO_DATE_TIME);
             startControl.setId("date-field");
             HBox.setHgrow(startControl, Priority.ALWAYS);
+            startControl.localDateTimeProperty().addListener(changeListener);
+
         }
         return startControl;
     }

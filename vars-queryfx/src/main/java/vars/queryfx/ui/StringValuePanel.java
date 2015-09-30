@@ -10,6 +10,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import vars.queryfx.ui.db.IConstraint;
 import vars.queryfx.ui.db.InConstraint;
 import vars.queryfx.ui.db.LikeConstraint;
@@ -32,7 +33,10 @@ public class StringValuePanel extends AbstractValuePanel {
 
     public StringValuePanel(String valueName) {
         super(valueName);
-        getChildren().addAll(getTextField(), getToggleButton());
+        Region btnSpacer = new Region();
+        btnSpacer.setMinWidth(10);
+        HBox.setHgrow(btnSpacer, Priority.NEVER);
+        getChildren().addAll(getTextField(), btnSpacer, getToggleButton());
     }
 
     private ListView<String> getListView() {

@@ -44,9 +44,12 @@ public class AutoCompleteComboBoxListener<T> implements EventHandler<KeyEvent> {
         TextField editor = comboBox.getEditor();
         String text = editor.getText();
 
-        if (event.getCode() == KeyCode.RIGHT || event.getCode() == KeyCode.LEFT
-                || event.isControlDown() || event.getCode() == KeyCode.HOME
-                || event.getCode() == KeyCode.END || event.getCode() == KeyCode.TAB) {
+        if (event.getCode() == KeyCode.RIGHT
+                || event.getCode() == KeyCode.LEFT
+                || event.isControlDown()
+                || event.getCode() == KeyCode.HOME
+                || event.getCode() == KeyCode.END
+                || event.getCode() == KeyCode.TAB) {
             return;
         }
         else if(event.getCode() == KeyCode.UP) {
@@ -77,14 +80,28 @@ public class AutoCompleteComboBoxListener<T> implements EventHandler<KeyEvent> {
                 .collect(Collectors.toList()));
 
         comboBox.setItems(list);
-        comboBox.getEditor().setText(text);
-        if(!moveCaretToPos) {
-            caretPos = -1;
+
+        if (event.getCode() == KeyCode.ENTER
+                || event.getCode() == KeyCode.ESCAPE) {
+            if (!list.isEmpty()) {
+                comboBox.getEditor().setText(transform.apply(list.get(0)));
+            }
+            else {
+                comboBox.getEditor().setText(text);
+            }
+            comboBox.hide();
         }
-        moveCaret(text.length());
-        if(!list.isEmpty()) {
-            comboBox.show();
+        else {
+            comboBox.getEditor().setText(text);
+            if(!moveCaretToPos) {
+                caretPos = -1;
+            }
+            moveCaret(text.length());
+            if(!list.isEmpty()) {
+                comboBox.show();
+            }
         }
+
     }
 
     private void moveCaret(int textLength) {

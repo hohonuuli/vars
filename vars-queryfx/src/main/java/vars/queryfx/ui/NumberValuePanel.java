@@ -8,6 +8,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import vars.queryfx.ui.db.IConstraint;
 import vars.queryfx.ui.db.MaxConstraint;
 import vars.queryfx.ui.db.MinConstraint;
@@ -27,10 +28,18 @@ public class NumberValuePanel extends AbstractValuePanel {
 
     public NumberValuePanel(String valueName) {
         super(valueName);
-        getChildren().addAll(new Label(" Min "),
+        Region spacer = new Region();
+        spacer.setMinWidth(20);
+        HBox.setHgrow(spacer, Priority.NEVER);
+        Region btnSpacer = new Region();
+        btnSpacer.setMinWidth(10);
+        HBox.setHgrow(btnSpacer, Priority.NEVER);
+        getChildren().addAll(//new Label(" Min "),
                 getMinTextField(),
-                new Label(" Max "),
+                spacer,
+                //new Label(" Max "),
                 getMaxTextField(),
+                btnSpacer,
                 getScanButton());
     }
 
