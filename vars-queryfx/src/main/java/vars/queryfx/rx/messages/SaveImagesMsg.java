@@ -1,9 +1,8 @@
-package vars.queryfx.messages;
+package vars.queryfx.rx.messages;
 
 import vars.queryfx.ui.db.results.QueryResults;
 
 import java.io.File;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 /**

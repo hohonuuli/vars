@@ -1,7 +1,8 @@
-package vars.queryfx.messages;
+package vars.queryfx.rx.messages;
 
 import javafx.stage.Stage;
 import vars.queryfx.ui.db.results.QueryResults;
+import vars.shared.rx.messages.Msg;
 
 import java.util.Optional;
 

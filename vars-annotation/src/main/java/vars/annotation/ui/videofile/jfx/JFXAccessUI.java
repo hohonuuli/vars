@@ -1,10 +1,11 @@
-package vars.annotation.ui.videofile.jfxmedia;
+package vars.annotation.ui.videofile.jfx;
 
 import org.mbari.util.Tuple2;
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.videofile.*;
+import vars.avplayer.jfx.JFXVideoControlServiceImpl;
 
 import javax.inject.Inject;
 import java.awt.*;

@@ -1,4 +1,4 @@
-package vars.queryfx;
+package vars.shared.rx;
 
 import rx.Observable;
 import rx.subjects.PublishSubject;

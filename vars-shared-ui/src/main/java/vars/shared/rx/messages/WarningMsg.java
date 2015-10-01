@@ -1,4 +1,4 @@
-package vars.queryfx.messages;
+package vars.shared.rx.messages;
 
 /**
  * @author Brian Schlining

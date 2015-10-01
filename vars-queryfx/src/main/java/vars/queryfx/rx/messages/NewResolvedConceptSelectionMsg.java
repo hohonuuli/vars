@@ -1,6 +1,7 @@
-package vars.queryfx.messages;
+package vars.queryfx.rx.messages;
 
 import vars.queryfx.beans.ResolvedConceptSelection;
+import vars.shared.rx.messages.Msg;
 
 /**
  * @author Brian Schlining

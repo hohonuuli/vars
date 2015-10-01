@@ -1,8 +1,9 @@
-package vars.queryfx.messages;
+package vars.queryfx.rx.messages;
 
 import vars.queryfx.beans.ResultsCustomization;
 import vars.queryfx.ui.db.ConceptConstraint;
 import vars.queryfx.ui.db.IConstraint;
+import vars.shared.rx.messages.Msg;
 
 import java.util.List;
 
