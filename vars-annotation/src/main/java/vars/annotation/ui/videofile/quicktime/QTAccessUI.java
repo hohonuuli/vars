@@ -4,11 +4,14 @@ import org.mbari.util.Tuple2;
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.ToolBelt;
-import vars.annotation.ui.videofile.*;
+import vars.avplayer.AbstractAccessUI;
+import vars.avplayer.DefaultVideoPlayerDialogUI;
+import vars.avplayer.VideoParams;
+import vars.avplayer.VideoPlayerController;
+import vars.avplayer.VideoPlayerDialogUI;
 
 import javax.inject.Inject;
 import java.awt.*;
-import java.util.Optional;
 
 /**
  * Created by brian on 1/7/14.

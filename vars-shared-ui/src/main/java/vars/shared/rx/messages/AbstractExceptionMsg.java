@@ -6,19 +6,19 @@ package vars.shared.rx.messages;
  */
 public abstract class AbstractExceptionMsg implements StatusMsg {
 
-    private final String msg;
+    private final String message;
     private final Throwable exception;
 
-    public AbstractExceptionMsg(String msg, Throwable exception) {
+    public AbstractExceptionMsg(String message, Throwable exception) {
         this.exception = exception;
-        this.msg = msg;
+        this.message = message;
     }
 
     public Throwable getException() {
         return exception;
     }
 
-    public String getMsg() {
-        return msg;
+    public String getMessage() {
+        return message;
     }
 }

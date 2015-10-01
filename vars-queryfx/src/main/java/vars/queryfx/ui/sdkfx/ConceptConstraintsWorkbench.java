@@ -1,7 +1,5 @@
 package vars.queryfx.ui.sdkfx;
 
-import com.google.common.collect.Lists;
-import com.guigarage.sdk.action.Action;
 import com.guigarage.sdk.container.WorkbenchView;
 import com.guigarage.sdk.form.EditorFormRow;
 import com.guigarage.sdk.form.FormLayout;
@@ -19,9 +17,9 @@ import vars.LinkBean;
 import vars.LinkUtilities;
 import vars.queryfx.Lookup;
 import vars.queryfx.QueryService;
-import vars.queryfx.RXEventBus;
+import vars.shared.rx.RXEventBus;
 import vars.queryfx.beans.ConceptSelection;
-import vars.queryfx.messages.FatalExceptionMsg;
+import vars.shared.rx.messages.FatalExceptionMsg;
 import vars.shared.javafx.scene.control.AutoCompleteComboBoxListener;
 
 import javax.inject.Inject;

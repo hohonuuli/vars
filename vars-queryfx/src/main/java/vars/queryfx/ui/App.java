@@ -10,19 +10,17 @@ import javafx.scene.paint.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.queryfx.Lookup;
-import vars.queryfx.RXEventBus;
+import vars.shared.rx.RXEventBus;
 import vars.queryfx.ToolBelt;
 import vars.queryfx.beans.ConceptSelection;
 import vars.queryfx.beans.QueryParams;
 import vars.queryfx.beans.ResolvedConceptSelection;
 import vars.queryfx.beans.ResultsCustomization;
-import vars.queryfx.messages.AbstractExceptionMsg;
-import vars.queryfx.messages.ExecuteSearchMsg;
-import vars.queryfx.messages.FatalExceptionMsg;
-import vars.queryfx.messages.Msg;
-import vars.queryfx.messages.NewConceptSelectionMsg;
-import vars.queryfx.messages.NewQueryResultsMsg;
-import vars.queryfx.messages.NewResolvedConceptSelectionMsg;
+import vars.shared.rx.messages.AbstractExceptionMsg;
+import vars.queryfx.rx.messages.ExecuteSearchMsg;
+import vars.shared.rx.messages.Msg;
+import vars.queryfx.rx.messages.NewConceptSelectionMsg;
+import vars.queryfx.rx.messages.NewResolvedConceptSelectionMsg;
 import vars.queryfx.ui.controllers.AppController;
 import vars.queryfx.ui.controllers.SaveResultsController;
 import vars.queryfx.ui.db.ConceptConstraint;
@@ -34,7 +32,6 @@ import vars.queryfx.ui.sdkfx.CustomizeResultsWorkbench;
 import vars.shared.javafx.application.ImageFX;
 import vars.shared.ui.GlobalLookup;
 
-import java.awt.*;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Date;
@@ -76,7 +73,7 @@ public class App {
         eventBus.toObserverable()
                 .filter(msg -> msg instanceof AbstractExceptionMsg)
                 .map(msg -> (AbstractExceptionMsg) msg)
-                .subscribe(msg -> log.error(msg.getMsg(), msg.getException()));
+                .subscribe(msg -> log.error(msg.getMessage(), msg.getException()));
     }
 
     protected Application getApplication() {

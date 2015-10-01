@@ -11,14 +11,18 @@ import org.mbari.vcr4j.timer.StatusMonitor;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
 import vars.annotation.ui.eventbus.VideoArchiveSelectedEvent;
-import vars.annotation.ui.videofile.*;
+import vars.avplayer.VideoParams;
+import vars.avplayer.VideoPlayer;
+import vars.avplayer.VideoPlayerAccessUI;
+import vars.avplayer.VideoPlayerDialogUI;
+import vars.avplayer.VideoPlayers;
+import vars.avplayer.VideoPlayerController;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
-import java.util.Optional;
 
 /**
  * DEVELOPER NOTE: Based off of StatusLabelForVideoArchive. Refer to that class if things aren't working.

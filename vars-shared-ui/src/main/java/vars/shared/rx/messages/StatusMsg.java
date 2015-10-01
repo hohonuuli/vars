@@ -5,4 +5,5 @@ package vars.shared.rx.messages;
  * @since 2015-07-19T13:38:00
  */
 public interface StatusMsg extends Msg {
+
 }

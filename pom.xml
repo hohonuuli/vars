@@ -40,6 +40,7 @@
         <mbarix4j.version>1.9.3</mbarix4j.version>
         <postgresql.version>9.0-801.jdbc4</postgresql.version>
         <qtx4j.version>0.18</qtx4j.version>
+        <rxjava.version>1.0.12</rxjava.version>
         <sanselan.version>0.97</sanselan.version>
         <scala.version>2.11.7</scala.version>
         <scala.version.major>2.11</scala.version.major>
