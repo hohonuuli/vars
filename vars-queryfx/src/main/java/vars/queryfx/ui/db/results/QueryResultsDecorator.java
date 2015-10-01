@@ -118,12 +118,13 @@ public class QueryResultsDecorator {
                         })
                         .collect(Collectors.toList());
 
-                List<String> ancestorNames = new ArrayList<>(phylogeny.size());
+                List<String> ancestorNames = new ArrayList<>(Collections.nCopies(phylogeny.size(), ""));
                 for (int i = 0; i < ranks.size(); i++) {
                     String rank = ranks.get(i);
                     if (rank != null) {
                         int idx = phylogeny.indexOf(rank);
                         if (idx >= 0) {
+                            //System.out.println("idx=" + idx + ",i=" + i + ",rank=" + rank + ",cn=" + ancestors.get(i).getPrimaryConceptName());
                             ancestorNames.set(idx, ancestors.get(i).getPrimaryConceptName().getName());
                         }
                     }
