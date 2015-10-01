@@ -1,4 +1,4 @@
-package vars.shared.ui.video;
+package vars.avplayer;
 
 import javax.swing.JDialog;
 

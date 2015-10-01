@@ -12,7 +12,12 @@ import org.mbari.vcr4j.timer.AnnotationQueueVCR;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.videofile.VideoPlayerController;
 import vars.annotation.ui.videofile.jfxmedia.vcr.VCR;
-import vars.shared.ui.video.*;
+import vars.avplayer.AbstractVideoControlService;
+import vars.avplayer.ImageCaptureException;
+import vars.avplayer.ImageCaptureService;
+import vars.avplayer.VideoControlService;
+import vars.avplayer.VideoControlStatus;
+import vars.avplayer.VideoTime;
 
 /**
  * Created by brian on 12/16/13.

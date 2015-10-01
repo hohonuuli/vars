@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package vars.shared.ui.video;
+package vars.avplayer;
 
 import org.mbari.vcr4j.IVCR;
 import org.mbari.vcr4j.IVCRError;

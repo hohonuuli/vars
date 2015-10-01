@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package vars.shared.ui.video;
+package vars.avplayer;
 
 import java.awt.Image;
 import java.io.File;
@@ -27,7 +27,7 @@ public interface ImageCaptureService {
     /**
      *
      * @return THe image captured from the QuickTime source
-     * @throws vars.shared.ui.video.ImageCaptureException
+     * @throws ImageCaptureException
      */
     Image capture(String timecode) throws ImageCaptureException;
 

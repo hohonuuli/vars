@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package vars.shared.ui.video;
+package vars.avplayer;
 
 import vars.VARSException;
 

@@ -13,7 +13,7 @@
 
 
 
-package vars.shared.ui.video;
+package vars.avplayer;
 
 import java.awt.Frame;
 import java.awt.Image;

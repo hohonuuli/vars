@@ -93,6 +93,11 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>vars-avplayer-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>vars-avfoundation</artifactId>
             <version>${project.version}</version>
         </dependency>

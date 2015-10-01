@@ -1,11 +1,7 @@
 package vars.annotation.ui.videofile;
 
-import vars.annotation.VideoArchive;
-import vars.shared.ui.video.ImageCaptureService;
-import vars.shared.ui.video.VideoControlService;
-
-import javax.swing.*;
-import java.awt.*;
+import vars.avplayer.ImageCaptureService;
+import vars.avplayer.VideoControlService;
 
 /**
  * Created by brian on 1/6/14.

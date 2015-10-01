@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 import vars.UserAccount;
 import vars.annotation.ui.Lookup;
 import vars.shared.preferences.PreferenceUpdater;
-import vars.shared.ui.video.ImageCaptureService;
+import vars.avplayer.ImageCaptureService;
 
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.*;

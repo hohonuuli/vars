@@ -7,7 +7,7 @@ package vars.annotation.ui.video;
 
 import java.util.Date;
 import vars.annotation.ui.Lookup;
-import vars.shared.ui.video.VideoTime;
+import vars.avplayer.VideoTime;
 
 /**
  *
