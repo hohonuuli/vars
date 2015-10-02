@@ -1,11 +1,6 @@
 package vars.avplayer;
 
-import vars.annotation.ui.videofile.*;
-import vars.avplayer.AbstractVideoControlService;
-import vars.avplayer.FakeImageCaptureServiceImpl;
-import vars.avplayer.ImageCaptureService;
-import vars.avplayer.VideoControlService;
-import vars.avplayer.VideoTime;
+
 
 import javax.swing.*;
 

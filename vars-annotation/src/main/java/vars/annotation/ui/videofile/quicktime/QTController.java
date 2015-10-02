@@ -1,7 +1,8 @@
 package vars.annotation.ui.videofile.quicktime;
 
-import vars.annotation.ui.videofile.VideoPlayerController;
 //import vars.quicktime.QTVideoControlServiceImpl;
+
+import vars.avplayer.VideoPlayerController;
 
 import javax.swing.*;
 

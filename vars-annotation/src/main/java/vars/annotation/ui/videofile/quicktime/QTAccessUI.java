@@ -1,11 +1,12 @@
 package vars.annotation.ui.videofile.quicktime;
 
 import org.mbari.util.Tuple2;
+import vars.ToolBelt;
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.VideoArchive;
-import vars.annotation.ui.ToolBelt;
 import vars.avplayer.AbstractAccessUI;
 import vars.avplayer.DefaultVideoPlayerDialogUI;
+import vars.avplayer.LookupService;
 import vars.avplayer.VideoParams;
 import vars.avplayer.VideoPlayerController;
 import vars.avplayer.VideoPlayerDialogUI;
@@ -22,10 +23,12 @@ public class QTAccessUI extends AbstractAccessUI {
     private VideoPlayerDialogUI dialog;
     private Window currentParent;
     //private QTController controller = new QTController();
+    private final LookupService lookupService;
 
     @Inject
-    public QTAccessUI(AnnotationDAOFactory daoFactory) {
+    public QTAccessUI(AnnotationDAOFactory daoFactory, LookupService lookupService) {
         super(daoFactory);
+        this.lookupService = lookupService;
     }
 
     @Override
@@ -39,7 +42,7 @@ public class QTAccessUI extends AbstractAccessUI {
 
         // create new dialog if needed
         if (dialog == null) {
-            dialog = new DefaultVideoPlayerDialogUI(parent, toolBelt, this);
+            dialog = new DefaultVideoPlayerDialogUI(parent, toolBelt, this, lookupService);
             currentParent = parent;
         }
 

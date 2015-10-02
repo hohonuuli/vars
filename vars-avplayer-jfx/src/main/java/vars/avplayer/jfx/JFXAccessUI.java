@@ -6,6 +6,7 @@ import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.VideoArchive;
 import vars.avplayer.AbstractAccessUI;
 import vars.avplayer.DefaultVideoPlayerDialogUI;
+import vars.avplayer.LookupService;
 import vars.avplayer.VideoParams;
 import vars.avplayer.VideoPlayerController;
 import vars.avplayer.VideoPlayerDialogUI;
@@ -22,10 +23,12 @@ public class JFXAccessUI extends AbstractAccessUI {
     private VideoPlayerDialogUI dialog;
     private Window currentParent;
     private JFXVideoControlServiceImpl controller = new JFXVideoControlServiceImpl();
+    private final LookupService lookupService;
 
     @Inject
-    public JFXAccessUI(AnnotationDAOFactory daoFactory) {
+    public JFXAccessUI(AnnotationDAOFactory daoFactory, LookupService lookupService) {
         super(daoFactory);
+        this.lookupService = lookupService;
     }
 
     @Override
@@ -38,7 +41,7 @@ public class JFXAccessUI extends AbstractAccessUI {
 
         // create new dialog if needed
         if (dialog == null) {
-            dialog = new DefaultVideoPlayerDialogUI(parent, toolBelt, this);
+            dialog = new DefaultVideoPlayerDialogUI(parent, toolBelt, this, lookupService);
             currentParent = parent;
         }
         return dialog;
