@@ -19,5 +19,10 @@
             <artifactId>vars-shared-ui</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mbari</groupId>
+            <artifactId>mbarix4j</artifactId>
+            <version>${mbarix4j.version}</version>
+        </dependency>
     </dependencies>
 </project>

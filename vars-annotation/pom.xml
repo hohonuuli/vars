@@ -21,6 +21,7 @@
                 <filtering>true</filtering>
                 <includes>
                     <include>annotation-app.properties</include>
+                    <include>vars/annotation/app.conf</include>
                 </includes>
             </resource>
             <resource>
@@ -28,6 +29,7 @@
                 <filtering>false</filtering>
                 <excludes>
                     <exclude>annotation-app.properties</exclude>
+                    <exclude>vars/annotation/app.conf</exclude>
                 </excludes>
             </resource>
         </resources>

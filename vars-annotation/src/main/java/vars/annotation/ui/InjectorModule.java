@@ -13,24 +13,16 @@ import java.util.ResourceBundle;
  */
 public class InjectorModule implements Module {
 
-    private static ResourceBundle bundle;  // HACK! Must be static
+    private final vars.shared.InjectorModule varsIJ;
 
-    /**
-     * Constructs ...
-     *
-     * @param bundle
-     */
-    public InjectorModule(ResourceBundle bundle) {
+    public InjectorModule(String annotationPersistenceUnit,
+            String knowledgebasePersistenceUnit,
+            String miscPersistenceUnit) {
+        varsIJ = new vars.shared.InjectorModule(annotationPersistenceUnit,
+                knowledgebasePersistenceUnit,
+                miscPersistenceUnit);
 
-    }
 
-    /**
-     * Constructs ...
-     *
-     * @param bundleName
-     */
-    public InjectorModule(String bundleName) {
-        this(ResourceBundle.getBundle(bundleName, Locale.US));
     }
 
     /**
@@ -39,14 +31,14 @@ public class InjectorModule implements Module {
      */
     public void configure(Binder binder) {
         try {
-            binder.install(new vars.shared.InjectorModule(bundle));
+            binder.install(varsIJ);
         }
         catch (Exception ex) {
             throw new VARSException("Failed to initialize VARS shared dependency injection", ex);
         }
 
         try {
-            binder.install(new vars.avplayer.InjectorModule(bundle));
+            binder.install(new vars.avplayer.InjectorModule());
         }
         catch (Exception e)  {
             throw new VARSException("Failed to intialize VARS avplayer dependency injection", e);

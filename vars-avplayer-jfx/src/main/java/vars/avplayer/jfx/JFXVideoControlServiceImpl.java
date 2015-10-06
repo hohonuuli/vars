@@ -2,7 +2,9 @@ package vars.avplayer.jfx;
 
 import java.awt.*;
 import java.io.File;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import javax.swing.*;
 
 import org.mbari.vcr4j.*;
@@ -28,6 +30,7 @@ public class JFXVideoControlServiceImpl  extends AbstractVideoControlService
     private JFXMovieFrame movieFrame = new JFXMovieFrame();
     private final JFXTimecode vcrTimcode = new JFXTimecode();
     private final JFXState vcrState = new JFXState();
+    private static final List<String> ACCEPTABLE_MIMETYPES = Arrays.asList("video/mp4");
 
     public JFXVideoControlServiceImpl() {
         movieFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
@@ -154,5 +157,12 @@ public class JFXVideoControlServiceImpl  extends AbstractVideoControlService
         vcrTimcode.setVCR(vcr);
         vcrState.setVcr(vcr);
         super.setVcr(vcr);
+    }
+
+    @Override
+    public boolean canPlay(String mimeType) {
+        return ACCEPTABLE_MIMETYPES.stream()
+                .filter(s -> s.equalsIgnoreCase(mimeType))
+                .count() > 0;
     }
 }

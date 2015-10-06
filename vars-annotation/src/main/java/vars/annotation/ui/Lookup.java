@@ -226,7 +226,8 @@ public class Lookup extends GlobalLookup {
         final Dispatcher dispatcher = Dispatcher.getDispatcher(KEY_DISPATCHER_GUICE_INJECTOR);
         Injector injector = (Injector) dispatcher.getValueObject();
         if (injector == null) {
-            injector = Guice.createInjector(new InjectorModule(RESOURCE_BUNDLE));
+            // HACK: Remove hardcoded names once switch to typesafe config is complete
+            injector = Guice.createInjector(new InjectorModule("vars-jpa-annotation", "vars-jpa-knowledgebase", "vars-jpa-misc"));
             dispatcher.setValueObject(injector);
         }
 

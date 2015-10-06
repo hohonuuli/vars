@@ -15,6 +15,5 @@ public interface VideoControlInformation {
 
     VideoControlStatus getVideoControlStatus();
 
-
 }
 

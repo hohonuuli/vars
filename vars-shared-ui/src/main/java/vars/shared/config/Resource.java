@@ -1,4 +1,4 @@
-package vars.queryfx.config;
+package vars.shared.config;
 
 import com.google.common.base.Preconditions;
 import com.typesafe.config.Config;
@@ -11,13 +11,19 @@ import java.util.Optional;
 /**
  * @author Brian Schlining
  * @since 2015-07-19T12:50:00
- * @deprecated Use vars.shared.config.Resource instead
  */
 public class Resource {
 
     private final Config config;
     private final Logger log = LoggerFactory.getLogger(getClass());
 
+    /**
+     * Typesafe's config uses a slightly weird resource path. Don't use "/"
+     * instead for a resource don't use the absolute ref: e.g. Do not use
+     * "/vars/queryfx/app" use "vars/queryfx/app
+     *
+     * @param resource Path to config file
+     */
     public Resource(String resource) {
         Preconditions.checkArgument(resource != null, "Resource argument can not be null");
         config = ConfigFactory.load(resource);

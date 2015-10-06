@@ -31,27 +31,14 @@ public class InjectorModule implements Module {
     private final String annotationPersistenceUnit;
     private final String knowledgebasePersistenceUnit;
     private final String miscPersistenceUnit;
-    private static ResourceBundle bundle;  // HACK! Must be static
 
-    /**
-     * Constructs ...
-     *
-     * @param bundle
-     */
-    public InjectorModule(ResourceBundle bundle) {
-        this.bundle = bundle;
-        annotationPersistenceUnit = bundle.getString("annotation.persistence.unit");
-        knowledgebasePersistenceUnit = bundle.getString("knowledgebase.persistence.unit");
-        miscPersistenceUnit = bundle.getString("misc.persistence.unit");
-    }
 
-    /**
-     * Constructs ...
-     *
-     * @param bundleName
-     */
-    public InjectorModule(String bundleName) {
-        this(ResourceBundle.getBundle(bundleName, Locale.US));
+    public InjectorModule(String annotationPersistenceUnit,
+            String knowledgebasePersistenceUnit,
+            String miscPersistenceUnit) {
+        this.annotationPersistenceUnit = annotationPersistenceUnit;
+        this.knowledgebasePersistenceUnit = knowledgebasePersistenceUnit;
+        this.miscPersistenceUnit = miscPersistenceUnit;
     }
 
     /**

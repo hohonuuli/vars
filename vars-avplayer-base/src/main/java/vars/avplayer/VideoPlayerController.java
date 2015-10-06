@@ -2,7 +2,7 @@ package vars.avplayer;
 
 
 /**
- * Created by brian on 1/6/14.
+ * This is an SPI service.
  */
 public interface VideoPlayerController {
 
@@ -13,6 +13,8 @@ public interface VideoPlayerController {
     String getMovieLocation();
 
     void close();
+
+    boolean canPlay(String mimeType);
 
 }
 

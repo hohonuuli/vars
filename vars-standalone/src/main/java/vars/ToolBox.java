@@ -65,7 +65,8 @@ public class ToolBox {
 class ScriptingModule implements Module {
 
     public void configure(Binder binder) {
-        binder.install(new InjectorModule("annotation-app"));
+        // HACK: Hard-wired JPA names. Change to typesafe config
+        binder.install(new InjectorModule("vars-jpa-annotation", "vars-jpa-knowledgebase", "vars-jpa-misc"));
         binder.install(new ExpdModule());
         binder.bind(MergeStatusDAO.class).to(MergeStatusDAOImpl.class).in(Scopes.SINGLETON);
         binder.bind(MergeHistoryDAO.class).to(MergeHistoryDAOImpl.class).in(Scopes.SINGLETON);
