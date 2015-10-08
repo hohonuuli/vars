@@ -57,7 +57,7 @@ public class DefaultVideoPlayerDialogUI extends StandardDialog implements VideoP
     private JLabel selectTimeSourcelbl;
     private JComboBox timeSourceComboBox;
     private Runnable onOkayFunction = DO_NOTHING_FUNCTION;
-    private final LookupService lookupService;
+    //private final LookupService lookupService;
 
 
 //    /**
@@ -81,7 +81,7 @@ public class DefaultVideoPlayerDialogUI extends StandardDialog implements VideoP
         super(parent);
         this.toolBelt = toolBelt;
         this.controller = controller;
-        this.lookupService = lookupService;
+        //this.lookupService = lookupService;
         /*
          * We're adding a slight delay here so that db lookups don't try to
          * occur as a person types.

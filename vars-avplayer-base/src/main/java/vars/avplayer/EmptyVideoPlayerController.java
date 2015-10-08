@@ -56,4 +56,9 @@ public class EmptyVideoPlayerController implements VideoPlayerController {
     public boolean canPlay(String mimeType) {
         return true;
     }
+
+    @Override
+    public String getName() {
+        return "None";
+    }
 }

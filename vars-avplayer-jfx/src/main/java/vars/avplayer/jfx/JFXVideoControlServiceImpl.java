@@ -165,4 +165,9 @@ public class JFXVideoControlServiceImpl  extends AbstractVideoControlService
                 .filter(s -> s.equalsIgnoreCase(mimeType))
                 .count() > 0;
     }
+
+    @Override
+    public String getName() {
+        return "JavaFX";
+    }
 }

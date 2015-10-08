@@ -92,4 +92,10 @@ public interface AnnotationPersistenceService {
      */
     Long findTimeCodeByVideoArchiveName(String timecode, String videoArchiveName);
 
+    /**
+     * Look up all camera platforms found in the database.
+     * @return
+     */
+    List<String> findAllCameraPlatforms();
+
 }

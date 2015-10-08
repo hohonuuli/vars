@@ -373,7 +373,21 @@ public class AnnotationPersistenceServiceImpl extends QueryableImpl implements A
         };
         return executeQueryFunction(sql, queryFunction);
     }
-    
+
+
+    @Override
+    public List<String> findAllCameraPlatforms() {
+        // TODO search in annotation-app.properties
+        final Collection<String> cameraPlatforms = VARSProperties.getCameraPlatforms();
+        String[] cp = new String[cameraPlatforms.size()];
+        cameraPlatforms.toArray(cp);
+        Arrays.sort(cp, new IgnoreCaseToStringComparator());
+        return cp;
+        // TODO search in app.conf
+        // TODO Fetch all values in database
+
+        return null;
+    }
 
     private class MyCacheClearedListener implements CacheClearedListener {
 

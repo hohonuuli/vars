@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.ServiceLoader;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author Brian Schlining
@@ -25,8 +24,12 @@ public interface LookupService {
                 .collect(Collectors.toList());
     }
 
+    default ServiceLoader<VideoPlayerAccessUI> loadVideoPlayerAccessUIs() {
+        return ServiceLoader.load(VideoPlayerAccessUI.class);
+    }
+
     CompletableFuture<List<String>> findCameraPlatforms();
 
-    Collection<VideoMetadata> findVideos(String platformName, Integer sequenceNumber, Integer videoNumber);
+    CompletableFuture<Collection<VideoMetadata>> findVideos(String platformName, Integer sequenceNumber, Integer videoNumber);
 
 }
