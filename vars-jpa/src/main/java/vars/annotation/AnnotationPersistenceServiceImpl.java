@@ -27,10 +27,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import org.mbari.text.IgnoreCaseToStringComparator;
+import org.mbari.util.stream.StreamUtilities;
 import vars.*;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
@@ -361,32 +363,65 @@ public class AnnotationPersistenceServiceImpl extends QueryableImpl implements A
                 "VideoArchive AS va ON vf.VideoArchiveID_FK = va.id WHERE " +
                 "va.videoArchiveName = '" + videoArchiveName + "' AND vf.TapeTimeCode = '" +
                 timecode + "'";
-        QueryFunction<Long> queryFunction = new QueryFunction<Long>() {
-            @Override
-            public Long apply(ResultSet resultSet) throws SQLException {
-                Long id = null;
-                if (resultSet.next()) {
-                    id = resultSet.getLong(1);
-                }
-                return id;
+        QueryFunction<Long> queryFunction = (resultSet) -> {
+            Long id = null;
+            if (resultSet.next()) {
+                id = resultSet.getLong(1);
             }
+            return id;
         };
+
+//        QueryFunction<Long> queryFunction = new QueryFunction<Long>() {
+//            @Override
+//            public Long apply(ResultSet resultSet) throws SQLException {
+//                Long id = null;
+//                if (resultSet.next()) {
+//                    id = resultSet.getLong(1);
+//                }
+//                return id;
+//            }
+//        };
         return executeQueryFunction(sql, queryFunction);
     }
 
 
     @Override
     public List<String> findAllCameraPlatforms() {
-        // TODO search in annotation-app.properties
-        final Collection<String> cameraPlatforms = VARSProperties.getCameraPlatforms();
-        String[] cp = new String[cameraPlatforms.size()];
-        cameraPlatforms.toArray(cp);
-        Arrays.sort(cp, new IgnoreCaseToStringComparator());
-        return cp;
-        // TODO search in app.conf
-        // TODO Fetch all values in database
+        List<String> cameraPlatforms = new ArrayList<>();
 
-        return null;
+        // --- Search in annotation-app.properties
+        // HACK: Hardcoded the annotation-app
+        try {
+            ResourceBundle bundle = ResourceBundle.getBundle("annotation-app", Locale.US);
+            List<String> cps = StreamUtilities.toStream(bundle.getKeys())
+                    .filter(s -> s.startsWith("cameraplatform"))
+                    .map(bundle::getString)
+                    .collect(Collectors.toList());
+            cameraPlatforms.addAll(cps);
+        }
+        catch (Exception e) {
+            log.debug("Failed to load camera platforms from annotation-app.properties", e);
+        }
+
+        // TODO search in app.conf
+
+        // --- Fetch all values in database
+        String sql = "SELECT DISTINCT PlatformName FROM VideoArchiveSet";
+        QueryFunction<List<String>> queryFunction = resultSet -> {
+            List<String> cps = new ArrayList<>();
+            while (resultSet.next()) {
+                cps.add(resultSet.getString(1));
+            }
+            return cps;
+        };
+        try {
+            cameraPlatforms.addAll(executeQueryFunction(sql, queryFunction));
+        }
+        catch (Exception e) {
+            log.debug("Failed to fetch cameraplatforms from database", e);
+        }
+
+        return cameraPlatforms;
     }
 
     private class MyCacheClearedListener implements CacheClearedListener {

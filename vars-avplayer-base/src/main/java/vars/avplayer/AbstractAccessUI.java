@@ -10,27 +10,22 @@ import java.util.Optional;
  * Created by brian on 1/22/14.
  */
 public abstract class AbstractAccessUI implements VideoPlayerAccessUI {
-    //private final AnnotationDAOFactory daoFactory;
 
-    //protected AbstractAccessUI(AnnotationDAOFactory daoFactory) {
-    //    this.daoFactory = daoFactory;
-    //}
-
-    public Optional<VideoArchive> findByLocation(String location, VideoArchiveDAO dao) {
-        //VideoArchiveDAO dao = daoFactory.newVideoArchiveDAO();
+    public Optional<VideoArchive> findByLocation(String location, AnnotationDAOFactory daoFactory) {
+        VideoArchiveDAO dao = daoFactory.newVideoArchiveDAO();
         dao.startTransaction();
         VideoArchive videoArchive = dao.findByName(location);
         dao.endTransaction();
         return Optional.ofNullable(videoArchive);
     }
 
-    public VideoArchive createVideoArchive(VideoParams videoParams, VideoArchiveDAO dao) {
+    public VideoArchive createVideoArchive(VideoParams videoParams, AnnotationDAOFactory daoFactory) {
         VideoArchive videoArchive = null;
         if (videoParams.getPlatformNameOpt().isPresent() && videoParams.getSequenceNumberOpt().isPresent()) {
             String location = videoParams.getMovieLocation();
             int sequenceNumber = videoParams.getSequenceNumberOpt().get();
             String platform = videoParams.getPlatformNameOpt().get();
-            //VideoArchiveDAO dao = daoFactory.newVideoArchiveDAO();
+            VideoArchiveDAO dao = daoFactory.newVideoArchiveDAO();
             dao.startTransaction();
             videoArchive = dao.findOrCreateByParameters(platform, sequenceNumber, location);
             dao.endTransaction();
@@ -38,7 +33,5 @@ public abstract class AbstractAccessUI implements VideoPlayerAccessUI {
         return videoArchive;
     }
 
-    //protected AnnotationDAOFactory getAnnotationDAOFactory() {
-    //    return daoFactory;
-    //}
+
 }

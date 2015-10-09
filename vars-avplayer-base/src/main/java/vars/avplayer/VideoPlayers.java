@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 
 /**
@@ -23,25 +24,12 @@ public class VideoPlayers {
     @Inject
     public VideoPlayers(AnnotationDAOFactory daoFactory) {
         ServiceLoader<VideoPlayerAccessUI> serviceLoader = ServiceLoader.load(VideoPlayerAccessUI.class);
-        StreamUtilities.toStream(serviceLoader)
-                .map(vp -> buildVideoPlayer())
-        List<VideoPlayer> vps = new ArrayList<>();
-        //buildVideoPlayer("Built-in", () -> new JFXAccessUI(daoFactory)).ifPresent(vps::add);
-        //buildVideoPlayer("QuickTime", () -> new QTAccessUI(daoFactory)).ifPresent(vps::add);
-        //buildVideoPlayer("Mac OS X", () -> new AVFAccessUI(daoFactory)).ifPresent(vps::add);
+        List<VideoPlayer> vps =  StreamUtilities.toStream(serviceLoader.iterator())
+                .map(vp -> new VideoPlayer(vp.getName(), vp))
+                .collect(Collectors.toList());
         playerList = ImmutableList.copyOf(vps);
     }
 
-    private Optional<VideoPlayer> buildVideoPlayer(String name, Supplier<VideoPlayerAccessUI> factory) {
-        Optional<VideoPlayer> vpOpt;
-        try {
-            vpOpt = Optional.of(new VideoPlayer(name, factory.get()));
-        }
-        catch (Exception e) {
-            vpOpt = Optional.empty();
-        }
-        return vpOpt;
-    }
 
     public List<VideoPlayer> get() { return playerList; }
 }

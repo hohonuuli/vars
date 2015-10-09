@@ -11,6 +11,8 @@ import vars.CacheClearedEvent;
 import vars.CacheClearedListener;
 import vars.ToolBelt;
 import vars.VARSException;
+import vars.annotation.AnnotationDAOFactory;
+import vars.annotation.AnnotationPersistenceService;
 import vars.annotation.CameraDeployment;
 import vars.annotation.VideoArchive;
 import vars.shared.ui.dialogs.StandardDialog;
@@ -57,7 +59,6 @@ public class DefaultVideoPlayerDialogUI extends StandardDialog implements VideoP
     private JLabel selectTimeSourcelbl;
     private JComboBox timeSourceComboBox;
     private Runnable onOkayFunction = DO_NOTHING_FUNCTION;
-    //private final LookupService lookupService;
 
 
 //    /**
@@ -77,11 +78,10 @@ public class DefaultVideoPlayerDialogUI extends StandardDialog implements VideoP
     /**
      * Create the dialog.
      */
-    public DefaultVideoPlayerDialogUI(final Window parent, final ToolBelt toolBelt, VideoPlayerAccessUI controller, LookupService lookupService) {
+    public DefaultVideoPlayerDialogUI(final Window parent, final ToolBelt toolBelt, VideoPlayerAccessUI controller) {
         super(parent);
         this.toolBelt = toolBelt;
         this.controller = controller;
-        //this.lookupService = lookupService;
         /*
          * We're adding a slight delay here so that db lookups don't try to
          * occur as a person types.
@@ -242,7 +242,10 @@ public class DefaultVideoPlayerDialogUI extends StandardDialog implements VideoP
         //final Collection<String> cameraPlatforms = VARSProperties.getCameraPlatforms();
         String[] cp = {""};
         try {
-            List<String> cameraPlatforms = lookupService.findCameraPlatforms().get(5, TimeUnit.SECONDS);
+            AnnotationPersistenceService aps = toolBelt.getAnnotationPersistenceService();
+            AnnotationDAOFactory daoFactory = toolBelt.getAnnotationDAOFactory();
+            List<String> cameraPlatforms = aps.findAllCameraPlatforms();
+            // List<String> cameraPlatforms = lookupService.findCameraPlatforms().get(5, TimeUnit.SECONDS);
             cp = new String[cameraPlatforms.size()];
             cameraPlatforms.toArray(cp);
             Arrays.sort(cp, new IgnoreCaseToStringComparator());
@@ -426,7 +429,8 @@ public class DefaultVideoPlayerDialogUI extends StandardDialog implements VideoP
     }
 
     private void updateVideoArchiveParameters() {
-        Optional<VideoArchive> videoArchiveOpt = controller.findByLocation(getUrlTextField().getText());
+        Optional<VideoArchive> videoArchiveOpt = controller.findByLocation(getUrlTextField().getText(),
+                toolBelt.getAnnotationDAOFactory());
         if (videoArchiveOpt.isPresent()) {
             VideoArchive videoArchive = videoArchiveOpt.get();
             getSequenceNumberTextField().setEnabled(false);
@@ -485,7 +489,7 @@ public class DefaultVideoPlayerDialogUI extends StandardDialog implements VideoP
 
         VideoParams params = new VideoParams(getUrlTextField().getText(), platformOpt, sequenceNumberOpt,
                 timeSourceOpt);
-        return controller.openMoviePlayer(params);
+        return controller.openMoviePlayer(params, toolBelt.getAnnotationDAOFactory());
     }
 
     class SelectedRBItemListener implements ItemListener {

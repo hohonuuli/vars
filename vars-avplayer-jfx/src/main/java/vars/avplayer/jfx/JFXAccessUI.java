@@ -23,13 +23,7 @@ public class JFXAccessUI extends AbstractAccessUI {
     private VideoPlayerDialogUI dialog;
     private Window currentParent;
     private JFXVideoControlServiceImpl controller = new JFXVideoControlServiceImpl();
-    private final LookupService lookupService;
 
-    @Inject
-    public JFXAccessUI(AnnotationDAOFactory daoFactory, LookupService lookupService) {
-        super(daoFactory);
-        this.lookupService = lookupService;
-    }
 
     @Override
     public VideoPlayerDialogUI getOpenDialog(Window parent, ToolBelt toolBelt) {
@@ -41,17 +35,22 @@ public class JFXAccessUI extends AbstractAccessUI {
 
         // create new dialog if needed
         if (dialog == null) {
-            dialog = new DefaultVideoPlayerDialogUI(parent, toolBelt, this, lookupService);
+            dialog = new DefaultVideoPlayerDialogUI(parent, toolBelt, this);
             currentParent = parent;
         }
         return dialog;
     }
 
     @Override
-    public Tuple2<VideoArchive, VideoPlayerController> openMoviePlayer(VideoParams videoParams) {
-        Optional<VideoArchive> videoArchiveOpt = findByLocation(videoParams.getMovieLocation());
-        VideoArchive videoArchive = videoArchiveOpt.orElseGet(() -> createVideoArchive(videoParams));
+    public Tuple2<VideoArchive, VideoPlayerController> openMoviePlayer(VideoParams videoParams, AnnotationDAOFactory daoFactory) {
+        Optional<VideoArchive> videoArchiveOpt = findByLocation(videoParams.getMovieLocation(), daoFactory);
+        VideoArchive videoArchive = videoArchiveOpt.orElseGet(() -> createVideoArchive(videoParams, daoFactory));
         controller.getVideoControlService().connect(videoArchive.getName());
         return new Tuple2<>(videoArchive, controller);
+    }
+
+    @Override
+    public String getName() {
+        return "Java FX";
     }
 }

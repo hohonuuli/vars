@@ -2,6 +2,7 @@ package vars.avplayer;
 
 import org.mbari.util.Tuple2;
 import vars.ToolBelt;
+import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.VideoArchive;
 
 
@@ -34,7 +35,7 @@ public interface VideoPlayerAccessUI {
      * @return A tuple of the VideoArchive that references the movie location as well as a VideoPlayerController that
      * can be used to control the display of the movie file
      */
-    Tuple2<VideoArchive, VideoPlayerController> openMoviePlayer(VideoParams videoParams);
+    Tuple2<VideoArchive, VideoPlayerController> openMoviePlayer(VideoParams videoParams, AnnotationDAOFactory daoFactory);
 
     /**
      *
@@ -42,13 +43,15 @@ public interface VideoPlayerAccessUI {
      * @return The matching VideoArchive, based on the movie URL. If no match is found the returned Optional will be
      *      empty
      */
-    Optional<VideoArchive> findByLocation(String location);
+    Optional<VideoArchive> findByLocation(String location, AnnotationDAOFactory daoFactory);
 
     /**
      * Creates a new VideoArchive based on the videoParams
      * @param videoParams
      * @return a new VideoArchive based on the videoParams
      */
-    VideoArchive createVideoArchive(VideoParams videoParams);
+    VideoArchive createVideoArchive(VideoParams videoParams, AnnotationDAOFactory daoFactory);
+
+    String getName();
 
 }

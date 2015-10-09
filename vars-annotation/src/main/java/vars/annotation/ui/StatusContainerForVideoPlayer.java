@@ -35,9 +35,11 @@ public class StatusContainerForVideoPlayer extends JPanel {
     private JComboBox<String> videoPlayerComboBox;
     private StatusLabel statusLabel;
     private VideoPlayers videoPlayers;
+    private final ToolBelt toolBelt;
 
     public StatusContainerForVideoPlayer(final ToolBelt toolBelt) {
         super();
+        this.toolBelt = toolBelt;
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         videoPlayers = new VideoPlayers(toolBelt.getAnnotationDAOFactory());
         statusLabel = new StatusLabelForVideoPlayer(toolBelt);
@@ -154,7 +156,8 @@ public class StatusContainerForVideoPlayer extends JPanel {
                     dialog.onOkay(() -> {
                         dialog.setVisible(false);
                         final VideoParams videoParams = dialog.getVideoParams();
-                        Tuple2<VideoArchive, VideoPlayerController> t = accessUI.openMoviePlayer(videoParams);
+                        Tuple2<VideoArchive, VideoPlayerController> t = accessUI.openMoviePlayer(videoParams,
+                                toolBelt.getAnnotationDAOFactory());
                         VideoArchive videoArchive = t.getA();
                         VideoPlayerController videoPlayerController = t.getB();
                         VideoArchiveChangedEvent event = new VideoArchiveChangedEvent(this, videoArchive);
