@@ -181,6 +181,12 @@
             </properties>
         </profile>
         <profile>
+            <id>shoredev</id>
+            <properties>
+                <environment>shoredev</environment>
+            </properties>
+        </profile>
+        <profile>
             <id>simpa</id>
             <properties>
                 <environment>simpa</environment>

@@ -131,9 +131,9 @@
         </profile>
         <profile>
             <id>dev</id>
-            <!-- activation>
+            <activation>
                 <activeByDefault>true</activeByDefault>
-            </activation -->
+            </activation>
             <properties>
                 <environment>dev</environment>
             </properties>
