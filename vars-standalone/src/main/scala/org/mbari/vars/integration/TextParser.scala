@@ -21,19 +21,19 @@ class TextParser(val url: URL, delimiter: String = "\t") {
 
   lazy val rows: List[String] = {
     val source = Source.fromURL(url)
-    val lines = source.getLines.filter(s => !s.startsWith("#")).toList
+    val lines = source.getLines().filter(s => !s.startsWith("#")).toList
     source.close()
     lines.tail // 1st line is the columns header
   }
 
   lazy val header: List[String] = {
     val source = Source.fromURL(url)
-    val lines = source.getLines.filter(s => s.startsWith("#")).toList
+    val lines = source.getLines().filter(s => s.startsWith("#")).toList
     source.close()
     lines
   }
 
   lazy val values: Array[Array[String]] =
-    rows.map(r => r.split(delimiter)).toArray
+    rows.map(r => r.split(delimiter).map(_.trim)).toArray
 
 }

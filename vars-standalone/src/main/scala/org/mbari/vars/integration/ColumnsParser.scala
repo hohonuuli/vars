@@ -22,7 +22,7 @@ class ColumnsParser(url: URL, delimiter: String = "\t") {
     val cs = if (!notHeaderLines.hasNext) Nil
     else {
       val columnLine = notHeaderLines.next()
-      columnLine.split(delimiter).toList
+      columnLine.split(delimiter).map(_.trim).toList
     }
     source.close()
     cs
