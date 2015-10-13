@@ -5,7 +5,7 @@
 # salinity, temperature, depth, latitude, longitude, oxygen
 
 # Example:
-# watermark_kbimages ~/Desktop/kbimages/dsg ~/Desktop/kbimages/overlay.png
+# merge_csv T0198-11HD ~/Desktop/data/shipdatagalore.csv
 
 VARS_HOME=$(cd $(dirname "$0")/..; pwd)
 VARS_CLASSPATH=$VARS_HOME/conf:$VARS_HOME/lib/*
