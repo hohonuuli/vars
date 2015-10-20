@@ -61,19 +61,16 @@ public abstract class PropertiesPanel extends javax.swing.JPanel implements IObs
      */
     public PropertiesPanel() {
         initialize();
-        Lookup.getSelectedObservationsDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
-            
-            public void propertyChange(PropertyChangeEvent evt) {
-                
-                /*
-                 * Child classes expect a single observation. If more than one has been selected then 
-                 * post a null value
-                 */
-                Collection<Observation> observations = (Collection<Observation>) evt.getNewValue();
-                Observation obs = observations.size() == 1 ? observations.iterator().next() : null;
-                update(obs, "");
-                
-            }
+        Lookup.getSelectedObservationsDispatcher().addPropertyChangeListener(evt -> {
+
+            /*
+             * Child classes expect a single observation. If more than one has been selected then
+             * post a null value
+             */
+            Collection<Observation> observations = (Collection<Observation>) evt.getNewValue();
+            Observation obs = observations.size() == 1 ? observations.iterator().next() : null;
+            update(obs, "");
+
         });
 
     }
@@ -111,8 +108,8 @@ public abstract class PropertiesPanel extends javax.swing.JPanel implements IObs
      */
     void clearValues() {
         for (final Iterator<String> i = propertyMap.keySet().iterator(); i.hasNext(); ) {
-            final String key = (String) i.next();
-            final PropertyPanel p = (PropertyPanel) propertyMap.get(key);
+            final String key = i.next();
+            final PropertyPanel p = propertyMap.get(key);
             p.setProperty(key, missingValue);
         }
     }
@@ -169,7 +166,7 @@ public abstract class PropertiesPanel extends javax.swing.JPanel implements IObs
             final Object[] args = new Object[] {};
             Object value = missingValue;
             for (final Iterator<String> i = propertyMap.keySet().iterator(); i.hasNext(); ) {
-                final String key = (String) i.next();
+                final String key = i.next();
                 final String firstLetter = key.substring(0, 1).toUpperCase();
                 final String name = "get" + firstLetter + key.substring(1, key.length());
                 try {
@@ -184,7 +181,7 @@ public abstract class PropertiesPanel extends javax.swing.JPanel implements IObs
                     value = missingValue;
                 }
 
-                final PropertyPanel p = (PropertyPanel) propertyMap.get(key);
+                final PropertyPanel p = propertyMap.get(key);
                 try {
                     p.setProperty(key, value);
                 }
@@ -232,4 +229,22 @@ public abstract class PropertiesPanel extends javax.swing.JPanel implements IObs
      * @see  org.mbari.util.IObserver#update(java.lang.Object, java.lang.Object)
      */
     public abstract void update(Object obj, Object changeCode);
+
+    protected Double readDouble(String fieldName, Double defaultValue) {
+        try {
+            return Double.parseDouble(getPropertyPanel(fieldName).getValueField().getText());
+        }
+        catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    protected Float readFloat(String fieldName, Float defaultValue) {
+        try {
+            return Float.parseFloat(getPropertyPanel(fieldName).getValueField().getText());
+        }
+        catch (Exception e) {
+            return defaultValue;
+        }
+    }
 }

@@ -33,8 +33,8 @@ class GenericMerge(val url: URL, val delimiter: String = ",") {
    *                      is found within that distance the annotation's values are set to null
    * @param daoFactory  implicit param for creating DAOs
    */
-  def apply(videoArchiveName: String, offsetSeconds: Double)(implicit daoFactory: AnnotationDAOFactory): Unit = {
-    update(collate(videoArchiveName, offsetSeconds))
+  def apply(videoArchiveName: String, offsetSeconds: Double, resetNulls: Boolean = true)(implicit daoFactory: AnnotationDAOFactory): Unit = {
+    update(collate(videoArchiveName, offsetSeconds), resetNulls)
   }
 
   /**
@@ -125,10 +125,13 @@ class GenericMerge(val url: URL, val delimiter: String = ",") {
   /**
    * Updates the fields of a VideoFrame in the database
    * @param data
+   * @param resetNulls If true null/missing values in GenericData will reset the value in the
+   *                   database to null. If false the value in the database will not be modified
+   *                   if the GenericData contains a missingValue for that field.
    * @param daoFactory
    * @return
    */
-  def update(data: Seq[(VideoFrame, Option[GenericData])])
+  def update(data: Seq[(VideoFrame, Option[GenericData])], resetNulls: Boolean = true)
                     (implicit daoFactory: AnnotationDAOFactory): Unit = {
     val dao = daoFactory.newVideoArchiveDAO()
     val vfDao = daoFactory.newVideoFrameDAO(dao.getEntityManager)
@@ -139,12 +142,22 @@ class GenericMerge(val url: URL, val delimiter: String = ",") {
       val videoFrame = vfDao.find(vf)
       val pd = videoFrame.getPhysicalData
 
-      if (gd.latitude.isNaN) pd.setLatitude(null) else pd.setLatitude(gd.latitude)
-      if (gd.longitude.isNaN) pd.setLongitude(null) else pd.setLongitude(gd.longitude)
-      if (gd.depth.isNaN) pd.setDepth(null) else pd.setDepth(gd.depth)
-      if (gd.salinity.isNaN) pd.setSalinity(null) else pd.setSalinity(gd.salinity)
-      if (gd.temperature.isNaN) pd.setTemperature(null) else pd.setTemperature(gd.salinity)
-      if (gd.oxygen.isNaN) pd.setOxygen(null) else pd.setOxygen(gd.oxygen)
+      if (resetNulls) {
+        if (gd.latitude.isNaN) pd.setLatitude(null) else pd.setLatitude(gd.latitude)
+        if (gd.longitude.isNaN) pd.setLongitude(null) else pd.setLongitude(gd.longitude)
+        if (gd.depth.isNaN) pd.setDepth(null) else pd.setDepth(gd.depth)
+        if (gd.salinity.isNaN) pd.setSalinity(null) else pd.setSalinity(gd.salinity)
+        if (gd.temperature.isNaN) pd.setTemperature(null) else pd.setTemperature(gd.salinity)
+        if (gd.oxygen.isNaN) pd.setOxygen(null) else pd.setOxygen(gd.oxygen)
+      }
+      else {
+        if (!gd.latitude.isNaN) pd.setLatitude(gd.latitude)
+        if (!gd.longitude.isNaN) pd.setLongitude(gd.longitude)
+        if (!gd.depth.isNaN) pd.setDepth(gd.depth)
+        if (!gd.salinity.isNaN) pd.setSalinity(gd.salinity)
+        if (!gd.temperature.isNaN) pd.setTemperature(gd.salinity)
+        if (!gd.oxygen.isNaN) pd.setOxygen(gd.oxygen)
+      }
     }
 
     dao.endTransaction()
@@ -157,7 +170,7 @@ object GenericMerge {
 
   def main(args: Array[String]) {
 
-    if (args.size < 2 || args.size > 3) {
+    if (args.size < 2 || args.size > 4) {
       println(
         """
           | Merge video annotations with data in a CSV file. The annotation information
@@ -166,7 +179,7 @@ object GenericMerge {
           | map data to each other.
           |
           | Usage:
-          |   GenericMerge [videoArchiveName] [csv file] [window seconds]
+          |   GenericMerge [videoArchiveName] [csv file] [window seconds] [reset missing]
           |
           | Inputs:
           |   videoArchiveName = The video archive name as stored in VARS
@@ -179,11 +192,18 @@ object GenericMerge {
           |     If an annotation is not found within this window of a row in the CSV file then the annotations
           |     position and CTD data will be set to null. Typically this window is about the same as
           |     you sample frequency. Default is a 15 seconds window (i.e +/- 7.5 seconds of an annotation)
+          |   reset missing = Allowed values: true, false. If true, then if matched row in the CSV contains a missing
+          |     value or null for a field that field in the database will be set to null. If false, the database
+          |     value for a missing field will not be altered. This is useful if you need to first merge
+          |     with a navigation file and then with a ctd file, where each file only contains some of the
+          |     data fields. The default value is false (i.e. unmatched fields in database will not be altered)
         """.stripMargin)
       return
     }
 
     val deltaSeconds = if (args.size == 3) args(2).toDouble / 2D else 7.5
+
+    val resetNulls = if (args.size == 4) Try(args(3).toBoolean).getOrElse(false) else false
 
     // --- Parse params
     val videoArchiveName = args(0)

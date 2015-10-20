@@ -84,13 +84,7 @@ public class MiscTabsPanel extends javax.swing.JPanel {
             treePanel.setJTree(tree);
             ((ConceptTreePanel) treePanel).setPopupMenu(new ConceptTreePopupMenu(tree, toolbelt.getKnowledgebaseDAOFactory()));
 
-            lookupConceptSubscriber = new EventTopicSubscriber<String>() {
-
-                public void onEvent(String topic, String data) {
-                    treePanel.goToMatchingNode(data, false);
-                }
-
-            };
+            lookupConceptSubscriber = (topic, data) -> treePanel.goToMatchingNode(data, false);
 
             // Refresh the tree if the cache is cleared
             toolbelt.getPersistenceCache().addCacheClearedListener(new CacheClearedListener() {

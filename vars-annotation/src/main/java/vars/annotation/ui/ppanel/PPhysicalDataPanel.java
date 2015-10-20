@@ -20,10 +20,22 @@ Created on October 31, 2003, 9:16 AM
  */
 package vars.annotation.ui.ppanel;
 
+import org.bushe.swing.event.EventBus;
+import org.mbari.awt.event.ActionAdapter;
+import org.mbari.swing.PropertyPanel;
 import org.mbari.util.IObserver;
+import vars.CacheClearedEvent;
+import vars.CacheClearedListener;
+import vars.annotation.ImmutablePhysicalData;
 import vars.annotation.Observation;
 import vars.annotation.PhysicalData;
 import vars.annotation.VideoFrame;
+import vars.annotation.ui.ToolBelt;
+import vars.annotation.ui.commandqueue.Command;
+import vars.annotation.ui.commandqueue.CommandEvent;
+import vars.annotation.ui.commandqueue.impl.ChangePhysicalDataCmd;
+
+import javax.swing.*;
 
 /**
  * <p>Displays the properties of a PhysicalData object.</p>
@@ -33,15 +45,48 @@ import vars.annotation.VideoFrame;
  */
 public class PPhysicalDataPanel extends PropertiesPanel implements IObserver {
 
+    private static final String[] propertyNames = {
+            "Latitude", "Longitude", "Depth", "Altitude", "Temperature", "Salinity", "Oxygen", "Light"
+    };
+    private PhysicalData physicalData;
+
+    private final ActionAdapter updateAction = new ActionAdapter() {
+        @Override
+        public void doAction() {
+            if (physicalData != null) {
+                PhysicalData newPhysicalData = readDataPanels();
+                if (newPhysicalData != null) {
+                    Command command = new ChangePhysicalDataCmd(physicalData, newPhysicalData);
+                    CommandEvent commandEvent = new CommandEvent(command);
+                    EventBus.publish(commandEvent);
+                }
+            }
+        }
+    };
 
 
     /**
      * Creates new form PPhysicalDataPanel
      */
-    public PPhysicalDataPanel() {
+    public PPhysicalDataPanel(ToolBelt toolBelt) {
         super();
-        setPropertyNames(new String[] {
-            "Latitude", "Longitude", "Depth", "Temperature", "Salinity", "Oxygen", "Light"
+        setPropertyNames(propertyNames);
+        for (String name : propertyNames) {
+            PropertyPanel panel = getPropertyPanel(name);
+            panel.getEditButton();
+            panel.setEditAction(updateAction);
+        }
+
+        toolBelt.getPersistenceCache().addCacheClearedListener(new CacheClearedListener() {
+
+            public void afterClear(CacheClearedEvent evt) {
+                update(null, null);
+            }
+
+            public void beforeClear(CacheClearedEvent evt) {
+
+                // Do nada
+            }
         });
     }
 
@@ -63,13 +108,33 @@ public class PPhysicalDataPanel extends PropertiesPanel implements IObserver {
             clearValues();
         }
         else {
-            final PhysicalData ad = vf.getPhysicalData();
-            if (ad == null) {
+            physicalData = vf.getPhysicalData();
+            if (physicalData == null) {
                 clearValues();
             }
             else {
-                setProperties(ad);
+                setProperties(physicalData);
             }
         }
     }
+
+    private PhysicalData readDataPanels() {
+        if (physicalData == null) {
+            return null;
+        }
+        else {
+            return new ImmutablePhysicalData(physicalData.getPrimaryKey(),
+                    readFloat("Altitude", physicalData.getAltitude()),
+                    readFloat("Depth", physicalData.getDepth()),
+                    readDouble("Latitude", physicalData.getLatitude()),
+                    readFloat("Light", physicalData.getLight()),
+                    physicalData.getLogDate(),
+                    readDouble("Longitude", physicalData.getLongitude()),
+                    readFloat("Oxygen", physicalData.getOxygen()),
+                    readFloat("Salinity", physicalData.getSalinity()),
+                    readFloat("Temperature", physicalData.getTemperature()));
+
+        }
+    }
+
 }

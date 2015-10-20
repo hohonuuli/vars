@@ -145,19 +145,7 @@ public class PObservationPanel extends PropertiesPanel {
         }
 
         public String getConcept() {
-            final String conceptName = observation.getConceptName();
-//            Concept out = null;
-//            try {
-//                ConceptDAO conceptDAO = toolBelt.getKnowledgebaseDAOFactory().newConceptDAO();
-//                conceptDAO.startTransaction();
-//                out = conceptDAO.findByName(conceptName);
-//                conceptDAO.endTransaction();
-//            }
-//            catch (final Exception e) {
-//                EventBus.publish(Lookup.TOPIC_FATAL_ERROR, e);
-//            }
-
-            return conceptName;
+            return observation.getConceptName();
         }
 
 
