@@ -29,6 +29,7 @@ import vars.CacheClearedListener;
 import vars.annotation.ImmutablePhysicalData;
 import vars.annotation.Observation;
 import vars.annotation.PhysicalData;
+import vars.annotation.PhysicalDataValueEq;
 import vars.annotation.VideoFrame;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.commandqueue.Command;
@@ -36,6 +37,10 @@ import vars.annotation.ui.commandqueue.CommandEvent;
 import vars.annotation.ui.commandqueue.impl.ChangePhysicalDataCmd;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import java.awt.*;
+import java.util.Comparator;
 
 /**
  * <p>Displays the properties of a PhysicalData object.</p>
@@ -49,6 +54,7 @@ public class PPhysicalDataPanel extends PropertiesPanel implements IObserver {
             "Latitude", "Longitude", "Depth", "Altitude", "Temperature", "Salinity", "Oxygen", "Light"
     };
     private PhysicalData physicalData;
+    private final PhysicalDataValueEq eq = new PhysicalDataValueEq();
 
     private final ActionAdapter updateAction = new ActionAdapter() {
         @Override
@@ -73,8 +79,10 @@ public class PPhysicalDataPanel extends PropertiesPanel implements IObserver {
         setPropertyNames(propertyNames);
         for (String name : propertyNames) {
             PropertyPanel panel = getPropertyPanel(name);
-            panel.getEditButton();
-            panel.setEditAction(updateAction);
+            JTextField valueField = panel.getValueField();
+            valueField.addActionListener(e -> updateAction.doAction());
+            valueField.getDocument().addDocumentListener(new MyDocListener(valueField));
+            panel.setEditable(true);
         }
 
         toolBelt.getPersistenceCache().addCacheClearedListener(new CacheClearedListener() {
@@ -84,10 +92,20 @@ public class PPhysicalDataPanel extends PropertiesPanel implements IObserver {
             }
 
             public void beforeClear(CacheClearedEvent evt) {
-
                 // Do nada
             }
         });
+    }
+
+    private boolean isEdited() {
+        PhysicalData a = physicalData;
+        PhysicalData b = readDataPanels();
+        if (a == null || b == null) {
+            return false;
+        }
+        else {
+            return !eq.equal(a, b);
+        }
     }
 
     /**
@@ -97,9 +115,9 @@ public class PPhysicalDataPanel extends PropertiesPanel implements IObserver {
      */
     public void update(final Object obj, final Object changeCode) {
         final Observation obs = (Observation) obj;
+
         if (obs == null) {
             clearValues();
-
             return;
         }
 
@@ -115,7 +133,11 @@ public class PPhysicalDataPanel extends PropertiesPanel implements IObserver {
             else {
                 setProperties(physicalData);
             }
+            for (String name : propertyNames) {
+                getPropertyPanel(name).getValueField().setForeground(Color.BLACK);
+            }
         }
+
     }
 
     private PhysicalData readDataPanels() {
@@ -137,4 +159,38 @@ public class PPhysicalDataPanel extends PropertiesPanel implements IObserver {
         }
     }
 
+
+    class MyDocListener implements DocumentListener {
+
+        private final JTextField textField;
+        public final Color defaultColor;
+
+        public MyDocListener(JTextField textField) {
+            this.textField = textField;
+            this.defaultColor = textField.getForeground();
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+            updateUI();
+        }
+
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            updateUI();
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            updateUI();
+        }
+
+        private void updateUI() {
+            Color color = isEdited() ? Color.RED : defaultColor;
+            textField.setForeground(color);
+        }
+
+    }
+
 }
+

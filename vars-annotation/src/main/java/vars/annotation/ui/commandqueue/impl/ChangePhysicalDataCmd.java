@@ -1,11 +1,17 @@
 package vars.annotation.ui.commandqueue.impl;
 
 import com.google.common.base.Preconditions;
+import org.bushe.swing.event.EventBus;
 import vars.annotation.ImmutablePhysicalData;
 import vars.annotation.PhysicalData;
 import vars.annotation.PhysicalDataDAO;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.commandqueue.Command;
+import vars.annotation.ui.eventbus.ObservationsChangedEvent;
+import vars.annotation.ui.eventbus.VideoFramesChangedEvent;
+
+import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * @author Brian Schlining
@@ -37,6 +43,7 @@ public class ChangePhysicalDataCmd implements Command {
         PhysicalData data = isApply ? newPhysicalData : oldPhysicalData;
         PhysicalDataDAO dao = toolBelt.getAnnotationDAOFactory().newPhysicalDataDAO();
         PhysicalData pd = dao.findByPrimaryKey(oldPhysicalData.getPrimaryKey());
+        VideoFramesChangedEvent event = null;
         if (pd != null) {
             pd.setAltitude(data.getAltitude());
             pd.setDepth(data.getDepth());
@@ -47,9 +54,13 @@ public class ChangePhysicalDataCmd implements Command {
             pd.setOxygen(data.getOxygen());
             pd.setSalinity(data.getSalinity());
             pd.setTemperature(data.getTemperature());
+            event = new VideoFramesChangedEvent(null, Collections.singletonList(pd.getVideoFrame()));
         }
         dao.endTransaction();
         dao.close();
+        if (event != null) {
+            EventBus.publish(event);
+        }
     }
 
     @Override
