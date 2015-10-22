@@ -8,109 +8,165 @@ import java.util.Date;
  */
 public class ImmutableCameraData implements CameraData {
 
+
+    private final String direction;
+    private final Double fieldWidth;
+    private final Integer focus;
+    private final Float heading;
+    private final String imageReference;
+    private final Integer iris;
+    private final Date logDate;
+    private final String name;
+    private final Float pitch;
+    private final Float roll;
+    private final Float viewHeight;
+    private final Float viewWidth;
+    private final String viewUnits;
+    private final Float x;
+    private final String xyUnits;
+    private final Float y;
+    private final Float z;
+    private final String zUnits;
+    private final Integer zoom;
+    private final Object primaryKey;
+
+    public ImmutableCameraData(Object primaryKey, String direction, Double fieldWidth, Integer focus,
+            Float heading, String imageReference, Integer iris, Date logDate, String name, Float pitch,
+            Float roll, Float viewHeight, Float viewWidth, String viewUnits, Float x, String xyUnits,
+            Float y, Float z,String zUnits, Integer zoom) {
+        this.direction = direction;
+        this.fieldWidth = fieldWidth;
+        this.focus = focus;
+        this.heading = heading;
+        this.imageReference = imageReference;
+        this.iris = iris;
+        this.logDate = logDate;
+        this.name = name;
+        this.pitch = pitch;
+        this.roll = roll;
+        this.viewHeight = viewHeight;
+        this.viewWidth = viewWidth;
+        this.viewUnits = viewUnits;
+        this.x = x;
+        this.xyUnits = xyUnits;
+        this.y = y;
+        this.z = z;
+        this.zUnits = zUnits;
+        this.zoom = zoom;
+        this.primaryKey = primaryKey;
+    }
+
+    public ImmutableCameraData(CameraData cameraData) {
+        this(cameraData.getPrimaryKey(), cameraData.getDirection(), cameraData.getFieldWidth(),
+                cameraData.getFocus(), cameraData.getHeading(), cameraData.getImageReference(),
+                cameraData.getIris(), cameraData.getLogDate(), cameraData.getName(),
+                cameraData.getPitch(), cameraData.getRoll(), cameraData.getViewHeight(),
+                cameraData.getViewWidth(), cameraData.getViewUnits(), cameraData.getX(), cameraData.getXYUnits(),
+                cameraData.getY(),cameraData.getZ(), cameraData.getZUnits(),
+                cameraData.getZoom());
+    }
+
     @Override
     public boolean containsData() {
-        return false;
+        return true;
     }
 
     @Override
     public String getDirection() {
-        return null;
+        return direction;
     }
 
     @Override
     public Double getFieldWidth() {
-        return null;
+        return fieldWidth;
     }
 
     @Override
     public Integer getFocus() {
-        return null;
+        return focus;
     }
 
     @Override
     public Float getHeading() {
-        return null;
+        return heading;
     }
 
     @Override
     public String getImageReference() {
-        return null;
+        return imageReference;
     }
 
     @Override
     public Integer getIris() {
-        return null;
+        return iris;
     }
 
     @Override
     public Date getLogDate() {
-        return null;
+        return logDate;
     }
 
     @Override
     public String getName() {
-        return null;
+        return name;
     }
 
     @Override
     public Float getPitch() {
-        return null;
+        return pitch;
     }
 
     @Override
     public Float getRoll() {
-        return null;
+        return roll;
+    }
+
+    public String getXYUnits() {
+        return xyUnits;
+    }
+
+    public String getZUnits() {
+        return zUnits;
     }
 
     @Override
     public VideoFrame getVideoFrame() {
-        return null;
+        throw new UnsupportedOperationException("Immutable objects do not have references. Use DAO find methods instead");
     }
 
     @Override
     public Float getViewHeight() {
-        return null;
-    }
-
-    @Override
-    public String getViewUnits() {
-        return null;
+        return viewHeight;
     }
 
     @Override
     public Float getViewWidth() {
-        return null;
+        return viewWidth;
+    }
+
+    @Override
+    public String getViewUnits() {
+        return viewUnits;
     }
 
     @Override
     public Float getX() {
-        return null;
-    }
-
-    @Override
-    public String getXYUnits() {
-        return null;
+        return x;
     }
 
     @Override
     public Float getY() {
-        return null;
+        return y;
     }
 
     @Override
     public Float getZ() {
-        return null;
-    }
-
-    @Override
-    public String getZUnits() {
-        return null;
+        return z;
     }
 
     @Override
     public Integer getZoom() {
-        return null;
+        return zoom;
     }
 
     @Override
@@ -210,6 +266,6 @@ public class ImmutableCameraData implements CameraData {
 
     @Override
     public Object getPrimaryKey() {
-        return null;
+        return primaryKey;
     }
 }

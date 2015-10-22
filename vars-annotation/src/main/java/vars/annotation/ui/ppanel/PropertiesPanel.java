@@ -281,4 +281,22 @@ public abstract class PropertiesPanel extends javax.swing.JPanel implements IObs
             return defaultValue;
         }
     }
+
+    protected String readString(String fieldName, String defaultValue) {
+        try {
+            return getPropertyPanel(fieldName).getValueField().getText();
+        }
+        catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    protected Integer readInteger(String fieldName, Integer defaultValue) {
+        try {
+            return Integer.parseInt(getPropertyPanel(fieldName).getValueField().getText());
+        }
+        catch (Exception e) {
+            return defaultValue;
+        }
+    }
 }

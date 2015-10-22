@@ -21,4 +21,6 @@ public interface CameraDataDAO extends DAO {
 
     List<CameraData> findByImageReferencePrefix(String prefix);
 
+    CameraData findByPrimaryKey(Object primaryKey);
+
 }

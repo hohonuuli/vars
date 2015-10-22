@@ -1,5 +1,6 @@
 package vars.annotation.jpa;
 
+import vars.annotation.PhysicalData;
 import vars.jpa.DAO;
 import vars.annotation.CameraDataDAO;
 import vars.annotation.CameraData;
@@ -52,5 +53,10 @@ public class CameraDataDAOImpl extends DAO implements CameraDataDAO {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("imageReference", prefix + "%");
         return findByNamedQuery("CameraData.findByImageReferenceLike", params);
+    }
+
+    @Override
+    public CameraData findByPrimaryKey(Object primaryKey) {
+        return findByPrimaryKey(CameraDataImpl.class, primaryKey);
     }
 }
