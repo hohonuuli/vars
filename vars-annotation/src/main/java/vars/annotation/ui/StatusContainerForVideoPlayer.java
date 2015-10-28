@@ -11,14 +11,18 @@ import org.mbari.vcr4j.timer.StatusMonitor;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
 import vars.annotation.ui.eventbus.VideoArchiveSelectedEvent;
-import vars.annotation.ui.videofile.*;
+import vars.avplayer.VideoParams;
+import vars.avplayer.VideoPlayer;
+import vars.avplayer.VideoPlayerAccessUI;
+import vars.avplayer.VideoPlayerDialogUI;
+import vars.avplayer.VideoPlayers;
+import vars.avplayer.VideoPlayerController;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
-import java.util.Optional;
 
 /**
  * DEVELOPER NOTE: Based off of StatusLabelForVideoArchive. Refer to that class if things aren't working.
@@ -31,9 +35,11 @@ public class StatusContainerForVideoPlayer extends JPanel {
     private JComboBox<String> videoPlayerComboBox;
     private StatusLabel statusLabel;
     private VideoPlayers videoPlayers;
+    private final ToolBelt toolBelt;
 
     public StatusContainerForVideoPlayer(final ToolBelt toolBelt) {
         super();
+        this.toolBelt = toolBelt;
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         videoPlayers = new VideoPlayers(toolBelt.getAnnotationDAOFactory());
         statusLabel = new StatusLabelForVideoPlayer(toolBelt);
@@ -150,7 +156,8 @@ public class StatusContainerForVideoPlayer extends JPanel {
                     dialog.onOkay(() -> {
                         dialog.setVisible(false);
                         final VideoParams videoParams = dialog.getVideoParams();
-                        Tuple2<VideoArchive, VideoPlayerController> t = accessUI.openMoviePlayer(videoParams);
+                        Tuple2<VideoArchive, VideoPlayerController> t = accessUI.openMoviePlayer(videoParams,
+                                toolBelt.getAnnotationDAOFactory());
                         VideoArchive videoArchive = t.getA();
                         VideoPlayerController videoPlayerController = t.getB();
                         VideoArchiveChangedEvent event = new VideoArchiveChangedEvent(this, videoArchive);

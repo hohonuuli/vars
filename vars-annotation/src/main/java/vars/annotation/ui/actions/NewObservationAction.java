@@ -27,21 +27,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.CacheClearedEvent;
 import vars.CacheClearedListener;
-import vars.DAO;
 import vars.UserAccount;
-import vars.annotation.CameraData;
 import vars.annotation.CameraDirections;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
-import vars.annotation.VideoFrame;
 import vars.annotation.ui.commandqueue.Command;
 import vars.annotation.ui.commandqueue.CommandEvent;
 import vars.annotation.ui.commandqueue.impl.AddObservationCmd;
 import vars.knowledgebase.ConceptName;
 import vars.annotation.ui.ToolBelt;
-import vars.shared.ui.video.VideoControlService;
+import vars.avplayer.VideoControlService;
 import vars.annotation.ui.Lookup;
-import vars.annotation.ui.PersistenceController;
 
 /**
  * <p>Action to add a new VideoFrame and a 'nearly' empty Observation

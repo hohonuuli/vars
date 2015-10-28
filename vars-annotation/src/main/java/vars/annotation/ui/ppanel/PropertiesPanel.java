@@ -28,10 +28,15 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+
+import org.bushe.swing.event.annotation.AnnotationProcessor;
+import org.bushe.swing.event.annotation.EventSubscriber;
 import org.mbari.awt.layout.VerticalFlowLayout;
 import org.mbari.swing.PropertyPanel;
 import org.mbari.util.IObserver;
@@ -39,7 +44,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import vars.annotation.Observation;
+import vars.annotation.VideoFrame;
 import vars.annotation.ui.Lookup;
+import vars.annotation.ui.eventbus.ObservationsChangedEvent;
+import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
+import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
+import vars.annotation.ui.eventbus.VideoFramesChangedEvent;
 
 /**
  * <p>A JPanel the displays a group of related properties that can be obtained
@@ -61,22 +71,43 @@ public abstract class PropertiesPanel extends javax.swing.JPanel implements IObs
      */
     public PropertiesPanel() {
         initialize();
-        Lookup.getSelectedObservationsDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
-            
-            public void propertyChange(PropertyChangeEvent evt) {
-                
-                /*
-                 * Child classes expect a single observation. If more than one has been selected then 
-                 * post a null value
-                 */
-                Collection<Observation> observations = (Collection<Observation>) evt.getNewValue();
-                Observation obs = observations.size() == 1 ? observations.iterator().next() : null;
-                update(obs, "");
-                
-            }
-        });
+//        Lookup.getSelectedObservationsDispatcher().addPropertyChangeListener(evt -> {
+//
+//            /*
+//             * Child classes expect a single observation. If more than one has been selected then
+//             * post a null value
+//             */
+//            Collection<Observation> observations = (Collection<Observation>) evt.getNewValue();
+//            Observation obs = observations.size() == 1 ? observations.iterator().next() : null;
+//            update(obs, "");
+//
+//        });
+        AnnotationProcessor.process(this);
 
     }
+
+    @EventSubscriber(eventClass = ObservationsSelectedEvent.class)
+    public void respondTo(ObservationsSelectedEvent event) {
+        Collection<Observation> observations = event.get();
+        Observation obs = observations.size() == 1 ? observations.iterator().next() : null;
+        update(obs, "");
+    }
+
+    @EventSubscriber(eventClass = VideoFramesChangedEvent.class)
+    public void respondTo(VideoFramesChangedEvent event) {
+        Collection<VideoFrame> videoFrames = event.get();
+        List<Observation> effectedObservations = videoFrames.stream()
+                .map(VideoFrame::getObservations)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
+        Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+        effectedObservations.retainAll(observations);
+        if (effectedObservations.size() == 1) {
+            update(effectedObservations.get(0), null);
+        }
+    }
+
+
 
     /**
      * Adds a tool-tip to the specified panel. The tooltip added is the contents of
@@ -111,8 +142,8 @@ public abstract class PropertiesPanel extends javax.swing.JPanel implements IObs
      */
     void clearValues() {
         for (final Iterator<String> i = propertyMap.keySet().iterator(); i.hasNext(); ) {
-            final String key = (String) i.next();
-            final PropertyPanel p = (PropertyPanel) propertyMap.get(key);
+            final String key = i.next();
+            final PropertyPanel p = propertyMap.get(key);
             p.setProperty(key, missingValue);
         }
     }
@@ -169,7 +200,7 @@ public abstract class PropertiesPanel extends javax.swing.JPanel implements IObs
             final Object[] args = new Object[] {};
             Object value = missingValue;
             for (final Iterator<String> i = propertyMap.keySet().iterator(); i.hasNext(); ) {
-                final String key = (String) i.next();
+                final String key = i.next();
                 final String firstLetter = key.substring(0, 1).toUpperCase();
                 final String name = "get" + firstLetter + key.substring(1, key.length());
                 try {
@@ -184,7 +215,7 @@ public abstract class PropertiesPanel extends javax.swing.JPanel implements IObs
                     value = missingValue;
                 }
 
-                final PropertyPanel p = (PropertyPanel) propertyMap.get(key);
+                final PropertyPanel p = propertyMap.get(key);
                 try {
                     p.setProperty(key, value);
                 }
@@ -232,4 +263,40 @@ public abstract class PropertiesPanel extends javax.swing.JPanel implements IObs
      * @see  org.mbari.util.IObserver#update(java.lang.Object, java.lang.Object)
      */
     public abstract void update(Object obj, Object changeCode);
+
+    protected Double readDouble(String fieldName, Double defaultValue) {
+        try {
+            return Double.parseDouble(getPropertyPanel(fieldName).getValueField().getText());
+        }
+        catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    protected Float readFloat(String fieldName, Float defaultValue) {
+        try {
+            return Float.parseFloat(getPropertyPanel(fieldName).getValueField().getText());
+        }
+        catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    protected String readString(String fieldName, String defaultValue) {
+        try {
+            return getPropertyPanel(fieldName).getValueField().getText();
+        }
+        catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    protected Integer readInteger(String fieldName, Integer defaultValue) {
+        try {
+            return Integer.parseInt(getPropertyPanel(fieldName).getValueField().getText());
+        }
+        catch (Exception e) {
+            return defaultValue;
+        }
+    }
 }

@@ -11,6 +11,7 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
@@ -32,6 +33,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
@@ -93,38 +95,54 @@ public class QueryResultsTableView {
 
         // Add a listener to display an image if present and row is double clicked
         final ImageStageExt ext = imageStageExt;
+
+        Function<String[], Void> showImageFn = rowItem -> {
+            List<String> urls = Arrays.stream(rowItem)
+                    .filter(s -> s.startsWith("http"))
+                    .collect(Collectors.toList());
+            if (!urls.isEmpty() && ext != null) {
+                final String imageLocation = urls.get(0);
+                final Image image = new Image(imageLocation);
+                ext.saveButton.setOnAction(v -> {
+                    try {
+                        URL imageUrl = new URL(imageLocation);
+                        fileChooser.setInitialFileName(URLUtilities.toFilename(imageUrl));
+                        File selectedFile = fileChooser.showSaveDialog(ext.imageStage);
+                        if (selectedFile != null) {
+                            URLUtilities.copy(new URL(imageLocation), selectedFile);
+                        }
+                    }
+                    catch (Exception e2) {
+                        // TODO throw exception onto eventbus
+                    }
+
+                });
+                ext.imageStage.setImage(image);
+                ext.imageStage.show();
+            }
+            return null;
+        };
+
         tableView.setRowFactory(tv -> {
             TableRow<String[]> row = new TableRow<>();
             row.setOnMouseClicked(e -> {
-                if (e.getClickCount() == 2 && ext != null) {
-                    String[] rowItem = row.getItem();
-                    List<String> urls = Arrays.stream(rowItem)
-                            .filter(s -> s.startsWith("http"))
-                            .collect(Collectors.toList());
-                    if (!urls.isEmpty()) {
-                        final String imageLocation = urls.get(0);
-                        final Image image = new Image(imageLocation);
-                        ext.saveButton.setOnAction(v -> {
-                            try {
-                                URL imageUrl = new URL(imageLocation);
-                                fileChooser.setInitialFileName(URLUtilities.toFilename(imageUrl));
-                                File selectedFile = fileChooser.showSaveDialog(ext.imageStage);
-                                if (selectedFile != null) {
-                                    URLUtilities.copy(new URL(imageLocation), selectedFile);
-                                }
-                            }
-                            catch (Exception e2) {
-                                // TODO throw exception onto eventbus
-                            }
-
-                        });
-                        ext.imageStage.setImage(image);
-                        ext.imageStage.show();
-                    }
+                if (e.getClickCount() == 2) {
+                    showImageFn.apply(row.getItem());
                 }
             });
+
             return row;
         });
+
+        tableView.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                String[] item = tableView.getSelectionModel().getSelectedItem();
+                if (item != null) {
+                    showImageFn.apply(item);
+                }
+            }
+        });
+
         return  tableView;
     }
 

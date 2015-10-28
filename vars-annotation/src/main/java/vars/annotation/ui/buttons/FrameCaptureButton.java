@@ -17,10 +17,6 @@
 
 package vars.annotation.ui.buttons;
 
-import foxtrot.Job;
-import foxtrot.Worker;
-
-import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.Action;
@@ -36,9 +32,9 @@ import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.video.SwingImageCaptureAction;
 import vars.shared.ui.DoNothingAction;
-import vars.shared.ui.video.VideoControlService;
+import vars.avplayer.VideoControlService;
 import vars.shared.ui.FancyButton;
-import vars.shared.ui.video.ImageCaptureService;
+import vars.avplayer.ImageCaptureService;
 
 /**
  * <p>

@@ -20,10 +20,27 @@ Created on October 31, 2003, 9:16 AM
  */
 package vars.annotation.ui.ppanel;
 
+import org.bushe.swing.event.EventBus;
+import org.mbari.awt.event.ActionAdapter;
+import org.mbari.swing.PropertyPanel;
 import org.mbari.util.IObserver;
+import vars.CacheClearedEvent;
+import vars.CacheClearedListener;
+import vars.annotation.ImmutablePhysicalData;
 import vars.annotation.Observation;
 import vars.annotation.PhysicalData;
+import vars.annotation.PhysicalDataValueEq;
 import vars.annotation.VideoFrame;
+import vars.annotation.ui.ToolBelt;
+import vars.annotation.ui.commandqueue.Command;
+import vars.annotation.ui.commandqueue.CommandEvent;
+import vars.annotation.ui.commandqueue.impl.ChangePhysicalDataCmd;
+
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import java.awt.*;
+import java.util.Comparator;
 
 /**
  * <p>Displays the properties of a PhysicalData object.</p>
@@ -33,16 +50,62 @@ import vars.annotation.VideoFrame;
  */
 public class PPhysicalDataPanel extends PropertiesPanel implements IObserver {
 
+    private static final String[] propertyNames = {
+            "Latitude", "Longitude", "Depth", "Altitude", "Temperature", "Salinity", "Oxygen", "Light"
+    };
+    private PhysicalData physicalData;
+    private final PhysicalDataValueEq eq = new PhysicalDataValueEq();
+
+    private final ActionAdapter updateAction = new ActionAdapter() {
+        @Override
+        public void doAction() {
+            if (physicalData != null) {
+                PhysicalData newPhysicalData = readDataPanels();
+                if (newPhysicalData != null) {
+                    Command command = new ChangePhysicalDataCmd(physicalData, newPhysicalData);
+                    CommandEvent commandEvent = new CommandEvent(command);
+                    EventBus.publish(commandEvent);
+                }
+            }
+        }
+    };
 
 
     /**
      * Creates new form PPhysicalDataPanel
      */
-    public PPhysicalDataPanel() {
+    public PPhysicalDataPanel(ToolBelt toolBelt) {
         super();
-        setPropertyNames(new String[] {
-            "Latitude", "Longitude", "Depth", "Temperature", "Salinity", "Oxygen", "Light"
+        setPropertyNames(propertyNames);
+        for (String name : propertyNames) {
+            PropertyPanel panel = getPropertyPanel(name);
+            JTextField valueField = panel.getValueField();
+            valueField.addActionListener(e -> updateAction.doAction());
+            valueField.getDocument().addDocumentListener(new MyDocListener(valueField));
+            panel.setEditable(true);
+        }
+
+        toolBelt.getPersistenceCache().addCacheClearedListener(new CacheClearedListener() {
+
+            public void afterClear(CacheClearedEvent evt) {
+                update(null, null);
+            }
+
+            public void beforeClear(CacheClearedEvent evt) {
+                // Do nada
+            }
         });
+    }
+
+    private boolean isEdited() {
+        PhysicalData a = physicalData;
+        PhysicalData b = readDataPanels();
+        if (a == null || b == null) {
+            return false;
+        }
+        else {
+            return !eq.equal(a, b);
+        }
     }
 
     /**
@@ -52,9 +115,9 @@ public class PPhysicalDataPanel extends PropertiesPanel implements IObserver {
      */
     public void update(final Object obj, final Object changeCode) {
         final Observation obs = (Observation) obj;
+
         if (obs == null) {
             clearValues();
-
             return;
         }
 
@@ -63,13 +126,71 @@ public class PPhysicalDataPanel extends PropertiesPanel implements IObserver {
             clearValues();
         }
         else {
-            final PhysicalData ad = vf.getPhysicalData();
-            if (ad == null) {
+            physicalData = vf.getPhysicalData();
+            if (physicalData == null) {
                 clearValues();
             }
             else {
-                setProperties(ad);
+                setProperties(physicalData);
+            }
+            for (String name : propertyNames) {
+                getPropertyPanel(name).getValueField().setForeground(Color.BLACK);
             }
         }
+
     }
+
+    private PhysicalData readDataPanels() {
+        if (physicalData == null) {
+            return null;
+        }
+        else {
+            return new ImmutablePhysicalData(physicalData.getPrimaryKey(),
+                    readFloat("Altitude", physicalData.getAltitude()),
+                    readFloat("Depth", physicalData.getDepth()),
+                    readDouble("Latitude", physicalData.getLatitude()),
+                    readFloat("Light", physicalData.getLight()),
+                    physicalData.getLogDate(),
+                    readDouble("Longitude", physicalData.getLongitude()),
+                    readFloat("Oxygen", physicalData.getOxygen()),
+                    readFloat("Salinity", physicalData.getSalinity()),
+                    readFloat("Temperature", physicalData.getTemperature()));
+
+        }
+    }
+
+
+    class MyDocListener implements DocumentListener {
+
+        private final JTextField textField;
+        public final Color defaultColor;
+
+        public MyDocListener(JTextField textField) {
+            this.textField = textField;
+            this.defaultColor = textField.getForeground();
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+            updateUI();
+        }
+
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            updateUI();
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            updateUI();
+        }
+
+        private void updateUI() {
+            Color color = isEdited() ? Color.RED : defaultColor;
+            textField.setForeground(color);
+        }
+
+    }
+
 }
+

@@ -11,28 +11,19 @@ import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import org.mbari.util.Tuple2;
-import vars.queryfx.RXEventBus;
-import vars.queryfx.messages.NewQueryResultsMsg;
-import vars.queryfx.messages.NonFatalExceptionMsg;
-import vars.queryfx.messages.SaveAsKMLMsg;
-import vars.queryfx.messages.SaveAsTextMsg;
-import vars.queryfx.messages.SaveImagesMsg;
+import vars.shared.rx.RXEventBus;
+import vars.queryfx.rx.messages.NewQueryResultsMsg;
+import vars.queryfx.rx.messages.SaveAsKMLMsg;
+import vars.queryfx.rx.messages.SaveAsTextMsg;
+import vars.queryfx.rx.messages.SaveImagesMsg;
 import vars.queryfx.ui.QueryResultsTableView;
-import vars.queryfx.ui.db.SQLStatementGenerator;
 import vars.queryfx.ui.db.results.QueryResults;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 /**
  * Created by brian on 8/5/15.

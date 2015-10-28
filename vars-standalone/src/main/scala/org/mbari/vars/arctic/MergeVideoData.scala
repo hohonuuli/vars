@@ -5,8 +5,7 @@ import java.io.File
 import java.util.{TimeZone, Date}
 
 import com.google.inject.Injector
-import org.mbari.math.{FastCollator, Collator}
-import org.mbari.movie.Timecode
+import org.mbari.math.{FastCollator}
 import org.slf4j.LoggerFactory
 import vars.annotation.VideoFrame
 import vars.annotation.ui.{Lookup, ToolBelt}

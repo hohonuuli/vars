@@ -2,7 +2,6 @@ package vars.annotation.ui.commandqueue.impl;
 
 import org.bushe.swing.event.EventBus;
 import vars.DAO;
-import vars.UserAccount;
 import vars.annotation.AnnotationFactory;
 import vars.annotation.AnnotationPersistenceService;
 import vars.annotation.Association;
@@ -12,14 +11,13 @@ import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveDAO;
 import vars.annotation.VideoFrame;
 import vars.annotation.VideoFrameDAO;
-import vars.annotation.jpa.ObservationImpl;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.commandqueue.Command;
 import vars.annotation.ui.eventbus.ObservationsAddedEvent;
 import vars.annotation.ui.eventbus.ObservationsRemovedEvent;
 import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
-import vars.shared.ui.video.VideoTime;
+import vars.avplayer.VideoTime;
 
 import java.util.ArrayList;
 import java.util.Collection;

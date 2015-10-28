@@ -1,7 +1,5 @@
 package vars.queryfx.ui.sdkfx;
 
-import com.google.common.collect.Lists;
-import com.guigarage.sdk.action.Action;
 import com.guigarage.sdk.container.WorkbenchView;
 import com.guigarage.sdk.form.EditorFormRow;
 import com.guigarage.sdk.form.FormLayout;
@@ -19,9 +17,9 @@ import vars.LinkBean;
 import vars.LinkUtilities;
 import vars.queryfx.Lookup;
 import vars.queryfx.QueryService;
-import vars.queryfx.RXEventBus;
+import vars.shared.rx.RXEventBus;
 import vars.queryfx.beans.ConceptSelection;
-import vars.queryfx.messages.FatalExceptionMsg;
+import vars.shared.rx.messages.FatalExceptionMsg;
 import vars.shared.javafx.scene.control.AutoCompleteComboBoxListener;
 
 import javax.inject.Inject;
@@ -116,7 +114,7 @@ public class ConceptConstraintsWorkbench extends WorkbenchView {
     private EditorFormRow<ComboBox<String>> getConceptRow() {
         if (conceptRow == null) {
             final ComboBox<String> conceptComboBox = new ComboBox<>();
-            conceptRow = new EditorFormRow<>("named", conceptComboBox);
+
             queryService.findAllConceptNamesAsStrings().handle((names, ex) -> {
                 if (names != null) {
                     return names;
@@ -146,6 +144,7 @@ public class ConceptConstraintsWorkbench extends WorkbenchView {
                     new AutoCompleteComboBoxListener<>(conceptComboBox);
                 });
             });
+            conceptRow = new EditorFormRow<>("named", conceptComboBox);
 
         }
         return conceptRow;

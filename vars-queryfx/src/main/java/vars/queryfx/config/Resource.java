@@ -11,6 +11,7 @@ import java.util.Optional;
 /**
  * @author Brian Schlining
  * @since 2015-07-19T12:50:00
+ * @deprecated Use vars.shared.config.Resource instead
  */
 public class Resource {
 

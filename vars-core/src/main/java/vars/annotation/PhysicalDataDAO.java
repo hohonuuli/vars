@@ -10,4 +10,6 @@ import vars.DAO;
  * To change this template use File | Settings | File Templates.
  */
 public interface PhysicalDataDAO extends DAO {
+
+    PhysicalData findByPrimaryKey(Object primaryKey);
 }

@@ -21,6 +21,7 @@
                 <filtering>true</filtering>
                 <includes>
                     <include>annotation-app.properties</include>
+                    <include>vars/annotation/app.conf</include>
                 </includes>
             </resource>
             <resource>
@@ -28,6 +29,7 @@
                 <filtering>false</filtering>
                 <excludes>
                     <exclude>annotation-app.properties</exclude>
+                    <exclude>vars/annotation/app.conf</exclude>
                 </excludes>
             </resource>
         </resources>
@@ -93,6 +95,16 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>vars-avplayer-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>vars-avplayer-jfx</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>vars-avfoundation</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -143,6 +155,12 @@
             </properties>
         </profile>
         <profile>
+            <id>hurl</id>
+            <properties>
+                <environment>dev</environment>
+            </properties>
+        </profile>
+        <profile>
             <id>openhouse</id>
             <properties>
                 <environment>openhouse</environment>
@@ -154,7 +172,6 @@
                 <environment>pgtest</environment>
             </properties>
         </profile>
-
         <profile>
             <id>rc</id>
             <properties>
@@ -166,6 +183,12 @@
             <id>shore</id>
             <properties>
                 <environment>shore</environment>
+            </properties>
+        </profile>
+        <profile>
+            <id>shoredev</id>
+            <properties>
+                <environment>shoredev</environment>
             </properties>
         </profile>
         <profile>

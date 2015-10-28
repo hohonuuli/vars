@@ -1,11 +1,11 @@
 package vars.queryfx.ui.controllers;
 
 import org.mbari.util.Tuple2;
-import vars.queryfx.RXEventBus;
-import vars.queryfx.messages.NonFatalExceptionMsg;
-import vars.queryfx.messages.SaveAsKMLMsg;
-import vars.queryfx.messages.SaveAsTextMsg;
-import vars.queryfx.messages.SaveImagesMsg;
+import vars.shared.rx.RXEventBus;
+import vars.shared.rx.messages.NonFatalExceptionMsg;
+import vars.queryfx.rx.messages.SaveAsKMLMsg;
+import vars.queryfx.rx.messages.SaveAsTextMsg;
+import vars.queryfx.rx.messages.SaveImagesMsg;
 import vars.queryfx.ui.controllers.fn.SaveImagesFn;
 import vars.queryfx.ui.controllers.fn.SaveResultsAsKMLFn;
 import vars.queryfx.ui.db.results.QueryResults;

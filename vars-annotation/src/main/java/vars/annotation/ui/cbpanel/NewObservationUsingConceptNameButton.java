@@ -51,7 +51,7 @@ import vars.UserAccount;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.actions.NewObservationUsingConceptNameAction;
 import vars.annotation.ui.ToolBelt;
-import vars.shared.ui.video.VideoControlService;
+import vars.avplayer.VideoControlService;
 import vars.annotation.ui.Lookup;
 import vars.knowledgebase.KnowledgebasePersistenceService;
 import vars.shared.ui.FancyButton;

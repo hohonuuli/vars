@@ -1,8 +1,8 @@
 package vars.queryfx.ui;
 
-import com.guigarage.sdk.util.Icon;
+import com.guigarage.sdk.util.FontBasedIcon;
 
-public enum AppIcons implements Icon {
+public enum AppIcons implements FontBasedIcon {
 
     PLUS("\uf067"),
     GEARS("\uF085"),

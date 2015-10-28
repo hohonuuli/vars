@@ -30,10 +30,10 @@ import org.mbari.util.Dispatcher;
 import org.mbari.util.Tuple2;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
-import vars.annotation.ui.videofile.VideoParams;
-import vars.annotation.ui.videofile.VideoPlayerController;
-import vars.annotation.ui.videofile.VideoPlayerDialogUI;
-import vars.annotation.ui.videofile.jfxmedia.JFXOpenVideoArchiveDialog;
+import vars.avplayer.VideoParams;
+import vars.avplayer.VideoPlayerController;
+import vars.avplayer.VideoPlayerDialogUI;
+import vars.avplayer.jfx.JFXOpenVideoArchiveDialog;
 import vars.annotation.ui.eventbus.VideoArchiveSelectedEvent;
 
 /**

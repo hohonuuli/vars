@@ -16,7 +16,6 @@
 package vars.annotation.ui.actions;
 
 import java.awt.Toolkit;
-import java.util.ArrayList;
 import java.util.Collection;
 import javax.swing.Action;
 import javax.swing.KeyStroke;
@@ -33,8 +32,8 @@ import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.commandqueue.Command;
 import vars.annotation.ui.commandqueue.CommandEvent;
 import vars.annotation.ui.commandqueue.impl.CopyObservationsCmd;
-import vars.shared.ui.video.VideoControlService;
-import vars.shared.ui.video.VideoTime;
+import vars.avplayer.VideoControlService;
+import vars.avplayer.VideoTime;
 
 /**
  * <p>

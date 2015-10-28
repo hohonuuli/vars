@@ -1,9 +1,9 @@
 package vars.annotation.ui.video;
 
-import vars.shared.ui.video.VideoControlService;
+import vars.avplayer.VideoControlService;
 
 /**
- * Utility class for creating a {@link vars.shared.ui.video.VideoControlService} from
+ * Utility class for creating a {@link VideoControlService} from
  * a String videoConnectionID (as stored in preferences)
  *
  * @author Brian Schlining

@@ -38,8 +38,8 @@ import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.commandqueue.Command;
 import vars.annotation.ui.commandqueue.CommandEvent;
 import vars.annotation.ui.commandqueue.impl.AddObservationCmd;
-import vars.shared.ui.video.ImageCaptureService;
-import vars.shared.ui.video.VideoControlService;
+import vars.avplayer.ImageCaptureService;
+import vars.avplayer.VideoControlService;
 
 /**
  * @author Brian Schlining

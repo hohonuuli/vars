@@ -48,7 +48,7 @@ import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
 import vars.annotation.ui.eventbus.VideoArchiveSelectedEvent;
 import vars.annotation.ui.eventbus.VideoFramesChangedEvent;
 import vars.annotation.ui.video.DoNothingVideoControlService;
-import vars.shared.ui.video.VideoControlService;
+import vars.avplayer.VideoControlService;
 import vars.annotation.ui.video.VideoControlServiceFactory;
 import vars.shared.preferences.PreferenceUpdater;
 import vars.shared.preferences.PreferencesService;

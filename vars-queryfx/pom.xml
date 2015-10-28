@@ -15,8 +15,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <easybind.version>1.0.3</easybind.version>
-        <jfxtras.version>8.0-r3</jfxtras.version>
-        <sdkfx.version>0.1-SNAPSHOT</sdkfx.version>
+        <jfxtras.version>8.0-r4</jfxtras.version>
+        <sdkfx.version>0.2.1</sdkfx.version>
     </properties>
     <dependencies>
         <dependency>

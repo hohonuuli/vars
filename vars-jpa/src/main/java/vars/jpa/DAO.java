@@ -139,19 +139,6 @@ public class DAO implements vars.DAO, EntityManagerAspect {
         return (T) entityManager.find(jpaEntity.getClass(), jpaEntity.getId());
     }
 
-
-//    @Override
-//    protected void finalize() throws Throwable {
-//        if ((entityManager != null) && entityManager.isOpen()) {
-//            if (log.isWarnEnabled()) {
-//                log.warn("Disposing of DAO that references an open entitymanager  [" +
-//                        entityManager + "]. Did you forget to call close()?");
-//            }
-//        }
-//
-//        super.finalize();
-//    }
-
     /**
     * Executes a named query using a map of named parameters
     *

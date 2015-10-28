@@ -351,11 +351,7 @@ public class PhysicalDataImpl implements Serializable, PhysicalData, JPAEntity {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(getClass().getSimpleName());
-        sb.append(" ([id=").append(getId()).append("] latitude=").append(latitude);
-        sb.append(", longitude=").append(longitude);
-        sb.append(", depth=").append(depth).append(")");
-
-        return sb.toString();
+        return getClass().getSimpleName() + " ([id=" + getId() + "] latitude=" + latitude +
+                ", longitude=" + longitude + ", depth=" + depth + ")";
     }
 }

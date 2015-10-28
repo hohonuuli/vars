@@ -22,7 +22,7 @@ import org.mbari.vcr4j.IVCR;
 import org.mbari.vcr4j.ui.VCRPanel;
 
 import vars.annotation.ui.Lookup;
-import vars.shared.ui.video.VideoControlService;
+import vars.avplayer.VideoControlService;
 
 /**
  * <p>A VCR panel that monitors for changes of VCRs</p>

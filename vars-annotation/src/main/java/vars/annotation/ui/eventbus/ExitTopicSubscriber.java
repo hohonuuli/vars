@@ -3,8 +3,8 @@ package vars.annotation.ui.eventbus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.ui.Lookup;
-import vars.shared.ui.video.ImageCaptureService;
-import vars.shared.ui.video.VideoControlService;
+import vars.avplayer.ImageCaptureService;
+import vars.avplayer.VideoControlService;
 
 /**
  * @author Brian Schlining

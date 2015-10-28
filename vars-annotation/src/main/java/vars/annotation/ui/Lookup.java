@@ -17,8 +17,6 @@ package vars.annotation.ui;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.prefs.Preferences;
 import java.util.prefs.PreferencesFactory;
 import org.bushe.swing.event.EventBus;
@@ -31,10 +29,9 @@ import vars.annotation.CameraDirections;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.table.ObservationTable;
-import vars.shared.ui.video.VideoControlService;
-import vars.shared.InjectorModule;
+import vars.avplayer.VideoControlService;
 import vars.shared.ui.GlobalLookup;
-import vars.shared.ui.video.ImageCaptureService;
+import vars.avplayer.ImageCaptureService;
 
 /**
  *
@@ -229,7 +226,8 @@ public class Lookup extends GlobalLookup {
         final Dispatcher dispatcher = Dispatcher.getDispatcher(KEY_DISPATCHER_GUICE_INJECTOR);
         Injector injector = (Injector) dispatcher.getValueObject();
         if (injector == null) {
-            injector = Guice.createInjector(new InjectorModule(RESOURCE_BUNDLE));
+            // HACK: Remove hardcoded names once switch to typesafe config is complete
+            injector = Guice.createInjector(new InjectorModule("vars-jpa-annotation", "vars-jpa-knowledgebase", "vars-jpa-misc"));
             dispatcher.setValueObject(injector);
         }
 

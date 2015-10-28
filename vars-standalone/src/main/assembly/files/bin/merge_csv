@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+# Merge video annotations with data in a CSV file. The CSV file should have a column
+# named 'date' (no quotes). It may also have the following columns (names are case-insensitve):
+# salinity, temperature, depth, latitude, longitude, oxygen
+
+# Example:
+# merge_csv T0198-11HD ~/Desktop/data/shipdatagalore.csv
+
+VARS_HOME=$(cd $(dirname "$0")/..; pwd)
+VARS_CLASSPATH=$VARS_HOME/conf:$VARS_HOME/lib/*
+
+${JAVACMD:=java} -Xms16m -Xmx512m \
+         -Duser.timezone=UTC \
+         -Dfile.encoding=UTF8 \
+         -classpath "$VARS_CLASSPATH" \
+         org.mbari.vars.integration.GenericMerge "$@"

@@ -1,23 +1,19 @@
 package vars.queryfx.ui.controllers;
 
 import javafx.application.Platform;
-import javafx.scene.Scene;
-import javafx.scene.control.TableView;
 import javafx.scene.image.Image;
-import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.VARSException;
 import vars.queryfx.QueryService;
-import vars.queryfx.RXEventBus;
+import vars.shared.rx.RXEventBus;
 import vars.queryfx.beans.ConceptSelection;
 import vars.queryfx.beans.ResultsCustomization;
-import vars.queryfx.messages.ExecuteSearchMsg;
-import vars.queryfx.messages.NewConceptSelectionMsg;
-import vars.queryfx.messages.NewQueryResultsMsg;
-import vars.queryfx.messages.NewResolvedConceptSelectionMsg;
-import vars.queryfx.ui.QueryResultsTableView;
+import vars.queryfx.rx.messages.ExecuteSearchMsg;
+import vars.queryfx.rx.messages.NewConceptSelectionMsg;
+import vars.queryfx.rx.messages.NewQueryResultsMsg;
+import vars.queryfx.rx.messages.NewResolvedConceptSelectionMsg;
 import vars.queryfx.ui.db.ConceptConstraint;
 import vars.queryfx.ui.db.IConstraint;
 import vars.queryfx.ui.db.PreparedStatementGenerator;
@@ -88,8 +84,6 @@ public class AppController {
     }
 
     protected void executeSearch(ExecuteSearchMsg msg) {
-        // TODO create a stage that shows elapse time. Reuse it to display results.
-
 
         SQLStatementGenerator sqlGen = new SQLStatementGenerator();
         String sql = sqlGen.getSQLStatement(msg.getQueryReturns(),

@@ -40,15 +40,12 @@ import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.annotation.AnnotationProcessor;
 import org.bushe.swing.event.annotation.EventSubscriber;
 import org.mbari.vcr4j.IVCR;
-import org.mbari.util.Dispatcher;
-import org.mbari.vcr4j.IVCR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.DAO;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoFrame;
-import vars.annotation.VideoFrameDAO;
 import vars.annotation.ui.buttons.RedoButton;
 import vars.annotation.ui.buttons.UndoButton;
 import vars.annotation.ui.cbpanel.ConceptButtonPanel;
@@ -69,8 +66,7 @@ import vars.annotation.ui.table.JXObservationTableColumnModel;
 import vars.annotation.ui.table.ObservationTable;
 import vars.annotation.ui.table.ObservationTableModel;
 import vars.annotation.ui.video.VideoControlPanel;
-import vars.annotation.ui.videoset.VideoArchiveSetEditorButton;
-import vars.shared.ui.video.VideoControlService;
+import vars.avplayer.VideoControlService;
 
 /**
  *
