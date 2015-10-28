@@ -155,6 +155,12 @@
             </properties>
         </profile>
         <profile>
+            <id>hurl</id>
+            <properties>
+                <environment>dev</environment>
+            </properties>
+        </profile>
+        <profile>
             <id>openhouse</id>
             <properties>
                 <environment>openhouse</environment>
@@ -166,7 +172,6 @@
                 <environment>pgtest</environment>
             </properties>
         </profile>
-
         <profile>
             <id>rc</id>
             <properties>

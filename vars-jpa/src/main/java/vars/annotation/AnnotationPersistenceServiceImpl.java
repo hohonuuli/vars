@@ -421,6 +421,10 @@ public class AnnotationPersistenceServiceImpl extends QueryableImpl implements A
             log.debug("Failed to fetch cameraplatforms from database", e);
         }
 
+        // --- Remove duplicate elements and sort list
+        cameraPlatforms = new ArrayList<>(new HashSet<>(cameraPlatforms));
+        Collections.sort(cameraPlatforms);
+
         return cameraPlatforms;
     }
 
