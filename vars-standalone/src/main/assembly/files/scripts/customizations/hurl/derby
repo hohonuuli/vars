@@ -1,0 +1,67 @@
+#!/bin/bash
+#
+# Startup script for Derby
+#
+# description: Derby startup script
+# Edit $VARS_HOME/derbyrun to set hostname and port
+# to enable on bootup on debian "update-rc.d derby defaults" or the
+# to disable on bootup on debian "update-rc.d derby remove"
+
+VARS_DIR=/path/to/vars
+DERBY_USER=derby
+start() {
+    echo -n "Derby Starting: "
+    sudo -u $DERBY_USER $VARS_DIR/bin/derbystart &
+    sudo -u $DERBY_USER sleep 3
+    sudo -u $DERBY_USER chmod 644 $VARS_DIR/database/derby.log
+}
+
+
+stop() {
+    echo -n "Derby Shutting down: "
+    $VARS_DIR/bin/derbystop &
+}
+
+status() {
+    echo "Derby has status: "
+    $VARS_DIR/bin/derbystatus &
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+        stop
+        sleep 3
+        start
+        ;;
+    status)
+        status
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart|status}"
+        exit 1
+esac
+
+exit $?
+
+
+# FROM: https://sites.google.com/site/sidloweb/ruzne/utility/ubuntu/db-derby
+# Then install script as service by command update-rc.d derby defaults.
+# Uninstall script by command update-rc.d derby remove.
+#
+# Set directory /var/db/derby to owner derby.
+#
+# sidlo64@ubuntu:/var/db$ ls -al
+# drwxr-xr-x  3 root  root  4096 srp 24 16:48 .
+# drwxr-xr-x 16 root  root  4096 srp 26 06:45 ..
+# drwxr-xr-x  3 derby derby 4096 srp 24 22:28 derby
+# For manually stop database use service derby stop.
+#
+# For manually start database use sudo service derby start.
+#
+# Then install script as service by command update-rc.d derby defaults.
