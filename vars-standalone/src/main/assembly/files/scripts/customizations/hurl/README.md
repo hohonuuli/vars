@@ -13,3 +13,8 @@ This doc contains the steps performed to migrate the HURL VARS database to a mor
 2. In `gsh` run `DestroyDuplicateFKFunction` and `CombineDuplicatesFunction`
 3. Run `update-hurlCastorToJPA2-anno.sql`
 4. Run `update-hurlCastorToJPA1-kb.sql`
+
+
+## NOTES
+
+- For an Aple Specific video playback app, we could just have an app with a playback window (via AVFoundation) that is talked to via TCP. Here's links to TCP sockets in Objective-C: https://gist.github.com/rjungemann/446256, https://github.com/robbiehanson/CocoaAsyncSocket, https://github.com/dreese/FastSocket, https://github.com/socketio/socket.io-client-swift
