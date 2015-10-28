@@ -1,0 +1,3 @@
+-- Change URLS in HURLS database
+-- FROM: http://deepsee.soest.hawaii.edu/~rachelorange/vars/images/P4/images/0224/10_55_30_08.jpg
+-- TO:   http://max5kn1.soest.hawaii.edu/imagearchive/P4/images/0224/10_55_30_08.jpg
