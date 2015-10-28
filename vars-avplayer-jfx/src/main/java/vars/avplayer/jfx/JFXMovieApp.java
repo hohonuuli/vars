@@ -26,22 +26,33 @@ public class JFXMovieApp {
     JFXPanel mediaPanel;
     MediaView mediaView;
     JFXPanel controlPanel;
+    private final String movie;
 
     public static void main(String[] args) {
-        JFXMovieApp app = new JFXMovieApp();
+
+        String movie = MEDIA_URL;
+        if (args.length > 0) {
+            movie = args[0];
+        }
+        JFXMovieApp app = new JFXMovieApp(movie);
         JFrame frame = app.getFrame();
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setVisible(true);
     }
 
-    public JFXMovieApp() {
+    public JFXMovieApp(String movie) {
+        this.movie = movie;
         initialize();
+    }
+
+    public JFXMovieApp() {
+        this(MEDIA_URL);
     }
 
     protected void initialize() {
         JFrame myFrame = getFrame();
         Platform.runLater(() -> {
-            Media media = new Media(MEDIA_URL);
+            Media media = new Media(movie);
             MediaPlayer mediaPlayer = new MediaPlayer(media);
             mediaPlayer.setAutoPlay(true);
             getMediaView().setMediaPlayer(mediaPlayer);
