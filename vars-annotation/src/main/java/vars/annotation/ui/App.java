@@ -37,6 +37,7 @@ import vars.annotation.AnnotationPersistenceService;
 import vars.annotation.Observation;
 import vars.annotation.ui.eventbus.ExitTopicSubscriber;
 import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
+import vars.avplayer.ImageCaptureService;
 import vars.knowledgebase.Concept;
 import vars.shared.ui.GlobalLookup;
 import vars.shared.ui.event.FatalExceptionSubscriber;
