@@ -17,6 +17,8 @@ package vars.annotation.ui;
 
 import java.awt.Frame;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
@@ -27,13 +29,9 @@ import org.bushe.swing.event.annotation.AnnotationProcessor;
 import org.bushe.swing.event.annotation.EventSubscriber;
 import org.mbari.swing.SwingUtils;
 import org.mbari.util.Dispatcher;
-import org.mbari.util.Tuple2;
 import vars.annotation.VideoArchive;
+import vars.annotation.ui.dialogs.OpenVideoArchiveDialog;
 import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
-import vars.avplayer.VideoParams;
-import vars.avplayer.VideoPlayerController;
-import vars.avplayer.VideoPlayerDialogUI;
-import vars.avplayer.jfx.JFXOpenVideoArchiveDialog;
 import vars.annotation.ui.eventbus.VideoArchiveSelectedEvent;
 
 /**
@@ -45,7 +43,7 @@ import vars.annotation.ui.eventbus.VideoArchiveSelectedEvent;
  */
 public class StatusLabelForVideoArchive extends StatusLabel {
 
-    private final VideoPlayerDialogUI dialog;
+    private final OpenVideoArchiveDialog dialog;
 
     /**
      * Constructor for the StatusLabelForVideoArchive object
@@ -57,18 +55,14 @@ public class StatusLabelForVideoArchive extends StatusLabel {
         Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
         final Dispatcher videoArchiveDispatcher = Lookup.getVideoArchiveDispatcher();
 
-
-        dialog = new JFXOpenVideoArchiveDialog(frame, toolBelt);
-        dialog.onOkay(() -> {
-            dialog.setVisible(false);
-            VideoParams videoParams = dialog.getVideoParams();
-            Tuple2<VideoArchive, VideoPlayerController> t = dialog.openVideoArchive();
-            VideoArchive videoArchive = t.getA();
-            VideoPlayerController videoPlayerController = t.getB();
-            VideoArchiveSelectedEvent event = new VideoArchiveSelectedEvent(this, videoArchive);
-            Lookup.getImageCaptureServiceDispatcher().setValueObject(videoPlayerController.getImageCaptureService());
-            Lookup.getVideoControlServiceDispatcher().setValueObject(videoPlayerController.getVideoControlService());
-            EventBus.publish(event);
+        dialog = new OpenVideoArchiveDialog(frame, toolBelt);
+        dialog.getOkayButton().addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                dialog.setVisible(false);
+                VideoArchive videoArchive = dialog.openVideoArchive();
+                VideoArchiveSelectedEvent event = new VideoArchiveSelectedEvent(this, videoArchive);
+                EventBus.publish(event);
+            }
         });
 
         AnnotationProcessor.process(this); // Register with EventBus
@@ -110,7 +104,6 @@ public class StatusLabelForVideoArchive extends StatusLabel {
         });
 
     }
-
 
     /**
      *

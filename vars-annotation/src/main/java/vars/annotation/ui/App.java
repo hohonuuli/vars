@@ -79,14 +79,14 @@ public class App {
     public App() {
 
         final ImageIcon mbariLogo =
-            new ImageIcon(getClass().getResource("/annotation-splash.png"));
+                new ImageIcon(getClass().getResource("/annotation-splash.png"));
         final SplashFrame splashFrame = new SplashFrame(mbariLogo);
         splashFrame.setVisible(true);
         splashFrame.setMessage(" Starting application beacon ...");
         activeAppBeacon = new ActiveAppBeacon(BEACON_PORTS, BEACON_MESSAGE);
 
         splashFrame.setMessage(" Initializing configuration ...");
-        splashFrame.setVisible(true);
+
 
         final Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
         try {
@@ -136,15 +136,15 @@ public class App {
         Lookup.getSelectedObservationsDispatcher().setValueObject(new Vector<Observation>());
 
         // Connect to the ImageCaptureService
-        Lookup.getImageCaptureServiceDispatcher().setValueObject(new FakeImageCaptureServiceImpl());
-        
+        Lookup.getImageCaptureServiceDispatcher().setValueObject(injector.getInstance(ImageCaptureService.class));
+
         // Configure EventBus
         EventTopicSubscriber fatalErrorSubscriber = new FatalExceptionSubscriber(getAnnotationFrame());
         EventTopicSubscriber nonFatalErrorSubscriber = new NonFatalErrorSubscriber(getAnnotationFrame());
-        EventTopicSubscriber warningSubscriber = new WarningSubscriber(getAnnotationFrame());       
+        EventTopicSubscriber warningSubscriber = new WarningSubscriber(getAnnotationFrame());
         EventTopicSubscriber exitSubscriber = new ExitTopicSubscriber();
         EventSubscriber loggingSubscriber = new LoggingEventSubscriber();
-        
+
         GC_PREVENTION.add(fatalErrorSubscriber);
         GC_PREVENTION.add(nonFatalErrorSubscriber);
         GC_PREVENTION.add(warningSubscriber);

@@ -370,17 +370,6 @@ public class AnnotationPersistenceServiceImpl extends QueryableImpl implements A
             }
             return id;
         };
-
-//        QueryFunction<Long> queryFunction = new QueryFunction<Long>() {
-//            @Override
-//            public Long apply(ResultSet resultSet) throws SQLException {
-//                Long id = null;
-//                if (resultSet.next()) {
-//                    id = resultSet.getLong(1);
-//                }
-//                return id;
-//            }
-//        };
         return executeQueryFunction(sql, queryFunction);
     }
 

@@ -134,12 +134,12 @@ public class ImagePreferencesPanel extends JPanel implements PreferenceUpdater {
     }
     
     protected JComboBox<String> getImageInterpComboBox() {
-                if (imageInterpComboBox == null) {
-                        imageInterpComboBox = new JComboBox(AWTUtilities.IMAGE_INTERPOLATION_MAP.keySet().toArray());
-                        imageInterpComboBox.setSelectedIndex(0);
-                    }
-                return imageInterpComboBox;
-            }
+        if (imageInterpComboBox == null) {
+            imageInterpComboBox = new JComboBox(AWTUtilities.IMAGE_INTERPOLATION_MAP.keySet().toArray());
+            imageInterpComboBox.setSelectedIndex(0);
+        }
+        return imageInterpComboBox;
+    }
 
     /**
      * @return

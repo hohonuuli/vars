@@ -31,9 +31,20 @@ Q: How do I deploy VARS at a large organization?
    brian@mbari.org.
 
 Q: What can VARS use as a video source?
-A: VARS is designed to work VCR's that support serial connections (RS232 or RS422) 
-   or video files. This version you've downloaded is for video files only.
+A: VARS is designed to work VCR's that support serial connections (RS232 or RS422) or
+   video files. This version that you've downloaded is for VCRs.
 
+Q: What hardware do I need to annotate video tapes?
+A: 1) A VCR with a serial port (either RS422 or RS232), most professional quality 
+      decks will have this port. Firewire connections are NOT supported.
+   2) A serial port on your computer. USB-to-Serial adapters will work.
+   3) A video capture card that supports the QuickTime API. This is not
+      required, but is useful for capturing images from you video. At MBARI,
+      we have had good experiences with Decklink cards from Blackmagic Design
+      (http://www.blackmagic-design.com/). 
+   4) If your VCR has an RS422 port you will need a converter for RS232-to-RS422. 
+      These are pretty inexpensive. Some video capture boards have build in RS422
+      so you might not need a converter with those boards.
    
        
 
