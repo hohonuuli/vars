@@ -30,8 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.VARSException;
 import vars.jpa.VarsJpaModule;
-import vars.shared.ui.video.FakeImageCaptureServiceImpl;
-import vars.shared.ui.video.ImageCaptureService;
 
 /**
  *
