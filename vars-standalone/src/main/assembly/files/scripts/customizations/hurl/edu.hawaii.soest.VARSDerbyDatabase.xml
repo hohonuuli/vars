@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Disabled</key>
+	<false/>
+	<key>KeepAlive</key>
+	<true/>
+	<key>Label</key>
+	<string>edu.hawaii.soest.VARSDerbyDatabase</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/System/Library/Frameworks/JavaVM.framework/Commands/java</string>
+		<string>-cp</string>
+		<string>/Users/rachelorange/Applications/vars-app-5.1-SNAPSHOT-standalone4hurl/lib/derby-10.6.1.0.jar:/Users/rachelorange/Applications/vars-app-5.1-SNAPSHOT-standalone4hurl/lib/derbynet-10.6.1.0.jar</string>
+		<string>-Dderby.system.home=/Users/rachelorange/Applications/vars-app-5.1-SNAPSHOT-standalone4hurl/database</string>
+		<string>org.apache.derby.drda.NetworkServerControl</string>
+		<string>start</string>
+		<string>-noSecurityManager</string>
+		<string>-h</string>
+		<string>deepsee.soest.hawaii.edu</string>
+		<string>-p</string>
+		<string>1527</string>
+	</array>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>java.awt.headless</key>
+	<string>true</string>
+</dict>
+</plist>
