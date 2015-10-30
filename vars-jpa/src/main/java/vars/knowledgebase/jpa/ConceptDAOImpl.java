@@ -87,10 +87,13 @@ public class ConceptDAOImpl extends DAO implements ConceptDAO {
     public Collection<ConceptName> findDescendentNames(Concept concept) {
 
         Collection<ConceptName> conceptNames = new ArrayList<ConceptName>();
-
-        Concept mergedConcept = findByPrimaryKey(ConceptImpl.class, ((JPAEntity) concept).getId());
-        conceptNames.addAll(mergedConcept.getConceptNames());
-        findDescendentNames(mergedConcept.getChildConcepts(), conceptNames);
+        Concept mergedConcept;
+        if (concept instanceof JPAEntity) {
+            mergedConcept = findByPrimaryKey(ConceptImpl.class, ((JPAEntity) concept).getId());
+        }
+        else {
+            mergedConcept = findByName(concept.getPrimaryConceptName().getName());
+        }
 
         return conceptNames;
 

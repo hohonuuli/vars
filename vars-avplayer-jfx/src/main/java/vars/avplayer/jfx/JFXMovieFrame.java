@@ -1,6 +1,10 @@
 package vars.avplayer.jfx;
 
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.embed.swing.JFXPanel;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.JavaFXBuilderFactory;
@@ -17,6 +21,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
 import java.net.URL;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Created by brian on 12/16/13. Based on an example from
@@ -25,23 +30,47 @@ import java.net.URL;
 public class JFXMovieFrame extends JFrame {
 
     private JFXPanel panel;
-    private JFXMovieFrameController controller;
+    private volatile JFXMovieFrameController controller;
     private final Logger log = LoggerFactory.getLogger(getClass());
+    private final Runnable onReady;
 
     @Inject
-    public JFXMovieFrame() throws HeadlessException {
+    public JFXMovieFrame(final String location, Runnable onReady) throws HeadlessException {
+        this.onReady = onReady;
         setLayout(new BorderLayout());
-        add(getPanel());
+        add(initPanel(location));
         setSize(480, 320);
-        setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
     }
 
     public JFXPanel getPanel() {
+        return panel;
+    }
+
+    private JFXPanel initPanel(final String location) {
         if (panel == null) {
             panel = new JFXPanel();
             Platform.runLater(() -> {
                 try {
-                    initFX(panel);
+                    URL controllerLocation = getClass().getResource("/fxml/JFXMovieFrame.fxml");
+                    FXMLLoader loader = new FXMLLoader();
+                    loader.setLocation(controllerLocation);
+                    loader.setBuilderFactory(new JavaFXBuilderFactory());
+
+                    Parent root = loader.load(controllerLocation.openStream());
+                    controller = loader.getController();
+                    controller.setFrame(this);
+
+                    Scene scene = new Scene(root);
+                    scene.getStylesheets().add("/styles/JFXMovieFrame.css");
+                    panel.setScene(scene);
+                    controller.setMediaLocation(location);
+                    controller.readyProperty().addListener((obs, oldValue, newValue) -> {
+                        if (newValue) {
+                            System.out.println("READY = " + newValue);
+                            onReady.run();
+                        }
+                    });
                 }
                 catch (IOException e) {
                     log.error("Failed to initialize JavaFX scene", e);
@@ -51,38 +80,21 @@ public class JFXMovieFrame extends JFrame {
         return panel;
     }
 
-    public void setMovieLocation(final String location) {
-        Platform.runLater(() -> {
-            try {
-                controller.setMediaLocation(location);
-            }
-            catch (MediaException e) {
-                EventBus.send(new WarningMsg("Unable to open the file at " + location + "using the Built-in (JavaFX) player"));
-            }
-        });
-    }
-
-    private void initFX(JFXPanel panel) throws IOException {
-        URL controllerLocation = getClass().getResource("/fxml/JFXMovieFrame.fxml");
-        FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(controllerLocation);
-        loader.setBuilderFactory(new JavaFXBuilderFactory());
-
-        Parent root = (Parent) loader.load(controllerLocation.openStream());
-        controller = loader.getController();
-        controller.setFrame(this);
-
-        Scene scene = new Scene(root);
-        scene.getStylesheets().add("/styles/JFXMovieFrame.css");
-        panel.setScene(scene);
-
-    }
 
     public JFXMovieFrameController getController() {
-        if (controller == null) {
-            getPanel(); // initFX;
-        }
-        return controller; // TODO this is not thread safe
+        return controller;
     }
 
+    public boolean isReady() {
+        return panel != null && controller != null && controller.isReady();
+    }
+
+
+    @Override
+    public void dispose() {
+        if (controller != null) {
+            controller.dispose();
+        }
+        super.dispose();
+    }
 }

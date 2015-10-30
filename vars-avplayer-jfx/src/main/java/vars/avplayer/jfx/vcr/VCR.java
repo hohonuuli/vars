@@ -44,7 +44,7 @@ public class VCR extends VCRAdapter {
     public void shuttleForward(int speed) {
         double rate = speed / 255D * MAX_RATE;
         mediaPlayer.setRate(rate);
-        mediaPlayer.play();
+        //mediaPlayer.play();
         super.shuttleForward(speed);
         triggerStateNotification();
     }
@@ -86,7 +86,9 @@ public class VCR extends VCRAdapter {
 
     @Override
     public void disconnect() {
-        mediaPlayer.currentTimeProperty().removeListener(timeListener);
+        if (mediaPlayer != null) {
+            mediaPlayer.currentTimeProperty().removeListener(timeListener);
+        }
         super.disconnect();
         triggerStateNotification();
     }
@@ -113,8 +115,14 @@ public class VCR extends VCRAdapter {
     @Override
     public void seekTimecode(Timecode timecode) {
         Timecode currentTimecode = getVcrTimecode().getTimecode();
-        double millis = timecode.getFrames() / currentTimecode.getFrameRate() * 1000D;
-        Duration duration = new Duration(millis);
+        Timecode tc = timecode;
+        if (!timecode.isComplete()) {
+            tc = new Timecode(timecode.toString(), DEFAULT_FRAME_RATE);
+        }
+
+        double seconds = tc.getFrames() / currentTimecode.getFrameRate();
+        Duration duration = new Duration(seconds * 1000D);
+        System.out.println(duration);
         mediaPlayer.seek(duration);
         super.seekTimecode(timecode);
         triggerStateNotification();

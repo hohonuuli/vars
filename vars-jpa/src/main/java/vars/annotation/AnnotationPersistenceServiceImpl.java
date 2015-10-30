@@ -95,7 +95,7 @@ public class AnnotationPersistenceServiceImpl extends QueryableImpl implements A
                     return from.getName();
                 }
             });
-            desendantNames = new ArrayList<String>(namesAsStrings);
+            desendantNames = new ArrayList<>(namesAsStrings);
             Collections.sort(desendantNames, new IgnoreCaseToStringComparator());
             descendantNameCache.put(concept, desendantNames);
         }
