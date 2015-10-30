@@ -39,7 +39,7 @@ public class PSubstrateSecondaryButton extends PropButton {
      */
     protected AddPropertyAction getAddPropertyAction() {
         if (addPropertyAction == null) {
-            addPropertyAction = new AddPropertyAction(toolBelt, "s2", "substrate", "nil");
+            addPropertyAction = new AddPropertyAction(toolBelt, "s2", "Substrates", "nil");
         }
         return addPropertyAction;
     }
@@ -64,7 +64,7 @@ public class PSubstrateSecondaryButton extends PropButton {
 
         protected ToConceptSelectionDialog getDialog() {
             if (dialog == null) {
-                dialog = new ToConceptSelectionDialog(toolBelt.getAnnotationPersistenceService());
+                dialog = new ToConceptSelectionDialog(toolBelt.getAnnotationPersistenceService(), "Substrates");
                 dialog.setLocationRelativeTo(PSubstrateSecondaryButton.this);
                 dialog.getOkayButton().addActionListener(e -> {
                     getAddPropertyAction().setToConcept(dialog.getSelectedConcept().getPrimaryConceptName().getName());

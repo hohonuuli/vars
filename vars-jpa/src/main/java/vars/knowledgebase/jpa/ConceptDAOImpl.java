@@ -95,6 +95,11 @@ public class ConceptDAOImpl extends DAO implements ConceptDAO {
             mergedConcept = findByName(concept.getPrimaryConceptName().getName());
         }
 
+        if (mergedConcept != null) {
+            conceptNames.addAll(mergedConcept.getConceptNames());
+            findDescendentNames(mergedConcept.getChildConcepts(), conceptNames);
+        }
+
         return conceptNames;
 
     }
