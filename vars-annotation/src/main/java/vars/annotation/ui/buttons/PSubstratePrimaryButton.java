@@ -5,8 +5,6 @@
 
 package vars.annotation.ui.buttons;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import javax.swing.ImageIcon;
 import org.mbari.awt.event.ActionAdapter;
 import vars.annotation.ui.dialogs.ToConceptSelectionDialog;
@@ -18,18 +16,20 @@ import vars.annotation.ui.ToolBelt;
  *
  * @author brian
  */
-public class PSurfaceButton extends PropButton {
+public class PSubstratePrimaryButton extends PropButton {
 
     private ActionAdapter showDialogAction;
     private AddPropertyAction addPropertyAction;
     private final ToolBelt toolBelt;
 
-    public PSurfaceButton() {
+
+
+    public PSubstratePrimaryButton() {
         super();
         this.toolBelt = getToolBelt();
         setAction(getShowDialogAction());
-        setToolTipText("upon");
-        setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/surfacebutton.png")));
+        setToolTipText("S1 - Primary Substrate");
+        setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/s1button.png")));
         setEnabled(false);
     }
 
@@ -39,7 +39,7 @@ public class PSurfaceButton extends PropButton {
      */
     protected AddPropertyAction getAddPropertyAction() {
         if (addPropertyAction == null) {
-            addPropertyAction = new AddPropertyAction(toolBelt, "upon", "physical object", "nil");
+            addPropertyAction = new AddPropertyAction(toolBelt, "s1", "substrate", "nil");
         }
         return addPropertyAction;
     }
@@ -65,7 +65,7 @@ public class PSurfaceButton extends PropButton {
         protected ToConceptSelectionDialog getDialog() {
             if (dialog == null) {
                 dialog = new ToConceptSelectionDialog(toolBelt.getAnnotationPersistenceService());
-                dialog.setLocationRelativeTo(PSurfaceButton.this);
+                dialog.setLocationRelativeTo(PSubstratePrimaryButton.this);
                 dialog.getOkayButton().addActionListener(e -> {
                     getAddPropertyAction().setToConcept(dialog.getSelectedConcept().getPrimaryConceptName().getName());
                     dialog.setVisible(false);
