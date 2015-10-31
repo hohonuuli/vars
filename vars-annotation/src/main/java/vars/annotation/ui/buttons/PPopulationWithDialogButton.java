@@ -1,17 +1,16 @@
 package vars.annotation.ui.buttons;
 
 import org.mbari.awt.event.ActionAdapter;
+import org.mbari.awt.event.NonDigitConsumingKeyListener;
 import vars.annotation.ui.actions.AddPropertyAction;
 import vars.annotation.ui.dialogs.AddCommentAssociationDialog;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 /**
  * Created by rachelorange on 10/30/15.
  */
-public class PPhotoReferenceButton extends PropButton {
+public class PPopulationWithDialogButton extends PropButton {
 
     private AddPropertyAction addPropertyAction;
     private ActionAdapter showDialogAction;
@@ -19,12 +18,12 @@ public class PPhotoReferenceButton extends PropButton {
     /**
      * Constructs ...
      */
-    public PPhotoReferenceButton() {
+    public PPopulationWithDialogButton() {
         super();
-        addPropertyAction = new AddPropertyAction(getToolBelt(), "photo-reference", "self", "");
+        addPropertyAction = new AddPropertyAction(getToolBelt(), "population-quantity", "self", "");
         setAction(getShowDialogAction());
-        setToolTipText("add photo reference");
-        setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/photo_reference.png")));
+        setToolTipText("population, 2 or more");
+        setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/nbutton.png")));
         setEnabled(false);
     }
 
@@ -67,8 +66,9 @@ public class PPhotoReferenceButton extends PropButton {
         protected AddCommentAssociationDialog getDialog() {
             if (dialog == null) {
                 dialog = new AddCommentAssociationDialog();
-                dialog.setTitle("VARS - Add Photo Reference");
-                dialog.setLocationRelativeTo(PPhotoReferenceButton.this);
+                dialog.getTextField().addKeyListener(new NonDigitConsumingKeyListener());
+                dialog.setTitle("VARS - Add Population Quantity");
+                dialog.setLocationRelativeTo(PPopulationWithDialogButton.this);
                 dialog.getOkayButton().addActionListener(e -> {
                     getAddPropertyAction().setLinkValue(dialog.getComment());
                     dialog.setVisible(false);
