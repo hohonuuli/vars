@@ -1,5 +1,5 @@
 -- Artifact -----------------------------------------------------------
-CREATE TABLE ARTIFACT  ( 
+CREATE TABLE ARTIFACT  (
     id                BIGINT NOT NULL,
     ConceptDelegateID_FK bigint NOT NULL,
     GROUPID           VARCHAR(64),
@@ -88,6 +88,10 @@ GO
 
 CREATE INDEX idx_ConceptName_name
     ON ConceptName(ConceptName)
+GO
+
+CREATE INDEX idx_ConceptName_LUT
+    ON ConceptName(LAST_UPDATED_TIME)
 GO
 
 UPDATE ConceptName
@@ -273,5 +277,3 @@ UPDATE UserAccount
     SET LAST_UPDATED_TIME='2015-10-26 00:00:00'
     WHERE LAST_UPDATED_TIME IS NULL
 GO
-
-

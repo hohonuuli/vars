@@ -7,8 +7,6 @@ import java.util.Date;
 import java.util.List;
 import javax.swing.*;
 
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 import org.mbari.vcr4j.*;
 import org.mbari.vcr4j.time.Timecode;
 import org.mbari.vcr4j.timer.AnnotationQueueVCR;
@@ -28,17 +26,16 @@ import vars.shared.rx.messages.NonFatalExceptionMsg;
 /**
  * Created by brian on 12/16/13.
  */
-public class JFXVideoControlServiceImpl  extends AbstractVideoControlService
+public class JFXVideoControlServiceImplOld  extends AbstractVideoControlService
         implements ImageCaptureService, VideoPlayerController {
 
-    private volatile JFXMovieJFrame movieFrame = new JFXMovieJFrame();
+    private volatile JFXMovieFrame movieFrame;
     private final JFXTimecode vcrTimcode = new JFXTimecode();
     private final JFXState vcrState = new JFXState();
     private static final List<String> ACCEPTABLE_MIMETYPES = Arrays.asList("video/mp4");
     private final Logger log = LoggerFactory.getLogger(getClass());
-    private volatile JFXMovieJFrameController controller;
 
-    public JFXVideoControlServiceImpl() {
+    public JFXVideoControlServiceImplOld() {
     }
 
     @Override
@@ -49,9 +46,9 @@ public class JFXVideoControlServiceImpl  extends AbstractVideoControlService
     @Override
     public Image capture(File file) throws ImageCaptureException {
         Image image = null;
-        if (controller != null) {
+        if (movieFrame.isReady()) {
             try {
-                image = controller.frameCapture(file);
+                image = movieFrame.getController().frameCapture(file);
             } catch (Exception e) {
                 EventBus.send(new NonFatalExceptionMsg("Failed to capture image to " + file.getAbsolutePath(), e));
             }
@@ -67,8 +64,7 @@ public class JFXVideoControlServiceImpl  extends AbstractVideoControlService
 
     @Override
     public void dispose() {
-        // We can't dispose of the JFXPanel in the JFXMovieJFrame or we have issues with JavaFX
-        movieFrame.setVisible(false);
+        disposeMovieFrame();
     }
 
     @Override
@@ -86,26 +82,16 @@ public class JFXVideoControlServiceImpl  extends AbstractVideoControlService
 
         String movieLocation = (String) args[0];
         try {
+            disposeMovieFrame();
 
-            movieFrame.setVisible(false);
-            movieFrame.setMediaLocation(movieLocation, c -> {
-                controller = c;
-                VCR fxVcr = new VCR(c.getMediaView().getMediaPlayer());
+            movieFrame = new JFXMovieFrame(movieLocation, () -> {
+                VCR fxVcr = new VCR(movieFrame.getController().getMediaView().getMediaPlayer());
                 IVCR vcr = new AnnotationQueueVCR(fxVcr);
                 setVcr(vcr);
                 setVideoControlInformation(new VideoControlInformationImpl(movieLocation, VideoControlStatus.CONNECTED));
                 fxVcr.triggerStateNotification();
-                MediaPlayer mediaPlayer = c.getMediaView().getMediaPlayer();
-                Media media = mediaPlayer.getMedia();
-                Timecode timecode = new Timecode(mediaPlayer.getCurrentTime().toSeconds(), 100D);
-                vcr.getVcrTimecode().timecodeProperty().setValue(timecode);
-                SwingUtilities.invokeLater(() -> {
-                    movieFrame.setSize(media.getWidth(), media.getHeight());
-                    movieFrame.setVisible(true);
-                });
-
             });
-
+            movieFrame.setVisible(true);
         }
         catch (Exception e) {
             log.error("Faile to create JFXMovieFrame", e);
@@ -115,6 +101,19 @@ public class JFXVideoControlServiceImpl  extends AbstractVideoControlService
 
     }
 
+    private void disposeMovieFrame() {
+        if (movieFrame != null) {
+            IVCR fxVcr = getVcr();
+            if (fxVcr != null) {
+                fxVcr.disconnect();
+                setVcr(new VCRAdapter());
+            }
+            movieFrame.getController().getMediaView().getMediaPlayer().stop();
+            movieFrame.setVisible(false);
+            movieFrame.dispose();
+            movieFrame = null;
+        }
+    }
 
     @Override
     public JDialog getConnectionDialog() {
@@ -125,9 +124,9 @@ public class JFXVideoControlServiceImpl  extends AbstractVideoControlService
     public void seek(String timecode) {
         IVCR vcr = getVcr();
         if (vcr != null) {
-            //getVcr().play();
+            getVcr().play();
             getVcr().seekTimecode(new Timecode(timecode));
-            //getVcr().stop();
+            getVcr().stop();
         }
     }
 
@@ -161,11 +160,7 @@ public class JFXVideoControlServiceImpl  extends AbstractVideoControlService
 
     @Override
     public String getMovieLocation() {
-        String location = null;
-        if (controller != null) {
-            location = controller.getMediaView().getMediaPlayer().getMedia().getSource();
-        }
-        return location;
+        return movieFrame.getController().getMediaView().getMediaPlayer().getMedia().getSource();
     }
 
     @Override
@@ -201,5 +196,4 @@ public class JFXVideoControlServiceImpl  extends AbstractVideoControlService
     public String getName() {
         return "JavaFX";
     }
-
 }

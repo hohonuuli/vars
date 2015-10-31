@@ -44,7 +44,7 @@ public class ToConceptSelectionDialog extends StandardDialog {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
     private final AnnotationPersistenceService annotationPersistenceService;
-    private ConceptNameComboBox comboBox;
+    private HierachicalConceptNameComboBox comboBox;
 
     /**
      * Create the dialog
@@ -53,48 +53,53 @@ public class ToConceptSelectionDialog extends StandardDialog {
      */
     @Inject
     public ToConceptSelectionDialog(AnnotationPersistenceService annotationPersistenceService) {
+        this(annotationPersistenceService, "physical-object");
+    }
+
+    public ToConceptSelectionDialog(AnnotationPersistenceService annotationPersistenceService, String conceptName) {
         super((Frame) Lookup.getApplicationFrameDispatcher().getValueObject());
         this.annotationPersistenceService = annotationPersistenceService;
 
         try {
             initialize();
+            setBaseConceptName(conceptName);
         }
         catch (Throwable e) {
             e.printStackTrace();
         }
     }
 
+    public void setBaseConceptName(String conceptName) {
+
+        try {
+            Concept concept = annotationPersistenceService.findConceptByName(conceptName);
+
+            if (concept == null) {
+                concept = annotationPersistenceService.findRootConcept();
+            }
+
+            getComboBox().setConcept(concept);
+            getComboBox().setSelectedItem(concept.getPrimaryConceptName().getName());
+        }
+        catch (Exception ex) {
+            log.error("Failed to lookup concepts from knowledgebase", ex);
+            EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, ex);
+        }
+
+    }
+
 
     /**
      * @return
      */
-    protected ConceptNameComboBox getComboBox() {
+    protected HierachicalConceptNameComboBox getComboBox() {
         if (comboBox == null) {
-            Concept concept = null;
-            try {
-                // TODO "physical-object" is hard coded. should be in a properties file
-                concept = annotationPersistenceService.findConceptByName("physical-object");
 
-                if (concept == null) {
-                    concept = annotationPersistenceService.findRootConcept();
-                }
-            }
-            catch (Exception ex) {
-                log.error("Failed to lookup concepts from knowledgebase", ex);
-                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, ex);
-            }
-
-            if (concept != null) {
-                comboBox = new HierachicalConceptNameComboBox(concept, annotationPersistenceService);
-            }
-            else {
-                comboBox = new HierachicalConceptNameComboBox(annotationPersistenceService);
-            }
+            comboBox = new HierachicalConceptNameComboBox(annotationPersistenceService);
 
             Dimension size = comboBox.getPreferredSize();
             Dimension preferredSize = new Dimension(350, size.height);
             comboBox.setPreferredSize(preferredSize);
-            comboBox.setSelectedItem(concept.getPrimaryConceptName().getName());
             comboBox.getEditor().getEditorComponent().addKeyListener(new KeyAdapter() {
                 @Override
                 public void keyTyped(KeyEvent ke) {
@@ -132,30 +137,14 @@ public class ToConceptSelectionDialog extends StandardDialog {
         setModal(true);
         setTitle("VARS - Select Concept");
         getContentPane().add(getComboBox(), BorderLayout.CENTER);
-        getCancelButton().addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                ToConceptSelectionDialog.this.dispose();
-            }
-
-        });
-        getOkayButton().addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                ToConceptSelectionDialog.this.dispose();
-            }
-        });
+        getCancelButton().addActionListener(e -> ToConceptSelectionDialog.this.dispose());
+        getOkayButton().addActionListener(e -> ToConceptSelectionDialog.this.dispose());
 
         getRootPane().setDefaultButton(getOkayButton());
-        addHierarchyListener(new HierarchyListener() {
-
-            public void hierarchyChanged(final HierarchyEvent e) {
-                if (HierarchyEvent.SHOWING_CHANGED == (HierarchyEvent.SHOWING_CHANGED & e.getChangeFlags())) {
-                    ToConceptSelectionDialog.this.getRootPane().setDefaultButton(getOkayButton());
-                }
+        addHierarchyListener(e -> {
+            if (HierarchyEvent.SHOWING_CHANGED == (HierarchyEvent.SHOWING_CHANGED & e.getChangeFlags())) {
+                ToConceptSelectionDialog.this.getRootPane().setDefaultButton(getOkayButton());
             }
-
-
         });
         pack();
     }

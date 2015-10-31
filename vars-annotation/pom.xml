@@ -157,7 +157,7 @@
         <profile>
             <id>hurl</id>
             <properties>
-                <environment>dev</environment>
+                <environment>hurl</environment>
             </properties>
         </profile>
         <profile>

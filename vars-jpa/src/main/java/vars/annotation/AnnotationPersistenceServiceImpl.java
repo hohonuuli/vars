@@ -90,19 +90,15 @@ public class AnnotationPersistenceServiceImpl extends QueryableImpl implements A
         List<String> desendantNames = descendantNameCache.get(concept);
         if (desendantNames == null && concept != null) {
             Collection<ConceptName> names = getReadOnlyConceptDAO().findDescendentNames(concept);
-            Collection<String> namesAsStrings = Collections2.transform(names, new Function<ConceptName, String>() {
-                public String apply(ConceptName from) {
-                    return from.getName();
-                }
-            });
-            desendantNames = new ArrayList<String>(namesAsStrings);
+            Collection<String> namesAsStrings = Collections2.transform(names, from -> from.getName());
+            desendantNames = new ArrayList<>(namesAsStrings);
             Collections.sort(desendantNames, new IgnoreCaseToStringComparator());
             descendantNameCache.put(concept, desendantNames);
         }
 
         // Don't return null. Alwasy return at least an empty list
         if (desendantNames == null) {
-            desendantNames = new ArrayList<String>();
+            desendantNames = new ArrayList<>();
         }
         
         return desendantNames;
