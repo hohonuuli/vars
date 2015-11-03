@@ -2,8 +2,9 @@ package org.mbari.vars.integration
 
 import java.io.File
 import java.net.URL
+import java.text.SimpleDateFormat
 import java.time.Instant
-import java.util.Date
+import java.util.{TimeZone, Date}
 
 import org.mbari.math.FastCollator
 import org.slf4j.LoggerFactory
@@ -24,6 +25,11 @@ class GenericMerge(val url: URL, val delimiter: String = ",") {
   private[this] val log = LoggerFactory.getLogger(getClass)
   private[this] val missingDouble = Double.NaN
   private[this] val missingFloat = Float.NaN
+  private[this] val dateParser = {
+    val s = new SimpleDateFormat("yyyyMMdd'T'HHmmss'Z'")
+    s.setTimeZone(TimeZone.getTimeZone("UTC"))
+    s
+  }
 
   /**
    * Apply the merge. This does everything and is typically the method that should be called.
@@ -87,7 +93,7 @@ class GenericMerge(val url: URL, val delimiter: String = ",") {
   private def loadGenericData(): Seq[GenericData] = {
 
     val columns = parser.columns.map(_.toLowerCase)
-    val date = load("date", s => Date.from(Instant.parse(s)), new Date(0), parser.rows.size)
+    val date = load("date", parseDate, new Date(0), parser.rows.size)
     val lat = load("latitude", s => s.toDouble, Double.NaN, parser.rows.size)
     val lon = load("longitude", s => s.toDouble, Double.NaN, parser.rows.size)
     val depth = load("depth", s => s.toFloat, Float.NaN, parser.rows.size)
@@ -102,6 +108,14 @@ class GenericMerge(val url: URL, val delimiter: String = ",") {
       temperature(i),
       oxygen(i))
   }
+
+  /**
+    * First trys to parse yyyy-MM-ddTHH:mm:ssZ then tries yyyyMMddTHHmmssZ
+    * @param s
+    * @return
+    */
+  private def parseDate(s: String): Date =  Try(Date.from(Instant.parse(s))).getOrElse(dateParser.parse(s))
+
 
   /**
    *

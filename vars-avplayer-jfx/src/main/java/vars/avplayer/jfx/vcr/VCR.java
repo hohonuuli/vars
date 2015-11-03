@@ -114,13 +114,14 @@ public class VCR extends VCRAdapter {
 
     @Override
     public void seekTimecode(Timecode timecode) {
-        Timecode currentTimecode = getVcrTimecode().getTimecode();
+        //Timecode currentTimecode = getVcrTimecode().getTimecode();
         Timecode tc = timecode;
         if (!timecode.isComplete()) {
             tc = new Timecode(timecode.toString(), DEFAULT_FRAME_RATE);
         }
 
-        double seconds = tc.getFrames() / currentTimecode.getFrameRate();
+        //double seconds = tc.getFrames() / currentTimecode.getFrameRate();
+        double seconds = tc.getSeconds();
         Duration duration = new Duration(seconds * 1000D);
         System.out.println(duration);
         mediaPlayer.seek(duration);
