@@ -28,7 +28,7 @@ public class PSubstrateSecondaryButton extends PropButton {
         super();
         this.toolBelt = getToolBelt();
         setAction(getShowDialogAction());
-        setToolTipText("S1 - Primary Substrate");
+        setToolTipText("S2 - Secondary Substrate");
         setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/s2button.png")));
         setEnabled(false);
     }
