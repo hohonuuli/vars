@@ -182,6 +182,20 @@ class GenericMergeSpec extends FlatSpec with Matchers with PrivateMethodTester {
 
   }
 
+  it should "parse HURL's messed up data formats" in {
+    val newUrl = getClass.getResource("/org/mbari/vars/integration/genericmergedata_hurlsmessedupformat.csv")
+    val gm = new GenericMerge(newUrl)
+    val data = gm invokePrivate loadGenericData()
+    data.size should be (39)
+    val datum = data.head
+    datum.depth should be(1.769F +- eps.toFloat)
+    datum.salinity should be(26.8362F +- eps.toFloat)
+    datum.temperature should be (29.0765F +- eps.toFloat)
+    //datum.latitude should be (null)
+    //datum.longitude should be (null)
+    datum.date should be (Date.from(Instant.parse("2015-09-18T18:27:25Z")))
+  }
+
 }
 
 object GenericMergeSpec {
