@@ -23,7 +23,8 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.util.Duration;
 import org.mbari.awt.image.ImageUtilities;
-import org.mbari.movie.Timecode;
+import org.mbari.vcr4j.time.Converters;
+import org.mbari.vcr4j.time.Timecode;
 
 import javax.swing.*;
 import java.awt.event.ComponentAdapter;
@@ -58,7 +59,7 @@ public class JFXMovieFrameController implements Initializable {
 
     private JFrame frame;
     private volatile MediaPlayer mediaPlayer;
-    private final Timecode timecode = new Timecode();
+    private double frameRate;
     private Duration duration;
     private BooleanProperty readyProperty = new SimpleBooleanProperty(false);
 
@@ -97,7 +98,7 @@ public class JFXMovieFrameController implements Initializable {
         Media media = new Media(mediaLocation);
         final ObservableMap<String,Object> metadata = media.getMetadata();
         //timecode.setFrameRate((Double) metadata.getOrDefault("framerate", DEFAULT_FRAME_RATE));
-        timecode.setFrameRate(DEFAULT_FRAME_RATE);
+        frameRate = DEFAULT_FRAME_RATE;
         mediaPlayer = new MediaPlayer(media);
         mediaView.setMediaPlayer(mediaPlayer);
 
@@ -135,7 +136,7 @@ public class JFXMovieFrameController implements Initializable {
         mediaPlayer.setOnReady(() -> {
             Media m = mediaPlayer.getMedia();
             duration = m.getDuration();
-            Timecode tc = new Timecode(duration.toSeconds() * timecode.getFrameRate(), DEFAULT_FRAME_RATE);
+            Timecode tc = new Timecode(duration.toSeconds() * frameRate, frameRate);
             maxTimecodeTextField.setText(tc.toString());
             updateValues();
             SwingUtilities.invokeLater(() -> frame.setSize(m.getWidth(), m.getHeight()));
@@ -228,8 +229,8 @@ public class JFXMovieFrameController implements Initializable {
         if (timecodeTextField != null && scrubber != null && mediaPlayer != null) {
             Platform.runLater(() -> {
                 Duration currentTime = mediaPlayer.getCurrentTime();
-                double frames = currentTime.toSeconds() * timecode.getFrameRate();
-                timecode.setFrames(frames);
+                double frames = currentTime.toSeconds() * frameRate;
+                Timecode timecode = new Timecode(frames, frameRate);
                 timecodeTextField.setText(timecode.toString());
                 scrubber.setDisable(duration.isUnknown());
                 if (!scrubber.isDisabled() && duration.greaterThan(Duration.ZERO) && !scrubber.isValueChanging()) {

@@ -53,7 +53,7 @@ public class PPhysicalDataPanel extends PropertiesPanel implements IObserver {
     private static final String[] propertyNames = {
             "Latitude", "Longitude", "Depth", "Altitude", "Temperature", "Salinity", "Oxygen", "Light"
     };
-    private PhysicalData physicalData;
+    private volatile PhysicalData physicalData;
     private final PhysicalDataValueEq eq = new PhysicalDataValueEq();
 
     private final ActionAdapter updateAction = new ActionAdapter() {

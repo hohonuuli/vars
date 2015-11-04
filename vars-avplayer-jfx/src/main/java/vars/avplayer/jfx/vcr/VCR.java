@@ -123,7 +123,7 @@ public class VCR extends VCRAdapter {
         //double seconds = tc.getFrames() / currentTimecode.getFrameRate();
         double seconds = tc.getSeconds();
         Duration duration = new Duration(seconds * 1000D);
-        System.out.println(duration);
+        //System.out.println(duration);
         mediaPlayer.seek(duration);
         super.seekTimecode(timecode);
         triggerStateNotification();

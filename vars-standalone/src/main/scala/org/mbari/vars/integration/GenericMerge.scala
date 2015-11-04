@@ -161,7 +161,7 @@ class GenericMerge(val url: URL, val delimiter: String = ",") {
         if (gd.longitude.isNaN) pd.setLongitude(null) else pd.setLongitude(gd.longitude)
         if (gd.depth.isNaN) pd.setDepth(null) else pd.setDepth(gd.depth)
         if (gd.salinity.isNaN) pd.setSalinity(null) else pd.setSalinity(gd.salinity)
-        if (gd.temperature.isNaN) pd.setTemperature(null) else pd.setTemperature(gd.salinity)
+        if (gd.temperature.isNaN) pd.setTemperature(null) else pd.setTemperature(gd.temperature)
         if (gd.oxygen.isNaN) pd.setOxygen(null) else pd.setOxygen(gd.oxygen)
       }
       else {
@@ -169,7 +169,7 @@ class GenericMerge(val url: URL, val delimiter: String = ",") {
         if (!gd.longitude.isNaN) pd.setLongitude(gd.longitude)
         if (!gd.depth.isNaN) pd.setDepth(gd.depth)
         if (!gd.salinity.isNaN) pd.setSalinity(gd.salinity)
-        if (!gd.temperature.isNaN) pd.setTemperature(gd.salinity)
+        if (!gd.temperature.isNaN) pd.setTemperature(gd.temperature)
         if (!gd.oxygen.isNaN) pd.setOxygen(gd.oxygen)
       }
     }

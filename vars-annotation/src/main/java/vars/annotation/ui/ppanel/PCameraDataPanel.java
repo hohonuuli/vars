@@ -54,7 +54,7 @@ public class PCameraDataPanel extends PropertiesPanel {
 
     private ActionAdapter directionAction;
     private final ToolBelt toolBelt;
-    private CameraData cameraData;
+    private volatile CameraData cameraData;
     private CameraDataValueEq eq = new CameraDataValueEq();
     private static final String[] propertyNames = {"Direction", "Name", "Zoom", "Focus", "Iris", "FieldWidth", "ImageReference", "X", "Y"};
 
@@ -163,9 +163,9 @@ public class PCameraDataPanel extends PropertiesPanel {
      */
     public void update(final Object obj, final Object changeCode) {
         final Observation obs = (Observation) obj;
+
         if (obs == null) {
             clearValues();
-
             return;
         }
 
@@ -174,12 +174,12 @@ public class PCameraDataPanel extends PropertiesPanel {
             clearValues();
         }
         else {
-            final CameraData c = vf.getCameraData();
-            if (c == null) {
+            cameraData = vf.getCameraData();
+            if (cameraData == null) {
                 clearValues();
             }
             else {
-                setProperties(c);
+                setProperties(cameraData);
             }
             for (String name : propertyNames) {
                 getPropertyPanel(name).getValueField().setForeground(Color.BLACK);

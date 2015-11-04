@@ -15,6 +15,8 @@
 
 package vars.annotation.ui.video.imagecapture;
 
+import org.mbari.vcr4j.time.Timecode;
+
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -22,7 +24,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
-import org.mbari.movie.Timecode;
 
 /**
  * Represents an instant of time related to a Video tape. This object combines 'real' time,
