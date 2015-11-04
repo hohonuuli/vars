@@ -49,9 +49,7 @@ import vars.annotation.ui.Lookup;
 public final class NewObservationAction extends ActionAdapter {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
-    private final Timecode timeCodeObj = new Timecode();
     private String defaultConceptName;
-    private final ToolBelt toolBelt;
 
     /**
      * Constructor for the NewVideoFrameAction object
@@ -60,7 +58,6 @@ public final class NewObservationAction extends ActionAdapter {
      */
     public NewObservationAction(final ToolBelt toolBelt) {
         super();
-        this.toolBelt = toolBelt;
 
         try {
             defaultConceptName = toolBelt.getAnnotationPersistenceService().findRootConcept().getPrimaryConceptName().getName();

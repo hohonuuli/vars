@@ -1,10 +1,10 @@
 package vars.testing;
 
-import org.mbari.movie.Timecode;
 
 import java.text.NumberFormat;
 import java.util.Date;
 
+import org.mbari.movie.Timecode;
 import vars.annotation.VideoFrame;
 import vars.annotation.*;
 

@@ -21,8 +21,12 @@ import org.bushe.swing.event.annotation.EventSubscriber;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collection;
-import org.mbari.movie.Timecode;
+import java.util.Optional;
+
 import org.mbari.util.Dispatcher;
+import org.mbari.vcr4j.time.Converters;
+import org.mbari.vcr4j.time.HMSF;
+import org.mbari.vcr4j.time.Timecode;
 import org.mbari.vcr4j.ui.TimeCodeSelectionFrame;
 import org.mbari.vcr4j.ui.TimeSelectPanel;
 import org.slf4j.Logger;
@@ -121,13 +125,16 @@ public class ChangeTimeCodeFrame extends TimeCodeSelectionFrame {
                 final String stc = vf.getTimecode();
                 if (stc != null) {
                     try {
-                        final Timecode tc = new Timecode(stc);
-                        hour = tc.getHour();
-                        minute = tc.getMinute();
-                        second = tc.getSecond();
-                        frame = tc.getFrame();
+                        Optional<HMSF> hmsfOpt = HMSF.from(stc);
+                        if (hmsfOpt.isPresent()) {
+                            HMSF hmsf = hmsfOpt.get();
+                            hour = hmsf.getHour();
+                            minute = hmsf.getMinute();
+                            second = hmsf.getSecond();
+                            frame = hmsf.getFrame();
+                        }
                     }
-                    catch (NumberFormatException e) {
+                    catch (Exception e) {
                         log.info("Failed to parse timecode of " + stc);
                     }
                 }

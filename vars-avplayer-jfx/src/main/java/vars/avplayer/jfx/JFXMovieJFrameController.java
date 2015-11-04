@@ -24,7 +24,7 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.util.Duration;
 import org.mbari.awt.image.ImageUtilities;
-import org.mbari.movie.Timecode;
+import org.mbari.vcr4j.time.Timecode;
 
 import javax.swing.*;
 import java.awt.image.BufferedImage;
@@ -32,7 +32,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 public class JFXMovieJFrameController implements Initializable {
@@ -62,7 +61,7 @@ public class JFXMovieJFrameController implements Initializable {
 
     private MediaPlayer mediaPlayer;
 
-    private final Timecode timecode = new Timecode();
+    private double frameRate;
     private Duration duration;
     private BooleanProperty readyProperty = new SimpleBooleanProperty(false);
 
@@ -92,7 +91,7 @@ public class JFXMovieJFrameController implements Initializable {
         Media media = new Media(mediaLocation);
         final ObservableMap<String,Object> metadata = media.getMetadata();
         //timecode.setFrameRate((Double) metadata.getOrDefault("framerate", DEFAULT_FRAME_RATE));
-        timecode.setFrameRate(DEFAULT_FRAME_RATE);
+        frameRate = DEFAULT_FRAME_RATE;
         mediaPlayer = new MediaPlayer(media);
         mediaView.setMediaPlayer(mediaPlayer);
 
@@ -107,7 +106,7 @@ public class JFXMovieJFrameController implements Initializable {
         mediaPlayer.setOnReady(() -> {
             Media m = mediaPlayer.getMedia();
             duration = m.getDuration();
-            Timecode tc = new Timecode(duration.toSeconds() * timecode.getFrameRate(), DEFAULT_FRAME_RATE);
+            Timecode tc = new Timecode(duration.toSeconds() * frameRate, frameRate);
             SwingUtilities.invokeLater(() -> maxTimecodeTextField.setText(tc.toString()));
             updateValues();
             onReadyRunnable.accept(this);
@@ -220,8 +219,8 @@ public class JFXMovieJFrameController implements Initializable {
         if (timecodeTextField != null && scrubber != null && mediaPlayer != null) {
             Platform.runLater(() -> {
                 Duration currentTime = mediaPlayer.getCurrentTime();
-                double frames = currentTime.toSeconds() * timecode.getFrameRate();
-                timecode.setFrames(frames);
+                double frames = currentTime.toSeconds() * frameRate;
+                Timecode timecode = new Timecode(frames, frameRate);
                 timecodeTextField.setText(timecode.toString());
                 scrubber.setDisable(duration.isUnknown());
                 if (!scrubber.isDisabled() && duration.greaterThan(Duration.ZERO) && !scrubber.isValueChanging()) {
