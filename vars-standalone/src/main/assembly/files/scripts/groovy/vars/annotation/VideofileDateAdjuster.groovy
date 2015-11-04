@@ -1,7 +1,7 @@
 package vars.annotation
 
+import org.mbari.vcr4j.time.Timecode
 import vars.ToolBox
-import org.mbari.movie.Timecode
 import org.slf4j.LoggerFactory
 
 /**
@@ -17,7 +17,7 @@ class VideofileDateAdjuster {
     def log = LoggerFactory.getLogger(getClass())
 
 
-    def adjust(String videoArchiveName, Date date) {
+    def adjust(String videoArchiveName, Date date, double frameRate = 30) {
 
         VideoArchiveDAO dao = toolbox.toolBelt.annotationDAOFactory.newVideoArchiveDAO()
         dao.startTransaction()
@@ -27,7 +27,7 @@ class VideofileDateAdjuster {
 
             videoArchive.videoFrames.each { VideoFrame vf ->
                 try {
-                    def timecode = new Timecode(vf.timecode)
+                    def timecode = new Timecode(vf.timecode, frameRate)
                     vf.recordedDate = new Date(date.time + (timecode.frames / timecode.frameRate * 1000L) as Long)
                 }
                 catch (Exception e) {
