@@ -44,6 +44,7 @@ public class ChangeCameraDataCmd implements Command {
     private void doCommand(ToolBelt toolBelt, boolean isApply) {
         CameraData data = isApply ? newCameraData : oldCameraData;
         CameraDataDAO dao = toolBelt.getAnnotationDAOFactory().newCameraDataDAO();
+        dao.startTransaction();
         CameraData cd = dao.findByPrimaryKey(oldCameraData.getPrimaryKey());
         VideoFramesChangedEvent event = null;
         if (cd != null) {
@@ -66,6 +67,7 @@ public class ChangeCameraDataCmd implements Command {
             cd.setZ(data.getZ());
             cd.setZoom(data.getZoom());
             cd.setZUnits(data.getZUnits());
+            dao.commit();
             event = new VideoFramesChangedEvent(null, Collections.singletonList(cd.getVideoFrame()));
         }
         dao.endTransaction();
