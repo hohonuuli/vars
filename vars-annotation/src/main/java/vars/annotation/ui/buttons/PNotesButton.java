@@ -27,7 +27,7 @@ public class PNotesButton extends PropButton {
         super();
         setAction(getShowDialogAction());
         setToolTipText("edit notes");
-        setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/notes.png")));
+        setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/note.png")));
         setEnabled(false);
     }
 
