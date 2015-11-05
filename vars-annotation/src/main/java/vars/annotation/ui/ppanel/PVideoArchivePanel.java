@@ -29,9 +29,11 @@ import javax.swing.SwingUtilities;
 
 import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
+import org.mbari.awt.event.NonDigitConsumingKeyListener;
 import org.mbari.swing.PropertyPanel;
 import vars.annotation.ui.commandqueue.Command;
 import vars.annotation.ui.commandqueue.CommandEvent;
+import vars.annotation.ui.commandqueue.impl.ChangeSequenceNumberCmd;
 import vars.annotation.ui.commandqueue.impl.ChangeVideoArchiveSetCmd;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -131,6 +133,39 @@ public class PVideoArchivePanel extends PropertiesPanel {
                                 vas.getFormatCode(), vas);
                         CommandEvent commandEvent = new CommandEvent(command);
                         EventBus.publish(commandEvent);
+                    }
+                }
+            }
+        });
+        p.setEditable(true);
+
+
+        p = getPropertyPanel("diveNumber");
+        final JTextField f4 = p.getValueField();
+        f4.addKeyListener(new NonDigitConsumingKeyListener());
+        f4.addActionListener(e -> {
+
+            Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+            observations = new ArrayList<>(observations); // Make a copy to avoid sync issues.
+            if (observations.size() == 1) {
+                final Observation obs = observations.iterator().next();
+                final VideoFrame vf = obs.getVideoFrame();
+                if (vf != null) {
+                    final VideoArchive va = vf.getVideoArchive();
+                    if (va != null) {
+                        try {
+                            final CameraDeployment cameraDeployment = va.getVideoArchiveSet().getCameraDeployments().iterator().next();
+                            int newSeqNumber = Integer.parseInt(f4.getText());
+                            int oldSeqNumber = cameraDeployment.getSequenceNumber();
+                            long id = (Long) va.getPrimaryKey();
+                            Command command = new ChangeSequenceNumberCmd(newSeqNumber, oldSeqNumber, id);
+                            CommandEvent commandEvent = new CommandEvent(command);
+                            EventBus.publish(commandEvent);
+                        }
+                        catch (Exception e1) {
+                            log.info("Failed to set diveNumber", e1);
+                        }
+
                     }
                 }
             }
