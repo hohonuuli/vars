@@ -42,6 +42,7 @@ public class ChangePhysicalDataCmd implements Command {
     private void doCommand(ToolBelt toolBelt, boolean isApply) {
         PhysicalData data = isApply ? newPhysicalData : oldPhysicalData;
         PhysicalDataDAO dao = toolBelt.getAnnotationDAOFactory().newPhysicalDataDAO();
+        dao.startTransaction();
         PhysicalData pd = dao.findByPrimaryKey(oldPhysicalData.getPrimaryKey());
         VideoFramesChangedEvent event = null;
         if (pd != null) {
@@ -54,6 +55,7 @@ public class ChangePhysicalDataCmd implements Command {
             pd.setOxygen(data.getOxygen());
             pd.setSalinity(data.getSalinity());
             pd.setTemperature(data.getTemperature());
+            dao.commit();
             event = new VideoFramesChangedEvent(null, Collections.singletonList(pd.getVideoFrame()));
         }
         dao.endTransaction();
