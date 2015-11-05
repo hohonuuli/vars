@@ -1,5 +1,5 @@
 import java.text.SimpleDateFormat
-import vars.annotation.DateAdjuster
+import vars.annotation.VideofileDateAdjuster
 
 /*
  This script will set the recorded date of each annotated video frame using
@@ -30,5 +30,5 @@ def videoArchiveName = args[0]
 def df = new SimpleDateFormat('yyyy-MM-dd')
 def date = df.parse(args[1])
 
-def dateAdjuster = new DateAdjuster()
+def dateAdjuster = new VideofileDateAdjuster()
 dateAdjuster.adjust(videoArchiveName, date, 100)
