@@ -17,6 +17,7 @@ import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Button;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.media.Media;
@@ -32,6 +33,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
 public class JFXMovieJFrameController implements Initializable {
@@ -165,7 +170,7 @@ public class JFXMovieJFrameController implements Initializable {
         }
     }
 
-    public BufferedImage frameCapture(File target) throws IOException, InterruptedException {
+    public BufferedImage frameCapture(File target) throws IOException, InterruptedException, TimeoutException, ExecutionException {
 
         BufferedImage bufferedImage = null;
         if (mediaView != null) {
@@ -193,16 +198,23 @@ public class JFXMovieJFrameController implements Initializable {
 
              */
             Exception failure = null;
-            for (int i = 0; i < 24; i++) {
-                Thread.sleep(400L);
-                try {
-                    bufferedImage = vars.shared.ui.ImageUtilities.watchForAndReadNewImage(target);
-                    break;
-                }
-                catch (IndexOutOfBoundsException e) {
-                    failure = e;
-                }
-            }
+//            long timeoutSeconds = 8L;
+//            int readAttempts = 20;
+//            java.time.Duration timeout = java.time.Duration.ofSeconds(timeoutSeconds);
+//            for (int i = 0; i < readAttempts; i++) {
+//                Thread.sleep(timeoutSeconds / readAttempts);
+//                try {
+//                    bufferedImage = vars.shared.ui.ImageUtilities.watchForAndReadNewImage(target, timeout);
+//                    break;
+//                }
+//                catch (IndexOutOfBoundsException e) {
+//                    failure = e;
+//                }
+//            }
+
+            java.time.Duration timeout = java.time.Duration.ofSeconds(8);
+            CompletableFuture<BufferedImage> imageFuture = vars.shared.ui.ImageUtilities.readImageAsync(target, timeout);
+            bufferedImage = imageFuture.get(timeout.getSeconds(), TimeUnit.SECONDS);
 
             if (bufferedImage == null && failure != null) {
                 // TODO report error
