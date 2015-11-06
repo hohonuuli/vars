@@ -141,7 +141,7 @@ public class App {
         // Configure EventBus
         EventTopicSubscriber fatalErrorSubscriber = new FatalExceptionSubscriber(getAnnotationFrame());
         EventTopicSubscriber nonFatalErrorSubscriber = new NonFatalErrorSubscriber(getAnnotationFrame());
-        EventTopicSubscriber warningSubscriber = new WarningSubscriber(getAnnotationFrame());       
+        EventTopicSubscriber warningSubscriber = new WarningSubscriber(getAnnotationFrame());
         EventTopicSubscriber exitSubscriber = new ExitTopicSubscriber();
         EventSubscriber loggingSubscriber = new LoggingEventSubscriber();
         
