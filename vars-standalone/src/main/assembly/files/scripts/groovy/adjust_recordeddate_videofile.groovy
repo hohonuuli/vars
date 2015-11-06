@@ -10,7 +10,7 @@ import vars.annotation.VideofileDateAdjuster
  Usage: adjust_recordeddate_videofile [videoArchiveName] [date]
  Arguments:
     videoArchiveName = The video name
-    date = date as yyyy-MM-dd (e.g. 2015-02-23)
+    date = date as yyyy-MM-ddTHH:mm:ss (e.g. 2015-02-23T13:01:58) UTC
 */
 
 if (args.size() != 2) {
@@ -21,13 +21,14 @@ if (args.size() != 2) {
   | Usage: adjust_timecode [videoArchiveName] [date]
   | Arguments:
   |   videoArchiveName = The video name
-  |   date = date as yyyy-MM-dd (e.g. 2015-02-23)
+  |   date = date as yyyy-MM-ddTHH:mm:ss (e.g. 2015-02-23T13:01:58) UTC
   """.stripMargin('|'))
     return
 }
 
 def videoArchiveName = args[0]
-def df = new SimpleDateFormat('yyyy-MM-dd')
+def df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+df.setTimeZone(TimeZone.getTimeZone('UTC'))
 def date = df.parse(args[1])
 
 def dateAdjuster = new VideofileDateAdjuster()
