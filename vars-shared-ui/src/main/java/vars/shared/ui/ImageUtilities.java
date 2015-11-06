@@ -61,7 +61,7 @@ public class ImageUtilities {
                         break;
                     }
                 }
-                catch (InterruptedException | IOException e) {
+                catch (IndexOutOfBoundsException | InterruptedException | IOException e) {
                     /*
                         We are writing the image asynchronously (e.g. Platform.runLater()). Since we're not using any RX
                         frameworks, we have to poll the image to see if it's done being written. If we try to read it while
