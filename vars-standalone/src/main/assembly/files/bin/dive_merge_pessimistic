@@ -1,0 +1,18 @@
+#!/bin/sh
+# $Id: $
+
+# This is a script used by MBARI for merging information from the on-board ships data with
+# annotations in the VARS data system.
+#
+# Usage: dive_merge [ROV] [DIVE] [HD]
+# Arguments:
+#    ROV = Ventana or Tiburon
+#    DIVE = The dive number (e.g. 2999)
+#    HD = true or false. true says that the dive is recorded in HD, false means that it is beta.
+
+ROV=$1
+DIVE=$2
+HD=$3
+
+echo [VARS] Executing VARS merge with EXPD for dive: $ROV $DIVE [isHD=$HD]
+`dirname "$0"`/gsh -e "def m = new org.mbari.vars.integration.MergeEXPDAnnotations2('$ROV', $DIVE, $HD); m.apply(vars.integration.MergeType.PESSIMISTIC)"
