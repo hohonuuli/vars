@@ -17,17 +17,8 @@ package vars.shared;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;
-import com.google.inject.Provider;
-import com.google.inject.Scopes;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
-import org.mbari.util.SystemUtilities;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import vars.VARSException;
 import vars.jpa.VarsJpaModule;
 
@@ -40,8 +31,6 @@ public class InjectorModule implements Module {
     private final String annotationPersistenceUnit;
     private final String knowledgebasePersistenceUnit;
     private final String miscPersistenceUnit;
-    private static ResourceBundle bundle;  // HACK! Must be static
-    private static final String fallbackImageCaptureService = "vars.shared.ui.video.FakeImageCaptureServiceImpl";
 
 
     public InjectorModule(String annotationPersistenceUnit,
@@ -66,5 +55,6 @@ public class InjectorModule implements Module {
         }
 
     }
+
 
 }

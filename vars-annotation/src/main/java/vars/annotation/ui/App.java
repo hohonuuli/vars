@@ -87,7 +87,7 @@ public class App {
         activeAppBeacon = new ActiveAppBeacon(BEACON_PORTS, BEACON_MESSAGE);
 
         splashFrame.setMessage(" Initializing configuration ...");
-
+        splashFrame.setVisible(true);
 
         final Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
         try {
