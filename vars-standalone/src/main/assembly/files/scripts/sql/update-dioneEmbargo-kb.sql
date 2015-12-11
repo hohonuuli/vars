@@ -2,6 +2,37 @@
 -- DELETE branches of concepts
 -- --------------------------------------------------------------------
 
+
+-- Cydippida 2 ------------------------------------------------------
+DECLARE @conceptId bigint
+
+DECLARE MyCursor CURSOR FOR
+  SELECT ConceptID_FK FROM ConceptName WHERE ConceptName = 'Cydippida 2'
+
+OPEN MyCursor
+FETCH NEXT FROM MyCursor into @conceptId
+WHILE @@FETCH_STATUS = 0
+  BEGIN
+    PRINT @conceptId
+    FETCH NEXT FROM MyCursor INTO @conceptId
+
+    -- Drop ConceptNames first
+    DELETE FROM ConceptName WHERE id IN (SELECT cn.id FROM Concept AS c LEFT JOIN
+      ConceptName AS cn ON cn.ConceptID_FK = c.id WHERE c.ParentConceptID_FK = @conceptId)
+
+    -- Drop Concepts
+    DELETE FROM Concept WHERE ParentConceptID_FK = @conceptId
+
+    DELETE FROM ConceptName WHERE ConceptID_FK =@conceptId
+
+    DELETE FROM Concept WHERE id = @conceptId
+
+  END
+CLOSE MyCursor
+DEALLOCATE MyCursor
+
+GO
+
 -- Mystery Mollusc --------------------------------------------------
 DECLARE @conceptId bigint
 
@@ -182,11 +213,41 @@ DEALLOCATE MyCursor
 
 GO
 
--- Erenna sp. 1 --------------------------------------------------
+-- Erenna sp. A --------------------------------------------------
 DECLARE @conceptId bigint
 
 DECLARE MyCursor CURSOR FOR
-  SELECT ConceptID_FK FROM ConceptName WHERE ConceptName = 'Erenna sp. 1'
+  SELECT ConceptID_FK FROM ConceptName WHERE ConceptName = 'Erenna sp. A'
+
+OPEN MyCursor
+FETCH NEXT FROM MyCursor into @conceptId
+WHILE @@FETCH_STATUS = 0
+  BEGIN
+    PRINT @conceptId
+    FETCH NEXT FROM MyCursor INTO @conceptId
+
+    -- Drop ConceptNames first
+    DELETE FROM ConceptName WHERE id IN (SELECT cn.id FROM Concept AS c LEFT JOIN
+      ConceptName AS cn ON cn.ConceptID_FK = c.id WHERE c.ParentConceptID_FK = @conceptId)
+
+    -- Drop Concepts
+    DELETE FROM Concept WHERE ParentConceptID_FK = @conceptId
+
+    DELETE FROM ConceptName WHERE ConceptID_FK =@conceptId
+
+    DELETE FROM Concept WHERE id = @conceptId
+
+  END
+CLOSE MyCursor
+DEALLOCATE MyCursor
+
+GO
+
+-- Erenna sp. B --------------------------------------------------
+DECLARE @conceptId bigint
+
+DECLARE MyCursor CURSOR FOR
+  SELECT ConceptID_FK FROM ConceptName WHERE ConceptName = 'Erenna sp. B'
 
 OPEN MyCursor
 FETCH NEXT FROM MyCursor into @conceptId
@@ -252,17 +313,17 @@ DELETE FROM
 WHERE
   ConceptDelegateID_FK IN ( 
     SELECT
-      cd.id 
+      cd.id
     FROM
-      ConceptDelegate AS cd LEFT JOIN 
-      Concept AS C ON cd.ConceptID_FK = C.id RIGHT JOIN 
-      Media AS M ON M.ConceptDelegateID_FK = cd.id RIGHT JOIN 
-      ConceptName AS cn ON cn.ConceptID_FK = C.id 
+      ConceptName AS cn RIGHT JOIN
+      Concept AS C ON C.id = cn.ConceptID_FK RIGHT JOIN
+      ConceptDelegate AS cd  ON cd.ConceptID_FK = C.id
     WHERE
       cn.ConceptName IN (
         'Xenoturbellida', 
         'Xenoturbellidae',
         'Xenoturbella',  
+        'Lyroctenidae',
         'Mertensia', 
         'Lyroctenidae', 
         'Lyrocteis', 
@@ -291,12 +352,11 @@ DELETE FROM
 WHERE
   ConceptDelegateID_FK IN ( 
     SELECT
-      cd.id 
+      cd.id
     FROM
-      ConceptDelegate AS cd LEFT JOIN 
-      Concept AS C ON cd.ConceptID_FK = C.id RIGHT JOIN 
-      Media AS M ON M.ConceptDelegateID_FK = cd.id RIGHT JOIN 
-      ConceptName AS cn ON cn.ConceptID_FK = C.id 
+      ConceptName AS cn RIGHT JOIN
+      Concept AS C ON C.id = cn.ConceptID_FK RIGHT JOIN
+      ConceptDelegate AS cd  ON cd.ConceptID_FK = C.id
     WHERE
       cn.ConceptName IN (
         'Xenoturbellida', 

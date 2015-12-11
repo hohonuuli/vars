@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+echo [VARS] Adjusting recordedDate fields in annotations
+MY_DIR=`dirname "$0"`
+$MY_DIR/gsh $MY_DIR/../scripts/groovy/adjust_recordeddate_videofile.groovy "$@"

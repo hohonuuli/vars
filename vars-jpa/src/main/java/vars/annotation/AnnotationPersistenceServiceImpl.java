@@ -27,10 +27,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import org.mbari.text.IgnoreCaseToStringComparator;
+import org.mbari.util.stream.StreamUtilities;
 import vars.*;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
@@ -88,19 +90,15 @@ public class AnnotationPersistenceServiceImpl extends QueryableImpl implements A
         List<String> desendantNames = descendantNameCache.get(concept);
         if (desendantNames == null && concept != null) {
             Collection<ConceptName> names = getReadOnlyConceptDAO().findDescendentNames(concept);
-            Collection<String> namesAsStrings = Collections2.transform(names, new Function<ConceptName, String>() {
-                public String apply(ConceptName from) {
-                    return from.getName();
-                }
-            });
-            desendantNames = new ArrayList<String>(namesAsStrings);
+            Collection<String> namesAsStrings = Collections2.transform(names, from -> from.getName());
+            desendantNames = new ArrayList<>(namesAsStrings);
             Collections.sort(desendantNames, new IgnoreCaseToStringComparator());
             descendantNameCache.put(concept, desendantNames);
         }
 
         // Don't return null. Alwasy return at least an empty list
         if (desendantNames == null) {
-            desendantNames = new ArrayList<String>();
+            desendantNames = new ArrayList<>();
         }
         
         return desendantNames;
@@ -361,19 +359,70 @@ public class AnnotationPersistenceServiceImpl extends QueryableImpl implements A
                 "VideoArchive AS va ON vf.VideoArchiveID_FK = va.id WHERE " +
                 "va.videoArchiveName = '" + videoArchiveName + "' AND vf.TapeTimeCode = '" +
                 timecode + "'";
-        QueryFunction<Long> queryFunction = new QueryFunction<Long>() {
-            @Override
-            public Long apply(ResultSet resultSet) throws SQLException {
-                Long id = null;
-                if (resultSet.next()) {
-                    id = resultSet.getLong(1);
-                }
-                return id;
+        QueryFunction<Long> queryFunction = (resultSet) -> {
+            Long id = null;
+            if (resultSet.next()) {
+                id = resultSet.getLong(1);
             }
+            return id;
         };
+
+//        QueryFunction<Long> queryFunction = new QueryFunction<Long>() {
+//            @Override
+//            public Long apply(ResultSet resultSet) throws SQLException {
+//                Long id = null;
+//                if (resultSet.next()) {
+//                    id = resultSet.getLong(1);
+//                }
+//                return id;
+//            }
+//        };
         return executeQueryFunction(sql, queryFunction);
     }
-    
+
+
+    @Override
+    public List<String> findAllCameraPlatforms() {
+        List<String> cameraPlatforms = new ArrayList<>();
+
+        // --- Search in annotation-app.properties
+        // HACK: Hardcoded the annotation-app
+        try {
+            ResourceBundle bundle = ResourceBundle.getBundle("annotation-app", Locale.US);
+            List<String> cps = StreamUtilities.toStream(bundle.getKeys())
+                    .filter(s -> s.startsWith("cameraplatform"))
+                    .map(bundle::getString)
+                    .collect(Collectors.toList());
+            cameraPlatforms.addAll(cps);
+        }
+        catch (Exception e) {
+            log.debug("Failed to load camera platforms from annotation-app.properties", e);
+        }
+
+        // TODO search in app.conf
+
+        // --- Fetch all values in database
+        String sql = "SELECT DISTINCT PlatformName FROM VideoArchiveSet";
+        QueryFunction<List<String>> queryFunction = resultSet -> {
+            List<String> cps = new ArrayList<>();
+            while (resultSet.next()) {
+                cps.add(resultSet.getString(1));
+            }
+            return cps;
+        };
+        try {
+            cameraPlatforms.addAll(executeQueryFunction(sql, queryFunction));
+        }
+        catch (Exception e) {
+            log.debug("Failed to fetch cameraplatforms from database", e);
+        }
+
+        // --- Remove duplicate elements and sort list
+        cameraPlatforms = new ArrayList<>(new HashSet<>(cameraPlatforms));
+        Collections.sort(cameraPlatforms);
+
+        return cameraPlatforms;
+    }
 
     private class MyCacheClearedListener implements CacheClearedListener {
 

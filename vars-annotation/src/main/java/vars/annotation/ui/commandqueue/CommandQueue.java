@@ -49,7 +49,6 @@ public class CommandQueue {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
     private final int maxUndos = 25;
-    //private final Queue<CommandEvent> pendingQueue = new ConcurrentLinkedQueue<CommandEvent>();
     private final BlockingQueue<CommandEvent> pendingQueue = new LinkedBlockingQueue<CommandEvent>();
     private final Deque<CommandEvent> undos = new LinkedBlockingDeque<CommandEvent>(maxUndos);
     private final Deque<CommandEvent> redos = new LinkedBlockingDeque<CommandEvent>(maxUndos);

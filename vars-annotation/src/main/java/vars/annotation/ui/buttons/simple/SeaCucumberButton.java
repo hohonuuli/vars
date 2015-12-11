@@ -5,14 +5,19 @@
 
 package vars.annotation.ui.buttons.simple;
 
+import vars.annotation.ui.ToolBelt;
+
+import javax.inject.Inject;
+
 /**
  *
  * @author brian
  */
 public class SeaCucumberButton extends QuickConceptButton {
 
-    public SeaCucumberButton() {
-        super("Sea Cucumber", "/images/simple/sea_cucumber.jpg");
+    @Inject
+    public SeaCucumberButton(ToolBelt toolBelt) {
+        super("Sea Cucumber", "/images/simple/sea_cucumber.jpg", toolBelt);
     }
     
 }

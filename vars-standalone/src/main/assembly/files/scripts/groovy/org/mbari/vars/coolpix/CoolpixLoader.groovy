@@ -1,6 +1,5 @@
 package org.mbari.vars.coolpix
 
-
 import org.slf4j.LoggerFactory
 import vars.ToolBox
 import vars.integration.MergeFunction

@@ -3,7 +3,7 @@ package uk.ac.ox.zoo
 import vars.annotation.VideoFrame
 import vars.ToolBox
 import org.slf4j.LoggerFactory
-import org.mbari.math.CoallateFunction
+import org.mbari.math.CollateFunction
 import vars.annotation.VideoArchiveSetDAO
 import vars.query.ui.Lookup
 
@@ -56,7 +56,7 @@ class MergeData {
         log.info("Found ${videoFrames?.size()} videoFrames")
         def coallatedData = [:]
         try {
-            coallatedData = CoallateFunction.coallate(videoFrames, convertVideoFrameToMillisecs,
+            coallatedData = CollateFunction.coallate(videoFrames, convertVideoFrameToMillisecs,
                 csvData, convertCsvDatumToMillisecs, offsetMillisecs)
         }
         catch (Exception e) {

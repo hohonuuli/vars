@@ -8,11 +8,7 @@
 
 import vars.shared.ui.GlobalLookup
 import vars.annotation.VideoArchiveDAO
-import org.mbari.vars.integration.MergeEXPDAnnotations
-import org.slf4j.LoggerFactory
-import vars.integration.MergeFunction
 
-def log = LoggerFactory.getLogger("bugfix-t0059tripod")
 def df = GlobalLookup.DATE_FORMAT_UTC
 def date = df.parse('2012-06-26 23:33:00')
 

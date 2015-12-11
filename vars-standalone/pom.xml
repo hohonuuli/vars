@@ -4,7 +4,7 @@
     <parent>
         <artifactId>vars-redux</artifactId>
         <groupId>vars-redux</groupId>
-        <version>7.1.0-SNAPSHOT</version>
+        <version>8.2-SNAPSHOT</version>
     </parent>
     <artifactId>vars-standalone</artifactId>
     <name>vars-standalone</name>
@@ -87,18 +87,6 @@
             <version>${commons.imaging.version}</version>
         </dependency>
 
-        <!-- Need for loading SIMPA -->
-        <!--<dependency>-->
-            <!--<groupId>${project.groupId}</groupId>-->
-            <!--<artifactId>vars-quicktime</artifactId>-->
-            <!--<version>${project.version}</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.mbari</groupId>-->
-            <!--<artifactId>qtx4j</artifactId>-->
-            <!--<version>${qtx4j.version}</version>-->
-        <!--</dependency>-->
-
         <!--
             Scala related classes
         -->
@@ -135,6 +123,28 @@
             <groupId>org.scalatest</groupId>
             <artifactId>scalatest_${scala.version.major}</artifactId>
             <version>${scalatest.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- JDBC Driver -->
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derbyclient</artifactId>
+            <version>${derby.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Database engine -->
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derby</artifactId>
+            <version>${derby.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Network server control -->
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derbynet</artifactId>
+            <version>${derby.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <!--
@@ -178,7 +188,7 @@
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.2.1</version>
                 <executions>
                     <execution>
                         <goals>
@@ -195,7 +205,7 @@
                                 <arg>-deprecation</arg>
                                 <arg>-feature</arg>
                                 <arg>-language:implicitConversions</arg>
-                                <!--<arg>-Xfatal-warnings</arg>-->
+                                <arg>-language:postfixOps</arg>
                             </args>
                         </configuration>
                     </execution>

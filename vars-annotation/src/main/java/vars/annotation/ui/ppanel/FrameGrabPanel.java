@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.Observation;
 import vars.annotation.VideoFrame;
+import vars.annotation.ui.AnnotationImageCanvas;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
 import vars.annotation.ui.imagepanel.ImageAnnotationFrame;
@@ -76,7 +77,6 @@ public class FrameGrabPanel extends javax.swing.JPanel {
      */
     public FrameGrabPanel(ToolBelt toolBelt) {
         this.imageFrame = new ImageAnnotationFrame(toolBelt);
-        //this.imageFrame = new JXImageAnnotationFrame(toolBelt);
         imageFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         imageFrame.pack();
         initialize();
@@ -123,9 +123,6 @@ public class FrameGrabPanel extends javax.swing.JPanel {
     }
 
     /**
-     * <p><!-- Method description --></p>
-     *
-     *
      * @param evt
      */
     private void resizeHandler(final java.awt.event.ComponentEvent evt) {
@@ -152,13 +149,7 @@ public class FrameGrabPanel extends javax.swing.JPanel {
 
             // If one observation is found show it's image
             Set<VideoFrame> videoFrames = new HashSet<VideoFrame>(Collections2.transform(observations,
-                new Function<Observation, VideoFrame>() {
-
-                public VideoFrame apply(Observation from) {
-                    return from.getVideoFrame();
-                }
-
-            }));
+                    from -> from.getVideoFrame()));
 
             if (videoFrames.size() == 1) {
                 VideoFrame videoFrame = videoFrames.iterator().next();

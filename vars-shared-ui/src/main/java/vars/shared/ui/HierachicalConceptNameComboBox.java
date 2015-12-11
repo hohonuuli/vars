@@ -21,8 +21,9 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.Collection;
 import java.util.Vector;
-import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
+import javax.inject.Inject;
+import javax.swing.*;
+
 import org.mbari.swing.SortedComboBoxModel;
 import org.mbari.swing.SpinningDialWaitIndicator;
 import org.mbari.swing.WaitIndicator;
@@ -49,6 +50,7 @@ public class HierachicalConceptNameComboBox extends ConceptNameComboBox {
      *
      * @param annotationPersistenceService
      */
+    @Inject
     public HierachicalConceptNameComboBox(AnnotationPersistenceService annotationPersistenceService) {
         super();
         this.annotationPersistenceService = annotationPersistenceService;
@@ -66,8 +68,8 @@ public class HierachicalConceptNameComboBox extends ConceptNameComboBox {
         // WARNING!! getDescendentNames can be very slow the first time it is called.
         super();
         this.annotationPersistenceService = annotationPersistenceService;
-        setConcept(concept);
         initialize();
+        setConcept(concept);
     }
 
     /**
@@ -120,48 +122,45 @@ public class HierachicalConceptNameComboBox extends ConceptNameComboBox {
         else {
 
             final String primaryName = concept.getPrimaryConceptName().getName();
+
             final SortedComboBoxModel<String> model =  (SortedComboBoxModel<String>) getModel();
             model.addElement(primaryName); // Gets removed at setItems call, but makes the comboBox look prettier in the interm
 
-            SwingUtilities.invokeLater(new Runnable() {
 
-                public void run() {
+                final WaitIndicator waitIndicator = new SpinningDialWaitIndicator( HierachicalConceptNameComboBox.this);
 
-                    final WaitIndicator waitIndicator = new SpinningDialWaitIndicator( HierachicalConceptNameComboBox.this);
+                SwingWorker worker = new SwingWorker<Collection<String>, Void>() {
 
-                    SwingWorker worker = new SwingWorker<Collection<String>, Void>() {
+                    @Override
+                    protected Collection<String> doInBackground() throws Exception {
+                        log.info("WOOT!");
+                        return annotationPersistenceService.findDescendantNamesFor(concept);
+                    }
 
-                        @Override
-                        protected Collection<String> doInBackground() throws Exception {
-                            return annotationPersistenceService.findDescendantNamesFor(concept);
+                    @Override
+                    protected void done() {
+                        try {
+                            model.setItems(new Vector<>(get()));
+                        }
+                        catch (Exception e) {
+                            log.warn("Failed to lookup " + concept, e);
+                        }
+                        finally {
+                            waitIndicator.dispose();
                         }
 
-                        @Override
-                        protected void done() {
-                            try {
-                                model.setItems(new Vector<String>(get()));
-                            }
-                            catch (Exception e) {
-                                log.warn("Failed to lookup " + concept, e);
-                            }
-                            finally {
-                                waitIndicator.dispose();
-                            }
-
-                            if (!model.contains(primaryName)) {
-                                model.addElement(primaryName);
-                            }
+                        if (!model.contains(primaryName)) {
+                            model.addElement(primaryName);
                         }
-                    };
+                    }
+                };
 
-                    worker.execute();
+                worker.execute();
 
-
-                }
-            });
 
             
         }
 
     }
+
 }

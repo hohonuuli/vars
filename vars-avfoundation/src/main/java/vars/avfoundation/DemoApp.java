@@ -1,7 +1,6 @@
 package vars.avfoundation;
 
 import org.mbari.util.TimeUtilities;
-import vars.shared.ui.video.ImageCaptureService;
 
 import java.awt.*;
 import java.io.File;

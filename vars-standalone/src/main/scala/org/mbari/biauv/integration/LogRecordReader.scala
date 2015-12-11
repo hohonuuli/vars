@@ -40,10 +40,10 @@ object LogRecordReader {
 
         def readValue(logRecord: LogRecord) = {
             logRecord.format match {
-                case "Float" => mappedByteBuffer.getFloat()
-                case "Int" => mappedByteBuffer.getInt()
-                case "Short" => mappedByteBuffer.getShort()
-                case "Double" => mappedByteBuffer.getDouble()
+                case "Float" => mappedByteBuffer.getFloat.toDouble
+                case "Int" => mappedByteBuffer.getInt.toDouble
+                case "Short" => mappedByteBuffer.getShort.toDouble
+                case "Double" => mappedByteBuffer.getDouble
             }
         }
 
@@ -101,7 +101,7 @@ object LogRecordReader {
                 continue = lineMatcher.find()
             }
         }
-        return (records.reverse, numberOfBytes)
+        (records.reverse, numberOfBytes)
     }
 
 
@@ -122,7 +122,7 @@ object LogRecordReader {
             case _ => units.replaceAll("[\r\n]", "").trim
         }
 
-        return new LogRecord(f, shortName, longName, u)
+        new LogRecord(f, shortName, longName, u)
     }
 
 }

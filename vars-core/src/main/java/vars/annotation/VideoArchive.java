@@ -68,7 +68,6 @@ public interface VideoArchive extends AnnotationObject, ILazy {
      */
     String getStartTimecode();
 
-
     /**
      * Get the tape number of this <code>VideoArchive</code>.
      * @return  The integer tape number.

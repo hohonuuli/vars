@@ -5,14 +5,19 @@
 
 package vars.annotation.ui.buttons.simple;
 
+import vars.annotation.ui.ToolBelt;
+
+import javax.inject.Inject;
+
 /**
  *
  * @author brian
  */
 public class CrabButton extends QuickConceptButton {
 
-    public CrabButton() {
-        super("Crab", "/images/simple/crab.jpg");
+    @Inject
+    public CrabButton(ToolBelt toolBelt) {
+        super("Crab", "/images/simple/crab.jpg", toolBelt);
     }
 
     

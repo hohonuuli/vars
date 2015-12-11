@@ -128,15 +128,12 @@ public class QueryPersistenceServiceImpl implements QueryPersistenceService {
         // All the conceptnames will be stored here
         final Set<String> allNames = new HashSet<String>();
 
-        final QueryFunction queryFunction = new QueryFunction() {
-
-            public Object apply(ResultSet resultSet) throws SQLException {
-                while (resultSet.next()) {
-                    allNames.add(resultSet.getString(1));
-                }
-
-                return allNames;
+        final QueryFunction queryFunction = resultSet -> {
+            while (resultSet.next()) {
+                allNames.add(resultSet.getString(1));
             }
+
+            return allNames;
         };
 
         // Fetch all conceptnames from Knowledgebase
@@ -244,7 +241,7 @@ public class QueryPersistenceServiceImpl implements QueryPersistenceService {
             }
         };
 
-        String query = "SELECT DISTINCT " + columnName + " FROM Annotations";
+        String query = "SELECT DISTINCT count(" + columnName + ") FROM Annotations";
 
         return (Integer) annoQueryable.executeQueryFunction(query, queryFunction);
 

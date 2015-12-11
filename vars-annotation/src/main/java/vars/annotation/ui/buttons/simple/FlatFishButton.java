@@ -5,14 +5,19 @@
 
 package vars.annotation.ui.buttons.simple;
 
+import vars.annotation.ui.ToolBelt;
+
+import javax.inject.Inject;
+
 /**
  *
  * @author brian
  */
 public class FlatFishButton extends QuickConceptButton {
 
-    public FlatFishButton() {
-        super("Flatfish", "/images/simple/flatfish.jpg");
+    @Inject
+    public FlatFishButton(ToolBelt toolBelt) {
+        super("Flatfish", "/images/simple/flatfish.jpg", toolBelt);
     }
     
 }

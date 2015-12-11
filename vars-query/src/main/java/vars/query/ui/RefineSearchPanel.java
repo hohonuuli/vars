@@ -86,6 +86,8 @@ public class RefineSearchPanel extends JPanel {
         DEFAULT_RETURNS.add("Observer");
         DEFAULT_RETURNS.add("TapeTimeCode");
         DEFAULT_RETURNS.add("VideoArchiveName");
+        DEFAULT_RETURNS.add("RovName");
+        DEFAULT_RETURNS.add("DiveNumber");
     }
 
     static {

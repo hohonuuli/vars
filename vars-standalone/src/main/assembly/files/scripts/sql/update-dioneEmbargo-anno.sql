@@ -42,6 +42,7 @@ WHERE
           'Intacta',
           'Aegina sp. 1',
           'Erenna sp. A',
+          'Erenna sp. B',
           'Physonectae sp. 1',
           'Tuscaroridae',
           'Tuscarantha',

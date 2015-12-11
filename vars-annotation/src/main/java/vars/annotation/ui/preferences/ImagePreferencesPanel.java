@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 import vars.UserAccount;
 import vars.annotation.ui.Lookup;
 import vars.shared.preferences.PreferenceUpdater;
-import vars.shared.ui.video.ImageCaptureService;
+import vars.avplayer.ImageCaptureService;
 
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.*;
@@ -68,7 +68,7 @@ public class ImagePreferencesPanel extends JPanel implements PreferenceUpdater {
             initialize();
         }
         catch (Exception e) {
-           log.warn("Failed to initialize!", e);
+            log.warn("Failed to initialize!", e);
         }
     }
 
@@ -235,6 +235,7 @@ public class ImagePreferencesPanel extends JPanel implements PreferenceUpdater {
             						.addComponent(getImageTargetMappingTextField(), GroupLayout.DEFAULT_SIZE, 305, Short.MAX_VALUE)
             						.addComponent(getImageFormatComboBox(), 0, 305, Short.MAX_VALUE)
             						.addComponent(getImageInterpComboBox(), 0, 305, Short.MAX_VALUE))))
+                            .addComponent(getDefaultsButton())
             			.addContainerGap())
             );
             groupLayout.setVerticalGroup(

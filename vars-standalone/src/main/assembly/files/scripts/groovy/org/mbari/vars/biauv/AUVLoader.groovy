@@ -1,6 +1,5 @@
 package org.mbari.vars.biauv
 
-import org.mbari.biauv.integration.MergeData
 import vars.ToolBox
 import vars.annotation.CameraDeployment
 import vars.annotation.VideoArchiveDAO
@@ -10,7 +9,7 @@ import vars.annotation.VideoFrame
 import vars.DAO
 import org.slf4j.LoggerFactory
 import org.mbari.biauv.integration.MergeDatum
-import org.mbari.math.CoallateFunction
+import org.mbari.math.CollateFunction
 
 /**
  * 
@@ -57,7 +56,7 @@ class AUVLoader {
                  
         // -- Coallate the mergedata with the images
         def dates = new ArrayList(images.keySet())
-        def data = CoallateFunction.coallate(dates, {Date d -> d.time}, 
+        def data = CollateFunction.coallate(dates, {Date d -> d.time},
                 mergeData, {MergeDatum d -> (d.time * 1000) as Long }, 5000)
 
         def videoArchiveDAO = toolBox.toolBelt.annotationDAOFactory.newVideoArchiveDAO()

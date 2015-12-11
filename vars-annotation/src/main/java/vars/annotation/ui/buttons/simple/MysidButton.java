@@ -5,14 +5,19 @@
 
 package vars.annotation.ui.buttons.simple;
 
+import vars.annotation.ui.ToolBelt;
+
+import javax.inject.Inject;
+
 /**
  *
  * @author brian
  */
 public class MysidButton extends QuickConceptButton {
 
-    public MysidButton() {
-        super("Mysid", "/images/simple/Mysid.jpg");
+    @Inject
+    public MysidButton(ToolBelt toolBelt) {
+        super("Mysid", "/images/simple/Mysid.jpg", toolBelt);
     }
     
 }

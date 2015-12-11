@@ -1,5 +1,6 @@
 package vars.annotation.jpa;
 
+import vars.annotation.PhysicalData;
 import vars.jpa.DAO;
 import vars.annotation.PhysicalDataDAO;
 import com.google.inject.Inject;
@@ -17,6 +18,11 @@ public class PhysicalDataDAOImpl extends DAO implements PhysicalDataDAO {
     @Inject
     public PhysicalDataDAOImpl(EntityManager entityManager) {
         super(entityManager);
+    }
+
+    @Override
+    public PhysicalData findByPrimaryKey(Object primaryKey) {
+        return findByPrimaryKey(PhysicalDataImpl.class, primaryKey);
     }
 
 }

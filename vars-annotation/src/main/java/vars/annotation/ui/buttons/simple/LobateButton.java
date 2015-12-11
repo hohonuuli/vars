@@ -5,14 +5,19 @@
 
 package vars.annotation.ui.buttons.simple;
 
+import vars.annotation.ui.ToolBelt;
+
+import javax.inject.Inject;
+
 /**
  *
  * @author brian
  */
 public class LobateButton extends QuickConceptButton {
 
-    public LobateButton() {
-        super("Lobate", "/images/simple/Lobate.jpg");
+    @Inject
+    public LobateButton(ToolBelt toolBelt) {
+        super("Lobate", "/images/simple/Lobate.jpg", toolBelt);
     }
     
 }

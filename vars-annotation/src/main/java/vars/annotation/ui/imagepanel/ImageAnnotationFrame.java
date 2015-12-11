@@ -24,6 +24,7 @@ import org.mbari.swing.JImageUrlCanvas;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.VideoFrame;
+import vars.annotation.ui.AnnotationImageCanvas;
 import vars.annotation.ui.PersistenceController;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.eventbus.ObservationsSelectedEvent;

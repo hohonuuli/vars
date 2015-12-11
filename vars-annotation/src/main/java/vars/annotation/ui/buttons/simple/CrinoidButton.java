@@ -5,14 +5,19 @@
 
 package vars.annotation.ui.buttons.simple;
 
+import vars.annotation.ui.ToolBelt;
+
+import javax.inject.Inject;
+
 /**
  *
  * @author brian
  */
 public class CrinoidButton extends QuickConceptButton {
 
-    public CrinoidButton() {
-        super("Crinoid", "/images/simple/Crinoid.jpg");
+    @Inject
+    public CrinoidButton(ToolBelt toolBelt) {
+        super("Crinoid", "/images/simple/Crinoid.jpg", toolBelt);
     }
     
 }

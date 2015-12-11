@@ -5,14 +5,19 @@
 
 package vars.annotation.ui.buttons.simple;
 
+import vars.annotation.ui.ToolBelt;
+
+import javax.inject.Inject;
+
 /**
  *
  * @author brian
  */
 public class KrillButton extends QuickConceptButton {
 
-    public KrillButton() {
-        super("Krill", "/images/simple/Krill.jpg");
+    @Inject
+    public KrillButton(ToolBelt toolBelt) {
+        super("Krill", "/images/simple/Krill.jpg", toolBelt);
     }
     
 }

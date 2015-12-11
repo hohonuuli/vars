@@ -97,7 +97,7 @@ public class AddCommentAssociationDialog extends StandardDialog {
     /**
      * @return
      */
-    protected JTextField getTextField() {
+    public JTextField getTextField() {
         if (textField == null) {
             textField = new JTextField();
             Dimension size = textField.getPreferredSize();

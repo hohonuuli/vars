@@ -29,9 +29,11 @@ import javax.swing.SwingUtilities;
 
 import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
+import org.mbari.awt.event.NonDigitConsumingKeyListener;
 import org.mbari.swing.PropertyPanel;
 import vars.annotation.ui.commandqueue.Command;
 import vars.annotation.ui.commandqueue.CommandEvent;
+import vars.annotation.ui.commandqueue.impl.ChangeSequenceNumberCmd;
 import vars.annotation.ui.commandqueue.impl.ChangeVideoArchiveSetCmd;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,29 +93,25 @@ public class PVideoArchivePanel extends PropertiesPanel {
         // Listeners for the shipName
         p = getPropertyPanel("shipName");
         final JTextField f2 = p.getValueField();
-        f2.addActionListener(new ActionListener() {
+        f2.addActionListener(e -> {
 
-            public void actionPerformed(final ActionEvent e) {
-                
-                Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
-                observations = new ArrayList<Observation>(observations); // Make a copy to avoid sync issues.
-                if (observations.size() == 1) {
-                    
-                    final Observation obs = observations.iterator().next();
-                    final VideoFrame vf = obs.getVideoFrame();
-                    if (vf != null) {
-                        final VideoArchive va = vf.getVideoArchive();
-                        if (va != null) {
-                            final VideoArchiveSet vas = va.getVideoArchiveSet();
-                            Command command = new ChangeVideoArchiveSetCmd(f2.getText(), vas.getPlatformName(),
-                                    vas.getFormatCode(), vas);
-                            CommandEvent commandEvent = new CommandEvent(command);
-                            EventBus.publish(commandEvent);
-                        }
+            Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+            observations = new ArrayList<>(observations); // Make a copy to avoid sync issues.
+            if (observations.size() == 1) {
+
+                final Observation obs = observations.iterator().next();
+                final VideoFrame vf = obs.getVideoFrame();
+                if (vf != null) {
+                    final VideoArchive va = vf.getVideoArchive();
+                    if (va != null) {
+                        final VideoArchiveSet vas = va.getVideoArchiveSet();
+                        Command command = new ChangeVideoArchiveSetCmd(f2.getText(), vas.getPlatformName(),
+                                vas.getFormatCode(), vas);
+                        CommandEvent commandEvent = new CommandEvent(command);
+                        EventBus.publish(commandEvent);
                     }
                 }
             }
-
         });
         p.setEditable(true);
 
@@ -121,27 +119,56 @@ public class PVideoArchivePanel extends PropertiesPanel {
         // Listeners for the platformName
         p = getPropertyPanel("platformName");
         final JTextField f3 = p.getValueField();
-        f3.addActionListener(new ActionListener() {
-
-            public void actionPerformed(final ActionEvent e) {
-                Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
-                observations = new ArrayList<Observation>(observations); // Make a copy to avoid sync issues.
-                if (observations.size() == 1) {
-                    final Observation obs = observations.iterator().next();
-                    final VideoFrame vf = obs.getVideoFrame();
-                    if (vf != null) {
-                        final VideoArchive va = vf.getVideoArchive();
-                        if (va != null) {
-                            final VideoArchiveSet vas = va.getVideoArchiveSet();
-                            Command command = new ChangeVideoArchiveSetCmd(vas.getShipName(), f3.getText(),
-                                    vas.getFormatCode(), vas);
-                            CommandEvent commandEvent = new CommandEvent(command);
-                            EventBus.publish(commandEvent);
-                        }
+        f3.addActionListener(e -> {
+            Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+            observations = new ArrayList<>(observations); // Make a copy to avoid sync issues.
+            if (observations.size() == 1) {
+                final Observation obs = observations.iterator().next();
+                final VideoFrame vf = obs.getVideoFrame();
+                if (vf != null) {
+                    final VideoArchive va = vf.getVideoArchive();
+                    if (va != null) {
+                        final VideoArchiveSet vas = va.getVideoArchiveSet();
+                        Command command = new ChangeVideoArchiveSetCmd(vas.getShipName(), f3.getText(),
+                                vas.getFormatCode(), vas);
+                        CommandEvent commandEvent = new CommandEvent(command);
+                        EventBus.publish(commandEvent);
                     }
                 }
             }
+        });
+        p.setEditable(true);
 
+
+        p = getPropertyPanel("diveNumber");
+        final JTextField f4 = p.getValueField();
+        f4.addKeyListener(new NonDigitConsumingKeyListener());
+        f4.addActionListener(e -> {
+
+            Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+            observations = new ArrayList<>(observations); // Make a copy to avoid sync issues.
+            if (observations.size() == 1) {
+                final Observation obs = observations.iterator().next();
+                final VideoFrame vf = obs.getVideoFrame();
+                if (vf != null) {
+                    final VideoArchive va = vf.getVideoArchive();
+                    if (va != null) {
+                        try {
+                            final CameraDeployment cameraDeployment = va.getVideoArchiveSet().getCameraDeployments().iterator().next();
+                            int newSeqNumber = Integer.parseInt(f4.getText());
+                            int oldSeqNumber = cameraDeployment.getSequenceNumber();
+                            long id = (Long) va.getPrimaryKey();
+                            Command command = new ChangeSequenceNumberCmd(newSeqNumber, oldSeqNumber, id);
+                            CommandEvent commandEvent = new CommandEvent(command);
+                            EventBus.publish(commandEvent);
+                        }
+                        catch (Exception e1) {
+                            log.info("Failed to set diveNumber", e1);
+                        }
+
+                    }
+                }
+            }
         });
         p.setEditable(true);
     }
@@ -163,43 +190,15 @@ public class PVideoArchivePanel extends PropertiesPanel {
     private RenameVideoArchiveDialog getChangeNameDialog() {
         if (changeNameDialog == null) {
             changeNameDialog = new RenameVideoArchiveDialog(SwingUtilities.getWindowAncestor(this), toolBelt);
-            changeNameDialog.getOkayButton().addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
-                    if (videoArchive != null) {
-                        Command command = new RenameVideoArchiveCmd(videoArchive.getName(), getChangeNameDialog().getNewVideoArchiveName());
-                        CommandEvent commandEvent = new CommandEvent(command);
-                        EventBus.publish(commandEvent);
-                    }
+            changeNameDialog.getOkayButton().addActionListener(e -> {
+                VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+                if (videoArchive != null) {
+                    Command command = new RenameVideoArchiveCmd(videoArchive.getName(), getChangeNameDialog().getNewVideoArchiveName());
+                    CommandEvent commandEvent = new CommandEvent(command);
+                    EventBus.publish(commandEvent);
                 }
             });
 
-
-//            {
-//
-//
-//                @Override
-//                public ActionAdapter getOkButtonAction() {
-//                    if (okButtonAction == null) {
-//                        okButtonAction = new ActionAdapter() {
-//                            public void doAction() {
-//                                final int seqNumber = Integer.parseInt(getTfDiveNumber().getText());
-//                                final String platform = (String) getCbCameraPlatform().getSelectedItem();
-//                                final int tapeNumber = Integer.parseInt(getTfTapeNumber().getText());
-//                                action.setPlatform(platform);
-//                                action.setSeqNumber(seqNumber);
-//                                action.setTapeNumber(tapeNumber);
-//                                action.doAction();
-//                                dispose();
-//                            }
-//                            private final ChangeVideoArchiveNameAction action = new ChangeVideoArchiveNameAction(toolBelt);
-//                        };
-//                    }
-//
-//                    return okButtonAction;
-//                }
-//            };
         }
 
         return changeNameDialog;
@@ -265,14 +264,14 @@ public class PVideoArchivePanel extends PropertiesPanel {
                     endDate = vas.getEndDate();
                     trackingNumber = vas.getTrackingNumber();
                     final Collection<CameraDeployment> cpd = new ArrayList<CameraDeployment>(vas.getCameraDeployments());
-                    if ((cpd != null) && (cpd.size() > 0)) {
+                    if (cpd.size() > 0) {
                         String sep = "";
                         if (cpd.size() > 1) {
                             sep = " | ";
                         }
 
-                        final StringBuffer d = new StringBuffer();
-                        final StringBuffer s = new StringBuffer();
+                        final StringBuilder d = new StringBuilder();
+                        final StringBuilder s = new StringBuilder();
                         for (final Iterator i = cpd.iterator(); i.hasNext(); ) {
                             final CameraDeployment pd = (CameraDeployment) i.next();
                             d.append(pd.getSequenceNumber()).append(sep);

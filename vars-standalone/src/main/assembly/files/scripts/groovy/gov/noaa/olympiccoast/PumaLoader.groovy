@@ -3,11 +3,10 @@ package gov.noaa.olympiccoast
 import vars.integration.MergeFunction
 import vars.annotation.VideoFrame
 import vars.integration.MergeFunction.MergeType
-import org.mbari.math.CoallateFunction
 import org.mbari.movie.Timecode
 import java.text.SimpleDateFormat
 import vars.ToolBox
-import org.mbari.math.CoallateFunction
+import org.mbari.math.CollateFunction
 import org.slf4j.LoggerFactory
 import vars.annotation.VideoArchiveSetDAO
 
@@ -87,7 +86,7 @@ class PumaLoader implements MergeFunction<Map<VideoFrame, PumaDatum>> {
     }
 
     Map<VideoFrame, PumaDatum> coallate(List<VideoFrame> videoFrames, List<PumaDatum> pumaData) {
-        return CoallateFunction.coallate(videoFrames, videoFrameToFrames, pumaData, pumaDatumToFrames)
+        return CollateFunction.coallate(videoFrames, videoFrameToFrames, pumaData, pumaDatumToFrames)
     }
     
 

@@ -5,14 +5,19 @@
 
 package vars.annotation.ui.buttons.simple;
 
+import vars.annotation.ui.ToolBelt;
+
+import javax.inject.Inject;
+
 /**
  *
  * @author brian
  */
 public class SquidButton extends QuickConceptButton {
 
-    public SquidButton() {
-        super("Squid", "/images/simple/squid.jpg");
+    @Inject
+    public SquidButton(ToolBelt toolBelt) {
+        super("Squid", "/images/simple/squid.jpg", toolBelt);
     }
     
 }

@@ -38,10 +38,10 @@ public class AnnotationImageCanvas extends VARSImageCanvas {
         super(url);
         AnnotationProcessor.process(this);
     }
-    
+
     @EventSubscriber(eventClass = ImageInterpolationChangedEvent.class)
     public void respondTo(ImageInterpolationChangedEvent event) {
         setImageInterpolation(event.get());
     }
-    
+
 }

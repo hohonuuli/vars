@@ -1,9 +1,7 @@
 package vars.annotation.ui.video.imagecapture;
 
 import org.mbari.awt.image.ImageUtilities;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import vars.shared.ui.video.ImageCaptureException;
+import vars.avplayer.ImageCaptureException;
 
 import java.awt.image.RenderedImage;
 import java.io.File;

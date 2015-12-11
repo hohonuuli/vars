@@ -15,19 +15,15 @@
 
 package vars.annotation.ui.actions;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import javax.swing.Icon;
 
 import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
-import org.mbari.movie.Timecode;
+import org.mbari.vcr4j.time.Timecode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.DAO;
 import vars.annotation.Observation;
-import vars.annotation.VideoArchive;
-import vars.annotation.VideoFrame;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.Lookup;
 import vars.annotation.ui.commandqueue.Command;
@@ -45,8 +41,7 @@ public class ChangeTimeCodeAction extends ActionAdapter {
     /**
      * This is the timecode we want to change to
      */
-    private final Timecode timeCode = new Timecode();
-    private final ToolBelt toolBelt;
+    private Timecode timeCode;
 
     /**
      *
@@ -55,7 +50,6 @@ public class ChangeTimeCodeAction extends ActionAdapter {
      */
     public ChangeTimeCodeAction(ToolBelt toolBelt) {
         super();
-        this.toolBelt = toolBelt;
     }
 
     /**
@@ -64,7 +58,6 @@ public class ChangeTimeCodeAction extends ActionAdapter {
      */
     public ChangeTimeCodeAction(final String name, ToolBelt toolBelt) {
         super(name);
-        this.toolBelt = toolBelt;
     }
 
     /**
@@ -74,7 +67,6 @@ public class ChangeTimeCodeAction extends ActionAdapter {
      */
     public ChangeTimeCodeAction(final String name, final Icon icon, ToolBelt toolBelt) {
         super(name, icon);
-        this.toolBelt = toolBelt;
     }
 
     /**
@@ -99,6 +91,6 @@ public class ChangeTimeCodeAction extends ActionAdapter {
      * @param timeCodeString
      */
     public void setTimeCode(final String timeCodeString) {
-        timeCode.setTimecode(timeCodeString);
+        timeCode = new Timecode(timeCodeString);
     }
 }

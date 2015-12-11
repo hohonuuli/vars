@@ -84,13 +84,7 @@ public class MiscTabsPanel extends javax.swing.JPanel {
             treePanel.setJTree(tree);
             ((ConceptTreePanel) treePanel).setPopupMenu(new ConceptTreePopupMenu(tree, toolbelt.getKnowledgebaseDAOFactory()));
 
-            lookupConceptSubscriber = new EventTopicSubscriber<String>() {
-
-                public void onEvent(String topic, String data) {
-                    treePanel.goToMatchingNode(data, false);
-                }
-
-            };
+            lookupConceptSubscriber = (topic, data) -> treePanel.goToMatchingNode(data, false);
 
             // Refresh the tree if the cache is cleared
             toolbelt.getPersistenceCache().addCacheClearedListener(new CacheClearedListener() {
@@ -142,7 +136,7 @@ public class MiscTabsPanel extends javax.swing.JPanel {
         tabbedPane.add("Knowledge Base", getTreePanel());
         tabbedPane.add("Observation", new PObservationPanel(toolbelt));
         tabbedPane.add("Video Archive", new PVideoArchivePanel(toolbelt));
-        tabbedPane.add("Physical Data", new PPhysicalDataPanel());
+        tabbedPane.add("Physical Data", new PPhysicalDataPanel(toolbelt));
         tabbedPane.add("Camera Data", new PCameraDataPanel(toolbelt));
     }
 

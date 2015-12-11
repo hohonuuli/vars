@@ -21,8 +21,12 @@ import org.bushe.swing.event.annotation.EventSubscriber;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collection;
-import org.mbari.movie.Timecode;
+import java.util.Optional;
+
 import org.mbari.util.Dispatcher;
+import org.mbari.vcr4j.time.Converters;
+import org.mbari.vcr4j.time.HMSF;
+import org.mbari.vcr4j.time.Timecode;
 import org.mbari.vcr4j.ui.TimeCodeSelectionFrame;
 import org.mbari.vcr4j.ui.TimeSelectPanel;
 import org.slf4j.Logger;
@@ -50,14 +54,6 @@ public class ChangeTimeCodeFrame extends TimeCodeSelectionFrame {
     public ChangeTimeCodeFrame(ToolBelt toolBelt) {
         this.toolBelt = toolBelt;
         AnnotationProcessor.process(this); // Create EventBus Proxy
-
-//        final Dispatcher dispatcher = Lookup.getSelectedObservationsDispatcher();
-//        dispatcher.addPropertyChangeListener(new PropertyChangeListener() {
-//            public void propertyChange(PropertyChangeEvent evt) {
-//                update(evt.getNewValue());
-//            }
-//        });
-
     }
 
     /**
@@ -121,7 +117,7 @@ public class ChangeTimeCodeFrame extends TimeCodeSelectionFrame {
         int second = 0;
         int frame = 0;
 
-        if ((obs != null) && (obs.size() == 1)) {
+        if (obs.size() == 1) {
 
 
             final VideoFrame vf = obs.iterator().next().getVideoFrame();
@@ -129,13 +125,16 @@ public class ChangeTimeCodeFrame extends TimeCodeSelectionFrame {
                 final String stc = vf.getTimecode();
                 if (stc != null) {
                     try {
-                        final Timecode tc = new Timecode(stc);
-                        hour = tc.getHour();
-                        minute = tc.getMinute();
-                        second = tc.getSecond();
-                        frame = tc.getFrame();
+                        Optional<HMSF> hmsfOpt = HMSF.from(stc);
+                        if (hmsfOpt.isPresent()) {
+                            HMSF hmsf = hmsfOpt.get();
+                            hour = hmsf.getHour();
+                            minute = hmsf.getMinute();
+                            second = hmsf.getSecond();
+                            frame = hmsf.getFrame();
+                        }
                     }
-                    catch (NumberFormatException e) {
+                    catch (Exception e) {
                         log.info("Failed to parse timecode of " + stc);
                     }
                 }

@@ -1,5 +1,5 @@
 /*
- * @(#)MergeEXPDAnnotations.java   2010.06.08 at 11:08:03 PDT
+ * @(#)MergeEXPDAnnotations2.java   2013.03.07 at 02:43:56 PST
  *
  * Copyright 2009 MBARI
  *
@@ -18,9 +18,9 @@ package org.mbari.vars.integration;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
-import com.google.common.base.Strings;
 import com.google.common.collect.Collections2;
 import com.google.inject.Injector;
+import java.util.*;
 import org.mbari.expd.*;
 import org.mbari.expd.actions.CollateByAlternateTimecodeFunction;
 import org.mbari.expd.actions.CollateByDateFunction;
@@ -28,35 +28,34 @@ import org.mbari.expd.actions.CollateByTimecodeFunction;
 import org.mbari.expd.actions.CollateFunction;
 import org.mbari.expd.jdbc.DAOFactoryImpl;
 import org.mbari.expd.jdbc.UberDatumImpl;
+import org.mbari.ocean.Seawater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.DAO;
 import vars.annotation.*;
 import vars.annotation.ui.Lookup;
 import vars.integration.MergeFunction;
-import vars.integration.MergeStatus;
-import vars.integration.MergeStatusDAO;
+import vars.integration.MergeHistory;
+import vars.integration.MergeHistoryDAO;
 import vars.integration.MergeType;
-import vars.jpa.JPAEntity;
-
-import java.util.*;
 
 /**
  * Implementation of the merge function
  * @author brian
- * @deprecated Use MergeEXPDAnnotations instead. It updates the EXPDMergeHistory table
  */
 public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberDatum>> {
 
     private final double offsetSecs = 7.5;
+
+    /**  */
+    public final Logger log = LoggerFactory.getLogger(getClass());
     private Dive dive;
-    private MergeStatus mergeStatus;
+    private MergeHistory mergeHistory  = new MergeHistory();
     private final String platform;
     private final int sequenceNumber;
     private Collection<UberDatum> uberData;
     private final boolean useHD;
     private Collection<VideoFrame> videoFrames;
-    public final Logger log = LoggerFactory.getLogger(getClass());
 
     /**
      * Constructs ...
@@ -79,8 +78,8 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
      */
     public Map<VideoFrame, UberDatum> apply(MergeType mergeType) {
         if (log.isDebugEnabled()) {
-            log.debug("Applying " + mergeType + " merge to " + platform + " #" + sequenceNumber +
-                    " [use HD = " + useHD + "]");
+            log.debug("Applying " + mergeType + " merge to " + platform + " #" + sequenceNumber + " [use HD = " +
+                    useHD + "]");
         }
         fetch();
 
@@ -118,9 +117,6 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
                 data = coallatePragmatic();
                 break;
         }
-
-        mergeStatus.setMergeDate(new Date());
-        mergeStatus.setStatusMessage("Using " + mergeType + " merge");
 
         return data;
     }
@@ -195,10 +191,6 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
 
     private void fetch() {
 
-        if (mergeStatus == null) {
-            mergeStatus = fetchMergeStatus();
-        }
-
         if (uberData == null) {
             uberData = fetchExpdData();
         }
@@ -227,45 +219,17 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
             NavigationDatumDAO navigationDatumDAO = daoFactory.newNavigationDatumDAO();
             List<NavigationDatum> navigationData = navigationDatumDAO.fetchBestNavigationData(dive);
             uberData.addAll(Collections2.transform(navigationData, new Function<NavigationDatum, UberDatum>() {
+
                 public UberDatum apply(NavigationDatum from) {
                     return new UberDatumImpl(null, from, null);
                 }
+
             }));
         }
 
         return uberData;
     }
 
-    private MergeStatus fetchMergeStatus() {
-        Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
-        AnnotationDAOFactory annotationDAOFactory = injector.getInstance(AnnotationDAOFactory.class);
-        VideoArchiveSetDAO videoArchiveSetDAO = annotationDAOFactory.newVideoArchiveSetDAO();
-        DAOFactory daoFactory = new DAOFactoryImpl();
-        DiveDAO diveDAO = daoFactory.newDiveDAO();
-        MergeStatusDAO dao = new MergeStatusDAOImpl(annotationDAOFactory, diveDAO);
-        MergeStatus myMergeStatus = dao.findByPlatformAndSequenceNumber(platform, sequenceNumber);
-        dao.close();
-        if (myMergeStatus == null) {
-            myMergeStatus = new MergeStatus();
-            videoArchiveSetDAO.startTransaction();
-
-            Collection<VideoArchiveSet> videoArchiveSets = videoArchiveSetDAO.findAllByPlatformAndSequenceNumber(
-                    platform, sequenceNumber);
-
-            if (videoArchiveSets.size() > 0) {
-                VideoArchiveSet videoArchiveSet = videoArchiveSets.iterator().next();
-
-                myMergeStatus.setVideoArchiveSetID(((JPAEntity) videoArchiveSet).getId());
-                myMergeStatus.setVideoFrameCount((long) videoArchiveSet.getVideoFrames().size());
-                myMergeStatus.setStatusMessage("");
-            }
-
-            videoArchiveSetDAO.endTransaction();
-        }
-        videoArchiveSetDAO.close();
-
-        return myMergeStatus;
-    }
 
     private List<VideoFrame> fetchVarsData() {
         Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
@@ -279,17 +243,32 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
                 sequenceNumber);
 
         for (VideoArchiveSet videoArchiveSet : videoArchiveSets) {
-            myVideoFrames.addAll(videoArchiveSet.getVideoFrames());
+            // Only fetch frames appropriate for HD or Beta merge (not both!!)
+            for (VideoArchive videoArchive : videoArchiveSet.getVideoArchives()) {
+                if (useHD && videoArchive.getName().toUpperCase().endsWith("HD")) {
+                    myVideoFrames.addAll(videoArchive.getVideoFrames());
+                }
+                else if (!useHD && !videoArchive.getName().toUpperCase().endsWith("HD")) {
+                    myVideoFrames.addAll(videoArchive.getVideoFrames());
+                }
+            }
         }
 
         videoArchiveSetDAO.endTransaction();
         videoArchiveSetDAO.close();
 
         if (myVideoFrames.size() == 0) {
-            mergeStatus.setStatusMessage(mergeStatus.getStatusMessage() + "; No annotations found in VARS");
+            mergeHistory.setStatusMessage(mergeHistory.getStatusMessage() + "; No annotations found in VARS");
         }
 
         return myVideoFrames;
+    }
+
+    /**
+     * @return
+     */
+    public MergeHistory getMergeHistory() {
+        return mergeHistory;
     }
 
     private Map<VideoFrame, UberDatum> mergeByDate(Collection<VideoFrame> vfc, Collection<UberDatum> udc) {
@@ -299,9 +278,11 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
 
         // Extract the dates from the video frames
         Collection<Date> d = Collections2.transform(vfc, new Function<VideoFrame, Date>() {
+
             public Date apply(VideoFrame from) {
                 return from.getRecordedDate();
             }
+
         });
 
         final Map<Date, UberDatum> r1 = f1.apply(d, udc, (long) offsetSecs * 1000);
@@ -322,12 +303,15 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
     private Map<VideoFrame, UberDatum> mergeByTimecode(Collection<VideoFrame> vfc, Collection<UberDatum> udc) {
 
         // Make sure we're using the correct merge function for HD and Beta
-        CollateFunction<String> f2 = useHD ? new CollateByAlternateTimecodeFunction() : new CollateByTimecodeFunction();
+        CollateFunction<String> f2 = useHD
+                ? new CollateByAlternateTimecodeFunction() : new CollateByTimecodeFunction();
 
         Collection<String> d = Collections2.transform(vfc, new Function<VideoFrame, String>() {
+
             public String apply(VideoFrame from) {
                 return from.getTimecode();
             }
+
         });
 
         final Map<String, UberDatum> r2 = f2.apply(d, udc, (long) offsetSecs * 1000);
@@ -354,6 +338,9 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
     public void update(Map<VideoFrame, UberDatum> data, MergeType mergeType) {
         fetch();
 
+        mergeHistory.setMergeDate(new Date());
+        mergeHistory.setStatusMessage("Using " + mergeType + " merge");
+
         Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
         AnnotationDAOFactory annotationDAOFactory = injector.getInstance(AnnotationDAOFactory.class);
         DAO dao = annotationDAOFactory.newDAO();
@@ -362,19 +349,29 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
 
         // Modify data
         int fixedDateCount = 0;
+        int badCameraDataCount = 0;
+        int badCtdDataCount = 0;
+        int badNavDataCount = 0;
 
         for (VideoFrame videoFrame : data.keySet()) {
             UberDatum uberDatum = data.get(videoFrame);
-            String nav = (uberDatum.getNavigationDatum() == null) ? "NO Navigation Data" :
-                    uberDatum.getNavigationDatum().getDate() + " : Depth = " + uberDatum.getNavigationDatum().getDepth();
-            String cam = (uberDatum.getCameraDatum() == null) ? "NO Camera Data" :
-                    uberDatum.getCameraDatum().getTimecode() + " - " + uberDatum.getCameraDatum().getAlternativeTimecode() +
-                           " - " + uberDatum.getCameraDatum().getDate();
+            String nav = (uberDatum.getNavigationDatum() == null)
+                    ? "NO Navigation Data"
+                    : uberDatum.getNavigationDatum().getDate() + " : Depth = " +
+                    uberDatum.getNavigationDatum().getDepth();
+            String cam = (uberDatum.getCameraDatum() == null)
+                    ? "NO Camera Data"
+                    : uberDatum.getCameraDatum().getTimecode() + " - " +
+                    uberDatum.getCameraDatum().getAlternativeTimecode() + " - " +
+                    uberDatum.getCameraDatum().getDate();
 
-            log.debug(videoFrame.getTimecode() + " : " + videoFrame.getRecordedDate() + " :NAV: " +
-                    nav + " :CAM: " + cam);
+            log.debug(videoFrame.getTimecode() + " : " + videoFrame.getRecordedDate() + " :NAV: " + nav + " :CAM: " +
+                    cam);
 
             videoFrame = dao.find(videoFrame);
+            if (mergeHistory.getVideoArchiveSetID() == null || mergeHistory.getVideoArchiveSetID() < 0) {
+                mergeHistory.setVideoArchiveSetID((Long) videoFrame.getVideoArchive().getVideoArchiveSet().getPrimaryKey());
+            }
 
             Date recordedDate = videoFrame.getRecordedDate();
 
@@ -386,16 +383,22 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
 
                 cameraData.setFocus((cameraDatum.getFocus() == null) ? null : Math.round(cameraDatum.getFocus()));
                 cameraData.setLogDate(cameraDatum.getDate());
-                videoFrame.setAlternateTimecode(cameraDatum.getAlternativeTimecode());
+                if (useHD) {
+                    videoFrame.setAlternateTimecode(cameraDatum.getTimecode());
+                }
+                else {
+                    videoFrame.setAlternateTimecode(cameraDatum.getAlternativeTimecode());
+                }
                 cameraData.setZoom((cameraDatum.getZoom() == null) ? null : Math.round(cameraDatum.getZoom()));
                 cameraData.setIris((cameraDatum.getIris() == null) ? null : Math.round(cameraDatum.getIris()));
             }
             else {
-                log.info("No camera data was found in EXPD for {}", videoFrame);
+                log.debug("No camera data was found in EXPD for {}", videoFrame);
                 cameraData.setFocus(null);
                 cameraData.setZoom(null);
                 cameraData.setIris(null);
                 cameraData.setLogDate(null);
+                badCameraDataCount++;
             }
 
             // ---- Update physicaldata
@@ -409,35 +412,46 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
                 physicalData.setTemperature(ctdDatum.getTemperature());
             }
             else {
-                log.info("No CTD data was found in EXPD for {}", videoFrame);
+                log.debug("No CTD data was found in EXPD for {}", videoFrame);
                 physicalData.setLight(null);
                 physicalData.setOxygen(null);
                 physicalData.setSalinity(null);
                 physicalData.setTemperature(null);
+                badCtdDataCount++;
             }
 
             NavigationDatum navigationDatum = uberDatum.getNavigationDatum();
 
             if (navigationDatum != null) {
+                // HACK Used to addrees JIRA: VARS-661
+                // try {
+                //   double depth = Seawater.depth(ctdDatum.getPressure(), navigationDatum.getLatitude());
+                //   physicalData.setDepth((float) depth);
+                // }
+                // catch (Exception e) {
+                //     log.warn("Hack failed: {}", e);
+                // }
                 physicalData.setDepth(navigationDatum.getDepth());
                 physicalData.setLatitude(navigationDatum.getLatitude());
                 physicalData.setLogDate(navigationDatum.getDate());
                 physicalData.setLongitude(navigationDatum.getLongitude());
             }
             else {
-                log.info("No navigation data was found in EXPD for {}", videoFrame);
+                log.debug("No navigation data was found in EXPD for {}", videoFrame);
                 physicalData.setDepth(null);
                 physicalData.setLatitude(null);
                 physicalData.setLogDate(null);
                 physicalData.setLongitude(null);
+                badNavDataCount++;
             }
 
             // ---- Update date 
             switch (mergeType) {
                 case PESSIMISTIC:
-                    mergeStatus.setDateSource("EXPD");
+                    mergeHistory.setDateSource("EXPD");
+
                     // Change dates to ones found in EXPD
-                    if (navigationDatum == null || navigationDatum.getDate() == null) {
+                    if ((navigationDatum == null) || (navigationDatum.getDate() == null)) {
                         videoFrame.setRecordedDate(null);
                         fixedDateCount++;
                     }
@@ -456,7 +470,7 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
                         if (navigationDatum != null) {
                             date = navigationDatum.getDate();
                         }
-                        if (date == null && cameraDatum != null) {
+                        if ((date == null) && (cameraDatum != null)) {
                             date = cameraDatum.getDate();
                         }
 
@@ -481,52 +495,64 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
             }
         }
 
-        // ---- Specify the source of the data information
-        switch (mergeType) {
-            case PESSIMISTIC:
-                mergeStatus.setDateSource("EXPD");
-
-                break;
-
-            default:
-                mergeStatus.setDateSource("VARS");
-        }
-
-        mergeStatus.setMerged(fixedDateCount);
-
-        if (fixedDateCount > 0) {
-            mergeStatus.setDateSource("Both");
-            mergeStatus.setStatusMessage(mergeStatus.getStatusMessage() + "; Fixed " + fixedDateCount +
-                    " annotation dates");
-        }
 
         dao.endTransaction();
         dao.close();
+
+        // --- Update MergeHistory -----------------------------------------------------------------
 
         // ---- Set the navigationedited flag
         Collection<UberDatum> rawNavRecords = Collections2.filter(data.values(), new Predicate<UberDatum>() {
             public boolean apply(UberDatum input) {
                 NavigationDatum nav = input.getNavigationDatum();
-                return (nav != null) && nav.isEdited() == Boolean.FALSE;
+                return (nav != null) && (nav.isEdited() == Boolean.FALSE);
             }
         });
 
-        mergeStatus.setNavigationEdited((rawNavRecords.size() == 0) ? 1 : 0);
+        // ---- Specify the source of the data information
+        switch (mergeType) {
+            case PESSIMISTIC:
+                mergeHistory.setDateSource("EXPD");
+                break;
+            default:
+                mergeHistory.setDateSource("VARS");
+        }
 
-        // Set merged flag
-        mergeStatus.setMerged((data.size() > 0) ? 1 : 0);
+
+        if (fixedDateCount > 0) {
+            mergeHistory.setDateSource("Both");
+            mergeHistory.setStatusMessage(mergeHistory.getStatusMessage() + "; Fixed " + fixedDateCount +
+                    " annotation dates");
+        }
+
+        if (badCameraDataCount > 0) {
+            mergeHistory.setStatusMessage(mergeHistory.getStatusMessage() + "; " +
+                    badCameraDataCount + " annotations without camera data");
+        }
+
+        if (badCtdDataCount > 0) {
+            mergeHistory.setStatusMessage(mergeHistory.getStatusMessage() + "; " +
+                    badCtdDataCount + " annotations without ctd data");
+        }
+
+        if (badNavDataCount > 0) {
+            mergeHistory.setStatusMessage(mergeHistory.getStatusMessage() + "; " +
+                    badNavDataCount + " annotations without navigation data");
+        }
+
+        mergeHistory.setHd(useHD);
+        mergeHistory.setMergeType(mergeType.name());
+        mergeHistory.setNavigationEdited(rawNavRecords.size() == 0);
+        mergeHistory.setVideoFrameCount(videoFrames.size());
 
         DAOFactory daoFactory = new DAOFactoryImpl();
         DiveDAO diveDAO = daoFactory.newDiveDAO();
-        MergeStatusDAO mergeStatusDAO = new MergeStatusDAOImpl(annotationDAOFactory, diveDAO);
+        MergeHistoryDAO mergeHistoryDAO = new MergeHistoryDAOImpl(annotationDAOFactory, diveDAO);
 
-        mergeStatusDAO.update(mergeStatus);
+        if (data.size() > 0) {
+            mergeHistoryDAO.update(mergeHistory);
+        }
 
 
-    }
-
-    public MergeStatus getMergeStatus() {
-        fetch();
-        return mergeStatus;
     }
 }

@@ -98,26 +98,11 @@ public class VideoArchiveImpl implements Serializable, VideoArchive, JPAEntity {
     }
 
     public void addVideoFrame(final VideoFrame videoFrame) {
-
         getVideoFrames().add(videoFrame);
         ((VideoFrameImpl) videoFrame).setVideoArchive(this);
-
-//        int idx = indexByTimecode(videoFrame.getTimecode());
-//
-//        if (idx >= 0) {
-//            throw new IllegalArgumentException("A VideoFrame with a timecode of " + videoFrame.getTimecode() +
-//                    " already exists in " + this + ".");
-//        }
-//        else {
-//            int insertIdx = -idx - 1;
-//            getVideoFrames().add(insertIdx, videoFrame);
-//            ((VideoFrameImpl) videoFrame).setVideoArchive(this);
-//        }
     }
 
     public VideoFrame findVideoFrameByTimeCode(final String timecode) {
-//        int idx = indexByTimecode(timecode);
-//        return (idx >= 0) ? getVideoFrames().get(idx) : null;
         VideoFrame videoFrame = null;
         for (VideoFrame vf : getVideoFrames()) {
             if (vf.getTimecode().equals(timecode)) {
@@ -171,20 +156,6 @@ public class VideoArchiveImpl implements Serializable, VideoArchive, JPAEntity {
         return id;
     }
 
-    private class TimecodePredicate implements Predicate<VideoFrame> {
-
-        private final String timecode;
-
-        public TimecodePredicate(String timecode) {
-            this.timecode = timecode;
-        }
-
-        public boolean apply(VideoFrame input) {
-            return  input.getTimecode().equals(timecode);
-        }
-
-    }
-
     private class EmptyVideoFramePredicate implements Predicate<VideoFrame> {
 
         public boolean apply(VideoFrame input) {
@@ -205,20 +176,4 @@ public class VideoArchiveImpl implements Serializable, VideoArchive, JPAEntity {
         return getClass().getSimpleName() + "([id=" + id + "] name=" + name + ")";
     }
 
-//    @Override
-//    public boolean equals(Object o) {
-//        if (this == o) return true;
-//        if (o == null || getClass() != o.getClass()) return false;
-//
-//        VideoArchiveImpl that = (VideoArchiveImpl) o;
-//
-//        if (name != null ? !name.equals(that.name) : that.name != null) return false;
-//
-//        return true;
-//    }
-//
-//    @Override
-//    public int hashCode() {
-//        return name != null ? name.hashCode() : 0;
-//    }
 }

@@ -19,12 +19,8 @@ public class ToConceptSelectionDialogDemo {
     public static void main(String[] args) {
         Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
         final ToConceptSelectionDialog dialog = injector.getInstance(ToConceptSelectionDialog.class);
-        dialog.getCancelButton().addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                System.exit(0);
-            }
-        });
+        dialog.setBaseConceptName("Substrates");
+        dialog.getCancelButton().addActionListener(e -> System.exit(0));
         dialog.setVisible(true);
 
     }

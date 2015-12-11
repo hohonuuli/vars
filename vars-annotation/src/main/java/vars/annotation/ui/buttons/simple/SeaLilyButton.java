@@ -5,14 +5,19 @@
 
 package vars.annotation.ui.buttons.simple;
 
+import vars.annotation.ui.ToolBelt;
+
+import javax.inject.Inject;
+
 /**
  *
  * @author brian
  */
 public class SeaLilyButton extends QuickConceptButton {
 
-    public SeaLilyButton() {
-        super("Sea Lily", "/images/simple/sea_lily.jpg");
+    @Inject
+    public SeaLilyButton(ToolBelt toolBelt) {
+        super("Sea Lily", "/images/simple/sea_lily.jpg", toolBelt);
     }
     
 }

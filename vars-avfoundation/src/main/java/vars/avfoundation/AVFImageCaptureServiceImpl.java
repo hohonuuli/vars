@@ -5,26 +5,19 @@ import org.mbari.nativelib.Native;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.VARSException;
+import vars.avplayer.ImageCaptureException;
+import vars.avplayer.ImageCaptureService;
 import vars.shared.ui.GlobalLookup;
 import vars.shared.ui.dialogs.StandardDialog;
-import vars.shared.ui.video.ImageCaptureException;
-import vars.shared.ui.video.ImageCaptureService;
+
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.WatchEvent;
-import java.nio.file.WatchKey;
-import java.nio.file.WatchService;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
 import java.util.prefs.Preferences;
-import static java.nio.file.StandardWatchEventKinds.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -136,6 +129,7 @@ public class AVFImageCaptureServiceImpl implements ImageCaptureService {
         // -- Save to temp file png.
         final File tempFile = new File(tempDir, LIBRARY_NAME + (new Date()).getTime() + ".png");
         Image image = capture(tempFile);
+        saveSnapshotToSpecifiedPath(tempFile.getAbsolutePath());
 
         // -- Delete the temp file in the background
         Thread thread = new Thread(new Runnable() {

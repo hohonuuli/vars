@@ -5,7 +5,7 @@
     <parent>
         <artifactId>vars-redux</artifactId>
         <groupId>vars-redux</groupId>
-        <version>7.1.0-SNAPSHOT</version>
+        <version>8.2-SNAPSHOT</version>
     </parent>
     <artifactId>vars-shared-ui</artifactId>
     <name>vars-shared-ui [Library]</name>
@@ -26,6 +26,17 @@
             <groupId>org.bushe</groupId>
             <artifactId>eventbus</artifactId>
             <version>${eventbus.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.reactivex</groupId>
+            <artifactId>rxjava</artifactId>
+            <version>${rxjava.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.typesafe</groupId>
+            <artifactId>config</artifactId>
+            <version>${config.version}</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.swinglabs.swingx</groupId>

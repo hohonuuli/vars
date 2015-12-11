@@ -19,7 +19,7 @@ import com.google.common.collect.Lists;
 import com.google.inject.Injector;
 import foxtrot.Job;
 import foxtrot.Worker;
-import java.awt.Toolkit;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.TimeZone;
@@ -29,7 +29,6 @@ import javax.swing.*;
 import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.EventSubscriber;
 import org.bushe.swing.event.EventTopicSubscriber;
-import org.mbari.awt.WaitCursorEventQueue;
 import org.mbari.swing.SplashFrame;
 import org.mbari.util.SystemUtilities;
 import org.slf4j.Logger;
@@ -38,13 +37,14 @@ import vars.annotation.AnnotationPersistenceService;
 import vars.annotation.Observation;
 import vars.annotation.ui.eventbus.ExitTopicSubscriber;
 import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
+import vars.avplayer.ImageCaptureService;
 import vars.knowledgebase.Concept;
 import vars.shared.ui.GlobalLookup;
 import vars.shared.ui.event.FatalExceptionSubscriber;
 import vars.shared.ui.event.LoggingEventSubscriber;
 import vars.shared.ui.event.NonFatalErrorSubscriber;
 import vars.shared.ui.event.WarningSubscriber;
-import vars.shared.ui.video.ImageCaptureService;
+import vars.avplayer.FakeImageCaptureServiceImpl;
 import vars.shared.util.ActiveAppBeacon;
 import vars.shared.util.ActiveAppPinger;
 
@@ -55,8 +55,8 @@ import vars.shared.util.ActiveAppPinger;
 public class App {
 
     private AnnotationFrame annotationFrame;
-    private final ToolBelt toolBelt;
-
+    private ToolBelt toolBelt;
+    
     /**
      * The App gets garbage collected shortly after startup. To
      * hang on to the EventTopicSubscribers we store them in a static list. This
@@ -87,11 +87,22 @@ public class App {
         activeAppBeacon = new ActiveAppBeacon(BEACON_PORTS, BEACON_MESSAGE);
 
         splashFrame.setMessage(" Initializing configuration ...");
-
+        splashFrame.setVisible(true);
 
         final Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
-        toolBelt = injector.getInstance(ToolBelt.class);
+        try {
+            toolBelt = injector.getInstance(ToolBelt.class);
+        }
+        catch (Exception e) {
+            Exception ex = new RuntimeException("Initialization failed. Perhaps VARS can't connect to the database", e);
+            (new FatalExceptionSubscriber(null)).onEvent(Lookup.TOPIC_FATAL_ERROR, ex);
+        }
 
+        // HACK - For failed initialization... e.g. Database isn't running.
+        // Hate putting a system exit call in constructor. But it works.
+        if (toolBelt == null) {
+            System.exit(-1);
+        }
 
         /*
          *  Verify that the database connection is working. If it's not, show
@@ -110,7 +121,7 @@ public class App {
         /*
          * Preload the knowledgebase in the Foxtrot worker thread!!
          */
-        splashFrame.setMessage(" Preloading knowledgebase ... be patient");
+        splashFrame.setMessage(" Pre-loading knowledgebase ... be patient");
         Worker.post(new Job() {
 
             @Override
@@ -146,11 +157,6 @@ public class App {
         EventBus.subscribe(Lookup.TOPIC_WARNING, warningSubscriber);
         EventBus.subscribe(Lookup.TOPIC_EXIT, exitSubscriber);
         EventBus.subscribe(VideoArchiveChangedEvent.class, loggingSubscriber);
-
-        /*
-         * Add a special eventQueue that toggles the cursor if the application is busy
-         */
-        //Toolkit.getDefaultToolkit().getSystemEventQueue().push(new WaitCursorEventQueue(500));
 
         JFrame frame = getAnnotationFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -208,6 +214,7 @@ public class App {
         GlobalLookup.getSettingsDirectory();
 
         try {
+
             // Set System L&F
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         }
@@ -223,11 +230,7 @@ public class App {
         }
         else {
             try {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        new App();
-                    }
-                });
+                SwingUtilities.invokeLater(() -> new App());
             }
             catch (Throwable e) {
                 LoggerFactory.getLogger(App.class).warn("An error occurred on startup", e);

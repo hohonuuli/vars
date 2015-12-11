@@ -31,20 +31,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.ActionMap;
-import javax.swing.BoxLayout;
-import javax.swing.InputMap;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTable;
-import javax.swing.JToolBar;
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -79,7 +66,7 @@ import vars.annotation.ui.table.JXObservationTableColumnModel;
 import vars.annotation.ui.table.ObservationTable;
 import vars.annotation.ui.table.ObservationTableModel;
 import vars.annotation.ui.video.VideoControlPanel;
-import vars.annotation.ui.videoset.VideoArchiveSetEditorButton;
+import vars.avplayer.VideoControlService;
 
 /**
  *
@@ -100,6 +87,7 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
     private QuickControlsPanel quickControlsPanel;
     private RowEditorPanel rowEditorPanel;
     private JXObservationTable table;
+    private JPopupMenu tablePopupMenu;
     private JScrollPane tableScrollPane;
     private JToolBar toolBar;
     private final ToolBelt toolBelt;
@@ -225,7 +213,9 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
         if (table == null) {
             table = new JXObservationTable();
             table.setFocusable(false);    // The row editor panel should get focus NOT the table
+            //((JXObservationTableColumnModel) table.getColumnModel()).setMiniView(true);
             ((JXObservationTableColumnModel) table.getColumnModel()).setImageView(VARSProperties.getShowRecordedDateInTable());
+
 
             // Map Mask+UP-ARROW Key Stroke
             String upTable = "up-table";
@@ -290,12 +280,41 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
                 }
             });
 
+            /*
+             * Right-click popup menu
+             */
+            table.setComponentPopupMenu(getTablePopupMenu());
 
             Lookup.getObservationTableDispatcher().setValueObject(table);
 
         }
 
         return table;
+    }
+
+    protected JPopupMenu getTablePopupMenu() {
+        if (tablePopupMenu == null) {
+            tablePopupMenu = new JPopupMenu();
+            JMenuItem seekItem = new JMenuItem("Seek to this timecode");
+            tablePopupMenu.add(seekItem);
+            Lookup.getSelectedObservationsDispatcher().addPropertyChangeListener((evt) -> {
+                Collection<Observation> observations = (Collection<Observation>) evt.getNewValue();
+                seekItem.setEnabled(observations.size() == 1);
+            });
+
+            seekItem.addActionListener((e) -> {
+                VideoControlService vcr = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
+                if (vcr != null) {
+                    // Get selected annotation
+                    Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+                    if (observations.size() == 1) {
+                        Observation obs = observations.iterator().next();
+                        vcr.seek(obs.getVideoFrame().getTimecode());
+                    }
+                }
+            });
+        }
+        return tablePopupMenu;
     }
 
     protected JScrollPane getTableScrollPane() {
@@ -314,7 +333,6 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
             toolBar.add(new UndoButton());
             toolBar.add(new RedoButton());
             toolBar.add(new RefreshButton(toolBelt));
-            toolBar.add(new VideoArchiveSetEditorButton(toolBelt));
             toolBar.add(new PreferenceFrameButton());
             toolBar.add(new StatusLabelForPerson(toolBelt));
             toolBar.add(new StatusLabelForVcr());
