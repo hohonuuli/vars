@@ -53,7 +53,7 @@ public class UDPVideoControlService extends AbstractVideoControlService {
 
         String host = (String) args[0];
         Integer port = (Integer) args[1];
-        frameRate = ((Double) args[2]).doubleValue();
+        frameRate = (Double) args[2];
 
         try {
             final IVCR vcrUdp = new VCR(host, port);
@@ -104,7 +104,6 @@ public class UDPVideoControlService extends AbstractVideoControlService {
         final Timecode timecode = vcrTimecode.getTimecode();
         final Timecode updatedTimecode = new Timecode(timecode.getFrames(), frameRate);
         vcrTimecode.timecodeProperty().set(updatedTimecode);
-        //timecode.setFrameRate(frameRate);
 
         // Convert userbits from byte[]->long->Date
         final int epicSeconds = NumberUtilities.toInt(vcrUserbits.getUserbits(), true);

@@ -172,13 +172,8 @@ public class RS422VideoControlService extends AbstractVideoControlService {
          * have to do anything fancy to get the correct timecode. We need to
          * request both the timecode and userbits.
          */
-        if (vcr.getVcrState().isPlaying()) {
-            vcr.requestVTimeCode();
-        }
-        else {
-            vcr.requestLTimeCode();
-        }
 
+        vcr.requestTimeCode();
         vcr.requestUserbits();
 
         // Read the timecode
@@ -186,18 +181,13 @@ public class RS422VideoControlService extends AbstractVideoControlService {
         IVCRUserbits vcrUserbits = vcr.getVcrUserbits();
 
         final Timecode timecode = vcrTimecode.getTimecode();
-        // FIXME VTC and LTC seem to be giving different values. Don't need values below.
-        //final Timecode updatedTimecode = new Timecode(timecode.getFrames(), frameRate);
-        //vcrTimecode.timecodeProperty().set(updatedTimecode);
-        //timecode.setFrameRate(frameRate);
 
         // Convert userbits from byte[]->long->Date
-
         final int epicSeconds = NumberUtilities.toInt(vcrUserbits.getUserbits(), true);
         final Date date = new Date((long) epicSeconds * 1000L);
-        log.debug("Timecode: " + timecode.toString() + '\n' +
-                "Userbits: " + vcrUserbits.getUserbits() + '\n' +
-                "Date: " + date);
+//        log.debug("Timecode: " + timecode.toString() + '\n' +
+//                "Userbits: " + vcrUserbits.getUserbits() + '\n' +
+//                "Date: " + date);
 
         return new VideoTimeImpl(timecode.toString(), date);
     }
@@ -207,9 +197,6 @@ public class RS422VideoControlService extends AbstractVideoControlService {
      * @param timecode
      */
     public void seek(String timecode) {
-
-        // TODO Start a timer and listen for valid checksums. If a valid one
-        // occurs reset the time. If timer ends throw a VideoControlException
         getVcr().seekTimecode(new Timecode(timecode));
     }
 
