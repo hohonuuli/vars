@@ -60,7 +60,7 @@ public class ChangeObservationConceptNameAction extends ActionAdapter {
         UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
         String username = userAccount == null ? UserAccount.USERNAME_DEFAULT : userAccount.getUserName();
         Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
-        observations = new ArrayList<Observation>(observations); // Make collection copy to avoid threading issues
+        observations = new ArrayList<>(observations); // Make collection copy to avoid threading issues
         Command command = new ChangeObservationNameCmd(observations, conceptName, username, new Date());
         CommandEvent commandEvent = new CommandEvent(command);
         EventBus.publish(commandEvent);

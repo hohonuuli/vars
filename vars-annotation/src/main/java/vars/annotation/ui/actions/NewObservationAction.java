@@ -182,7 +182,7 @@ public final class NewObservationAction extends ActionAdapter {
                      *  may have the time that the frame was recorded stored as a
                      *  little-endian 4-byte int.
                      */
-                    videoService.requestVUserbits();
+                    videoService.requestUserbits();
                     final int epicSeconds = NumberUtilities.toInt(videoService.getVcrUserbits().getUserbits(), true);
                     utcDate = new Date((long) epicSeconds * 1000L);
                 }

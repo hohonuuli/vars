@@ -68,7 +68,7 @@ public class SnapTime {
      * @return time formatted for the GMT timezone
      */
     String getFormattedGmtTime() {
-        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         return dateFormat.format(observationDate);
     }
