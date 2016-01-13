@@ -1,4 +1,4 @@
-# MBARI's Video Annotation and Reference System (VARS)
+# [MBARI's](http://www.mbari.org/) Video Annotation and Reference System (VARS)
 
 # General Info
 
