@@ -11,7 +11,7 @@ Documentation for VARS is at [https://hohonuuli.github.io/vars/](https://hohonuu
 Pre-built binaries can be downloaded from [Bintray](https://bintray.com/hohonuuli/generic/VARS/view). There are 2 versions:
 
 1. __vcr__ - This version of VARS is configured to work with video decks that support RS422 (serial port) and connect to video capture cards such as [BlackMagic Decklink](https://www.blackmagicdesign.com/products/decklink). Video capture is currently only supported on Mac OS X.
-2. __video__ - This version of VARS is for working directly with videofiles. (Currently MP4/H264 but other codecs such as ProRes are likely to be supported in 2016)
+2. __video__ - This version of VARS is for working directly with videofiles. (Currently MP4/H264 but other codecs such as ProRes are likely to be supported in 2016). Theoretically, this version work on Windows, Mac, and Linux.
 
 ## Building
 
