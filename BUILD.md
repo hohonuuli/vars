@@ -29,11 +29,6 @@ VARS is co-developed alongside several other external modules. Normally these mo
     cd vcr4j
     mvn install
 
-    # QTX4J at https://github.com/hohonuuli/qtx4j
-    # Execute the following commands to build and install in your local maven repository
-    git clone https://github.com/hohonuuli/qtx4j.git
-    cd qtx4j
-    mvn install
     
 Normally Maven expects you to have an internet connection when running builds. However, if you want to checkout the VARS code and build it offline you can do that as follows:
 
