@@ -17,7 +17,7 @@ For the impatient:
 2. Build
   `mvn install -P dev`
   
-More details can be found in [BUILD.md](BUILD.md)
+More details can be found in [BUILD.md](https://github.com/hohonuuli/vars/blob/master/BUILD.md)
 
 ## Workflow
 
