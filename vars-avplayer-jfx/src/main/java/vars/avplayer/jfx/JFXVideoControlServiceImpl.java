@@ -108,7 +108,7 @@ public class JFXVideoControlServiceImpl  extends AbstractVideoControlService
 
         }
         catch (Exception e) {
-            log.error("Faile to create JFXMovieFrame", e);
+            log.error("Failed to create JFXMovieJFrame", e);
             setVcr(new VCRAdapter());
             setVideoControlInformation(new VideoControlInformationImpl(movieLocation, VideoControlStatus.ERROR));
         }

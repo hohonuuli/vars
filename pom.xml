@@ -90,7 +90,7 @@
         <module>vars-knowledgebase</module>
         <module>vars-avplayer-base</module>
         <module>vars-avplayer-novideo</module>
-        <module>vars-avplayer-vcr</module>
+        <module>vars-avplayer-rs422</module>
         <module>vars-avplayer-jfx</module>
         <module>vars-avplayer-vlcj</module>
         <module>vars-annotation</module>

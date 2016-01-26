@@ -88,22 +88,14 @@ public class DefaultVideoPlayerDialogUI extends StandardDialog implements VideoP
          */
 
         // This action occurs when the timer fires.
-        ActionListener changeItemAction = new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                updateVideoArchiveParameters();
-            }
-        };
+        ActionListener changeItemAction = e -> updateVideoArchiveParameters();
 
         // The timer with a delay and bound to above action.
         delayTimer = new Timer(RESPONSE_DELAY, changeItemAction);
         delayTimer.setRepeats(false);
 
         // Checks when to update the ok button
-        ActionListener updateOkayAction = new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                updateOkayStatus();
-            }
-        };
+        ActionListener updateOkayAction = e -> updateOkayStatus();
         updateOkayTimer = new Timer(RESPONSE_DELAY, updateOkayAction);
         updateOkayTimer.setRepeats(false);
 
@@ -148,17 +140,8 @@ public class DefaultVideoPlayerDialogUI extends StandardDialog implements VideoP
         buttonGroup.add(getOpenByLocationRB());
         buttonGroup.add(getOpenExistingRB());
         buttonGroup.setSelected(getOpenByLocationRB().getModel(), true);
-        getOkayButton().addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                setVisible(false);
-            }
-        });
-
-        getCancelButton().addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                setVisible(false);
-            }
-        });
+        getOkayButton().addActionListener(e -> setVisible(false));
+        getCancelButton().addActionListener(e -> setVisible(false));
         getContentPane().add(getPanel(), BorderLayout.CENTER);
         getOpenByLocationRB().setSelected(true);
     }
@@ -245,7 +228,6 @@ public class DefaultVideoPlayerDialogUI extends StandardDialog implements VideoP
             AnnotationPersistenceService aps = toolBelt.getAnnotationPersistenceService();
             AnnotationDAOFactory daoFactory = toolBelt.getAnnotationDAOFactory();
             List<String> cameraPlatforms = aps.findAllCameraPlatforms();
-            // List<String> cameraPlatforms = lookupService.findCameraPlatforms().get(5, TimeUnit.SECONDS);
             cp = new String[cameraPlatforms.size()];
             cameraPlatforms.toArray(cp);
             Arrays.sort(cp, new IgnoreCaseToStringComparator());
