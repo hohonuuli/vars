@@ -25,6 +25,6 @@ Originally designed for annotating underwater video, VARS can be applied to any 
 ## Acknowledgements
 
 The following products were very kindly donated to assist with the development of VARS:  
-<a href="http://www.jetbrains.com/idea/"><img src="images/logo_IntelliJIDEA" alt="The best Java IDE" border="0" width="150" height="50" /></a>&nbsp;
+<a href="http://www.jetbrains.com/idea/"><img src="images/logo_IntelliJIDEA.png" alt="The best Java IDE" border="0" width="150" height="50" /></a>&nbsp;
 <a href="http://www.aquafold.com"><img src="images/s_aquadatastudio_262x62.gif" alt="Aqua Data Studio" width="132" height="31" border="0" /></a>&nbsp;
 <a href="http://www.ej-technologies.com/products/jprofiler/overview.html"><img src="images/jprofiler.gif" alt="JProfiler" border="0" /></a>  
