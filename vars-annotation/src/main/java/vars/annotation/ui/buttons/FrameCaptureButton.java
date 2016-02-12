@@ -71,11 +71,7 @@ public class FrameCaptureButton extends FancyButton {
                        SwingUtils.getKeyString((KeyStroke) getAction().getValue(Action.ACCELERATOR_KEY)) + "]");
         setText("");
 
-        PropertyChangeListener listener = new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                setEnabled(checkEnable());
-            }
-        };
+        PropertyChangeListener listener = evt -> setEnabled(checkEnable());
 
         Lookup.getImageCaptureServiceDispatcher().addPropertyChangeListener(listener);
         Lookup.getVideoArchiveDispatcher().addPropertyChangeListener(listener);

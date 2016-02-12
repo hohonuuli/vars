@@ -227,5 +227,11 @@
                 <environment>test</environment>
             </properties>
         </profile>
+        <profile>
+            <id>csiro</id>
+            <properties>
+                <environment>csiro</environment>
+            </properties>
+        </profile>
     </profiles>
 </project>
