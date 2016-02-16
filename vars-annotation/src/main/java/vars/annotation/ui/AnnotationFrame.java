@@ -66,6 +66,7 @@ import vars.annotation.ui.table.JXObservationTableColumnModel;
 import vars.annotation.ui.table.ObservationTable;
 import vars.annotation.ui.table.ObservationTableModel;
 import vars.annotation.ui.video.VideoControlPanel;
+import vars.annotation.ui.videoset.VideoArchiveSetEditorButton;
 import vars.avplayer.VideoControlService;
 
 /**
@@ -333,6 +334,7 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
             toolBar.add(new UndoButton());
             toolBar.add(new RedoButton());
             toolBar.add(new RefreshButton(toolBelt));
+            toolBar.add(new VideoArchiveSetEditorButton(toolBelt));
             toolBar.add(new PreferenceFrameButton());
             toolBar.add(new StatusLabelForPerson(toolBelt));
             toolBar.add(new StatusLabelForVcr());

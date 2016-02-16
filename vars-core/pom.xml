@@ -4,7 +4,7 @@
     <parent>
         <artifactId>vars-redux</artifactId>
         <groupId>vars-redux</groupId>
-        <version>8.2-SNAPSHOT</version>
+        <version>8.1.2</version>
     </parent>
     <artifactId>vars-core</artifactId>
     <name>vars-core [Library]</name>
