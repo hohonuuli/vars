@@ -31,7 +31,7 @@ WHERE
           'Cydippida 2',
           'Llyria',
           'Mertensia',
-          'Mertensiidae sp. A'
+          'Mertensiidae sp. A',
           'Platyctenida sp. 1',
           'Lyroctenidae',
           'Lyrocteis',
