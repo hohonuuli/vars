@@ -32,6 +32,7 @@ WHERE
           'Llyria',
           'Mertensia',
           'Mertensiidae sp. A',
+          'Platyctenida',
           'Platyctenida sp. 1',
           'Lyroctenidae',
           'Lyrocteis',

@@ -122,7 +122,7 @@ DEALLOCATE MyCursor
 
 GO
 
--- Platyctenida --------------------------------------------------
+-- Platyctenida sp. 1--------------------------------------------------
 DECLARE @conceptId bigint
 
 DECLARE MyCursor CURSOR FOR
