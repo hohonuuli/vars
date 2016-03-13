@@ -123,9 +123,8 @@ Knowledgebase      knowledgebase.bat   knowledgebase
 Query              query.bat           query
 
 NOTE: The Annotation application may take a long time to start. This is 
-normal because a) it must load all the information from the knowledgebase database
-when starting and b) The RXTX serial port libraries used to talk to the VCR can
-take a long time to initialize.
+normal because it must load all the information from the knowledgebase database
+when starting.
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -134,9 +133,11 @@ take a long time to initialize.
 
 VARS was designed to integrate other data such as position (latitude, longitude,
 depth) and physical parameters (salinity, temperature, etc.). This information 
-is stored in a table named PhysicalData in the database. If you need help or 
-suggestions on how to import your physical data into VARS send an email to the
-mailing lists at http://vars.sourceforge.net. Also, if you would like to 
+is stored in a table named PhysicalData in the database. There is a script included 
+in the bin directory named 'merge_csv'. If you run merge_cvs from the command line
+it will display help. If you need further help or suggestions on how to import 
+your physical data into VARS you can post your question at 
+https://github.com/hohonuuli/vars/issues. Also, if you would like to 
 integrate other information thats not available in the default tables, send an 
 email. It's very easy to modify VARS to store additional information.
 
@@ -158,5 +159,5 @@ setting VARS up other databases.
 VARS is an open source project. We welcome contributions and suggestions. 
 Contributions can come in many different forms such as documentation, code 
 contributions, web site improvements etc. More information can be found 
-http://vars.sourceforge.net or http://code.google.com/p/vars-redux/. The VARS 
-mailing list can be found at http://groups.google.com/group/mbari-vars.
+https://github.com/hohonuuli/vars. The VARS mailing list can be found at 
+http://groups.google.com/group/mbari-vars.

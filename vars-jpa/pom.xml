@@ -4,7 +4,7 @@
     <parent>
         <artifactId>vars-redux</artifactId>
         <groupId>vars-redux</groupId>
-        <version>8.1.2</version>
+        <version>8.2-SNAPSHOT</version>
     </parent>
     <artifactId>vars-jpa</artifactId>
     <name>vars-jpa [Library]</name>
@@ -324,6 +324,25 @@
                     <groupId>net.sourceforge.jtds</groupId>
                     <artifactId>jtds</artifactId>
                     <version>${jtds.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>csiro</id>
+            <properties>
+                <environment>csiro</environment>
+            </properties>
+            <dependencies>
+                <!--
+                Download the jar from Oracle. Install in maven with:
+
+                mvn install:install-file -DgroupId=com.oracle -DartifactId=ojdbc7 \
+                  -Dversion=12.1.0.2 -Dpackaging=jar -Dfile=ojdbc7.jar -DgeneratePom=true
+                -->
+                <dependency>
+                    <groupId>com.oracle</groupId>
+                    <artifactId>ojdbc7</artifactId>
+                    <version>12.1.0.2</version>
                 </dependency>
             </dependencies>
         </profile>

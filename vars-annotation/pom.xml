@@ -4,7 +4,7 @@
     <parent>
         <artifactId>vars-redux</artifactId>
         <groupId>vars-redux</groupId>
-        <version>8.1.2</version>
+        <version>8.2-SNAPSHOT</version>
     </parent>
     <artifactId>vars-annotation</artifactId>
     <name>vars-annotation</name>
@@ -225,6 +225,12 @@
             <id>test</id>
             <properties>
                 <environment>test</environment>
+            </properties>
+        </profile>
+        <profile>
+            <id>csiro</id>
+            <properties>
+                <environment>csiro</environment>
             </properties>
         </profile>
     </profiles>

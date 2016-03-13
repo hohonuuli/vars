@@ -355,9 +355,15 @@ public class AnnotationPersistenceServiceImpl extends QueryableImpl implements A
     }
 
     public Long findTimeCodeByVideoArchiveName(String timecode, String videoArchiveName) {
-        String sql = "SELECT vf.id FROM VideoFrame AS vf RIGHT OUTER JOIN " +
-                "VideoArchive AS va ON vf.VideoArchiveID_FK = va.id WHERE " +
-                "va.videoArchiveName = '" + videoArchiveName + "' AND vf.TapeTimeCode = '" +
+//        String sql = "SELECT vf.id FROM VideoFrame AS vf RIGHT OUTER JOIN " +
+//                "VideoArchive AS va ON vf.VideoArchiveID_FK = va.id WHERE " +
+//                "va.videoArchiveName = '" + videoArchiveName + "' AND vf.TapeTimeCode = '" +
+//                timecode + "'";
+
+        // FIX for Oracle/CSIRO
+        String sql = "SELECT VideoFrame.id FROM VideoFrame RIGHT OUTER JOIN " +
+                "VideoArchive ON VideoFrame.VideoArchiveID_FK = VideoArchive.id WHERE " +
+                "VideoArchive.videoArchiveName = '" + videoArchiveName + "' AND VideoFrame.TapeTimeCode = '" +
                 timecode + "'";
         QueryFunction<Long> queryFunction = (resultSet) -> {
             Long id = null;
