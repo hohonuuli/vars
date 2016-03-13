@@ -27,6 +27,7 @@ import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 import javax.persistence.Version;
 import vars.jpa.JPAEntity;
 import vars.jpa.KeyNullifier;
