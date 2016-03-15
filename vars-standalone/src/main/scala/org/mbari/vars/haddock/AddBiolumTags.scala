@@ -7,7 +7,7 @@ import scala.collection.JavaConverters._
 import scala.io.Source
 
 /**
-  *
+  * @see https://mbari1.atlassian.net/browse/VARS-758
   *
   * @author Brian Schlining
   * @since 2016-03-13T15:35:00
@@ -50,19 +50,25 @@ object AddBiolumTags {
 
 
   val BIOLUM_LINKNAME = "is-bioluminescent"
+  val LINK_NAME_UNDEFINED = "undefined"
 
   def main(args: Array[String]) {
     val file = new File(args(0))
-    val source = Source.fromFile(file)
-    val lines = source.getLines()
-    val speciesTags = for (line <- lines) yield {
-      val parts = line.split("\t")
-      parts(0) -> parts(1)
-    }
-
-    val tagMap = speciesTags.toMap
+    val tagMap = parseTagFile(file)
     val tagAdder = new AddBiolumTags(tagMap)
     tagAdder.apply()
 
+  }
+
+  def parseTagFile(file: File): Map[String, String] = {
+    val source = Source.fromFile(file)
+    val lines = source.getLines()
+    val speciesTags = for (line <- lines) yield {
+      val parts = line.split("\t").map(_.trim)
+      parts(0) -> parts(1).toLowerCase()
+    }
+
+    speciesTags.toMap
+        .filterNot({case (k, v) => v.equalsIgnoreCase(LINK_NAME_UNDEFINED)})
   }
 }
