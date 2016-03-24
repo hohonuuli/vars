@@ -3,6 +3,7 @@ package vars.avplayer;
 
 /**
  * This is an SPI service.
+ * @deprecated Use VideoPlayerOld instead
  */
 public interface VideoPlayerController {
 

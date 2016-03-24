@@ -1,24 +1,15 @@
 package vars.avplayer.vcr;
 
-import org.mbari.util.Tuple2;
-import vars.ToolBelt;
-import vars.annotation.AnnotationDAOFactory;
-import vars.annotation.VideoArchive;
 import vars.avplayer.AbstractVideoControlService;
 import vars.avplayer.ImageCaptureException;
 import vars.avplayer.ImageCaptureService;
-import vars.avplayer.VideoControlInformation;
 import vars.avplayer.VideoControlService;
-import vars.avplayer.VideoParams;
-import vars.avplayer.VideoPlayerAccessUI;
 import vars.avplayer.VideoPlayerController;
-import vars.avplayer.VideoPlayerDialogUI;
 import vars.avplayer.VideoTime;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
-import java.util.Optional;
 
 /**
  * @author Brian Schlining

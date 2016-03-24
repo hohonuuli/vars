@@ -9,6 +9,7 @@ import javax.swing.*;
 /**
  * @author Brian Schlining
  * @since 2016-02-15T18:44:00
+ * @deprecated
  */
 public interface VideoControlService {
 

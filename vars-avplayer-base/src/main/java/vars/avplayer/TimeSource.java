@@ -1,5 +1,8 @@
 package vars.avplayer;
 
+/**
+ * @deprecated
+ */
 public enum TimeSource {
     TIMECODETRACK("Time-code Track"),
     RUNTIME("Elapsed Time"),

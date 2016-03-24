@@ -120,6 +120,13 @@ public class AVFImageCaptureServiceImpl implements ImageCaptureService {
         return image;
     }
 
+    /**
+     *
+     * @param timecode
+     * @return
+     * @throws ImageCaptureException
+     * @deprecated
+     */
     @Override
     public Image capture(String timecode) throws ImageCaptureException {
         if (!isStarted) {

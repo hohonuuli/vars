@@ -17,7 +17,6 @@
 
 package vars.annotation.ui.buttons;
 
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.Action;
 import javax.swing.ImageIcon;

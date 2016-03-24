@@ -24,5 +24,10 @@
             <artifactId>mbarix4j</artifactId>
             <version>${mbarix4j.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mbari.vcr4j</groupId>
+            <artifactId>vcr4j-v2-adapter</artifactId>
+            <version>${vcr4j.version}</version>
+        </dependency>
     </dependencies>
 </project>

@@ -44,7 +44,6 @@ import vars.shared.ui.event.FatalExceptionSubscriber;
 import vars.shared.ui.event.LoggingEventSubscriber;
 import vars.shared.ui.event.NonFatalErrorSubscriber;
 import vars.shared.ui.event.WarningSubscriber;
-import vars.avplayer.FakeImageCaptureServiceImpl;
 import vars.shared.util.ActiveAppBeacon;
 import vars.shared.util.ActiveAppPinger;
 

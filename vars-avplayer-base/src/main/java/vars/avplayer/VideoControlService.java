@@ -4,6 +4,9 @@ import javax.swing.JDialog;
 
 import org.mbari.vcr4j.IVCR;
 
+/**
+ * @deprecated Use VideoController instead
+ */
 public interface VideoControlService extends IVCR {
     
     /**

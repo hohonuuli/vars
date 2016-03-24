@@ -10,16 +10,12 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
-import org.mbari.util.Tuple2;
 import vars.ToolBelt;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveDAO;
-import vars.annotation.VideoFrame;
 import vars.avplayer.EmptyVideoPlayerController;
-import vars.avplayer.VideoPlayerController;
 
 import javax.swing.*;
-import java.util.Collection;
 import java.util.List;
 
 /**

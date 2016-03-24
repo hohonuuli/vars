@@ -8,6 +8,7 @@ import java.util.Optional;
 
 /**
  * Created by brian on 1/22/14.
+ * @deprecated This implentation should be move to a package or module that looks up VideoArchvive by location or parames
  */
 public abstract class AbstractAccessUI implements VideoPlayerAccessUI {
 

@@ -5,6 +5,7 @@ import vars.annotation.VideoArchive;
 
 /**
  * Created by brian on 1/7/14.
+ * @deprecated
  */
 public interface VideoPlayerDialogUI {
 

@@ -1,6 +1,13 @@
-package vars.avplayer;
+package vars.avplayer.jfx;
 
 
+
+import vars.avplayer.AbstractVideoControlService;
+import vars.avplayer.VideoControlService;
+import vars.avplayer.VideoPlayerController;
+import vars.avplayer.VideoTime;
+import vars.avplayer.ImageCaptureService;
+import vars.avplayer.noop.NoopImageCaptureService;
 
 import javax.swing.*;
 
@@ -9,7 +16,7 @@ import javax.swing.*;
  */
 public class EmptyVideoPlayerController implements VideoPlayerController {
 
-    ImageCaptureService imageCaptureService = new FakeImageCaptureServiceImpl();
+    ImageCaptureService imageCaptureService = new NoopImageCaptureService();
     VideoControlService videoControlService = new AbstractVideoControlService() {
         @Override
         public void connect(Object... args) {

@@ -5,13 +5,10 @@ import vars.ToolBelt;
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.VideoArchive;
 import vars.avplayer.AbstractAccessUI;
-import vars.avplayer.DefaultVideoPlayerDialogUI;
-import vars.avplayer.LookupService;
 import vars.avplayer.VideoParams;
 import vars.avplayer.VideoPlayerController;
 import vars.avplayer.VideoPlayerDialogUI;
 
-import javax.inject.Inject;
 import java.awt.*;
 import java.util.Optional;
 

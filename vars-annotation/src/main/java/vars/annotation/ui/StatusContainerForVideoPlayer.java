@@ -12,7 +12,7 @@ import vars.annotation.VideoArchive;
 import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
 import vars.annotation.ui.eventbus.VideoArchiveSelectedEvent;
 import vars.avplayer.VideoParams;
-import vars.avplayer.VideoPlayer;
+import vars.avplayer.VideoPlayerOld;
 import vars.avplayer.VideoPlayerAccessUI;
 import vars.avplayer.VideoPlayerDialogUI;
 import vars.avplayer.VideoPlayers;
@@ -58,7 +58,7 @@ public class StatusContainerForVideoPlayer extends JPanel {
     private JComboBox<String> getVideoPlayerComboBox() {
         if (videoPlayerComboBox == null) {
             videoPlayerComboBox = new JComboBox<>();
-            for (VideoPlayer v : videoPlayers.get()) {
+            for (VideoPlayerOld v : videoPlayers.get()) {
                 videoPlayerComboBox.addItem(v.getName());
             }
         }
@@ -115,11 +115,11 @@ public class StatusContainerForVideoPlayer extends JPanel {
         statusLabel.setOk(ok);
     }
 
-    VideoPlayer getSelectedVideoPlayer() {
+    VideoPlayerOld getSelectedVideoPlayer() {
         JComboBox<String> cb = getVideoPlayerComboBox();
         String name = cb.getItemAt(cb.getSelectedIndex());
-        VideoPlayer videoPlayer = null;
-        for (VideoPlayer v: videoPlayers.get()) {
+        VideoPlayerOld videoPlayer = null;
+        for (VideoPlayerOld v: videoPlayers.get()) {
             if (v.getName().equals(name)) {
                 videoPlayer = v;
                 break;
@@ -148,8 +148,8 @@ public class StatusContainerForVideoPlayer extends JPanel {
                     SwingUtilities.convertPointToScreen(mousePosition, StatusLabelForVideoPlayer.this);
 
                     // Get the correct AccessUI. This provides a dialog to open a VideoArchive and a VideoPlayerController
-                    // for a selected VideoPlayer module
-                    final VideoPlayer videoPlayer = getSelectedVideoPlayer();
+                    // for a selected VideoPlayerOld module
+                    final VideoPlayerOld videoPlayer = getSelectedVideoPlayer();
                     final VideoPlayerAccessUI accessUI = videoPlayer.getAccessUI();
                     final VideoPlayerDialogUI dialog = accessUI.getOpenDialog(frame, toolBelt);
 

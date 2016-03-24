@@ -10,7 +10,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
-import org.mbari.text.IgnoreCaseToStringComparator;
 import org.mbari.util.Tuple2;
 import vars.ToolBelt;
 import vars.annotation.CameraDeployment;
@@ -18,7 +17,6 @@ import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveDAO;
 import vars.annotation.VideoFrame;
 
-import vars.avplayer.EmptyVideoPlayerController;
 import vars.avplayer.VideoPlayerController;
 import vars.avplayer.EventBus;
 import vars.shared.rx.messages.NonFatalExceptionMsg;

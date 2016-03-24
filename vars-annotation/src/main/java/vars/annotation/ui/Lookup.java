@@ -45,7 +45,7 @@ public class Lookup extends GlobalLookup {
     protected static final Object KEY_DISPATCHER_LOGINCREDENTIAL = "vars.annotation.ui.Lookup-LoginCredential";
     protected static final Object KEY_DISPATCHER_OBSERVATION_TABLE = "vars.annotation.ui.Lookup-ObservationTable";
     protected static final Object KEY_DISPATCHER_PREFERENCES = "vars.annotation.ui.Lookup-Preferences";
-    protected static final Object KEY_DISPATCHER_VIDEOSERVICE = "vars.annotation.ui.Lookup-VideoService";
+    protected static final Object KEY_DISPATCHER_VIDEOSERVICE = "vars.annotation.ui.Lookup-VideoPlayerOld";
 
     /**  */
     public static final String RESOURCE_BUNDLE = "annotation-app";

@@ -18,6 +18,7 @@ import org.mbari.vcr4j.time.Timecode;
  * Abstract class that delegates calls to an underlying VCR implementation. Ensures
  * that the VCR object will never be null, avoiding the dreaded {@link NullPointerException}
  * @author brian
+ * @deprecated
  */
 public abstract class AbstractVideoControlService implements VideoControlService {
 

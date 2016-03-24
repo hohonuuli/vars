@@ -7,6 +7,8 @@ import java.util.Optional;
  * At a minimum we need a movieLocation to open a videoarchive. If no match is found in the database, then we will also
  * need the other params of platformName, sequenceNumber and (maybe) TimeSource
  * Created by brian on 1/13/14.
+ *
+ * @deprecated This is no longer appropriate for our video workflows.
  */
 public class VideoParams {
     private final String movieLocation;

@@ -1,2 +1,2 @@
 # Providers or VideoControlServices
-vars.avplayer.EmptyVideoPlayerController
+vars.avplayer.jfx.EmptyVideoPlayerController

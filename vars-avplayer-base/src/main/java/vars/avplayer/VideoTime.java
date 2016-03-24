@@ -11,6 +11,7 @@ import java.util.Date;
  * Represents both an index into a tape and it's corresponding moment in time
  *
  * @author brian
+ * @deprecated use org.mbari.vcr4j.VideoIndex instead
  */
 public interface VideoTime {
 

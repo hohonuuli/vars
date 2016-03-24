@@ -1,4 +1,4 @@
-package vars.avplayer;
+package vars.avplayer.jfx;
 
 import org.mbari.awt.event.NonDigitConsumingKeyListener;
 import org.mbari.swing.SpinningDialWaitIndicator;
@@ -15,6 +15,11 @@ import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.AnnotationPersistenceService;
 import vars.annotation.CameraDeployment;
 import vars.annotation.VideoArchive;
+import vars.avplayer.TimeSource;
+import vars.avplayer.VideoParams;
+import vars.avplayer.VideoPlayerAccessUI;
+import vars.avplayer.VideoPlayerController;
+import vars.avplayer.VideoPlayerDialogUI;
 import vars.shared.ui.dialogs.StandardDialog;
 
 import javax.swing.*;
@@ -27,7 +32,6 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by brian on 1/13/14.

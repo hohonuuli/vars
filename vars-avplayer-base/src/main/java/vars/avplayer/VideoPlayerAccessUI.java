@@ -16,6 +16,7 @@ import java.util.Optional;
  *     <li>openMoviePlayer - A method to open a VideoArchive and  VideoPlayerController that can be used
  *     to control the display of a movie file.</li>
  * </ul>
+ * @deprecated This no longer is applicable to how MBARI works with video
  */
 public interface VideoPlayerAccessUI {
 

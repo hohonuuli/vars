@@ -230,7 +230,7 @@ public class AnnotationFrameController implements PreferenceUpdater, UIEventSubs
                         videoControlService.getVideoControlInformation().getVideoConnectionID());
             }
             catch (NullPointerException e) {
-                log.info("Did not save Last VideoConnection ID preference. Most likely this " +
+                log.info("Did not save Last VideoController ID preference. Most likely this " +
                         "was attempted after the video connection was closed");
             }
 

@@ -1,11 +1,12 @@
 package vars.avplayer.v2;
 
-import vars.avplayer.ImageCaptureService;
 
+import vars.avplayer.ImageCaptureService;
 
 /**
  * @author Brian Schlining
  * @since 2016-02-15T18:43:00
+ * @deprecated
  */
 public interface VideoPlayerController {
 

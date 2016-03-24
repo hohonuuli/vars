@@ -6,7 +6,7 @@
 package vars.avplayer;
 
 /**
- *
+ * @deprecated
  * @author brian
  */
 public interface VideoControlInformation {

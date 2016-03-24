@@ -7,6 +7,7 @@ import vars.shared.rx.RXEventBus;
 /**
  * @author Brian Schlining
  * @since 2015-10-01T16:00:00
+ * @deprecated Use RXEventBus instead
  */
 public class EventBus {
 

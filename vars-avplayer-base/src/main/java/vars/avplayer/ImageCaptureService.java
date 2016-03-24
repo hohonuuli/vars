@@ -5,11 +5,13 @@
 
 package vars.avplayer;
 
+
 import java.awt.Image;
 import java.io.File;
+import java.util.Optional;
 
 /**
- *
+ * Base interface for services that capture images.
  * @author brian
  */
 public interface ImageCaptureService {
@@ -19,17 +21,21 @@ public interface ImageCaptureService {
      * writes the PNG directly to disk first, then it must be read back to get the Java Image
      * object
      * @return true if a PNG is written directly to disk first.
+     * @deprecated
      */
-    boolean isPngAutosaved();
-
-    Image capture(File file) throws ImageCaptureException;
+    //boolean isPngAutosaved();
 
     /**
-     *
-     * @return THe image captured from the QuickTime source
+     * The imagecapture service should:
+     * 1. Alwasy write to the file, unless it's null. Then write to a temporary file and delete it.
+     * 2. Alwasy return the image data
+     * @param file
+     * @return
      * @throws ImageCaptureException
      */
-    Image capture(String timecode) throws ImageCaptureException;
+    Optional<Image> capture(File file) throws ImageCaptureException;
+
+
 
     /**
      * Cleanup resources
