@@ -197,26 +197,11 @@ public class JFXMovieJFrameController implements Initializable {
                     at ...
 
              */
-            Exception failure = null;
-//            long timeoutSeconds = 8L;
-//            int readAttempts = 20;
-//            java.time.Duration timeout = java.time.Duration.ofSeconds(timeoutSeconds);
-//            for (int i = 0; i < readAttempts; i++) {
-//                Thread.sleep(timeoutSeconds / readAttempts);
-//                try {
-//                    bufferedImage = vars.shared.ui.ImageUtilities.watchForAndReadNewImage(target, timeout);
-//                    break;
-//                }
-//                catch (IndexOutOfBoundsException e) {
-//                    failure = e;
-//                }
-//            }
-
             java.time.Duration timeout = java.time.Duration.ofSeconds(8);
             CompletableFuture<BufferedImage> imageFuture = vars.shared.ui.ImageUtilities.readImageAsync(target, timeout);
             bufferedImage = imageFuture.get(timeout.getSeconds(), TimeUnit.SECONDS);
 
-            if (bufferedImage == null && failure != null) {
+            if (bufferedImage == null) {
                 // TODO report error
                 //EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, failure);
             }

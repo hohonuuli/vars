@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.util.Optional;
 
 /**
+ * Noop player can't play anything, it's a fake placeholder though.
  * @author Brian Schlining
  * @since 2016-03-24T13:08:00
  */
@@ -14,7 +15,7 @@ public class NoopVideoPlayer implements VideoPlayer {
 
     @Override
     public boolean canPlay(String mimeType) {
-        return false;
+        return true;
     }
 
     @Override

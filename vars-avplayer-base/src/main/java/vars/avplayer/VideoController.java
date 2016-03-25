@@ -12,6 +12,9 @@ import java.util.concurrent.Future;
 /**
  * Controller that allows interaction with a video.
  *
+ * Note that the VideoIO object should already be appropriately decorated for the particular video stream.
+ * VARS is not going to modify it.
+ *
  * @author Brian Schlining
  * @since 2016-03-24T11:04:00
  */
@@ -64,6 +67,7 @@ public class VideoController<S extends VideoState, E extends VideoError> extends
         getVideoIO().close();
         imageCaptureService.dispose();
     }
+
 
 
 }
