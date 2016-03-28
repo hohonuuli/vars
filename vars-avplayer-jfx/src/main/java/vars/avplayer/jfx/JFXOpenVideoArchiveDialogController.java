@@ -11,15 +11,14 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import org.mbari.util.Tuple2;
+import org.mbari.vcr4j.SimpleVideoError;
+import org.mbari.vcr4j.VideoController;
+import org.mbari.vcr4j.javafx.JFXVideoState;
 import vars.ToolBelt;
 import vars.annotation.CameraDeployment;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveDAO;
 import vars.annotation.VideoFrame;
-
-import vars.avplayer.VideoPlayerController;
-import vars.avplayer.EventBus;
-import vars.shared.rx.messages.NonFatalExceptionMsg;
 
 import javax.swing.*;
 import java.io.File;
@@ -82,7 +81,7 @@ public class JFXOpenVideoArchiveDialogController {
                     Platform.runLater(() -> movieLocationView.setText(url));
                 }
                 catch (MalformedURLException e) {
-                    EventBus.send(new NonFatalExceptionMsg("Bad URL", e));
+                    //EventBus.send(new NonFatalExceptionMsg("Bad URL", e));
                 }
             }
         });
@@ -204,7 +203,7 @@ public class JFXOpenVideoArchiveDialogController {
         selectNameView.setDisable(!useExisting);
     }
 
-    public Tuple2<VideoArchive, VideoPlayerController> openVideoArchive() {
+    public Tuple2<VideoArchive, VideoController<JFXVideoState, SimpleVideoError>> openVideoArchive() {
         VideoArchive videoArchive = null;
         if (rbOpenByLocation.isSelected()) {
             videoArchive = findByLocation(movieLocationView.getText());

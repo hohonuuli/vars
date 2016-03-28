@@ -31,7 +31,6 @@ import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.video.SwingImageCaptureAction;
 import vars.shared.ui.DoNothingAction;
-import vars.avplayer.VideoControlService;
 import vars.shared.ui.FancyButton;
 import vars.avplayer.ImageCaptureService;
 

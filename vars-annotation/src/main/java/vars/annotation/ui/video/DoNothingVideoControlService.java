@@ -5,9 +5,6 @@
 
 package vars.annotation.ui.video;
 
-import vars.avplayer.AbstractVideoControlService;
-import vars.avplayer.VideoTime;
-
 import java.util.Date;
 import javax.swing.JDialog;
 

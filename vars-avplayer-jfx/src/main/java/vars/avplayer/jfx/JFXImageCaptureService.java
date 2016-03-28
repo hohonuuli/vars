@@ -1,9 +1,7 @@
 package vars.avplayer.jfx;
 
-import vars.avplayer.EventBus;
 import vars.avplayer.ImageCaptureException;
 import vars.avplayer.ImageCaptureService;
-import vars.shared.rx.messages.NonFatalExceptionMsg;
 
 import java.awt.*;
 import java.io.File;
@@ -29,7 +27,8 @@ public class JFXImageCaptureService implements ImageCaptureService {
             try {
                 image = controller.frameCapture(file);
             } catch (Exception e) {
-                EventBus.send(new NonFatalExceptionMsg("Failed to capture image to " + file.getAbsolutePath(), e));
+                throw new ImageCaptureException("Failed to capture image and write it to " + file.getAbsolutePath(), e);
+                //EventBus.send(new NonFatalExceptionMsg("Failed to capture image to " + file.getAbsolutePath(), e));
             }
         }
         return Optional.ofNullable(image);

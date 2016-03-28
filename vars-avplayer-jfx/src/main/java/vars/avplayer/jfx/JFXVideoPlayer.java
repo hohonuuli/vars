@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.avplayer.VideoController;
 import vars.avplayer.VideoPlayer;
-import vars.avplayer.jfx.vcr.VCR;
+import vars.avplayer.VideoPlayerDialogUI;
 
 import javax.swing.*;
 import java.util.Arrays;
@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * @author Brian Schlining
  * @since 2016-03-25T13:19:00
  */
-public class JFXVideoPlayer implements VideoPlayer {
+public class JFXVideoPlayer implements VideoPlayer<JFXVideoState, SimpleVideoError> {
 
     private static final List<String> ACCEPTABLE_MIMETYPES = Arrays.asList("video/mp4");
     private volatile JFXMovieJFrame movieFrame = new JFXMovieJFrame();
@@ -38,7 +38,7 @@ public class JFXVideoPlayer implements VideoPlayer {
     }
 
     @Override
-    public Optional<VideoController> connect(Object... args) {
+    public Optional<VideoController<JFXVideoState, SimpleVideoError>> connect(Object... args) {
         if ((args.length != 1) && (args[0] instanceof String)) {
             throw new IllegalArgumentException("You didn't call this method correctly. The argument is the " +
                     "string URL to the movie to open with JavaFX");
@@ -53,8 +53,7 @@ public class JFXVideoPlayer implements VideoPlayer {
             movieFrame.setVisible(false);
             movieFrame.setMediaLocation(movieLocation, c -> {
                 controller = c;
-                VCR fxVcr = new VCR(c.getMediaView().getMediaPlayer());
-                fxVcr.triggerStateNotification();
+
                 MediaPlayer mediaPlayer = c.getMediaView().getMediaPlayer();
                 Media media = mediaPlayer.getMedia();
 
@@ -80,7 +79,7 @@ public class JFXVideoPlayer implements VideoPlayer {
     }
 
     @Override
-    public JDialog getConnectionDialog() {
+    public VideoPlayerDialogUI getConnectionDialog() {
         return null;
     }
 }

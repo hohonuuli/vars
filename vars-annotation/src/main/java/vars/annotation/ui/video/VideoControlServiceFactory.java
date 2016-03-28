@@ -1,7 +1,5 @@
 package vars.annotation.ui.video;
 
-import vars.avplayer.VideoControlService;
-
 /**
  * Utility class for creating a {@link VideoControlService} from
  * a String videoConnectionID (as stored in preferences)

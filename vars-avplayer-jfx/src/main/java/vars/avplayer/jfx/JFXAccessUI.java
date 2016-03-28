@@ -5,8 +5,6 @@ import vars.ToolBelt;
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.VideoArchive;
 import vars.avplayer.AbstractAccessUI;
-import vars.avplayer.VideoParams;
-import vars.avplayer.VideoPlayerController;
 import vars.avplayer.VideoPlayerDialogUI;
 
 import java.awt.*;

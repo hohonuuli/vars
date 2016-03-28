@@ -11,23 +11,24 @@ import java.util.stream.Collectors;
 
 
 /**
- * This enumeration provides access to
+ * Loads available VideoPlayer SPI's
  * Created by brian on 1/6/14.
- * @deprecated
  */
 public class VideoPlayers {
 
-    private final List<VideoPlayerOld> playerList; //ImmutableList.of(new VideoPlayerOld("Built-in",));
 
-    @Inject
-    public VideoPlayers(AnnotationDAOFactory daoFactory) {
-        ServiceLoader<VideoPlayerAccessUI> serviceLoader = ServiceLoader.load(VideoPlayerAccessUI.class);
-        List<VideoPlayerOld> vps =  StreamUtilities.toStream(serviceLoader.iterator())
-                .map(vp -> new VideoPlayerOld(vp.getName(), vp))
-                .collect(Collectors.toList());
-        playerList = ImmutableList.copyOf(vps);
+    public List<VideoPlayer> get() {
+        return StreamUtilities.toStream(loadVideoPlayers().iterator())
+            .collect(Collectors.toList());
     }
 
+    public ServiceLoader<VideoPlayer> loadVideoPlayers() {
+        return ServiceLoader.load(VideoPlayer.class);
+    }
 
-    public List<VideoPlayerOld> get() { return playerList; }
+    public List<VideoPlayer> findVideoPlayers(String mimeType) {
+        return StreamUtilities.toStream(loadVideoPlayers().iterator())
+                .filter(v -> v.canPlay(mimeType))
+                .collect(Collectors.toList());
+    }
 }

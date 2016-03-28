@@ -1,13 +1,14 @@
 package vars.avplayer;
 
 import org.mbari.util.Tuple2;
+import org.mbari.vcr4j.*;
+import vars.ToolBelt;
 import vars.annotation.VideoArchive;
 
 /**
  * Created by brian on 1/7/14.
- * @deprecated
  */
-public interface VideoPlayerDialogUI {
+public interface VideoPlayerDialogUI<S extends VideoState, E extends VideoError> {
 
     /**
      * Same behavior as swing's setVisible methods
@@ -35,11 +36,7 @@ public interface VideoPlayerDialogUI {
      * controller to manage video playback.
      * @return
      */
-    Tuple2<VideoArchive, VideoPlayerController> openVideoArchive();
+    Tuple2<VideoArchive, VideoController<S, E>> openVideoArchive();
 
-    VideoParams getVideoParams();
-
-    void setSupportTimeSource(boolean s);
-    boolean getSupportTimeSource();
 
 }

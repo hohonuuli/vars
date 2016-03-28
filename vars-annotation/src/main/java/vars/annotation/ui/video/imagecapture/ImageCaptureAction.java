@@ -39,7 +39,6 @@ import vars.annotation.ui.commandqueue.Command;
 import vars.annotation.ui.commandqueue.CommandEvent;
 import vars.annotation.ui.commandqueue.impl.AddObservationCmd;
 import vars.avplayer.ImageCaptureService;
-import vars.avplayer.VideoControlService;
 
 /**
  * @author Brian Schlining

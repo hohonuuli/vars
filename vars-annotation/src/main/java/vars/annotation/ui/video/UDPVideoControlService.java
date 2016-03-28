@@ -25,9 +25,7 @@ import org.mbari.vcr4j.time.Timecode;
 import org.mbari.vcr4j.timer.AnnotationQueueVCR;
 import org.mbari.vcr4j.udp01.VCR;
 import vars.VARSException;
-import vars.avplayer.AbstractVideoControlService;
 import vars.avplayer.VideoControlStatus;
-import vars.avplayer.VideoTime;
 
 /**
  *

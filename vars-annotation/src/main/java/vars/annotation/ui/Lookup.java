@@ -29,7 +29,6 @@ import vars.annotation.CameraDirections;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.table.ObservationTable;
-import vars.avplayer.VideoControlService;
 import vars.shared.ui.GlobalLookup;
 import vars.avplayer.ImageCaptureService;
 

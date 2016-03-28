@@ -15,10 +15,7 @@ import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.AnnotationPersistenceService;
 import vars.annotation.CameraDeployment;
 import vars.annotation.VideoArchive;
-import vars.avplayer.TimeSource;
-import vars.avplayer.VideoParams;
-import vars.avplayer.VideoPlayerAccessUI;
-import vars.avplayer.VideoPlayerController;
+import vars.avplayer.VideoPlayer;
 import vars.avplayer.VideoPlayerDialogUI;
 import vars.shared.ui.dialogs.StandardDialog;
 
@@ -43,7 +40,6 @@ public class DefaultVideoPlayerDialogUI extends StandardDialog implements VideoP
     private static final Runnable DO_NOTHING_FUNCTION = () -> {  };
     private final ButtonGroup buttonGroup = new ButtonGroup();
     private final ItemListener rbItemListener = new SelectedRBItemListener();
-    private final VideoPlayerAccessUI controller;
     private JPanel panel;
     private final ToolBelt toolBelt;
     private JLabel lblMovie;
@@ -82,10 +78,9 @@ public class DefaultVideoPlayerDialogUI extends StandardDialog implements VideoP
     /**
      * Create the dialog.
      */
-    public DefaultVideoPlayerDialogUI(final Window parent, final ToolBelt toolBelt, VideoPlayerAccessUI controller) {
+    public DefaultVideoPlayerDialogUI(final Window parent, final ToolBelt toolBelt) {
         super(parent);
         this.toolBelt = toolBelt;
-        this.controller = controller;
         /*
          * We're adding a slight delay here so that db lookups don't try to
          * occur as a person types.
@@ -415,6 +410,8 @@ public class DefaultVideoPlayerDialogUI extends StandardDialog implements VideoP
     }
 
     private void updateVideoArchiveParameters() {
+
+        // TODO open using Toolbelt instead of controller
         Optional<VideoArchive> videoArchiveOpt = controller.findByLocation(getUrlTextField().getText(),
                 toolBelt.getAnnotationDAOFactory());
         if (videoArchiveOpt.isPresent()) {
@@ -447,7 +444,7 @@ public class DefaultVideoPlayerDialogUI extends StandardDialog implements VideoP
         getOkayButton().setEnabled(enable);
     }
 
-    public Tuple2<VideoArchive, VideoPlayerController> openVideoArchive() {
+    public Tuple2<VideoArchive, VideoPlayer> openVideoArchive() {
         String platformName = (String) getCameraPlatformComboBox().getSelectedItem();
         if (platformName != null && platformName.length() == 0) {
             platformName = null;

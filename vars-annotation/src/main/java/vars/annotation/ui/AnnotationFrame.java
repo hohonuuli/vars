@@ -67,7 +67,6 @@ import vars.annotation.ui.table.ObservationTable;
 import vars.annotation.ui.table.ObservationTableModel;
 import vars.annotation.ui.video.VideoControlPanel;
 import vars.annotation.ui.videoset.VideoArchiveSetEditorButton;
-import vars.avplayer.VideoControlService;
 
 /**
  *

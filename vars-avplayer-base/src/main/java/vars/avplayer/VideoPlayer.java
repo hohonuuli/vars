@@ -1,8 +1,9 @@
 package vars.avplayer;
 
-import vars.avplayer.VideoController;
+import org.mbari.vcr4j.VideoError;
+import org.mbari.vcr4j.VideoState;
+import vars.ToolBelt;
 
-import javax.swing.JDialog;
 import java.util.Optional;
 
 /**
@@ -11,7 +12,7 @@ import java.util.Optional;
  * @author Brian Schlining
  * @since 2016-03-24T11:04:00
  */
-public interface VideoPlayer {
+public interface VideoPlayer<S extends VideoState, E extends VideoError> {
 
     /**
      * Connect to your video controller. This method accepts a varargs
@@ -21,7 +22,7 @@ public interface VideoPlayer {
      * @return A resulting VideoController or nothing if the connection failed
      *
      */
-    Optional<VideoController> connect(Object... args);
+    Optional<VideoController<S, E>> connect(Object... args);
 
     /**
      * Connect to your video service with input from a User Interface. This
@@ -31,7 +32,7 @@ public interface VideoPlayer {
      *
      * @return A JDialog that can be used to connect to your video service
      */
-    JDialog getConnectionDialog();
+    VideoPlayerDialogUI<S, E> getConnectionDialog(ToolBelt toolBelt);
 
     /**
      * Used to determine if this service can open this mimetype.

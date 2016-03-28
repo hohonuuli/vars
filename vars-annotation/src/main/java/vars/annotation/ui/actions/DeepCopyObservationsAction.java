@@ -32,8 +32,6 @@ import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.commandqueue.Command;
 import vars.annotation.ui.commandqueue.CommandEvent;
 import vars.annotation.ui.commandqueue.impl.CopyObservationsCmd;
-import vars.avplayer.VideoControlService;
-import vars.avplayer.VideoTime;
 
 /**
  * <p>

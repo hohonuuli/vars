@@ -21,7 +21,6 @@ import javax.swing.Action;
 import javax.swing.KeyStroke;
 import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
-import org.mbari.movie.Timecode;
 import org.mbari.util.NumberUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +35,6 @@ import vars.annotation.ui.commandqueue.CommandEvent;
 import vars.annotation.ui.commandqueue.impl.AddObservationCmd;
 import vars.knowledgebase.ConceptName;
 import vars.annotation.ui.ToolBelt;
-import vars.avplayer.VideoControlService;
 import vars.annotation.ui.Lookup;
 
 /**

@@ -35,9 +35,7 @@ import org.mbari.vcr4j.timer.AnnotationQueueVCR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.ui.Lookup;
-import vars.avplayer.AbstractVideoControlService;
 import vars.avplayer.VideoControlStatus;
-import vars.avplayer.VideoTime;
 import vars.VARSException;
 
 /**

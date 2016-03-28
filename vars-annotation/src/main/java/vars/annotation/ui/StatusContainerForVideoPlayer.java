@@ -11,12 +11,8 @@ import org.mbari.vcr4j.timer.StatusMonitor;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
 import vars.annotation.ui.eventbus.VideoArchiveSelectedEvent;
-import vars.avplayer.VideoParams;
-import vars.avplayer.VideoPlayerOld;
-import vars.avplayer.VideoPlayerAccessUI;
 import vars.avplayer.VideoPlayerDialogUI;
 import vars.avplayer.VideoPlayers;
-import vars.avplayer.VideoPlayerController;
 
 import javax.swing.*;
 import java.awt.*;

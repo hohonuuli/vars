@@ -17,7 +17,6 @@ import vars.annotation.ui.commandqueue.Command;
 import vars.annotation.ui.eventbus.ObservationsAddedEvent;
 import vars.annotation.ui.eventbus.ObservationsRemovedEvent;
 import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
-import vars.avplayer.VideoTime;
 
 import java.util.ArrayList;
 import java.util.Collection;
