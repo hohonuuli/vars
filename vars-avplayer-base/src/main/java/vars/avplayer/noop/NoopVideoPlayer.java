@@ -1,7 +1,11 @@
 package vars.avplayer.noop;
 
+import org.mbari.util.Tuple2;
+import vars.ToolBelt;
+import vars.annotation.VideoArchive;
 import vars.avplayer.VideoPlayer;
 import vars.avplayer.VideoController;
+import vars.avplayer.VideoPlayerDialogUI;
 
 import javax.swing.*;
 import java.util.Optional;
@@ -18,14 +22,20 @@ public class NoopVideoPlayer implements VideoPlayer {
         return true;
     }
 
+
     @Override
-    public Optional<VideoController> connect(Object... args) {
-        return Optional.empty();
+    public VideoPlayerDialogUI getConnectionDialog(ToolBelt toolBelt) {
+        // TODO return a dialog with only a close button
+        return null;
     }
 
     @Override
-    public JDialog getConnectionDialog() {
-        // TODO return a dialog with only a close button
-        return null;
+    public String getName() {
+        return "Disconnected";
+    }
+
+    @Override
+    public Optional<Tuple2<VideoArchive, VideoController>> openVideoArchive(ToolBelt toolBelt, Object... args) {
+        return Optional.empty();
     }
 }

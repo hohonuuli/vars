@@ -109,8 +109,8 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mbari</groupId>
-            <artifactId>vcr4j</artifactId>
+            <groupId>org.mbari.vcr4j</groupId>
+            <artifactId>vcr4j-core</artifactId>
             <version>${vcr4j.version}</version>
         </dependency>
         <dependency>

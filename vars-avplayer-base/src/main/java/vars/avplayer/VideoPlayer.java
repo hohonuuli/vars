@@ -1,8 +1,10 @@
 package vars.avplayer;
 
+import org.mbari.util.Tuple2;
 import org.mbari.vcr4j.VideoError;
 import org.mbari.vcr4j.VideoState;
 import vars.ToolBelt;
+import vars.annotation.VideoArchive;
 
 import java.util.Optional;
 
@@ -19,10 +21,11 @@ public interface VideoPlayer<S extends VideoState, E extends VideoError> {
      * as the argument so you can feed in whatever params you need.
      *
      * @param args The arguments need to connect to you video control service
-     * @return A resulting VideoController or nothing if the connection failed
+     * @return A resulting pair of VideoArchive and a VideoController to manage playback
+     *         of the videoarchive, or nothing if the connection failed.
      *
      */
-    Optional<VideoController<S, E>> connect(Object... args);
+    Optional<Tuple2<VideoArchive, VideoController<S, E>>> openVideoArchive(ToolBelt toolBelt, Object... args);
 
     /**
      * Connect to your video service with input from a User Interface. This
@@ -44,6 +47,7 @@ public interface VideoPlayer<S extends VideoState, E extends VideoError> {
      */
     boolean canPlay(String mimeType);
 
+    String getName();
 
 
 }

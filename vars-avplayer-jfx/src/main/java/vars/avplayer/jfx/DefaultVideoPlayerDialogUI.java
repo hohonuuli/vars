@@ -5,6 +5,8 @@ import org.mbari.swing.SpinningDialWaitIndicator;
 import org.mbari.swing.WaitIndicator;
 import org.mbari.text.IgnoreCaseToStringComparator;
 import org.mbari.util.Tuple2;
+import org.mbari.vcr4j.SimpleVideoError;
+import org.mbari.vcr4j.javafx.JFXVideoState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.CacheClearedEvent;
@@ -15,6 +17,7 @@ import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.AnnotationPersistenceService;
 import vars.annotation.CameraDeployment;
 import vars.annotation.VideoArchive;
+import vars.avplayer.VideoController;
 import vars.avplayer.VideoPlayer;
 import vars.avplayer.VideoPlayerDialogUI;
 import vars.shared.ui.dialogs.StandardDialog;
@@ -57,8 +60,8 @@ public class DefaultVideoPlayerDialogUI extends StandardDialog implements VideoP
     private final Timer delayTimer;
     private final Timer updateOkayTimer;
     private JLabel selectTimeSourcelbl;
-    private JComboBox timeSourceComboBox;
     private Runnable onOkayFunction = DO_NOTHING_FUNCTION;
+    private final JFXVideoPlayer videoPlayer;
 
 
 //    /**
@@ -78,8 +81,9 @@ public class DefaultVideoPlayerDialogUI extends StandardDialog implements VideoP
     /**
      * Create the dialog.
      */
-    public DefaultVideoPlayerDialogUI(final Window parent, final ToolBelt toolBelt) {
+    public DefaultVideoPlayerDialogUI(final Window parent, final ToolBelt toolBelt, JFXVideoPlayer videoPlayer) {
         super(parent);
+        this.videoPlayer = videoPlayer;
         this.toolBelt = toolBelt;
         /*
          * We're adding a slight delay here so that db lookups don't try to
@@ -118,6 +122,10 @@ public class DefaultVideoPlayerDialogUI extends StandardDialog implements VideoP
     @Override
     public void onOkay(Runnable fn) {
         onOkayFunction = fn;
+    }
+
+    public void onCancel(Runnable fn) {
+        // DO nothing for now. The cancel button already has an actionlistener that hides the frame
     }
 
     /**
@@ -177,11 +185,7 @@ public class DefaultVideoPlayerDialogUI extends StandardDialog implements VideoP
                                                             .addGroup(gl_panel.createSequentialGroup()
                                                                     .addGap(29)
                                                                     .addComponent(getLblSelectName(), GroupLayout.PREFERRED_SIZE, 81, GroupLayout.PREFERRED_SIZE))
-                                                            .addComponent(getSelectTimeSourcelbl()))
-                                                    .addGap(30)
-                                                    .addGroup(gl_panel.createParallelGroup(GroupLayout.Alignment.LEADING)
-                                                            .addComponent(getTimeSourceComboBox(), 0, 311, Short.MAX_VALUE)
-                                                            .addComponent(getExistingNamesComboBox(), 0, 311, Short.MAX_VALUE))))
+                                                            .addComponent(getSelectTimeSourcelbl()))))
                                     .addContainerGap())
             );
             gl_panel.setVerticalGroup(
@@ -209,10 +213,6 @@ public class DefaultVideoPlayerDialogUI extends StandardDialog implements VideoP
                                     .addGroup(gl_panel.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                             .addComponent(getLblSelectName())
                                             .addComponent(getExistingNamesComboBox(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                                    .addGap(18)
-                                    .addGroup(gl_panel.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                            .addComponent(getSelectTimeSourcelbl())
-                                            .addComponent(getTimeSourceComboBox(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                                     .addContainerGap(53, Short.MAX_VALUE))
             );
             panel.setLayout(gl_panel);
@@ -221,11 +221,9 @@ public class DefaultVideoPlayerDialogUI extends StandardDialog implements VideoP
     }
 
     private String[] listCameraPlatforms() {
-        //final Collection<String> cameraPlatforms = VARSProperties.getCameraPlatforms();
         String[] cp = {""};
         try {
             AnnotationPersistenceService aps = toolBelt.getAnnotationPersistenceService();
-            AnnotationDAOFactory daoFactory = toolBelt.getAnnotationDAOFactory();
             List<String> cameraPlatforms = aps.findAllCameraPlatforms();
             cp = new String[cameraPlatforms.size()];
             cameraPlatforms.toArray(cp);
@@ -412,7 +410,7 @@ public class DefaultVideoPlayerDialogUI extends StandardDialog implements VideoP
     private void updateVideoArchiveParameters() {
 
         // TODO open using Toolbelt instead of controller
-        Optional<VideoArchive> videoArchiveOpt = controller.findByLocation(getUrlTextField().getText(),
+        Optional<VideoArchive> videoArchiveOpt = videoPlayer.findByLocation(getUrlTextField().getText(),
                 toolBelt.getAnnotationDAOFactory());
         if (videoArchiveOpt.isPresent()) {
             VideoArchive videoArchive = videoArchiveOpt.get();
@@ -444,20 +442,18 @@ public class DefaultVideoPlayerDialogUI extends StandardDialog implements VideoP
         getOkayButton().setEnabled(enable);
     }
 
-    public Tuple2<VideoArchive, VideoPlayer> openVideoArchive() {
+    public Tuple2<VideoArchive, VideoController<JFXVideoState, SimpleVideoError>> openVideoArchive() {
         String platformName = (String) getCameraPlatformComboBox().getSelectedItem();
         if (platformName != null && platformName.length() == 0) {
             platformName = null;
         }
-        Optional<String> platformOpt = Optional.ofNullable(platformName);
 
-        Optional<Integer> sequenceNumberOpt;
+        Integer sequenceNumber = null;
         try {
-            Integer sn = Integer.parseInt(getSequenceNumberTextField().getText());
-            sequenceNumberOpt = Optional.of(sn);
+            sequenceNumber = Integer.parseInt(getSequenceNumberTextField().getText());
         }
         catch (Exception e) {
-            sequenceNumberOpt = Optional.empty();
+            // DO nothing
         }
 
         String movieLocation = getUrlTextField().getText();
@@ -465,14 +461,7 @@ public class DefaultVideoPlayerDialogUI extends StandardDialog implements VideoP
             throw new VARSException("Unless you provide a movie location, VARS can't open the video file.");
         }
 
-        Optional<TimeSource> timeSourceOpt = Optional.empty();
-        if (getSupportTimeSource()) {
-            timeSourceOpt = Optional.of((TimeSource) getTimeSourceComboBox().getSelectedItem());
-        }
-
-        VideoParams params = new VideoParams(getUrlTextField().getText(), platformOpt, sequenceNumberOpt,
-                timeSourceOpt);
-        return controller.openMoviePlayer(params, toolBelt.getAnnotationDAOFactory());
+        return videoPlayer.openVideoArchive(toolBelt, movieLocation, platformName, sequenceNumber).get();
     }
 
     class SelectedRBItemListener implements ItemListener {
@@ -504,43 +493,5 @@ public class DefaultVideoPlayerDialogUI extends StandardDialog implements VideoP
         return selectTimeSourcelbl;
     }
 
-    protected JComboBox getTimeSourceComboBox() {
-        if (timeSourceComboBox == null) {
-            timeSourceComboBox = new JComboBox();
-            timeSourceComboBox.setModel(new DefaultComboBoxModel(TimeSource.values()));
-            timeSourceComboBox.setSelectedItem(TimeSource.AUTO);
-        }
-        return timeSourceComboBox;
-    }
 
-    @Override
-    public VideoParams getVideoParams() {
-        String movieLocation;
-        String platformName = null;
-        Integer sequenceNumber = null;
-        TimeSource timeSource = null;
-        if (getOpenExistingRB().isSelected()) {
-            movieLocation = (String) getExistingNamesComboBox().getSelectedItem();
-        }
-        else {
-            movieLocation = getUrlTextField().getText();
-            // TODO if it's a file URL replace '%20' with a space
-            platformName = (String) getCameraPlatformComboBox().getSelectedItem();
-            sequenceNumber = Integer.parseInt(getSequenceNumberTextField().getText());
-            if (getSupportTimeSource()) {
-                timeSource = (TimeSource) getTimeSourceComboBox().getSelectedItem();
-            }
-        }
-        return new VideoParams(movieLocation, platformName, sequenceNumber, timeSource);
-    }
-
-    @Override
-    public void setSupportTimeSource(boolean s) {
-        getTimeSourceComboBox().setEnabled(s);
-    }
-
-    @Override
-    public boolean getSupportTimeSource() {
-        return getTimeSourceComboBox().isEnabled();
-    }
 }

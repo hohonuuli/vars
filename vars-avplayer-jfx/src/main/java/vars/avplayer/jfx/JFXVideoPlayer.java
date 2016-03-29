@@ -2,6 +2,9 @@ package vars.avplayer.jfx;
 
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import org.mbari.awt.AwtUtilities;
+import org.mbari.swing.SwingUtils;
+import org.mbari.util.Tuple2;
 import org.mbari.vcr4j.SimpleVideoError;
 import org.mbari.vcr4j.decorators.StatusDecorator;
 import org.mbari.vcr4j.decorators.VCRSyncDecorator;
@@ -9,11 +12,18 @@ import org.mbari.vcr4j.javafx.JFXVideoIO;
 import org.mbari.vcr4j.javafx.JFXVideoState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.ToolBelt;
+import vars.annotation.AnnotationDAOFactory;
+import vars.annotation.VideoArchive;
+import vars.annotation.VideoArchiveDAO;
 import vars.avplayer.VideoController;
 import vars.avplayer.VideoPlayer;
 import vars.avplayer.VideoPlayerDialogUI;
+import vars.shared.awt.AWTUtilities;
+import vars.shared.ui.GlobalLookup;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +40,8 @@ public class JFXVideoPlayer implements VideoPlayer<JFXVideoState, SimpleVideoErr
     private final Logger log = LoggerFactory.getLogger(getClass());
     private volatile JFXMovieJFrameController controller;
 
+    private VideoPlayerDialogUI dialogUI;
+
     @Override
     public boolean canPlay(String mimeType) {
         return ACCEPTABLE_MIMETYPES.stream()
@@ -37,17 +49,11 @@ public class JFXVideoPlayer implements VideoPlayer<JFXVideoState, SimpleVideoErr
                 .count() > 0;
     }
 
-    @Override
-    public Optional<VideoController<JFXVideoState, SimpleVideoError>> connect(Object... args) {
-        if ((args.length != 1) && (args[0] instanceof String)) {
-            throw new IllegalArgumentException("You didn't call this method correctly. The argument is the " +
-                    "string URL to the movie to open with JavaFX");
-        }
+    public Optional<VideoController<JFXVideoState, SimpleVideoError>> createVideoController(String movieLocation) {
 
         AtomicReference<VideoController<JFXVideoState, SimpleVideoError>> videoControllerRef =
                 new AtomicReference<>();
 
-        String movieLocation = (String) args[0];
         try {
 
             movieFrame.setVisible(false);
@@ -79,7 +85,77 @@ public class JFXVideoPlayer implements VideoPlayer<JFXVideoState, SimpleVideoErr
     }
 
     @Override
-    public VideoPlayerDialogUI getConnectionDialog() {
-        return null;
+    public VideoPlayerDialogUI getConnectionDialog(ToolBelt toolBelt) {
+        if (dialogUI == null) {
+            Window window = (Window) GlobalLookup.getSelectedFrameDispatcher().getValueObject();
+            dialogUI = new DefaultVideoPlayerDialogUI(window, toolBelt, this);
+        }
+        return dialogUI;
+    }
+
+    /**
+     *
+     * @param toolBelt
+     * @param args The arguments need to connect to you video control service. They are the following: movieLocation: String,
+     *             platformName: String, sequenceNumber: Integer
+     * @return A tuple of the videoarchve and the corresponding videocontroller
+     */
+    @Override
+    public Optional<Tuple2<VideoArchive, VideoController<JFXVideoState, SimpleVideoError>>> openVideoArchive(ToolBelt toolBelt, Object... args) {
+        String movieLocation = (String) args[0];
+        String platformName = (String) args[1];
+        Integer sequenceNumber = (Integer) args[2];
+        return openVideoArchive(toolBelt, movieLocation, platformName, sequenceNumber);
+    }
+
+    private Optional<Tuple2<VideoArchive, VideoController<JFXVideoState, SimpleVideoError>>> openVideoArchive(ToolBelt toolBelt, String movieLocation,
+            String platformName,
+            Integer sequenceNumber) {
+
+        VideoArchive videoArchive = getOrCreateVideoArchive(
+                new VideoParams(movieLocation, platformName, sequenceNumber),
+                toolBelt.getAnnotationDAOFactory());
+
+        Optional<VideoController<JFXVideoState, SimpleVideoError>> controller = createVideoController(movieLocation);
+
+        if (controller.isPresent()) {
+            return Optional.of(new Tuple2<>(videoArchive, controller.get()));
+        }
+        else {
+            return Optional.empty();
+        }
+
+    }
+
+    public Optional<VideoArchive> findByLocation(String location, AnnotationDAOFactory daoFactory) {
+        VideoArchiveDAO dao = daoFactory.newVideoArchiveDAO();
+        dao.startTransaction();
+        VideoArchive videoArchive = dao.findByName(location);
+        dao.endTransaction();
+        return Optional.ofNullable(videoArchive);
+    }
+
+    private VideoArchive createVideoArchive(VideoParams videoParams, AnnotationDAOFactory daoFactory) {
+        VideoArchive videoArchive = null;
+        if (videoParams.getPlatformName().isPresent() && videoParams.getSequenceNumber().isPresent()) {
+            String location = videoParams.getMovieLocation();
+            int sequenceNumber = videoParams.getSequenceNumber().get();
+            String platform = videoParams.getPlatformName().get();
+            VideoArchiveDAO dao = daoFactory.newVideoArchiveDAO();
+            dao.startTransaction();
+            videoArchive = dao.findOrCreateByParameters(platform, sequenceNumber, location);
+            dao.endTransaction();
+        }
+        return videoArchive;
+    }
+
+    private VideoArchive getOrCreateVideoArchive(VideoParams videoParams, AnnotationDAOFactory daoFactory) {
+        return findByLocation(videoParams.getMovieLocation(), daoFactory)
+                .orElseGet(() -> createVideoArchive(videoParams, daoFactory));
+    }
+
+    @Override
+    public String getName() {
+        return "Java FX";
     }
 }

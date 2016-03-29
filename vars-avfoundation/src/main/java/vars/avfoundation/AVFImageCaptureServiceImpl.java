@@ -17,6 +17,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import java.util.Optional;
 import java.util.prefs.Preferences;
 
 /**
@@ -97,12 +98,7 @@ public class AVFImageCaptureServiceImpl implements ImageCaptureService {
     /////////////////////
 
     @Override
-    public boolean isPngAutosaved() {
-        return true;
-    }
-
-    @Override
-    public Image capture(File file) throws ImageCaptureException {
+    public Optional<Image> capture(File file) throws ImageCaptureException {
         if (!isStarted) {
             startDevice();
         }
@@ -117,38 +113,10 @@ public class AVFImageCaptureServiceImpl implements ImageCaptureService {
             EventBus.publish(GlobalLookup.TOPIC_WARNING, e);
         }
 
-        return image;
+        return Optional.ofNullable(image);
     }
 
-    /**
-     *
-     * @param timecode
-     * @return
-     * @throws ImageCaptureException
-     * @deprecated
-     */
-    @Override
-    public Image capture(String timecode) throws ImageCaptureException {
-        if (!isStarted) {
-            startDevice();
-        }
 
-        // -- Save to temp file png.
-        final File tempFile = new File(tempDir, LIBRARY_NAME + (new Date()).getTime() + ".png");
-        Image image = capture(tempFile);
-        saveSnapshotToSpecifiedPath(tempFile.getAbsolutePath());
-
-        // -- Delete the temp file in the background
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                tempFile.delete();
-            }
-        }, "DELETE-" + tempFile.getName());
-        thread.run();
-
-        return image;
-    }
 
     @Override
     public void dispose() {

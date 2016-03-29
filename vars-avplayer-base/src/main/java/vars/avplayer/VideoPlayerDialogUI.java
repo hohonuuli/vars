@@ -31,12 +31,7 @@ public interface VideoPlayerDialogUI<S extends VideoState, E extends VideoError>
      */
     void onOkay(Runnable fn);
 
-    /**
-     * This will be called by the onOkay method. It should return the open VideoArchive object as well as
-     * controller to manage video playback.
-     * @return
-     */
-    Tuple2<VideoArchive, VideoController<S, E>> openVideoArchive();
+    void onCancel(Runnable fn);
 
 
 }
