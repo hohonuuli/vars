@@ -149,7 +149,7 @@ public class JXDateValuePanel extends ValuePanel {
                                 queryResults = queryPersistenceService.executeQuery(sql);
                             }
                             catch (Exception e1) {
-                                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR,
+                                EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR,
                                         "An error occurred while executing the SQL statement: '" + sql + "'");
                                 log.error("An error occurred while executing the SQL statement: '" + sql + "'", e1);
                             }

@@ -5,7 +5,7 @@ import vars.ToolBox
 import org.slf4j.LoggerFactory
 import org.mbari.math.CollateFunction
 import vars.annotation.VideoArchiveSetDAO
-import vars.query.ui.Lookup
+import vars.annotation.ui.StateLookup
 
 /**
  *
@@ -22,7 +22,7 @@ class MergeData {
 
     def offsetMillisecs = 10 * 1000
 
-    def dateFormat = Lookup.DATE_FORMAT_UTC
+    def dateFormat = StateLookup.getUTCDateFormat()
 
     final convertVideoFrameToMillisecs = { videoFrame ->
         videoFrame?.recordedDate?.time
