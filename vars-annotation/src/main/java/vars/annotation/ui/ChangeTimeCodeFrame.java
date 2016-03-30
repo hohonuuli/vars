@@ -77,8 +77,8 @@ public class ChangeTimeCodeFrame extends TimeCodeSelectionFrame {
             okActionListener = new ActionListener() {
 
                 public void actionPerformed(final ActionEvent e) {
-                    final Dispatcher dispatcher = Lookup.getSelectedObservationsDispatcher();
-                    final Collection<Observation> observations = (Collection<Observation>) dispatcher.getValueObject();
+                    final Collection<Observation> observations = StateLookup.getSelectedObservations();
+
                     if (observations.size() == 1) {
                         getChangeTimeCodeAction().setTimeCode(getTimePanel().getTimeAsString());
                         getChangeTimeCodeAction().doAction();

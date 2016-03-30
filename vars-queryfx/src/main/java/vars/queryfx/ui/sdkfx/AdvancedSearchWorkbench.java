@@ -11,8 +11,8 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.ScrollPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.queryfx.Lookup;
 import vars.queryfx.QueryService;
+import vars.queryfx.StateLookup;
 import vars.shared.rx.RXEventBus;
 import vars.queryfx.beans.QueryParams;
 import vars.shared.rx.messages.FatalExceptionMsg;
@@ -98,7 +98,7 @@ public class AdvancedSearchWorkbench extends WorkbenchView {
 
     private void groupPanels() {
 
-        Config config = Lookup.getConfig();
+        Config config = StateLookup.getConfig();
         ConfigObject groups = config.getObject("vars.query.column.groups");
         Config groupsConfig = groups.toConfig();
 
@@ -130,7 +130,7 @@ public class AdvancedSearchWorkbench extends WorkbenchView {
     }
 
     private void configureDefaultReturns() {
-        Config config = Lookup.getConfig();
+        Config config = StateLookup.getConfig();
         List<String> defaultReturnNames = config.getStringList("vars.query.column.default.returns");
         for (AbstractValuePanel valuePanel : valuePanels) {
             if (defaultReturnNames.contains(valuePanel.getValueName())) {

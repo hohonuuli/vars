@@ -33,12 +33,13 @@ import org.slf4j.LoggerFactory;
 import vars.UserAccount;
 import vars.annotation.CameraDirections;
 import vars.annotation.VideoArchive;
-import vars.annotation.ui.Lookup;
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.commandqueue.Command;
 import vars.annotation.ui.commandqueue.CommandEvent;
 import vars.annotation.ui.commandqueue.impl.AddObservationCmd;
 import vars.avplayer.ImageCaptureService;
+import vars.avplayer.VideoController;
 
 /**
  * @author Brian Schlining
@@ -75,26 +76,24 @@ public class ImageCaptureAction extends ActionAdapter {
 
         // --- Step 1: Verify that all the needed services and objects exist
         // Verify that we have the services needed to capture an image
-        VideoControlService videoControlService = (VideoControlService) Lookup.getVideoControlServiceDispatcher()
-            .getValueObject();
-        if (videoControlService == null) {
-            EventBus.publish(Lookup.TOPIC_WARNING, "You are not connected to the VCR. Unable to capture a frame.");
+        VideoController videoController = StateLookup.getVideoController();
+        if (videoController == null) {
+            EventBus.publish(StateLookup.TOPIC_WARNING, "You are not connected to a video. Unable to capture a frame.");
 
             return;
         }
 
-        ImageCaptureService imageCaptureService = (ImageCaptureService) Lookup.getImageCaptureServiceDispatcher()
-            .getValueObject();
+        ImageCaptureService imageCaptureService = videoController.getImageCaptureService();
         if (imageCaptureService == null) {
-            EventBus.publish(Lookup.TOPIC_WARNING, "No image capture service is available for frame capture");
+            EventBus.publish(StateLookup.TOPIC_WARNING, "No image capture service is available for frame capture");
 
             return;
         }
 
         // Get the image archive we're adding to.
-        VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+        VideoArchive videoArchive = StateLookup.getVideoArchive();
         if (videoArchive == null) {
-            EventBus.publish(Lookup.TOPIC_WARNING,
+            EventBus.publish(StateLookup.TOPIC_WARNING,
                              "No video-archive is open for annotating. Unable to capture an image.");
 
             return;
@@ -109,7 +108,7 @@ public class ImageCaptureAction extends ActionAdapter {
             png = new File(imageDirectory.getImageDirectory(), snapTime.getTimeCodeAsName() + ".png");
         }
         catch (final Exception e) {
-            EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+            EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, e);
             log.error("Unable to create or write to the image directory", e);
 
             return;
@@ -133,7 +132,7 @@ public class ImageCaptureAction extends ActionAdapter {
                     JPGPreviewUtilities.createJpgWithOverlay(bufferedImage, jpg, overlayText);
                 }
                 catch (Exception e) {
-                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+                    EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, e);
                     log.error("Failed to write jpg preview file to " + jpg.getAbsolutePath(), e);
 
                     return;
@@ -206,7 +205,8 @@ public class ImageCaptureAction extends ActionAdapter {
      * @return  true if a frame-capture card is installed and accessable
      */
     public boolean isAvailable() {
-        return Lookup.getVideoControlServiceDispatcher().getValueObject() != null;
+
+        return StateLookup.getVideoController() != null;
     }
 
     /**
@@ -214,14 +214,13 @@ public class ImageCaptureAction extends ActionAdapter {
      */
     private void updateVideoArchive(SnapTime snapTime, File jpg) {
 
-        VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+        VideoArchive videoArchive = StateLookup.getVideoArchive();
         if (videoArchive != null) {
 
-            CameraDirections cameraDirections = (CameraDirections) Lookup.getCameraDirectionDispatcher()
-                .getValueObject();
+            CameraDirections cameraDirections = StateLookup.getCameraDirection();
             final String cameraDirection = cameraDirections.getDirection();
 
-            UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+            UserAccount userAccount = StateLookup.getUserAccount();
             String user = (userAccount == null) ? UserAccount.USERNAME_DEFAULT : userAccount.getUserName();
             String imageReference = null;
 

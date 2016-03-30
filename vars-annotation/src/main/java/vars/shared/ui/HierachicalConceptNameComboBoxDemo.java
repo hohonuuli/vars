@@ -2,7 +2,7 @@ package vars.shared.ui;
 
 import com.google.inject.Injector;
 import vars.annotation.AnnotationPersistenceService;
-import vars.annotation.ui.Lookup;
+import vars.annotation.ui.StateLookup;
 import vars.knowledgebase.Concept;
 
 import javax.swing.*;
@@ -16,7 +16,7 @@ public class HierachicalConceptNameComboBoxDemo {
     public static void main(String[] args) {
         JFrame frame = new JFrame();
         frame.setLayout(new BorderLayout());
-        Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
+        Injector injector = StateLookup.GUICE_INJECTOR;
         HierachicalConceptNameComboBox cb = injector.getInstance(HierachicalConceptNameComboBox.class);
         frame.add(cb);
         frame.setVisible(true);

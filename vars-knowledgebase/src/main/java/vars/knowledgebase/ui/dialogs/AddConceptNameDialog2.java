@@ -37,7 +37,7 @@ import vars.knowledgebase.History;
 import vars.knowledgebase.HistoryFactory;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.KnowledgebaseFactory;
-import vars.knowledgebase.ui.Lookup;
+import vars.knowledgebase.ui.StateLookup;
 import vars.knowledgebase.ui.ToolBelt;
 import vars.knowledgebase.ui.actions.ApproveHistoryTask;
 import vars.shared.ui.FancyButton;
@@ -86,7 +86,7 @@ public class AddConceptNameDialog2 extends javax.swing.JDialog {
         this.approveHistoryTask = toolBelt.getApproveHistoryTask();
         initComponents();
         initModel();
-        Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
+        Frame frame = StateLookup.getApplicationFrame();
         setLocationRelativeTo(frame);
         pack();
     }
@@ -342,15 +342,15 @@ private void initComponents() {
                 /*
                  * Add a History object to track the change.
                  */
-                final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+                final UserAccount userAccount = StateLookup.getUserAccount();
                 History history = historyFactory.add(userAccount, conceptName);
                 myConcept.getConceptMetadata().addHistory(history);
                 dao.persist(history);
                 dao.endTransaction();
-                EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
+                EventBus.publish(StateLookup.TOPIC_APPROVE_HISTORY, history);
             }
             catch (Exception e) {
-                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+                EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, e);
             }
             close();
             waitIndicator.dispose();

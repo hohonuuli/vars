@@ -28,9 +28,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import javax.swing.JComponent;
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
+
 import org.bushe.swing.event.EventBus;
 import org.mbari.swing.LabeledSpinningDialWaitIndicator;
 import vars.DAO;
@@ -49,7 +48,7 @@ import vars.knowledgebase.LinkRealization;
 import vars.knowledgebase.LinkTemplate;
 import vars.knowledgebase.Media;
 import vars.knowledgebase.MediaDAO;
-import vars.knowledgebase.ui.Lookup;
+import vars.knowledgebase.ui.StateLookup;
 import vars.knowledgebase.ui.ToolBelt;
 
 /**
@@ -150,7 +149,7 @@ public class RejectHistoryTask extends AbstractHistoryTask {
             reject(userAccount, history, dao);
         }
         catch (Exception e) {
-            EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+            EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, e);
         }
         finally {
             dao.endTransaction();
@@ -163,8 +162,7 @@ public class RejectHistoryTask extends AbstractHistoryTask {
 
             @Override
             public Object run() {
-                JComponent frame = (JComponent) Lookup.getApplicationFrameDispatcher().getValueObject();
-
+                JFrame frame = StateLookup.getApplicationFrame();
                 return new LabeledSpinningDialWaitIndicator(frame);
             }
 
@@ -269,7 +267,7 @@ public class RejectHistoryTask extends AbstractHistoryTask {
                                 toolBelt.getAnnotationPersistenceService().updateConceptNameUsedByAnnotations(thisConcept);
                             }
                             catch (Exception e) {
-                                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+                                EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, e);
                             }
 
                         }
@@ -288,7 +286,7 @@ public class RejectHistoryTask extends AbstractHistoryTask {
 
             }
             else {
-                EventBus.publish(Lookup.TOPIC_WARNING,
+                EventBus.publish(StateLookup.TOPIC_WARNING,
                                  "The history appears to be attached to the wrong concept. " +
                                  "Moving it to the correct one.");
                 thisConcept.getConceptMetadata().removeHistory(history);
@@ -333,7 +331,7 @@ public class RejectHistoryTask extends AbstractHistoryTask {
                 return;
             }
             else if (!parentConcept.getChildConcepts().contains(rejectedConcept)) {
-                EventBus.publish(Lookup.TOPIC_WARNING,
+                EventBus.publish(StateLookup.TOPIC_WARNING,
                                  "The concept with the name '" + rejectedName + "' is no longer a child of '" +
                                  parentConcept.getPrimaryConceptName().getName() +
                                  "'. Moving the history to the correct concept.");
@@ -354,7 +352,7 @@ public class RejectHistoryTask extends AbstractHistoryTask {
             /*
              * Let the user know just how much damage they're about to do to the database
              */
-            Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
+            final Frame frame = StateLookup.getApplicationFrame();
             int option = JOptionPane.showConfirmDialog(frame,
                 "You are about to delete " + conceptsToBeDeleted.size() +
                 " concept(s) from the \nknowledgebase. Are you sure you want to continue?", "VARS - Delete Concepts",
@@ -457,7 +455,7 @@ public class RejectHistoryTask extends AbstractHistoryTask {
                 /*
                  * Confirm that we really want to do this
                  */
-                final Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
+                final Frame frame = StateLookup.getApplicationFrame();
                 final int option = JOptionPane
                     .showConfirmDialog(
                         frame, "Are you sure you want to delete '" + history.getNewValue() +
@@ -517,7 +515,7 @@ public class RejectHistoryTask extends AbstractHistoryTask {
                 /*
                  * Confirm that we really want to do this
                  */
-                final Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
+                final Frame frame = StateLookup.getApplicationFrame();
                 final int option = JOptionPane
                     .showConfirmDialog(
                         frame, "Are you sure you want to delete '" + history.getNewValue() +
@@ -630,7 +628,7 @@ public class RejectHistoryTask extends AbstractHistoryTask {
                 final ConceptName conceptName = concept.getConceptName(history.getNewValue());
 
                 if (conceptName == null) {
-                    EventBus.publish(Lookup.TOPIC_WARNING,
+                    EventBus.publish(StateLookup.TOPIC_WARNING,
                                      "Unable to find a concept named '" + history.getNewValue() + "'" +
                                      "associated with '" + concept.getPrimaryConceptName().getName() +
                                      "'. Unable to reject this history.");
@@ -659,7 +657,7 @@ public class RejectHistoryTask extends AbstractHistoryTask {
                                     toolBelt.getAnnotationPersistenceService().updateConceptNameUsedByAnnotations(concept);
                                 }
                                 catch (Exception e) {
-                                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+                                    EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, e);
                                 }
 
                             }
@@ -704,7 +702,7 @@ public class RejectHistoryTask extends AbstractHistoryTask {
                     super.reject(userAccount, history, dao);
                 }
                 else {
-                    EventBus.publish(Lookup.TOPIC_WARNING,
+                    EventBus.publish(StateLookup.TOPIC_WARNING,
                                      "Unable to reject this history. The NODC Code has been modified" +
                                      " since this history was created.");
 
@@ -748,7 +746,7 @@ public class RejectHistoryTask extends AbstractHistoryTask {
                     oldParent = conceptDAO.findByName(history.getOldValue());
                 }
                 catch (Exception e) {
-                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+                    EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, e);
                 }
 
                 conceptDAO.endTransaction();
@@ -774,7 +772,7 @@ public class RejectHistoryTask extends AbstractHistoryTask {
                         });
 
                         if (matches.size() > 0) {
-                            EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR,
+                            EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR,
                                              "\'" + oldParent.getPrimaryConceptName().getName() +
                                              "\' already has a child named \'" +
                                              concept.getPrimaryConceptName().getName() +
@@ -797,7 +795,7 @@ public class RejectHistoryTask extends AbstractHistoryTask {
                         /*
                          * We can't reject the change if we can't find the original parent
                          */
-                        EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR,
+                        EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR,
                                          "Unable to find the original parent. Unable to move \'" +
                                          concept.getPrimaryConceptName().getName() +
                                          "\' back to it\'s previous state.");
@@ -825,7 +823,7 @@ public class RejectHistoryTask extends AbstractHistoryTask {
                                   concept.getPrimaryConceptName().getName() + "\' back to it\'s previous state.";
                     }
 
-                    EventBus.publish(Lookup.TOPIC_WARNING, message);
+                    EventBus.publish(StateLookup.TOPIC_WARNING, message);
                 }
             }
         }
@@ -856,7 +854,7 @@ public class RejectHistoryTask extends AbstractHistoryTask {
 
                 }
                 else {
-                    EventBus.publish(Lookup.TOPIC_WARNING,
+                    EventBus.publish(StateLookup.TOPIC_WARNING,
                                      "Unable to reject this history. The Rank Level has been modified" +
                                      " since this history was created.");
 
@@ -889,7 +887,7 @@ public class RejectHistoryTask extends AbstractHistoryTask {
                     super.reject(userAccount, history, dao);
                 }
                 else {
-                    EventBus.publish(Lookup.TOPIC_WARNING,
+                    EventBus.publish(StateLookup.TOPIC_WARNING,
                                      "Unable to reject this history. The Rank Name has been modified" +
                                      " since this history was created.");
 
@@ -923,7 +921,7 @@ public class RejectHistoryTask extends AbstractHistoryTask {
                     super.reject(userAccount, history, dao);
                 }
                 else {
-                    EventBus.publish(Lookup.TOPIC_WARNING,
+                    EventBus.publish(StateLookup.TOPIC_WARNING,
                                      "Unable to reject this history. The Reference has been modified" +
                                      " since this history was created.");
                 }

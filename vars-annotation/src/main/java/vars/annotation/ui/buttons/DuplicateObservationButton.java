@@ -17,20 +17,15 @@
 
 package vars.annotation.ui.buttons;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.Collection;
-
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
 import org.mbari.swing.SwingUtils;
 
 import vars.UserAccount;
-import vars.annotation.Observation;
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.actions.DuplicateObservationAction;
 import vars.annotation.ui.ToolBelt;
-import vars.annotation.ui.Lookup;
 import vars.shared.ui.FancyButton;
 
 /**
@@ -58,14 +53,9 @@ public class DuplicateObservationButton extends FancyButton {
          * Enable this button if someone is logged in AND the Observation
          * in the ObservationDispather is not null and the VCR is enabled.
          */
-        Lookup.getSelectedObservationsDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
-            
-            public void propertyChange(PropertyChangeEvent evt) {
-                final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
-                final Collection<Observation> observations = (Collection<Observation>) evt.getNewValue();
-                setEnabled ((userAccount != null) && (observations.size() > 0));
-                
-            }
+        StateLookup.selectedObservationsProperty().addListener((obs, oldVal, observations) -> {
+            final UserAccount userAccount = StateLookup.getUserAccount();
+            setEnabled ((userAccount != null) && (observations.size() > 0));
         });
 
     }

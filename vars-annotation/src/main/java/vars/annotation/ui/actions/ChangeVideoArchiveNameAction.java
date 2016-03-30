@@ -15,16 +15,10 @@
 
 package vars.annotation.ui.actions;
 
-import java.util.Collection;
 import org.bushe.swing.event.EventBus;
-import vars.annotation.AnnotationFactory;
-import vars.annotation.CameraDeployment;
 import vars.annotation.VideoArchive;
-import vars.annotation.VideoArchiveDAO;
-import vars.annotation.VideoArchiveSet;
-import vars.annotation.VideoArchiveSetDAO;
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.ToolBelt;
-import vars.annotation.ui.Lookup;
 import vars.annotation.ui.PersistenceController;
 import vars.annotation.ui.commandqueue.Command;
 import vars.annotation.ui.commandqueue.CommandEvent;
@@ -61,7 +55,7 @@ public class ChangeVideoArchiveNameAction extends OpenVideoArchiveUsingParamsAct
             return;
         }
 
-        VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+        VideoArchive videoArchive = StateLookup.getVideoArchive();
         String newName = PersistenceController.makeVideoArchiveName(getPlatform(), getSeqNumber(), getTapeNumber(), getPostfix());
         Command command = new ChangeVideoArchiveNameCmd(videoArchive, newName, getPlatform(), getSeqNumber());
         CommandEvent commandEvent = new CommandEvent(command);
@@ -84,7 +78,7 @@ public class ChangeVideoArchiveNameAction extends OpenVideoArchiveUsingParamsAct
 
         // Check that all required info is entered
         if ((p == null) || (sn == 0) || (tn == 0)) {
-            EventBus.publish(Lookup.TOPIC_WARNING, "Some of the information " +
+            EventBus.publish(StateLookup.TOPIC_WARNING, "Some of the information " +
                     "required to carry out this action is missing. You're request is being ignored.");
             ok = false;
         }

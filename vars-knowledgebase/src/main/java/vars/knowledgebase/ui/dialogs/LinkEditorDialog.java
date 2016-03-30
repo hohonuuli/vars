@@ -42,8 +42,8 @@ import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.LinkTemplate;
 import vars.knowledgebase.SimpleConceptBean;
 import vars.knowledgebase.SimpleConceptNameBean;
+import vars.knowledgebase.ui.StateLookup;
 import vars.shared.ui.ILockableEditor;
-import vars.knowledgebase.ui.Lookup;
 import vars.knowledgebase.ui.ToolBelt;
 import vars.shared.ui.HierachicalConceptNameComboBox;
 import vars.shared.ui.OkCancelButtonPanel;
@@ -390,7 +390,7 @@ public class LinkEditorDialog extends JDialog implements ILockableEditor {
         */
         String toConceptAsString = null;
         if (matchingLinkTemplates.isEmpty()) {
-            EventBus.publish(Lookup.TOPIC_WARNING, "Unable to find a LinkTemplate that matches '" + link + "'");
+            EventBus.publish(StateLookup.TOPIC_WARNING, "Unable to find a LinkTemplate that matches '" + link + "'");
             toConceptAsString = link.getToConcept();
         }
         else {
@@ -425,7 +425,7 @@ public class LinkEditorDialog extends JDialog implements ILockableEditor {
             }
             catch (Exception e) {
                 log.error("", e);
-                EventBus.publish(Lookup.TOPIC_WARNING, "A database error occurred. Try refreshing the knowledgebase");
+                EventBus.publish(StateLookup.TOPIC_WARNING, "A database error occurred. Try refreshing the knowledgebase");
                 concept = NIL_CONCEPT;
                 selectedConcept = NIL_CONCEPT;
                 cb.addItem(NIL_CONCEPT.getPrimaryConceptName());

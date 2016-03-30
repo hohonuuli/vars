@@ -52,8 +52,8 @@ public class StatusLabelForVideoArchive extends StatusLabel {
      */
     public StatusLabelForVideoArchive(ToolBelt toolBelt) {
         super();
-        Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
-        final Dispatcher videoArchiveDispatcher = Lookup.getVideoArchiveDispatcher();
+        Frame frame = StateLookup.getAnnotationFrame();
+        VideoArchive videoArchive = StateLookup.getVideoArchive();
 
         dialog = new OpenVideoArchiveDialog(frame, toolBelt);
         dialog.getOkayButton().addActionListener(new ActionListener() {
@@ -67,7 +67,7 @@ public class StatusLabelForVideoArchive extends StatusLabel {
 
         AnnotationProcessor.process(this); // Register with EventBus
 
-        update((VideoArchive) videoArchiveDispatcher.getValueObject());
+        update(videoArchive);
 
         /*
          * When the user clicks this label a dialog should pop up allowing them
@@ -75,7 +75,7 @@ public class StatusLabelForVideoArchive extends StatusLabel {
          */
         addMouseListener(new MouseAdapter() {
 
-            Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
+            //Frame frame = StateLookup.getAnnotationFrame();
 
             @Override
             public void mouseClicked(final MouseEvent me) {

@@ -46,8 +46,8 @@ public class ApproveHistorySubscriber implements EventTopicSubscriber<History> {
      * @param history
      */
     public void onEvent(String topic, History history) {
-        if (Lookup.TOPIC_APPROVE_HISTORY.equals(topic)) {
-            final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+        if (StateLookup.TOPIC_APPROVE_HISTORY.equals(topic)) {
+            final UserAccount userAccount = StateLookup.getUserAccount();
 
             try {
                 if ((userAccount != null) && (userAccount.isAdministrator()) && (!history.isProcessed())) {
@@ -55,10 +55,10 @@ public class ApproveHistorySubscriber implements EventTopicSubscriber<History> {
                 }
             }
             catch (Exception e) {
-                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+                EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, e);
             }
             finally {
-                EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE,
+                EventBus.publish(StateLookup.TOPIC_REFRESH_KNOWLEGEBASE,
                                  history.getConceptMetadata().getConcept().getPrimaryConceptName().getName());
             }
         }

@@ -39,7 +39,7 @@ import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.LinkTemplate;
 import vars.knowledgebase.LinkTemplateDAO;
 import vars.knowledgebase.ui.LinkEditorPanel;
-import vars.knowledgebase.ui.Lookup;
+import vars.knowledgebase.ui.StateLookup;
 import vars.knowledgebase.ui.ToolBelt;
 import vars.knowledgebase.ui.actions.ApproveHistoryTask;
 import vars.shared.ui.OkCancelButtonPanel;
@@ -127,7 +127,7 @@ public class AddLinkTemplateDialog extends JDialog {
                         c.getConceptMetadata(); // Lazy Load relation
                     }
                     catch (Exception e2) {
-                        EventBus.publish(Lookup.TOPIC_FATAL_ERROR,
+                        EventBus.publish(StateLookup.TOPIC_FATAL_ERROR,
                                          "Failed to lookup '" + p.getFromConcept() + "' from the" +
                                          " database. Unable to add '" + linkTemplate.stringValue() + "'");
                     }
@@ -149,7 +149,7 @@ public class AddLinkTemplateDialog extends JDialog {
                         }
                         catch (Exception e1) {
                             log.error("Failed to look up linkname", e1);
-                            EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e1);
+                            EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, e1);
                         }
                         linkTemplateDAO.endTransaction();
 
@@ -160,7 +160,7 @@ public class AddLinkTemplateDialog extends JDialog {
                         if (matchingLinks.size() > 0) {
 
                             // Don't allow duplicate link names
-                            EventBus.publish(Lookup.TOPIC_WARNING,
+                            EventBus.publish(StateLookup.TOPIC_WARNING,
                                              links.size() + " LinkTemplate(s) with a LinkName of '" +
                                              linkTemplate.getLinkName() + "' and LinkValue of '" +
                                              linkTemplate.getLinkValue() +
@@ -168,7 +168,7 @@ public class AddLinkTemplateDialog extends JDialog {
                         }
                         else {
 
-                            UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+                            UserAccount userAccount = StateLookup.getUserAccount();
                             History history = historyFactory.add(userAccount, linkTemplate);
                             try {
                                 // DAOTX
@@ -182,10 +182,10 @@ public class AddLinkTemplateDialog extends JDialog {
                             
                             }
                             catch (Exception e1) {
-                                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e1);
+                                EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, e1);
                             }
 
-                            EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
+                            EventBus.publish(StateLookup.TOPIC_APPROVE_HISTORY, history);
 
                         }
                         
@@ -242,7 +242,7 @@ public class AddLinkTemplateDialog extends JDialog {
         this.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
         this.setModal(true);
         this.setContentPane(getJContentPane());
-        Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
+        Frame frame = StateLookup.getApplicationFrame();
         setLocationRelativeTo(frame);
         pack();
     }

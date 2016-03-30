@@ -15,8 +15,6 @@
 
 package vars.annotation.ui.buttons;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 
 import javax.swing.Action;
 import javax.swing.ImageIcon;
@@ -25,9 +23,10 @@ import org.mbari.swing.SwingUtils;
 import vars.UserAccount;
 import vars.annotation.VideoArchive;
 
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.actions.NewObservationAction;
 import vars.annotation.ui.ToolBelt;
-import vars.annotation.ui.Lookup;
+import vars.avplayer.VideoController;
 import vars.shared.ui.FancyButton;
 
 
@@ -52,15 +51,10 @@ public class NewObservationButton extends FancyButton {
                        SwingUtils.getKeyString((KeyStroke) action.getValue(Action.ACCELERATOR_KEY)) + "]");
         setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/obs_new.png")));
 
-        PropertyChangeListener listener = new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                setEnabled(checkEnable());
-            }
-        };
 
-        Lookup.getVideoControlServiceDispatcher().addPropertyChangeListener(listener);
-        Lookup.getVideoArchiveDispatcher().addPropertyChangeListener(listener);
-        Lookup.getUserAccountDispatcher().addPropertyChangeListener(listener);
+        StateLookup.videoControllerProperty().addListener((obs, oldVal, newVal) -> setEnabled(checkEnable()));
+        StateLookup.videoArchiveProperty().addListener((obs, oldVal, newVal) -> setEnabled(checkEnable()));
+        StateLookup.userAccountProperty().addListener((obs, oldVal, newVal) -> setEnabled(checkEnable()));
 
         setEnabled(checkEnable());
 
@@ -73,9 +67,9 @@ public class NewObservationButton extends FancyButton {
      * open and the VCR exists.</p>
      */
     public boolean checkEnable() {
-        VideoControlService vcs = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
-        VideoArchive va = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
-        UserAccount ua = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
-        return vcs != null && va != null && ua != null;
+        VideoController videoController = StateLookup.getVideoController();
+        VideoArchive videoArchive = StateLookup.getVideoArchive();
+        UserAccount userAccount = StateLookup.getUserAccount();
+        return videoController != null && videoArchive != null && userAccount != null;
     }
 }

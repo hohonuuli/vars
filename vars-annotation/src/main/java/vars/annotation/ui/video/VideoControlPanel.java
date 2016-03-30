@@ -21,7 +21,8 @@ import org.mbari.util.Dispatcher;
 import org.mbari.vcr4j.IVCR;
 import org.mbari.vcr4j.ui.VCRPanel;
 
-import vars.annotation.ui.Lookup;
+import vars.annotation.ui.StateLookup;
+import vars.avplayer.VideoController;
 
 /**
  * <p>A VCR panel that monitors for changes of VCRs</p>
@@ -35,10 +36,15 @@ public class VideoControlPanel extends VCRPanel implements PropertyChangeListene
      */
     public VideoControlPanel() {
         super();
-        final Dispatcher dispatcher = Lookup.getVideoControlServiceDispatcher();
+
+
+
+        //final Dispatcher dispatcher = Lookup.getVideoControlServiceDispatcher();
         dispatcher.addPropertyChangeListener(this);
-        final VideoControlService videoService = (VideoControlService) dispatcher.getValueObject();
-        final IVCR vcr = (videoService == null) ? null : videoService;
+
+        VideoController videoController = StateLookup.getVideoController();
+        //final VideoControlService videoService = (VideoControlService) dispatcher.getValueObject();
+        //final IVCR vcr = (videoService == null) ? null : videoService;
         setVcr(vcr);
     }
 

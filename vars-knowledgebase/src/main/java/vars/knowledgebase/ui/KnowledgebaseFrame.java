@@ -52,7 +52,6 @@ import vars.knowledgebase.Concept;
 import vars.shared.ui.ILockableEditor;
 import vars.shared.ui.dialogs.AdministorUserAccountDialog;
 import vars.shared.ui.dialogs.LoginAction;
-import vars.shared.ui.dialogs.ModifyUserAccountDialog;
 import vars.shared.ui.tree.ConceptTreeCellRenderer;
 import vars.shared.ui.tree.ConceptTreeModel;
 import vars.shared.ui.tree.ConceptTreeNode;
@@ -97,7 +96,7 @@ public class KnowledgebaseFrame extends JFrame {
         this.toolBelt = toolBelt;
         controller = new KnowledgebaseFrameController(this, toolBelt);
         initialize();
-        initUserAccountDispatcher();
+        initUserAccount();
         toolBelt.getPersistenceCache().addCacheClearedListener(new ACacheClearedListener());
     }
 
@@ -105,15 +104,9 @@ public class KnowledgebaseFrame extends JFrame {
     private ConceptPanel getConceptPanel() {
         if (conceptPanel == null) {
             conceptPanel = new ConceptPanel();
-            final Dispatcher dispatcher = Lookup.getSelectedConceptDispatcher();
-            dispatcher.addPropertyChangeListener(new PropertyChangeListener() {
+            StateLookup.selectedConceptProperty()
+                    .addListener((obs, oldVal, newVal) -> conceptPanel.setConcept(newVal));
 
-                public void propertyChange(PropertyChangeEvent evt) {
-                    final Concept concept = (Concept) dispatcher.getValueObject();
-                    conceptPanel.setConcept(concept);
-                }
-
-            });
 
             /*
              * Allow the user to login when they click on the lock button
@@ -123,17 +116,12 @@ public class KnowledgebaseFrame extends JFrame {
 
 
             /*
-             * When an account is set the tooltip text shoudl tell us what user
+             * When an account is set the tooltip text should tell us what user
              */
-            final Dispatcher userAccountDispatcher = Lookup.getUserAccountDispatcher();
-            userAccountDispatcher.addPropertyChangeListener(new PropertyChangeListener() {
+            StateLookup.userAccountProperty()
+                    .addListener((obs, oldVal, newVal) -> conceptPanel.setUserAccount(newVal));
 
-                public void propertyChange(PropertyChangeEvent evt) {
-                    final UserAccount userAccount = (UserAccount) evt.getNewValue();
-                    conceptPanel.setUserAccount(userAccount);
-                }
 
-            });
         }
 
         return conceptPanel;
@@ -150,12 +138,9 @@ public class KnowledgebaseFrame extends JFrame {
              * are not verified. We register with the UserAccount Dispatcher
              * to keep track of credentials
              */
-            Lookup.getUserAccountDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
-                public void propertyChange(PropertyChangeEvent evt) {
-                    historyEditorPanel.setUserAccount((UserAccount) evt.getNewValue());
-                }
+            StateLookup.userAccountProperty()
+                    .addListener((obs, oldVal, newVal) -> historyEditorPanel.setUserAccount(newVal));
 
-            });
         }
 
         return historyEditorPanel;
@@ -197,7 +182,7 @@ public class KnowledgebaseFrame extends JFrame {
                     }
                     else {
                         lockAction.setLocked(true);
-                        EventBus.publish(Lookup.TOPIC_USERACCOUNT, null);
+                        EventBus.publish(StateLookup.TOPIC_USERACCOUNT, null);
                     }
                 }
             };
@@ -248,16 +233,11 @@ public class KnowledgebaseFrame extends JFrame {
             editConcept.setText("Edit Selected Concept");
             editConcept.setEnabled(false);
 
-            final Dispatcher dispatcher = Lookup.getUserAccountDispatcher();
-            dispatcher.addPropertyChangeListener(new PropertyChangeListener() {
-
-                public void propertyChange(PropertyChangeEvent evt) {
-                    final UserAccount userAccount = (UserAccount) evt.getNewValue();
-                    editUser.setEnabled((userAccount != null) && userAccount.isAdministrator());
-                    editConcept.setEnabled((userAccount != null) && !userAccount.isReadOnly());
-                }
-
+            StateLookup.userAccountProperty().addListener((obs, oldVal, newVal) -> {
+                editUser.setEnabled((newVal != null) && newVal.isAdministrator());
+                editConcept.setEnabled((newVal != null) && !newVal.isReadOnly());
             });
+
         }
 
         return myMenuBar;
@@ -344,10 +324,10 @@ public class KnowledgebaseFrame extends JFrame {
             treePanel.setPopupMenu(popupMenu);
 
             /*
-             * Register the tree with a dispatcher so that other components can
+             * Register the tree so that other components can
              * attempt to fetch it.
              */
-            Lookup.getConceptTreeDispatcher().setValueObject(tree);
+            StateLookup.setConceptTree(tree);
         }
 
         return treePanel;
@@ -363,27 +343,20 @@ public class KnowledgebaseFrame extends JFrame {
     }
 
     /**
-     * Initializes the UserAccount Dispatcher. This watches for changes in
+     * Initializes the UserAccount property listener. This watches for changes in
      * the user logged in and toggles the editors states appropriately. It uses
      * the LockAction to toggle the editors.
      */
-    private void initUserAccountDispatcher() {
-        Dispatcher dispatcher = Lookup.getUserAccountDispatcher();
+    private void initUserAccount() {
 
-        dispatcher.addPropertyChangeListener(new PropertyChangeListener() {
-
-            public void propertyChange(PropertyChangeEvent evt) {
-                UserAccount userAccount = (UserAccount) evt.getNewValue();
-                boolean locked = ((userAccount == null) || (userAccount.isReadOnly()));
-
-                if (log.isDebugEnabled()) {
-                    log.debug("Using UserAccount '" + userAccount + "'; setting locked to " + locked);
-                }
-
-                lockAction.setLocked(locked);
+        StateLookup.userAccountProperty().addListener((obs, oldVal, userAccount) -> {
+            boolean locked = ((userAccount == null) || (userAccount.isReadOnly()));
+            if (log.isDebugEnabled()) {
+                log.debug("Using UserAccount '" + userAccount + "'; setting locked to " + locked);
             }
-
+            lockAction.setLocked(locked);
         });
+
     }
 
 
@@ -404,27 +377,14 @@ public class KnowledgebaseFrame extends JFrame {
 
     private void setupEditorPanel(final EditorPanel editorPanel) {
 
-        final Dispatcher conceptDispatcher = Lookup.getSelectedConceptDispatcher();
-
-        /*
-         * Add a listener so that this panel is updated whenever a new
-         * concept is selected in the Knowledgebasetree.
-         */
-        conceptDispatcher.addPropertyChangeListener(new PropertyChangeListener() {
-
-            public void propertyChange(PropertyChangeEvent evt) {
-                final Concept concept = (Concept) evt.getNewValue();
-                editorPanel.setConcept(concept);
-            }
-
-        });
+        StateLookup.selectedConceptProperty()
+                .addListener((obs, oldVal, newVal) -> editorPanel.setConcept(newVal));
 
         /*
          * Register the panel with the lockAction. This will signal the
          * editor that the user is logged in.
          */
         lockAction.addEditor(editorPanel);
-
 
     }
 
@@ -448,7 +408,7 @@ public class KnowledgebaseFrame extends JFrame {
          * @param evt
          */
         public void beforeClear(CacheClearedEvent evt) {
-            Lookup.getSelectedConceptDispatcher().setValueObject(null);
+            StateLookup.setSelectedConcept(null);
         }
     }
 
@@ -478,9 +438,8 @@ public class KnowledgebaseFrame extends JFrame {
             if (log.isDebugEnabled()) {
                 log.debug("Selected " + concept + " in the knowledgebase tree");
             }
+            StateLookup.setSelectedConcept(concept);
 
-            Dispatcher dispatcher = Lookup.getSelectedConceptDispatcher();
-            dispatcher.setValueObject(concept);
         }
     }
 
@@ -495,8 +454,7 @@ public class KnowledgebaseFrame extends JFrame {
                 "VARS - Edit a user account", true, toolBelt.getMiscDAOFactory());
 
         public void doAction() {
-
-            dialog.setUserAccount((UserAccount) Lookup.getUserAccountDispatcher().getValueObject());
+            dialog.setUserAccount(StateLookup.getUserAccount());
             dialog.setVisible(true);
         }
     }

@@ -35,7 +35,7 @@ import vars.knowledgebase.HistoryFactory;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.LinkRealization;
 import vars.knowledgebase.ui.LinkEditorPanel;
-import vars.knowledgebase.ui.Lookup;
+import vars.knowledgebase.ui.StateLookup;
 import vars.knowledgebase.ui.ToolBelt;
 import vars.knowledgebase.ui.actions.ApproveHistoryTask;
 import vars.shared.ui.OkCancelButtonPanel;
@@ -155,7 +155,7 @@ public class AddLinkRealizationDialog extends JDialog {
         this.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
         this.setModal(true);
         this.setContentPane(getJContentPane());
-        final Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
+        final Frame frame = StateLookup.getApplicationFrame();
         setLocationRelativeTo(frame);
         pack();
     }
@@ -168,7 +168,7 @@ public class AddLinkRealizationDialog extends JDialog {
     private void onOkClick() {
         setVisible(false);
 
-        UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+        UserAccount userAccount = StateLookup.getUserAccount();
         if ((userAccount != null) && !userAccount.isReadOnly()) {
 
             KnowledgebaseDAOFactory knowledgebaseDAOFactory = toolBelt.getKnowledgebaseDAOFactory();
@@ -215,12 +215,12 @@ public class AddLinkRealizationDialog extends JDialog {
                 dao.endTransaction();
                 dao.close();
 
-                EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
+                EventBus.publish(StateLookup.TOPIC_APPROVE_HISTORY, history);
 
             }
             catch (Exception e) {
-                EventBus.publish(Lookup.TOPIC_WARNING, e);
-                EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, c.getPrimaryConceptName().getName());
+                EventBus.publish(StateLookup.TOPIC_WARNING, e);
+                EventBus.publish(StateLookup.TOPIC_REFRESH_KNOWLEGEBASE, c.getPrimaryConceptName().getName());
             }
 
             setConcept(null);

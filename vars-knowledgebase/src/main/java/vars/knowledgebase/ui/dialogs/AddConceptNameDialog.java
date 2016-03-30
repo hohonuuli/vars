@@ -50,7 +50,7 @@ import vars.knowledgebase.HistoryFactory;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.ui.KnowledgebaseFrame;
-import vars.knowledgebase.ui.Lookup;
+import vars.knowledgebase.ui.StateLookup;
 
 /**
  * <!-- Class Description -->
@@ -359,7 +359,7 @@ public class AddConceptNameDialog extends JDialog {
 
         //this.setSize(300, 200);
         this.setContentPane(getJContentPane());
-        Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
+        Frame frame = StateLookup.getApplicationFrame();
         setLocationRelativeTo(frame);
         pack();
     }
@@ -416,14 +416,14 @@ public class AddConceptNameDialog extends JDialog {
             catch (Exception e) {
                 if (log.isErrorEnabled()) {
                     log.error("Failed attempt to look up the concept '" + name + "'", e);
-                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+                    EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, e);
                     okToProceed = false;
                 }
             }
 
             if (okToProceed && (preexistingConcept != null)) {
                 String preexistingName = preexistingConcept.getPrimaryConceptName().getName();
-                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR,
+                EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR,
                                  "The name '" + name + "' is already used by '" + preexistingName +
                                  "'. If you want to add the name to '" + concept.getPrimaryConceptName().getName() +
                                  "' you must" + "remove it from '" + preexistingName + "' first.");
@@ -449,7 +449,7 @@ public class AddConceptNameDialog extends JDialog {
                 /*
                  * Add a History object to track the change.
                  */
-                UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+                UserAccount userAccount = StateLookup.getUserAccount();
                 History history = historyFactory.add(userAccount, conceptName);
                 concept.getConceptMetadata().addHistory(history);
 
@@ -467,18 +467,16 @@ public class AddConceptNameDialog extends JDialog {
                     concept.removeConceptName(conceptName);
                     concept.getConceptMetadata().removeHistory(history);
                     log.error("Failed to update " + concept, e);
-                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR,
+                    EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR,
                                      "Failed to save" + " changes. Rolling back to previous state");
                 }
 
-                final Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
-                if ((frame != null) && (frame instanceof KnowledgebaseFrame)) {
+                final KnowledgebaseFrame frame = StateLookup.getApplicationFrame();
+                if (frame != null) {
                     Worker.post(new Job() {
 
                         public Object run() {
-                            ((KnowledgebaseFrame) frame).refreshTreeAndOpenNode(
-                                concept.getPrimaryConceptName().getName());
-
+                            frame.refreshTreeAndOpenNode(concept.getPrimaryConceptName().getName());
                             return null;
                         }
 

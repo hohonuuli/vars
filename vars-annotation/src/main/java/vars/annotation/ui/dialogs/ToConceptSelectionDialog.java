@@ -18,20 +18,15 @@ package vars.annotation.ui.dialogs;
 import com.google.inject.Inject;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.HierarchyEvent;
-import java.awt.event.HierarchyListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import org.bushe.swing.event.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.AnnotationPersistenceService;
-import vars.annotation.ui.Lookup;
+import vars.annotation.ui.StateLookup;
 import vars.knowledgebase.Concept;
-import vars.shared.ui.ConceptNameComboBox;
 import vars.shared.ui.HierachicalConceptNameComboBox;
 import vars.shared.ui.dialogs.StandardDialog;
 
@@ -57,7 +52,7 @@ public class ToConceptSelectionDialog extends StandardDialog {
     }
 
     public ToConceptSelectionDialog(AnnotationPersistenceService annotationPersistenceService, String conceptName) {
-        super((Frame) Lookup.getApplicationFrameDispatcher().getValueObject());
+        super(StateLookup.getAnnotationFrame());
         this.annotationPersistenceService = annotationPersistenceService;
 
         try {
@@ -83,7 +78,7 @@ public class ToConceptSelectionDialog extends StandardDialog {
         }
         catch (Exception ex) {
             log.error("Failed to lookup concepts from knowledgebase", ex);
-            EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, ex);
+            EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, ex);
         }
 
     }
@@ -126,7 +121,7 @@ public class ToConceptSelectionDialog extends StandardDialog {
         }
         catch (Exception e) {
             log.error("Failed to lookup '" + conceptName + "' from the knowledgebase", e);
-            EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+            EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, e);
         }
 
         return concept;

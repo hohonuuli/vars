@@ -12,8 +12,6 @@ import java.awt.BorderLayout;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.PreferencesFactory;
@@ -26,7 +24,7 @@ import javax.swing.JTabbedPane;
 
 import vars.MiscDAOFactory;
 import vars.UserAccount;
-import vars.annotation.ui.Lookup;
+import vars.annotation.ui.StateLookup;
 import vars.shared.preferences.PreferenceUpdater;
 
 /**
@@ -147,7 +145,7 @@ public class PreferencesFrame extends JFrame {
     public UserPreferencesPanel getUserPreferencesPanel() {
         if (userPreferencesPanel == null) {
             // INJECTION HACK!!
-            Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
+            Injector injector = StateLookup.GUICE_INJECTOR;
             MiscDAOFactory daoFactory = injector.getInstance(MiscDAOFactory.class);
             userPreferencesPanel = new UserPreferencesPanel(daoFactory);
         }

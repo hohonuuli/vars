@@ -10,13 +10,11 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JToggleButton;
 import vars.annotation.VideoArchive;
-import vars.annotation.ui.Lookup;
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.ToolBelt;
 
 /**
@@ -54,12 +52,9 @@ public class VideoArchiveSetEditorButton extends JToggleButton {
         setText("");
         setToolTipText("Edit VideoArchiveSet");
 
-        Lookup.getVideoArchiveDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
+        StateLookup.videoArchiveProperty()
+                .addListener((obs, oldVal, newVal) -> setEnabled(newVal != null));
 
-            public void propertyChange(PropertyChangeEvent evt) {
-                setEnabled(evt.getNewValue() != null);
-            }
-        });
     }
 
     private VideoArchiveSetEditorPanel getPanel() {
@@ -112,7 +107,7 @@ public class VideoArchiveSetEditorButton extends JToggleButton {
     }
 
     private void refresh() {
-        VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+        VideoArchive videoArchive = StateLookup.getVideoArchive();
         if (videoArchive != null) {
             panel.setVideoArchiveSet(videoArchive.getVideoArchiveSet());
         }

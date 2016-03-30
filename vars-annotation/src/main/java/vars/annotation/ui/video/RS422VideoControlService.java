@@ -34,13 +34,14 @@ import org.mbari.vcr4j.time.Timecode;
 import org.mbari.vcr4j.timer.AnnotationQueueVCR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.annotation.ui.Lookup;
+import vars.annotation.ui.StateLookup;
 import vars.avplayer.VideoControlStatus;
 import vars.VARSException;
 
 /**
  *
  * @author brian
+ * @deprecated Use VideoPlayers instead
  */
 public class RS422VideoControlService extends AbstractVideoControlService {
 
@@ -116,7 +117,7 @@ public class RS422VideoControlService extends AbstractVideoControlService {
         if (libraryName != null) {
 
             // Location to extract the native libraries into $HOME/.vars/native/Mac
-            File libraryHome = new File(new File(Lookup.getSettingsDirectory(), "native"), os.substring(0, 3));
+            File libraryHome = new File(new File(StateLookup.getSettingsDirectory(), "native"), os.substring(0, 3));
             if (!libraryHome.exists()) {
                 libraryHome.mkdirs();
             }

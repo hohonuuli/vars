@@ -49,6 +49,7 @@ import vars.annotation.ui.eventbus.VideoArchiveSelectedEvent;
 import vars.annotation.ui.eventbus.VideoFramesChangedEvent;
 import vars.annotation.ui.video.DoNothingVideoControlService;
 import vars.annotation.ui.video.VideoControlServiceFactory;
+import vars.avplayer.VideoController;
 import vars.shared.preferences.PreferenceUpdater;
 import vars.shared.preferences.PreferencesService;
 
@@ -88,11 +89,11 @@ public class AnnotationFrameController implements PreferenceUpdater, UIEventSubs
                 persistPreferences();
 
                 log.info("Saving last Observations to persistent storage during JVM shutdown");
-                Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+                Collection<Observation> observations = StateLookup.getSelectedObservations();
                 toolBelt.getPersistenceController().updateAndValidate(new ArrayList<Observation>(observations));
 
                 // Update current videoarchive's image URLs on shutdown
-                VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+                VideoArchive videoArchive = StateLookup.getVideoArchive();
                 if (videoArchive != null) {
                     updateCameraData(videoArchive);
                 }
@@ -128,53 +129,33 @@ public class AnnotationFrameController implements PreferenceUpdater, UIEventSubs
 
         // When preferences change (i.e. when a new user logs in) we need save
         // the old preferences into the database and load the new ones
-        Lookup.getPreferencesDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
-
-            public void propertyChange(PropertyChangeEvent evt) {
-
-                /*
-                 * Save old preferences
-                 */
-                persistPreferences((Preferences) evt.getOldValue());
-
-                /*
-                 * Load new preferences
-                 */
-                loadPreferences((Preferences) evt.getNewValue());
-                
-            }
+        StateLookup.preferencesProperty().addListener((obs, oldVal, newVal) -> {
+            persistPreferences(oldVal); // Save the old
+            loadPreferences(newVal);    // load the new
         });
+
 
 
         /*
          * This listener updates the URL's of the image you've captured in
          * a background thread.
          */
-        Lookup.getVideoArchiveDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
-
-            public void propertyChange(final PropertyChangeEvent evt) {
-                Runnable runnable = new Runnable() {
-                    public void run() {
-                        VideoArchive videoArchive = (VideoArchive) evt.getOldValue();
-                        if (videoArchive != null) {
-                            updateCameraData(videoArchive);
-
-                            // Evict the videoArchive from the JPA cache. or we
-                            // won't get a fresh copy when we reopen it.
-                            toolBelt.getPersistenceCache().evict(videoArchive);
-                        }
-                    }
-                };
-
-                new Thread(runnable, "UpdateCameraDataThread-" + System.currentTimeMillis()).start();
-
-            }
+        StateLookup.videoArchiveProperty().addListener((obs, oldVal, videoArchive) -> {
+            Runnable runnable = () -> {
+                if (videoArchive != null) {
+                    updateCameraData(videoArchive);
+                    // Evict the videoArchive from the JPA cache. or we
+                    // won't get a fresh copy when we reopen it.
+                    toolBelt.getPersistenceCache().evict(videoArchive);
+                }
+            };
+            new Thread(runnable, "UpdateCameraDataThread-" + System.currentTimeMillis()).start();
         });
 
     }
 
     public void persistPreferences() {
-        Preferences userPreferences = (Preferences) Lookup.getPreferencesDispatcher().getValueObject();
+        Preferences userPreferences = StateLookup.getPreferences();
         persistPreferences(userPreferences);
     }
 
@@ -220,10 +201,14 @@ public class AnnotationFrameController implements PreferenceUpdater, UIEventSubs
             preferences.putInt(PREF_CONTROLS_DIVIDER_LOCATION, controlsDividerLocation);
 
             // -- Save video control info
-            Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
+            Injector injector = StateLookup.GUICE_INJECTOR;
             PreferencesFactory preferencesFactory = injector.getInstance(PreferencesFactory.class);
             PreferencesService preferencesService = new PreferencesService(preferencesFactory);
-            VideoControlService videoControlService = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
+            VideoController videoController = StateLookup.getVideoController();
+
+            // TODO this was added to support ships connection. So user doen't have to manually connect
+            // to UDP. We will need a workaround in the new VARS.
+            //VideoControlService videoControlService = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
             try {
                 preferencesService.persistLastVideoConnectionId(preferencesService.getHostname(),
                         videoControlService.getVideoControlInformation().getVideoConnectionID());
@@ -297,10 +282,12 @@ public class AnnotationFrameController implements PreferenceUpdater, UIEventSubs
             }
 
             // -- Load video control info
-            Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
+            Injector injector = StateLookup.GUICE_INJECTOR;
             PreferencesFactory preferencesFactory = injector.getInstance(PreferencesFactory.class);
             PreferencesService preferencesService = new PreferencesService(preferencesFactory);
             if (preferencesService.findAutoconnectVcr(preferencesService.getHostname())) {
+
+                // TODO this was added for ships. We will need a workaround for the new VARS
                 String videoID = preferencesService.findLastVideoConnectionId(preferencesService.getHostname());
                 VideoControlService videoControlService;
                 try {
@@ -310,7 +297,7 @@ public class AnnotationFrameController implements PreferenceUpdater, UIEventSubs
                     log.warn("Failed to create a VideoControlService for " + videoID);
                     videoControlService = new DoNothingVideoControlService();
                 }
-                Lookup.getVideoControlServiceDispatcher().setValueObject(videoControlService);
+                StateLookup.setVideoController(videoControlService);
             }
 
         }
@@ -322,8 +309,8 @@ public class AnnotationFrameController implements PreferenceUpdater, UIEventSubs
      * @param videoArchive
      */
     public void updateCameraData(VideoArchive videoArchive) {
-        PreferencesFactory preferencesFactory = Lookup.getPreferencesFactory();
-        UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+        PreferencesFactory preferencesFactory = StateLookup.PREFERENCES_FACTORY;
+        UserAccount userAccount = StateLookup.getUserAccount();
         if (videoArchive != null &&
                 preferencesFactory instanceof VarsUserPreferencesFactory &&
                 userAccount != null) {
@@ -335,7 +322,7 @@ public class AnnotationFrameController implements PreferenceUpdater, UIEventSubs
             try {
                 toolBelt.getPersistenceController().updateCameraDataUrls(videoArchive, imageTarget, imageTargetMapping);
             } catch (MalformedURLException ex) {
-                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, ex);
+                EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, ex);
             }
         }
     }
@@ -354,7 +341,7 @@ public class AnnotationFrameController implements PreferenceUpdater, UIEventSubs
     @EventSubscriber(eventClass = ObservationsChangedEvent.class)
     @Override
     public void respondTo(ObservationsChangedEvent event) {
-        Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+        Collection<Observation> observations = StateLookup.getSelectedObservations();
         List<Observation> selectedObservations = new ArrayList<Observation>(observations);
         List<Observation> changedObservations = new ArrayList<Observation>(event.get());
         Collection<Observation> updatedObservations = new ArrayList<Observation>(selectedObservations.size());
@@ -367,7 +354,7 @@ public class AnnotationFrameController implements PreferenceUpdater, UIEventSubs
                 updatedObservations.add(observation);
             }
         }
-        Lookup.getSelectedObservationsDispatcher().setValueObject(updatedObservations);
+        StateLookup.setSelectedObservations(updatedObservations);
     }
 
     /**
@@ -377,7 +364,7 @@ public class AnnotationFrameController implements PreferenceUpdater, UIEventSubs
     @EventSubscriber(eventClass = ObservationsRemovedEvent.class)
     @Override
     public void respondTo(ObservationsRemovedEvent event) {
-        Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+        Collection<Observation> observations = StateLookup.getSelectedObservations();
         List<Observation> selectedObservations = new ArrayList<Observation>(observations);
         List<Observation> removedObservations = new ArrayList<Observation>(event.get());
         Collection<Observation> updatedObservations = new ArrayList<Observation>(selectedObservations.size());
@@ -390,7 +377,7 @@ public class AnnotationFrameController implements PreferenceUpdater, UIEventSubs
                 updatedObservations.add(observation);
             }
         }
-        Lookup.getSelectedObservationsDispatcher().setValueObject(updatedObservations);
+        StateLookup.setSelectedObservations(updatedObservations);
     }
 
     @EventSubscriber(eventClass = ObservationsSelectedEvent.class)
@@ -398,31 +385,31 @@ public class AnnotationFrameController implements PreferenceUpdater, UIEventSubs
     public void respondTo(ObservationsSelectedEvent event) {
         Collection<Observation> observations = event.get() == null ?
                 new ArrayList<Observation>() : event.get();
-        Lookup.getSelectedObservationsDispatcher().setValueObject(observations);
+        StateLookup.setSelectedObservations(observations);
     }
 
     @EventSubscriber(eventClass = VideoArchiveChangedEvent.class)
     @Override
     public void respondTo(VideoArchiveChangedEvent event) {
-        Lookup.getVideoArchiveDispatcher().setValueObject(event.get());
+        StateLookup.setVideoArchive(event.get());
     }
 
     @EventSubscriber(eventClass = VideoArchiveSelectedEvent.class)
     @Override
     public void respondTo(VideoArchiveSelectedEvent event) {
-        Lookup.getVideoArchiveDispatcher().setValueObject(event.get());
+        StateLookup.setVideoArchive(event.get());
         EventBus.publish(new ClearCommandQueueEvent());
     }
 
     @Override
     public void respondTo(VideoFramesChangedEvent event) {
-        VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+        VideoArchive videoArchive = StateLookup.getVideoArchive();
         if (videoArchive != null) {
             Collection<VideoFrame> videoFrames = event.get();
             for (VideoFrame videoFrame : videoFrames) {
                 if (videoFrame.getVideoArchive().equals(videoArchive)) {
-                    Lookup.getVideoArchiveDispatcher().setValueObject(null);
-                    Lookup.getVideoArchiveDispatcher().setValueObject(videoArchive);
+                    StateLookup.setVideoArchive(null);
+                    StateLookup.setVideoArchive(videoArchive);
                     break;
                 }
             }

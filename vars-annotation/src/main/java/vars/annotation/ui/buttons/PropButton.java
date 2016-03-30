@@ -23,14 +23,8 @@ Preferences - Java - Code Generation - Code and Comments
  */
 package vars.annotation.ui.buttons;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.Collection;
-
-
 import vars.UserAccount;
-import vars.annotation.Observation;
-import vars.annotation.ui.Lookup;
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.ToolBelt;
 import vars.shared.ui.FancyButton;
 
@@ -61,20 +55,17 @@ public class PropButton extends FancyButton {
 
         // Enable the button if a user is logged in and one or more rows are
         // selected in the table.
-        Lookup.getSelectedObservationsDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
-            
-            public void propertyChange(PropertyChangeEvent evt) {
-                boolean enable = false;
-                
-                Collection<Observation> observations = (Collection<Observation>) evt.getNewValue();
-                if (observations.size() > 0) {
-                    UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
-                    enable = userAccount != null;
-                }
-                
-                setEnabled(enable);
+        StateLookup.selectedObservationsProperty().addListener((obs, oldVal, observations) -> {
+            boolean enable = false;
+
+            if (observations.size() > 0) {
+                UserAccount userAccount = StateLookup.getUserAccount();
+                enable = userAccount != null;
             }
+
+            setEnabled(enable);
         });
+
         
         setEnabled(false);
         

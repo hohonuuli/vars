@@ -6,10 +6,8 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
-import javafx.util.Callback;
-import jfxtras.scene.control.LocalDateTimePicker;
 import jfxtras.scene.control.LocalDateTimeTextField;
-import vars.queryfx.Lookup;
+import vars.queryfx.StateLookup;
 import vars.queryfx.ui.db.DateBoundsConstraint;
 import vars.queryfx.ui.db.IConstraint;
 
@@ -66,7 +64,7 @@ public class DateValuePanel extends AbstractValuePanel {
 
     private LocalDateTimeTextField getStartControl() {
         if (startControl == null) {
-            LocalDateTime dt = Lookup.getAnnotationStartDate().toLocalDateTime().truncatedTo(ChronoUnit.MINUTES);
+            LocalDateTime dt = StateLookup.getAnnotationStartDate().toLocalDateTime().truncatedTo(ChronoUnit.MINUTES);
             startControl = new LocalDateTimeTextField(dt);
             startControl.parseErrorCallbackProperty().set( p -> {
                 startControl.setLocalDateTime(dt);

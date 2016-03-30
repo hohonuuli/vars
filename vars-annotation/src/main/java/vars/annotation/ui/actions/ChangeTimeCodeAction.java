@@ -24,8 +24,8 @@ import org.mbari.vcr4j.time.Timecode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.Observation;
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.ToolBelt;
-import vars.annotation.ui.Lookup;
 import vars.annotation.ui.commandqueue.Command;
 import vars.annotation.ui.commandqueue.CommandEvent;
 import vars.annotation.ui.commandqueue.impl.ChangeTimeCodeCmd;
@@ -73,7 +73,7 @@ public class ChangeTimeCodeAction extends ActionAdapter {
      *
      */
     public void doAction() {
-        Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+        Collection<Observation> observations = StateLookup.getSelectedObservations();
         Command command = new ChangeTimeCodeCmd(observations, getTimeCode());
         CommandEvent commandEvent = new CommandEvent(command);
         EventBus.publish(commandEvent);

@@ -45,10 +45,8 @@ import org.slf4j.LoggerFactory;
 
 import vars.annotation.Observation;
 import vars.annotation.VideoFrame;
-import vars.annotation.ui.Lookup;
-import vars.annotation.ui.eventbus.ObservationsChangedEvent;
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
-import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
 import vars.annotation.ui.eventbus.VideoFramesChangedEvent;
 
 /**
@@ -100,7 +98,7 @@ public abstract class PropertiesPanel extends javax.swing.JPanel implements IObs
                 .map(VideoFrame::getObservations)
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
-        Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+        Collection<Observation> observations = StateLookup.getSelectedObservations();
         effectedObservations.retainAll(observations);
         if (effectedObservations.size() == 1) {
             update(effectedObservations.get(0), null);

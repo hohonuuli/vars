@@ -1,6 +1,6 @@
 package vars.queryfx.ui.db;
 
-import vars.queryfx.Lookup;
+import vars.queryfx.StateLookup;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -37,7 +37,7 @@ public class DateBoundsConstraint implements IConstraint<Date> {
 
     @Override
     public String toSQLClause() {
-        DateFormat df = Lookup.DATE_FORMAT_UTC;
+        DateFormat df = StateLookup.getUTCDateFormat();
         return columnName + " BETWEEN '" + df.format(minDate) + "' AND '" +
                 df.format(maxDate) + "'";
     }

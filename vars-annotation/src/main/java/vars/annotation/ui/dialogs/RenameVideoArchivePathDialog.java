@@ -4,7 +4,7 @@ import org.bushe.swing.event.annotation.AnnotationProcessor;
 import org.bushe.swing.event.annotation.EventSubscriber;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveDAO;
-import vars.annotation.ui.Lookup;
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
 import vars.annotation.ui.eventbus.VideoArchiveSelectedEvent;
@@ -41,7 +41,7 @@ public class RenameVideoArchivePathDialog extends StandardDialog {
         initialize();
         getRootPane().setDefaultButton(getOkayButton());
         pack();
-        VideoArchive va = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+        VideoArchive va = StateLookup.getVideoArchive();
         setVideoArchive(va);
         AnnotationProcessor.process(this);
     }

@@ -33,7 +33,7 @@ public class QueryModule implements Module {
 
 
     public QueryModule() {
-        Resource resource = new Resource(Lookup.getConfig());
+        Resource resource = new Resource(StateLookup.getConfig());
         log.info(resource.getConfig().toString());
         annotationPersistenceUnit = resource.findByKey("vars.annotation.persistence.unit").get();
         knowledgebasePersistenceUnit = resource.findByKey("vars.knowledgebase.persistence.unit").get();

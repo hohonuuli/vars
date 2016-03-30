@@ -6,11 +6,12 @@
 package vars.annotation.ui.video;
 
 import java.util.Date;
-import vars.annotation.ui.Lookup;
+import vars.annotation.ui.StateLookup;
 
 /**
  *
  * @author brian
+ * @deprecated Use VideoIndex instead
  */
 public class VideoTimeImpl implements VideoTime {
 
@@ -33,7 +34,7 @@ public class VideoTimeImpl implements VideoTime {
 
     @Override
     public String toString() {
-        return "<VideoTime date=\"" + Lookup.DATE_FORMAT_UTC.format(date) + "\" timecode=\"" + timecode + "\" />";
+        return "<VideoTime date=\"" + StateLookup.getUTCDateFormat().format(date) + "\" timecode=\"" + timecode + "\" />";
     }
 
 }

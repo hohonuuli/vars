@@ -2,16 +2,17 @@ package org.mbari.vars.arctic
 
 
 import java.io.File
-import java.util.{TimeZone, Date}
+import java.util.{Date, TimeZone}
 
 import com.google.inject.Injector
-import org.mbari.math.{FastCollator}
+import org.mbari.math.FastCollator
 import org.slf4j.LoggerFactory
 import vars.annotation.VideoFrame
-import vars.annotation.ui.{Lookup, ToolBelt}
+import vars.annotation.ui.{StateLookup, ToolBelt}
 import vars.shared.ui.GlobalLookup
+
 import scala.collection.JavaConverters._
-import scala.util.{Try, Failure, Success}
+import scala.util.{Failure, Success, Try}
 
 /**
  *
@@ -94,10 +95,7 @@ object MergeVideoData {
     videoFrames
   }
 
-  lazy val toolbelt: ToolBelt = {
-    val injector = Lookup.getGuiceInjectorDispatcher.getValueObject.asInstanceOf[Injector]
-    injector.getInstance(classOf[ToolBelt])
-  }
+  lazy val toolbelt: ToolBelt = StateLookup.GUICE_INJECTOR.getInstance(classOf[ToolBelt])
 
   def apply(videoArchiveName: String, logFile: File, startDate: Date): Unit = {
     val raw = CSVLogReader(logFile)

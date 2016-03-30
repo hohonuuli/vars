@@ -24,9 +24,9 @@ import org.bushe.swing.event.annotation.AnnotationProcessor;
 import org.bushe.swing.event.annotation.EventSubscriber;
 import org.mbari.swing.SwingUtils;
 import vars.UserAccount;
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.actions.DeleteSelectedObservationsWithConfirmAction;
 import vars.annotation.ui.ToolBelt;
-import vars.annotation.ui.Lookup;
 import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
 import vars.shared.ui.FancyButton;
 
@@ -57,7 +57,7 @@ public class DeleteSelectedObservationsButton extends FancyButton {
 
     @EventSubscriber(eventClass = ObservationsSelectedEvent.class)
     public void onSelectedObservationsEvent(ObservationsSelectedEvent selectionEvent) {
-        final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+        final UserAccount userAccount = StateLookup.getUserAccount();
         boolean enabled = (userAccount != null) && selectionEvent.get().size() > 0;
         setEnabled(enabled);
         getAction().setEnabled(enabled);

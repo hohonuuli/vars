@@ -23,7 +23,7 @@ import org.mbari.swing.JImageUrlCanvas;
 import vars.UserAccount;
 import vars.annotation.Observation;
 import vars.annotation.VideoFrame;
-import vars.annotation.ui.Lookup;
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.commandqueue.Command;
 import vars.annotation.ui.commandqueue.CommandEvent;
@@ -263,7 +263,8 @@ public class AnnotationLayerUI<T extends JImageUrlCanvas> extends ImageFrameLaye
         void newObservation(Point2D point) {
 
             String conceptName = getConcept().getPrimaryConceptName().getName();
-            String user = ((UserAccount) Lookup.getUserAccountDispatcher().getValueObject()).getUserName();
+            UserAccount userAccount = StateLookup.getUserAccount();
+            String user = userAccount.getUserName();
             VideoFrame videoFrame = dataCoordinator.getVideoFrame();
             if (videoFrame != null) {
                 Command command = new AddObservationToVideoFrameCmd(conceptName, dataCoordinator.getVideoFrame(), user,

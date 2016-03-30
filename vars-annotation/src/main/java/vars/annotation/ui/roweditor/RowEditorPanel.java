@@ -49,7 +49,6 @@ import javax.swing.LayoutFocusTraversalPolicy;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.bushe.swing.event.EventBus;
-import org.bushe.swing.event.EventTopicSubscriber;
 import org.bushe.swing.event.annotation.AnnotationProcessor;
 import org.bushe.swing.event.annotation.EventSubscriber;
 import org.slf4j.Logger;
@@ -59,7 +58,7 @@ import vars.CacheClearedListener;
 import vars.DAO;
 import vars.UserAccount;
 import vars.annotation.Observation;
-import vars.annotation.ui.Lookup;
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.commandqueue.Command;
 import vars.annotation.ui.commandqueue.CommandEvent;
@@ -70,7 +69,6 @@ import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptName;
 import vars.shared.ui.AllConceptNamesComboBox;
-import vars.shared.ui.event.LoggingTopicSubscriber;
 
 /**
  * <p>THis panel is explcitly desinged for editing Observations in the
@@ -242,7 +240,7 @@ public class RowEditorPanel extends JPanel {
                         }
                         catch (final Exception e1) {
                             log.error("Failed to lookup '" + conceptComboBox.getSelectedItem() + "' from database", e1);
-                            EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e1);
+                            EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, e1);
                             primaryName = ConceptName.NAME_DEFAULT;
                         }
 
@@ -252,7 +250,7 @@ public class RowEditorPanel extends JPanel {
 
                         // Change conceptName in database
                         if (observation != null && !observation.getConceptName().equals(primaryName)) {
-                            final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+                            final UserAccount userAccount = StateLookup.getUserAccount();
 
                             Command command = new ChangeObservationNameCmd(ImmutableList.of(observation), primaryName,
                                     userAccount.getUserName(), new Date());

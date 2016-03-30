@@ -35,6 +35,7 @@ import vars.avplayer.ImageCaptureService;
 /**
  *
  * @author brian
+ * @deprecated Use StateLookup instead
  */
 public class Lookup extends GlobalLookup {
 

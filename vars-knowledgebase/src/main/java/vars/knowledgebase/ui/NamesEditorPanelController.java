@@ -76,25 +76,25 @@ class NamesEditorPanelController {
 
     void deleteConceptName(ConceptName conceptName) {
 
-            int value = JOptionPane.showConfirmDialog(namesEditorPanel,
+        int value = JOptionPane.showConfirmDialog(namesEditorPanel,
                 "Do you want to mark '" + conceptName.getName() + "' for deletion?", "VARS - Confirm",
                 JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE);
 
-            final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
-            if (value == JOptionPane.YES_OPTION) {
-                WaitIndicator waitIndicator = new WaitIndicator(namesEditorPanel);
-                History history = historyFactory.delete(userAccount, conceptName);
-                DAO dao = toolBelt.getKnowledgebaseDAOFactory().newDAO();
-                dao.startTransaction();
-                conceptName = dao.merge(conceptName);
-                conceptName.getConcept().getConceptMetadata().addHistory(history);
-                dao.persist(history);
-                dao.endTransaction();
-                dao.close();
-                waitIndicator.dispose();
-                EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
-                
-            }
+        final UserAccount userAccount = StateLookup.getUserAccount();
+        if (value == JOptionPane.YES_OPTION) {
+            WaitIndicator waitIndicator = new WaitIndicator(namesEditorPanel);
+            History history = historyFactory.delete(userAccount, conceptName);
+            DAO dao = toolBelt.getKnowledgebaseDAOFactory().newDAO();
+            dao.startTransaction();
+            conceptName = dao.merge(conceptName);
+            conceptName.getConcept().getConceptMetadata().addHistory(history);
+            dao.persist(history);
+            dao.endTransaction();
+            dao.close();
+            waitIndicator.dispose();
+            EventBus.publish(StateLookup.TOPIC_APPROVE_HISTORY, history);
+
+        }
 
     }
     
@@ -138,14 +138,14 @@ class NamesEditorPanelController {
                     log.error("A search for '" + newName + "' in the database failed", e1);
                 }
 
-                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e1);
+                EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, e1);
                 okToProceed = false;
             }
         }
 
         if (okToProceed) {
             if ((matchingConcept != null) && !conceptDAO.equalInDatastore(matchingConcept, concept)) {
-                EventBus.publish(Lookup.TOPIC_WARNING,
+                EventBus.publish(StateLookup.TOPIC_WARNING,
                                  "A concept with " + "the name '" + newName + "' already exists.");
                 okToProceed = false;
             }
@@ -227,7 +227,7 @@ class NamesEditorPanelController {
                 String msg = "Failed to change primary names of annotations from '" + oldName + "' to '" +
                              newName + "'.";
                 log.error(msg);
-                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+                EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, e);
             }
 
             /*
@@ -235,7 +235,7 @@ class NamesEditorPanelController {
              * or your database transaction will fail because of a timestamp mismatch. (ie. Cache does not
              * match you instance)
              */
-            EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
+            EventBus.publish(StateLookup.TOPIC_APPROVE_HISTORY, history);
 
         }
 
@@ -258,26 +258,22 @@ class NamesEditorPanelController {
 
         private AddConceptNameDialog2 getDialog() {
             if (dialog == null) {
-                final Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
+                final Frame frame = StateLookup.getApplicationFrame();
                 dialog = new AddConceptNameDialog2(frame, true, toolBelt);
 
                 /*
                  * Set the currently selected concept
                  */
-                Dispatcher dispatcher = Lookup.getSelectedConceptDispatcher();
-                dialog.setConcept((Concept) dispatcher.getValueObject());
+                dialog.setConcept(StateLookup.getSelectedConcept());
 
                 /*
                  * The dialog needs a reference to the currently selected
                  * concept. We do that by listening to the appropriate
-                 * dispatcher.
+                 * property.
                  */
-                dispatcher.addPropertyChangeListener(new PropertyChangeListener() {
+                StateLookup.selectedConceptProperty()
+                        .addListener((obs, oldVal, newVal) -> dialog.setConcept(newVal) );
 
-                    public void propertyChange(PropertyChangeEvent evt) {
-                        dialog.setConcept((Concept) evt.getNewValue());
-                    }
-                });
             }
 
             return dialog;

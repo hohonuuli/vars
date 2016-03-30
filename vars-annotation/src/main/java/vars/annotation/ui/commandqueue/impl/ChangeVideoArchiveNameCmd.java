@@ -7,7 +7,7 @@ import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveDAO;
 import vars.annotation.VideoArchiveSet;
 import vars.annotation.VideoArchiveSetDAO;
-import vars.annotation.ui.Lookup;
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.commandqueue.Command;
 import vars.annotation.ui.eventbus.VideoArchiveSetChangedEvent;
@@ -50,7 +50,7 @@ public class ChangeVideoArchiveNameCmd implements Command {
         VideoArchive matchingVideoArchive = dao.findByName(data.videoArchiveName);
         if (matchingVideoArchive != null) {
             DataBean oldData = isApply ? originalData : modifiedData;
-            EventBus.publish(Lookup.TOPIC_WARNING, "A VideoArchive named " + data.videoArchiveName +
+            EventBus.publish(StateLookup.TOPIC_WARNING, "A VideoArchive named " + data.videoArchiveName +
                     " already exists. Unable to rename " + oldData.videoArchiveName);
         }
         else {
