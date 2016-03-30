@@ -131,7 +131,7 @@ public class  SearchPanel extends JPanel {
                     catch (Exception e1) {
 
                         // Fire eventbus message
-                        EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e1);
+                        EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, e1);
                         log.error("Problem accessing the database", e1);
                         return;
                     }
@@ -566,7 +566,7 @@ public class  SearchPanel extends JPanel {
                     names = getConceptNameSelectionPanel().getSelectedConceptNamesAsStrings();
                 }
                 catch (Exception e) {
-                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+                    EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, e);
                     log.error("Failed to retrieve concept names from the database.", e);
                 }
 

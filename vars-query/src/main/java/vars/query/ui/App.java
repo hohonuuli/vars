@@ -33,13 +33,11 @@ import javax.swing.UIManager;
 
 import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.EventTopicSubscriber;
-import org.mbari.awt.WaitCursorEventQueue;
 import org.mbari.swing.SplashFrame;
 import org.mbari.util.SystemUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
-import vars.shared.ui.GlobalLookup;
 import vars.shared.ui.event.FatalExceptionSubscriber;
 import vars.shared.ui.event.NonFatalErrorSubscriber;
 import vars.shared.ui.event.WarningSubscriber;
@@ -91,7 +89,7 @@ public class App {
          * We put this application into a dispatcher so that other components
          * like dialogs, can grab it.
          */
-        Lookup.getApplicationDispatcher().setValueObject(this);
+        StateLookup.setApplication(this);
 
         initialize();
 
@@ -101,9 +99,9 @@ public class App {
         EventTopicSubscriber fatalErrorSubscriber = new FatalExceptionSubscriber(getQueryFrame());
         EventTopicSubscriber nonFatalErrorSubscriber = new NonFatalErrorSubscriber(getQueryFrame());
         EventTopicSubscriber warningSubscriber = new WarningSubscriber(getQueryFrame());
-        EventBus.subscribe(Lookup.TOPIC_FATAL_ERROR, fatalErrorSubscriber);
-        EventBus.subscribe(Lookup.TOPIC_NONFATAL_ERROR, nonFatalErrorSubscriber);
-        EventBus.subscribe(Lookup.TOPIC_WARNING, warningSubscriber);
+        EventBus.subscribe(StateLookup.TOPIC_FATAL_ERROR, fatalErrorSubscriber);
+        EventBus.subscribe(StateLookup.TOPIC_NONFATAL_ERROR, nonFatalErrorSubscriber);
+        EventBus.subscribe(StateLookup.TOPIC_WARNING, warningSubscriber);
         GC_PREVENTION.add(fatalErrorSubscriber);
         GC_PREVENTION.add(nonFatalErrorSubscriber);
         GC_PREVENTION.add(warningSubscriber);
@@ -152,10 +150,10 @@ public class App {
         if (queryFrame == null) {
 
             // Let's let Guice autowire the dependencies
-        	Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
+            Injector injector = StateLookup.GUICE_INJECTOR;
             queryFrame = injector.getInstance(QueryFrame.class);
             queryFrame.setSize(300, 200);
-            Lookup.getApplicationFrameDispatcher().setValueObject(queryFrame);
+            StateLookup.setApplicationFrame(queryFrame);
         }
 
         return queryFrame;
@@ -187,7 +185,7 @@ public class App {
                         knowledgebaseDAOFactory.newConceptDAO().findRoot();
                     }
                     catch (Exception e) {
-                        EventBus.publish(Lookup.TOPIC_FATAL_ERROR, e);
+                        EventBus.publish(StateLookup.TOPIC_FATAL_ERROR, e);
                     }
 
                     return null;
@@ -252,7 +250,7 @@ public class App {
          */
         System.setProperty("user.timezone", "UTC");
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-        GlobalLookup.getSettingsDirectory(); // Not used
+        StateLookup.getSettingsDirectory(); // Not used, but generates needed dirs
 
         /**
          * Log uncaught Exceptions
@@ -287,20 +285,16 @@ public class App {
             mainLog.info("Unable to set look and feel", e);
         }
 
-        final Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
+        final Injector injector = StateLookup.GUICE_INJECTOR;
 
-        SwingUtilities.invokeLater(new Runnable() {
-
-            public void run() {
-                try {
-                    final App queryApp = injector.getInstance(App.class);
-                }
-                catch (Exception e) {
-                    FatalExceptionSubscriber subscriber = new FatalExceptionSubscriber(null);
-                    subscriber.onEvent(Lookup.TOPIC_FATAL_ERROR, e);
-                }
+        SwingUtilities.invokeLater(() -> {
+            try {
+                final App queryApp = injector.getInstance(App.class);
             }
-
+            catch (Exception e) {
+                FatalExceptionSubscriber subscriber = new FatalExceptionSubscriber(null);
+                subscriber.onEvent(StateLookup.TOPIC_FATAL_ERROR, e);
+            }
         });
     }
 }
