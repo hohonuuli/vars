@@ -15,10 +15,8 @@
 
 package vars.annotation.ui.actions;
 
-import java.util.Collection;
 import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
-import org.mbari.util.Dispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.CacheClearedEvent;
@@ -26,10 +24,8 @@ import vars.CacheClearedListener;
 import vars.PersistenceCache;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveDAO;
-import vars.annotation.VideoFrame;
-import vars.annotation.ui.Lookup;
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.ToolBelt;
-import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
 import vars.annotation.ui.eventbus.VideoArchiveSelectedEvent;
 
 /**
@@ -63,12 +59,11 @@ public class ClearDatabaseCacheAction extends ActionAdapter {
     @Override
     public void doAction() {
 
-        final Dispatcher dispatcher = Lookup.getVideoArchiveDispatcher();
-        final VideoArchive videoArchive = (VideoArchive) dispatcher.getValueObject();
+        final VideoArchive videoArchive = StateLookup.getVideoArchive();
 
         // We need this to reopen the VideoArchive after refresh
         final String name = (videoArchive == null) ? null : videoArchive.getName();
-        dispatcher.setValueObject(null);
+        StateLookup.setVideoArchive(null);
 
         final PersistenceCache persistenceCache = toolBelt.getPersistenceCache();
         final CacheClearedListener listener = new CacheClearedListener() {
@@ -104,7 +99,7 @@ public class ClearDatabaseCacheAction extends ActionAdapter {
                 }
                 catch (Exception e) {
                     log.error("Failed to refresh the knowledgbase", e);
-                    EventBus.publish(Lookup.TOPIC_FATAL_ERROR, e);
+                    EventBus.publish(StateLookup.TOPIC_FATAL_ERROR, e);
                 }
 
             }

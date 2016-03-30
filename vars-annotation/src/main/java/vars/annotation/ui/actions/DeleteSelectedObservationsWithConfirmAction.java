@@ -35,8 +35,8 @@ import org.mbari.awt.event.ActionAdapter;
 import org.mbari.awt.event.IAction;
 
 import vars.annotation.Observation;
-import vars.annotation.ui.Lookup;
 import vars.annotation.ui.PersistenceController;
+import vars.annotation.ui.StateLookup;
 
 /**
  * <p>Provides a wrapper around the DeleteSelectedObservationsAction so that the
@@ -66,10 +66,10 @@ public class DeleteSelectedObservationsWithConfirmAction extends ActionAdapter {
      * @see org.mbari.awt.event.IAction#doAction()
      */
     public void doAction() {
-        Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+        Collection<Observation> observations = StateLookup.getSelectedObservations();
         final int count = observations.size();
         final Object[] options = { "OK", "CANCEL" };
-        final int confirm = JOptionPane.showOptionDialog((Frame) Lookup.getApplicationFrameDispatcher().getValueObject(),
+        final int confirm = JOptionPane.showOptionDialog(StateLookup.getAnnotationFrame(),
                                 "Do you want to delete " + count + " observation(s)?", "VARS - Confirm Delete",
                                 JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
         if (confirm == JOptionPane.YES_OPTION) {

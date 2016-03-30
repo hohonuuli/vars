@@ -13,7 +13,7 @@ def approvedHistories = historyDao.findApprovedHistories().toList()
 approvedHistories = approvedHistories.findAll { h ->
     h.processedDate >= startDate && h.processedDate <= endDate
 }
-approvedHistories.sort { h -> h?.conceptMetadata?.concept?.primaryConceptName?.name?.toUpperCase() }
+approvedHistories.sort { h -> h?.conceptMetadata?.getSelectedConcept?.primaryConceptName?.name?.toUpperCase() }
 
 
 def userAccountDao = toolBox.toolBelt.miscDAOFactory.newUserAccountDAO()
@@ -46,7 +46,7 @@ Recently approved changes:
 """
 
 approvedHistories.each { h ->
-    msg += "${h.conceptMetadata.concept.primaryConceptName.name}: ${h.stringValue()}\n\n"
+    msg += "${h.conceptMetadata.getSelectedConcept.primaryConceptName.name}: ${h.stringValue()}\n\n"
 }
 email.msg = msg
 

@@ -85,7 +85,7 @@ class AutoFramegrabLoader {
         def failedCaptureCount = 0
         try {
 
-            // Need the root concept
+            // Need the root selectedConcept
             def conceptDAO = toolBox.toolBelt.knowledgebaseDAOFactory.newConceptDAO()
             conceptDAO.startTransaction()
             def conceptNameAsString = conceptDAO.findRoot().primaryConceptName.name

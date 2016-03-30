@@ -23,8 +23,8 @@ import java.util.Collection;
 import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
 import vars.annotation.Observation;
-import vars.annotation.ui.Lookup;
 import vars.annotation.ui.PersistenceController;
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.commandqueue.Command;
 import vars.annotation.ui.commandqueue.CommandEvent;
 import vars.annotation.ui.commandqueue.impl.RemoveObservationsCmd;
@@ -47,7 +47,7 @@ public class DeleteSelectedObservationsAction extends ActionAdapter {
      *
      */
     public void doAction() {
-        Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+        Collection<Observation> observations = StateLookup.getSelectedObservations();
         Command command = new RemoveObservationsCmd(observations);
         CommandEvent commandEvent = new CommandEvent(command);
         EventBus.publish(commandEvent);

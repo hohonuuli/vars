@@ -30,7 +30,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.EventTopicSubscriber;
-import org.mbari.awt.WaitCursorEventQueue;
 import org.mbari.swing.SplashFrame;
 import org.mbari.util.Dispatcher;
 import org.mbari.util.SystemUtilities;
@@ -90,7 +89,7 @@ public class App {
     public App() {
         super();
 
-        Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
+        Injector injector = StateLookup.GUICE_INJECTOR;
         toolBelt = injector.getInstance(ToolBelt.class);
         approveHistorySubscriber = new ApproveHistorySubscriber(toolBelt.getApproveHistoryTask());
         approveHistoriesSubscriber = new ApproveHistoriesSubscriber(toolBelt.getApproveHistoryTask());
@@ -101,46 +100,41 @@ public class App {
         /*
          * Subscribe to all our favorite topics
          */
-        EventBus.subscribe(Lookup.TOPIC_APPROVE_HISTORY, approveHistorySubscriber);
-        EventBus.subscribe(Lookup.TOPIC_APPROVE_HISTORIES, approveHistoriesSubscriber);
-        EventBus.subscribe(Lookup.TOPIC_EXIT, exitSubscriber);
-        EventBus.subscribe(Lookup.TOPIC_FATAL_ERROR, tempFatalErrorSubscriber);
-        EventBus.subscribe(Lookup.TOPIC_NONFATAL_ERROR, tempNonFatalErrorSubscriber);
+        EventBus.subscribe(StateLookup.TOPIC_APPROVE_HISTORY, approveHistorySubscriber);
+        EventBus.subscribe(StateLookup.TOPIC_APPROVE_HISTORIES, approveHistoriesSubscriber);
+        EventBus.subscribe(StateLookup.TOPIC_EXIT, exitSubscriber);
+        EventBus.subscribe(StateLookup.TOPIC_FATAL_ERROR, tempFatalErrorSubscriber);
+        EventBus.subscribe(StateLookup.TOPIC_NONFATAL_ERROR, tempNonFatalErrorSubscriber);
         
         initialize();
 
         // After the app is intialiazed, remove the temporary error subscribers
         // and add the permanant ones
-        EventBus.unsubscribe(Lookup.TOPIC_FATAL_ERROR, tempFatalErrorSubscriber);
-        EventBus.unsubscribe(Lookup.TOPIC_NONFATAL_ERROR, tempNonFatalErrorSubscriber);
+        EventBus.unsubscribe(StateLookup.TOPIC_FATAL_ERROR, tempFatalErrorSubscriber);
+        EventBus.unsubscribe(StateLookup.TOPIC_NONFATAL_ERROR, tempNonFatalErrorSubscriber);
         fatalErrorSubscriber  = new FatalExceptionSubscriber(getKnowledgebaseFrame());
         nonFatalErrorSubscriber = new NonFatalErrorSubscriber(getKnowledgebaseFrame());
         warningSubscriber = new WarningSubscriber(getKnowledgebaseFrame());
-        EventBus.subscribe(Lookup.TOPIC_FATAL_ERROR, fatalErrorSubscriber);
-        EventBus.subscribe(Lookup.TOPIC_NONFATAL_ERROR, nonFatalErrorSubscriber);
-        EventBus.subscribe(Lookup.TOPIC_WARNING, warningSubscriber);
+        EventBus.subscribe(StateLookup.TOPIC_FATAL_ERROR, fatalErrorSubscriber);
+        EventBus.subscribe(StateLookup.TOPIC_NONFATAL_ERROR, nonFatalErrorSubscriber);
+        EventBus.subscribe(StateLookup.TOPIC_WARNING, warningSubscriber);
 
 
         /*
          * We put this application into a dispatcher so that other components
          * like dialogs, can grab it.
          */
-        Lookup.getApplicationDispatcher().setValueObject(this);
+        StateLookup.setApplication(this);
 
         /*
          * Ensure that the concept is registered with all listeners when a user logs in.
-         * This was originally done with dispatchers. We could also use EventBus.
          */
-
-        Lookup.getUserAccountDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
-
-            public void propertyChange(PropertyChangeEvent evt) {
-                Dispatcher dispatcher = Lookup.getSelectedConceptDispatcher();
-                Concept selectedConcept = (Concept) dispatcher.getValueObject();
-                dispatcher.setValueObject(null);
-                dispatcher.setValueObject(selectedConcept);
-            }
+        StateLookup.userAccountProperty().addListener((obs, oldVal, newVal) -> {
+            Concept selectedConcept = StateLookup.getSelectedConcept();
+            StateLookup.setSelectedConcept(null);
+            StateLookup.setSelectedConcept(selectedConcept);
         });
+
     }
 
     public KnowledgebaseFrame getKnowledgebaseFrame() {
@@ -151,8 +145,8 @@ public class App {
              * We store the frame here so that other components can easily
              * access it.
              */
-            Lookup.getApplicationFrameDispatcher().setValueObject(knowledgebaseFrame);
-            GlobalLookup.getSelectedFrameDispatcher().setValueObject(knowledgebaseFrame);
+            StateLookup.setApplicationFrame(knowledgebaseFrame);
+            StateLookup.setSelectedFrame(knowledgebaseFrame);
 
         }
 
@@ -246,11 +240,11 @@ public class App {
             Concept rootConcept = dao.findRoot();
             dao.endTransaction();
             dao.close();
-            Lookup.getSelectedConceptDispatcher().setValueObject(rootConcept);
+            StateLookup.setSelectedConcept(rootConcept);
         }
         catch (Exception e) {
             log.error("Unable to locate root concept --- this means trouble!!", e);
-            EventBus.publish(Lookup.TOPIC_FATAL_ERROR, e);
+            EventBus.publish(StateLookup.TOPIC_FATAL_ERROR, e);
         }
 
         getKnowledgebaseFrame().setVisible(true);

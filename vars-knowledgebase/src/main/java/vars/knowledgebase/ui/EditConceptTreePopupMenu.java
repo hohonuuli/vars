@@ -86,8 +86,8 @@ public class EditConceptTreePopupMenu extends ConceptTreePopupMenu implements IL
                     triggerRemoveAction();
                 }
                 catch (Exception e) {
-                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
-                    EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, null);
+                    EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, e);
+                    EventBus.publish(StateLookup.TOPIC_REFRESH_KNOWLEGEBASE, null);
                 }
             }
 
@@ -100,8 +100,8 @@ public class EditConceptTreePopupMenu extends ConceptTreePopupMenu implements IL
                     triggerEditAction();
                 }
                 catch (Exception e) {
-                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
-                    EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, null);
+                    EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, e);
+                    EventBus.publish(StateLookup.TOPIC_REFRESH_KNOWLEGEBASE, null);
                 }
             }
 
@@ -194,7 +194,7 @@ public class EditConceptTreePopupMenu extends ConceptTreePopupMenu implements IL
             if (concept != null) {
 
                 // Ask are you sure?
-                JFrame frame = (JFrame) Lookup.getApplicationFrameDispatcher().getValueObject();
+                JFrame frame = StateLookup.getApplicationFrame();
                 int value = JOptionPane.showConfirmDialog(frame,
                     "Do you want to mark '" + concept.getPrimaryConceptName().getName() + "' for deletion?",
                     "VARS - Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE);
@@ -217,10 +217,10 @@ public class EditConceptTreePopupMenu extends ConceptTreePopupMenu implements IL
                         dao.persist(history);
                         dao.endTransaction();
                         waitIndicator.dispose();
-                        EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
+                        EventBus.publish(StateLookup.TOPIC_APPROVE_HISTORY, history);
                     }
                     else {
-                        EventBus.publish(Lookup.TOPIC_WARNING, "Unable to delete root concept");
+                        EventBus.publish(StateLookup.TOPIC_WARNING, "Unable to delete root concept");
                     }
                     dao.endTransaction();
                     dao.close();

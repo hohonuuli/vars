@@ -120,7 +120,7 @@ public class HistoryEditorPanel extends EditorPanel implements ILockableEditor {
                         // Do nothing
                     }
 
-                    EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, name);
+                    EventBus.publish(StateLookup.TOPIC_REFRESH_KNOWLEGEBASE, name);
                 }
 
             });
@@ -154,7 +154,7 @@ public class HistoryEditorPanel extends EditorPanel implements ILockableEditor {
                         // Do nothing
                     }
 
-                    EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, name);
+                    EventBus.publish(StateLookup.TOPIC_REFRESH_KNOWLEGEBASE, name);
                 }
 
             });

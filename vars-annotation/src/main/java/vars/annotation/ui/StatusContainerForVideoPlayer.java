@@ -45,8 +45,8 @@ public class StatusContainerForVideoPlayer extends JPanel {
         add(new JLabel("Video Player:"));
         add(getVideoPlayerComboBox());
 
-        final Dispatcher videoArchiveDispatcher = Lookup.getVideoArchiveDispatcher();
-        update((VideoArchive) videoArchiveDispatcher.getValueObject());
+        VideoArchive videoArchive = StateLookup.getVideoArchive();
+        update(videoArchive);
 
         AnnotationProcessor.process(this); // Register with EventBus
     }
@@ -132,7 +132,7 @@ public class StatusContainerForVideoPlayer extends JPanel {
 
             addMouseListener(new MouseAdapter() {
 
-                Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
+                Frame frame = StateLookup.getAnnotationFrame();
 
 
                 @Override
@@ -150,6 +150,8 @@ public class StatusContainerForVideoPlayer extends JPanel {
                     final VideoPlayerDialogUI dialog = accessUI.getOpenDialog(frame, toolBelt);
 
                     dialog.onOkay(() -> {
+                        // TODO this needs to be replaced with new vcr4j 3 code and StateLookup
+
                         dialog.setVisible(false);
                         final VideoParams videoParams = dialog.getVideoParams();
                         Tuple2<VideoArchive, VideoPlayerController> t = accessUI.openMoviePlayer(videoParams,
@@ -157,8 +159,10 @@ public class StatusContainerForVideoPlayer extends JPanel {
                         VideoArchive videoArchive = t.getA();
                         VideoPlayerController videoPlayerController = t.getB();
                         VideoArchiveChangedEvent event = new VideoArchiveChangedEvent(this, videoArchive);
-                        Lookup.getImageCaptureServiceDispatcher().setValueObject(videoPlayerController.getImageCaptureService());
-                        Lookup.getVideoControlServiceDispatcher().setValueObject(videoPlayerController.getVideoControlService());
+
+
+                        //Lookup.getImageCaptureServiceDispatcher().setValueObject(videoPlayerController.getImageCaptureService());
+                        //Lookup.getVideoControlServiceDispatcher().setValueObject(videoPlayerController.getVideoControlService());
                         EventBus.publish(event);
                     });
 

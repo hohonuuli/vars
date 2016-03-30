@@ -20,7 +20,7 @@ WHERE
         RovName = 'Tiburon' AND
         DiveNumber IN (1001, 1029, 1030, 1031, 1032, 1033, 1034)
       )
-      OR ( -- Delete embargoes by concept
+      OR ( -- Delete embargoes by selectedConcept
         ConceptName IN (
           'Xenoturbellida',
           'Xenoturbellidae',

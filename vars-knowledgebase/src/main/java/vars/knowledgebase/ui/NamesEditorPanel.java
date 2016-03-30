@@ -169,7 +169,7 @@ public class NamesEditorPanel extends EditorPanel implements ILockableEditor {
                     okToProceed = (value == JOptionPane.YES_OPTION) && !name.equals(selectedName) &&
                                   (name.equals("")) && (selectedName != null) && (oldConceptName != null);
 
-                    final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+                    final UserAccount userAccount = StateLookup.getUserAccount();
 
                     /*
                      * Warn users if they are trying to change the primary name.

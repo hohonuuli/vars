@@ -1,9 +1,10 @@
 package org.mbari.smith
 
-import vars.annotation.ui.{ToolBelt, Lookup}
+import vars.annotation.ui.{StateLookup, ToolBelt}
 import com.google.inject.Injector
+
 import scala.collection.JavaConverters._
-import vars.annotation.{VideoFrame}
+import vars.annotation.VideoFrame
 import org.slf4j.LoggerFactory
 import java.net.URL
 
@@ -17,8 +18,8 @@ object CoverageEstimator {
 
   private[this] val log = LoggerFactory.getLogger(getClass)
 
-  private[this] val toolBelt = Lookup.getGuiceInjectorDispatcher.getValueObject.
-      asInstanceOf[Injector].getInstance(classOf[ToolBelt])
+
+  private[this] val toolBelt = StateLookup.GUICE_INJECTOR.getInstance(classOf[ToolBelt])
 
   private[this] var imageWidth: Int = _
   private[this] var imageHeight: Int = _

@@ -2,19 +2,21 @@ package org.mbari.vars.varspub
 
 
 import com.google.inject.Injector
-import java.awt.image.{BufferedImage}
+import java.awt.image.BufferedImage
 import java.awt.{AlphaComposite, Graphics2D}
 import java.io.File
 import java.net.URL
-import java.nio.file.{Files, Paths, Path}
+import java.nio.file.{Files, Path, Paths}
 import javax.imageio.ImageIO
+
 import org.slf4j.LoggerFactory
+
 import scala.collection.JavaConverters._
 import scala.math._
 import scala.sys.process._
 import scala.util.Try
-import vars.knowledgebase.ui.{Lookup, ToolBelt}
-import vars.knowledgebase.{Media, Concept}
+import vars.knowledgebase.ui.{StateLookup, ToolBelt}
+import vars.knowledgebase.{Concept, Media}
 
 /**
  *
@@ -121,7 +123,7 @@ object KBImageMigrator {
     val target = Paths.get(args(0))
     val overlayImageURL = new File(args(1)).toURI.toURL
     implicit val toolbelt = {
-      val injector = Lookup.getGuiceInjectorDispatcher.getValueObject.asInstanceOf[Injector]
+      val injector = StateLookup.GUICE_INJECTOR;
       injector.getInstance(classOf[ToolBelt])
     }
     val imageMigrator = new KBImageMigrator(target, overlayImageURL)

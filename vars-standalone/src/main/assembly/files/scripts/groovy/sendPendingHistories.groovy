@@ -35,10 +35,10 @@ Pending changes:
 """
 
 def histories = pendingHistories.toList()
-histories.sort { h -> h?.conceptMetadata?.concept?.primaryConceptName?.name?.toUpperCase() }
+histories.sort { h -> h?.conceptMetadata?.getSelectedConcept?.primaryConceptName?.name?.toUpperCase() }
 
 histories.each { h ->
-    msg += "${h?.conceptMetadata?.concept?.primaryConceptName?.name}: ${h.stringValue()}\n\n"
+    msg += "${h?.conceptMetadata?.getSelectedConcept?.primaryConceptName?.name}: ${h.stringValue()}\n\n"
 }
 email.msg = msg
 

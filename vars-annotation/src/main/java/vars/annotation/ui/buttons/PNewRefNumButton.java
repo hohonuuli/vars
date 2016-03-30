@@ -19,7 +19,7 @@ import org.mbari.swing.IPopup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.VideoArchive;
-import vars.annotation.ui.Lookup;
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.actions.AddNewRefNumPropAction;
 import vars.annotation.ui.eventbus.VideoArchiveSelectedEvent;
@@ -70,7 +70,7 @@ public class PNewRefNumButton extends PropButton implements IPopup {
             auto.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+                    VideoArchive videoArchive = StateLookup.getVideoArchive();
                     controller.respondTo(new VideoArchiveSelectedEvent(PNewRefNumButton.this, videoArchive));
                 }
             });
@@ -90,12 +90,12 @@ public class PNewRefNumButton extends PropButton implements IPopup {
             set.addActionListener(new ActionListener() {
 
                 public void actionPerformed(final ActionEvent ae) {
-                    VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+                    VideoArchive videoArchive = StateLookup.getVideoArchive();
                     Integer max = controller.findMaxReferenceNumber(videoArchive);
                     String maxString = max == null ? "1" : max.toString();
 
                     // TO help the user out let's put the max used number in the dialog
-                    Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
+                    Frame frame = StateLookup.getAnnotationFrame();
                     final String s = (String) JOptionPane.showInputDialog(frame, "Enter a reference number",
                         "VARS - Input", JOptionPane.PLAIN_MESSAGE, null, null, maxString);
                     if (s == null) {

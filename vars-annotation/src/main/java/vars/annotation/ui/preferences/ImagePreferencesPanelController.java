@@ -26,7 +26,7 @@ import org.bushe.swing.event.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.UserAccount;
-import vars.annotation.ui.Lookup;
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.eventbus.ImageInterpolationChangedEvent;
 import vars.shared.awt.AWTUtilities;
 import vars.shared.preferences.PreferenceUpdater;
@@ -68,7 +68,7 @@ public class ImagePreferencesPanelController implements PreferenceUpdater {
         // --- Parse and set the imageTarget
         File imageTarget = new File(imageTargetTextField.getText());
         if (!imageTarget.exists() && !imageTarget.canWrite()) {
-            EventBus.publish(Lookup.TOPIC_WARNING,
+            EventBus.publish(StateLookup.TOPIC_WARNING,
                                  "The location, " + imageTargetTextField.getText() +
                                  ", that you specified is not valid");
         }
@@ -83,7 +83,7 @@ public class ImagePreferencesPanelController implements PreferenceUpdater {
         catch (MalformedURLException ex) {
             log.warn("The user specified an invalid URL as an imageTarget. The bogus URL is '" +
                      imageTargetMappingTextField.getText() + "'");
-            EventBus.publish(Lookup.TOPIC_WARNING,
+            EventBus.publish(StateLookup.TOPIC_WARNING,
                              "The location, " + imageTargetTextField.getText() +
                              ", that you specified is not a valid URL");
             return;
@@ -122,7 +122,7 @@ public class ImagePreferencesPanelController implements PreferenceUpdater {
         final JTextField imageTargetTextField = panel.getImageTargetTextField();
         File defaultImageTarget = new File(imageTargetTextField.getText());
         if (!defaultImageTarget.exists() && !defaultImageTarget.canWrite()) {
-            EventBus.publish(Lookup.TOPIC_WARNING,
+            EventBus.publish(StateLookup.TOPIC_WARNING,
                                  "The location, " + imageTargetTextField.getText() +
                                  ", that you specified is not valid or does not exist");
         }
@@ -137,7 +137,7 @@ public class ImagePreferencesPanelController implements PreferenceUpdater {
         catch (MalformedURLException ex) {
             log.warn("The user specified an invalid URL as an imageTarget. The bogus URL is '" +
                      imageTargetMappingTextField.getText() + "'");
-            EventBus.publish(Lookup.TOPIC_WARNING,
+            EventBus.publish(StateLookup.TOPIC_WARNING,
                              "The location, " + imageTargetTextField.getText() +
                              ", that you specified is not a valid URL");
             return;

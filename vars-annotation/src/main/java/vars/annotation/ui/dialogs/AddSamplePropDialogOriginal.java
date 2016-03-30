@@ -15,9 +15,10 @@
 
 package vars.annotation.ui.dialogs;
 
-import java.awt.Frame;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.actions.AddPropertyAction;
 import vars.annotation.ui.actions.AddSamplePropAction;
 import vars.knowledgebase.Concept;
@@ -27,7 +28,6 @@ import vars.knowledgebase.SimpleConceptBean;
 import vars.knowledgebase.SimpleConceptNameBean;
 import vars.annotation.ui.ToolBelt;
 import vars.shared.ui.HierachicalConceptNameComboBox;
-import vars.annotation.ui.Lookup;
 
 /**
  * <p>A dialog that prompts the user for the sampler device and sample number.
@@ -59,7 +59,7 @@ public class AddSamplePropDialogOriginal extends JDialog {
      * @param toolBelt
      */
     public AddSamplePropDialogOriginal(ToolBelt toolBelt) {
-        super((Frame) Lookup.getApplicationFrameDispatcher().getValueObject(), true);
+        super(StateLookup.getAnnotationFrame(), true);
         this.toolBelt = toolBelt;
         initialize();
     }

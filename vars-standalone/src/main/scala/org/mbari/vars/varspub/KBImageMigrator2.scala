@@ -5,17 +5,19 @@ import java.text.SimpleDateFormat
 import java.util.Date
 
 import com.google.inject.Injector
-import java.awt.image.{BufferedImage}
-import java.io.{FileOutputStream, BufferedOutputStream, File}
+import java.awt.image.BufferedImage
+import java.io.{BufferedOutputStream, File, FileOutputStream}
 import java.net.URL
-import java.nio.file.{Files, Paths, Path}
+import java.nio.file.{Files, Path, Paths}
 import javax.imageio.ImageIO
-import org.apache.commons.imaging.formats.tiff.constants.{TiffTagConstants, ExifTagConstants}
+
+import org.apache.commons.imaging.formats.tiff.constants.{ExifTagConstants, TiffTagConstants}
 import org.slf4j.LoggerFactory
+
 import scala.collection.JavaConverters._
 import scala.util.{Failure, Try}
-import vars.knowledgebase.ui.{Lookup, ToolBelt}
-import vars.knowledgebase.{Media, Concept}
+import vars.knowledgebase.ui.{StateLookup, ToolBelt}
+import vars.knowledgebase.{Concept, Media}
 
 /**
  * Fetches representational images registered in the VARS knowledgebase and creates copies
@@ -184,7 +186,7 @@ object KBImageMigrator2 {
     val target = Paths.get(args(0))
     val overlayImageURL = new File(args(1)).toURI.toURL
     implicit val toolbelt = {
-      val injector = Lookup.getGuiceInjectorDispatcher.getValueObject.asInstanceOf[Injector]
+      val injector = StateLookup.GUICE_INJECTOR
       injector.getInstance(classOf[ToolBelt])
     }
     val imageMigrator = new KBImageMigrator2(target, overlayImageURL)

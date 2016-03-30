@@ -3,7 +3,7 @@ package vars.annotation.ui.buttons;
 import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
 import vars.annotation.Observation;
-import vars.annotation.ui.Lookup;
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.commandqueue.Command;
 import vars.annotation.ui.commandqueue.CommandEvent;
 import vars.annotation.ui.commandqueue.impl.EditNotesCmd;
@@ -57,7 +57,7 @@ public class PNotesButton extends PropButton {
         @Override
         public void doAction() {
             final AddCommentAssociationDialog d = getDialog();
-            Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+            Collection<Observation> observations = StateLookup.getSelectedObservations();
             if (observations.size() == 1) {
                 Observation obs = observations.iterator().next();
                 String notes = obs.getNotes();
@@ -73,7 +73,7 @@ public class PNotesButton extends PropButton {
                 dialog.setLocationRelativeTo(PNotesButton.this);
                 dialog.getOkayButton().addActionListener(e -> {
                     Command command = null;
-                    Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+                    Collection<Observation> observations = StateLookup.getSelectedObservations();
                     if (observations.size() == 1) {
                         Observation obs = observations.iterator().next();
                         String oldNotes = obs.getNotes();

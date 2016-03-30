@@ -30,7 +30,6 @@ import javax.swing.border.EmptyBorder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.annotation.ui.Lookup;
 import vars.shared.ui.dialogs.StandardDialog;
 
 /**
@@ -38,6 +37,7 @@ import vars.shared.ui.dialogs.StandardDialog;
  *
  * @version        Enter version here..., 2009.12.09 at 10:16:52 PST
  * @author         Brian Schlining [brian@mbari.org]
+ * @deprecated Need to implement ways to select a videocontrol service
  */
 public class VideoControlServiceDialog extends StandardDialog {
 
@@ -186,6 +186,7 @@ public class VideoControlServiceDialog extends StandardDialog {
                 dispose();
 
                 videoControlService.connect(connectionParameters.getConnectionParameters());
+
                 Lookup.getVideoControlServiceDispatcher().setValueObject(videoControlService);
 
             }

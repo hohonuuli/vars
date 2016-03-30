@@ -19,9 +19,7 @@ import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
 import vars.DAO;
 import vars.annotation.VideoArchive;
-import vars.annotation.VideoArchiveSet;
-import vars.annotation.ui.Lookup;
-import vars.annotation.ui.PersistenceController;
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
 
@@ -38,7 +36,6 @@ public class ChangeAnnotationModeAction extends ActionAdapter {
     /**
      *
      *
-     * @param persistenceController
      */
     public ChangeAnnotationModeAction(ToolBelt toolBelt) {
         super();
@@ -49,10 +46,9 @@ public class ChangeAnnotationModeAction extends ActionAdapter {
      * Sets the formatcode of the VideoArchive retrieved from the
      * VideoArchiveDispatcher
      *
-     * @see org.mbari.vars.annotation.ui.actions.IAction#doAction()
      */
     public void doAction() {
-        VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+        VideoArchive videoArchive = StateLookup.getVideoArchive();
         if (videoArchive != null) {
             // DAOTX
             DAO dao = toolBelt.getAnnotationDAOFactory().newDAO();

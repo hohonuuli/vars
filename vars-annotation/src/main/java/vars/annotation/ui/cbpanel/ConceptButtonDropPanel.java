@@ -44,9 +44,9 @@ import org.mbari.swing.IPopup;
 import org.mbari.swing.SwingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.ToolBelt;
 import vars.shared.ui.StringTransferable;
-import vars.annotation.ui.Lookup;
 
 /**
  * <p>
@@ -195,7 +195,7 @@ public class ConceptButtonDropPanel extends JPanel {
 
         }
         catch (Exception e) {
-            EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+            EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, e);
         }
 
     }

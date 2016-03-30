@@ -11,14 +11,10 @@ import java.util.Collections;
 import javax.swing.*;
 
 import org.mbari.awt.event.ActionAdapter;
-import org.mbari.swing.DefaultListCellEditor;
 import org.mbari.swing.DynamicList;
-import org.mbari.swing.JListMutable;
-import org.mbari.swing.MutableListModel;
-import vars.annotation.ui.Lookup;
+import vars.annotation.ui.StateLookup;
 import vars.shared.ui.dialogs.StandardDialog;
 
-import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
 import org.mbari.swing.ListListModel;
@@ -39,7 +35,7 @@ public class JXHorizontalLinePainterDialog extends StandardDialog {
 	
 	
 	public JXHorizontalLinePainterDialog(JXHorizontalLinePainter painter) {
-        this((Frame) Lookup.getApplicationFrameDispatcher().getValueObject(), painter);
+        this(StateLookup.getAnnotationFrame(), painter);
     }
 
     public JXHorizontalLinePainterDialog(Frame parent, JXHorizontalLinePainter painter) {

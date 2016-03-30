@@ -6,7 +6,7 @@ import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveDAO;
 import vars.annotation.VideoFrame;
 import vars.annotation.VideoFrameDAO;
-import vars.annotation.ui.Lookup;
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.commandqueue.Command;
 import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
@@ -95,7 +95,7 @@ public class MoveVideoFramesCmd implements Command {
         EventBus.publish(new VideoFramesChangedEvent(null, modifiedVideoFrames));
 
         if (refreshVideoArchive) {
-            VideoArchive va = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+            VideoArchive va = StateLookup.getVideoArchive();
             va = dao.find(va);
             EventBus.publish(new VideoArchiveChangedEvent(MoveVideoFramesCmd.this, va));
         }
@@ -139,7 +139,7 @@ public class MoveVideoFramesCmd implements Command {
         EventBus.publish(new VideoFramesChangedEvent(null, modifiedVideoFrames));
 
         if (refreshVideoArchive) {
-            VideoArchive va = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+            VideoArchive va = StateLookup.getVideoArchive();
             va = dao.find(va);
             EventBus.publish(new VideoArchiveChangedEvent(MoveVideoFramesCmd.this, va));
         }

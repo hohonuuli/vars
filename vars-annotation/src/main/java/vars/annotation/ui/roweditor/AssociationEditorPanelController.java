@@ -16,19 +16,15 @@
 package vars.annotation.ui.roweditor;
 
 import com.google.common.collect.ImmutableList;
-import java.util.Collection;
 import org.bushe.swing.event.EventBus;
 import vars.ILink;
 import vars.annotation.Association;
-import vars.annotation.AssociationDAO;
 import vars.annotation.Observation;
-import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.commandqueue.Command;
 import vars.annotation.ui.commandqueue.CommandEvent;
 import vars.annotation.ui.commandqueue.impl.AddAssociationCmd;
 import vars.annotation.ui.commandqueue.impl.ChangeAssociationsCmd;
-import vars.knowledgebase.ConceptDAO;
 
 /**
  *

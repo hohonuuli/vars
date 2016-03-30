@@ -57,7 +57,7 @@ import vars.LinkUtilities;
 import vars.annotation.AnnotationPersistenceService;
 import vars.annotation.Association;
 import vars.annotation.Observation;
-import vars.annotation.ui.Lookup;
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.ToolBelt;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.LinkTemplate;
@@ -498,7 +498,7 @@ public class AssociationEditorPanel extends JPanel {
 
             }
             catch (final Exception e) {
-                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+                EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, e);
                 comboBox.addItem(conceptName);
             }
         }
@@ -571,7 +571,7 @@ public class AssociationEditorPanel extends JPanel {
                     model.addAll(linkTemplates);
                 }
                 catch (Exception e) {
-                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+                    EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, e);
                 }
 
                 /*

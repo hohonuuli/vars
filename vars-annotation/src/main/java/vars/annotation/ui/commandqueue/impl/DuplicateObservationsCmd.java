@@ -2,11 +2,9 @@ package vars.annotation.ui.commandqueue.impl;
 
 import org.bushe.swing.event.EventBus;
 import vars.DAO;
-import vars.UserAccount;
 import vars.annotation.AnnotationFactory;
 import vars.annotation.Observation;
 import vars.annotation.VideoFrame;
-import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.commandqueue.Command;
 import vars.annotation.ui.eventbus.ObservationsAddedEvent;

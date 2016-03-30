@@ -17,11 +17,13 @@ package vars.annotation.ui.actions;
 
 import java.awt.Toolkit;
 import java.util.Date;
+import java.util.concurrent.Future;
 import javax.swing.Action;
 import javax.swing.KeyStroke;
 import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.util.NumberUtilities;
+import org.mbari.vcr4j.VideoIndex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.CacheClearedEvent;
@@ -30,12 +32,13 @@ import vars.UserAccount;
 import vars.annotation.CameraDirections;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.commandqueue.Command;
 import vars.annotation.ui.commandqueue.CommandEvent;
 import vars.annotation.ui.commandqueue.impl.AddObservationCmd;
+import vars.avplayer.VideoController;
 import vars.knowledgebase.ConceptName;
 import vars.annotation.ui.ToolBelt;
-import vars.annotation.ui.Lookup;
 
 /**
  * <p>Action to add a new VideoFrame and a 'nearly' empty Observation
@@ -123,14 +126,18 @@ public final class NewObservationAction extends ActionAdapter {
         Observation observation = null;
 
         // Need the VCR to get a current timecode
-        VideoControlService videoService = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
-        if (videoService != null) {
+        VideoController videoController = StateLookup.getVideoController();
+        //VideoControlService videoService = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
+        if (videoController != null) {
             try {
+                Future<VideoIndex> videoIndexFuture = videoController.getVideoIndex();
+                // TODO this needs to grab all components of the videoIndex and update those values in VARS
+
                 final String timecode = videoService.getVcrTimecode().toString();
                 observation = doAction(conceptName, timecode);
             }
             catch (Exception e) {
-                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+                EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, e);
             }
         }
 
@@ -150,12 +157,15 @@ public final class NewObservationAction extends ActionAdapter {
         Observation observation = null;
 
         // Need a videoArchive to add a VideoFrame too.
-        VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
-        final VideoControlService videoService = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
+        VideoArchive videoArchive = StateLookup.getVideoArchive();
+        final VideoController videoController = StateLookup.getVideoController();
+
+        // TODO use new VCR4J v3 - should get and parse parts of video index
+        //final VideoControlService videoService = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
         if (videoArchive != null) {
 
             if ((conceptName != null) && (timecode != null)) {
-                UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+                UserAccount userAccount = StateLookup.getUserAccount();
 
                 String person = userAccount.getUserName();
                 if (person == null) {
@@ -185,7 +195,7 @@ public final class NewObservationAction extends ActionAdapter {
                     utcDate = new Date((long) epicSeconds * 1000L);
                 }
 
-                CameraDirections cameraDirections = (CameraDirections) Lookup.getCameraDirectionDispatcher().getValueObject();
+                CameraDirections cameraDirections = StateLookup.getCameraDirection();
                 final String cameraDirection = cameraDirections.getDirection();
 
 

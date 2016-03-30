@@ -88,13 +88,13 @@ public class App {
         splashFrame.setMessage(" Initializing configuration ...");
         splashFrame.setVisible(true);
 
-        final Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
+        final Injector injector = StateLookup.GUICE_INJECTOR;
         try {
             toolBelt = injector.getInstance(ToolBelt.class);
         }
         catch (Exception e) {
             Exception ex = new RuntimeException("Initialization failed. Perhaps VARS can't connect to the database", e);
-            (new FatalExceptionSubscriber(null)).onEvent(Lookup.TOPIC_FATAL_ERROR, ex);
+            (new FatalExceptionSubscriber(null)).onEvent(StateLookup.TOPIC_FATAL_ERROR, ex);
         }
 
         // HACK - For failed initialization... e.g. Database isn't running.
@@ -113,9 +113,9 @@ public class App {
             toolBelt.getMiscDAOFactory().newUserAccountDAO().findAll();
         }
         catch (Exception e) {
-            (new FatalExceptionSubscriber(null)).onEvent(Lookup.TOPIC_FATAL_ERROR, e);
+            (new FatalExceptionSubscriber(null)).onEvent(StateLookup.TOPIC_FATAL_ERROR, e);
         }
-        Lookup.getApplicationDispatcher().setValueObject(this);
+        StateLookup.setApp(this);
 
         /*
          * Preload the knowledgebase in the Foxtrot worker thread!!
@@ -133,10 +133,11 @@ public class App {
         });
 
         splashFrame.setMessage("Assembling the user interface ...");
-        Lookup.getSelectedObservationsDispatcher().setValueObject(new Vector<Observation>());
+        StateLookup.setSelectedObservations(new Vector<>());
 
         // Connect to the ImageCaptureService
-        Lookup.getImageCaptureServiceDispatcher().setValueObject(injector.getInstance(ImageCaptureService.class));
+        // TODO Do we need to set a default imagecaptureservice??
+       // Lookup.getImageCaptureServiceDispatcher().setValueObject(injector.getInstance(ImageCaptureService.class));
 
         // Configure EventBus
         EventTopicSubscriber fatalErrorSubscriber = new FatalExceptionSubscriber(getAnnotationFrame());
@@ -151,15 +152,15 @@ public class App {
         GC_PREVENTION.add(exitSubscriber);
         GC_PREVENTION_EVENTS.add(loggingSubscriber);
 
-        EventBus.subscribe(Lookup.TOPIC_FATAL_ERROR, fatalErrorSubscriber);
-        EventBus.subscribe(Lookup.TOPIC_NONFATAL_ERROR, nonFatalErrorSubscriber);
-        EventBus.subscribe(Lookup.TOPIC_WARNING, warningSubscriber);
-        EventBus.subscribe(Lookup.TOPIC_EXIT, exitSubscriber);
+        EventBus.subscribe(StateLookup.TOPIC_FATAL_ERROR, fatalErrorSubscriber);
+        EventBus.subscribe(StateLookup.TOPIC_NONFATAL_ERROR, nonFatalErrorSubscriber);
+        EventBus.subscribe(StateLookup.TOPIC_WARNING, warningSubscriber);
+        EventBus.subscribe(StateLookup.TOPIC_EXIT, exitSubscriber);
         EventBus.subscribe(VideoArchiveChangedEvent.class, loggingSubscriber);
 
-        JFrame frame = getAnnotationFrame();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        Lookup.getApplicationFrameDispatcher().setValueObject(frame);
+        AnnotationFrame frame = getAnnotationFrame();
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        StateLookup.setAnnotationFrame(frame);
         frame.pack();
         splashFrame.dispose();
         frame.setVisible(true);

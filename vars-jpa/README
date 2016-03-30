@@ -10,24 +10,24 @@ methods are query methods.
 Working with the Concepts:
 
 To insert into the database:
-	NOTE: inserts cascade. Inserting a concept will insert all it's children.
+	NOTE: inserts cascade. Inserting a selectedConcept will insert all it's children.
   Example:
-	// Assume you've already created a concept here
-	Concept concept; 
-	// ---- Step 1: You need to make sure you're working with a persisted parent concept!!
+	// Assume you've already created a selectedConcept here
+	Concept selectedConcept;
+	// ---- Step 1: You need to make sure you're working with a persisted parent selectedConcept!!
 	Concept parentConcept = dao.findByName('something') 
 	// ---- Step 2: Add Concept to parent
-	parentConcept.addChildConcept(concept);
+	parentConcept.addChildConcept(selectedConcept);
 	// ---- Step 3: insert
-	dao.persist(concept) // OR dao.update(parentConcept)
+	dao.persist(selectedConcept) // OR dao.update(parentConcept)
 		
 To delete from the database:
 	NOTE: Deletes cascade to the childConcepts but NOT to the parent.
   Example:
 	// ---- Step 1: Detach from the parent
-	concept.getParentConcept().removeChildConcept(concept);
+	selectedConcept.getParentConcept().removeChildConcept(selectedConcept);
 	// ---- Step 2: Execute delete
-	dao.makeTransient(concept);
+	dao.makeTransient(selectedConcept);
 	
 	
 Creating your database:

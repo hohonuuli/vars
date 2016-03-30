@@ -26,7 +26,7 @@ import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.ConceptNameTypes;
 import vars.knowledgebase.KnowledgebaseFactory;
-import vars.knowledgebase.ui.Lookup;
+import vars.knowledgebase.ui.StateLookup;
 import vars.knowledgebase.ui.ToolBelt;
 import vars.shared.ui.dialogs.CreateUserAccountDialog;
 
@@ -83,7 +83,7 @@ public class PopulateDatabaseAction extends ActionAdapter {
         
         if (!gotRoot) {
 
-            final Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
+            final Frame frame = StateLookup.getApplicationFrame();
 
             int ok = JOptionPane.showConfirmDialog(frame,
                          "Unable to find the root of the knowledgebase. Do you want to create one?",
@@ -120,8 +120,7 @@ public class PopulateDatabaseAction extends ActionAdapter {
         boolean gotAdmins = (admins.size() != 0);
         
         if (!gotAdmins) {
-            
-            final Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
+            final Frame frame = StateLookup.getApplicationFrame();
 
             // create an admin
             int ok = JOptionPane.showConfirmDialog(frame,

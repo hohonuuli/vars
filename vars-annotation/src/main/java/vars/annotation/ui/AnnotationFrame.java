@@ -40,6 +40,7 @@ import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.annotation.AnnotationProcessor;
 import org.bushe.swing.event.annotation.EventSubscriber;
 import org.mbari.vcr4j.IVCR;
+import org.mbari.vcr4j.time.Timecode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.DAO;
@@ -67,6 +68,7 @@ import vars.annotation.ui.table.ObservationTable;
 import vars.annotation.ui.table.ObservationTableModel;
 import vars.annotation.ui.video.VideoControlPanel;
 import vars.annotation.ui.videoset.VideoArchiveSetEditorButton;
+import vars.avplayer.VideoController;
 
 /**
  *
@@ -271,9 +273,9 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
                         }
                         // TODO add check to see if the selected observations are different thant
                         // the previously selected observations BEFORE sending this
-                        Collection<Observation> oldObservations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
-                        Set<Observation> oldSelectedObservations = new HashSet<Observation>(oldObservations);
-                        if (!Sets.symmetricDifference(new HashSet<Observation>(selectedObservations), oldSelectedObservations).isEmpty()) {
+                        Collection<Observation> oldObservations = StateLookup.getSelectedObservations();
+                        Set<Observation> oldSelectedObservations = new HashSet<>(oldObservations);
+                        if (!Sets.symmetricDifference(new HashSet<>(selectedObservations), oldSelectedObservations).isEmpty()) {
                             EventBus.publish(new ObservationsSelectedEvent(table, selectedObservations));
                         }
                     }
@@ -285,7 +287,7 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
              */
             table.setComponentPopupMenu(getTablePopupMenu());
 
-            Lookup.getObservationTableDispatcher().setValueObject(table);
+            StateLookup.setObservationTable(table);
 
         }
 
@@ -297,19 +299,19 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
             tablePopupMenu = new JPopupMenu();
             JMenuItem seekItem = new JMenuItem("Seek to this timecode");
             tablePopupMenu.add(seekItem);
-            Lookup.getSelectedObservationsDispatcher().addPropertyChangeListener((evt) -> {
-                Collection<Observation> observations = (Collection<Observation>) evt.getNewValue();
-                seekItem.setEnabled(observations.size() == 1);
-            });
+            StateLookup.selectedObservationsProperty()
+                    .addListener((obs, oldVal, observations) -> seekItem.setEnabled(observations.size() == 1));
+
 
             seekItem.addActionListener((e) -> {
-                VideoControlService vcr = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
-                if (vcr != null) {
+                VideoController controller = StateLookup.getVideoController();
+                if (controller != null) {
                     // Get selected annotation
-                    Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+                    Collection<Observation> observations = StateLookup.getSelectedObservations();
                     if (observations.size() == 1) {
                         Observation obs = observations.iterator().next();
-                        vcr.seek(obs.getVideoFrame().getTimecode());
+                        Timecode timecode = new Timecode(obs.getVideoFrame().getTimecode());
+                        controller.seek(timecode);
                     }
                 }
             });
@@ -368,12 +370,10 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
     private VideoControlPanel getVideoControlPanel() {
         if (videoControlPanel == null) {
             videoControlPanel = new VideoControlPanel();
-            Lookup.getVideoControlServiceDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
 
-                public void propertyChange(PropertyChangeEvent evt) {
-                    videoControlPanel.setVcr((IVCR) evt.getNewValue());
-                }
-            });
+            StateLookup.videoControllerProperty()
+                    .addListener((obs, oldVal, newVal) -> videoControlPanel.setVcr(newVal));
+
         }
 
         return videoControlPanel;

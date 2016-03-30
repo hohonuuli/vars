@@ -1,26 +1,28 @@
 package vars.annotation.ui;
 
-import com.google.common.base.Preconditions;
+import com.google.inject.Guice;
 import com.google.inject.Injector;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import vars.UserAccount;
+import org.bushe.swing.event.EventBus;
 import vars.VarsUserPreferencesFactory;
 import vars.annotation.CameraDirections;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.table.ObservationTable;
 import vars.avplayer.VideoController;
+import vars.shared.ui.GlobalStateLookup;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.prefs.Preferences;
+import java.util.prefs.PreferencesFactory;
 
 /**
  * @author Brian Schlining
  * @since 2016-03-29T13:02:00
  */
-public class StateLookup {
+public class StateLookup extends GlobalStateLookup {
 
     public static final String RESOURCE_BUNDLE = "annotation-app";
     /**
@@ -42,9 +44,10 @@ public class StateLookup {
      */
     public static final String TOPIC_SELECT_CONCEPT = "vars-annotation.ui.Lookup-SelectedConcept";
 
-    private static final ObjectProperty<UserAccount> userAccount = new SimpleObjectProperty<>();
+
+    //private static final ObjectProperty<UserAccount> userAccount = new SimpleObjectProperty<>();
     private static final ObjectProperty<CameraDirections> cameraDirection = new SimpleObjectProperty<>();
-    private static Injector injector;
+    public static final Injector GUICE_INJECTOR = Guice.createInjector(new InjectorModule("vars-jpa-annotation", "vars-jpa-knowledgebase", "vars-jpa-misc"));
     private static final ObjectProperty<VideoController> videoController = new SimpleObjectProperty<>();
     private static final ObjectProperty<ObservationTable> observationTable = new SimpleObjectProperty<>();
     private static final ObjectProperty<Preferences> preferences = new SimpleObjectProperty<>();
@@ -53,17 +56,39 @@ public class StateLookup {
     private static final ObjectProperty<Collection<Observation>> selectedObservations = new SimpleObjectProperty<>(new ArrayList<>());
     private static AnnotationFrame annotationFrame;
     private static App app;
+    public static PreferencesFactory PREFERENCES_FACTORY = GUICE_INJECTOR.getInstance(PreferencesFactory.class);
 
 
     static {
-        userAccount.addListener((obs, oldVal, newVal) -> {
+        userAccountProperty().addListener((obs, oldVal, newVal) -> {
             Preferences prefs = null;
             if (newVal != null) {
-                VarsUserPreferencesFactory factory = injector.getInstance(VarsUserPreferencesFactory.class);
+                VarsUserPreferencesFactory factory = GUICE_INJECTOR .getInstance(VarsUserPreferencesFactory.class);
                 prefs = factory.userRoot(newVal.getUserName());
             }
             preferences.set(prefs);
         });
+
+        videoController.addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                oldVal.close();
+            }
+        });
+
+        userAccountProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal == null) {
+                setPreferences(null);
+            }
+            else {
+                VarsUserPreferencesFactory factory = GUICE_INJECTOR.getInstance(VarsUserPreferencesFactory.class);
+                Preferences prefs = factory.userRoot(newVal.getUserName());
+                setPreferences(prefs);
+            }
+        });
+
+        EventBus.subscribe(TOPIC_REFRESH, LOGGING_SUBSCRIBER);
+        EventBus.subscribe(TOPIC_DATABASE_STATUS, LOGGING_SUBSCRIBER);
+
     }
 
 
@@ -92,7 +117,7 @@ public class StateLookup {
     }
 
     public Injector getInjector() {
-        return injector;
+        return GUICE_INJECTOR ;
     }
 
     public static VideoController getVideoController() {
@@ -105,10 +130,6 @@ public class StateLookup {
 
     public static void setVideoController(VideoController videoController) {
         StateLookup.videoController.set(videoController);
-    }
-
-    public void setInjector(Injector injector) {
-        this.injector = injector;
     }
 
     public static ObservationTable getObservationTable() {
@@ -136,16 +157,29 @@ public class StateLookup {
     }
 
     public static Collection<Observation> getSelectedObservations() {
-        return selectedObservations.get();
+        Collection<Observation> obs = selectedObservations.get();
+        if (obs == null || obs.isEmpty()) {
+            return new ArrayList<>();
+        }
+        else {
+            return new ArrayList<>(obs);
+        }
     }
 
     public static ObjectProperty<Collection<Observation>> selectedObservationsProperty() {
         return selectedObservations;
     }
 
+    /**
+     * Makes a copy
+     * @param selectedObservations
+     */
     public static void setSelectedObservations(Collection<Observation> selectedObservations) {
         if (selectedObservations == null) {
             selectedObservations = new ArrayList<>();
+        }
+        else {
+            selectedObservations = new ArrayList<>(selectedObservations);
         }
         StateLookup.selectedObservations.set(selectedObservations);
     }
@@ -166,15 +200,4 @@ public class StateLookup {
         StateLookup.app = app;
     }
 
-    public static UserAccount getUserAccount() {
-        return userAccount.get();
-    }
-
-    public static ObjectProperty<UserAccount> userAccountProperty() {
-        return userAccount;
-    }
-
-    public static void setUserAccount(UserAccount userAccount) {
-        StateLookup.userAccount.set(userAccount);
-    }
 }

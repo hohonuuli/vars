@@ -414,7 +414,7 @@ public class LinkRealizationEditorPanel extends EditorPanel {
              */
             String toConceptAsString = null;
             if (matchingLinkTemplates.isEmpty()) {
-                EventBus.publish(Lookup.TOPIC_WARNING, "Unable to find a LinkTemplate that matches '" + link + "'");
+                EventBus.publish(StateLookup.TOPIC_WARNING, "Unable to find a LinkTemplate that matches '" + link + "'");
                 toConceptAsString = link.getToConcept();
             }
             else {
@@ -456,7 +456,7 @@ public class LinkRealizationEditorPanel extends EditorPanel {
                         }
                         catch (Exception e) {
                             log.error("", e);
-                            EventBus.publish(Lookup.TOPIC_WARNING,
+                            EventBus.publish(StateLookup.TOPIC_WARNING,
                                              "A database error occurred. Try refreshing the knowledgebase");
                             concept = NIL_CONCEPT;
                             selectedConcept = NIL_CONCEPT;
@@ -492,7 +492,7 @@ public class LinkRealizationEditorPanel extends EditorPanel {
          */
         @Override
         public void doAction() {
-            final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+            final UserAccount userAccount = StateLookup.getUserAccount();
             if ((userAccount != null) && !userAccount.isReadOnly()) {
 
                 JList linkList = getLinkList();
@@ -509,7 +509,7 @@ public class LinkRealizationEditorPanel extends EditorPanel {
                     dao.endTransaction();
                     dao.close();
 
-                    EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
+                    EventBus.publish(StateLookup.TOPIC_APPROVE_HISTORY, history);
                 }
             }
         }
@@ -518,8 +518,8 @@ public class LinkRealizationEditorPanel extends EditorPanel {
 
     private class NewAction extends ActionAdapter {
 
-        private final AddLinkRealizationDialog dialog = new AddLinkRealizationDialog(
-            (Frame) Lookup.getApplicationFrameDispatcher().getValueObject(), getToolBelt());
+        private final AddLinkRealizationDialog dialog = new AddLinkRealizationDialog(StateLookup.getApplicationFrame(),
+            getToolBelt());
 
         /**
          */
@@ -536,7 +536,7 @@ public class LinkRealizationEditorPanel extends EditorPanel {
          */
         @Override
         public void doAction() {
-            final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+            final UserAccount userAccount = StateLookup.getUserAccount();
             if ((userAccount != null) && !userAccount.isReadOnly()) {
                 JList linkList = getLinkList();
                 LinkRealization linkRealization = (LinkRealization) linkList.getSelectedValue();
@@ -585,7 +585,7 @@ public class LinkRealizationEditorPanel extends EditorPanel {
                 dao.endTransaction();
                 dao.close();
 
-                EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
+                EventBus.publish(StateLookup.TOPIC_APPROVE_HISTORY, history);
 
             }
         }

@@ -26,7 +26,7 @@ import vars.annotation.CameraData;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoFrame;
-import vars.annotation.ui.Lookup;
+import vars.annotation.ui.StateLookup;
 
 /**
  *
@@ -512,7 +512,7 @@ public class JXObservationTableColumnModel extends DefaultTableColumnModelExt {
          */
         public final static String ID = "Recorded Date";
 
-        public final DateFormat dateFormat = Lookup.DATE_FORMAT_UTC;
+        public final DateFormat dateFormat = StateLookup.getUTCDateFormat();
 
         public RecordedDateColumn() {
             super(ID, COLUMN_INDEX, 180);

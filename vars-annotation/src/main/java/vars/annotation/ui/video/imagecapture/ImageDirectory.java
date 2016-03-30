@@ -24,7 +24,7 @@ import vars.UserAccount;
 import vars.annotation.CameraDeployment;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveSet;
-import vars.annotation.ui.Lookup;
+import vars.annotation.ui.StateLookup;
 import vars.shared.preferences.PreferencesService;
 
 /**
@@ -50,7 +50,7 @@ public class ImageDirectory {
      *
      */
     public ImageDirectory() {
-        preferencesService = new PreferencesService(Lookup.getPreferencesFactory());
+        preferencesService = new PreferencesService(StateLookup.PREFERENCES_FACTORY);
     }
 
     /**
@@ -62,13 +62,13 @@ public class ImageDirectory {
      * @throws java.io.IOException If unable to create or write to the image directory
      */
     public File getImageDirectory() throws IOException {
-        final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+        UserAccount userAccount = StateLookup.getUserAccount();
         final String hostname = preferencesService.getHostname();
         File imageTarget = preferencesService.findImageTarget(userAccount.getUserName(), hostname);
 
 
         // Get the platform name. Defaults to unknown
-        final VideoArchive va = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+        final VideoArchive va = StateLookup.getVideoArchive();
         final VideoArchiveSet vas = va.getVideoArchiveSet();
         String platform = UNKNOWN_PLATFORM;
         if (vas != null) {

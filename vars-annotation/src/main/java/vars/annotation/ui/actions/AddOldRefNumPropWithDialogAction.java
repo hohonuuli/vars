@@ -31,9 +31,9 @@ import vars.annotation.AnnotationPersistenceService;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveSet;
+import vars.annotation.ui.StateLookup;
 import vars.knowledgebase.Concept;
 import vars.annotation.ui.ToolBelt;
-import vars.annotation.ui.Lookup;
 
 /**
  * <p>Adds 'identity-reference | self | [some integer]' property to the Observation set in
@@ -68,13 +68,12 @@ public class AddOldRefNumPropWithDialogAction extends ActionAdapter {
         /*
          * Get all the existing reference numbers in a VideoArchive
          */
-        final VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+        final VideoArchive videoArchive = StateLookup.getVideoArchive();
         if (videoArchive == null) {
             return;
         }
 
-        final Collection<Observation> observations = (Collection<Observation>)
-                Lookup.getSelectedObservationsDispatcher().getValueObject();
+        final Collection<Observation> observations = StateLookup.getSelectedObservations();
         if (observations.size() == 0) {
             return;
         }
@@ -82,7 +81,7 @@ public class AddOldRefNumPropWithDialogAction extends ActionAdapter {
         String conceptName = observations.iterator().next().getConceptName();
         for (Observation observation : observations) {
             if (!observation.getConceptName().equals(conceptName)) {
-                EventBus.publish(Lookup.TOPIC_WARNING,
+                EventBus.publish(StateLookup.TOPIC_WARNING,
                                  "The selected observations must all contain the same conceptname");
                 return;
             }
@@ -98,7 +97,7 @@ public class AddOldRefNumPropWithDialogAction extends ActionAdapter {
         }
         catch (final Exception e) {
             log.error("Failed to lookup a concept in the knowledebase", e);
-            EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+            EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, e);
             return;
         }
 
@@ -108,7 +107,7 @@ public class AddOldRefNumPropWithDialogAction extends ActionAdapter {
          * allowing the user to select.
          */
         if (refNums.size() == 0) {
-            EventBus.publish(Lookup.TOPIC_WARNING,
+            EventBus.publish(StateLookup.TOPIC_WARNING,
                              "<html><body>No reference numbers for " + conceptName +
                              " were found. Use 'New #' instead.</body></html>");
         }
@@ -117,7 +116,7 @@ public class AddOldRefNumPropWithDialogAction extends ActionAdapter {
             final Object[] choices = refNums.toArray(new String[refNums.size()]);
             Arrays.sort(choices, COMPARATOR);
             final String i = (String) JOptionPane.showInputDialog(
-                (Frame) Lookup.getApplicationFrameDispatcher().getValueObject(), "Select a reference number",
+                    StateLookup.getAnnotationFrame(), "Select a reference number",
                 "VARS - Select Reference Number", JOptionPane.PLAIN_MESSAGE, null, choices, choices[0]);
 
             // If a string was returned, say so.

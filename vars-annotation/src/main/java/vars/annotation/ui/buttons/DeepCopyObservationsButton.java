@@ -23,12 +23,12 @@ import javax.swing.KeyStroke;
 import org.bushe.swing.event.annotation.AnnotationProcessor;
 import org.bushe.swing.event.annotation.EventSubscriber;
 import org.mbari.swing.SwingUtils;
-import org.mbari.vcr4j.IVCR;
 import vars.UserAccount;
-import vars.annotation.ui.Lookup;
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.actions.DeepCopyObservationsAction;
 import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
+import vars.avplayer.VideoController;
 import vars.shared.ui.FancyButton;
 
 /**
@@ -58,10 +58,9 @@ public class DeepCopyObservationsButton extends FancyButton {
 
     @EventSubscriber(eventClass = ObservationsSelectedEvent.class)
     public void respondTo(ObservationsSelectedEvent event) {
-        final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
-        final VideoControlService videoService = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
-        final IVCR vcr = videoService;
-        boolean enabled = (userAccount != null) && (event.get().size() > 0) && (vcr != null);
+        final UserAccount userAccount = StateLookup.getUserAccount();
+        final VideoController videoController = StateLookup.getVideoController();
+        boolean enabled = (userAccount != null) && (event.get().size() > 0) && (videoController != null);
         setEnabled(enabled);
         getAction().setEnabled(enabled);
     }

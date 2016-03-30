@@ -2,11 +2,13 @@ package org.mbari.vars.integration
 
 import org.slf4j.LoggerFactory
 import vars.ToolBelt
-import vars.knowledgebase.ui.Lookup
 import com.google.inject.Injector
 import java.net.URL
 import java.util.Arrays
-import vars.annotation.{CameraDataDAO, CameraData}
+
+import vars.annotation.{CameraData, CameraDataDAO}
+import vars.knowledgebase.ui.StateLookup
+
 import scala.collection.JavaConversions._
 
 /**
@@ -102,7 +104,7 @@ object ImageReferenceFixer {
     val PNG_KEY: Array[Byte] = Array[Byte](0xFF.asInstanceOf[Byte], 0xD8.asInstanceOf[Byte], 0xFF.asInstanceOf[Byte])
 
     lazy val toolBelt = {
-        val injector = Lookup.getGuiceInjectorDispatcher.getValueObject.asInstanceOf[Injector]
+        val injector = StateLookup.GUICE_INJECTOR;
         injector.getInstance(classOf[ToolBelt])
     }
 

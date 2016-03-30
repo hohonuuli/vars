@@ -17,21 +17,25 @@ package vars.annotation.ui.actions;
 
 import java.awt.Toolkit;
 import java.util.Collection;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import javax.swing.Action;
 import javax.swing.KeyStroke;
 
 import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
+import org.mbari.vcr4j.VideoIndex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.UserAccount;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
-import vars.annotation.ui.Lookup;
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.commandqueue.Command;
 import vars.annotation.ui.commandqueue.CommandEvent;
 import vars.annotation.ui.commandqueue.impl.CopyObservationsCmd;
+import vars.avplayer.VideoController;
 
 /**
  * <p>
@@ -68,22 +72,33 @@ public final class DeepCopyObservationsAction extends ActionAdapter {
     public void doAction() {
 
         // Need a videoArchive to add a VideoFrame too.
-        VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
-        final VideoControlService videoControlService = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
-        if ((videoArchive != null) && (videoControlService != null)) {
+        VideoArchive videoArchive = StateLookup.getVideoArchive();
+        final VideoController videoController = StateLookup.getVideoController();
+        //final VideoControlService videoControlService = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
+        if ((videoArchive != null) && (videoController != null)) {
 
 
-            Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+            Collection<Observation> observations = StateLookup.getSelectedObservations();
             if (observations.size() == 0) {
                 return;
             }
-            final VideoTime videoTime = videoControlService.requestVideoTime();
-            UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
-            String user = userAccount != null ? userAccount.getUserName() : UserAccount.USERNAME_DEFAULT;
 
-            Command command = new CopyObservationsCmd(videoArchive.getName(), videoTime, user, observations, true);
-            CommandEvent commandEvent = new CommandEvent(command);
-            EventBus.publish(commandEvent);
+            try {
+                final Future<VideoIndex> videoIndexFuture = videoController.getVideoIndex();
+                final VideoIndex videoIndex = videoIndexFuture.get(3, TimeUnit.SECONDS);
+                UserAccount userAccount = StateLookup.getUserAccount();
+
+                final VideoTime videoTime = videoControlService.requestVideoTime();
+                String user = userAccount != null ? userAccount.getUserName() : UserAccount.USERNAME_DEFAULT;
+
+                Command command = new CopyObservationsCmd(videoArchive.getName(), videoTime, user, observations, true);
+                CommandEvent commandEvent = new CommandEvent(command);
+                EventBus.publish(commandEvent);
+            }
+            catch (Exception e) {
+                EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR,
+                        "Timed-out waiting for videoindex from " + videoController);
+            }
 
         }
         else {

@@ -25,7 +25,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.SwingUtilities;
 import org.mbari.swing.SwingUtils;
-import org.mbari.util.Dispatcher;
 import org.mbari.util.IObserver;
 import org.mbari.vcr4j.IVCR;
 import org.mbari.vcr4j.IVCRState;
@@ -53,7 +52,7 @@ public class StatusLabelForVcr extends StatusLabel {
         setText(NO_CONNECTION);
 
 
-        Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
+        Frame frame = StateLookup.getAnnotationFrame();
         VideoControlServiceDialog videoDialog = new VideoControlServiceDialog(frame);
 
         /*
@@ -69,10 +68,13 @@ public class StatusLabelForVcr extends StatusLabel {
          * old obj are equal, so we have to set it to null and then back to
          * it's value to trigger a notification.
          */
-        final Dispatcher dispatcher = Lookup.getVideoControlServiceDispatcher();
-        final VideoControlService videoService = (VideoControlService) dispatcher.getValueObject();
+        // TODO replace with VideoController code
+        //VideoController videoController = StateLookup.getVideoController();
+        //final Dispatcher dispatcher = Lookup.getVideoControlServiceDispatcher();
+        //final VideoControlService videoService = (VideoControlService) dispatcher.getValueObject();
         final IVCR vcr = (videoService == null) ? null : videoService;
 
+        //StateLookup.videoControllerProperty().addListener((obs, oldVal, newVal) -> setVcr(newVal));
         dispatcher.addPropertyChangeListener(new VcrListener());
         setVcr(vcr);
 
@@ -180,20 +182,18 @@ public class StatusLabelForVcr extends StatusLabel {
          */
         public UserAccountListener(VideoControlServiceDialog dialog) {
             this.dialog = dialog;
-            preferencesService = new PreferencesService(Lookup.getPreferencesFactory());
+            preferencesService = new PreferencesService(StateLookup.PREFERENCES_FACTORY);
 
-            dialog.getOkayButton().addActionListener(new ActionListener() {
+            dialog.getOkayButton().addActionListener( e -> {
+                UserAccount userAccount = StateLookup.getUserAccount();
+                String host = UserAccountListener.this.dialog.getUdpPanel().getHostTextField().getText();
+                String port = UserAccountListener.this.dialog.getUdpPanel().getPortTextField().getText();
+                host = (host == null) ? preferencesService.getHostname() : host;
+                port = (port == null) ? "9000" : port;
+                preferencesService.persistVcrUrl(userAccount.getUserName(), preferencesService.getHostname(), host,
+                                                 port);
 
-                public void actionPerformed(ActionEvent e) {
-                    UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
-                    String host = UserAccountListener.this.dialog.getUdpPanel().getHostTextField().getText();
-                    String port = UserAccountListener.this.dialog.getUdpPanel().getPortTextField().getText();
-                    host = (host == null) ? preferencesService.getHostname() : host;
-                    port = (port == null) ? "9000" : port;
-                    preferencesService.persistVcrUrl(userAccount.getUserName(), preferencesService.getHostname(), host,
-                                                     port);
 
-                }
 
             });
         }

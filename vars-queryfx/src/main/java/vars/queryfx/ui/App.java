@@ -9,7 +9,7 @@ import javafx.application.Platform;
 import javafx.scene.paint.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.queryfx.Lookup;
+import vars.queryfx.StateLookup;
 import vars.shared.rx.RXEventBus;
 import vars.queryfx.ToolBelt;
 import vars.queryfx.beans.ConceptSelection;
@@ -211,7 +211,7 @@ public class App {
             mainLog.info("This application was launched at " + date.toString());
         }
 
-        Injector injector = Lookup.getInjector();
+        Injector injector = StateLookup.getInjector();
         ToolBelt toolBelt = injector.getInstance(ToolBelt.class);
 
         // Check that we can connect to the database. JDBC driver doesn't seem to get initialize
@@ -227,7 +227,7 @@ public class App {
 
 
         App app = new App(toolBelt);
-        Lookup.setApp(app);
+        StateLookup.setApp(app);
         ImageFX.setIsJavaFXRunning(true);
         app.getApplication().setPrefSize(800, 800);
         app.getApplication().setStopCallback(() -> System.exit(0));

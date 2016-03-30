@@ -18,20 +18,14 @@ package vars.annotation.ui.actions;
 import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
 import javax.swing.Action;
 import javax.swing.KeyStroke;
 
 import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
-import vars.DAO;
 import vars.UserAccount;
-import vars.annotation.AnnotationFactory;
 import vars.annotation.Observation;
-import vars.annotation.VideoFrame;
-import vars.annotation.ui.Lookup;
-import vars.annotation.ui.PersistenceController;
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.commandqueue.Command;
 import vars.annotation.ui.commandqueue.CommandEvent;
@@ -63,11 +57,9 @@ public final class DuplicateObservationAction extends ActionAdapter {
     /**
      */
     public void doAction() {
-
-        final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
-        Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher()
-            .getValueObject();
-        observations = new ArrayList<Observation>(observations);    // Copy to avoid threading issues
+        final UserAccount userAccount = StateLookup.getUserAccount();
+        Collection<Observation> observations = StateLookup.getSelectedObservations();
+        observations = new ArrayList<>(observations);    // Copy to avoid threading issues
         String name = userAccount.getUserName();
         Command command = new DuplicateObservationsCmd(name, observations, true);
         CommandEvent commandEvent = new CommandEvent(command);

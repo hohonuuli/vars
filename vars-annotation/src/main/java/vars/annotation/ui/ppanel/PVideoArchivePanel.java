@@ -31,6 +31,7 @@ import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.awt.event.NonDigitConsumingKeyListener;
 import org.mbari.swing.PropertyPanel;
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.commandqueue.Command;
 import vars.annotation.ui.commandqueue.CommandEvent;
 import vars.annotation.ui.commandqueue.impl.ChangeSequenceNumberCmd;
@@ -43,10 +44,8 @@ import vars.annotation.VideoFrame;
 import vars.annotation.CameraDeployment;
 import vars.annotation.Observation;
 import vars.annotation.ui.ToolBelt;
-import vars.annotation.ui.Lookup;
 import vars.annotation.ui.commandqueue.impl.RenameVideoArchiveCmd;
 import vars.annotation.ui.dialogs.RenameVideoArchiveDialog;
-import vars.shared.ui.dialogs.StandardDialog;
 
 /**
  * <p>
@@ -94,8 +93,7 @@ public class PVideoArchivePanel extends PropertiesPanel {
         p = getPropertyPanel("shipName");
         final JTextField f2 = p.getValueField();
         f2.addActionListener(e -> {
-
-            Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+            Collection<Observation> observations = StateLookup.getSelectedObservations();
             observations = new ArrayList<>(observations); // Make a copy to avoid sync issues.
             if (observations.size() == 1) {
 
@@ -120,7 +118,7 @@ public class PVideoArchivePanel extends PropertiesPanel {
         p = getPropertyPanel("platformName");
         final JTextField f3 = p.getValueField();
         f3.addActionListener(e -> {
-            Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+            Collection<Observation> observations = StateLookup.getSelectedObservations();
             observations = new ArrayList<>(observations); // Make a copy to avoid sync issues.
             if (observations.size() == 1) {
                 final Observation obs = observations.iterator().next();
@@ -145,7 +143,7 @@ public class PVideoArchivePanel extends PropertiesPanel {
         f4.addKeyListener(new NonDigitConsumingKeyListener());
         f4.addActionListener(e -> {
 
-            Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+            Collection<Observation> observations = StateLookup.getSelectedObservations();
             observations = new ArrayList<>(observations); // Make a copy to avoid sync issues.
             if (observations.size() == 1) {
                 final Observation obs = observations.iterator().next();
@@ -191,7 +189,7 @@ public class PVideoArchivePanel extends PropertiesPanel {
         if (changeNameDialog == null) {
             changeNameDialog = new RenameVideoArchiveDialog(SwingUtilities.getWindowAncestor(this), toolBelt);
             changeNameDialog.getOkayButton().addActionListener(e -> {
-                VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+                VideoArchive videoArchive = StateLookup.getVideoArchive();
                 if (videoArchive != null) {
                     Command command = new RenameVideoArchiveCmd(videoArchive.getName(), getChangeNameDialog().getNewVideoArchiveName());
                     CommandEvent commandEvent = new CommandEvent(command);

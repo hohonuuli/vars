@@ -11,7 +11,7 @@ import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveDAO;
 import vars.annotation.VideoFrame;
 import vars.annotation.VideoFrameDAO;
-import vars.annotation.ui.Lookup;
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.commandqueue.Command;
 import vars.annotation.ui.eventbus.ObservationsAddedEvent;
@@ -73,7 +73,7 @@ public class CopyObservationsCmd implements Command {
                 videoFrame = annotationFactory.newVideoFrame();
                 videoFrame.setTimecode(videoTime.getTimecode());
                 videoFrame.setRecordedDate(videoTime.getDate());
-                CameraDirections cameraDirections = (CameraDirections) Lookup.getCameraDirectionDispatcher().getValueObject();
+                CameraDirections cameraDirections = StateLookup.getCameraDirection();
                 videoFrame.getCameraData().setDirection(cameraDirections.getDirection());
                 videoArchive.addVideoFrame(videoFrame);
                 dao.persist(videoFrame);
