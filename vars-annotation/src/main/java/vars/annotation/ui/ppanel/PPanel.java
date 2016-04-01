@@ -77,7 +77,7 @@ public class PPanel extends PropertyPanel {
          * Need to check the state of the current observation in
          * order to properly enable a button on startup.
          */
-        final Collection<Observation> obj = StateLookup.getSelectedObservations()
+        final Collection<Observation> obj = StateLookup.getSelectedObservations();
         btn.setEnabled(obj != null && obj.size() == 1);
 
     }

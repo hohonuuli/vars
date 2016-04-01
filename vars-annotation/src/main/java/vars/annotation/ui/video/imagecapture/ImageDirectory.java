@@ -99,7 +99,6 @@ public class ImageDirectory {
             if (!ok) {
                 final String msg = new StringBuffer().append("Unable to create the directory, ").append(
                     imageDir.getAbsolutePath()).append(", needed to store the images").toString();
-                imageDir = null;
 
                 throw new IOException(msg);
             }
@@ -107,7 +106,6 @@ public class ImageDirectory {
         else if (!imageDir.canWrite()) {
             final String msg = new StringBuffer().append("Unable to write to the directory, ").append(
                 imageDir.getAbsolutePath()).toString();
-            imageDir = null;
 
             throw new IOException(msg);
         }

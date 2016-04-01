@@ -123,7 +123,7 @@ public class PCameraDataPanel extends PropertiesPanel {
                         "Select a camera direction.", "VARS - Camera Direction", JOptionPane.QUESTION_MESSAGE, null,
                         CameraDirections.values(), CameraDirections.findValue(initialValue));
                     if (selectedValue != null) {
-                        final Collection<Observation> observations = StateLookup.getSelectedObservations()
+                        final Collection<Observation> observations = StateLookup.getSelectedObservations();
                         if (observations.size() == 1) {
 
                             try {

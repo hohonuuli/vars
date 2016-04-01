@@ -341,7 +341,7 @@ public class NewObservationUsingConceptNameButton extends FancyButton
             final UserAccount userAccount = StateLookup.getUserAccount();
             hasPerson = userAccount != null;
 
-            final VideoController videoController = StateLookup.getVideoController()
+            final VideoController videoController = StateLookup.getVideoController();
             hasVcr = videoController != null;
         }
     }
