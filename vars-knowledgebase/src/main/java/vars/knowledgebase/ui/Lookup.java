@@ -45,6 +45,7 @@ import vars.shared.ui.GlobalLookup;
  * objects (which can store values as well as register {@link PropertyChangeListener}s is:
  * Objects published to {@link EventBus} will be set in the appropriate {@link Dispatcher}.
  * However, objects set in a Dispatcher will not send a message via EventBus.
+ * @deprecated
  */
 public class Lookup extends GlobalLookup {
 

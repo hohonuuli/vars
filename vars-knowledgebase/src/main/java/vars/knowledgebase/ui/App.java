@@ -38,7 +38,6 @@ import org.slf4j.LoggerFactory;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ui.actions.PopulateDatabaseAction;
-import vars.shared.ui.GlobalLookup;
 import vars.shared.ui.event.ExitTopicSubscriber;
 import vars.shared.ui.event.FatalExceptionSubscriber;
 import vars.shared.ui.event.NonFatalErrorSubscriber;

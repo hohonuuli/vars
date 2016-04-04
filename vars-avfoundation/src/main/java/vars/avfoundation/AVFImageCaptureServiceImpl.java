@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import vars.VARSException;
 import vars.avplayer.ImageCaptureException;
 import vars.avplayer.ImageCaptureService;
-import vars.shared.ui.GlobalLookup;
+import vars.shared.ui.GlobalStateLookup;
 import vars.shared.ui.dialogs.StandardDialog;
 
 
@@ -16,7 +16,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Date;
 import java.util.Optional;
 import java.util.prefs.Preferences;
 
@@ -110,7 +109,7 @@ public class AVFImageCaptureServiceImpl implements ImageCaptureService {
         try {
             image = watchForAndReadNewImage(file);
         } catch (Exception e) {
-            EventBus.publish(GlobalLookup.TOPIC_WARNING, e);
+            EventBus.publish(GlobalStateLookup.TOPIC_WARNING, e);
         }
 
         return Optional.ofNullable(image);
@@ -128,7 +127,7 @@ public class AVFImageCaptureServiceImpl implements ImageCaptureService {
         Preferences preferences = Preferences.userRoot();
         String originalVideoSrc = preferences.get(LIBRARY_NAME, "");
         if (dialog == null) {
-            Frame frame = (Frame) GlobalLookup.getSelectedFrameDispatcher().getValueObject();
+            Frame frame = GlobalStateLookup.getSelectedFrame();
 
             // --- start HACK: Always add "Blackmagic" to video device list (brian 2014-03-04)
             // In Mac OS X 10.9.2, Blackmagic stopped showing up in the videodevice list
@@ -171,7 +170,7 @@ public class AVFImageCaptureServiceImpl implements ImageCaptureService {
         Preferences preferences = Preferences.userRoot();
         String videoSource = preferences.get(LIBRARY_NAME, "");
         if (isStarted) {
-            EventBus.publish(GlobalLookup.TOPIC_WARNING, "The video device '" +
+            EventBus.publish(GlobalStateLookup.TOPIC_WARNING, "The video device '" +
                     videoSource + "' is already opened");
         }
         else if (!videoSource.isEmpty()) {
@@ -180,7 +179,7 @@ public class AVFImageCaptureServiceImpl implements ImageCaptureService {
             isStarted = true;
         }
         else {
-            EventBus.publish(GlobalLookup.TOPIC_WARNING, "A video source has not been selected");
+            EventBus.publish(GlobalStateLookup.TOPIC_WARNING, "A video source has not been selected");
         }
     }
 
@@ -198,7 +197,7 @@ public class AVFImageCaptureServiceImpl implements ImageCaptureService {
         if (libraryName != null) {
 
             // Location to extract the native libraries into $HOME/.vars/native/Mac
-            File libraryHome = new File(new File(GlobalLookup.getSettingsDirectory(), "native"), os.substring(0, 3));
+            File libraryHome = new File(new File(GlobalStateLookup.getSettingsDirectory(), "native"), os.substring(0, 3));
             if (!libraryHome.exists()) {
                 libraryHome.mkdirs();
             }

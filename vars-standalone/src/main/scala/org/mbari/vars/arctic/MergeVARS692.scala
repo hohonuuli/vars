@@ -1,10 +1,10 @@
 package org.mbari.vars.arctic
 
 import java.io.File
-import java.util.{TimeZone, Date}
+import java.util.{Date, TimeZone}
 
 import org.slf4j.LoggerFactory
-import vars.shared.ui.GlobalLookup
+import vars.shared.ui.GlobalStateLookup
 
 import scala.util.{Failure, Success, Try}
 
@@ -24,7 +24,7 @@ object MergeVARS692 {
     val videoFrames = MergeVideoData.lookupVideoFrames(videoArchiveName).filter(_.getRecordedDate != null)
 
     if (log.isDebugEnabled) {
-      val df = GlobalLookup.DATE_FORMAT_UTC
+      val df = GlobalStateLookup.getUTCDateFormat
 
       val rs = full.sortBy(_.gpsDate.getTime)
       log.debug(s"Log spans ${df.format(rs.head.gpsDate)} to ${df.format(rs.last.gpsDate)}")
@@ -63,7 +63,7 @@ object MergeVARS692 {
     }
     val videoArchiveName = args(0)
     val logFile = new File(args(1))
-    val startDate = Try(GlobalLookup.DATE_FORMAT_UTC.parse(args(2))) match {
+    val startDate = Try(GlobalStateLookup.getUTCDateFormat.parse(args(2))) match {
       case Success(d) => d
       case Failure(d) => {
         log.error(s"Unable to parse your date of ${args(2)}. Try yyyy-MM-dd HH:mm:ss format.")

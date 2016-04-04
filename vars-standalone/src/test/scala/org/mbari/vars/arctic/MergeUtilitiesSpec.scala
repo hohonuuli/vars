@@ -4,7 +4,7 @@ import org.junit.runner.RunWith
 import org.mbari.movie.Timecode
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.{FlatSpec, Matchers}
-import vars.shared.ui.GlobalLookup
+import vars.shared.ui.GlobalStateLookup
 
 /**
  *
@@ -37,7 +37,7 @@ class MergeUtilitiesSpec extends FlatSpec with Matchers {
   }
 
   "toFullLogRecords" should "transform RawLogRecords with no rollover correctly" in {
-    val now = GlobalLookup.DATE_FORMAT_UTC.parse("2015-02-26 00:00:00")
+    val now = GlobalStateLookup.getUTCDateFormat.parse("2015-02-26 00:00:00")
     val fullRecords = MergeUtilities.toFullLogRecords(testRecords, now)
     fullRecords.size should be (testRecords.size)
     for (i <- 0 until testRecords.size) {
@@ -47,7 +47,7 @@ class MergeUtilitiesSpec extends FlatSpec with Matchers {
   }
 
   "toFullLogRecords" should "transform RawLogRecords with rollover correctly" in {
-    val now = GlobalLookup.DATE_FORMAT_UTC.parse("2015-02-26 00:00:00")
+    val now = GlobalStateLookup.getUTCDateFormat.parse("2015-02-26 00:00:00")
     val xs = testRecords ++ testRecords
     val fullRecords = MergeUtilities.toFullLogRecords(xs, now)
     fullRecords.size should be (xs.size)
@@ -58,10 +58,10 @@ class MergeUtilitiesSpec extends FlatSpec with Matchers {
   }
 
   "toFullLogRecords" should "ignore hour, minutes and seconds in start date" in {
-    val nowNoHours = GlobalLookup.DATE_FORMAT_UTC.parse("2015-02-26 00:00:00")
+    val nowNoHours = GlobalStateLookup.getUTCDateFormat.parse("2015-02-26 00:00:00")
     val expected = MergeUtilities.toFullLogRecords(testRecords, nowNoHours)
 
-    val now = GlobalLookup.DATE_FORMAT_UTC.parse("2015-02-26 12:11:31")
+    val now = GlobalStateLookup.getUTCDateFormat.parse("2015-02-26 12:11:31")
     val actual = MergeUtilities.toFullLogRecords(testRecords, now)
 
     actual.size should be (expected.size)
@@ -76,7 +76,7 @@ class MergeUtilitiesSpec extends FlatSpec with Matchers {
 
 
   "toFullLogRecords" should "munge dates correctly" in {
-    val df = GlobalLookup.DATE_FORMAT_UTC
+    val df = GlobalStateLookup.getUTCDateFormat
     val startDate = df.parse("2012-09-28 12:34:56")
     val records = MergeUtilities.toFullLogRecords(
       lines.split('\n').flatMap(CSVLogReader.parseLine(_)), startDate)

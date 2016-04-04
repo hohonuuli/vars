@@ -38,7 +38,7 @@ import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.Media;
-import vars.shared.ui.GlobalLookup;
+import vars.shared.ui.GlobalStateLookup;
 
 /**
  * @author brian
@@ -199,11 +199,11 @@ public class ConceptTreePopupMenu extends JPopupMenu {
 
             imageFrame.setTitle(concept.getPrimaryConceptName().getName());
             imageFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-            imageFrame.setLocationRelativeTo((Component) GlobalLookup.getSelectedFrameDispatcher().getValueObject());
+            imageFrame.setLocationRelativeTo(GlobalStateLookup.getSelectedFrame());
             imageFrame.setVisible(true);
         }
         catch (MalformedURLException ex) {
-            EventBus.publish(GlobalLookup.TOPIC_WARNING, "Unable to load " + media.getUrl());
+            EventBus.publish(GlobalStateLookup.TOPIC_WARNING, "Unable to load " + media.getUrl());
         }
 
     }

@@ -2,7 +2,7 @@ package vars.avplayer.noop;
 
 import vars.avplayer.ImageCaptureException;
 import vars.avplayer.ImageCaptureService;
-import vars.shared.ui.GlobalLookup;
+import vars.shared.ui.GlobalStateLookup;
 
 
 import javax.swing.JOptionPane;
@@ -40,7 +40,7 @@ public class NoopImageCaptureService implements ImageCaptureService {
     public void showSettingsDialog() {
 
         // Do nothing
-        Frame frame = (Frame) GlobalLookup.getSelectedFrameDispatcher().getValueObject();
+        Frame frame = GlobalStateLookup.getSelectedFrame();
         JOptionPane.showMessageDialog(frame, "No settings are available", "VARS - Video Settings",
                 JOptionPane.INFORMATION_MESSAGE);
     }

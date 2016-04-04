@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat
 import java.util.TimeZone
 
 import org.slf4j.LoggerFactory
-import vars.shared.ui.GlobalLookup
+import vars.shared.ui.{GlobalStateLookup}
 
 /**
  *
@@ -24,7 +24,7 @@ object MergeVARS688 {
     val videoFrames = MergeVideoData.lookupVideoFrames(videoArchiveName).filter(_.getRecordedDate != null)
 
     if (log.isDebugEnabled) {
-      val df = GlobalLookup.DATE_FORMAT_UTC
+      val df = GlobalStateLookup.getUTCDateFormat
 
       val rs = full.sortBy(_.gpsDate.getTime)
       log.debug(s"Log spans ${df.format(rs.head.gpsDate)} to ${df.format(rs.last.gpsDate)}")

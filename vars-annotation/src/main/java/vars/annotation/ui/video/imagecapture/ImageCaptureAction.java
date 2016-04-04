@@ -15,22 +15,25 @@
 
 package vars.annotation.ui.video.imagecapture;
 
-import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.MalformedURLException;
+import java.time.Instant;
 import java.util.Date;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import javax.swing.Action;
 import javax.swing.KeyStroke;
 import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.awt.image.ImageUtilities;
 import org.mbari.io.FileUtilities;
-import org.mbari.util.NumberUtilities;
+import org.mbari.vcr4j.VideoIndex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.UserAccount;
+import vars.VARSException;
 import vars.annotation.CameraDirections;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.StateLookup;
@@ -100,47 +103,48 @@ public class ImageCaptureAction extends ActionAdapter {
         }
 
         // --- Step 2: Get Video timecode and recordedDate
-        final SnapTime snapTime = getSnapTime(videoControlService);
+        final SnapTime snapTime = getSnapTime(videoController);
+
 
         // --- Step 3: Get location to write original PNG file to
         File png = null;
         try {
-            png = new File(imageDirectory.getImageDirectory(), snapTime.getTimeCodeAsName() + ".png");
+            png = new File(imageDirectory.getImageDirectory(), snapTime.getFramegrabName() + ".png");
         }
         catch (final Exception e) {
             EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, e);
             log.error("Unable to create or write to the image directory", e);
-
             return;
         }
 
         // --- Step 4: Save PNG
-        final BufferedImage bufferedImage = grabImageAndSavePng(imageCaptureService, png, snapTime);
+        final Optional<BufferedImage> bufferedImageOpt = grabImageAndSavePng(imageCaptureService, png, snapTime);
+        if (!bufferedImageOpt.isPresent()) {
+            EventBus.publish(StateLookup.TOPIC_WARNING, "No image was captured");
+            return;
+        }
 
         // --- Step 5: Create JPG and add annotation off main thread
         final File pngFile = png;
-        Runnable runnable = new Runnable() {
-
-            @Override
-            public void run() {
-                JPGPreviewUtilities.createCommentFile(pngFile, snapTime);
-                final String[] overlayText = JPGPreviewUtilities.createOverlayText(pngFile, snapTime);
-                JPGPreviewUtilities.createOverlayFile(pngFile, overlayText);
-                File jpg = null;
-                try {
-                    jpg = FileUtilities.changeExtension(pngFile, ".jpg");
-                    JPGPreviewUtilities.createJpgWithOverlay(bufferedImage, jpg, overlayText);
-                }
-                catch (Exception e) {
-                    EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, e);
-                    log.error("Failed to write jpg preview file to " + jpg.getAbsolutePath(), e);
-
-                    return;
-                }
-                updateVideoArchive(snapTime, jpg);
+        Runnable runnable = () -> {
+            JPGPreviewUtilities.createCommentFile(pngFile, snapTime);
+            final String[] overlayText = JPGPreviewUtilities.createOverlayText(pngFile, snapTime);
+            JPGPreviewUtilities.createOverlayFile(pngFile, overlayText);
+            File jpg = null;
+            try {
+                jpg = FileUtilities.changeExtension(pngFile, ".jpg");
+                JPGPreviewUtilities.createJpgWithOverlay(bufferedImageOpt.get(), jpg, overlayText);
             }
+            catch (Exception e) {
+                EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, e);
+                log.error("Failed to write jpg preview file to " + jpg.getAbsolutePath(), e);
+
+                return;
+            }
+            updateVideoArchive(snapTime, jpg);
         };
         (new Thread(runnable, "JPEG-Generation-" + snapTime.getObservationDate().getTime())).run();
+
 
     }
 
@@ -153,49 +157,35 @@ public class ImageCaptureAction extends ActionAdapter {
         }
     }
 
-    private SnapTime getSnapTime(VideoControlService videoControlService) {
-        final String timecode = videoControlService.getVcrTimecode().toString();
+    private SnapTime getSnapTime(VideoController videoController) {
 
-        Date recordedDate;
-        if (videoControlService.getVcrState().isRecording()) {
-            recordedDate = new Date();
-        }
-        else {
-            /*
-             *  Try to grab the userbits off of the tape. The userbits
-             *  may have the time that the frame was recorded stored as a
-             *  little-endian 4-byte int.
-             */
-            videoControlService.requestUserbits();
-            final int epicSeconds = NumberUtilities.toInt(videoControlService.getVcrUserbits().getUserbits(), true);
-            recordedDate = new Date((long) epicSeconds * 1000L);
-        }
+        Instant observationTimestamp = Instant.now();
 
-        return new SnapTime(new Date(), recordedDate, timecode);
+        try {
+            VideoIndex videoIndex = (VideoIndex) videoController.getVideoIndex().get(2, TimeUnit.SECONDS);
+            return new SnapTime(observationTimestamp, videoIndex);
+        }
+        catch (Exception e) {
+            throw new VARSException("Failed to acquire SnapTime", e);
+        }
 
     }
 
-    private BufferedImage grabImageAndSavePng(ImageCaptureService imageCaptureService, File png, SnapTime snapTime) {
+    private Optional<BufferedImage> grabImageAndSavePng(ImageCaptureService imageCaptureService, File png, SnapTime snapTime) {
 
         if (log.isDebugEnabled()) {
             log.debug("Attempting to save an image to " + png.getAbsolutePath());
         }
 
-        Image image;
-        BufferedImage bufferedImage;
+        final Optional<BufferedImage> image = imageCaptureService.capture(png)
+                .map(ImageUtilities::toBufferedImage);
 
-        if (imageCaptureService.isPngAutosaved()) {
-            image = imageCaptureService.capture(png);
-            bufferedImage = ImageUtilities.toBufferedImage(image);
-        }
-        else {
-            image = imageCaptureService.capture(snapTime.getTimeCodeAsString());
-            bufferedImage = ImageUtilities.toBufferedImage(image);
-            Runnable saveRunnable = new SaveImageRunnable(bufferedImage, png);
+        image.ifPresent(i -> {
+            Runnable saveRunnable = new SaveImageRunnable(i, png);
             (new Thread(saveRunnable, "ImageIO-" + png.getName())).run();
-        }
+        });
 
-        return bufferedImage;
+        return image;
 
     }
 
@@ -233,9 +223,23 @@ public class ImageCaptureAction extends ActionAdapter {
                 }
             }
 
+            // FIXME recodedDate may not always be present. null should be inserted if not found
+            Date recordedDate = snapTime.getVideoIndex()
+                    .getTimestamp()
+                    .map(Date::from)
+                    .orElse(null);
+
             // FIXME physical object is hardcoded. Should be set in preferences
-            Command command = new AddObservationCmd("physical object", snapTime.getTimeCodeAsString(),
-                snapTime.getRecordedDate(), videoArchive.getName(), user, cameraDirection, null, imageReference, true);
+            Command command = new AddObservationCmd("physical object",
+                    snapTime.getTimecodeString(),
+                    recordedDate,
+                    videoArchive.getName(),
+                    user,
+                    cameraDirection,
+                    null,
+                    imageReference,
+                    true);
+
             CommandEvent commandEvent = new CommandEvent(command);
             EventBus.publish(commandEvent);
         }

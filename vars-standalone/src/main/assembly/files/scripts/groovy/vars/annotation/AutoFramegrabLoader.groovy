@@ -21,10 +21,10 @@ class AutoFramegrabLoader {
     private toolBox = new ToolBox();
     private targetRootDirectory
     private targetRootUrl
-    private IVCR vcr
     private log = LoggerFactory.getLogger("AutoFramegrabLoader")
     private imageCaptureService
     private frameGrabber
+    private videoController
 
     /**
      * @param targetDir is the root of the directory to write images into

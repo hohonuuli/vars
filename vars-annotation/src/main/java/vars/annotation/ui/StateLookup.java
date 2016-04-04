@@ -5,6 +5,8 @@ import com.google.inject.Injector;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import org.bushe.swing.event.EventBus;
+import org.mbari.vcr4j.VideoError;
+import org.mbari.vcr4j.VideoState;
 import vars.VarsUserPreferencesFactory;
 import vars.annotation.CameraDirections;
 import vars.annotation.Observation;
@@ -44,11 +46,9 @@ public class StateLookup extends GlobalStateLookup {
      */
     public static final String TOPIC_SELECT_CONCEPT = "vars-annotation.ui.Lookup-SelectedConcept";
 
-
-    //private static final ObjectProperty<UserAccount> userAccount = new SimpleObjectProperty<>();
     private static final ObjectProperty<CameraDirections> cameraDirection = new SimpleObjectProperty<>();
     public static final Injector GUICE_INJECTOR = Guice.createInjector(new InjectorModule("vars-jpa-annotation", "vars-jpa-knowledgebase", "vars-jpa-misc"));
-    private static final ObjectProperty<VideoController> videoController = new SimpleObjectProperty<>();
+    private static final ObjectProperty<VideoController<? extends VideoState, ? extends VideoError>> videoController = new SimpleObjectProperty<>();
     private static final ObjectProperty<ObservationTable> observationTable = new SimpleObjectProperty<>();
     private static final ObjectProperty<Preferences> preferences = new SimpleObjectProperty<>();
 
@@ -124,11 +124,11 @@ public class StateLookup extends GlobalStateLookup {
         return videoController.get();
     }
 
-    public static ObjectProperty<VideoController> videoControllerProperty() {
+    public static ObjectProperty<VideoController<? extends VideoState, ? extends VideoError>> videoControllerProperty() {
         return videoController;
     }
 
-    public static void setVideoController(VideoController videoController) {
+    public static void setVideoController(VideoController<? extends VideoState, ? extends VideoError> videoController) {
         StateLookup.videoController.set(videoController);
     }
 

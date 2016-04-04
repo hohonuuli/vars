@@ -39,11 +39,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.PersistenceCache;
 import vars.knowledgebase.Concept;
-import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.ConceptNameDAO;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
-import vars.shared.ui.GlobalLookup;
+import vars.shared.ui.GlobalStateLookup;
 
 /**
  *
@@ -191,7 +190,7 @@ public class ConceptTreePanel extends SearchableTreePanel {
                 catch (Exception e) {
                     if (log.isErrorEnabled()) {
                         log.error("Database lookup of " + text + " failed", e);
-                        EventBus.publish(GlobalLookup.TOPIC_NONFATAL_ERROR, e);
+                        EventBus.publish(GlobalStateLookup.TOPIC_NONFATAL_ERROR, e);
                     }
                 }
 
@@ -219,7 +218,7 @@ public class ConceptTreePanel extends SearchableTreePanel {
                 }
                 catch (Exception e) {
                     log.error("A problem occurred with the database while loading concepts matching " + text, e);
-                    EventBus.publish(GlobalLookup.TOPIC_NONFATAL_ERROR, e);
+                    EventBus.publish(GlobalStateLookup.TOPIC_NONFATAL_ERROR, e);
                 }
 
                 return matches;

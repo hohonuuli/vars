@@ -40,8 +40,6 @@ public class VideoController<S extends VideoState, E extends VideoError> extends
         return getVideoIO().getConnectionID();
     }
 
-    //public String getVideoLocation();
-
     public Future<Boolean> isStopped() {
         CompletableFuture<Boolean> future = new CompletableFuture<>();
         getVideoIO().getStateObservable().take(1).forEach(s -> future.complete(s.isStopped()));

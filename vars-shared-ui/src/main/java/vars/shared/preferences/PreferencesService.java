@@ -30,7 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.VARSException;
 import vars.shared.awt.AWTUtilities;
-import vars.shared.ui.GlobalLookup;
+import vars.shared.ui.GlobalStateLookup;
 
 /**
  * A convient interface for reading/writing some specialized preferences used
@@ -61,7 +61,7 @@ public class PreferencesService {
     @Inject
     public PreferencesService(PreferencesFactory preferencesFactory) {
         this.preferencesFactory = preferencesFactory;
-        defaultImageTarget = new File(GlobalLookup.getSettingsDirectory(), "images");
+        defaultImageTarget = new File(GlobalStateLookup.getSettingsDirectory(), "images");
 
         /*
          * Store the login information

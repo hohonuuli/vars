@@ -23,8 +23,6 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -39,7 +37,6 @@ import com.google.common.collect.Sets;
 import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.annotation.AnnotationProcessor;
 import org.bushe.swing.event.annotation.EventSubscriber;
-import org.mbari.vcr4j.IVCR;
 import org.mbari.vcr4j.time.Timecode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -371,8 +368,8 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
         if (videoControlPanel == null) {
             videoControlPanel = new VideoControlPanel();
 
-            StateLookup.videoControllerProperty()
-                    .addListener((obs, oldVal, newVal) -> videoControlPanel.setVcr(newVal));
+//            StateLookup.videoControllerProperty()
+//                    .addListener((obs, oldVal, newVal) -> videoControlPanel.setVcr(newVal));
 
         }
 
@@ -394,7 +391,6 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
     @Override
     public void respondTo(ObservationsAddedEvent event) {
         respondTo(new ObservationsChangedEvent(this, event.get()));
-        //EventBus.publish(new ObservationsSelectedEvent(null, event.get()));
     }
 
     @EventSubscriber(eventClass = ObservationsChangedEvent.class)

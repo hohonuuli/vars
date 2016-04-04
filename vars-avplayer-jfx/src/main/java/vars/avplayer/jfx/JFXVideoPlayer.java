@@ -19,8 +19,7 @@ import vars.annotation.VideoArchiveDAO;
 import vars.avplayer.VideoController;
 import vars.avplayer.VideoPlayer;
 import vars.avplayer.VideoPlayerDialogUI;
-import vars.shared.awt.AWTUtilities;
-import vars.shared.ui.GlobalLookup;
+import vars.shared.ui.GlobalStateLookup;
 
 import javax.swing.*;
 import java.awt.*;
@@ -87,7 +86,7 @@ public class JFXVideoPlayer implements VideoPlayer<JFXVideoState, SimpleVideoErr
     @Override
     public VideoPlayerDialogUI getConnectionDialog(ToolBelt toolBelt) {
         if (dialogUI == null) {
-            Window window = (Window) GlobalLookup.getSelectedFrameDispatcher().getValueObject();
+            Window window = GlobalStateLookup.getSelectedFrame();
             dialogUI = new DefaultVideoPlayerDialogUI(window, toolBelt, this);
         }
         return dialogUI;

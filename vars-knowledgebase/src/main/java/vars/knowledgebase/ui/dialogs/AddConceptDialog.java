@@ -42,7 +42,7 @@ import vars.knowledgebase.ui.StateLookup;
 import vars.knowledgebase.ui.ToolBelt;
 import vars.shared.ui.AllConceptNamesComboBox;
 import vars.shared.ui.FancyButton;
-import vars.shared.ui.GlobalLookup;
+import vars.shared.ui.GlobalStateLookup;
 
 /**
  * @author brian
@@ -455,7 +455,7 @@ public class AddConceptDialog extends javax.swing.JDialog {
             /*
              * Check userAccount status
              */
-            UserAccount userAccount = (UserAccount) GlobalLookup.getUserAccountDispatcher().getValueObject();
+            UserAccount userAccount = GlobalStateLookup.getUserAccount();
 
             String primaryName = nameField.getText();
             History history = null;

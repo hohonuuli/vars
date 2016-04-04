@@ -27,6 +27,9 @@ import org.bushe.swing.event.annotation.AnnotationProcessor;
 import org.bushe.swing.event.annotation.EventSubscriber;
 import org.mbari.swing.LabeledSpinningDialWaitIndicator;
 import org.mbari.swing.WaitIndicator;
+import org.mbari.vcr4j.VideoError;
+import org.mbari.vcr4j.VideoState;
+import org.mbari.vcr4j.adapter.noop.NoopVideoIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.CacheClearedEvent;
@@ -50,6 +53,7 @@ import vars.annotation.ui.eventbus.VideoFramesChangedEvent;
 import vars.annotation.ui.video.DoNothingVideoControlService;
 import vars.annotation.ui.video.VideoControlServiceFactory;
 import vars.avplayer.VideoController;
+import vars.avplayer.noop.NoopImageCaptureService;
 import vars.shared.preferences.PreferenceUpdater;
 import vars.shared.preferences.PreferencesService;
 
@@ -211,7 +215,7 @@ public class AnnotationFrameController implements PreferenceUpdater, UIEventSubs
             //VideoControlService videoControlService = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
             try {
                 preferencesService.persistLastVideoConnectionId(preferencesService.getHostname(),
-                        videoControlService.getVideoControlInformation().getVideoConnectionID());
+                        videoController.getConnectionID());
             }
             catch (NullPointerException e) {
                 log.info("Did not save Last VideoController ID preference. Most likely this " +
@@ -289,15 +293,15 @@ public class AnnotationFrameController implements PreferenceUpdater, UIEventSubs
 
                 // TODO this was added for ships. We will need a workaround for the new VARS
                 String videoID = preferencesService.findLastVideoConnectionId(preferencesService.getHostname());
-                VideoControlService videoControlService;
+                VideoController<? extends VideoState, ? extends VideoError> videoController;
                 try {
-                    videoControlService = VideoControlServiceFactory.newVideoControlService(videoID);
+                    videoController = VideoControlServiceFactory.newVideoController(videoID);
                 }
                 catch (Exception e) {
                     log.warn("Failed to create a VideoControlService for " + videoID);
-                    videoControlService = new DoNothingVideoControlService();
+                    videoController = new VideoController<>(new NoopImageCaptureService(), new NoopVideoIO());
                 }
-                StateLookup.setVideoController(videoControlService);
+                StateLookup.setVideoController(videoController);
             }
 
         }
@@ -384,7 +388,7 @@ public class AnnotationFrameController implements PreferenceUpdater, UIEventSubs
     @Override
     public void respondTo(ObservationsSelectedEvent event) {
         Collection<Observation> observations = event.get() == null ?
-                new ArrayList<Observation>() : event.get();
+                new ArrayList<>() : event.get();
         StateLookup.setSelectedObservations(observations);
     }
 

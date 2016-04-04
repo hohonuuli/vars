@@ -34,12 +34,10 @@ import org.mbari.util.SystemUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.AnnotationPersistenceService;
-import vars.annotation.Observation;
 import vars.annotation.ui.eventbus.ExitTopicSubscriber;
 import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
-import vars.avplayer.ImageCaptureService;
 import vars.knowledgebase.Concept;
-import vars.shared.ui.GlobalLookup;
+import vars.shared.ui.GlobalStateLookup;
 import vars.shared.ui.event.FatalExceptionSubscriber;
 import vars.shared.ui.event.LoggingEventSubscriber;
 import vars.shared.ui.event.NonFatalErrorSubscriber;
@@ -211,7 +209,7 @@ public class App {
         /*
          * Create an application settings directory if needed
          */
-        GlobalLookup.getSettingsDirectory();
+        GlobalStateLookup.getSettingsDirectory();
 
         try {
 

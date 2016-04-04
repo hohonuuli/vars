@@ -17,19 +17,19 @@ package vars.annotation.ui;
 
 import java.awt.Frame;
 import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import javax.swing.SwingUtilities;
+
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import org.mbari.swing.SwingUtils;
-import org.mbari.util.IObserver;
-import org.mbari.vcr4j.IVCR;
-import org.mbari.vcr4j.IVCRState;
+import org.mbari.vcr4j.VideoError;
+import org.mbari.vcr4j.VideoState;
 import vars.UserAccount;
 import vars.annotation.ui.video.VideoControlServiceDialog;
+import vars.avplayer.VideoController;
 import vars.shared.preferences.PreferencesService;
 
 /**
@@ -42,7 +42,7 @@ import vars.shared.preferences.PreferencesService;
 public class StatusLabelForVcr extends StatusLabel {
 
     private static final String NO_CONNECTION = "VCR: Not connected";
-    private final StatusMonitor statusMonitor = new StatusMonitor();
+//    private final StatusMonitor statusMonitor = new StatusMonitor();
 
     /**
      * Constructor
@@ -69,16 +69,11 @@ public class StatusLabelForVcr extends StatusLabel {
          * it's value to trigger a notification.
          */
         // TODO replace with VideoController code
-        //VideoController videoController = StateLookup.getVideoController();
-        //final Dispatcher dispatcher = Lookup.getVideoControlServiceDispatcher();
-        //final VideoControlService videoService = (VideoControlService) dispatcher.getValueObject();
-        final IVCR vcr = (videoService == null) ? null : videoService;
+        StateLookup.videoControllerProperty().addListener((obs, oldVal, newVal) -> {
+            setVideoController(newVal);
+        });
 
-        //StateLookup.videoControllerProperty().addListener((obs, oldVal, newVal) -> setVcr(newVal));
-        dispatcher.addPropertyChangeListener(new VcrListener());
-        setVcr(vcr);
-
-        Lookup.getUserAccountDispatcher().addPropertyChangeListener(new UserAccountListener(videoDialog));
+        StateLookup.userAccountProperty().addListener(new UserAccountChangeListener(videoDialog));
 
     }
 
@@ -87,22 +82,17 @@ public class StatusLabelForVcr extends StatusLabel {
      * @param evt
      */
     public void propertyChange(PropertyChangeEvent evt) {
-
-        // TODO Auto-generated method stub
-
+        // Do nothing
     }
 
-    private void setVcr(final IVCR vcr) {
+    private void setVideoController(VideoController<? extends VideoState, ? extends VideoError> videoController) {
         String label = NO_CONNECTION;
-
-        if (vcr != null) {
-            label = "VCR: " + vcr.getConnectionName();
-            setOk(vcr.getVcrState().isConnected());
-            vcr.getVcrState().addObserver(statusMonitor);
+        if (videoController != null) {
+            label = "VCR: " + videoController.getConnectionID();
         }
-
         setText(label);
     }
+
 
     private class MyMouseListener extends MouseAdapter {
 
@@ -149,63 +139,52 @@ public class StatusLabelForVcr extends StatusLabel {
      *  Monitors the VCR status. When the VCR is connected it toggles the
      * OK state of the label.
      */
-    private class StatusMonitor implements IObserver {
-
-        /**
-         * Method description
-         *
-         *
-         * @param obj
-         * @param changeCode
-         */
-        public void update(final Object obj, final Object changeCode) {
-            final IVCRState vcrState = (IVCRState) obj;
-
-            setOk(vcrState.isConnected());
-        }
-    }
+//    private class StatusMonitor implements IObserver {
+//
+//        /**
+//         * Method description
+//         *
+//         *
+//         * @param obj
+//         * @param changeCode
+//         */
+//        public void update(final Object obj, final Object changeCode) {
+//            final IVCRState vcrState = (IVCRState) obj;
+//
+//            setOk(vcrState.isConnected());
+//        }
+//    }
 
 
     /**
      * Class that listens for changing UserAccounts and updated the UDP
      * Panel fields accordingly. Also persists values when OK button is pressed.
      */
-    private class UserAccountListener implements PropertyChangeListener {
+    private class UserAccountChangeListener implements ChangeListener<UserAccount> {
 
         private final VideoControlServiceDialog dialog;
-        private final PreferencesService preferencesService;
+        private final PreferencesService preferencesService = new PreferencesService(StateLookup.PREFERENCES_FACTORY);;
 
-        /**
-         * Constructs ...
-         *
-         * @param dialog
-         */
-        public UserAccountListener(VideoControlServiceDialog dialog) {
+        public UserAccountChangeListener(VideoControlServiceDialog dialog) {
             this.dialog = dialog;
-            preferencesService = new PreferencesService(StateLookup.PREFERENCES_FACTORY);
 
             dialog.getOkayButton().addActionListener( e -> {
                 UserAccount userAccount = StateLookup.getUserAccount();
-                String host = UserAccountListener.this.dialog.getUdpPanel().getHostTextField().getText();
-                String port = UserAccountListener.this.dialog.getUdpPanel().getPortTextField().getText();
+                String host = UserAccountChangeListener.this.dialog.getUdpPanel().getHostTextField().getText();
+                String port = UserAccountChangeListener.this.dialog.getUdpPanel().getPortTextField().getText();
                 host = (host == null) ? preferencesService.getHostname() : host;
                 port = (port == null) ? "9000" : port;
-                preferencesService.persistVcrUrl(userAccount.getUserName(), preferencesService.getHostname(), host,
-                                                 port);
-
-
-
+                preferencesService.persistVcrUrl(userAccount.getUserName(),
+                        preferencesService.getHostname(),
+                        host,
+                        port);
             });
         }
 
-        /**
-         *
-         * @param evt
-         */
-        public void propertyChange(PropertyChangeEvent evt) {
-            UserAccount userAccount = (UserAccount) evt.getNewValue();
-            String port = null;
-            String hostname = null;
+        @Override
+        public void changed(ObservableValue<? extends UserAccount> observable, UserAccount oldValue, UserAccount userAccount) {
+            String port;
+            String hostname;
             if (userAccount != null) {
                 port = preferencesService.findVcrPort(userAccount.getUserName(), preferencesService.getHostname());
                 hostname = preferencesService.findVcrHostname(userAccount.getUserName(),
@@ -220,31 +199,4 @@ public class StatusLabelForVcr extends StatusLabel {
     }
 
 
-    private class VcrListener implements PropertyChangeListener {
-
-        /**
-         * Method description
-         *
-         *
-         * @param evt
-         */
-        public void propertyChange(final PropertyChangeEvent evt) {
-            final VideoControlService newVideoService = (VideoControlService) evt.getNewValue();
-            final VideoControlService oldVideoService = (VideoControlService) evt.getOldValue();
-            final IVCR newVcr = (newVideoService == null) ? null : newVideoService;
-            final IVCR oldVcr = (oldVideoService == null) ? null : oldVideoService;
-
-            if (log.isDebugEnabled()) {
-                final String label = (newVcr == null) ? NO_CONNECTION : "VCR: " + newVcr.getConnectionName();
-
-                log.debug("Updating label: OLD = " + getText() + ", NEW = " + label);
-            }
-
-            if (oldVcr != null) {
-                oldVcr.getVcrState().removeObserver(statusMonitor);
-            }
-
-            setVcr(newVcr);
-        }
-    }
 }

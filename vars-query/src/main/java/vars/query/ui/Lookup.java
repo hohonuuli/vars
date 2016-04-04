@@ -14,6 +14,7 @@ import vars.shared.ui.GlobalLookup;
 /**
  *
  * @author brian
+ * @deprecated
  */
 public class Lookup extends GlobalLookup {
 

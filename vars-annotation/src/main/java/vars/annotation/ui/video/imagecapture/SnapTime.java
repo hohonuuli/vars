@@ -15,12 +15,15 @@
 
 package vars.annotation.ui.video.imagecapture;
 
+import org.mbari.vcr4j.VideoIndex;
 import org.mbari.vcr4j.time.Timecode;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
@@ -38,49 +41,30 @@ public class SnapTime {
     private final static NumberFormat format3i = new DecimalFormat("000");
     private final static DateFormat dateFormat = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy");
     private final static DateFormat timezoneFormat = new SimpleDateFormat("ZZ");
-    private final Calendar gmtCalendar;
+    private final Calendar gmtCalendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+
+    private final Instant observationTimestamp;
     private final Date observationDate;
-    private final Date recordedDate;
-    private final Timecode timeCode;
+    private final VideoIndex videoIndex;
 
-    /**
-     * Constructs ...
-     *
-     *
-     * @param observationDate
-     * @param timeCode
-     */
-    SnapTime(final Date observationDate, final Date recordedDate, final String timeCode) {
-        this.observationDate = observationDate;
-        this.recordedDate = recordedDate;
-        this.timeCode = new Timecode(timeCode);
-        gmtCalendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+    public SnapTime(final Instant observationTimestamp, final VideoIndex videoIndex) {
+        this.observationTimestamp = observationTimestamp;
+        this.videoIndex = videoIndex;
+        this.observationDate = Date.from(observationTimestamp);
     }
 
-    /**
-     * @return  DDD
-     */
-    String getDayOfYear() {
-        return format3i.format(gmtCalendar.get(Calendar.DAY_OF_YEAR));
+    public VideoIndex getVideoIndex() {
+        return videoIndex;
     }
 
-    /**
-     * @return time formatted for the GMT timezone
-     */
-    String getFormattedGmtTime() {
-        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-        return dateFormat.format(observationDate);
+    public Instant getObservationTimestamp() {
+        return observationTimestamp;
     }
 
-    /**
-     * @return time formatted for the local timezone
-     */
-    String getFormattedLocalTime() {
-        dateFormat.setTimeZone(TimeZone.getDefault());
-
-        return dateFormat.format(observationDate);
+    public Date getObservationDate() {
+        return observationDate;
     }
+
 
     /**
      * @return  The timezone offset between local and GMT
@@ -89,30 +73,31 @@ public class SnapTime {
         return timezoneFormat.format(observationDate);
     }
 
-    /**
-     * @return  A date
-     */
-    Date getObservationDate() {
-        return observationDate;
+    public String getTimecodeString() {
+        Timecode placeholder;
+
+        if (videoIndex.getTimecode().isPresent()) {             // Check timecode first
+            placeholder = videoIndex.getTimecode().get();
+        }
+        else if (videoIndex.getElapsedTime().isPresent()) {     // If no timecode, try elapsed time
+            Duration duration = videoIndex.getElapsedTime().get();
+            double frames = duration.toMillis() / 10D; // centi-seconds
+            placeholder = new Timecode(frames, 100D);
+        }
+        else {        // final case create name from data
+            Instant timestamp = videoIndex.getTimestamp().get();
+            double centisecs = timestamp.toEpochMilli() / 10D;
+            placeholder = new Timecode(centisecs, 100D);
+        }
+
+        return placeholder.toString();
     }
 
-    Date getRecordedDate() {
-        return recordedDate;
+
+    public String getFramegrabName() {
+        return getTimecodeString().replace(":", "_");
     }
 
-    /**
-     * @return  Timecode formatted for names (':' is replaced with '_')
-     */
-    String getTimeCodeAsName() {
-        return timeCode.toString().replace(':', '_');
-    }
-
-    /**
-     * @return THe timecode as a string
-     */
-    String getTimeCodeAsString() {
-        return timeCode.toString();
-    }
 
     /**
      * @return  The current time in seconds
@@ -124,7 +109,7 @@ public class SnapTime {
     /**
      * @return  YYYYDDD
      */
-    String getTrackingNumber() {
+    public String getTrackingNumber() {
         return getYear() + getDayOfYear();
     }
 
@@ -134,4 +119,29 @@ public class SnapTime {
     String getYear() {
         return format4i.format(gmtCalendar.get(Calendar.YEAR));
     }
+
+    /**
+     * @return  DDD
+     */
+    private String getDayOfYear() {
+        return format3i.format(gmtCalendar.get(Calendar.DAY_OF_YEAR));
+    }
+
+    /**
+     * @return time formatted for the GMT timezone
+     */
+    String getFormattedGmtTime() {
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return dateFormat.format(getObservationDate());
+    }
+
+    /**
+     * @return time formatted for the local timezone
+     */
+    String getFormattedLocalTime() {
+        dateFormat.setTimeZone(TimeZone.getDefault());
+
+        return dateFormat.format(observationDate);
+    }
+
 }

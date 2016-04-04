@@ -30,7 +30,7 @@ import vars.queryfx.ui.sdkfx.ConceptConstraintsWorkbench;
 import vars.queryfx.ui.sdkfx.ConceptMedia;
 import vars.queryfx.ui.sdkfx.CustomizeResultsWorkbench;
 import vars.shared.javafx.application.ImageFX;
-import vars.shared.ui.GlobalLookup;
+import vars.shared.ui.GlobalStateLookup;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -192,7 +192,7 @@ public class App {
     public static void main( String[] args ) {
         System.setProperty("user.timezone", "UTC");
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-        GlobalLookup.getSettingsDirectory(); // Not used
+        GlobalStateLookup.getSettingsDirectory(); // Not used
 
         /*
           Log uncaught Exceptions
