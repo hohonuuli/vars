@@ -13,12 +13,10 @@ import vars.CacheClearedEvent;
 import vars.CacheClearedListener;
 import vars.ToolBelt;
 import vars.VARSException;
-import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.AnnotationPersistenceService;
 import vars.annotation.CameraDeployment;
 import vars.annotation.VideoArchive;
 import vars.avplayer.VideoController;
-import vars.avplayer.VideoPlayer;
 import vars.avplayer.VideoPlayerDialogUI;
 import vars.shared.ui.dialogs.StandardDialog;
 
@@ -36,7 +34,7 @@ import java.util.List;
 /**
  * Created by brian on 1/13/14.
  */
-public class DefaultVideoPlayerDialogUI extends StandardDialog implements VideoPlayerDialogUI {
+public class JFXVideoPlayerDialogUI extends StandardDialog implements VideoPlayerDialogUI {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
     private static final int RESPONSE_DELAY = 750;
@@ -81,7 +79,7 @@ public class DefaultVideoPlayerDialogUI extends StandardDialog implements VideoP
     /**
      * Create the dialog.
      */
-    public DefaultVideoPlayerDialogUI(final Window parent, final ToolBelt toolBelt, JFXVideoPlayer videoPlayer) {
+    public JFXVideoPlayerDialogUI(final Window parent, final ToolBelt toolBelt, JFXVideoPlayer videoPlayer) {
         super(parent);
         this.videoPlayer = videoPlayer;
         this.toolBelt = toolBelt;
@@ -290,7 +288,7 @@ public class DefaultVideoPlayerDialogUI extends StandardDialog implements VideoP
                 final JFileChooser chooser = new JFileChooser();
 
                 public void actionPerformed(ActionEvent e) {
-                    int option = chooser.showOpenDialog(DefaultVideoPlayerDialogUI.this);
+                    int option = chooser.showOpenDialog(JFXVideoPlayerDialogUI.this);
                     if (option == JFileChooser.APPROVE_OPTION) {
                         File file = chooser.getSelectedFile();
                         try {

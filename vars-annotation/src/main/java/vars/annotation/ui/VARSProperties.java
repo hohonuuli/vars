@@ -198,6 +198,7 @@ public class VARSProperties {
     /**
      * @return The collection of cameraplatforms found in the vars.properties file.
      * The collecition is Collection<String>
+     *    @deprecated  Use AnnotationPersistenceService.findAllCameraPlatforms instead
      */
     public static Collection<String> getCameraPlatforms() {
         return platforms.keySet();

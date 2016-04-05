@@ -2,8 +2,6 @@ package vars.avplayer.jfx;
 
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import org.mbari.awt.AwtUtilities;
-import org.mbari.swing.SwingUtils;
 import org.mbari.util.Tuple2;
 import org.mbari.vcr4j.SimpleVideoError;
 import org.mbari.vcr4j.decorators.StatusDecorator;
@@ -87,7 +85,7 @@ public class JFXVideoPlayer implements VideoPlayer<JFXVideoState, SimpleVideoErr
     public VideoPlayerDialogUI getConnectionDialog(ToolBelt toolBelt) {
         if (dialogUI == null) {
             Window window = GlobalStateLookup.getSelectedFrame();
-            dialogUI = new DefaultVideoPlayerDialogUI(window, toolBelt, this);
+            dialogUI = new JFXVideoPlayerDialogUI(window, toolBelt, this);
         }
         return dialogUI;
     }

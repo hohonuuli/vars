@@ -3,7 +3,7 @@ package vars.annotation.ui.video;
 import org.bushe.swing.event.EventBus;
 import org.mbari.vcr4j.VideoError;
 import org.mbari.vcr4j.VideoIO;
-import org.mbari.vcr4j.VideoIOFacade;
+import org.mbari.vcr4j.SimpleVideoIO;
 import org.mbari.vcr4j.VideoState;
 import org.mbari.vcr4j.decorators.VCRSyncDecorator;
 import org.mbari.vcr4j.rs422.RS422Error;
@@ -47,7 +47,7 @@ public class VideoControlServiceFactory {
                 new VCRSyncDecorator<>(io);
                 new RS422StatusDecorator(io);
                 UserbitsAsTimeDecorator decorator = new UserbitsAsTimeDecorator(io);
-                VideoIO<RS422State, RS422Error> io2 = new VideoIOFacade<>(io.getConnectionID(),
+                VideoIO<RS422State, RS422Error> io2 = new SimpleVideoIO<>(io.getConnectionID(),
                         io.getCommandSubject(),
                         io.getStateObservable(),
                         io.getErrorObservable(),
