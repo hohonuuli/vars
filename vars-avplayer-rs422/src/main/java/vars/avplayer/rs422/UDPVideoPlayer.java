@@ -1,16 +1,14 @@
 package vars.avplayer.rs422;
 
+import org.bushe.swing.event.EventBus;
 import org.mbari.util.Tuple2;
-import org.mbari.vcr4j.rs422.RS422Error;
-import org.mbari.vcr4j.rs422.RS422State;
 import org.mbari.vcr4j.rs422.RS422VideoIO;
-import org.mbari.vcr4j.rxtx.RXTXVideoIO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.mbari.vcr4j.udp.UDPError;
+import org.mbari.vcr4j.udp.UDPState;
+import org.mbari.vcr4j.udp.UDPVideoIO;
 import vars.ToolBelt;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveDAO;
-import vars.avfoundation.AVFImageCaptureServiceImpl;
 import vars.avplayer.ImageCaptureService;
 import vars.avplayer.VideoController;
 import vars.avplayer.VideoPlayer;
@@ -26,27 +24,25 @@ import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author Brian Schlining
- * @since 2016-04-05T12:32:00
+ * @since 2016-04-06T09:58:00
  */
-public class RS422VideoPlayer implements VideoPlayer<RS422State, RS422Error> {
+public class UDPVideoPlayer implements VideoPlayer<UDPState, UDPError> {
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
-    private final AtomicReference<RS422VideoIO> videoIORef = new AtomicReference<>();
+    private final AtomicReference<UDPVideoIO> videoIORef = new AtomicReference<>();
     private ImageCaptureService imageCaptureService = ImageCaptureServiceRef.getImageCaptureService();
-    private RS422VideoPlayerDialogUI dialogUI;
+    private UDPVideoPlayerDialogUI dialogUI;
 
     @Override
     public boolean canPlay(String mimeType) {
         return false;
     }
 
-
-
     /**
      *
      * @param toolBelt
      * @param args The arguments need to connect to you video control service.
-     *             [serialPort: String,
+     *             [hostName: String,
+     *             port: Integer
      *             platformName: String,
      *             sequenceNumber: Integer,
      *             tapeNumber: Integer,
@@ -54,59 +50,57 @@ public class RS422VideoPlayer implements VideoPlayer<RS422State, RS422Error> {
      * @return
      */
     @Override
-    public Optional<Tuple2<VideoArchive, VideoController<RS422State, RS422Error>>> openVideoArchive(ToolBelt toolBelt, Object... args) {
-        String serialPort = (String) args[0];
-        String platformName = (String) args[1];
-        Integer sequenceNumber = (Integer) args[2];
-        Integer tapeNumber = (Integer) args[3];
-        Boolean isHD = (Boolean) args[4];
-        RS422VideoParams videoParams = new RS422VideoParams(serialPort, platformName, sequenceNumber, tapeNumber, isHD);
+    public Optional<Tuple2<VideoArchive, VideoController<UDPState, UDPError>>> openVideoArchive(ToolBelt toolBelt, Object... args) {
+        String hostName = (String) args[0];
+        Integer port = (Integer) args[1];
+        String platformName = (String) args[2];
+        Integer sequenceNumber = (Integer) args[3];
+        Integer tapeNumber = (Integer) args[4];
+        Boolean isHD = (Boolean) args[5];
+        UDPVideoParams videoParams = new UDPVideoParams(hostName, port, platformName, sequenceNumber, tapeNumber, isHD);
         return openVideoArchive(toolBelt, videoParams);
     }
 
-    public Optional<Tuple2<VideoArchive, VideoController<RS422State, RS422Error>>> openVideoArchive(ToolBelt toolBelt, RS422VideoParams videoParams) {
+    public Optional<Tuple2<VideoArchive, VideoController<UDPState, UDPError>>> openVideoArchive(ToolBelt toolBelt, UDPVideoParams videoParams) {
         VideoArchiveDAO dao = toolBelt.getAnnotationDAOFactory().newVideoArchiveDAO();
         VideoArchive videoArchive = dao.findOrCreateByParameters(videoParams.getPlatformName(),
                 videoParams.getSequenceNumber(),
                 videoParams.getVideoArchiveName());
         dao.close();
 
-        // Close the port if it's different
-        setSerialPort(videoParams.getSerialPortName());
-
+        setUDPConnection(videoParams.getHostName(), videoParams.getPort());
         return Optional.of(new Tuple2<>(videoArchive, getVideoController()));
     }
 
-    private void setSerialPort(String serialPortName) {
-        // Close the port if it's different
+    private void setUDPConnection(String hostname, Integer port) {
         if (videoIORef.get() != null) {
-            RS422VideoIO videoIO = videoIORef.get();
-            String connectionID = videoIO.getConnectionID();
-            if (!connectionID.equalsIgnoreCase(serialPortName)) {
-                videoIO.close();
-                videoIORef.set(null);
-            }
+            UDPVideoIO io = videoIORef.get();
+            io.close();
+            videoIORef.set(null);
         }
 
-        // Connect to the port if needed
-        if (videoIORef.get() == null) {
-            RS422VideoIO videoIO = RXTXVideoIO.open(serialPortName);
-            videoIORef.set(videoIO);
+        try {
+            UDPVideoIO io = new UDPVideoIO(hostname, port);
+            videoIORef.set(io);
+        }
+        catch (Exception e) {
+            EventBus.publish(GlobalStateLookup.TOPIC_NONFATAL_ERROR, e);
         }
     }
 
-    private VideoController<RS422State, RS422Error> getVideoController() {
+    private VideoController<UDPState, UDPError> getVideoController() {
         return new VideoController<>(imageCaptureService, videoIORef.get());
     }
 
     @Override
-    public VideoPlayerDialogUI<RS422State, RS422Error> getConnectionDialog(ToolBelt toolBelt, RXEventBus eventBus) {
+    public VideoPlayerDialogUI<UDPState, UDPError> getConnectionDialog(ToolBelt toolBelt, RXEventBus eventBus) {
         if (dialogUI == null) {
             Window window = GlobalStateLookup.getSelectedFrame();
-            dialogUI = new RS422VideoPlayerDialogUI(window, toolBelt);
+            dialogUI = new UDPVideoPlayerDialogUI(window, toolBelt);
             dialogUI.onOkay(() -> {
                 VideoArchive videoArchive = dialogUI.openVideoArchive();
-                setSerialPort(dialogUI.getSerialPortName());
+                Tuple2<String, Integer> params = dialogUI.getRemoteConnectionParams();
+                setUDPConnection(params.getA(), params.getB());
                 eventBus.send(new SetVideoArchiveMsg(videoArchive));
                 eventBus.send(new SetVideoControllerMsg<>(getVideoController()));
             });
@@ -116,7 +110,7 @@ public class RS422VideoPlayer implements VideoPlayer<RS422State, RS422Error> {
 
     @Override
     public String getName() {
-        return "RS422";
+        return "Remote VCR Connection";
     }
 
 

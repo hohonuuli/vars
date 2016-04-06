@@ -1,13 +1,15 @@
 package vars.avplayer.rs422;
 
+import gnu.io.CommPortIdentifier;
 import org.mbari.awt.event.NonDigitConsumingKeyListener;
 import org.mbari.swing.SpinningDialWaitIndicator;
 import org.mbari.swing.WaitIndicator;
+import org.mbari.util.Tuple2;
 import org.mbari.vcr4j.rs422.RS422Error;
 import org.mbari.vcr4j.rs422.RS422State;
 import org.mbari.vcr4j.rxtx.RXTXUtilities;
-
-import gnu.io.CommPortIdentifier;
+import org.mbari.vcr4j.udp.UDPError;
+import org.mbari.vcr4j.udp.UDPState;
 import vars.CacheClearedEvent;
 import vars.CacheClearedListener;
 import vars.ToolBelt;
@@ -17,28 +19,25 @@ import vars.avplayer.VideoPlayerDialogUI;
 import vars.shared.ui.dialogs.StandardDialog;
 
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.*;
-import java.util.List;
-
+import javax.swing.border.EtchedBorder;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.border.TitledBorder;
 
 /**
  * @author Brian Schlining
- * @since 2016-04-05T14:13:00
+ * @since 2016-04-06T10:23:00
  */
-public class RS422VideoPlayerDialogUI extends StandardDialog implements VideoPlayerDialogUI<RS422State, RS422Error> {
+public class UDPVideoPlayerDialogUI extends StandardDialog implements VideoPlayerDialogUI<UDPState, UDPError> {
 
     private final ButtonGroup buttonGroup = new ButtonGroup();
-    private final ItemListener rbItemListener = new SelectedRBItemListener();
+    private final ItemListener rbItemListener = new UDPVideoPlayerDialogUI.SelectedRBItemListener();
     private JComboBox<String> cameraPlatformComboBox;
     private JComboBox<String> existingNamesComboBox;
     private boolean loadExistingNames = true;
@@ -56,19 +55,21 @@ public class RS422VideoPlayerDialogUI extends StandardDialog implements VideoPla
     private JTextField sequenceNumberTextField;
     private JTextField tapeNumberTextField;
     private JComboBox<String> cameraPlatformByNameComboBox;
-    private JComboBox<String> serialPortComboBox;
-    private Runnable okRunnable = () -> {};
+    private Runnable okRunnable = () -> {
+    };
     private Runnable cancelRunnable = () -> this.setVisible(false);
 
-    private enum OpenType { BY_PARAMS, BY_NAME, EXISTING; }
+    private enum OpenType {BY_PARAMS, BY_NAME, EXISTING;}
 
     private final ToolBelt toolBelt;
     private JTextField sequenceNumberByNameTextField;
+    private JTextField hostTextField;
+    private JTextField portTextField;
 
     /**
      * Constructs ...
      */
-    public RS422VideoPlayerDialogUI(final Window parent, final ToolBelt toolBelt) {
+    public UDPVideoPlayerDialogUI(final Window parent, final ToolBelt toolBelt) {
         super(parent);
         this.toolBelt = toolBelt;
         initialize();
@@ -182,7 +183,7 @@ public class RS422VideoPlayerDialogUI extends StandardDialog implements VideoPla
     private JRadioButton getOpenByNameRB() {
         if (openByNameRB == null) {
             openByNameRB = new JRadioButton("Open by Name");
-            openByNameRB.setName(OpenType.BY_NAME.name());
+            openByNameRB.setName(UDPVideoPlayerDialogUI.OpenType.BY_NAME.name());
             openByNameRB.addItemListener(rbItemListener);
             //openByNameRB.setEnabled(false); // TODO have to look into implementing this. there are some gotchas
         }
@@ -193,7 +194,7 @@ public class RS422VideoPlayerDialogUI extends StandardDialog implements VideoPla
     private JRadioButton getOpenByPlatformRB() {
         if (openByPlatformRB == null) {
             openByPlatformRB = new JRadioButton("Open by Platform and Sequence Number");
-            openByPlatformRB.setName(OpenType.BY_PARAMS.name());
+            openByPlatformRB.setName(UDPVideoPlayerDialogUI.OpenType.BY_PARAMS.name());
             openByPlatformRB.addItemListener(rbItemListener);
         }
 
@@ -203,20 +204,18 @@ public class RS422VideoPlayerDialogUI extends StandardDialog implements VideoPla
     private JRadioButton getOpenExistingRB() {
         if (openExistingRB == null) {
             openExistingRB = new JRadioButton("Open Existing");
-            openExistingRB.setName(OpenType.EXISTING.name());
+            openExistingRB.setName(UDPVideoPlayerDialogUI.OpenType.EXISTING.name());
             openExistingRB.addItemListener(rbItemListener);
-            openExistingRB.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    if (loadExistingNames) {
-                        JComboBox<String> comboBox = getExistingNamesComboBox();
-                        WaitIndicator waitIndicator = new SpinningDialWaitIndicator(comboBox);
-                        java.util.List<String> names = toolBelt.getAnnotationPersistenceService().findAllVideoArchiveNames();
-                        String[] van = new String[names.size()];
-                        names.toArray(van);
-                        comboBox.setModel(new DefaultComboBoxModel<String>(van));
-                        waitIndicator.dispose();
-                        loadExistingNames = false;
-                    }
+            openExistingRB.addActionListener(e -> {
+                if (loadExistingNames) {
+                    JComboBox<String> comboBox = getExistingNamesComboBox();
+                    WaitIndicator waitIndicator = new SpinningDialWaitIndicator(comboBox);
+                    java.util.List<String> names = toolBelt.getAnnotationPersistenceService().findAllVideoArchiveNames();
+                    String[] van = new String[names.size()];
+                    names.toArray(van);
+                    comboBox.setModel(new DefaultComboBoxModel<String>(van));
+                    waitIndicator.dispose();
+                    loadExistingNames = false;
                 }
             });
         }
@@ -230,95 +229,124 @@ public class RS422VideoPlayerDialogUI extends StandardDialog implements VideoPla
 
             JLabel cameraByNameLabel = new JLabel("Camera Platform:");
             JLabel sequenceNumberByNameLabel = new JLabel("Sequence Number:");
-            
-            JPanel serialPortPanel = new JPanel();
-            serialPortPanel.setBorder(new TitledBorder(null, "Serial Port", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+
+            JPanel remoteHostPanel = new JPanel();
+            remoteHostPanel.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null), "Remote Connection", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 
             GroupLayout groupLayout = new GroupLayout(panel);
             groupLayout.setHorizontalGroup(
-            	groupLayout.createParallelGroup(Alignment.LEADING)
-            		.addGroup(groupLayout.createSequentialGroup()
-            			.addContainerGap()
-            			.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-            				.addComponent(serialPortPanel, GroupLayout.DEFAULT_SIZE, 463, Short.MAX_VALUE)
-            				.addComponent(getOpenByPlatformRB())
-            				.addComponent(getOpenByNameRB())
-            				.addGroup(groupLayout.createSequentialGroup()
-            					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-            						.addComponent(getOpenExistingRB())
-            						.addGroup(groupLayout.createSequentialGroup()
-            							.addGap(29)
-            							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-            								.addComponent(cameraByNameLabel)
-            								.addComponent(getLblName())
-            								.addComponent(sequenceNumberByNameLabel)))
-            						.addGroup(groupLayout.createSequentialGroup()
-            							.addGap(29)
-            							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-            								.addComponent(getLblCameraPlatform())
-            								.addComponent(getLblSequenceNumber())
-            								.addComponent(getLblTapeNumber())))
-            						.addGroup(groupLayout.createSequentialGroup()
-            							.addGap(29)
-            							.addComponent(getLblSelectName())))
-            					.addGap(18)
-            					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-            						.addComponent(getCameraPlatformByNameComboBox(), 0, 299, Short.MAX_VALUE)
-            						.addComponent(getNameTextField(), Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE)
-            						.addComponent(getSequenceNumberByNameTextField(), GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE)
-            						.addComponent(getExistingNamesComboBox(), 0, 299, Short.MAX_VALUE)
-            						.addComponent(getSequenceNumberTextField(), GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE)
-            						.addComponent(getTapeNumberTextField(), GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE)
-            						.addComponent(getCameraPlatformComboBox(), 0, 299, Short.MAX_VALUE)
-            						.addComponent(getHdCheckBox()))))
-            			.addContainerGap())
+                    groupLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                            .addGroup(groupLayout.createSequentialGroup()
+                                    .addContainerGap()
+                                    .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                            .addComponent(remoteHostPanel, GroupLayout.DEFAULT_SIZE, 463, Short.MAX_VALUE)
+                                            .addComponent(getOpenByPlatformRB())
+                                            .addComponent(getOpenByNameRB())
+                                            .addGroup(groupLayout.createSequentialGroup()
+                                                    .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                                            .addComponent(getOpenExistingRB())
+                                                            .addGroup(groupLayout.createSequentialGroup()
+                                                                    .addGap(29)
+                                                                    .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                                                            .addComponent(cameraByNameLabel)
+                                                                            .addComponent(getLblName())
+                                                                            .addComponent(sequenceNumberByNameLabel)))
+                                                            .addGroup(groupLayout.createSequentialGroup()
+                                                                    .addGap(29)
+                                                                    .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                                                            .addComponent(getLblCameraPlatform())
+                                                                            .addComponent(getLblSequenceNumber())
+                                                                            .addComponent(getLblTapeNumber())))
+                                                            .addGroup(groupLayout.createSequentialGroup()
+                                                                    .addGap(29)
+                                                                    .addComponent(getLblSelectName())))
+                                                    .addGap(18)
+                                                    .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                                            .addComponent(getCameraPlatformByNameComboBox(), 0, 299, Short.MAX_VALUE)
+                                                            .addComponent(getNameTextField(), GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE)
+                                                            .addComponent(getSequenceNumberByNameTextField(), GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE)
+                                                            .addComponent(getExistingNamesComboBox(), 0, 299, Short.MAX_VALUE)
+                                                            .addComponent(getSequenceNumberTextField(), GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE)
+                                                            .addComponent(getTapeNumberTextField(), GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE)
+                                                            .addComponent(getCameraPlatformComboBox(), 0, 299, Short.MAX_VALUE)
+                                                            .addComponent(getHdCheckBox()))))
+                                    .addContainerGap())
             );
             groupLayout.setVerticalGroup(
-            	groupLayout.createParallelGroup(Alignment.LEADING)
-            		.addGroup(groupLayout.createSequentialGroup()
+                    groupLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                            .addGroup(groupLayout.createSequentialGroup()
+                                    .addContainerGap()
+                                    .addComponent(getOpenByPlatformRB())
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                            .addComponent(getLblCameraPlatform())
+                                            .addComponent(getCameraPlatformComboBox(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                            .addComponent(getLblSequenceNumber())
+                                            .addComponent(getSequenceNumberTextField(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                                    .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                            .addComponent(getLblTapeNumber())
+                                            .addComponent(getTapeNumberTextField(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(getHdCheckBox())
+                                    .addGap(4)
+                                    .addComponent(getOpenByNameRB())
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                            .addComponent(getNameTextField(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(getLblName()))
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                            .addComponent(getCameraPlatformByNameComboBox(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(cameraByNameLabel))
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                            .addComponent(sequenceNumberByNameLabel)
+                                            .addComponent(getSequenceNumberByNameTextField(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(getOpenExistingRB())
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                            .addComponent(getLblSelectName())
+                                            .addComponent(getExistingNamesComboBox(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                                    .addComponent(remoteHostPanel, GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE)
+                                    .addContainerGap())
+            );
+            
+            JLabel lblRemoteHost = new JLabel("Host:");
+            JLabel lblRemotePort = new JLabel("Port:");
+            
+            GroupLayout gl_serialPortPanel = new GroupLayout(remoteHostPanel);
+            gl_serialPortPanel.setHorizontalGroup(
+            	gl_serialPortPanel.createParallelGroup(Alignment.LEADING)
+            		.addGroup(gl_serialPortPanel.createSequentialGroup()
             			.addContainerGap()
-            			.addComponent(getOpenByPlatformRB())
+            			.addGroup(gl_serialPortPanel.createParallelGroup(Alignment.LEADING)
+            				.addComponent(lblRemoteHost)
+            				.addComponent(lblRemotePort))
             			.addPreferredGap(ComponentPlacement.RELATED)
-            			.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-            				.addComponent(getLblCameraPlatform())
-            				.addComponent(getCameraPlatformComboBox(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-            			.addPreferredGap(ComponentPlacement.RELATED)
-            			.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-            				.addComponent(getLblSequenceNumber())
-            				.addComponent(getSequenceNumberTextField(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-            			.addPreferredGap(ComponentPlacement.UNRELATED)
-            			.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-            				.addComponent(getLblTapeNumber())
-            				.addComponent(getTapeNumberTextField(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-            			.addPreferredGap(ComponentPlacement.RELATED)
-            			.addComponent(getHdCheckBox())
-            			.addGap(4)
-            			.addComponent(getOpenByNameRB())
-            			.addPreferredGap(ComponentPlacement.RELATED)
-            			.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-            				.addComponent(getNameTextField(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-            				.addComponent(getLblName()))
-            			.addPreferredGap(ComponentPlacement.RELATED)
-            			.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-            				.addComponent(getCameraPlatformByNameComboBox(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-            				.addComponent(cameraByNameLabel))
-            			.addPreferredGap(ComponentPlacement.RELATED)
-            			.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-            				.addComponent(sequenceNumberByNameLabel)
-            				.addComponent(getSequenceNumberByNameTextField(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-            			.addPreferredGap(ComponentPlacement.RELATED)
-            			.addComponent(getOpenExistingRB())
-            			.addPreferredGap(ComponentPlacement.RELATED)
-            			.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-            				.addComponent(getLblSelectName())
-            				.addComponent(getExistingNamesComboBox(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-            			.addPreferredGap(ComponentPlacement.UNRELATED)
-            			.addComponent(serialPortPanel, GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE)
+            			.addGroup(gl_serialPortPanel.createParallelGroup(Alignment.LEADING)
+            				.addComponent(getPortTextField(), GroupLayout.DEFAULT_SIZE, 399, Short.MAX_VALUE)
+            				.addComponent(getHostTextField(), GroupLayout.DEFAULT_SIZE, 348, Short.MAX_VALUE))
             			.addContainerGap())
             );
-            serialPortPanel.setLayout(new BorderLayout(0, 0));
-            
-            serialPortPanel.add(getSerialPortComboBox(), BorderLayout.CENTER);
+            gl_serialPortPanel.setVerticalGroup(
+            	gl_serialPortPanel.createParallelGroup(Alignment.LEADING)
+            		.addGroup(gl_serialPortPanel.createSequentialGroup()
+            			.addContainerGap()
+            			.addGroup(gl_serialPortPanel.createParallelGroup(Alignment.BASELINE)
+            				.addComponent(lblRemoteHost)
+            				.addComponent(getHostTextField(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+            			.addPreferredGap(ComponentPlacement.RELATED)
+            			.addGroup(gl_serialPortPanel.createParallelGroup(Alignment.BASELINE)
+            				.addComponent(lblRemotePort)
+            				.addComponent(getPortTextField(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+            			.addContainerGap(83, Short.MAX_VALUE))
+            );
+            remoteHostPanel.setLayout(gl_serialPortPanel);
             panel.setLayout(groupLayout);
 
             buttonGroup.add(getOpenByNameRB());
@@ -328,18 +356,6 @@ public class RS422VideoPlayerDialogUI extends StandardDialog implements VideoPla
 
         }
         return panel;
-    }
-    
-    private JComboBox<String> getSerialPortComboBox() {
-    	if (serialPortComboBox == null) {
-    		String[] ports = RXTXUtilities.getAvailableSerialPorts()
-    		    .stream()
-    		    .map(CommPortIdentifier::getName)
-    		    .sorted()
-    		    .toArray(String[]::new);
-    		serialPortComboBox = new JComboBox<>(ports);
-    	}
-    	return serialPortComboBox;
     }
 
     private JTextField getSequenceNumberTextField() {
@@ -372,14 +388,14 @@ public class RS422VideoPlayerDialogUI extends StandardDialog implements VideoPla
     }
 
     protected void initialize() {
-        setPreferredSize(new Dimension(475, 475));
+        setPreferredSize(new Dimension(475, 550));
         getOkayButton().addActionListener(e -> okRunnable.run());
         getCancelButton().addActionListener(e -> cancelRunnable.run());
         getContentPane().add(getPanel(), BorderLayout.CENTER);
     }
 
     private String[] listCameraPlatforms() {
-        final List<String> cameraPlatforms = toolBelt.getAnnotationPersistenceService().findAllCameraPlatforms();
+        final java.util.List<String> cameraPlatforms = toolBelt.getAnnotationPersistenceService().findAllCameraPlatforms();
         String[] cp = new String[cameraPlatforms.size()];
         cameraPlatforms.toArray(cp);
         return cp;
@@ -389,17 +405,18 @@ public class RS422VideoPlayerDialogUI extends StandardDialog implements VideoPla
      * This method call opens/creates a videoArchive based on the parameters
      * a user has set in this Dialog. This method is intended to be called from
      * an ActionListener to retrieve the VideoArchiveSet.
+     *
      * @return
      */
     public VideoArchive openVideoArchive() {
         VideoArchive videoArchive = null;
 
         Enumeration<AbstractButton> e = buttonGroup.getElements();
-        OpenType openType = null;
+        UDPVideoPlayerDialogUI.OpenType openType = null;
         while (e.hasMoreElements()) {
             AbstractButton b = e.nextElement();
             if (b.isSelected()) {
-                openType = OpenType.valueOf(b.getName());
+                openType = UDPVideoPlayerDialogUI.OpenType.valueOf(b.getName());
                 break;
             }
         }
@@ -408,16 +425,14 @@ public class RS422VideoPlayerDialogUI extends StandardDialog implements VideoPla
         dao.startTransaction();
 
         switch (openType) {
-            case BY_NAME:
-            {
+            case BY_NAME: {
                 String videoArchiveName = getNameTextField().getText();
                 int sequenceNumber = Integer.parseInt(getSequenceNumberByNameTextField().getText());
                 String platform = (String) getCameraPlatformComboBox().getSelectedItem();
                 videoArchive = dao.findOrCreateByParameters(platform, sequenceNumber, videoArchiveName);
                 break;
             }
-            case BY_PARAMS:
-            {
+            case BY_PARAMS: {
                 int sequenceNumber = Integer.parseInt(getSequenceNumberTextField().getText());
                 String platform = (String) getCameraPlatformComboBox().getSelectedItem();
                 int tapeNumber = Integer.parseInt(getTapeNumberTextField().getText());
@@ -426,8 +441,7 @@ public class RS422VideoPlayerDialogUI extends StandardDialog implements VideoPla
                 videoArchive = dao.findOrCreateByParameters(platform, sequenceNumber, videoArchiveName);
                 break;
             }
-            case EXISTING:
-            {
+            case EXISTING: {
                 String name = (String) getExistingNamesComboBox().getSelectedItem();
                 videoArchive = dao.findByName(name);
                 break;
@@ -440,9 +454,7 @@ public class RS422VideoPlayerDialogUI extends StandardDialog implements VideoPla
         return videoArchive;
     }
 
-    public String getSerialPortName() {
-        return (String) getSerialPortComboBox().getSelectedItem();
-    }
+
 
 
     private JTextField getSequenceNumberByNameTextField() {
@@ -465,20 +477,17 @@ public class RS422VideoPlayerDialogUI extends StandardDialog implements VideoPla
 
 
     /**
-     *
      * @author brian
-     *
      */
     class SelectedRBItemListener implements ItemListener {
 
         /**
-         *
          * @param e
          */
         public void itemStateChanged(ItemEvent e) {
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 JRadioButton radioButton = (JRadioButton) e.getItemSelectable();
-                OpenType openType = OpenType.valueOf(radioButton.getName());
+                UDPVideoPlayerDialogUI.OpenType openType = UDPVideoPlayerDialogUI.OpenType.valueOf(radioButton.getName());
                 boolean cameraPlatformCB = false;
                 boolean sequenceNumberTF = false;
                 boolean hdChckB = false;
@@ -522,6 +531,27 @@ public class RS422VideoPlayerDialogUI extends StandardDialog implements VideoPla
         }
     }
 
+    public JTextField getHostTextField() {
+        if (hostTextField == null) {
+            hostTextField = new JTextField();
+            hostTextField.setColumns(10);
+        }
+        return hostTextField;
+    }
+
+    public JTextField getPortTextField() {
+        if (portTextField == null) {
+            portTextField = new JTextField();
+            portTextField.addKeyListener(new NonDigitConsumingKeyListener());
+            portTextField.setColumns(10);
+        }
+        return portTextField;
+    }
+
+    public Tuple2<String, Integer> getRemoteConnectionParams() {
+        return new Tuple2<>(getHostTextField().getText(),
+                Integer.parseInt(getPortTextField().getText()));
+    }
 
     @Override
     public void onCancel(Runnable fn) {

@@ -5,6 +5,7 @@ import org.mbari.vcr4j.VideoError;
 import org.mbari.vcr4j.VideoState;
 import vars.ToolBelt;
 import vars.annotation.VideoArchive;
+import vars.shared.rx.RXEventBus;
 
 import java.util.Optional;
 
@@ -33,9 +34,13 @@ public interface VideoPlayer<S extends VideoState, E extends VideoError> {
      * call the connect method. The returned dialog may be requested once and then
      * subsequently reused by UI components so you should write it accordely.
      *
+     * @param toolBelt ToolBelt for accessign the various factories
+     * @param eventBus Updates to the VideoArchive and VideoController will be sent as messages
+     *                 on the eventbus
      * @return A JDialog that can be used to connect to your video service
+     *
      */
-    VideoPlayerDialogUI<S, E> getConnectionDialog(ToolBelt toolBelt);
+    VideoPlayerDialogUI<S, E> getConnectionDialog(ToolBelt toolBelt, RXEventBus eventBus);
 
     /**
      * Used to determine if this service can open this mimetype.

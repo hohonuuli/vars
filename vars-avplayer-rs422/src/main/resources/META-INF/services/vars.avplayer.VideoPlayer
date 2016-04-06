@@ -1,0 +1,3 @@
+# Providers for VideoPlayers
+vars.avplayer.rs422.RS422VideoPlayer
+vars.avplayer.rs422.UDPVideoPlayer

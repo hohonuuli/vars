@@ -6,6 +6,7 @@ import vars.annotation.VideoArchive;
 import vars.avplayer.VideoPlayer;
 import vars.avplayer.VideoController;
 import vars.avplayer.VideoPlayerDialogUI;
+import vars.shared.rx.RXEventBus;
 
 import javax.swing.*;
 import java.util.Optional;
@@ -24,7 +25,7 @@ public class NoopVideoPlayer implements VideoPlayer {
 
 
     @Override
-    public VideoPlayerDialogUI getConnectionDialog(ToolBelt toolBelt) {
+    public VideoPlayerDialogUI getConnectionDialog(ToolBelt toolBelt, RXEventBus eventBus) {
         // TODO return a dialog with only a close button
         return null;
     }
