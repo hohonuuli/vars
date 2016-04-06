@@ -4,12 +4,11 @@ import vars.ToolBox
 import org.slf4j.LoggerFactory
 import vars.annotation.ui.Lookup
 import vars.avplayer.ImageCaptureService
-import vars.annotation.ui.video.RS422VideoControlService
+
 import org.mbari.vcr.VCRAdapter
 import org.mbari.movie.Timecode
 import org.mbari.vcr.VCRUtil
 import vars.annotation.ui.PersistenceController
-import org.mbari.vcr.IVCR
 
 /**
  *

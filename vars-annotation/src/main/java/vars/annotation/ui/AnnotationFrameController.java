@@ -7,8 +7,6 @@ package vars.annotation.ui;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
@@ -50,7 +48,6 @@ import vars.annotation.ui.eventbus.UIEventSubscriber;
 import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
 import vars.annotation.ui.eventbus.VideoArchiveSelectedEvent;
 import vars.annotation.ui.eventbus.VideoFramesChangedEvent;
-import vars.annotation.ui.video.DoNothingVideoControlService;
 import vars.annotation.ui.video.VideoControlServiceFactory;
 import vars.avplayer.VideoController;
 import vars.avplayer.noop.NoopImageCaptureService;

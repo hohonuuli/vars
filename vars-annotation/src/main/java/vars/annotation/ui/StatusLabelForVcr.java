@@ -28,7 +28,6 @@ import org.mbari.swing.SwingUtils;
 import org.mbari.vcr4j.VideoError;
 import org.mbari.vcr4j.VideoState;
 import vars.UserAccount;
-import vars.annotation.ui.video.VideoControlServiceDialog;
 import vars.avplayer.VideoController;
 import vars.shared.preferences.PreferencesService;
 

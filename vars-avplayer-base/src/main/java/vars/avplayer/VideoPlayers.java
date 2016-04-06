@@ -17,16 +17,16 @@ import java.util.stream.Collectors;
 public class VideoPlayers {
 
 
-    public List<VideoPlayer> get() {
+    public static List<VideoPlayer> get() {
         return StreamUtilities.toStream(loadVideoPlayers().iterator())
             .collect(Collectors.toList());
     }
 
-    public ServiceLoader<VideoPlayer> loadVideoPlayers() {
+    public static ServiceLoader<VideoPlayer> loadVideoPlayers() {
         return ServiceLoader.load(VideoPlayer.class);
     }
 
-    public List<VideoPlayer> findVideoPlayers(String mimeType) {
+    public static List<VideoPlayer> findVideoPlayers(String mimeType) {
         return StreamUtilities.toStream(loadVideoPlayers().iterator())
                 .filter(v -> v.canPlay(mimeType))
                 .collect(Collectors.toList());

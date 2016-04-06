@@ -17,6 +17,7 @@ import vars.annotation.VideoArchiveDAO;
 import vars.avplayer.VideoController;
 import vars.avplayer.VideoPlayer;
 import vars.avplayer.VideoPlayerDialogUI;
+import vars.shared.rx.RXEventBus;
 import vars.shared.ui.GlobalStateLookup;
 
 import javax.swing.*;
@@ -82,7 +83,7 @@ public class JFXVideoPlayer implements VideoPlayer<JFXVideoState, SimpleVideoErr
     }
 
     @Override
-    public VideoPlayerDialogUI getConnectionDialog(ToolBelt toolBelt) {
+    public VideoPlayerDialogUI getConnectionDialog(ToolBelt toolBelt, RXEventBus eventBus) {
         if (dialogUI == null) {
             Window window = GlobalStateLookup.getSelectedFrame();
             dialogUI = new JFXVideoPlayerDialogUI(window, toolBelt, this);

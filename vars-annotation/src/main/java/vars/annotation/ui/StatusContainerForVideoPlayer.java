@@ -5,20 +5,24 @@ import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.annotation.AnnotationProcessor;
 import org.bushe.swing.event.annotation.EventSubscriber;
 import org.mbari.swing.SwingUtils;
-import org.mbari.util.Dispatcher;
-import org.mbari.util.Tuple2;
-import org.mbari.vcr4j.timer.StatusMonitor;
+
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
 import vars.annotation.ui.eventbus.VideoArchiveSelectedEvent;
+import vars.avplayer.VideoPlayer;
 import vars.avplayer.VideoPlayerDialogUI;
 import vars.avplayer.VideoPlayers;
+import vars.avplayer.noop.NoopVideoPlayer;
+import vars.shared.rx.RXEventBus;
+
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * DEVELOPER NOTE: Based off of StatusLabelForVideoArchive. Refer to that class if things aren't working.
@@ -27,17 +31,18 @@ import java.beans.PropertyChangeEvent;
 public class StatusContainerForVideoPlayer extends JPanel {
 
     private static final String NO_FILE = "Video: None Selected";
-    private final StatusMonitor statusMonitor = new StatusMonitor();
     private JComboBox<String> videoPlayerComboBox;
     private StatusLabel statusLabel;
-    private VideoPlayers videoPlayers;
+    private List<VideoPlayer> videoPlayers;
     private final ToolBelt toolBelt;
+    private final RXEventBus eventBus;
 
-    public StatusContainerForVideoPlayer(final ToolBelt toolBelt) {
+    public StatusContainerForVideoPlayer(final ToolBelt toolBelt, RXEventBus eventBus) {
         super();
         this.toolBelt = toolBelt;
+        this.eventBus = eventBus;
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-        videoPlayers = new VideoPlayers(toolBelt.getAnnotationDAOFactory());
+        videoPlayers = VideoPlayers.get();
         statusLabel = new StatusLabelForVideoPlayer(toolBelt);
 
         add(statusLabel);
@@ -54,7 +59,7 @@ public class StatusContainerForVideoPlayer extends JPanel {
     private JComboBox<String> getVideoPlayerComboBox() {
         if (videoPlayerComboBox == null) {
             videoPlayerComboBox = new JComboBox<>();
-            for (VideoPlayerOld v : videoPlayers.get()) {
+            for (VideoPlayer v : videoPlayers) {
                 videoPlayerComboBox.addItem(v.getName());
             }
         }
@@ -111,17 +116,13 @@ public class StatusContainerForVideoPlayer extends JPanel {
         statusLabel.setOk(ok);
     }
 
-    VideoPlayerOld getSelectedVideoPlayer() {
+    VideoPlayer getSelectedVideoPlayer() {
         JComboBox<String> cb = getVideoPlayerComboBox();
         String name = cb.getItemAt(cb.getSelectedIndex());
-        VideoPlayerOld videoPlayer = null;
-        for (VideoPlayerOld v: videoPlayers.get()) {
-            if (v.getName().equals(name)) {
-                videoPlayer = v;
-                break;
-            }
-        }
-        return videoPlayer;
+        Optional<VideoPlayer> videoPlayer = videoPlayers.stream()
+                .filter(v -> v.getName().equals(name))
+                .findFirst();
+        return videoPlayer.orElse(new NoopVideoPlayer());
     }
 
 
@@ -134,7 +135,6 @@ public class StatusContainerForVideoPlayer extends JPanel {
 
                 Frame frame = StateLookup.getAnnotationFrame();
 
-
                 @Override
                 public void mouseClicked(final MouseEvent me) {
                     SwingUtils.flashJComponent(StatusLabelForVideoPlayer.this, 2);
@@ -145,12 +145,12 @@ public class StatusContainerForVideoPlayer extends JPanel {
 
                     // Get the correct AccessUI. This provides a dialog to open a VideoArchive and a VideoPlayerController
                     // for a selected VideoPlayerOld module
-                    final VideoPlayerOld videoPlayer = getSelectedVideoPlayer();
-                    final VideoPlayerAccessUI accessUI = videoPlayer.getAccessUI();
-                    final VideoPlayerDialogUI dialog = accessUI.getOpenDialog(frame, toolBelt);
+                    final VideoPlayer videoPlayer = getSelectedVideoPlayer();
+                    final VideoPlayerDialogUI dialog = videoPlayer.getConnectionDialog(toolBelt, eventBus)
 
                     dialog.onOkay(() -> {
-                        // TODO this needs to be replaced with new vcr4j 3 code and StateLookup
+                        // TODO this needs to be replaced with new vcr4j 3 code, StateLookup and RXEventBus listenersi
+
 
                         dialog.setVisible(false);
                         final VideoParams videoParams = dialog.getVideoParams();
