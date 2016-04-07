@@ -4,6 +4,7 @@ import org.mbari.util.Tuple2;
 import org.mbari.vcr4j.rs422.RS422Error;
 import org.mbari.vcr4j.rs422.RS422State;
 import org.mbari.vcr4j.rs422.RS422VideoIO;
+import org.mbari.vcr4j.rxtx.RXTX;
 import org.mbari.vcr4j.rxtx.RXTXVideoIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,10 @@ public class RS422VideoPlayer implements VideoPlayer<RS422State, RS422Error> {
     private final AtomicReference<RS422VideoIO> videoIORef = new AtomicReference<>();
     private ImageCaptureService imageCaptureService = ImageCaptureServiceRef.getImageCaptureService();
     private RS422VideoPlayerDialogUI dialogUI;
+
+    public RS422VideoPlayer() {
+        RXTX.setup();
+    }
 
     @Override
     public boolean canPlay(String mimeType) {

@@ -146,25 +146,25 @@ public class StatusContainerForVideoPlayer extends JPanel {
                     // Get the correct AccessUI. This provides a dialog to open a VideoArchive and a VideoPlayerController
                     // for a selected VideoPlayerOld module
                     final VideoPlayer videoPlayer = getSelectedVideoPlayer();
-                    final VideoPlayerDialogUI dialog = videoPlayer.getConnectionDialog(toolBelt, eventBus)
+                    final VideoPlayerDialogUI dialog = videoPlayer.getConnectionDialog(toolBelt, eventBus);
 
-                    dialog.onOkay(() -> {
-                        // TODO this needs to be replaced with new vcr4j 3 code, StateLookup and RXEventBus listenersi
-
-
-                        dialog.setVisible(false);
-                        final VideoParams videoParams = dialog.getVideoParams();
-                        Tuple2<VideoArchive, VideoPlayerController> t = accessUI.openMoviePlayer(videoParams,
-                                toolBelt.getAnnotationDAOFactory());
-                        VideoArchive videoArchive = t.getA();
-                        VideoPlayerController videoPlayerController = t.getB();
-                        VideoArchiveChangedEvent event = new VideoArchiveChangedEvent(this, videoArchive);
-
-
-                        //Lookup.getImageCaptureServiceDispatcher().setValueObject(videoPlayerController.getImageCaptureService());
-                        //Lookup.getVideoControlServiceDispatcher().setValueObject(videoPlayerController.getVideoControlService());
-                        EventBus.publish(event);
-                    });
+//                    dialog.onOkay(() -> {
+//                        // TODO this needs to be replaced with new vcr4j 3 code, StateLookup and RXEventBus listenersi
+//
+//
+//                        dialog.setVisible(false);
+//                        final VideoParams videoParams = dialog.getVideoParams();
+//                        Tuple2<VideoArchive, VideoPlayerController> t = accessUI.openMoviePlayer(videoParams,
+//                                toolBelt.getAnnotationDAOFactory());
+//                        VideoArchive videoArchive = t.getA();
+//                        VideoPlayerController videoPlayerController = t.getB();
+//                        VideoArchiveChangedEvent event = new VideoArchiveChangedEvent(this, videoArchive);
+//
+//
+//                        //Lookup.getImageCaptureServiceDispatcher().setValueObject(videoPlayerController.getImageCaptureService());
+//                        //Lookup.getVideoControlServiceDispatcher().setValueObject(videoPlayerController.getVideoControlService());
+//                        EventBus.publish(event);
+//                    });
 
                     int x = mousePosition.x;
                     if (x < 1) {

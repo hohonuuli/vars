@@ -66,6 +66,7 @@ import vars.annotation.ui.table.ObservationTableModel;
 import vars.annotation.ui.video.VideoControlPanel;
 import vars.annotation.ui.videoset.VideoArchiveSetEditorButton;
 import vars.avplayer.VideoController;
+import vars.shared.rx.RXEventBus;
 
 /**
  *
@@ -90,6 +91,7 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
     private JScrollPane tableScrollPane;
     private JToolBar toolBar;
     private final ToolBelt toolBelt;
+    private final RXEventBus eventBus;
     private VideoControlPanel videoControlPanel;
     private VideoArchive videoArchive;
 
@@ -100,8 +102,9 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
      *
      * @throws HeadlessException
      */
-    public AnnotationFrame(ToolBelt toolBelt) throws HeadlessException {
+    public AnnotationFrame(ToolBelt toolBelt, RXEventBus eventBus) throws HeadlessException {
         this.toolBelt = toolBelt;
+        this.eventBus = eventBus;
         this.controller = new AnnotationFrameController(this, toolBelt);
         AnnotationProcessor.process(this); // Create EventBus Proxy
         initialize();
@@ -335,7 +338,8 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
             toolBar.add(new VideoArchiveSetEditorButton(toolBelt));
             toolBar.add(new PreferenceFrameButton());
             toolBar.add(new StatusLabelForPerson(toolBelt));
-            toolBar.add(new StatusLabelForVcr());
+            toolBar.add(new VideoPlayersPanel(toolBelt, eventBus));
+            //toolBar.add(new StatusLabelForVcr());
             toolBar.add(new StatusLabelForVideoArchive(toolBelt));
 
             // Map in undo and redo keys

@@ -37,6 +37,7 @@ import vars.annotation.AnnotationPersistenceService;
 import vars.annotation.ui.eventbus.ExitTopicSubscriber;
 import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
 import vars.knowledgebase.Concept;
+import vars.shared.rx.RXEventBus;
 import vars.shared.ui.GlobalStateLookup;
 import vars.shared.ui.event.FatalExceptionSubscriber;
 import vars.shared.ui.event.LoggingEventSubscriber;
@@ -51,6 +52,7 @@ import vars.shared.util.ActiveAppPinger;
  */
 public class App {
 
+    private RXEventBus eventBus = new RXEventBus();
     private AnnotationFrame annotationFrame;
     private ToolBelt toolBelt;
     
@@ -169,7 +171,7 @@ public class App {
      */
     public AnnotationFrame getAnnotationFrame() {
         if (annotationFrame == null) {
-            annotationFrame = new AnnotationFrame(toolBelt);
+            annotationFrame = new AnnotationFrame(toolBelt, eventBus);
         }
 
         return annotationFrame;

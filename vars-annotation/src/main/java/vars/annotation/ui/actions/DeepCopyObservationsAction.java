@@ -88,10 +88,10 @@ public final class DeepCopyObservationsAction extends ActionAdapter {
                 final VideoIndex videoIndex = videoIndexFuture.get(3, TimeUnit.SECONDS);
                 UserAccount userAccount = StateLookup.getUserAccount();
 
-                final VideoTime videoTime = videoControlService.requestVideoTime();
+                //final VideoTime videoTime = videoControlService.requestVideoTime();
                 String user = userAccount != null ? userAccount.getUserName() : UserAccount.USERNAME_DEFAULT;
 
-                Command command = new CopyObservationsCmd(videoArchive.getName(), videoTime, user, observations, true);
+                Command command = new CopyObservationsCmd(videoArchive.getName(), videoIndex, user, observations, true);
                 CommandEvent commandEvent = new CommandEvent(command);
                 EventBus.publish(commandEvent);
             }

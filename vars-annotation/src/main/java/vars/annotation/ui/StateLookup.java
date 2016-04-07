@@ -32,19 +32,19 @@ public class StateLookup extends GlobalStateLookup {
      * True = status is OK,
      * false = database problems
      */
-    public static final String TOPIC_DATABASE_STATUS = "vars.annotation.ui.Lookup-DatabaseStatus";
+    public static final String TOPIC_DATABASE_STATUS = "vars.annotation.ui.StateLookup-DatabaseStatus";
 
     /**
      * Refresh the persisted objects (aka clear 2nd level cache).
      */
-    public static final String TOPIC_REFRESH = "vars.annotation.ui.Lookup-Refresh";
+    public static final String TOPIC_REFRESH = "vars.annotation.ui.StateLookup-Refresh";
 
     /**
      * Message is sent when a concept should be selected in the concept tree. The
      * data object is a {@link String} representing the concept name to select. The
      * subscriber for the tree is in {@link MiscTabsPanel}
      */
-    public static final String TOPIC_SELECT_CONCEPT = "vars-annotation.ui.Lookup-SelectedConcept";
+    public static final String TOPIC_SELECT_CONCEPT = "vars-annotation.ui.StateLookup-SelectedConcept";
 
     private static final ObjectProperty<CameraDirections> cameraDirection = new SimpleObjectProperty<>();
     public static final Injector GUICE_INJECTOR = Guice.createInjector(new InjectorModule("vars-jpa-annotation", "vars-jpa-knowledgebase", "vars-jpa-misc"));

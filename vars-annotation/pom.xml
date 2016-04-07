@@ -99,6 +99,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>vars-redux</groupId>
+            <artifactId>vars-avplayer-rs422</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>vars-avplayer-jfx</artifactId>
             <version>${project.version}</version>

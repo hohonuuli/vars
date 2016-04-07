@@ -157,18 +157,16 @@ public class QuickControlsPanel extends JPanel {
             }
 
             setPreferredSize(new java.awt.Dimension(120, 25));
-            addActionListener(new java.awt.event.ActionListener() {
+            addActionListener(e -> {
 
-                public void actionPerformed(final java.awt.event.ActionEvent e) {
-                    final Object selectedItem = getSelectedItem();
-                    if (!(selectedItem instanceof ModeObject)) {
-                        return;
-                    }
-
-                    final ModeObject mode = (ModeObject) modeChoiceBox.getSelectedItem();
-                    action.setFormatCode(mode.code);
-                    action.doAction();
+                final Object selectedItem = getSelectedItem();
+                if (!(selectedItem instanceof ModeObject)) {
+                    return;
                 }
+
+                final ModeObject mode = (ModeObject) modeChoiceBox.getSelectedItem();
+                action.setFormatCode(mode.code);
+                action.doAction();
 
             });
 
@@ -191,7 +189,10 @@ public class QuickControlsPanel extends JPanel {
             });
         }
 
-
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            // TODO what to do here
+        }
     }
 
 

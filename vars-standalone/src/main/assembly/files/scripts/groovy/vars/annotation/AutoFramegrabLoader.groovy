@@ -2,12 +2,9 @@ package vars.annotation
 
 import vars.ToolBox
 import org.slf4j.LoggerFactory
-import vars.annotation.ui.Lookup
-import vars.avplayer.ImageCaptureService
+import vars.annotation.ui.StateLookup
 
-import org.mbari.vcr.VCRAdapter
 import org.mbari.movie.Timecode
-import org.mbari.vcr.VCRUtil
 import vars.annotation.ui.PersistenceController
 
 /**
@@ -54,8 +51,7 @@ class AutoFramegrabLoader {
            that says I need to sign my classes for this to work. I need to add
            some code to sign the jars when building the standalone app
         */
-        imageCaptureService = Lookup.guiceInjectorDispatcher.valueObject.getInstance(ImageCaptureService.class);
-        // frameGrabber = imageCaptureService.grabber // using QT4J
+        imageCaptureService = StateLookup.videoController.imageCaptureService
 
         // Initialize video control service
         try {
