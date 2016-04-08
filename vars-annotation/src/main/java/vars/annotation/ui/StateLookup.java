@@ -70,7 +70,7 @@ public class StateLookup extends GlobalStateLookup {
         });
 
         videoController.addListener((obs, oldVal, newVal) -> {
-            if (newVal != null) {
+            if (oldVal != null) {
                 oldVal.close();
             }
         });

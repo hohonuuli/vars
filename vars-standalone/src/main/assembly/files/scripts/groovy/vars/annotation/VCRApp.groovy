@@ -2,14 +2,13 @@ package vars.annotation
 
 import org.mbari.vcr4j.time.Timecode
 import vars.annotation.ui.StateLookup
-import vars.annotation.ui.StatusLabelForVcr
+
 import vars.annotation.ui.video.VideoControlPanel
 
 import javax.swing.BoxLayout
 import javax.swing.JButton
 import javax.swing.JFrame
 import javax.swing.JPanel
-import javax.swing.JTextArea
 import javax.swing.JTextField
 import javax.swing.JToolBar
 import javax.swing.SwingUtilities
@@ -32,7 +31,7 @@ class VCRApp {
         pane.layout = new BorderLayout(5, 5)
 
         def toolBar = new JToolBar()
-        toolBar.add(new StatusLabelForVcr())
+        //toolBar.add(new StatusLabelForVcr())
         pane.add(toolBar, BorderLayout.NORTH)
 
         def videoControlPanel = new VideoControlPanel()

@@ -51,8 +51,11 @@ import vars.annotation.ui.eventbus.VideoFramesChangedEvent;
 import vars.annotation.ui.video.VideoControlServiceFactory;
 import vars.avplayer.VideoController;
 import vars.avplayer.noop.NoopImageCaptureService;
+import vars.avplayer.rx.SetVideoArchiveMsg;
+import vars.avplayer.rx.SetVideoControllerMsg;
 import vars.shared.preferences.PreferenceUpdater;
 import vars.shared.preferences.PreferencesService;
+import vars.shared.rx.RXEventBus;
 
 /**
  *
@@ -71,12 +74,16 @@ public class AnnotationFrameController implements PreferenceUpdater, UIEventSubs
     private final AnnotationFrame annotationFrame;
     private final Logger log = LoggerFactory.getLogger(getClass());
     private final ToolBelt toolBelt;
+    private final RXEventBus eventBus;
     /** VERY IMPORTANT - the CommandQueue process the EventBus commands that modify model classes */
     private final CommandQueue commandQueue;
 
-    public AnnotationFrameController(final AnnotationFrame annotationFrame, final ToolBelt toolBelt) {
+    public AnnotationFrameController(final AnnotationFrame annotationFrame,
+            final ToolBelt toolBelt,
+            final RXEventBus eventBus) {
         this.annotationFrame = annotationFrame;
         this.toolBelt = toolBelt;
+        this.eventBus = eventBus;
         this.commandQueue = new CommandQueue(toolBelt);
         AnnotationProcessor.process(this); // Make EventBus Aware
         
@@ -102,10 +109,9 @@ public class AnnotationFrameController implements PreferenceUpdater, UIEventSubs
                 log.info("Shutdown thread is finished. Bye Bye");
             }
         }, "VARS-cleanupBeforeShutdownThread");
-        //cleanupThread.setDaemon(false);
+
         Runtime.getRuntime().addShutdownHook(cleanupThread);
 
-                
         // This listener displays a wait indicator while the cache is being cleared
         toolBelt.getPersistenceCache().addCacheClearedListener(new CacheClearedListener() {
 
@@ -152,6 +158,20 @@ public class AnnotationFrameController implements PreferenceUpdater, UIEventSubs
             };
             new Thread(runnable, "UpdateCameraDataThread-" + System.currentTimeMillis()).start();
         });
+
+        /*
+            Bridge between the RXEventBus and the StateLookup's videoArchive property
+         */
+        eventBus.toObserverable()
+                .ofType(SetVideoArchiveMsg.class)
+                .subscribe(msg -> StateLookup.setVideoArchive(msg.getVideoArchive()));
+
+        /*
+            Bridges between the RXEventBus and the StateLookup's videoController property
+         */
+        eventBus.toObserverable()
+                .ofType(SetVideoControllerMsg.class)
+                .subscribe(msg -> StateLookup.setVideoController(msg.getVideoController()));
 
     }
 

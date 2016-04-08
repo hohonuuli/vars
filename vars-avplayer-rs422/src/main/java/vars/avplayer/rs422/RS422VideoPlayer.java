@@ -110,6 +110,7 @@ public class RS422VideoPlayer implements VideoPlayer<RS422State, RS422Error> {
             Window window = GlobalStateLookup.getSelectedFrame();
             dialogUI = new RS422VideoPlayerDialogUI(window, toolBelt);
             dialogUI.onOkay(() -> {
+                dialogUI.setVisible(false);
                 VideoArchive videoArchive = dialogUI.openVideoArchive();
                 setSerialPort(dialogUI.getSerialPortName());
                 eventBus.send(new SetVideoArchiveMsg(videoArchive));

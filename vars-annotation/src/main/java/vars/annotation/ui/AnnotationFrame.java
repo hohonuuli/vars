@@ -105,7 +105,7 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
     public AnnotationFrame(ToolBelt toolBelt, RXEventBus eventBus) throws HeadlessException {
         this.toolBelt = toolBelt;
         this.eventBus = eventBus;
-        this.controller = new AnnotationFrameController(this, toolBelt);
+        this.controller = new AnnotationFrameController(this, toolBelt, eventBus);
         AnnotationProcessor.process(this); // Create EventBus Proxy
         initialize();
     }
@@ -339,8 +339,6 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
             toolBar.add(new PreferenceFrameButton());
             toolBar.add(new StatusLabelForPerson(toolBelt));
             toolBar.add(new VideoPlayersPanel(toolBelt, eventBus));
-            //toolBar.add(new StatusLabelForVcr());
-            toolBar.add(new StatusLabelForVideoArchive(toolBelt));
 
             // Map in undo and redo keys
             InputMap inputMap = toolBar.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
