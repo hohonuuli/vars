@@ -6,7 +6,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import vars.queryfx.ui.db.results.QueryResults;
+import vars.query.results.QueryResults;
 
 import java.util.HashMap;
 import java.util.List;

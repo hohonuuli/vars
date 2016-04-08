@@ -1,10 +1,8 @@
-package vars.queryfx.ui.controllers.fn;
+package vars.query.results;
 
-import javafx.scene.control.Label;
 import org.mbari.util.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.queryfx.ui.db.results.QueryResults;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -26,7 +24,6 @@ public class SaveImagesFn {
     private final File targetDir;
     private final QueryResults queryResults;
     private volatile boolean ok = true;
-    private Label fileLabel;
     private Consumer<Double> progressFn; // Used to updated a progress indicator
     private final Logger log = LoggerFactory.getLogger(getClass());
     private final Executor executor;

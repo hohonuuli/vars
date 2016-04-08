@@ -17,13 +17,23 @@ package vars.query;
 
 import java.sql.*;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
+import com.google.common.collect.Lists;
+import javafx.util.Pair;
 import org.mbari.sql.QueryFunction;
 import org.mbari.sql.QueryResults;
 import org.mbari.sql.QueryableImpl;
 import vars.ILink;
 import vars.LinkBean;
 import vars.VARSException;
+import vars.knowledgebase.Concept;
+import vars.knowledgebase.ConceptDAO;
+import vars.knowledgebase.ConceptName;
+import vars.knowledgebase.KnowledgebaseDAOFactory;
+
+import javax.inject.Inject;
 
 /**
  * DAO for use by the query app. This drops out of hibernate and uses a lot of
@@ -35,11 +45,16 @@ public class QueryPersistenceServiceImpl implements QueryPersistenceService {
     private final QueryableImpl annoQueryable;
     private final QueryableImpl kbQueryable;
     private final String url;
+    private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
+    protected final Function<Concept, Collection<String>> asNames = c ->
+            c.getConceptNames().stream().map(ConceptName::getName).collect(Collectors.toList());
 
     /**
      * Constructs ...
      */
-    public QueryPersistenceServiceImpl() {
+    @Inject
+    public QueryPersistenceServiceImpl(KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
+        this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
         ResourceBundle bundle = ResourceBundle.getBundle("annotation-jdbc", Locale.US);
         String jdbcUrl = bundle.getString("jdbc.url");
         url = jdbcUrl;
@@ -80,7 +95,7 @@ public class QueryPersistenceServiceImpl implements QueryPersistenceService {
     }
 
     /**
-     * Similar to findByConceptNames. However, this looksup all LinkTemplates rather
+     * Similar to findLinksByConceptNames. However, this looksup all LinkTemplates rather
      * that Associations.
      *
      * @return A Collection of <code>AssociationBean</code>s
@@ -95,20 +110,17 @@ public class QueryPersistenceServiceImpl implements QueryPersistenceService {
         sb.append("SELECT DISTINCT linkName, toConcept, linkValue ");
         sb.append("FROM LinkTemplate");
 
-        final QueryFunction<Collection<ILink>> queryFunction = new QueryFunction<Collection<ILink>>() {
-
-            public Collection<ILink> apply(ResultSet resultSet) throws SQLException {
-                Collection<ILink> associationBeans = new ArrayList<ILink>();
-                while (resultSet.next()) {
-                    LinkBean bean = new LinkBean();
-                    bean.setLinkName(resultSet.getString(1));
-                    bean.setToConcept(resultSet.getString(2));
-                    bean.setLinkValue(resultSet.getString(3));
-                    associationBeans.add(bean);
-                }
-
-                return associationBeans;
+        final QueryFunction<Collection<ILink>> queryFunction = resultSet -> {
+            Collection<ILink> associationBeans = new ArrayList<>();
+            while (resultSet.next()) {
+                LinkBean bean = new LinkBean();
+                bean.setLinkName(resultSet.getString(1));
+                bean.setToConcept(resultSet.getString(2));
+                bean.setLinkValue(resultSet.getString(3));
+                associationBeans.add(bean);
             }
+
+            return associationBeans;
         };
 
         return kbQueryable.executeQueryFunction(sb.toString(), queryFunction);
@@ -126,7 +138,7 @@ public class QueryPersistenceServiceImpl implements QueryPersistenceService {
     public Collection<String> findAllNamesUsedInAnnotations() {
 
         // All the conceptnames will be stored here
-        final Set<String> allNames = new HashSet<String>();
+        final Set<String> allNames = new HashSet<>();
 
         final QueryFunction queryFunction = resultSet -> {
             while (resultSet.next()) {
@@ -162,7 +174,7 @@ public class QueryPersistenceServiceImpl implements QueryPersistenceService {
      *  associations actually used to annotate Observations with the specifed
      *  conceptNames.
      */
-    public Collection<ILink> findByConceptNames(Collection<String> conceptNames) {
+    public Collection<ILink> findLinksByConceptNames(Collection<String> conceptNames) {
 
         // Here's the function that extracts the contents of a results set
         final QueryFunction queryFunction = new QueryFunction() {
@@ -309,6 +321,97 @@ public class QueryPersistenceServiceImpl implements QueryPersistenceService {
         return (Collection) annoQueryable.executeQueryFunction(query, queryFunction);
 
 
+    }
+
+    @Override
+    public List<Concept> findAncestors(String conceptName) {
+        List<Concept> names = new ArrayList<>();
+        ConceptDAO conceptDAO = knowledgebaseDAOFactory.newConceptDAO();
+        conceptDAO.startTransaction();
+        Concept concept = conceptDAO.findByName(conceptName);
+        if (concept != null) {
+            while (concept != null) {
+                names.add(concept);
+                concept = concept.getParentConcept();
+            }
+        }
+        conceptDAO.endTransaction();
+        Collections.reverse(names);
+        return names;
+    }
+
+    @Override
+    public Collection<Concept> findConcepts(String name,
+            boolean extendToParent,
+            boolean extendToSiblings,
+            boolean extendToChildren,
+            boolean extendToDescendants) {
+        Collection<Concept> concepts = new HashSet<>();
+
+        ConceptDAO conceptDAO = knowledgebaseDAOFactory.newConceptDAO();
+        conceptDAO.startTransaction();
+        Concept c = conceptDAO.findByName(name);
+
+        if (c != null) {
+            concepts.add(c);
+
+            if (extendToParent && c.getParentConcept() != null) {
+                concepts.add(c.getParentConcept());
+            }
+
+            if (extendToSiblings && c.getParentConcept() != null) {
+                concepts.addAll(c.getParentConcept().getChildConcepts());
+            }
+
+            if (extendToChildren && !extendToDescendants) {
+                concepts.addAll(c.getChildConcepts());
+            }
+
+            if (extendToDescendants) {
+                concepts.addAll(conceptDAO.findDescendents(c));
+            }
+        }
+        conceptDAO.endTransaction();
+        conceptDAO.close();
+
+        return concepts;
+    }
+
+    public List<String> findConceptNamesAsStrings(String name,
+            boolean extendToParent,
+            boolean extendToSiblings,
+            boolean extendToChildren,
+            boolean extendToDescendants) {
+        Collection<Concept> concepts = findConcepts(name, extendToParent, extendToSiblings, extendToChildren, extendToDescendants);
+        List<String> names;
+        if (concepts != null) {
+            names = concepts.stream()
+                    .flatMap(c -> asNames.apply(c).stream())
+                    .sorted()
+                    .collect(Collectors.toList());
+        }
+        else {
+            names = new ArrayList<>();
+        }
+        return names;
+    }
+
+    @Override
+    public List<String> findDescendantNamesAsStrings(String conceptName) {
+        List<String> names;
+        ConceptDAO conceptDAO = knowledgebaseDAOFactory.newConceptDAO();
+        conceptDAO.startTransaction();
+        Concept concept = conceptDAO.findByName(conceptName);
+        if (concept == null) {
+            names = Lists.newArrayList();
+        } else {
+            names = conceptDAO.findDescendentNames(concept).stream()
+                    .map(ConceptName::getName)
+                    .sorted()
+                    .collect(Collectors.toList());
+        }
+        conceptDAO.endTransaction();
+        return names;
     }
 
     public QueryResults executeQuery(String query) throws Exception {

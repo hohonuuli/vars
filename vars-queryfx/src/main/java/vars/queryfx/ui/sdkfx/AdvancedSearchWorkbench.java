@@ -12,7 +12,7 @@ import javafx.scene.control.ScrollPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.queryfx.Lookup;
-import vars.queryfx.QueryService;
+import vars.queryfx.AsyncQueryService;
 import vars.shared.rx.RXEventBus;
 import vars.queryfx.beans.QueryParams;
 import vars.shared.rx.messages.FatalExceptionMsg;
@@ -38,12 +38,12 @@ public class AdvancedSearchWorkbench extends WorkbenchView {
 
     private ObservableList<AbstractValuePanel> valuePanels = FXCollections.observableArrayList();
 
-    private final QueryService queryService;
+    private final AsyncQueryService queryService;
     private final RXEventBus eventBus;
     private final FormLayout formLayout;
 
 
-    public AdvancedSearchWorkbench(QueryService queryService, RXEventBus eventBus) {
+    public AdvancedSearchWorkbench(AsyncQueryService queryService, RXEventBus eventBus) {
         this.queryService = queryService;
         this.eventBus = eventBus;
         this.formLayout = new FormLayout();

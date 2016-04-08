@@ -16,7 +16,7 @@ import vars.ILink;
 import vars.LinkBean;
 import vars.LinkUtilities;
 import vars.queryfx.Lookup;
-import vars.queryfx.QueryService;
+import vars.queryfx.AsyncQueryService;
 import vars.shared.rx.RXEventBus;
 import vars.queryfx.beans.ConceptSelection;
 import vars.shared.rx.messages.FatalExceptionMsg;
@@ -55,13 +55,13 @@ public class ConceptConstraintsWorkbench extends WorkbenchView {
 
     private final RXEventBus eventBus;
     private final Executor executor;
-    private final QueryService queryService;
+    private final AsyncQueryService queryService;
     private volatile CompletableFuture<List<ILink>> runningFuture;
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
     @Inject
-    public ConceptConstraintsWorkbench(QueryService queryService, Executor executor, RXEventBus eventBus) {
+    public ConceptConstraintsWorkbench(AsyncQueryService queryService, Executor executor, RXEventBus eventBus) {
         this.queryService = queryService;
         this.executor = executor;
         this.eventBus = eventBus;

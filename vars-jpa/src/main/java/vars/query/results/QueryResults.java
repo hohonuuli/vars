@@ -1,4 +1,4 @@
-package vars.queryfx.ui.db.results;
+package vars.query.results;
 
 import com.google.common.base.Preconditions;
 import org.mbari.util.Tuple2;
@@ -9,9 +9,6 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;

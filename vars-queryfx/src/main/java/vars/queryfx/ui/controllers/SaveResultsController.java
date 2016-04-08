@@ -1,15 +1,15 @@
 package vars.queryfx.ui.controllers;
 
 import org.mbari.util.Tuple2;
+import vars.query.results.QueryResults;
+import vars.query.results.QueryResultsUtilities;
 import vars.shared.rx.RXEventBus;
 import vars.shared.rx.messages.NonFatalExceptionMsg;
 import vars.queryfx.rx.messages.SaveAsKMLMsg;
 import vars.queryfx.rx.messages.SaveAsTextMsg;
 import vars.queryfx.rx.messages.SaveImagesMsg;
-import vars.queryfx.ui.controllers.fn.SaveImagesFn;
-import vars.queryfx.ui.controllers.fn.SaveResultsAsKMLFn;
-import vars.queryfx.ui.db.results.QueryResults;
-import vars.queryfx.ui.db.results.QueryResultsUtilities;
+import vars.query.results.SaveImagesFn;
+import vars.query.results.SaveResultsAsKMLFn;
 
 import java.io.BufferedWriter;
 import java.io.File;

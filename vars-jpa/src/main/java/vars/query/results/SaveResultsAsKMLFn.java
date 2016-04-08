@@ -1,9 +1,8 @@
-package vars.queryfx.ui.controllers.fn;
+package vars.query.results;
 
 import org.mbari.util.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.queryfx.ui.db.results.QueryResults;
 
 import java.io.BufferedWriter;
 import java.io.File;

@@ -3,11 +3,9 @@ package vars.queryfx.ui.db.results;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.knowledgebase.Concept;
-import vars.knowledgebase.ConceptDAO;
-import vars.knowledgebase.KnowledgebaseDAOFactory;
-import vars.queryfx.QueryService;
+import vars.query.results.QueryResults;
+import vars.queryfx.AsyncQueryService;
 
-import javax.management.Query;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -19,7 +17,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -28,10 +25,10 @@ public class QueryResultsDecorator {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
     //private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
-    private final QueryService queryService;
+    private final AsyncQueryService queryService;
 
 
-    public QueryResultsDecorator(QueryService queryService) {
+    public QueryResultsDecorator(AsyncQueryService queryService) {
         this.queryService = queryService;
     }
 

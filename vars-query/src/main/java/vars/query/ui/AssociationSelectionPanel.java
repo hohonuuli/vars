@@ -40,8 +40,6 @@ import vars.ILink;
 import vars.LinkBean;
 import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.ConceptNameTypes;
-import vars.knowledgebase.KnowledgebaseDAOFactory;
-import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.SimpleConceptNameBean;
 import vars.query.QueryPersistenceService;
 import vars.shared.ui.AllConceptNamesComboBox;
@@ -325,7 +323,7 @@ public class AssociationSelectionPanel extends JPanel {
                 associationBeans = queryPersistenceService.findAllLinkTemplates();
             }
             else {
-                associationBeans = queryPersistenceService.findByConceptNames(conceptNames);
+                associationBeans = queryPersistenceService.findLinksByConceptNames(conceptNames);
             }
         }
         catch (Exception e) {

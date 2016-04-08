@@ -1,6 +1,7 @@
-package vars.queryfx.ui.db.results;
+package vars.query.results;
 
 import vars.ILink;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;

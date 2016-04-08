@@ -1,7 +1,8 @@
 package vars.queryfx.ui;
 
 import javafx.stage.Stage;
-import vars.queryfx.ui.db.results.QueryResults;
+import vars.query.results.QueryResults;
+
 
 /**
  * @author Brian Schlining

@@ -1,10 +1,6 @@
 package vars.queryfx.ui;
 
-import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -13,25 +9,18 @@ import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
-import javafx.util.Callback;
-import org.mbari.io.FileUtilities;
 import org.mbari.net.URLUtilities;
 import org.mbari.util.Tuple2;
-import vars.queryfx.ui.db.results.QueryResults;
+import vars.query.results.QueryResults;
 import vars.shared.javafx.application.ImageFX;
 import vars.shared.javafx.stage.ImageStage;
 
 import java.io.File;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;

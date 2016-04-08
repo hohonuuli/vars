@@ -11,13 +11,13 @@ import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import vars.query.results.QueryResults;
 import vars.shared.rx.RXEventBus;
 import vars.queryfx.rx.messages.NewQueryResultsMsg;
 import vars.queryfx.rx.messages.SaveAsKMLMsg;
 import vars.queryfx.rx.messages.SaveAsTextMsg;
 import vars.queryfx.rx.messages.SaveImagesMsg;
 import vars.queryfx.ui.QueryResultsTableView;
-import vars.queryfx.ui.db.results.QueryResults;
 
 import java.io.File;
 import java.time.Duration;

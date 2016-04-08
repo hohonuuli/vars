@@ -8,89 +8,81 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
-import org.mbari.sql.QueryResults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
+import vars.query.results.QueryResults;
+
+import javax.inject.Inject;
 
 public class QueryResultsDecorator {
     
     private static final Logger log = LoggerFactory.getLogger(QueryResultsDecorator.class);
     private final KnowledgebaseDAOFactory knowledgebaseDAOFactory;
+    private final QueryPersistenceService queryPersistenceService;
 
 
-    public QueryResultsDecorator(KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
+    @Inject
+    public QueryResultsDecorator(KnowledgebaseDAOFactory knowledgebaseDAOFactory, QueryPersistenceService queryPersistenceService) {
         this.knowledgebaseDAOFactory = knowledgebaseDAOFactory;
+        this.queryPersistenceService = queryPersistenceService;
     }
 
 
-    public void addHierarchy(QueryResults queryResults)  {
-        Set<String> columnNames = (Set<String>) queryResults.getColumnNames();
-        for (String name : columnNames) {
-            if (name.equalsIgnoreCase("conceptname")) {
+    public QueryResults addHierarchy(QueryResults queryResults)  {
+        Set<String> columnNames = queryResults.getColumnNames();
+        Optional<String> column  = columnNames.stream()
+                .filter(s -> s.equalsIgnoreCase("conceptname"))
+                .findFirst();
 
-                /*
-                 * Create a list of all the unique conceptNames
-                 */
-                List<String> conceptNames = queryResults.getResults(name);
-                Set<String> uniqueNames = new HashSet<String>();
-                uniqueNames.addAll(conceptNames);
-
-                /*
-                 * Iterate through each conceptname and create a hierarchy for each.
-                 */
-                Map<String, String> map = new HashMap<String, String>();
-                ConceptDAO dao = knowledgebaseDAOFactory.newConceptDAO();
-                for (String n : uniqueNames) {
-
-                    Concept concept = dao.findByName(n);
-                    if (concept == null) {
-                        log.info("Unable to find " + n + " in the knowledgebase");
-                    }
-
-                    /*
-                     * Generate a List of Concepts as we walk up the heirarchy
-                     */
-                    List<Concept> ancestors = new ArrayList<Concept>();
-                    while (concept != null) {
-                        ancestors.add(concept);
-                        concept = concept.getParentConcept();
-                    }
-                    // Flip the list so it goes from the top of the hierarcy down to our name
-                    Collections.reverse(ancestors);
-
-                    /*
-                     * Create a comma-separated list of the hieracy and put it in the map for storage
-                     */
-                    StringBuilder sb = new StringBuilder();
-                    for (int i = 0; i < ancestors.size() - 1; i++) {
-                        Concept c = ancestors.get(i);
-                        sb.append(c.getPrimaryConceptName().getName()).append(",");
-                    }
-                    sb.append(ancestors.get(ancestors.size() - 1).getPrimaryConceptName().getName()); // Append last element without a trailing ','
-                    map.put(n, sb.toString());
-
-                    /*
-                     * Populate the queryResults with a new column
-                     */
-                    Map resultsMap = queryResults.getResultsMap();
-                    List aList = new ArrayList();
-                    for (String string : conceptNames) {
-                        aList.add(map.get(string));
-                    }
-                    resultsMap.put("Hierarchy", aList);
-
-                }
-                dao.close();
-                break; // exit for loop after processing the conceptname column
-            }
-           
+        if (!column.isPresent()) {
+            return queryResults;
         }
+
+        /*
+         * Create a list of all the unique conceptNames
+         */
+        List<String> conceptNameColumn = (List<String>) queryResults.getValues(column.get());
+        Set<String> uniqueNames = new HashSet<String>();
+        uniqueNames.addAll(conceptNameColumn);
+        Map<String, String> hierarchy = new HashMap<>();
+        for (String n : uniqueNames) {
+            final CompletableFuture<List<Concept>> ancestorsF = queryService.findAncestors(n);
+            // block on each future
+            try {
+                List<Concept> ancestors = ancestorsF.get(5, TimeUnit.SECONDS);
+                String h = ancestors.stream()
+                        .map(c -> c.getPrimaryConceptName().getName())
+                        .collect(Collectors.joining(","));
+                hierarchy.put(n, h);
+            }
+            catch (Exception e) {
+                log.warn("Failed to find ancestors for " + n, e);
+                hierarchy.put(n, null);
+            }
+        }
+
+        List<Object> hierarchyColumn = new ArrayList<>(queryResults.getRows());
+        for (String n : conceptNameColumn) {
+            String h = hierarchy.get(n);
+            hierarchyColumn.add(h);
+        }
+
+        final Map<String, List<Object>> resultsMap = queryResults.copyData();
+        resultsMap.put("Hierarchy", hierarchyColumn);
+
+        return new QueryResults(resultsMap);
+           
+
     }
     
     private void addPhylogeny(QueryResults queryResults, List<String> phylogeny) {
@@ -101,7 +93,7 @@ public class QueryResultsDecorator {
                 /*
                  * Create a list of all the unique conceptNames
                  */
-                List<String> conceptNames = queryResults.getResults(name);
+                List<String> conceptNames = queryResults.getValues(name);
                 Set<String> uniqueNames = new HashSet<String>();
                 uniqueNames.addAll(conceptNames);
 
@@ -158,7 +150,7 @@ public class QueryResultsDecorator {
                 /*
                  * Populate the queryResults with the new columns
                  */
-                Map resultsMap = queryResults.getResultsMap();
+                Map resultsMap = queryResults.copyData();
                 for (int i = 0; i < phylogeny.size(); i++) {
                     List<String> terms = new ArrayList<String>(conceptNames.size());
                     for (String cn : conceptNames) {
@@ -266,7 +258,7 @@ public class QueryResultsDecorator {
         
         for (String column : columns) {
             
-            List data = queryResults.getResults(column);
+            List data = queryResults.getValues(column);
             boolean hasData = false;
             
             for (Iterator i = data.iterator(); i.hasNext();) {

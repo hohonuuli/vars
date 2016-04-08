@@ -13,7 +13,7 @@ import javafx.scene.layout.VBox;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.queryfx.Lookup;
-import vars.queryfx.QueryService;
+import vars.queryfx.AsyncQueryService;
 import vars.queryfx.ui.AbstractValuePanel;
 import vars.queryfx.ui.ValuePanelFactory;
 
@@ -33,11 +33,11 @@ public class AdvancedSearchWorkbenchA extends WorkbenchView {
 
     private ObservableList<AbstractValuePanel> valuePanels = FXCollections.observableArrayList();
 
-    private final QueryService queryService;
+    private final AsyncQueryService queryService;
 
     VBox root = new VBox();
 
-    public AdvancedSearchWorkbenchA(QueryService queryService) {
+    public AdvancedSearchWorkbenchA(AsyncQueryService queryService) {
         this.queryService = queryService;
         initialize();
         ScrollPane scrollPane = new javafx.scene.control.ScrollPane();

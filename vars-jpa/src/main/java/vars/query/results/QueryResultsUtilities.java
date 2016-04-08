@@ -1,4 +1,5 @@
-package vars.queryfx.ui.db.results;
+package vars.query.results;
+
 
 import java.time.Instant;
 import java.util.Optional;

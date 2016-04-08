@@ -2,7 +2,6 @@ package vars.queryfx;
 
 import vars.ILink;
 import vars.knowledgebase.Concept;
-import vars.knowledgebase.ConceptName;
 import vars.queryfx.beans.ConceptSelection;
 import vars.queryfx.beans.ResolvedConceptSelection;
 
@@ -15,13 +14,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 
 /**
  * @author Brian Schlining
  * @since 2015-07-20T15:55:00
  */
-public interface QueryService {
+public interface AsyncQueryService {
+
+
+    CompletableFuture<ResolvedConceptSelection> resolveConceptSelection(ConceptSelection conceptSelection);
 
     /**
      * Lookup all names that are associated with
@@ -38,21 +39,27 @@ public interface QueryService {
 
     CompletableFuture<Optional<Concept>> findConcept(String name);
 
+    /**
+     * Given a particular concept (by name), lookup all of it's alternate names as well as those names
+     * that you extend the search to.
+     * @param name The name to search for
+     * @param extendToParent
+     * @param extendToSiblings
+     * @param extendToChildren
+     * @param extendToDescendants
+     * @return A list of names sorted alpha-betically, or any empty list if no matches are found
+     */
     CompletableFuture<List<String>> findConceptNamesAsStrings(String name,
-                                                              boolean extendToParent,
-                                                              boolean extendToSiblings,
-                                                              boolean extendToChildren,
-                                                              boolean extendToDescendants);
+            boolean extendToParent,
+            boolean extendToSiblings,
+            boolean extendToChildren,
+            boolean extendToDescendants);
 
     CompletableFuture<List<String>> findAllConceptNamesAsStrings();
 
     CompletableFuture<List<ILink>> findLinksByConceptNames(Collection<String> conceptNames);
 
     CompletableFuture<List<ILink>> findAllLinks();
-
-    //CompletableFuture<List<ILink>> findLinksByLinkName(String linkName);
-
-    CompletableFuture<ResolvedConceptSelection> resolveConceptSelection(ConceptSelection conceptSelection);
 
     CompletableFuture<Optional<URL>> resolveImageURL(String conceptName);
 
@@ -65,6 +72,7 @@ public interface QueryService {
     CompletableFuture<List<Date>> getAnnotationViewsMinAndMaxDatesforColumn(String columnName);
 
     Connection getAnnotationConnection() throws SQLException;
+
 }
 
 /*

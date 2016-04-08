@@ -1,8 +1,9 @@
-package vars.queryfx.ui.db.results;
+package vars.query.results;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import org.junit.Test;
+import vars.query.results.QueryResults;
+
 import static org.junit.Assert.*;
 
 import java.util.HashMap;
