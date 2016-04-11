@@ -78,6 +78,22 @@ public class QueryResults {
         return new Tuple2<>(columnNames, data);
     }
 
+    /**
+     * Convert data to an array
+     * @return Row-orderd data where the size is String[rows][columns]
+     */
+    public String[][] toRowOrientedArray() {
+        Tuple2<List<String>, List<String[]>> t = toRowOrientedData();
+        List<String[]> array = t.getB();
+        int r = array.size();
+        int c = array.get(0).length;
+        String[][] data = new String[r][c];
+        for (int i = 0; i < r; i++) {
+            data[i] = array.get(i);
+        }
+        return data;
+    }
+
     public Set<String> getColumnNames() {
         return new TreeSet<>(resultsMap.keySet());
     }

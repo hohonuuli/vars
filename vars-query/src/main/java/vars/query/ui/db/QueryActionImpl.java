@@ -1,13 +1,16 @@
 package vars.query.ui.db;
 
 import org.mbari.awt.event.ActionAdapter;
-import org.mbari.sql.QueryResults;
 import org.mbari.util.ExceptionHandler;
 import org.mbari.util.ExceptionHandlerSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
+import vars.query.QueryPersistenceService;
 import vars.query.QueryResultsDecorator;
+import vars.query.results.AssociationColumnRemappingDecorator;
+import vars.query.results.CoalescingDecorator;
+import vars.query.results.QueryResults;
 
 import javax.swing.*;
 import java.beans.PropertyChangeListener;
@@ -50,25 +53,25 @@ public class QueryActionImpl extends ActionAdapter implements QueryAction {
      * Constructor for the QueryAction object
      *
      * @param  queryExecutor Description of the Parameter
-     * @param knowledgebaseDAOFactory
+     * @param queryPersistenceService
      */
-    public QueryActionImpl(final QueryExecutor queryExecutor, KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
-        this(queryExecutor, knowledgebaseDAOFactory, false, false, false, false);
+    public QueryActionImpl(final QueryExecutor queryExecutor, QueryPersistenceService queryPersistenceService) {
+        this(queryExecutor, queryPersistenceService, false, false, false, false);
     }
 
     /**
      * Constructs ...
      *
      * @param queryExecutor
-     * @param knowledgebaseDAOFactory
+     * @param queryPersistenceService
      * @param showHiearchy
      * @param showBasicPhylogeny
      * @param showFullPhylogeny
      */
-    public QueryActionImpl(final QueryExecutor queryExecutor, KnowledgebaseDAOFactory knowledgebaseDAOFactory,
+    public QueryActionImpl(final QueryExecutor queryExecutor, QueryPersistenceService queryPersistenceService,
             boolean showHiearchy, boolean showBasicPhylogeny, boolean showFullPhylogeny, boolean showAssociationPerColumn) {
         this.queryExecutor = queryExecutor;
-        this.queryResultsDecorator = new QueryResultsDecorator(knowledgebaseDAOFactory);
+        this.queryResultsDecorator = new QueryResultsDecorator(queryPersistenceService);
         this.showHierarchy = showHiearchy;
         this.showBasicPhylogeny = showBasicPhylogeny;
         this.showFullPhylogeny = showFullPhylogeny;
@@ -132,24 +135,24 @@ public class QueryActionImpl extends ActionAdapter implements QueryAction {
                 QueryResults queryResults = null;
                 try {
                     queryResults = queryExecutor.query();
-                    queryResults.coalesce(coalesceKey);
+                    queryResults = CoalescingDecorator.coalesce(queryResults, coalesceKey);
 
                     if (showHierarchy) {
-                        queryResultsDecorator.addHierarchy(queryResults);
+                        queryResults = queryResultsDecorator.addHierarchy(queryResults);
                     }
 
                     if (showAssociationPerColumn) {
-                        AssociationColumnRemapper.apply(queryResults);
+                        queryResults = AssociationColumnRemappingDecorator.apply(queryResults);
                     }
 
                     // Either show Full or Basic phylogeny. Basic is a subset of full
                     // so we'll check to see if full is selected first.
                     if (showFullPhylogeny) {
-                        queryResultsDecorator.addFullPhylogeny(queryResults);
-                        QueryResultsDecorator.dropEmptyColumns(queryResults);
+                        queryResults = queryResultsDecorator.addFullPhylogeny(queryResults);
+                        queryResults = QueryResultsDecorator.dropEmptyColumns(queryResults);
                     }
                     else if (showBasicPhylogeny) {
-                        queryResultsDecorator.addBasicPhylogeny(queryResults);
+                        queryResults = queryResultsDecorator.addBasicPhylogeny(queryResults);
                     }
 
                     if (log.isDebugEnabled()) {

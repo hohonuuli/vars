@@ -1,8 +1,8 @@
 package vars.query.ui.db.sql;
 
 import org.mbari.sql.IQueryable;
-import org.mbari.sql.QueryResults;
 import vars.VARSException;
+import vars.query.results.QueryResults;
 import vars.query.ui.db.AbstractQueryExecutor;
 
 import java.util.Collection;

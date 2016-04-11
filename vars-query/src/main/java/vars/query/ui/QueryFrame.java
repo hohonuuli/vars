@@ -46,7 +46,6 @@ import vars.query.ui.db.QueryActionImpl;
 import vars.query.ui.db.QueryActionUI;
 import vars.query.ui.db.QueryExecutor;
 import vars.query.ui.db.preparedstatement.EscapedQueryExecutorImpl;
-import vars.query.ui.db.sql.SQLGenerator;
 
 /**
  * @author Brian Schlining
@@ -236,7 +235,7 @@ public class QueryFrame extends JFrame {
                             getSearchPanel().getCbAllAssociations().isSelected(),
                             queryPersistenceService.getAnnotationQueryable());
                     QueryAction queryAction = new QueryActionImpl(queryExecutor,
-                            knowledgebaseDAOFactory,
+                            queryPersistenceService,
                             getSearchPanel().getCbHierarchy().isSelected(),
                             getSearchPanel().getCbPhylogeny().isSelected(),
                             getSearchPanel().getCbFullPhylogeny().isSelected(),

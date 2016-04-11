@@ -5,7 +5,6 @@ import vars.query.ui.ConceptConstraints;
 import vars.query.ui.ValuePanel;
 import vars.query.ui.db.sql.SQLGenerator;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 /**

@@ -20,13 +20,14 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import javax.swing.SwingUtilities;
 import org.mbari.awt.event.ActionAdapter;
-import org.mbari.sql.QueryResults;
 import org.mbari.util.ExceptionHandler;
 import org.mbari.util.ExceptionHandlerSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
+import vars.query.QueryPersistenceService;
 import vars.query.QueryResultsDecorator;
+import vars.query.results.QueryResults;
 
 /**
  * <p>This action takes a SQL query (as a string) and an IQueryable object, executes
@@ -107,10 +108,10 @@ public class QueryAction extends ActionAdapter {
      *
      * @param  query Description of the Parameter
      * @param  queryable Description of the Parameter
-     * @param knowledgebaseDAOFactory
+     * @param queryPersistenceService
      */
-    public QueryAction(final String query, IQueryable queryable, KnowledgebaseDAOFactory knowledgebaseDAOFactory) {
-        this(query, queryable, knowledgebaseDAOFactory, false, false, false);
+    public QueryAction(final String query, IQueryable queryable, QueryPersistenceService queryPersistenceService) {
+        this(query, queryable, queryPersistenceService, false, false, false);
     }
 
     /**
@@ -118,16 +119,16 @@ public class QueryAction extends ActionAdapter {
      *
      * @param query
      * @param queryable
-     * @param knowledgebaseDAOFactory
+     * @param queryPersistenceService
      * @param showHiearchy
      * @param showBasicPhylogeny
      * @param showFullPhylogeny
      */
-    public QueryAction(final String query, IQueryable queryable, KnowledgebaseDAOFactory knowledgebaseDAOFactory,
+    public QueryAction(final String query, IQueryable queryable, QueryPersistenceService queryPersistenceService,
             boolean showHiearchy, boolean showBasicPhylogeny, boolean showFullPhylogeny) {
         this.query = query;
         this.queryable = queryable;
-        this.queryResultsDecorator = new QueryResultsDecorator(knowledgebaseDAOFactory);
+        this.queryResultsDecorator = new QueryResultsDecorator(queryPersistenceService);
         this.showHierarchy = showHiearchy;
         this.showBasicPhylogeny = showBasicPhylogeny;
         this.showFullPhylogeny = showFullPhylogeny;

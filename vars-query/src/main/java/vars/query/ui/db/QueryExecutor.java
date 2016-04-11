@@ -1,6 +1,7 @@
 package vars.query.ui.db;
 
-import org.mbari.sql.QueryResults;
+
+import vars.query.results.QueryResults;
 
 /**
  * @author Brian Schlining

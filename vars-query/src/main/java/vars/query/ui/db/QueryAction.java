@@ -1,8 +1,8 @@
 package vars.query.ui.db;
 
 import org.mbari.awt.event.IAction;
-import org.mbari.sql.QueryResults;
 import org.mbari.util.ExceptionHandler;
+import vars.query.results.QueryResults;
 
 import java.beans.PropertyChangeListener;
 

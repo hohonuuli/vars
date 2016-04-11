@@ -1,14 +1,13 @@
 package vars.query.ui.db.preparedstatement;
 
-import org.mbari.sql.QueryResults;
 import org.mbari.sql.QueryableImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.VARSException;
+import vars.query.results.QueryResults;
 import vars.query.ui.ConceptConstraints;
 import vars.query.ui.ValuePanel;
 import vars.query.ui.db.AbstractQueryExecutor;
-import vars.query.ui.db.QueryExecutor;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -42,7 +41,7 @@ public class EscapedQueryExecutorImpl extends AbstractQueryExecutor {
             log.debug("PreparedStatement Template = \n" + template);
             PreparedStatement preparedStatement = connection.prepareStatement(template);
             preparedStatementGenerator.bind(preparedStatement);
-            QueryResults queryResults = new QueryResults(preparedStatement.executeQuery());
+            QueryResults queryResults = QueryResults.fromResultSet(preparedStatement.executeQuery());
             connection.close();
             return queryResults;
         } catch (SQLException e) {

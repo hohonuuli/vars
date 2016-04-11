@@ -25,11 +25,11 @@ import javax.swing.JFrame;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
-import org.mbari.sql.QueryResults;
 import org.mbari.swing.JImageUrlFrame;
 import org.mbari.swing.table.TableSorter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.query.results.QueryResults;
 
 /**
  *
@@ -167,29 +167,15 @@ public class QueryResultsTable extends JTable {
      */
     class QueryResultsTableModel extends DefaultTableModel {
 
-        /**
-         *
-         *
-         * @param queryResults
-         */
         QueryResultsTableModel(QueryResults queryResults) {
-            super(queryResults.getDataArray(),
-                  (String[]) queryResults.getColumnNames().toArray(new String[queryResults.getColumnNames().size()]));
+            super(queryResults.toRowOrientedArray(),
+                  queryResults.getColumnNames()
+                          .toArray(new String[queryResults.getColumnNames().size()]));
         }
 
         /*
          *  (non-Javadoc)
          * @see javax.swing.table.TableModel#isCellEditable(int, int)
-         */
-
-        /**
-         * <p><!-- Method description --></p>
-         *
-         *
-         * @param row
-         * @param column
-         *
-         * @return
          */
         @Override
         public boolean isCellEditable(int row, int column) {

@@ -21,11 +21,16 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.mbari.util.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.mbari.awt.event.ActionAdapter;
-import org.mbari.sql.QueryResults;
+import vars.query.results.QueryResults;
 
 //~--- classes ----------------------------------------------------------------
 
@@ -40,23 +45,10 @@ public class SaveQueryResultsAction extends ActionAdapter {
     /**
      *
      */
-    private static final long serialVersionUID = 5979392162494300316L;
-    private static final Logger log = LoggerFactory.getLogger(SaveQueryResultsAction.class);
+    private final Logger log = LoggerFactory.getLogger(SaveQueryResultsAction.class);
 
-    //~--- fields -------------------------------------------------------------
-
-    /**
-	 * @uml.property  name="file"
-	 */
     private final File file;
-    /**
-	 * @uml.property  name="query"
-	 */
     private final String query;
-    /**
-	 * @uml.property  name="queryResults"
-	 * @uml.associationEnd  multiplicity="(1 1)"
-	 */
     private final QueryResults queryResults;
 
     private final String databaseUrl;
@@ -106,7 +98,21 @@ public class SaveQueryResultsAction extends ActionAdapter {
         try {
             BufferedWriter out = new BufferedWriter(new FileWriter(file));
             out.write(header());
-            queryResults.writeFormattedResults(out);
+            Tuple2<List<String>, List<String[]>> content = queryResults.toRowOrientedData();
+            List<String> columnNames = content.getA();
+            List<String[]> rows = content.getB();
+
+            String columns = "# " + columnNames.stream()
+                    .collect(Collectors.joining("\t"));
+            out.write(columns);
+            out.write("\n");
+
+            for (String[] r : rows) {
+                String rs = Arrays.stream(r)
+                        .collect(Collectors.joining("\t"));
+                out.write(rs);
+                out.write("\n");
+            }
             out.close();
         } catch (IOException e) {
             log.error("Unable to save to " + file.getAbsolutePath(), e);
@@ -125,9 +131,8 @@ public class SaveQueryResultsAction extends ActionAdapter {
         sb.append("#\n");
         sb.append("# QUERY\n# ").append(query).append("\n");
         sb.append("#\n");
-        sb.append(
-                "# TOTAL RECORDS: ").append(
-                queryResults.rowCount()).append("\n");
+        sb.append("# TOTAL RECORDS: ").append(
+                queryResults.getRows()).append("\n");
         return sb.toString();
     }
 }

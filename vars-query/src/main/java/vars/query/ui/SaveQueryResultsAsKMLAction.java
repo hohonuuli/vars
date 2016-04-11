@@ -30,9 +30,9 @@ import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import org.mbari.awt.event.ActionAdapter;
-import org.mbari.sql.QueryResults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.query.results.QueryResults;
 
 /**
  *
@@ -41,7 +41,6 @@ import org.slf4j.LoggerFactory;
 public class SaveQueryResultsAsKMLAction extends ActionAdapter {
 
     private static final String KEY_CONCEPTNAME = "conceptname";
-    private static final String KEY_IMAGE = "image";
     private static final String KEY_LATITUDE = "latitude";
     private static final String KEY_LONGITUDE = "longitude";
     private static final String KEY_RECORDEDDATE = "recordeddate";
@@ -142,7 +141,7 @@ public class SaveQueryResultsAsKMLAction extends ActionAdapter {
     @SuppressWarnings("unchecked")
     private void queryResultsToPlacemarks(Writer out) throws IOException {
         StringBuilder sb = new StringBuilder();
-        Map<String, ?> resultsMap = queryResults.getResultsMap();
+        Map<String, ?> resultsMap = queryResults.copyData();
         Set<String> keys = new TreeSet<String>(resultsMap.keySet());
 
         // We need to be able to search using case-insensitive keys
