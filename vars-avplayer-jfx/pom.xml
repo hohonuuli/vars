@@ -4,7 +4,7 @@
     <parent>
         <groupId>vars-redux</groupId>
         <artifactId>vars-redux</artifactId>
-        <version>8.1.2</version>
+        <version>8.2.1</version>
     </parent>
     <groupId>vars-redux</groupId>
     <artifactId>vars-avplayer-jfx</artifactId>

@@ -4,7 +4,7 @@
     <parent>
         <artifactId>vars-redux</artifactId>
         <groupId>vars-redux</groupId>
-        <version>8.1.2</version>
+        <version>8.2.1</version>
     </parent>
     <artifactId>vars-standalone</artifactId>
     <name>vars-standalone</name>
