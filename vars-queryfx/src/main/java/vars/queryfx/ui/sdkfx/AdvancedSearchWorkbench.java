@@ -131,9 +131,12 @@ public class AdvancedSearchWorkbench extends WorkbenchView {
 
     private void configureDefaultReturns() {
         Config config = Lookup.getConfig();
-        List<String> defaultReturnNames = config.getStringList("vars.query.column.default.returns");
+        List<String> defaultReturnNames = config.getStringList("vars.query.column.default.returns")
+                .stream()
+                .map(String::toUpperCase)
+                .collect(Collectors.toList());
         for (AbstractValuePanel valuePanel : valuePanels) {
-            if (defaultReturnNames.contains(valuePanel.getValueName())) {
+            if (defaultReturnNames.contains(valuePanel.getValueName().toUpperCase())) {
                 valuePanel.setReturned(true);
             }
         }
@@ -146,6 +149,7 @@ public class AdvancedSearchWorkbench extends WorkbenchView {
                 .map(AbstractValuePanel::getValueName)
                 .collect(Collectors.toList());
         List<IConstraint> constraints = vps.stream()
+                .filter(AbstractValuePanel::isConstrained)
                 .map(AbstractValuePanel::getConstraint)
                 .filter(Optional::isPresent)
                 .map(Optional::get)

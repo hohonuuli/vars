@@ -3,6 +3,8 @@ package vars.queryfx.ui.controllers;
 import org.mbari.util.Tuple2;
 import vars.query.results.QueryResults;
 import vars.query.results.QueryResultsUtilities;
+import vars.query.results.SaveResultsAsJSONFn;
+import vars.queryfx.rx.messages.SaveAsJSONMsg;
 import vars.shared.rx.RXEventBus;
 import vars.shared.rx.messages.NonFatalExceptionMsg;
 import vars.queryfx.rx.messages.SaveAsKMLMsg;
@@ -35,19 +37,20 @@ public class SaveResultsController {
         this.executor = executor;
 
         eventBus.toObserverable()
-                .filter(msg -> msg instanceof SaveAsTextMsg)
-                .map(msg -> (SaveAsTextMsg) msg)
+                .ofType(SaveAsTextMsg.class)
                 .subscribe(msg -> saveAsText(msg.getTarget(), msg.getQueryResults(), msg.getSql()));
 
         eventBus.toObserverable()
-                .filter(msg -> msg instanceof SaveAsKMLMsg)
-                .map(msg -> (SaveAsKMLMsg) msg)
+                .ofType(SaveAsKMLMsg.class)
                 .subscribe(msg -> saveAsKML(msg.getTarget(), msg.getQueryResults(), msg.getSql()));
 
         eventBus.toObserverable()
-                .filter(msg -> msg instanceof SaveImagesMsg)
-                .map(msg -> (SaveImagesMsg) msg)
+                .ofType(SaveImagesMsg.class)
                 .subscribe(msg -> saveImages(msg.getTargetDir(), msg.getQueryResults(), msg.getProgressFn()));
+
+        eventBus.toObserverable()
+                .ofType(SaveAsJSONMsg.class)
+                .subscribe(msg -> saveAsJSON(msg.getTarget(), msg.getQueryResults()));
     }
 
     public void saveAsText(File file, QueryResults queryResults, Optional<String> sql) {
@@ -78,6 +81,7 @@ public class SaveResultsController {
                     out.write(rs);
                     out.write("\n");
                 }
+                out.close();
             }
             catch (Exception e) {
                 eventBus.send(new NonFatalExceptionMsg("Unable to save results to " + file.getAbsolutePath(), e));
@@ -94,6 +98,11 @@ public class SaveResultsController {
 
     public void saveImages(File targetDir, QueryResults queryResults, Consumer<Double> progressFn) {
         SaveImagesFn fn = new SaveImagesFn(executor, targetDir, queryResults, progressFn);
+        fn.apply();
+    }
+
+    public void saveAsJSON(File file, QueryResults queryResults) {
+        SaveResultsAsJSONFn fn = new SaveResultsAsJSONFn(executor, file, queryResults);
         fn.apply();
     }
 }

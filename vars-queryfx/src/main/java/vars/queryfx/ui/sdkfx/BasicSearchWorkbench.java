@@ -8,7 +8,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import vars.queryfx.beans.ConceptSelection;
 import vars.queryfx.beans.ResolvedConceptSelection;
+import vars.queryfx.rx.messages.ShowConceptConstraintsWorkbenchMsg;
 import vars.queryfx.ui.AppIcons;
+import vars.shared.rx.RXEventBus;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,9 +23,13 @@ public class BasicSearchWorkbench extends WorkbenchView {
 
     private final MediaList<ConceptMedia> mediaList = new MediaList<>();
     private final ObservableList<ConceptSelection> conceptSelections = FXCollections.observableArrayList();
+    private final RXEventBus eventBus;
 
-    public BasicSearchWorkbench() {
+    public BasicSearchWorkbench(RXEventBus eventBus) {
+        this.eventBus = eventBus;
         ActionFooter footer = new ActionFooter();
+        footer.addAction(new Action(AppIcons.PLUS, "Add Search Term",
+                () -> eventBus.send(new ShowConceptConstraintsWorkbenchMsg())));
         footer.addAction(new Action(AppIcons.TRASH, "Remove All",
                 () -> mediaList.getItems().clear()));
         setFooterNode(footer);

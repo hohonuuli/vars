@@ -22,8 +22,8 @@ import java.util.stream.Collectors;
  */
 public class QueryResults {
     private Map<String, List<Object>> resultsMap = new TreeMap<>();
-    private final Logger log = LoggerFactory.getLogger(getClass());
-    private final int rows;
+    private transient final Logger log = LoggerFactory.getLogger(getClass());
+    private transient final int rows;
 
     public QueryResults(Map<String, List<Object>> data) {
 
@@ -47,7 +47,6 @@ public class QueryResults {
         Set<String> columnNames = resultsMap.keySet().stream()
                 .filter(s -> s.equalsIgnoreCase(columnName))
                 .collect(Collectors.toSet());
-
 
         if (columnNames.isEmpty()) {
             return new ArrayList<>();

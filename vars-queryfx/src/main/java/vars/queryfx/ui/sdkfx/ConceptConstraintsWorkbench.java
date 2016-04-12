@@ -1,6 +1,9 @@
 package vars.queryfx.ui.sdkfx;
 
+import com.guigarage.sdk.action.Action;
 import com.guigarage.sdk.container.WorkbenchView;
+import com.guigarage.sdk.footer.ActionFooter;
+import com.guigarage.sdk.footer.Footer;
 import com.guigarage.sdk.form.EditorFormRow;
 import com.guigarage.sdk.form.FormLayout;
 import javafx.application.Platform;
@@ -17,6 +20,9 @@ import vars.LinkBean;
 import vars.LinkUtilities;
 import vars.queryfx.Lookup;
 import vars.queryfx.AsyncQueryService;
+import vars.queryfx.rx.messages.NewConceptSelectionMsg;
+import vars.queryfx.rx.messages.ShowBasicSearchWorkbenchMsg;
+import vars.queryfx.ui.AppIcons;
 import vars.shared.rx.RXEventBus;
 import vars.queryfx.beans.ConceptSelection;
 import vars.shared.rx.messages.FatalExceptionMsg;
@@ -71,7 +77,7 @@ public class ConceptConstraintsWorkbench extends WorkbenchView {
 
         formLayout.addHeader("", "Search by concept");
         formLayout.add(getConceptRow());
-        formLayout.addHeader("", "extend to");
+        formLayout.addHeader("", "extend search to the concepts");
         formLayout.add(extendToParentRow);
         formLayout.add(extendToSiblingsRow);
         formLayout.add(extendToChildrenRow);
@@ -87,6 +93,17 @@ public class ConceptConstraintsWorkbench extends WorkbenchView {
         formLayout.add(linkNameRow);
         formLayout.add(toConceptRow);
         formLayout.add(linkValueRow);
+
+        ActionFooter footer = new ActionFooter();
+        footer.addAction(new Action(AppIcons.PLUS, "Apply",
+                () -> {
+                    ConceptSelection conceptSelection = getConceptSelection();
+                    eventBus.send(new NewConceptSelectionMsg(conceptSelection));
+                    eventBus.send((new ShowBasicSearchWorkbenchMsg()));
+                }));
+        footer.addAction(new Action(AppIcons.CANCEL, "Cancel",
+                () -> eventBus.send(new ShowBasicSearchWorkbenchMsg())));
+        setFooterNode(footer);
 
 
         // --- Do event wiring

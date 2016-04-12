@@ -5,7 +5,6 @@ import org.mbari.util.ExceptionHandler;
 import org.mbari.util.ExceptionHandlerSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.query.QueryPersistenceService;
 import vars.query.QueryResultsDecorator;
 import vars.query.results.AssociationColumnRemappingDecorator;
@@ -135,14 +134,15 @@ public class QueryActionImpl extends ActionAdapter implements QueryAction {
                 QueryResults queryResults = null;
                 try {
                     queryResults = queryExecutor.query();
+
+                    if (showAssociationPerColumn) {
+                        queryResults = AssociationColumnRemappingDecorator.apply(queryResults);
+                    }
+
                     queryResults = CoalescingDecorator.coalesce(queryResults, coalesceKey);
 
                     if (showHierarchy) {
                         queryResults = queryResultsDecorator.addHierarchy(queryResults);
-                    }
-
-                    if (showAssociationPerColumn) {
-                        queryResults = AssociationColumnRemappingDecorator.apply(queryResults);
                     }
 
                     // Either show Full or Basic phylogeny. Basic is a subset of full

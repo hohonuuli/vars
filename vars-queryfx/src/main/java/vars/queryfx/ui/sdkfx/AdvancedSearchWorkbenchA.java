@@ -93,9 +93,12 @@ public class AdvancedSearchWorkbenchA extends WorkbenchView {
         for (String name : groupNames) {
             VBox vbox = new VBox();
             vbox.setStyle("-fx-border-color: black");
-            List<String> columns = groupsConfig.getStringList(name);
+            List<String> columns = groupsConfig.getStringList(name)
+                    .stream()
+                    .map(String::toUpperCase)
+                    .collect(Collectors.toList());
             List<AbstractValuePanel> matchingVps = vps.stream()
-                    .filter(vp -> columns.contains(vp.getValueName()))
+                    .filter(vp -> columns.contains(vp.getValueName().toUpperCase()))
                     .sorted((vp1, vp2) ->
                             vp1.getValueName().toUpperCase().compareTo(vp2.getValueName().toUpperCase()))
                     .collect(Collectors.toList());

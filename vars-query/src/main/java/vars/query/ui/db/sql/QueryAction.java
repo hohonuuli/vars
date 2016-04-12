@@ -13,7 +13,6 @@
 
 package vars.query.ui.db.sql;
 
-import org.mbari.sql.IQueryable;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.Locale;
@@ -24,10 +23,11 @@ import org.mbari.util.ExceptionHandler;
 import org.mbari.util.ExceptionHandlerSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.query.QueryPersistenceService;
 import vars.query.QueryResultsDecorator;
+import vars.query.results.CoalescingDecorator;
 import vars.query.results.QueryResults;
+import vars.query.results.SQLQueryable;
 
 /**
  * <p>This action takes a SQL query (as a string) and an IQueryable object, executes
@@ -94,7 +94,7 @@ public class QueryAction extends ActionAdapter {
     private volatile QueryResults queryResults;
     private final QueryResultsDecorator queryResultsDecorator;
 
-    private final IQueryable queryable;
+    private final SQLQueryable queryable;
     private boolean showBasicPhylogeny;
     private boolean showFullPhylogeny;
     private boolean showHierarchy;
@@ -110,7 +110,7 @@ public class QueryAction extends ActionAdapter {
      * @param  queryable Description of the Parameter
      * @param queryPersistenceService
      */
-    public QueryAction(final String query, IQueryable queryable, QueryPersistenceService queryPersistenceService) {
+    public QueryAction(final String query, SQLQueryable queryable, QueryPersistenceService queryPersistenceService) {
         this(query, queryable, queryPersistenceService, false, false, false);
     }
 
@@ -124,7 +124,7 @@ public class QueryAction extends ActionAdapter {
      * @param showBasicPhylogeny
      * @param showFullPhylogeny
      */
-    public QueryAction(final String query, IQueryable queryable, QueryPersistenceService queryPersistenceService,
+    public QueryAction(final String query, SQLQueryable queryable, QueryPersistenceService queryPersistenceService,
             boolean showHiearchy, boolean showBasicPhylogeny, boolean showFullPhylogeny) {
         this.query = query;
         this.queryable = queryable;
@@ -193,7 +193,7 @@ public class QueryAction extends ActionAdapter {
                 QueryResults queryResults = null;
                 try {
                     queryResults = queryable.executeQuery(query);
-                    queryResults.coalesce(coalesceKey);
+                    queryResults = CoalescingDecorator.coalesce(queryResults, coalesceKey);
 
                     if (showHierarchy) {
                         queryResultsDecorator.addHierarchy(queryResults);

@@ -12,6 +12,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import vars.query.results.QueryResults;
+import vars.queryfx.rx.messages.SaveAsJSONMsg;
 import vars.shared.rx.RXEventBus;
 import vars.queryfx.rx.messages.NewQueryResultsMsg;
 import vars.queryfx.rx.messages.SaveAsKMLMsg;
@@ -113,6 +114,15 @@ public class QueryResultsUIController {
                     eventBus.send(new SaveAsKMLMsg(saveFile, queryResults, sql));
                 }
             });
+            Button saveJSONButton = new MaterialDesignButton("Save JSON");
+            saveJSONButton.setOnAction(v -> {
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.setInitialFileName("vars_query.json");
+                File saveFile = fileChooser.showSaveDialog(stage);
+                if (saveFile != null) {
+                    eventBus.send(new SaveAsJSONMsg(saveFile, queryResults));
+                }
+            });
             Button saveImagesButton = new MaterialDesignButton("Save Images");
             saveImagesButton.setOnAction(v -> {
                 DirectoryChooser dirChooser = new DirectoryChooser();
@@ -128,7 +138,7 @@ public class QueryResultsUIController {
                             })));
                 }
             });
-            toolBar.getItems().addAll(saveButton, saveKMLButton, saveImagesButton, progressIndicator);
+            toolBar.getItems().addAll(saveButton, saveKMLButton, saveJSONButton, saveImagesButton, progressIndicator);
             borderPane.setTop(toolBar);
 
             Scene scene = new Scene(borderPane);
