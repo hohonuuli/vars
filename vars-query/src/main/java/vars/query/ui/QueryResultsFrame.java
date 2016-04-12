@@ -38,7 +38,7 @@ import javax.swing.SwingConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.mbari.awt.event.ActionAdapter;
-import org.mbari.sql.QueryResults;
+import vars.query.results.QueryResults;
 
 
 /**
@@ -319,7 +319,7 @@ public class QueryResultsFrame extends JFrame {
             queryText.append(temp).append("</strong></p><br>");
 
             // Append the record count
-            queryText.append("<p>TOTAL RECORDS: ").append(queryResults.rowCount()).append("</p><br>");
+            queryText.append("<p>TOTAL RECORDS: ").append(queryResults.getRows()).append("</p><br>");
             queryText.append("</body></html>");
             queryLabel.setText(queryText.toString());
             queryLabel.setVerticalAlignment(SwingConstants.TOP);
@@ -534,6 +534,6 @@ public class QueryResultsFrame extends JFrame {
         this.setJMenuBar(getAMenuBar());
         this.setSize(300, 200);
         this.setContentPane(getJContentPane());
-        this.setTitle("VARS Query Results (" + queryResults.rowCount() + " rows)");
+        this.setTitle("VARS Query Results (" + queryResults.getRows() + " rows)");
     }
 }

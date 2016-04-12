@@ -4,12 +4,14 @@ import com.guigarage.sdk.util.FontBasedIcon;
 
 public enum AppIcons implements FontBasedIcon {
 
-    PLUS("\uf067"),
+    CANCEL("\uF05E"),
     GEARS("\uF085"),
+    HOME("\uF015"),
+    PLAY("\uF04B"),
+    PLUS("\uf067"),
     SEARCH("\uF002"),
     SEARCH_PLUS("\uF00E"),
-    TRASH("\uF014"),
-    PLAY("\uF04B");
+    TRASH("\uF014");
 
 
     private String text;

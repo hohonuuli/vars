@@ -1,6 +1,6 @@
 package vars.queryfx.ui;
 
-import vars.queryfx.QueryService;
+import vars.queryfx.AsyncQueryService;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -12,9 +12,9 @@ import java.util.Collection;
  */
 public class ValuePanelFactory {
 
-    private final QueryService queryService;
+    private final AsyncQueryService queryService;
 
-    public ValuePanelFactory(QueryService queryService) {
+    public ValuePanelFactory(AsyncQueryService queryService) {
         this.queryService = queryService;
     }
 

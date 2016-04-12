@@ -1,13 +1,11 @@
 package vars.queryfx;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 import org.mbari.sql.QueryResults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.ILink;
 import vars.knowledgebase.Concept;
-import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.Media;
@@ -22,9 +20,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -37,7 +33,8 @@ import java.util.stream.Collectors;
  * @author Brian Schlining
  * @since 2015-07-22T10:42:00
  */
-public class QueryServiceImpl implements QueryService {
+public class AsyncQueryServiceImpl implements AsyncQueryService {
+
 
     private final Executor executor;
     private final QueryPersistenceService queryPersistenceService;
@@ -49,7 +46,7 @@ public class QueryServiceImpl implements QueryService {
 
 
     @Inject
-    public QueryServiceImpl(Executor executor,
+    public AsyncQueryServiceImpl(Executor executor,
             KnowledgebaseDAOFactory knowledgebaseDAOFactory,
             QueryPersistenceService queryPersistenceService) {
         this.executor = executor;
@@ -64,22 +61,7 @@ public class QueryServiceImpl implements QueryService {
 
     @Override
     public CompletableFuture<List<String>> findDescendantNamesAsStrings(String conceptName) {
-        return CompletableFuture.supplyAsync(() -> {
-            List<String> names;
-            ConceptDAO conceptDAO = knowledgebaseDAOFactory.newConceptDAO();
-            conceptDAO.startTransaction();
-            Concept concept = conceptDAO.findByName(conceptName);
-            if (concept == null) {
-                names = Lists.newArrayList();
-            } else {
-                names = conceptDAO.findDescendentNames(concept).stream()
-                        .map(ConceptName::getName)
-                        .sorted()
-                        .collect(Collectors.toList());
-            }
-            conceptDAO.endTransaction();
-            return names;
-        }, executor);
+        return CompletableFuture.supplyAsync(() -> queryPersistenceService.findDescendantNamesAsStrings(conceptName), executor);
     }
 
     @Override
@@ -97,37 +79,8 @@ public class QueryServiceImpl implements QueryService {
 
         Preconditions.checkArgument(name != null, "You must supply a concept name");
 
-        return CompletableFuture.supplyAsync(() -> {
-            Collection<Concept> concepts = new HashSet<>();
-
-            ConceptDAO conceptDAO = knowledgebaseDAOFactory.newConceptDAO();
-            conceptDAO.startTransaction();
-            Concept c = conceptDAO.findByName(name);
-
-            if (c != null) {
-                concepts.add(c);
-
-                if (extendToParent && c.getParentConcept() != null) {
-                    concepts.add(c.getParentConcept());
-                }
-
-                if (extendToSiblings && c.getParentConcept() != null) {
-                    concepts.addAll(c.getParentConcept().getChildConcepts());
-                }
-
-                if (extendToChildren && !extendToDescendants) {
-                    concepts.addAll(c.getChildConcepts());
-                }
-
-                if (extendToDescendants) {
-                    concepts.addAll(conceptDAO.findDescendents(c));
-                }
-            }
-            conceptDAO.endTransaction();
-            conceptDAO.close();
-
-            return concepts;
-        }, executor);
+        return CompletableFuture.supplyAsync(() -> queryPersistenceService.findConcepts(name, extendToParent,
+                extendToSiblings, extendToChildren, extendToDescendants), executor);
 
     }
 
@@ -164,18 +117,9 @@ public class QueryServiceImpl implements QueryService {
     @Override
     public CompletableFuture<List<ILink>> findLinksByConceptNames(Collection<String> conceptNames) {
         return CompletableFuture.supplyAsync(() ->
-                new ArrayList<>(queryPersistenceService.findByConceptNames(conceptNames)), executor);
+                new ArrayList<>(queryPersistenceService.findLinksByConceptNames(conceptNames)), executor);
     }
 
-    @Override
-    public CompletableFuture<ResolvedConceptSelection> resolveConceptSelection(ConceptSelection conceptSelection) {
-        return findConceptNamesAsStrings(conceptSelection.getConceptName(),
-                conceptSelection.isExtendToParent(),
-                conceptSelection.isExtendToSiblings(),
-                conceptSelection.isExtendToChildren(),
-                conceptSelection.isExtendToDescendants())
-                .thenApplyAsync(list -> new ResolvedConceptSelection(conceptSelection, list), executor);
-    }
 
     @Override
     public CompletableFuture<Optional<URL>> resolveImageURL(String conceptName) {
@@ -185,7 +129,7 @@ public class QueryServiceImpl implements QueryService {
                     Optional<URL> url = Optional.empty();
                     if (primaryImage != null) {
                         try {
-                            url = Optional.ofNullable(new URL(primaryImage.getUrl()));
+                            url = Optional.of(new URL(primaryImage.getUrl()));
                         }
                         catch (MalformedURLException e) {
                             log.info("Invalid URL for '" + conceptName + "': " + primaryImage.getUrl());
@@ -259,23 +203,19 @@ public class QueryServiceImpl implements QueryService {
      */
     @Override
     public CompletableFuture<List<Concept>> findAncestors(String conceptName) {
-        return CompletableFuture.supplyAsync(() -> {
-            List<Concept> names = new ArrayList<Concept>();
-            ConceptDAO conceptDAO = knowledgebaseDAOFactory.newConceptDAO();
-            conceptDAO.startTransaction();
-            Concept concept = conceptDAO.findByName(conceptName);
-            if (concept != null) {
-                while (concept != null) {
-                    names.add(concept);
-                    concept = concept.getParentConcept();
-                }
-            }
-            conceptDAO.endTransaction();
-            Collections.reverse(names);
-            return names;
-        }, executor);
+        return CompletableFuture.supplyAsync(() -> queryPersistenceService.findAncestors(conceptName), executor);
     }
 
+
+    @Override
+    public CompletableFuture<ResolvedConceptSelection> resolveConceptSelection(ConceptSelection conceptSelection) {
+        return findConceptNamesAsStrings(conceptSelection.getConceptName(),
+                conceptSelection.isExtendToParent(),
+                conceptSelection.isExtendToSiblings(),
+                conceptSelection.isExtendToChildren(),
+                conceptSelection.isExtendToDescendants())
+                .thenApplyAsync(list -> new ResolvedConceptSelection(conceptSelection, list), executor);
+    }
 
 }
 

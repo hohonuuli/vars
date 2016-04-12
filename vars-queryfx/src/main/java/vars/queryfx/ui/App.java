@@ -6,10 +6,15 @@ import com.guigarage.sdk.Application;
 import com.guigarage.sdk.action.Action;
 import com.guigarage.sdk.container.WorkbenchView;
 import javafx.application.Platform;
+import javafx.scene.control.Alert;
 import javafx.scene.paint.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.queryfx.StateLookup;
+import vars.queryfx.rx.messages.ShowAdvancedSearchWorkbenchMsg;
+import vars.queryfx.rx.messages.ShowBasicSearchWorkbenchMsg;
+import vars.queryfx.rx.messages.ShowConceptConstraintsWorkbenchMsg;
+import vars.queryfx.rx.messages.ShowCustomizeResultsWorkbenchMsg;
 import vars.shared.rx.RXEventBus;
 import vars.queryfx.ToolBelt;
 import vars.queryfx.beans.ConceptSelection;
@@ -66,14 +71,28 @@ public class App {
         this.toolBelt = toolBelt;
 
         eventBus.toObserverable()
-                .filter(msg -> msg instanceof NewResolvedConceptSelectionMsg)
-                .map(msg -> (NewResolvedConceptSelectionMsg) msg)
+                .ofType(NewResolvedConceptSelectionMsg.class)
                 .subscribe(msg -> addResolvedConceptSelection(msg.getResolvedConceptSelection()));
 
         eventBus.toObserverable()
-                .filter(msg -> msg instanceof AbstractExceptionMsg)
-                .map(msg -> (AbstractExceptionMsg) msg)
+                .ofType(AbstractExceptionMsg.class)
                 .subscribe(msg -> log.error(msg.getMessage(), msg.getException()));
+
+        eventBus.toObserverable()
+                .ofType(ShowAdvancedSearchWorkbenchMsg.class)
+                .subscribe(msg -> showAdvancedSearch(getApplication()));
+
+        eventBus.toObserverable()
+                .ofType(ShowBasicSearchWorkbenchMsg.class)
+                .subscribe(msg -> showBasicSearch(getApplication()));
+
+        eventBus.toObserverable()
+                .ofType(ShowConceptConstraintsWorkbenchMsg.class)
+                .subscribe(msg -> showConceptConstraintsWorkBench(getApplication()));
+
+        eventBus.toObserverable()
+                .ofType(ShowCustomizeResultsWorkbenchMsg.class)
+                .subscribe(msg -> showCustomizeResults(getApplication()));
     }
 
     protected Application getApplication() {
@@ -82,14 +101,17 @@ public class App {
             application.addStylesheet(getClass().getResource("/vars/queryfx/queryfx.css").toExternalForm());
 
             application.setTitle("VARS Query");
-            application.addToolbarItem(new Action(AppIcons.PLAY, "Run Search", () -> doSearch()));
+            application.addToolbarItem(new Action(AppIcons.HOME, "Home", () -> eventBus.send(new ShowBasicSearchWorkbenchMsg())));
 
             application.setBaseColor(new Color(0x1B / 255D, 0x4D / 255D, 0x93 / 255D, 1));
-            application.addMenuEntry(new Action(AppIcons.SEARCH, "Basic Search", () -> showBasicSearch(application)));
+            application.addMenuEntry(new Action(AppIcons.HOME, "Home",
+                    () -> eventBus.send(new ShowBasicSearchWorkbenchMsg())));
 
-            application.addMenuEntry(new Action(AppIcons.SEARCH_PLUS, "Advanced Search", () -> showAdvancedSearch(application)));
+            application.addMenuEntry(new Action(AppIcons.SEARCH_PLUS, "Refine Search",
+                    () -> eventBus.send(new ShowAdvancedSearchWorkbenchMsg())));
 
-            application.addMenuEntry(new Action(AppIcons.GEARS, "Customize Results", () -> showCustomizeResults(application)));
+            application.addMenuEntry(new Action(AppIcons.GEARS, "Customize Results",
+                    () -> eventBus.send(new ShowCustomizeResultsWorkbenchMsg())));
 
             showBasicSearch(application);
             getAdvancedSearchWorkbench(); // If we don't call this returns are not initialized on the first query
@@ -102,16 +124,27 @@ public class App {
                 .map(ConceptConstraint::new)
                 .collect(Collectors.toList());
         final QueryParams queryParams = getAdvancedSearchWorkbench().getQueryParams();
-        final ResultsCustomization resultsCustomization = getCustomizeResultsWorkbench().getResultsCustomization();
-        Msg msg = new ExecuteSearchMsg(conceptConstraints, queryParams.getQueryReturns(), queryParams.getQueryConstraints(), resultsCustomization);
-        eventBus.send(msg);
+        if (conceptConstraints.isEmpty() && queryParams.getQueryConstraints().isEmpty()) {
+            // Show warning dialog
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Whoops!");
+            alert.setHeaderText("Unable to complete search");
+            alert.setContentText("You did not specify any search constraints, so you are asking for the entire database." +
+                    " That's not allowed");
+            alert.showAndWait();
+        }
+        else {
+            final ResultsCustomization resultsCustomization = getCustomizeResultsWorkbench().getResultsCustomization();
+            Msg msg = new ExecuteSearchMsg(conceptConstraints, queryParams.getQueryReturns(), queryParams.getQueryConstraints(), resultsCustomization);
+            eventBus.send(msg);
+        }
     }
 
     protected void showBasicSearch(Application app) {
         WorkbenchView view = getBasicSearchWorkbench();
         app.setWorkbench(view);
         app.clearGlobalActions();
-        app.addGlobalAction(new Action(AppIcons.PLUS, () -> showConceptConstraintsWorkBench(app)));
+        app.addGlobalAction(new Action(AppIcons.SEARCH, this::doSearch));
     }
 
     protected void showAdvancedSearch(Application app) {
@@ -134,7 +167,7 @@ public class App {
 
     protected BasicSearchWorkbench getBasicSearchWorkbench()  {
         if (basicSearchWorkbench == null) {
-            basicSearchWorkbench = new BasicSearchWorkbench();
+            basicSearchWorkbench = new BasicSearchWorkbench(eventBus);
         }
         return basicSearchWorkbench;
     }
@@ -143,12 +176,12 @@ public class App {
         if (conceptConstraintsWorkbench == null) {
             conceptConstraintsWorkbench = new ConceptConstraintsWorkbench(
                     toolBelt.getQueryService(), toolBelt.getExecutor(), eventBus);
-            conceptConstraintsWorkbench.getFormLayout().addActions(new Action(AppIcons.TRASH, "Cancel", () -> showBasicSearch(app)),
-                    new Action(AppIcons.PLUS, "Apply", () -> {
-                        ConceptSelection conceptSelection = conceptConstraintsWorkbench.getConceptSelection();
-                        eventBus.send(new NewConceptSelectionMsg(conceptSelection));
-                        showBasicSearch(app);
-                    }));
+//            conceptConstraintsWorkbench.getFormLayout().addActions(new Action(AppIcons.TRASH, "Cancel", () -> showBasicSearch(app)),
+//                    new Action(AppIcons.PLUS, "Apply", () -> {
+//                        ConceptSelection conceptSelection = conceptConstraintsWorkbench.getConceptSelection();
+//                        eventBus.send(new NewConceptSelectionMsg(conceptSelection));
+//                        showBasicSearch(app);
+//                    }));
         }
         return conceptConstraintsWorkbench;
     }
@@ -229,7 +262,7 @@ public class App {
         App app = new App(toolBelt);
         StateLookup.setApp(app);
         ImageFX.setIsJavaFXRunning(true);
-        app.getApplication().setPrefSize(800, 800);
+        app.getApplication().setPrefSize(800, 900);
         app.getApplication().setStopCallback(() -> System.exit(0));
         app.getApplication().show();
 

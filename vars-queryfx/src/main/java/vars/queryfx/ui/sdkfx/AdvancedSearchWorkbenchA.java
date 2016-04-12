@@ -12,7 +12,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.queryfx.QueryService;
+import vars.queryfx.AsyncQueryService;
 import vars.queryfx.StateLookup;
 import vars.queryfx.ui.AbstractValuePanel;
 import vars.queryfx.ui.ValuePanelFactory;
@@ -33,11 +33,11 @@ public class AdvancedSearchWorkbenchA extends WorkbenchView {
 
     private ObservableList<AbstractValuePanel> valuePanels = FXCollections.observableArrayList();
 
-    private final QueryService queryService;
+    private final AsyncQueryService queryService;
 
     VBox root = new VBox();
 
-    public AdvancedSearchWorkbenchA(QueryService queryService) {
+    public AdvancedSearchWorkbenchA(AsyncQueryService queryService) {
         this.queryService = queryService;
         initialize();
         ScrollPane scrollPane = new javafx.scene.control.ScrollPane();
@@ -93,9 +93,12 @@ public class AdvancedSearchWorkbenchA extends WorkbenchView {
         for (String name : groupNames) {
             VBox vbox = new VBox();
             vbox.setStyle("-fx-border-color: black");
-            List<String> columns = groupsConfig.getStringList(name);
+            List<String> columns = groupsConfig.getStringList(name)
+                    .stream()
+                    .map(String::toUpperCase)
+                    .collect(Collectors.toList());
             List<AbstractValuePanel> matchingVps = vps.stream()
-                    .filter(vp -> columns.contains(vp.getValueName()))
+                    .filter(vp -> columns.contains(vp.getValueName().toUpperCase()))
                     .sorted((vp1, vp2) ->
                             vp1.getValueName().toUpperCase().compareTo(vp2.getValueName().toUpperCase()))
                     .collect(Collectors.toList());

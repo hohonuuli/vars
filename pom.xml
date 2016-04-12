@@ -28,6 +28,7 @@
         <foxtrot.version>4.0</foxtrot.version>
         <guava.version>18.0</guava.version>
         <guice.version>4.0</guice.version>
+        <gson.version>2.6.2</gson.version>
         <jama.version>1.0.2</jama.version>
         <jasypt.version>1.9.2</jasypt.version>
         <javax.persistence.version>2.1.1</javax.persistence.version>

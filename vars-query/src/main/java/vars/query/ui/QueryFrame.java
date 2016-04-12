@@ -222,7 +222,7 @@ public class QueryFrame extends JFrame {
                             getSearchPanel().getCbAllAssociations().isSelected(),
                             queryPersistenceService.getAnnotationQueryable());
                     QueryAction queryAction = new QueryActionImpl(queryExecutor,
-                            knowledgebaseDAOFactory,
+                            queryPersistenceService,
                             getSearchPanel().getCbHierarchy().isSelected(),
                             getSearchPanel().getCbPhylogeny().isSelected(),
                             getSearchPanel().getCbFullPhylogeny().isSelected(),

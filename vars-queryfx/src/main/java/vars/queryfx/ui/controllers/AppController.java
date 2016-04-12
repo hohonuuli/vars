@@ -6,7 +6,10 @@ import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.VARSException;
-import vars.queryfx.QueryService;
+import vars.query.results.AssociationColumnRemappingDecorator;
+import vars.query.results.CoalescingDecorator;
+import vars.query.results.QueryResults;
+import vars.queryfx.AsyncQueryService;
 import vars.shared.rx.RXEventBus;
 import vars.queryfx.beans.ConceptSelection;
 import vars.queryfx.beans.ResultsCustomization;
@@ -18,9 +21,6 @@ import vars.queryfx.ui.db.ConceptConstraint;
 import vars.queryfx.ui.db.IConstraint;
 import vars.queryfx.ui.db.PreparedStatementGenerator;
 import vars.queryfx.ui.db.SQLStatementGenerator;
-import vars.queryfx.ui.db.results.AssociationColumnRemappingDecorator;
-import vars.queryfx.ui.db.results.CoalescingDecorator;
-import vars.queryfx.ui.db.results.QueryResults;
 import vars.queryfx.ui.db.results.QueryResultsDecorator;
 
 import java.net.URL;
@@ -38,14 +38,14 @@ import java.util.concurrent.Executor;
  */
 public class AppController {
 
-    private final QueryService queryService;
+    private final AsyncQueryService queryService;
     private final RXEventBus eventBus;
     private final Executor executor;
     private final QueryResultsUIController uiController;
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
-    public AppController(QueryService queryService, RXEventBus eventBus, Executor executor) {
+    public AppController(AsyncQueryService queryService, RXEventBus eventBus, Executor executor) {
         this.queryService = queryService;
         this.eventBus = eventBus;
         this.executor = executor;

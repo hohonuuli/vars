@@ -1,8 +1,8 @@
 package vars.query.ui.db.sql;
 
-import org.mbari.sql.IQueryable;
-import org.mbari.sql.QueryResults;
 import vars.VARSException;
+import vars.query.results.QueryResults;
+import vars.query.results.SQLQueryable;
 import vars.query.ui.db.AbstractQueryExecutor;
 
 import java.util.Collection;
@@ -13,11 +13,11 @@ import java.util.Collection;
  */
 public class SQLQueryExecutorImpl extends AbstractQueryExecutor {
 
-    private final IQueryable queryable;
+    private final SQLQueryable queryable;
 
     public SQLQueryExecutorImpl(Collection conceptConstraints,
             Collection valuePanels, boolean allInterpretations,
-                boolean allAssociations, IQueryable queryable) {
+                boolean allAssociations, SQLQueryable queryable) {
         super(conceptConstraints, valuePanels, allInterpretations, allAssociations);
         this.queryable = queryable;
 

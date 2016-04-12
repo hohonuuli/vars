@@ -1,4 +1,4 @@
-package vars.queryfx.ui.db.results;
+package vars.query.results;
 
 import com.google.common.base.Preconditions;
 import org.mbari.util.Tuple2;
@@ -9,9 +9,6 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -25,8 +22,8 @@ import java.util.stream.Collectors;
  */
 public class QueryResults {
     private Map<String, List<Object>> resultsMap = new TreeMap<>();
-    private final Logger log = LoggerFactory.getLogger(getClass());
-    private final int rows;
+    private transient final Logger log = LoggerFactory.getLogger(getClass());
+    private transient final int rows;
 
     public QueryResults(Map<String, List<Object>> data) {
 
@@ -50,7 +47,6 @@ public class QueryResults {
         Set<String> columnNames = resultsMap.keySet().stream()
                 .filter(s -> s.equalsIgnoreCase(columnName))
                 .collect(Collectors.toSet());
-
 
         if (columnNames.isEmpty()) {
             return new ArrayList<>();
@@ -79,6 +75,22 @@ public class QueryResults {
             }
         }
         return new Tuple2<>(columnNames, data);
+    }
+
+    /**
+     * Convert data to an array
+     * @return Row-orderd data where the size is String[rows][columns]
+     */
+    public String[][] toRowOrientedArray() {
+        Tuple2<List<String>, List<String[]>> t = toRowOrientedData();
+        List<String[]> array = t.getB();
+        int r = array.size();
+        int c = array.get(0).length;
+        String[][] data = new String[r][c];
+        for (int i = 0; i < r; i++) {
+            data[i] = array.get(i);
+        }
+        return data;
     }
 
     public Set<String> getColumnNames() {

@@ -42,10 +42,6 @@ import vars.query.ui.actions.SaveFramegrabsAction;
  */
 public class SaveImagesFromQueryResultsAction extends ActionAdapter {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 2601526373243226798L;
     private static final Logger log = LoggerFactory.getLogger(SaveImagesFromQueryResultsAction.class);
 
 
@@ -92,7 +88,7 @@ public class SaveImagesFromQueryResultsAction extends ActionAdapter {
      */
     @SuppressWarnings("unchecked")
     private URL[] getImageURLs() {
-        Object[][] data = queryResultsFrame.getQueryResults().getDataArray();
+        Object[][] data = queryResultsFrame.getQueryResults().toRowOrientedArray();
         Collection urlList = new ArrayList();
         for (int row = 0; row < data.length; row++) {
             Object[] dataRow = data[row];

@@ -17,7 +17,7 @@ import java.util.concurrent.Executor;
 
 public class ToolBelt extends vars.ToolBelt {
 
-    private final QueryService queryService;
+    private final AsyncQueryService queryService;
     private final Executor executor;
 
     @Inject
@@ -30,7 +30,7 @@ public class ToolBelt extends vars.ToolBelt {
                     AnnotationPersistenceService annotationPersistenceService,
                     KnowledgebasePersistenceService knowledgebasePersistenceService,
                     QueryPersistenceService queryPersistenceService,
-                    QueryService queryService,
+                    AsyncQueryService queryService,
                     Executor executor) {
         super(annotationDAOFactory, annotationFactory, knowledgebaseDAOFactory,
                 knowledgebaseFactory, miscDAOFactory, miscFactory,
@@ -40,7 +40,7 @@ public class ToolBelt extends vars.ToolBelt {
         this.executor = executor;
     }
 
-    public QueryService getQueryService() {
+    public AsyncQueryService getQueryService() {
         return queryService;
     }
 
