@@ -22,6 +22,11 @@ Originally designed for annotating underwater video, VARS can be applied to any 
 ## Resources
 - [MBARI-VARS Group](https://groups.google.com/forum/#!forum/mbari-vars)
 
+## Query MBARI's Public VARS Data
+
+- [Launch VARS Query via Java Webstart](http://dsg.mbari.org/vars/webstart/varspublicquery.jnlp)
+- [Launch VARS QueryFX (Beta) via Java Webstart](http://dsg.mbari.org/vars/webstart/varspublicqueryfx.jnlp)
+
 ## Acknowledgements
 
 The following products were very kindly donated to assist with the development of VARS:  
