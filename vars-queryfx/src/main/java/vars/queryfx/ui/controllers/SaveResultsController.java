@@ -102,7 +102,7 @@ public class SaveResultsController {
     }
 
     public void saveAsJSON(File file, QueryResults queryResults) {
-        SaveResultsAsJSONFn fn = new SaveResultsAsJSONFn(executor, file, queryResults);
-        fn.apply();
+//        SaveResultsAsJSONFn fn = new SaveResultsAsJSONFn(executor, file, queryResults);
+//        fn.apply();
     }
 }
