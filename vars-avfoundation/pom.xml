@@ -76,9 +76,9 @@
                                 <configuration>
                                     <tasks>
                                         <copy file="${xcode.builddir}/libavfimagesnap.dylib"
-                                              todir="${build.outputDirectory}/native" />
+                                              todir="${project.build.outputDirectory}/native" />
                                         <copy file="${xcode.builddir}/libavfimagesnap.dylib"
-                                              tofile="${build.outputDirectory}/native/libavfimagesnap.jnilib" />
+                                              tofile="${project.build.outputDirectory}/native/libavfimagesnap.jnilib" />
                                     </tasks>
                                 </configuration>
                             </execution>

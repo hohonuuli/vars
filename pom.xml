@@ -210,7 +210,7 @@
                         </manifest>
                         <manifestEntries>
                             <environment>${environment}</environment>
-                            <url>${pom.url}</url>
+                            <url>${project.url}</url>
                         </manifestEntries>
                     </archive>
                 </configuration>

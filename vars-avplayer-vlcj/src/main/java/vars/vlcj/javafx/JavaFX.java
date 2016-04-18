@@ -6,9 +6,10 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.co.caprica.vlcj.binding.LibVlc;
+import uk.co.caprica.vlcj.discovery.NativeDiscovery;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -150,8 +151,13 @@ public class JavaFX {
      * @throws Exception
      */
     public static void main(String[] args) throws Exception {
-        System.setProperty("VLC_PLUGIN_PATH", "/Applications/VLC.app/Contents/MacOS/plugins/");
-        System.setProperty("jna.library.path", "/Applications/VLC.app/Contents/MacOS/lib/");
+        //System.setProperty("VLC_PLUGIN_PATH", "/Applications/VLC.app/Contents/MacOS/plugins/");
+        //System.setProperty("jna.library.path", "/Applications/VLC.app/Contents/MacOS/lib/");
+        boolean found = new NativeDiscovery().discover();
+        if (found) {
+            System.out.println("Using VLC version: " + LibVlc.INSTANCE.libvlc_get_version());
+        }
+
         String a = args[0];
 
         Consumer<VideoStage> fn = videoStage -> {
