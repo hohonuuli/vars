@@ -1,9 +1,16 @@
 package vars.avplayer.rs422;
 
+import org.bushe.swing.event.EventBus;
 import org.mbari.util.Tuple2;
+import org.mbari.vcr4j.SimpleVideoIO;
+import org.mbari.vcr4j.VideoIO;
+import org.mbari.vcr4j.decorators.SchedulerVideoIO;
+import org.mbari.vcr4j.decorators.VCRSyncDecorator;
 import org.mbari.vcr4j.rs422.RS422Error;
 import org.mbari.vcr4j.rs422.RS422State;
 import org.mbari.vcr4j.rs422.RS422VideoIO;
+import org.mbari.vcr4j.rs422.decorators.RS422StatusDecorator;
+import org.mbari.vcr4j.rs422.decorators.UserbitsAsTimeDecorator;
 import org.mbari.vcr4j.rxtx.RXTX;
 import org.mbari.vcr4j.rxtx.RXTXVideoIO;
 import org.slf4j.Logger;
@@ -23,6 +30,7 @@ import vars.shared.ui.GlobalStateLookup;
 
 import java.awt.*;
 import java.util.Optional;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -32,7 +40,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class RS422VideoPlayer implements VideoPlayer<RS422State, RS422Error> {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
-    private final AtomicReference<RS422VideoIO> videoIORef = new AtomicReference<>();
+    private final AtomicReference<VideoIO<RS422State, RS422Error>> videoIORef = new AtomicReference<>();
     private ImageCaptureService imageCaptureService = ImageCaptureServiceRef.getImageCaptureService();
     private RS422VideoPlayerDialogUI dialogUI;
 
@@ -85,7 +93,7 @@ public class RS422VideoPlayer implements VideoPlayer<RS422State, RS422Error> {
     private void setSerialPort(String serialPortName) {
         // Close the port if it's different
         if (videoIORef.get() != null) {
-            RS422VideoIO videoIO = videoIORef.get();
+            VideoIO<RS422State, RS422Error> videoIO = videoIORef.get();
             String connectionID = videoIO.getConnectionID();
             if (!connectionID.equalsIgnoreCase(serialPortName)) {
                 videoIO.close();
@@ -95,9 +103,33 @@ public class RS422VideoPlayer implements VideoPlayer<RS422State, RS422Error> {
 
         // Connect to the port if needed
         if (videoIORef.get() == null) {
-            RS422VideoIO videoIO = RXTXVideoIO.open(serialPortName);
-            videoIORef.set(videoIO);
+            videoIORef.set(newVideoIO(serialPortName));
         }
+    }
+
+    private VideoIO<RS422State, RS422Error> newVideoIO(String serialPortName) {
+        VideoIO<RS422State, RS422Error> io = null;
+        try {
+            RS422VideoIO rawIO = RXTXVideoIO.open(serialPortName);
+            // Keep UI in sync by scheduling status/time requests
+            new VCRSyncDecorator<>(rawIO);
+            // Keep UI in sync by sending status/timecode requests after commands
+            new RS422StatusDecorator(rawIO);
+            // Listen to time stored in userbits and decode it.
+            UserbitsAsTimeDecorator timeDecorator = new UserbitsAsTimeDecorator(rawIO);
+            // Hide all the complexity.
+            VideoIO<RS422State, RS422Error> simpleIO = new SimpleVideoIO<>(rawIO.getConnectionID(),
+                    rawIO.getCommandSubject(),
+                    rawIO.getStateObservable(),
+                    rawIO.getErrorObservable(),
+                    timeDecorator.getIndexObservable());
+            // Move IO off of current thread
+            io = new SchedulerVideoIO<>(simpleIO, Executors.newCachedThreadPool());
+        }
+        catch (Exception e) {
+            EventBus.publish(GlobalStateLookup.TOPIC_NONFATAL_ERROR, e);
+        }
+        return io;
     }
 
     private VideoController<RS422State, RS422Error> getVideoController() {

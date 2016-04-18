@@ -2,6 +2,10 @@ package vars.avplayer.rs422;
 
 import org.bushe.swing.event.EventBus;
 import org.mbari.util.Tuple2;
+import org.mbari.vcr4j.VideoIO;
+import org.mbari.vcr4j.adapter.noop.NoopVideoIO;
+import org.mbari.vcr4j.decorators.SchedulerVideoIO;
+import org.mbari.vcr4j.decorators.VCRSyncDecorator;
 import org.mbari.vcr4j.rs422.RS422VideoIO;
 import org.mbari.vcr4j.udp.UDPError;
 import org.mbari.vcr4j.udp.UDPState;
@@ -20,6 +24,7 @@ import vars.shared.ui.GlobalStateLookup;
 
 import java.awt.*;
 import java.util.Optional;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -28,7 +33,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class UDPVideoPlayer implements VideoPlayer<UDPState, UDPError> {
 
-    private final AtomicReference<UDPVideoIO> videoIORef = new AtomicReference<>();
+    private final AtomicReference<VideoIO<UDPState, UDPError>> videoIORef = new AtomicReference<>();
     private ImageCaptureService imageCaptureService = ImageCaptureServiceRef.getImageCaptureService();
     private UDPVideoPlayerDialogUI dialogUI;
 
@@ -74,18 +79,32 @@ public class UDPVideoPlayer implements VideoPlayer<UDPState, UDPError> {
 
     private void setUDPConnection(String hostname, Integer port) {
         if (videoIORef.get() != null) {
-            UDPVideoIO io = videoIORef.get();
+            VideoIO<UDPState, UDPError> io = videoIORef.get();
             io.close();
             videoIORef.set(null);
         }
 
         try {
-            UDPVideoIO io = new UDPVideoIO(hostname, port);
-            videoIORef.set(io);
+            videoIORef.set(newVideoIO(hostname, port));
         }
         catch (Exception e) {
             EventBus.publish(GlobalStateLookup.TOPIC_NONFATAL_ERROR, e);
         }
+    }
+
+    private VideoIO<UDPState, UDPError> newVideoIO(String hostname, Integer port) {
+        VideoIO<UDPState, UDPError> io = null;
+        try {
+            UDPVideoIO rawIO = new UDPVideoIO(hostname, port);
+            // Wrap io to request timestamps and status
+            new VCRSyncDecorator<>(rawIO);
+            // Move IO off of current thread
+            io = new SchedulerVideoIO<>(rawIO, Executors.newCachedThreadPool());
+        }
+        catch (Exception e) {
+            EventBus.publish(GlobalStateLookup.TOPIC_NONFATAL_ERROR, e);
+        }
+        return io;
     }
 
     private VideoController<UDPState, UDPError> getVideoController() {
@@ -98,6 +117,7 @@ public class UDPVideoPlayer implements VideoPlayer<UDPState, UDPError> {
             Window window = GlobalStateLookup.getSelectedFrame();
             dialogUI = new UDPVideoPlayerDialogUI(window, toolBelt);
             dialogUI.onOkay(() -> {
+                dialogUI.setVisible(false);
                 VideoArchive videoArchive = dialogUI.openVideoArchive();
                 Tuple2<String, Integer> params = dialogUI.getRemoteConnectionParams();
                 setUDPConnection(params.getA(), params.getB());

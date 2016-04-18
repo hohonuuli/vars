@@ -30,10 +30,7 @@ public class VideoControlPanel extends VCRPanel {
      */
     public VideoControlPanel() {
         super();
-
-        videoControllerProperty().set(StateLookup.getVideoController());
-
-
+        videoControllerProperty().bind(StateLookup.videoControllerProperty());
     }
 
 }
