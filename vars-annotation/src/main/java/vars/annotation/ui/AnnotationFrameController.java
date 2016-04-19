@@ -85,29 +85,31 @@ public class AnnotationFrameController implements PreferenceUpdater, UIEventSubs
         this.toolBelt = toolBelt;
         this.eventBus = eventBus;
         this.commandQueue = new CommandQueue(toolBelt);
+        initialize();
         AnnotationProcessor.process(this); // Make EventBus Aware
-        
+    }
+
+    private void initialize() {
         // Make sure we save the last observations we annotated to the database
-        Thread cleanupThread = new Thread(new Runnable() {
-            public void run() {
+        Thread cleanupThread = new Thread(() -> {
 
-                // Persist prefs BEFORE shutting off services. Otherwise video connection
-                // information is lost.
-                log.info("Persisting preferences");
-                persistPreferences();
+            // Persist prefs BEFORE shutting off services. Otherwise video connection
+            // information is lost.
+            log.info("Persisting preferences");
+            persistPreferences();
 
-                log.info("Saving last Observations to persistent storage during JVM shutdown");
-                Collection<Observation> observations = StateLookup.getSelectedObservations();
-                toolBelt.getPersistenceController().updateAndValidate(new ArrayList<Observation>(observations));
+            log.info("Saving last Observations to persistent storage during JVM shutdown");
+            Collection<Observation> observations = StateLookup.getSelectedObservations();
+            toolBelt.getPersistenceController().updateAndValidate(new ArrayList<Observation>(observations));
 
-                // Update current videoarchive's image URLs on shutdown
-                VideoArchive videoArchive = StateLookup.getVideoArchive();
-                if (videoArchive != null) {
-                    updateCameraData(videoArchive);
-                }
-
-                log.info("Shutdown thread is finished. Bye Bye");
+            // Update current videoarchive's image URLs on shutdown
+            VideoArchive videoArchive = StateLookup.getVideoArchive();
+            if (videoArchive != null) {
+                updateCameraData(videoArchive);
             }
+
+            log.info("Shutdown thread is finished. Bye Bye");
+
         }, "VARS-cleanupBeforeShutdownThread");
 
         Runtime.getRuntime().addShutdownHook(cleanupThread);
@@ -125,7 +127,7 @@ public class AnnotationFrameController implements PreferenceUpdater, UIEventSubs
                         waitIndicator = null;
                     }
                 });
-                
+
             }
 
             public void beforeClear(CacheClearedEvent evt) {
@@ -140,7 +142,6 @@ public class AnnotationFrameController implements PreferenceUpdater, UIEventSubs
             persistPreferences(oldVal); // Save the old
             loadPreferences(newVal);    // load the new
         });
-
 
 
         /*
@@ -160,11 +161,12 @@ public class AnnotationFrameController implements PreferenceUpdater, UIEventSubs
         });
 
         /*
-            Bridge between the RXEventBus and the StateLookup's videoArchive property
+            Bridge between the RXEventBus and the EventBus/StateLookup's videoArchive property
          */
         eventBus.toObserverable()
                 .ofType(SetVideoArchiveMsg.class)
-                .subscribe(msg -> StateLookup.setVideoArchive(msg.getVideoArchive()));
+                .subscribe(msg -> EventBus.publish(new VideoArchiveChangedEvent(null, msg.getVideoArchive())));
+
 
         /*
             Bridges between the RXEventBus and the StateLookup's videoController property
@@ -172,7 +174,6 @@ public class AnnotationFrameController implements PreferenceUpdater, UIEventSubs
         eventBus.toObserverable()
                 .ofType(SetVideoControllerMsg.class)
                 .subscribe(msg -> StateLookup.setVideoController(msg.getVideoController()));
-
     }
 
     public void persistPreferences() {

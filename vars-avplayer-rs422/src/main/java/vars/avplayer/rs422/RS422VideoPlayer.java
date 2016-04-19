@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import vars.ToolBelt;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveDAO;
-import vars.avfoundation.AVFImageCaptureServiceImpl;
 import vars.avplayer.ImageCaptureService;
 import vars.avplayer.VideoController;
 import vars.avplayer.VideoPlayer;
@@ -143,10 +142,15 @@ public class RS422VideoPlayer implements VideoPlayer<RS422State, RS422Error> {
             dialogUI = new RS422VideoPlayerDialogUI(window, toolBelt);
             dialogUI.onOkay(() -> {
                 dialogUI.setVisible(false);
-                VideoArchive videoArchive = dialogUI.openVideoArchive();
-                setSerialPort(dialogUI.getSerialPortName());
-                eventBus.send(new SetVideoArchiveMsg(videoArchive));
-                eventBus.send(new SetVideoControllerMsg<>(getVideoController()));
+                //eventBus.send(new SetVideoArchiveMsg(null));
+                // Do lookup off of Swing's thread
+//                Runnable r = ()  -> {
+                    VideoArchive videoArchive = dialogUI.openVideoArchive();
+                    setSerialPort(dialogUI.getSerialPortName());
+                    eventBus.send(new SetVideoArchiveMsg(videoArchive));
+                    eventBus.send(new SetVideoControllerMsg<>(getVideoController()));
+//                };
+//                new Thread(r).run();
             });
         }
         return dialogUI;

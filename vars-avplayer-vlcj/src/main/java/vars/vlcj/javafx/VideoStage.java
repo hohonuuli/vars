@@ -128,6 +128,26 @@ public class VideoStage extends Stage {
             return pixelWriter;
         }
 
+        // vlcj 4x experimental branch
+
+        @Override
+        public void display(DirectMediaPlayer mediaPlayer, ByteBuffer[] nativeBuffers, BufferFormat bufferFormat) {
+            if (writableImage == null) {
+                return;
+            }
+            Platform.runLater(() -> {
+                try {
+                    final ByteBuffer byteBuffer = mediaPlayer.lock()[0];
+                    getPixelWriter().setPixels(0, 0, bufferFormat.getWidth(), bufferFormat.getHeight(), pixelFormat, byteBuffer, bufferFormat.getPitches()[0]);
+                } finally {
+                    mediaPlayer.unlock();
+                }
+            });
+        }
+
+
+        // vlc4j 3.10.1
+        /*
         @Override
         public void display(DirectMediaPlayer mediaPlayer, Memory[] nativeBuffers, BufferFormat bufferFormat) {
             if (writableImage == null) {
@@ -143,6 +163,7 @@ public class VideoStage extends Stage {
                 }
             });
         }
+        */
     }
 
     private class CanvasBufferFormatCallback implements BufferFormatCallback {

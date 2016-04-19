@@ -3,10 +3,8 @@ package vars.avplayer.rs422;
 import org.bushe.swing.event.EventBus;
 import org.mbari.util.Tuple2;
 import org.mbari.vcr4j.VideoIO;
-import org.mbari.vcr4j.adapter.noop.NoopVideoIO;
 import org.mbari.vcr4j.decorators.SchedulerVideoIO;
 import org.mbari.vcr4j.decorators.VCRSyncDecorator;
-import org.mbari.vcr4j.rs422.RS422VideoIO;
 import org.mbari.vcr4j.udp.UDPError;
 import org.mbari.vcr4j.udp.UDPState;
 import org.mbari.vcr4j.udp.UDPVideoIO;
@@ -118,11 +116,15 @@ public class UDPVideoPlayer implements VideoPlayer<UDPState, UDPError> {
             dialogUI = new UDPVideoPlayerDialogUI(window, toolBelt);
             dialogUI.onOkay(() -> {
                 dialogUI.setVisible(false);
-                VideoArchive videoArchive = dialogUI.openVideoArchive();
-                Tuple2<String, Integer> params = dialogUI.getRemoteConnectionParams();
-                setUDPConnection(params.getA(), params.getB());
-                eventBus.send(new SetVideoArchiveMsg(videoArchive));
-                eventBus.send(new SetVideoControllerMsg<>(getVideoController()));
+//                Runnable r = () -> {
+                    VideoArchive videoArchive = dialogUI.openVideoArchive();
+                    Tuple2<String, Integer> params = dialogUI.getRemoteConnectionParams();
+                    setUDPConnection(params.getA(), params.getB());
+                    eventBus.send(new SetVideoArchiveMsg(videoArchive));
+                    eventBus.send(new SetVideoControllerMsg<>(getVideoController()));
+//                };
+//                new Thread(r).run();
+
             });
         }
         return dialogUI;
