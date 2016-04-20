@@ -1,6 +1,6 @@
 package vars.avplayer.rs422;
 
-import java.util.Optional;
+import vars.avplayer.IVideoParams;
 
 /**
  * @author Brian Schlining

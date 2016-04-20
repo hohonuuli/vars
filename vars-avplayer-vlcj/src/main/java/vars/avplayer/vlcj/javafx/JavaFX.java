@@ -1,4 +1,4 @@
-package vars.vlcj.javafx;
+package vars.avplayer.vlcj.javafx;
 
 import javafx.application.Application;
 import javafx.application.Platform;

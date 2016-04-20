@@ -1,5 +1,7 @@
 package vars.avplayer.rs422;
 
+import vars.avplayer.IVideoParams;
+
 /**
  * @author Brian Schlining
  * @since 2016-04-06T10:00:00

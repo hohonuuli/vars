@@ -1,4 +1,4 @@
-package vars.vlcj.javafx;
+package vars.avplayer.vlcj.javafx;
 
 import com.google.common.base.Preconditions;
 import com.sun.jna.Memory;

@@ -158,7 +158,7 @@ public class RS422VideoPlayer implements VideoPlayer<RS422State, RS422Error> {
 
     @Override
     public String getName() {
-        return "RS422";
+        return "VCR via RS422";
     }
 
 

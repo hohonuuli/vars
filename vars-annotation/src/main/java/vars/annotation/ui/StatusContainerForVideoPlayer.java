@@ -133,8 +133,6 @@ public class StatusContainerForVideoPlayer extends JPanel {
 
             addMouseListener(new MouseAdapter() {
 
-                Frame frame = StateLookup.getAnnotationFrame();
-
                 @Override
                 public void mouseClicked(final MouseEvent me) {
                     SwingUtils.flashJComponent(StatusLabelForVideoPlayer.this, 2);
@@ -147,24 +145,6 @@ public class StatusContainerForVideoPlayer extends JPanel {
                     // for a selected VideoPlayerOld module
                     final VideoPlayer videoPlayer = getSelectedVideoPlayer();
                     final VideoPlayerDialogUI dialog = videoPlayer.getConnectionDialog(toolBelt, eventBus);
-
-//                    dialog.onOkay(() -> {
-//                        // TODO this needs to be replaced with new vcr4j 3 code, StateLookup and RXEventBus listenersi
-//
-//
-//                        dialog.setVisible(false);
-//                        final VideoParams videoParams = dialog.getVideoParams();
-//                        Tuple2<VideoArchive, VideoPlayerController> t = accessUI.openMoviePlayer(videoParams,
-//                                toolBelt.getAnnotationDAOFactory());
-//                        VideoArchive videoArchive = t.getA();
-//                        VideoPlayerController videoPlayerController = t.getB();
-//                        VideoArchiveChangedEvent event = new VideoArchiveChangedEvent(this, videoArchive);
-//
-//
-//                        //Lookup.getImageCaptureServiceDispatcher().setValueObject(videoPlayerController.getImageCaptureService());
-//                        //Lookup.getVideoControlServiceDispatcher().setValueObject(videoPlayerController.getVideoControlService());
-//                        EventBus.publish(event);
-//                    });
 
                     int x = mousePosition.x;
                     if (x < 1) {
@@ -179,7 +159,6 @@ public class StatusContainerForVideoPlayer extends JPanel {
                     dialog.setVisible(true);
 
                 }
-
 
             });
         }

@@ -132,7 +132,7 @@ public class UDPVideoPlayer implements VideoPlayer<UDPState, UDPError> {
 
     @Override
     public String getName() {
-        return "Remote VCR Connection";
+        return "Ship Network";
     }
 
 

@@ -6,11 +6,23 @@
         <artifactId>vars-redux</artifactId>
         <groupId>vars-redux</groupId>
         <version>8.2-SNAPSHOT</version>
-        <relativePath>../vars/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>vars-avplayer-kipro</artifactId>
+    
+    <dependencies>
+        <dependency>
+            <groupId>vars-redux</groupId>
+            <artifactId>vars-avplayer-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mbari.vcr4j</groupId>
+            <artifactId>vcr4j-kipro</artifactId>
+            <version>${vcr4j.version}</version>
+        </dependency>
+    </dependencies>
 
 
 </project>

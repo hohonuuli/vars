@@ -154,6 +154,6 @@ public class JFXVideoPlayer implements VideoPlayer<JFXVideoState, SimpleVideoErr
 
     @Override
     public String getName() {
-        return "Java FX";
+        return "MP4 using Java";
     }
 }
