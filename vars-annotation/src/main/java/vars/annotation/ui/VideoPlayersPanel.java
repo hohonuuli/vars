@@ -1,15 +1,9 @@
 package vars.annotation.ui;
 
 import org.bushe.swing.event.annotation.AnnotationProcessor;
-import org.bushe.swing.event.annotation.EventSubscriber;
 import org.mbari.swing.SwingUtils;
-import rx.Observable;
-import rx.subjects.PublishSubject;
-import rx.subjects.SerializedSubject;
-import rx.subjects.Subject;
+import org.mbari.util.Tuple2;
 import vars.annotation.VideoArchive;
-import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
-import vars.annotation.ui.eventbus.VideoArchiveSelectedEvent;
 import vars.avplayer.VideoController;
 import vars.avplayer.VideoPlayer;
 import vars.avplayer.VideoPlayerDialogUI;
@@ -32,8 +26,7 @@ public class VideoPlayersPanel extends JPanel {
     private JComboBox<VideoPlayer> videoPlayerComboBox;
     private final ToolBelt toolBelt;
     private final RXEventBus eventBus;
-    private StatusLabel videoLabel;
-    private final Subject<VideoArchive, VideoArchive> localVideoArchiveObs = new SerializedSubject<>(PublishSubject.create());
+    private VideoLabel videoLabel;
 
     public VideoPlayersPanel(ToolBelt toolBelt, RXEventBus eventBus) {
         this.toolBelt = toolBelt;
@@ -48,6 +41,13 @@ public class VideoPlayersPanel extends JPanel {
         add(getVideoPlayerComboBox());
         add(Box.createHorizontalStrut(10));
         add(getVideoLabel());
+        StateLookup.videoControllerProperty().addListener((obs, oldVal, newVal) -> {
+            getVideoLabel().updateLabel(StateLookup.getVideoArchive(), newVal);
+        });
+
+        StateLookup.videoArchiveProperty().addListener((obs, oldVal, newVal) -> {
+            getVideoLabel().updateLabel(newVal, StateLookup.getVideoController());
+        });
     }
 
     private JComboBox<VideoPlayer> getVideoPlayerComboBox() {
@@ -66,7 +66,7 @@ public class VideoPlayersPanel extends JPanel {
     }
 
 
-    private StatusLabel getVideoLabel() {
+    private VideoLabel getVideoLabel() {
         if (videoLabel == null) {
             videoLabel = new VideoLabel();
             Dimension d = videoLabel.getPreferredSize();
@@ -128,52 +128,48 @@ public class VideoPlayersPanel extends JPanel {
             });
 
             AnnotationProcessor.process(this); // Register with EventBus
-            setVideoArchive(StateLookup.getVideoArchive());
+            updateLabel(StateLookup.getVideoArchive(), StateLookup.getVideoController());
         }
 
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
-            setVideoArchive((VideoArchive) evt.getNewValue());
+            updateLabel((VideoArchive) evt.getNewValue(), StateLookup.getVideoController());
         }
 
-        public void updateLabel(final VideoArchive videoArchive)
+        /**
+         * Builds the label string indicating the videoarchve & videocontroller
+         * @param videoArchive
+         * @param videoController
+         * @return A tuple of (tooltip, labelText)
+         */
+        public Tuple2<String, String> buildLabel(final VideoArchive videoArchive, final VideoController videoController) {
 
-        public void setVideoArchive(final VideoArchive videoArchive) {
-            localVideoArchiveObs.onNext(videoArchive);
-            boolean ok = false;
-            String text = "NONE";
-            String toolTip = text;
-            if (videoArchive != null) {
-                VideoController videoController = StateLookup.getVideoController(); // FIXME - Using global lookup, bad me.
-                String connectionID = videoController != null ? " @ " + videoController.getConnectionID() : "";
-                text = videoArchive.getName() + connectionID;
-                toolTip = text;
-
-                if ((text.length() > 20) &&
-                        (text.toLowerCase().startsWith("http:") || text.toLowerCase().startsWith("file:"))) {
-                    String[] parts = text.split("/");
-                    if (parts.length > 0) {
-                        text = ".../" + parts[parts.length - 1];
-                    }
-
+            String videoPart = videoArchive == null ? "NONE" : videoArchive.getName();
+            String toolTip = videoPart;
+            if ((videoPart.length() > 20) &&
+                    (videoPart.toLowerCase().startsWith("http:") || videoPart.toLowerCase().startsWith("file:"))) {
+                String[] parts = videoPart.split("/");
+                if (parts.length > 0) {
+                    videoPart = ".../" + parts[parts.length - 1];
                 }
-
-                ok = true;
             }
 
-            setText("Video: " + text);
+            String connectionID = videoController != null ? " @ " + videoController.getConnectionID() : "";
+            String text = videoPart + connectionID;
+
+            text = "Video: " + text;
+            toolTip = toolTip + connectionID; // Long form without "Video"
+            return new Tuple2<>(toolTip, text);
+        }
+
+        public void updateLabel(final VideoArchive videoArchive, final VideoController videoController) {
+            boolean ok = videoArchive != null;
+            Tuple2<String, String> txt = buildLabel(videoArchive, videoController);
+            String text = txt.getB();
+            String toolTip = txt.getA();
+            setText(text);
             setToolTipText(toolTip);
             setOk(ok);
-        }
-
-        @EventSubscriber(eventClass = VideoArchiveChangedEvent.class)
-        public void respondTo(VideoArchiveChangedEvent event) {
-            setVideoArchive(event.get());
-        }
-
-        @EventSubscriber(eventClass = VideoArchiveSelectedEvent.class)
-        public void respondTo(VideoArchiveSelectedEvent event) {
-            setVideoArchive(event.get());
         }
 
     }

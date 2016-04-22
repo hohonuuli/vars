@@ -13,6 +13,7 @@ import vars.avplayer.SimpleVideoParams;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 /**
@@ -24,6 +25,7 @@ public class QuadVideoPlayerDialogUI extends OpenVideoArchiveDialog<QuadState, Q
 
     private JPanel topPanel;
     private JTextField hostTextField;
+    public static final String PREF_HTTP_ADDRESS = "aja-kipro-quad-address";
 
 
     public QuadVideoPlayerDialogUI(Window parent, ToolBelt toolBelt) {
@@ -35,6 +37,22 @@ public class QuadVideoPlayerDialogUI extends OpenVideoArchiveDialog<QuadState, Q
     private void initialize() {
         setPreferredSize(new Dimension(475, 550));
         getContentPane().add(getTopPanel(), BorderLayout.NORTH);
+    }
+
+    @Override
+    public void setVisible(boolean b) {
+        Preferences prefs = Preferences.userNodeForPackage(getClass());
+        String address = prefs.get(PREF_HTTP_ADDRESS, "");
+        if (address != null && !address.isEmpty()) {
+            getHostTextField().setText(address);
+        }
+        super.setVisible(b);
+    }
+
+    @Override
+    public VideoArchive openVideoArchive() {
+        saveQuadHTTPAddress(getQuadHTTPAddress());
+        return super.openVideoArchive();
     }
 
     @Override
@@ -50,8 +68,6 @@ public class QuadVideoPlayerDialogUI extends OpenVideoArchiveDialog<QuadState, Q
         String videoArchiveName = videoParams.getVideoArchiveName();
         VideoArchive videoArchive = dao.findOrCreateByParameters(platform, sequenceNumber, videoArchiveName);
         dao.endTransaction();
-        Preferences prefs = Preferences.userNodeForPackage(OpenVideoArchiveDialog.class);
-        prefs.put(PREF_PLATFORM_NAME, platform);
 
         return videoArchive;
     }
@@ -84,5 +100,20 @@ public class QuadVideoPlayerDialogUI extends OpenVideoArchiveDialog<QuadState, Q
             ip = "http://" + ip;
         }
         return ip;
+    }
+
+
+
+    private void saveQuadHTTPAddress(String address) {
+        if (address != null && !address.isEmpty()) {
+            Preferences prefs = Preferences.userNodeForPackage(getClass());
+            prefs.put(PREF_HTTP_ADDRESS, address);
+            try {
+                prefs.flush();
+            }
+            catch (BackingStoreException e) {
+                log.warn("Failed to save preference of '" + PREF_HTTP_ADDRESS + "'");
+            }
+        }
     }
 }

@@ -2,6 +2,8 @@ package vars.avplayer;
 
 import org.mbari.vcr4j.VideoError;
 import org.mbari.vcr4j.VideoState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import vars.ToolBelt;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveDAO;
@@ -13,6 +15,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Enumeration;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import java.util.prefs.PreferencesFactory;
 
@@ -30,6 +33,7 @@ public abstract class OpenVideoArchiveDialog<S extends VideoState, E extends Vid
     private OpenVideoArchivePanel centerPanel;
     private enum OpenType { BY_PARAMS, BY_NAME, EXISTING; }
     public static final String PREF_PLATFORM_NAME = "platform-name";
+    protected final Logger log = LoggerFactory.getLogger(getClass());
 
     public OpenVideoArchiveDialog(final Window parent, ToolBelt toolBelt) {
         super(parent);
@@ -107,6 +111,9 @@ public abstract class OpenVideoArchiveDialog<S extends VideoState, E extends Vid
                 break;
             default:
         }
+        if (videoArchive != null) {
+            savePlatformPreferences(videoArchive.getVideoArchiveSet().getPlatformName());
+        }
         return videoArchive;
 
     }
@@ -115,6 +122,12 @@ public abstract class OpenVideoArchiveDialog<S extends VideoState, E extends Vid
         if (platform != null && !platform.isEmpty()) {
             Preferences prefs = Preferences.userNodeForPackage(getClass());
             prefs.put(PREF_PLATFORM_NAME, platform);
+            try {
+                prefs.flush();
+            }
+            catch (BackingStoreException e) {
+                log.warn("Failed to save preference of '" + PREF_PLATFORM_NAME + "'");
+            }
         }
     }
 
@@ -127,7 +140,6 @@ public abstract class OpenVideoArchiveDialog<S extends VideoState, E extends Vid
         String platform = (String) cp.getCameraPlatformComboBox().getSelectedItem();
         VideoArchive videoArchive = dao.findOrCreateByParameters(platform, sequenceNumber, videoArchiveName);
         dao.endTransaction();
-        savePlatformPreferences(platform);
         return videoArchive;
     }
 
@@ -164,7 +176,6 @@ public abstract class OpenVideoArchiveDialog<S extends VideoState, E extends Vid
         dao.startTransaction();
         String name = (String) cp.getExistingNamesComboBox().getSelectedItem();
         VideoArchive videoArchive = dao.findByName(name);
-        savePlatformPreferences(videoArchive.getVideoArchiveSet().getPlatformName());
         dao.endTransaction();
         return videoArchive;
     }

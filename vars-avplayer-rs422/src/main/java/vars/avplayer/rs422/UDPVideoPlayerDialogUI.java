@@ -108,8 +108,6 @@ public class UDPVideoPlayerDialogUI extends OpenVideoArchiveDialog<UDPState, UDP
         String videoArchiveName = videoParams.getVideoArchiveName();
         VideoArchive videoArchive = dao.findOrCreateByParameters(platform, sequenceNumber, videoArchiveName);
         dao.endTransaction();
-        Preferences prefs = Preferences.userNodeForPackage(OpenVideoArchiveDialog.class);
-        prefs.put(PREF_PLATFORM_NAME, platform);
         return videoArchive;
     }
 

@@ -32,5 +32,4 @@ public class SQLQueryExecutorImpl extends AbstractQueryExecutor {
         }
     }
 
-
 }
