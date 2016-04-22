@@ -13,6 +13,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Enumeration;
+import java.util.prefs.Preferences;
+import java.util.prefs.PreferencesFactory;
 
 /**
  * @author Brian Schlining
@@ -27,6 +29,7 @@ public abstract class OpenVideoArchiveDialog<S extends VideoState, E extends Vid
     private Runnable cancelRunnable = () -> this.setVisible(false);
     private OpenVideoArchivePanel centerPanel;
     private enum OpenType { BY_PARAMS, BY_NAME, EXISTING; }
+    public static final String PREF_PLATFORM_NAME = "platform-name";
 
     public OpenVideoArchiveDialog(final Window parent, ToolBelt toolBelt) {
         super(parent);
@@ -76,8 +79,7 @@ public abstract class OpenVideoArchiveDialog<S extends VideoState, E extends Vid
         okRunnable = fn;
     }
 
-    public VideoArchive openVideoArchive() {
-
+    protected OpenType getOpenType() {
         Enumeration<AbstractButton> e = getCenterPanel().getButtonGroup().getElements();
         OpenType openType = null;
         while (e.hasMoreElements()) {
@@ -87,9 +89,13 @@ public abstract class OpenVideoArchiveDialog<S extends VideoState, E extends Vid
                 break;
             }
         }
+        return openType == null ? OpenType.BY_PARAMS : openType;
+    }
+
+    public VideoArchive openVideoArchive() {
 
         VideoArchive videoArchive = null;
-        switch (openType) {
+        switch (getOpenType()) {
             case BY_NAME:
                 videoArchive = openVideoArchiveByName();
                 break;
@@ -105,6 +111,13 @@ public abstract class OpenVideoArchiveDialog<S extends VideoState, E extends Vid
 
     }
 
+    private void savePlatformPreferences(String platform) {
+        if (platform != null && !platform.isEmpty()) {
+            Preferences prefs = Preferences.userNodeForPackage(getClass());
+            prefs.put(PREF_PLATFORM_NAME, platform);
+        }
+    }
+
     protected VideoArchive openVideoArchiveByName() {
         OpenVideoArchivePanel cp = getCenterPanel();
         VideoArchiveDAO dao = toolBelt.getAnnotationDAOFactory().newVideoArchiveDAO();
@@ -114,7 +127,33 @@ public abstract class OpenVideoArchiveDialog<S extends VideoState, E extends Vid
         String platform = (String) cp.getCameraPlatformComboBox().getSelectedItem();
         VideoArchive videoArchive = dao.findOrCreateByParameters(platform, sequenceNumber, videoArchiveName);
         dao.endTransaction();
+        savePlatformPreferences(platform);
         return videoArchive;
+    }
+
+    /**
+     * We read the last used platform form the preferences and set it.
+     * @param b
+     */
+    @Override
+    public void setVisible(boolean b) {
+        if (b) {
+            Preferences prefs = Preferences.userNodeForPackage(getClass());
+            String platformName = prefs.get(PREF_PLATFORM_NAME, "");
+            if (platformName.isEmpty()) {
+                try {
+                    platformName = getCenterPanel().listCameraPlatforms()[0];
+                }
+                catch (Exception e) {
+                    // Bummer
+                }
+            }
+            if (!platformName.isEmpty()) {
+                getCenterPanel().getCameraPlatformByNameComboBox().setSelectedItem(platformName);
+                getCenterPanel().getCameraPlatformComboBox().setSelectedItem(platformName);
+            }
+        }
+        super.setVisible(b);
     }
 
     protected abstract VideoArchive openVideoArchiveByParams();
@@ -125,6 +164,7 @@ public abstract class OpenVideoArchiveDialog<S extends VideoState, E extends Vid
         dao.startTransaction();
         String name = (String) cp.getExistingNamesComboBox().getSelectedItem();
         VideoArchive videoArchive = dao.findByName(name);
+        savePlatformPreferences(videoArchive.getVideoArchiveSet().getPlatformName());
         dao.endTransaction();
         return videoArchive;
     }

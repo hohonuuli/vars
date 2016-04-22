@@ -13,6 +13,7 @@ import vars.avplayer.OpenVideoArchivePanel;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.util.prefs.Preferences;
 
 /**
  * @author Brian Schlining
@@ -68,6 +69,8 @@ public class RS422VideoPlayerDialogUI extends OpenVideoArchiveDialog<RS422State,
         String videoArchiveName = videoParams.getVideoArchiveName();
         VideoArchive videoArchive = dao.findOrCreateByParameters(platform, sequenceNumber, videoArchiveName);
         dao.endTransaction();
+        Preferences prefs = Preferences.userNodeForPackage(OpenVideoArchiveDialog.class);
+        prefs.put(PREF_PLATFORM_NAME, platform);
         return videoArchive;
     }
 

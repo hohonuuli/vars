@@ -11,7 +11,9 @@ import vars.avplayer.OpenVideoArchivePanel;
 import vars.avplayer.SimpleVideoParams;
 
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.util.prefs.Preferences;
 
 /**
  * @author Brian Schlining
@@ -48,6 +50,9 @@ public class QuadVideoPlayerDialogUI extends OpenVideoArchiveDialog<QuadState, Q
         String videoArchiveName = videoParams.getVideoArchiveName();
         VideoArchive videoArchive = dao.findOrCreateByParameters(platform, sequenceNumber, videoArchiveName);
         dao.endTransaction();
+        Preferences prefs = Preferences.userNodeForPackage(OpenVideoArchiveDialog.class);
+        prefs.put(PREF_PLATFORM_NAME, platform);
+
         return videoArchive;
     }
 
@@ -64,6 +69,8 @@ public class QuadVideoPlayerDialogUI extends OpenVideoArchiveDialog<QuadState, Q
             topPanel = new JPanel();
             BoxLayout layout = new BoxLayout(topPanel, BoxLayout.X_AXIS);
             topPanel.setLayout(layout);
+            topPanel.setBorder(new TitledBorder(null, "KiPro Quad Remote Address",
+                    TitledBorder.LEADING, TitledBorder.TOP, null, null));
             topPanel.add(new JLabel("IP Address:"));
             topPanel.add(Box.createHorizontalGlue());
             topPanel.add(getHostTextField());

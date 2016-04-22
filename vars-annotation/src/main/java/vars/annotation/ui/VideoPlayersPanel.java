@@ -3,9 +3,14 @@ package vars.annotation.ui;
 import org.bushe.swing.event.annotation.AnnotationProcessor;
 import org.bushe.swing.event.annotation.EventSubscriber;
 import org.mbari.swing.SwingUtils;
+import rx.Observable;
+import rx.subjects.PublishSubject;
+import rx.subjects.SerializedSubject;
+import rx.subjects.Subject;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
 import vars.annotation.ui.eventbus.VideoArchiveSelectedEvent;
+import vars.avplayer.VideoController;
 import vars.avplayer.VideoPlayer;
 import vars.avplayer.VideoPlayerDialogUI;
 import vars.avplayer.VideoPlayers;
@@ -28,6 +33,7 @@ public class VideoPlayersPanel extends JPanel {
     private final ToolBelt toolBelt;
     private final RXEventBus eventBus;
     private StatusLabel videoLabel;
+    private final Subject<VideoArchive, VideoArchive> localVideoArchiveObs = new SerializedSubject<>(PublishSubject.create());
 
     public VideoPlayersPanel(ToolBelt toolBelt, RXEventBus eventBus) {
         this.toolBelt = toolBelt;
@@ -37,6 +43,8 @@ public class VideoPlayersPanel extends JPanel {
     }
 
     protected void initialize() {
+        add(new JLabel("Video Device:"));
+        add(Box.createHorizontalStrut(10));
         add(getVideoPlayerComboBox());
         add(Box.createHorizontalStrut(10));
         add(getVideoLabel());
@@ -47,6 +55,8 @@ public class VideoPlayersPanel extends JPanel {
             Vector<VideoPlayer> videoPlayers = new Vector<>(VideoPlayers.get());
             videoPlayerComboBox = new JComboBox<>(videoPlayers);
             videoPlayerComboBox.setRenderer(new VideoPlayerRenderer());
+            Dimension d = videoPlayerComboBox.getPreferredSize();
+            videoPlayerComboBox.setPreferredSize(new Dimension(150, d.height));
         }
         return videoPlayerComboBox;
     }
@@ -59,6 +69,8 @@ public class VideoPlayersPanel extends JPanel {
     private StatusLabel getVideoLabel() {
         if (videoLabel == null) {
             videoLabel = new VideoLabel();
+            Dimension d = videoLabel.getPreferredSize();
+            videoLabel.setPreferredSize(new Dimension(400, d.height));
         }
         return videoLabel;
     }
@@ -124,12 +136,17 @@ public class VideoPlayersPanel extends JPanel {
             setVideoArchive((VideoArchive) evt.getNewValue());
         }
 
+        public void updateLabel(final VideoArchive videoArchive)
+
         public void setVideoArchive(final VideoArchive videoArchive) {
+            localVideoArchiveObs.onNext(videoArchive);
             boolean ok = false;
             String text = "NONE";
             String toolTip = text;
             if (videoArchive != null) {
-                text = videoArchive.getName() + "";
+                VideoController videoController = StateLookup.getVideoController(); // FIXME - Using global lookup, bad me.
+                String connectionID = videoController != null ? " @ " + videoController.getConnectionID() : "";
+                text = videoArchive.getName() + connectionID;
                 toolTip = text;
 
                 if ((text.length() > 20) &&

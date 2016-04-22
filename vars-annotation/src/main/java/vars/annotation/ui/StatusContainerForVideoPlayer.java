@@ -45,6 +45,8 @@ public class StatusContainerForVideoPlayer extends JPanel {
         videoPlayers = VideoPlayers.get();
         statusLabel = new StatusLabelForVideoPlayer(toolBelt);
 
+        add(new JLabel("Video Device:"));
+        add(Box.createHorizontalStrut(20));
         add(statusLabel);
         add(Box.createHorizontalStrut(20));
         add(new JLabel("Video Player:"));
@@ -62,6 +64,8 @@ public class StatusContainerForVideoPlayer extends JPanel {
             for (VideoPlayer v : videoPlayers) {
                 videoPlayerComboBox.addItem(v.getName());
             }
+            Dimension d = videoPlayerComboBox.getPreferredSize();
+            videoPlayerComboBox.setPreferredSize(new Dimension(200, d.height));
         }
         return videoPlayerComboBox;
     }

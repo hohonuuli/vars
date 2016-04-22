@@ -77,17 +77,17 @@ public class QuadVideoPlayer implements VideoPlayer<QuadState, QuadError> {
             QuadVideoIO rawIO = QuadVideoIO.open(httpAddress);
             new VCRSyncDecorator<>(rawIO);
             //new LoggingDecorator<>(rawIO);
-            VideoIO<QuadState, QuadError> scheduledIO = new SchedulerVideoIO<>(rawIO, Executors.newSingleThreadExecutor());
+            io = new SchedulerVideoIO<>(rawIO, Executors.newSingleThreadExecutor());
 
             // For the UI we need to filter videoIndices that don't have timecode (or the UI
             // show --:--:--:-- every few seconds
-            Observable<VideoIndex> indexObservable = scheduledIO.getIndexObservable()
-                    .filter(vi -> vi.getTimecode().isPresent());
-            io = new SimpleVideoIO<>(scheduledIO.getConnectionID(),
-                    scheduledIO.getCommandSubject(),
-                    scheduledIO.getStateObservable(),
-                    scheduledIO.getErrorObservable(),
-                    indexObservable);
+//            Observable<VideoIndex> indexObservable = scheduledIO.getIndexObservable()
+//                    .filter(vi -> vi.getTimecode().isPresent());
+//            io = new SimpleVideoIO<>(scheduledIO.getConnectionID(),
+//                    scheduledIO.getCommandSubject(),
+//                    scheduledIO.getStateObservable(),
+//                    scheduledIO.getErrorObservable(),
+//                    indexObservable);
         }
         catch (Exception e) {
             EventBus.publish(GlobalStateLookup.TOPIC_NONFATAL_ERROR, e);

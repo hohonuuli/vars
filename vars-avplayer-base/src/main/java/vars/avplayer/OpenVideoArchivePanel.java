@@ -316,7 +316,7 @@ public class OpenVideoArchivePanel extends JPanel {
         buttonGroup.setSelected(getOpenByPlatformRB().getModel(), true);
     }
 
-    private String[] listCameraPlatforms() {
+    public String[] listCameraPlatforms() {
         String[] cp = {};
         try {
             final java.util.List<String> cameraPlatforms = toolBelt.getAnnotationPersistenceService().findAllCameraPlatforms();
