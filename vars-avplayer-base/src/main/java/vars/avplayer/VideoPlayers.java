@@ -19,7 +19,8 @@ public class VideoPlayers {
 
     public static List<VideoPlayer> get() {
         return StreamUtilities.toStream(loadVideoPlayers().iterator())
-            .collect(Collectors.toList());
+                .sorted((a, b)  -> a.getName().compareToIgnoreCase(b.getName()))
+                .collect(Collectors.toList());
     }
 
     public static ServiceLoader<VideoPlayer> loadVideoPlayers() {

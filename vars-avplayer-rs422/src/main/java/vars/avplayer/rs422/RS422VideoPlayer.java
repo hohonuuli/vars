@@ -44,7 +44,13 @@ public class RS422VideoPlayer implements VideoPlayer<RS422State, RS422Error> {
     private RS422VideoPlayerDialogUI dialogUI;
 
     public RS422VideoPlayer() {
-        RXTX.setup();
+       try {
+         
+         RXTX.setup();
+       } 
+       catch (UnsatisfiedLinkError e) {
+          log.warn("Failed to setup RXTX native libraries", e);
+       }
     }
 
     @Override

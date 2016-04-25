@@ -17,6 +17,8 @@ import vars.annotation.VideoArchiveDAO;
 import vars.avplayer.VideoController;
 import vars.avplayer.VideoPlayer;
 import vars.avplayer.VideoPlayerDialogUI;
+import vars.avplayer.rx.SetVideoArchiveMsg;
+import vars.avplayer.rx.SetVideoControllerMsg;
 import vars.shared.rx.RXEventBus;
 import vars.shared.ui.GlobalStateLookup;
 
@@ -87,6 +89,14 @@ public class JFXVideoPlayer implements VideoPlayer<JFXVideoState, SimpleVideoErr
         if (dialogUI == null) {
             Window window = GlobalStateLookup.getSelectedFrame();
             dialogUI = new JFXVideoPlayerDialogUI(window, toolBelt, this);
+            dialogUI.onOkay(() -> {
+                dialogUI.setVisible(false);
+                Tuple2<VideoArchive, VideoController<JFXVideoState, SimpleVideoError>> data = ((JFXVideoPlayerDialogUI) dialogUI).openVideoArchive();
+                VideoArchive videoArchive = data.getA();
+                VideoController<JFXVideoState, SimpleVideoError> videoController = data.getB();
+                eventBus.send(new SetVideoArchiveMsg(videoArchive));
+                eventBus.send(new SetVideoControllerMsg<>(videoController));
+            });
         }
         return dialogUI;
     }
