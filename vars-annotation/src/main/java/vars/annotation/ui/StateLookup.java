@@ -6,7 +6,9 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import org.bushe.swing.event.EventBus;
 import org.mbari.vcr4j.VideoError;
+import org.mbari.vcr4j.VideoIndex;
 import org.mbari.vcr4j.VideoState;
+import rx.Subscriber;
 import vars.VarsUserPreferencesFactory;
 import vars.annotation.CameraDirections;
 import vars.annotation.Observation;
@@ -52,6 +54,11 @@ public class StateLookup extends GlobalStateLookup {
     private static final ObjectProperty<ObservationTable> observationTable = new SimpleObjectProperty<>();
     private static final ObjectProperty<Preferences> preferences = new SimpleObjectProperty<>();
 
+    /**
+     * When a device isn't responding, we can store the last available timecode and use it if needed.
+     */
+    private static final ObjectProperty<VideoIndex> lastVideoIndex = new SimpleObjectProperty<>();
+
     private static final ObjectProperty<VideoArchive> videoArchive = new SimpleObjectProperty<>();
     private static final ObjectProperty<Collection<Observation>> selectedObservations = new SimpleObjectProperty<>(new ArrayList<>());
     private static AnnotationFrame annotationFrame;
@@ -72,6 +79,10 @@ public class StateLookup extends GlobalStateLookup {
         videoController.addListener((obs, oldVal, newVal) -> {
             if (oldVal != null) {
                 oldVal.close();
+            }
+
+            if (newVal != null) {
+                newVal.getIndexObservable().subscribe(newIndexSubscriber());
             }
         });
 
@@ -170,6 +181,7 @@ public class StateLookup extends GlobalStateLookup {
         return selectedObservations;
     }
 
+
     /**
      * Makes a copy
      * @param selectedObservations
@@ -198,6 +210,37 @@ public class StateLookup extends GlobalStateLookup {
 
     public static void setApp(App app) {
         StateLookup.app = app;
+    }
+
+    public static VideoIndex getLastVideoIndex() {
+        return lastVideoIndex.get();
+    }
+
+    public static ObjectProperty<VideoIndex> lastVideoIndexProperty() {
+        return lastVideoIndex;
+    }
+
+    public static void setLastVideoIndex(VideoIndex lastVideoIndex) {
+        StateLookup.lastVideoIndex.set(lastVideoIndex);
+    }
+
+    private static Subscriber<VideoIndex> newIndexSubscriber() {
+        return new Subscriber<VideoIndex>() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+
+            }
+
+            @Override
+            public void onNext(VideoIndex videoIndex) {
+                lastVideoIndex.set(videoIndex);
+            }
+        };
     }
 
 }

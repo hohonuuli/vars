@@ -136,6 +136,7 @@ public class NewObservationUsingConceptNameButton extends FancyButton
 
         StateLookup.videoControllerProperty().addListener((obs, oldVal, newVal) -> {
             hasVcr = newVal != null;
+            checkEnable();
         });
 
 

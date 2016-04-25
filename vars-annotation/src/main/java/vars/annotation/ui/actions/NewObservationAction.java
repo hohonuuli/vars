@@ -19,6 +19,7 @@ import java.awt.Toolkit;
 import java.util.Date;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import javax.swing.Action;
 import javax.swing.KeyStroke;
 import org.bushe.swing.event.EventBus;
@@ -161,8 +162,6 @@ public final class NewObservationAction extends ActionAdapter {
         VideoArchive videoArchive = StateLookup.getVideoArchive();
         final VideoController videoController = StateLookup.getVideoController();
 
-        // TODO use new VCR4J v3 - should get and parse parts of video index
-        //final VideoControlService videoService = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
         if (videoArchive != null) {
 
             if ((conceptName != null) && (timecode != null)) {
@@ -176,7 +175,13 @@ public final class NewObservationAction extends ActionAdapter {
                 try {
                     Future<VideoIndex> videoIndexFuture = videoController.getVideoIndex();
                     // TODO this needs to grab all components of the videoIndex and update those values in VARS
-                    VideoIndex videoIndex = videoIndexFuture.get(3, TimeUnit.SECONDS);
+                    VideoIndex videoIndex = StateLookup.getLastVideoIndex();
+                    try {
+                        videoIndex = videoIndexFuture.get(3, TimeUnit.SECONDS);
+                    }
+                    catch (TimeoutException te) {
+                        log.warn("Failed to connect to video device. Using a previously stored video index", te);
+                    }
                     Date utcDate = videoIndex.getTimestamp()
                             .map(Date::from)
                             .orElse(new Date());
