@@ -8,6 +8,8 @@ import vars.annotation.VideoArchive;
 import vars.shared.rx.RXEventBus;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 /**
  * Implementations of this class can open videos. Use `canPlay` to see if a mimetype is playable.
@@ -26,7 +28,7 @@ public interface VideoPlayer<S extends VideoState, E extends VideoError> {
      *         of the videoarchive, or nothing if the connection failed.
      *
      */
-    Optional<Tuple2<VideoArchive, VideoController<S, E>>> openVideoArchive(ToolBelt toolBelt, Object... args);
+    CompletableFuture<Tuple2<VideoArchive, VideoController<S, E>>> openVideoArchive(ToolBelt toolBelt, Object... args);
 
     /**
      * Connect to your video service with input from a User Interface. This

@@ -26,7 +26,9 @@ import vars.shared.ui.GlobalStateLookup;
 
 import java.awt.*;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * @author Brian Schlining
@@ -44,7 +46,7 @@ public class QuadVideoPlayer implements VideoPlayer<QuadState, QuadError> {
     }
 
     @Override
-    public Optional<Tuple2<VideoArchive, VideoController<QuadState, QuadError>>> openVideoArchive(ToolBelt toolBelt, Object... args) {
+    public CompletableFuture<Tuple2<VideoArchive, VideoController<QuadState, QuadError>>> openVideoArchive(ToolBelt toolBelt, Object... args) {
         return null;
     }
 

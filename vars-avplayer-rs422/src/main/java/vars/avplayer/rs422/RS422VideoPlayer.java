@@ -29,7 +29,9 @@ import vars.shared.ui.GlobalStateLookup;
 
 import java.awt.*;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -72,17 +74,17 @@ public class RS422VideoPlayer implements VideoPlayer<RS422State, RS422Error> {
      * @return
      */
     @Override
-    public Optional<Tuple2<VideoArchive, VideoController<RS422State, RS422Error>>> openVideoArchive(ToolBelt toolBelt, Object... args) {
+    public CompletableFuture<Tuple2<VideoArchive, VideoController<RS422State, RS422Error>>> openVideoArchive(ToolBelt toolBelt, Object... args) {
         String serialPort = (String) args[0];
         String platformName = (String) args[1];
         Integer sequenceNumber = (Integer) args[2];
         Integer tapeNumber = (Integer) args[3];
         Boolean isHD = (Boolean) args[4];
         RS422VideoParams videoParams = new RS422VideoParams(serialPort, platformName, sequenceNumber, tapeNumber, isHD);
-        return openVideoArchive(toolBelt, videoParams);
+        return CompletableFuture.supplyAsync(() -> openVideoArchive(toolBelt, videoParams));
     }
 
-    public Optional<Tuple2<VideoArchive, VideoController<RS422State, RS422Error>>> openVideoArchive(ToolBelt toolBelt, RS422VideoParams videoParams) {
+    public Tuple2<VideoArchive, VideoController<RS422State, RS422Error>> openVideoArchive(ToolBelt toolBelt, RS422VideoParams videoParams) {
         VideoArchiveDAO dao = toolBelt.getAnnotationDAOFactory().newVideoArchiveDAO();
         VideoArchive videoArchive = dao.findOrCreateByParameters(videoParams.getPlatformName(),
                 videoParams.getSequenceNumber(),
@@ -92,7 +94,7 @@ public class RS422VideoPlayer implements VideoPlayer<RS422State, RS422Error> {
         // Close the port if it's different
         setSerialPort(videoParams.getSerialPortName());
 
-        return Optional.of(new Tuple2<>(videoArchive, getVideoController()));
+        return new Tuple2<>(videoArchive, getVideoController());
     }
 
     private void setSerialPort(String serialPortName) {

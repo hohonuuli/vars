@@ -27,6 +27,8 @@ import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -49,10 +51,9 @@ public class JFXVideoPlayer implements VideoPlayer<JFXVideoState, SimpleVideoErr
                 .count() > 0;
     }
 
-    public Optional<VideoController<JFXVideoState, SimpleVideoError>> createVideoController(String movieLocation) {
+    public CompletableFuture<VideoController<JFXVideoState, SimpleVideoError>> createVideoController(String movieLocation) {
 
-        AtomicReference<VideoController<JFXVideoState, SimpleVideoError>> videoControllerRef =
-                new AtomicReference<>();
+        CompletableFuture<VideoController<JFXVideoState, SimpleVideoError>> cf = new CompletableFuture<>();
 
         try {
 
@@ -68,7 +69,7 @@ public class JFXVideoPlayer implements VideoPlayer<JFXVideoState, SimpleVideoErr
                 new StatusDecorator<>(videoIO);   // Some commands should immediatly send a status request
                 new VCRSyncDecorator<>(videoIO);  // Send state/index commands at regular intervals
 
-                videoControllerRef.set(new VideoController<>(new JFXImageCaptureService(controller), videoIO));
+                cf.complete(new VideoController<>(new JFXImageCaptureService(controller), videoIO));
                 SwingUtilities.invokeLater(() -> {
                     movieFrame.setSize(media.getWidth(), media.getHeight());
                     movieFrame.setVisible(true);
@@ -79,9 +80,10 @@ public class JFXVideoPlayer implements VideoPlayer<JFXVideoState, SimpleVideoErr
         }
         catch (Exception e) {
             log.error("Failed to create JFXMovieJFrame", e);
+            cf.completeExceptionally(e);
         }
 
-        return Optional.ofNullable(videoControllerRef.get());
+        return cf;
     }
 
     @Override
@@ -109,14 +111,14 @@ public class JFXVideoPlayer implements VideoPlayer<JFXVideoState, SimpleVideoErr
      * @return A tuple of the videoarchve and the corresponding videocontroller
      */
     @Override
-    public Optional<Tuple2<VideoArchive, VideoController<JFXVideoState, SimpleVideoError>>> openVideoArchive(ToolBelt toolBelt, Object... args) {
+    public CompletableFuture<Tuple2<VideoArchive, VideoController<JFXVideoState, SimpleVideoError>>> openVideoArchive(ToolBelt toolBelt, Object... args) {
         String movieLocation = (String) args[0];
         String platformName = (String) args[1];
         Integer sequenceNumber = (Integer) args[2];
         return openVideoArchive(toolBelt, movieLocation, platformName, sequenceNumber);
     }
 
-    private Optional<Tuple2<VideoArchive, VideoController<JFXVideoState, SimpleVideoError>>> openVideoArchive(ToolBelt toolBelt, String movieLocation,
+    private CompletableFuture<Tuple2<VideoArchive, VideoController<JFXVideoState, SimpleVideoError>>> openVideoArchive(ToolBelt toolBelt, String movieLocation,
             String platformName,
             Integer sequenceNumber) {
 
@@ -124,14 +126,8 @@ public class JFXVideoPlayer implements VideoPlayer<JFXVideoState, SimpleVideoErr
                 new VideoParams(movieLocation, platformName, sequenceNumber),
                 toolBelt.getAnnotationDAOFactory());
 
-        Optional<VideoController<JFXVideoState, SimpleVideoError>> controller = createVideoController(movieLocation);
-
-        if (controller.isPresent()) {
-            return Optional.of(new Tuple2<>(videoArchive, controller.get()));
-        }
-        else {
-            return Optional.empty();
-        }
+        return createVideoController(movieLocation)
+                .thenCompose(c -> CompletableFuture.supplyAsync(() -> new Tuple2<>(videoArchive, c)));
 
     }
 

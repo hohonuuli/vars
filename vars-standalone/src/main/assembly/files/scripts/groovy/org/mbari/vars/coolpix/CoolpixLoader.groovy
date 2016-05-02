@@ -51,43 +51,48 @@ class CoolpixLoader {
             images.each { url ->
 
                 //  -- Get the time from the image EXIF data using Sanselan
-                def inputStream = new BufferedInputStream(url.openStream());
-                def metadata = Sanselan.getMetadata(inputStream, null)
-                if (metadata) {
-                    def field = metadata.findEXIFValue(TiffConstants.EXIF_TAG_CREATE_DATE)
-                    if (field) {
+                try {
+                  def inputStream = new BufferedInputStream(url.openStream());
+                  def metadata = Sanselan.getMetadata(inputStream, null)
+                  if (metadata) {
+                      def field = metadata.findEXIFValue(TiffConstants.EXIF_TAG_CREATE_DATE)
+                      if (field) {
 
-                        def date = dateFormat.parse(field.valueDescription[1..-2])
-                        def timecode = timecodeFormat.format(date)
-                        def videoFrame = videoArchive.findVideoFrameByTimeCode(timecode)
-                        if (!videoFrame) {
-                            videoFrame = annotationFactory.newVideoFrame()
-                            videoFrame.timecode = timecode
-                            videoFrame.recordedDate = date
-                            videoArchive.addVideoFrame(videoFrame)
-                            videoArchiveDAO.persist(videoFrame)
-                        }
+                          def date = dateFormat.parse(field.valueDescription[1..-2])
+                          def timecode = timecodeFormat.format(date)
+                          def videoFrame = videoArchive.findVideoFrameByTimeCode(timecode)
+                          if (!videoFrame) {
+                              videoFrame = annotationFactory.newVideoFrame()
+                              videoFrame.timecode = timecode
+                              videoFrame.recordedDate = date
+                              videoArchive.addVideoFrame(videoFrame)
+                              videoArchiveDAO.persist(videoFrame)
+                          }
 
-                        //  -- IF a matching videoframe already exists. Change the image URL if none is yet set.
-                        if (videoFrame.cameraData.imageReference) {
-                            log.warn("${videoFrame} already exists and contains an image reference. Not modifying it")   
-                        }
-                        else {
-                            videoFrame.cameraData.setImageReference(url.toExternalForm())  
-                            if (videoFrame.observations.size() == 0) {
-                                def observation = annotationFactory.newObservation()
-                                observation.conceptName = conceptNameAsString
-                                observation.observer = getClass().simpleName
-                                observation.observationDate = new Date()
-                                videoFrame.addObservation(observation)
-                                videoArchiveDAO.persist(observation)
-                            }
-                        }
-                    }
-                }
-                else {
-                    log.warn("${TiffConstants.EXIF_TAG_CREATE_DATE.name} was not found")
-                }
+                          //  -- IF a matching videoframe already exists. Change the image URL if none is yet set.
+                          if (videoFrame.cameraData.imageReference) {
+                              log.warn("${videoFrame} already exists and contains an image reference. Not modifying it")   
+                          }
+                          else {
+                              videoFrame.cameraData.setImageReference(url.toExternalForm())  
+                              if (videoFrame.observations.size() == 0) {
+                                  def observation = annotationFactory.newObservation()
+                                  observation.conceptName = conceptNameAsString
+                                  observation.observer = getClass().simpleName
+                                  observation.observationDate = new Date()
+                                  videoFrame.addObservation(observation)
+                                  videoArchiveDAO.persist(observation)
+                              }
+                          }
+                      }
+                  }
+                  else {
+                      log.warn("${TiffConstants.EXIF_TAG_CREATE_DATE.name} was not found")
+                  }
+              }
+              catch (Exception e) {
+                log.warn("Failed to load image: ${url}")
+              }
             }
             videoArchiveDAO.endTransaction()
             

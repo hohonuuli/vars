@@ -30,6 +30,9 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
@@ -460,7 +463,13 @@ public class JFXVideoPlayerDialogUI extends StandardDialog implements VideoPlaye
             throw new VARSException("Unless you provide a movie location, VARS can't open the video file.");
         }
 
-        return videoPlayer.openVideoArchive(toolBelt, movieLocation, platformName, sequenceNumber).get();
+        Tuple2<VideoArchive, VideoController<JFXVideoState, SimpleVideoError>> vids = null;
+        try {
+             vids = videoPlayer.openVideoArchive(toolBelt, movieLocation, platformName, sequenceNumber).get(4, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            log.warn("Failed to open video player", e);
+        }
+        return vids;
     }
 
     class SelectedRBItemListener implements ItemListener {

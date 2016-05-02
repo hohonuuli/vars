@@ -10,6 +10,8 @@ import vars.shared.rx.RXEventBus;
 
 import javax.swing.*;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 /**
  * Noop player can't play anything, it's a fake placeholder though.
@@ -17,6 +19,7 @@ import java.util.Optional;
  * @since 2016-03-24T13:08:00
  */
 public class NoopVideoPlayer implements VideoPlayer {
+
 
     @Override
     public boolean canPlay(String mimeType) {
@@ -36,7 +39,9 @@ public class NoopVideoPlayer implements VideoPlayer {
     }
 
     @Override
-    public Optional<Tuple2<VideoArchive, VideoController>> openVideoArchive(ToolBelt toolBelt, Object... args) {
-        return Optional.empty();
+    public CompletableFuture<Tuple2<VideoArchive, VideoController>> openVideoArchive(ToolBelt toolBelt, Object... args) {
+        CompletableFuture<Tuple2<VideoArchive, VideoController>> cf = new CompletableFuture<>();
+        cf.completeExceptionally(new RuntimeException("openVideoArchive is not implemented in " + getClass().getName()));
+        return cf;
     }
 }
