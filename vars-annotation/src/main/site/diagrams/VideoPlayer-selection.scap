@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<ScappleDocument Version="1.1" ID="A85F95DE-8779-478B-97BF-965BDDBB0266">
+    <Notes>
+        <Note ID="0" FontSize="28.0" Position="125.082031,111.253906" Width="259.0">
+            <Appearance></Appearance>
+            <String>VideoPlayersPanel</String>
+            <ConnectedNoteIDs>2, 6</ConnectedNoteIDs>
+            <PointsToNoteIDs>2, 6</PointsToNoteIDs>
+            <Formatting>
+                <FormatRange Bold="Yes">0,17</FormatRange>
+            </Formatting>
+        </Note>
+        <Note ID="1" FontSize="12.0" Position="65.0625,260.0" Width="131.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <Border Weight="1">0.290055 0.1523 0.182215</Border>
+                <Fill>0.940019 0.892907 0.779716</Fill>
+            </Appearance>
+            <String>videoPlayerComboBox</String>
+            <ConnectedNoteIDs>2, 4</ConnectedNoteIDs>
+        </Note>
+        <Note ID="2" FontSize="12.0" Position="163.074219,190.007812" Width="52.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>displays</String>
+            <ConnectedNoteIDs>0-1</ConnectedNoteIDs>
+            <PointsToNoteIDs>1</PointsToNoteIDs>
+        </Note>
+        <Note ID="3" FontSize="12.0" Position="103.007812,394.039062" Width="73.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <Border Weight="1">0.477193 0.557066 0.76433</Border>
+                <Fill>0.840969 0.866828 0.925903</Fill>
+            </Appearance>
+            <String>VideoPlayer</String>
+            <ConnectedNoteIDs>4, 7</ConnectedNoteIDs>
+            <PointsToNoteIDs>7</PointsToNoteIDs>
+        </Note>
+        <Note ID="4" FontSize="12.0" Position="105.515625,319.992188" Width="73.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>user selects</String>
+            <ConnectedNoteIDs>1, 3</ConnectedNoteIDs>
+        </Note>
+        <Note ID="5" FontSize="12.0" Position="275.453125,260.0" Width="67.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <Border Weight="1">0.290055 0.1523 0.182215</Border>
+                <Fill>0.940019 0.892907 0.779716</Fill>
+            </Appearance>
+            <String>videoLabel</String>
+            <ConnectedNoteIDs>6, 8</ConnectedNoteIDs>
+        </Note>
+        <Note ID="6" FontSize="12.0" Position="256.675781,187.613281" Width="52.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>displays</String>
+            <ConnectedNoteIDs>0, 5</ConnectedNoteIDs>
+            <PointsToNoteIDs>5</PointsToNoteIDs>
+        </Note>
+        <Note ID="7" FontSize="12.0" Position="273.578125,385.539062" Width="119.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <Border Weight="1">0.477193 0.557066 0.76433</Border>
+                <Fill>0.840969 0.866828 0.925903</Fill>
+            </Appearance>
+            <String>VideoPlayerDialogUI</String>
+            <ConnectedNoteIDs>3, 8, 10</ConnectedNoteIDs>
+        </Note>
+        <Note ID="8" FontSize="12.0" Position="228.480469,320.453125" Width="179.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>displays dialog when user clicks</String>
+            <ConnectedNoteIDs>5, 7</ConnectedNoteIDs>
+        </Note>
+        <Note ID="9" FontSize="12.0" Position="215.164062,580.828125" Width="133.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <Border Weight="1">0.290055 0.1523 0.182215</Border>
+                <Fill>0.940019 0.892907 0.779716</Fill>
+            </Appearance>
+            <String>eventBus: RXEventBus</String>
+            <ConnectedNoteIDs>10, 13</ConnectedNoteIDs>
+        </Note>
+        <Note ID="10" FontSize="12.0" Position="269.527344,453.0" Width="200.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>onOkay -&gt; send SetVideoArchiveMsg and SetVideoControllerMsg</String>
+            <ConnectedNoteIDs>7, 9</ConnectedNoteIDs>
+        </Note>
+        <Note ID="13" FontSize="28.0" Position="87.0,679.0" Width="374.0">
+            <Appearance>
+                <Border>0.035486 0.240123 0.288805</Border>
+            </Appearance>
+            <String>AnnotationFrameController</String>
+            <ConnectedNoteIDs>9, 15</ConnectedNoteIDs>
+            <Formatting>
+                <FormatRange Bold="Yes">0,25</FormatRange>
+            </Formatting>
+        </Note>
+        <Note ID="15" FontSize="12.0" Position="89.042969,738.957031" Width="359.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>subscribes to eventBus:
+
+msg -&gt; StateLookup.setVideoArchive(msg.getVideoArchive())
+msg -&gt; StateLookup.setVideoController(msg.getVideoController())
+
+</String>
+            <ConnectedNoteIDs>13, 18</ConnectedNoteIDs>
+            <Formatting>
+                <FormatRange Italic="Yes">25,122</FormatRange>
+            </Formatting>
+        </Note>
+        <Note ID="17" FontSize="28.0" Position="719.714844,671.238281" Width="178.0">
+            <Appearance></Appearance>
+            <String>StateLookup</String>
+            <ConnectedNoteIDs>18</ConnectedNoteIDs>
+            <Formatting>
+                <FormatRange Bold="Yes">0,11</FormatRange>
+            </Formatting>
+        </Note>
+        <Note ID="18" FontSize="12.0" Position="644.714844,753.152344" Width="272.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>contains references to
+
+videoArchive: ObjectProperty&lt;VideoArchive&gt;
+videoController: ObjectProperty&lt;VideoController&gt;</String>
+            <ConnectedNoteIDs>15, 17, 21</ConnectedNoteIDs>
+            <Formatting>
+                <FormatRange Italic="Yes">24,91</FormatRange>
+            </Formatting>
+        </Note>
+        <Note ID="21" FontSize="28.0" Position="587.707031,904.8125" Width="515.0">
+            <Appearance></Appearance>
+            <String>VideoControlPanel extends VCRPanel</String>
+            <ConnectedNoteIDs>18</ConnectedNoteIDs>
+            <Formatting>
+                <FormatRange Bold="Yes">0,34</FormatRange>
+            </Formatting>
+        </Note>
+    </Notes>
+    <BackgroundShapes>
+        <Shape ID="12" Sticky="No" Position="47.851562,107.0" Width="427.652344" Height="415.0">
+            <Appearance>
+                <Border Weight="3">0.035486 0.240123 0.288805</Border>
+            </Appearance>
+        </Shape>
+        <Shape ID="14" Sticky="No" Position="64.402344,668.164062" Width="453.578125" Height="166.835938">
+            <Appearance>
+                <Border Weight="3">0.035486 0.240123 0.288805</Border>
+            </Appearance>
+        </Shape>
+        <Shape ID="16" Sticky="No" Position="598.589844,665.84375" Width="453.578125" Height="168.835938">
+            <Appearance>
+                <Border Weight="3">0.035486 0.240123 0.288805</Border>
+            </Appearance>
+        </Shape>
+        <Shape ID="20" Sticky="No" Position="581.0,901.0" Width="531.0" Height="168.835938">
+            <Appearance>
+                <Border Weight="3">0.035486 0.240123 0.288805</Border>
+            </Appearance>
+        </Shape>
+    </BackgroundShapes>
+    <AutoFit>0-9, 13, 15, 17-18</AutoFit>
+    <NoteStyles>
+        <Style Name="Title Text" ID="2D25389B-D230-4BCF-A70A-960809A8CA3E" AffectFontStyle="Yes" AffectAlignment="Yes" AffectTextColor="No" AffectNoteBody="No" AffectFade="No">
+            <FontSize>28.0</FontSize>
+            <IsBold>Yes</IsBold>
+        </Style>
+        <Style Name="Red Text" ID="262FC474-79C3-4DF0-839A-FF967B283470" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="Yes" AffectNoteBody="No" AffectFade="No">
+            <TextColor>1.0 0.0 0.0</TextColor>
+        </Style>
+        <Style Name="Brown Bubble" ID="9DCB1124-E6FE-4FDA-9520-270568E07270" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="No" AffectNoteBody="Yes" AffectFade="No">
+            <BorderThickness>1</BorderThickness>
+            <BorderColor>0.290055 0.1523 0.182215</BorderColor>
+            <FillColor>0.940019 0.892907 0.779716</FillColor>
+        </Style>
+        <Style Name="Yellow Bubble" ID="9C8D235B-D69E-42E3-9339-FD9081643988" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="No" AffectNoteBody="Yes" AffectFade="No">
+            <BorderThickness>1</BorderThickness>
+            <BorderColor>0.756763 0.785592 0.373258</BorderColor>
+            <FillColor>0.906773 0.910625 0.634363</FillColor>
+        </Style>
+        <Style Name="Green Bubble" ID="582B6101-6DD5-465A-8E6C-5028FCE71BC3" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="No" AffectNoteBody="Yes" AffectFade="No">
+            <BorderThickness>1</BorderThickness>
+            <BorderColor>0.331867 0.609932 0.356197</BorderColor>
+            <FillColor>0.790123 0.882328 0.80198</FillColor>
+        </Style>
+        <Style Name="Blue Bubble" ID="7AB2FC6D-CE93-4D3D-BE8B-BD4AA96BB508" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="No" AffectNoteBody="Yes" AffectFade="No">
+            <BorderThickness>1</BorderThickness>
+            <BorderColor>0.477193 0.557066 0.76433</BorderColor>
+            <FillColor>0.840969 0.866828 0.925903</FillColor>
+        </Style>
+        <Style Name="Pink Bubble" ID="4BAA84E8-91DD-40D6-9CDD-FBAE419BE6AE" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="No" AffectNoteBody="Yes" AffectFade="No">
+            <BorderThickness>1</BorderThickness>
+            <BorderColor>0.747881 0.366532 0.542813</BorderColor>
+            <FillColor>0.918452 0.807302 0.863467</FillColor>
+        </Style>
+    </NoteStyles>
+    <UISettings>
+        <BackgroundColor>0.999737 0.986332 0.931298</BackgroundColor>
+        <DefaultFont>Helvetica</DefaultFont>
+        <DefaultTextColor>0.0 0.0 0.0</DefaultTextColor>
+    </UISettings>
+    <PrintSettings PaperSize="612.0,792.0" LeftMargin="72.0" RightMargin="72.0" TopMargin="90.0" BottomMargin="90.0" PaperType="na-letter" Orientation="Portrait" HorizontalPagination="Clip" VerticalPagination="Auto" ScaleFactor="1.0" HorizontallyCentered="Yes" VerticallyCentered="Yes" Collates="Yes" PagesAcross="1" PagesDown="1"></PrintSettings>
+</ScappleDocument>

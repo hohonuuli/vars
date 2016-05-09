@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<ScappleDocument Version="1.1" ID="D08DB24C-81EC-4F98-8E32-0236182DA493">
+    <Notes>
+        <Note ID="0" FontSize="12.0" Position="462.0,223.0" Width="167.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <Border Weight="1">0.477193 0.557066 0.76433</Border>
+                <Fill>0.840969 0.866828 0.925903</Fill>
+            </Appearance>
+            <String>Video
+- uuid: UUID
+- start: Instant
+- duration: Double
+- name: String
+- videoSequence: UUID
+- lastUpdated: Instant</String>
+            <ConnectedNoteIDs>1-2, 6</ConnectedNoteIDs>
+            <PointsToNoteIDs>6</PointsToNoteIDs>
+        </Note>
+        <Note ID="1" FontSize="12.0" Position="461.0,352.0" Width="167.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <Border Weight="1">0.477193 0.557066 0.76433</Border>
+                <Fill>0.840969 0.866828 0.925903</Fill>
+            </Appearance>
+            <String>VideoView
+- uuid: UUID
+- video: UUID
+- uri: URI
+- container: Mimetype
+- videoCodec: String
+- audioCodec: String
+- width: Integer
+- height: Integer
+- lastUpdated: Instant</String>
+            <ConnectedNoteIDs>0, 10-12</ConnectedNoteIDs>
+            <PointsToNoteIDs>0</PointsToNoteIDs>
+        </Note>
+        <Note ID="2" FontSize="12.0" Position="760.0,163.0" Width="298.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>A ‘Video’ conceptually is a single video but with multiple versions of same video. There will be  a number of videos (proxy, mezzaine, local file ref, http url) representing the same view.
+
+What type to use for duration? What do we do if we don’t have a start date for a video?</String>
+            <ConnectedNoteIDs>0</ConnectedNoteIDs>
+        </Note>
+        <Note ID="4" FontSize="28.0" Position="408.0,45.0" Width="329.0">
+            <Appearance></Appearance>
+            <String>Media Asset Manager</String>
+            <ConnectedNoteIDs>26</ConnectedNoteIDs>
+            <Formatting>
+                <FormatRange Bold="Yes">0,19</FormatRange>
+            </Formatting>
+        </Note>
+        <Note ID="6" FontSize="12.0" Position="468.496094,88.265625" Width="195.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <Border Weight="1">0.477193 0.557066 0.76433</Border>
+                <Fill>0.840969 0.866828 0.925903</Fill>
+            </Appearance>
+            <String>VideoSequence
+- uuid: UUID
+- cameraID: String
+- name: String
+- lastUpdated: Instant</String>
+            <ConnectedNoteIDs>0, 8</ConnectedNoteIDs>
+        </Note>
+        <Note ID="8" FontSize="12.0" Position="752.0,81.0" Width="298.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>A sequence is a logical grouping of related files from the same camera; analogous to aVideoArchiveSet</String>
+            <ConnectedNoteIDs>6</ConnectedNoteIDs>
+        </Note>
+        <Note ID="10" FontSize="12.0" Position="750.0,342.0" Width="308.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>I’m using URI as the reference as we need to be able to reference URL (file, http) as well as tape numbers. 
+
+Will need to import existing tape numbers from VARS into MAM.</String>
+            <ConnectedNoteIDs>1</ConnectedNoteIDs>
+        </Note>
+        <Note ID="11" FontSize="12.0" Position="839.0,767.0" Width="175.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <Border Weight="1">0.477193 0.557066 0.76433</Border>
+                <Fill>0.840969 0.866828 0.925903</Fill>
+            </Appearance>
+            <String>VideoFrame
+- uuid: UUID
+- videoView: UUID
+- timecode: String
+- recordedDate: Instant
+- elapsedTime: Double
+- url: URL
+- lastUpdated: Instant</String>
+            <ConnectedNoteIDs>1, 25</ConnectedNoteIDs>
+            <PointsToNoteIDs>1</PointsToNoteIDs>
+        </Note>
+        <Note ID="12" FontSize="12.0" Position="509.0,711.0" Width="196.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <Border Weight="1">0.477193 0.557066 0.76433</Border>
+                <Fill>0.840969 0.866828 0.925903</Fill>
+            </Appearance>
+            <String>Observation
+- uuid: UUID
+- videoView: UUID
+- concept: String
+- timecode: String
+- recordedDate: Instant
+- elapsedTime: Double
+- duration: Double
+- observer: String
+- observationDate: Instant
+- x: Integer 
+- y: Integer
+- lastUpdated: Instant</String>
+            <ConnectedNoteIDs>1, 13, 24, 28</ConnectedNoteIDs>
+            <PointsToNoteIDs>1</PointsToNoteIDs>
+        </Note>
+        <Note ID="13" FontSize="12.0" Position="517.0,968.0" Width="167.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <Border Weight="1">0.477193 0.557066 0.76433</Border>
+                <Fill>0.840969 0.866828 0.925903</Fill>
+            </Appearance>
+            <String>Association
+- uuid: UUID
+- observation: UUID
+- linkName: String
+- toConcept: String
+- linkValue: String
+- lastUpdated: Instant</String>
+            <ConnectedNoteIDs>12</ConnectedNoteIDs>
+            <PointsToNoteIDs>12</PointsToNoteIDs>
+        </Note>
+        <Note ID="16" FontSize="28.0" Position="644.96875,651.527344" Width="76.0">
+            <Appearance></Appearance>
+            <String>VARS</String>
+            <ConnectedNoteIDs>23, 26</ConnectedNoteIDs>
+            <Formatting>
+                <FormatRange Bold="Yes">0,4</FormatRange>
+            </Formatting>
+        </Note>
+        <Note ID="17" FontSize="28.0" Position="1354.0,55.0" Width="228.0">
+            <Appearance></Appearance>
+            <String>External Data</String>
+            <ConnectedNoteIDs>26</ConnectedNoteIDs>
+            <Formatting>
+                <FormatRange Bold="Yes">0,13</FormatRange>
+            </Formatting>
+        </Note>
+        <Note ID="19" FontSize="12.0" Position="1277.0,108.0" Width="167.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <Border Weight="1">0.477193 0.557066 0.76433</Border>
+                <Fill>0.840969 0.866828 0.925903</Fill>
+            </Appearance>
+            <String>CameraPose
+- x: Double
+- y: Double
+- z: Double
+- phi: Double
+- theta: Double
+- psi: Double
+- vx or vPhi: Double
+- vy or vTheta: Double
+- vz or vPsi: Double</String>
+        </Note>
+        <Note ID="20" FontSize="12.0" Position="1507.0,111.0" Width="182.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <Border Weight="1">0.477193 0.557066 0.76433</Border>
+                <Fill>0.840969 0.866828 0.925903</Fill>
+            </Appearance>
+            <String>EnvironmentalData
+- salinity: Double
+- temperature: Double
+- oxygen: Double
+- transmissivity: Double
+- etc …</String>
+        </Note>
+        <Note ID="21" FontSize="12.0" Position="1347.0,301.0" Width="189.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <Border Weight="1">0.477193 0.557066 0.76433</Border>
+                <Fill>0.840969 0.866828 0.925903</Fill>
+            </Appearance>
+            <String>MissionInformation
+- platformName: String
+- sequenceNumber: Integer
+- chiefScientist: String
+- notes: String</String>
+        </Note>
+        <Note ID="23" FontSize="12.0" Position="29.167969,573.914062" Width="437.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>Greatly simplified VARS model. It just focuses on 2 things: 
+1. Relating an observation back to it’s videoView 
+2. Relating an image (VideoFrame) back to it’s videoView
+
+Things no longer stored in VARS:
+- Info about the deployment. That should be fetch from external datastore as needed.
+- Position and physical data, those should be fetched as needed from the appropriate service. (no more merges)</String>
+            <ConnectedNoteIDs>16</ConnectedNoteIDs>
+        </Note>
+        <Note ID="24" FontSize="12.0" Position="9.0,776.0" Width="401.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>An observation/videoFrame has 3 possible indices: timecode, recordedDate and elapsedTime. Another change is possibly to add a duration to an observation to track an object in the field of view.
+
+Although an observation is tied to a particular videoView, it can related to other videoViews of the same video through the MAM.</String>
+            <ConnectedNoteIDs>12</ConnectedNoteIDs>
+        </Note>
+        <Note ID="25" FontSize="12.0" Position="1090.0,926.0" Width="338.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>VideoFrames are completely independent of observations, but can be related to each other by using the 3 indices</String>
+            <ConnectedNoteIDs>11</ConnectedNoteIDs>
+        </Note>
+        <Note ID="26" FontSize="12.0" Position="1164.0,579.0" Width="261.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <Border Weight="1">0.331867 0.609932 0.356197</Border>
+                <Fill>0.790123 0.882328 0.80198</Fill>
+            </Appearance>
+            <String>Lookup Services
+- i2map
+- mini-rov
+- Doc Ricketts/Ventana/Tiburon</String>
+            <ConnectedNoteIDs>4, 16-17, 27</ConnectedNoteIDs>
+        </Note>
+        <Note ID="27" FontSize="12.0" Position="1163.0,697.0" Width="313.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>Rather than doing merges. We would need services that know how to lookup external ancillary, position, and other data
+
+This MIGHT not be performant enough though.</String>
+            <ConnectedNoteIDs>26</ConnectedNoteIDs>
+        </Note>
+        <Note ID="28" FontSize="12.0" Position="773.0,1022.0" Width="204.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <Border Weight="1">0.477193 0.557066 0.76433</Border>
+                <Fill>0.840969 0.866828 0.925903</Fill>
+            </Appearance>
+            <String>AnxillaryDataCache
+- uuid: UUID
+- latitude: Double
+- longitude: Double
+- depthMeters: Float
+- salinity: Float
+- temperatureCelsius: Float
+- oxygen: Float
+- observation: UUID
+- lastUpdated: Instant</String>
+            <ConnectedNoteIDs>12, 29</ConnectedNoteIDs>
+            <PointsToNoteIDs>12</PointsToNoteIDs>
+        </Note>
+        <Note ID="29" FontSize="12.0" Position="1094.0,1079.0" Width="200.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>If the lookup services performance is not up to par, we could cache results in the VARS database</String>
+            <ConnectedNoteIDs>28</ConnectedNoteIDs>
+        </Note>
+    </Notes>
+    <BackgroundShapes>
+        <Shape ID="3" Sticky="Yes" Position="374.675781,35.0" Width="365.0" Height="491.0">
+            <Appearance>
+                <Border Weight="1"></Border>
+                <Fill>0.99454 0.964232 0.652697</Fill>
+            </Appearance>
+        </Shape>
+        <Shape ID="15" Sticky="Yes" Position="487.96875,638.527344" Width="601.476562" Height="562.0">
+            <Appearance>
+                <Border Weight="1"></Border>
+                <Fill>0.959467 0.659347 0.625097</Fill>
+            </Appearance>
+        </Shape>
+        <Shape ID="22" Sticky="Yes" Position="1225.0,50.0" Width="473.0" Height="400.394531">
+            <Appearance>
+                <Border Weight="1"></Border>
+                <Fill>0.841092 0.495964 0.979041</Fill>
+            </Appearance>
+        </Shape>
+    </BackgroundShapes>
+    <AutoFit>0-1, 4, 11-13, 16-17, 19-21, 28</AutoFit>
+    <NoteStyles>
+        <Style Name="Blue Bubble" ID="3A2FE97B-A888-489E-ADCC-7287CDDD9068" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="No" AffectNoteBody="Yes" AffectFade="No">
+            <BorderThickness>1</BorderThickness>
+            <BorderColor>0.477193 0.557066 0.76433</BorderColor>
+            <FillColor>0.840969 0.866828 0.925903</FillColor>
+        </Style>
+        <Style Name="Brown Bubble" ID="421CC212-A436-4BC3-8167-3D26119751AF" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="No" AffectNoteBody="Yes" AffectFade="No">
+            <BorderThickness>1</BorderThickness>
+            <BorderColor>0.290055 0.1523 0.182215</BorderColor>
+            <FillColor>0.940019 0.892907 0.779716</FillColor>
+        </Style>
+        <Style Name="Green Bubble" ID="027E190E-FFE9-419B-9756-04AA994E01C8" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="No" AffectNoteBody="Yes" AffectFade="No">
+            <BorderThickness>1</BorderThickness>
+            <BorderColor>0.331867 0.609932 0.356197</BorderColor>
+            <FillColor>0.790123 0.882328 0.80198</FillColor>
+        </Style>
+        <Style Name="Pink Bubble" ID="EF3A4905-C39B-48FA-8FE7-764FD379F898" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="No" AffectNoteBody="Yes" AffectFade="No">
+            <BorderThickness>1</BorderThickness>
+            <BorderColor>0.747881 0.366532 0.542813</BorderColor>
+            <FillColor>0.918452 0.807302 0.863467</FillColor>
+        </Style>
+        <Style Name="Red Text" ID="2B17BA2B-DB09-4CED-908B-BEF478F0B636" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="Yes" AffectNoteBody="No" AffectFade="No">
+            <TextColor>1.0 0.0 0.0</TextColor>
+        </Style>
+        <Style Name="Title Text" ID="578DC5BE-95EB-46E1-BEB4-A144D2B3F5A6" AffectFontStyle="Yes" AffectAlignment="Yes" AffectTextColor="No" AffectNoteBody="No" AffectFade="No">
+            <FontSize>28.0</FontSize>
+            <IsBold>Yes</IsBold>
+        </Style>
+        <Style Name="Yellow Bubble" ID="7F43E5D0-B0EB-4D26-8422-DA20FB886EBE" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="No" AffectNoteBody="Yes" AffectFade="No">
+            <BorderThickness>1</BorderThickness>
+            <BorderColor>0.756763 0.785592 0.373258</BorderColor>
+            <FillColor>0.906773 0.910625 0.634363</FillColor>
+        </Style>
+    </NoteStyles>
+    <UISettings>
+        <BackgroundColor>0.999737 0.986332 0.931298</BackgroundColor>
+        <DefaultFont>Menlo</DefaultFont>
+        <DefaultTextColor>0.0 0.0 0.0</DefaultTextColor>
+    </UISettings>
+    <PrintSettings PaperSize="612.0,792.0" LeftMargin="72.0" RightMargin="72.0" TopMargin="90.0" BottomMargin="90.0" PaperType="na-letter" Orientation="Portrait" HorizontalPagination="Clip" VerticalPagination="Auto" ScaleFactor="1.0" HorizontallyCentered="Yes" VerticallyCentered="Yes" Collates="Yes" PagesAcross="1" PagesDown="1"></PrintSettings>
+</ScappleDocument>
