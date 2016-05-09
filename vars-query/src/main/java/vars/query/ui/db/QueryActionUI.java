@@ -141,7 +141,7 @@ public class QueryActionUI {
          *
          */
         QueryActionDialog() {
-            super(((App) Dispatcher.getDispatcher(App.class).getValueObject()).getQueryFrame());
+            super(StateLookup.getApplication().getQueryFrame());
             initialize();
             timer.start();
         }
