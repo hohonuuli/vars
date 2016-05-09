@@ -171,6 +171,12 @@
             </properties>
         </profile>
         <profile>
+            <id>imagingdev</id>
+            <properties>
+                <environment>imagingdev</environment>
+            </properties>
+        </profile>
+        <profile>
             <id>dev</id>
             <activation>
                 <activeByDefault>true</activeByDefault>

@@ -135,6 +135,19 @@
             </dependencies>
         </profile>
         <profile>
+            <id>imagingdev</id>
+            <properties>
+                <environment>imagingdev</environment>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>net.sourceforge.jtds</groupId>
+                    <artifactId>jtds</artifactId>
+                    <version>${jtds.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
             <id>dev</id>
             <activation>
                 <activeByDefault>true</activeByDefault>

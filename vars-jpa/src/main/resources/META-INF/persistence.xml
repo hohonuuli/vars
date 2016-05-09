@@ -15,7 +15,7 @@
         <class>vars.knowledgebase.jpa.LinkTemplateImpl</class>
         <class>vars.knowledgebase.jpa.MediaImpl</class>
         <class>vars.knowledgebase.jpa.UsageImpl</class>
-        <properties>rche
+        <properties>
             <property name="javax.persistence.jdbc.url" value="${KNOWLEDGEBASE_JDBC_URL}"/>
             <property name="javax.persistence.jdbc.user" value="${KNOWLEDGEBASE_JDBC_USERNAME}"/>
             <property name="javax.persistence.jdbc.driver" value="${KNOWLEDGEBASE_JDBC_DRIVER}"/>
