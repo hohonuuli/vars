@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <ScappleDocument Version="1.1" ID="D08DB24C-81EC-4F98-8E32-0236182DA493">
     <Notes>
-        <Note ID="0" FontSize="12.0" Position="462.0,223.0" Width="167.0">
+        <Note ID="0" FontSize="12.0" Position="477.515625,217.347656" Width="167.0">
             <Appearance>
                 <Alignment>Left</Alignment>
                 <Border Weight="1">0.477193 0.557066 0.76433</Border>
@@ -17,7 +17,7 @@
             <ConnectedNoteIDs>1-2, 6</ConnectedNoteIDs>
             <PointsToNoteIDs>6</PointsToNoteIDs>
         </Note>
-        <Note ID="1" FontSize="12.0" Position="461.0,352.0" Width="167.0">
+        <Note ID="1" FontSize="12.0" Position="459.957031,354.960938" Width="167.0">
             <Appearance>
                 <Alignment>Left</Alignment>
                 <Border Weight="1">0.477193 0.557066 0.76433</Border>
@@ -45,7 +45,7 @@
 What type to use for duration? What do we do if we don’t have a start date for a video?</String>
             <ConnectedNoteIDs>0</ConnectedNoteIDs>
         </Note>
-        <Note ID="4" FontSize="28.0" Position="408.0,45.0" Width="329.0">
+        <Note ID="4" FontSize="28.0" Position="406.566406,48.515625" Width="329.0">
             <Appearance></Appearance>
             <String>Media Asset Manager</String>
             <ConnectedNoteIDs>26</ConnectedNoteIDs>
@@ -53,7 +53,7 @@ What type to use for duration? What do we do if we don’t have a start date for
                 <FormatRange Bold="Yes">0,19</FormatRange>
             </Formatting>
         </Note>
-        <Note ID="6" FontSize="12.0" Position="468.496094,88.265625" Width="195.0">
+        <Note ID="6" FontSize="12.0" Position="455.480469,109.769531" Width="195.0">
             <Appearance>
                 <Alignment>Left</Alignment>
                 <Border Weight="1">0.477193 0.557066 0.76433</Border>
@@ -82,7 +82,7 @@ What type to use for duration? What do we do if we don’t have a start date for
 Will need to import existing tape numbers from VARS into MAM.</String>
             <ConnectedNoteIDs>1</ConnectedNoteIDs>
         </Note>
-        <Note ID="11" FontSize="12.0" Position="839.0,767.0" Width="175.0">
+        <Note ID="11" FontSize="12.0" Position="742.0,713.0" Width="175.0">
             <Appearance>
                 <Alignment>Left</Alignment>
                 <Border Weight="1">0.477193 0.557066 0.76433</Border>
@@ -94,9 +94,13 @@ Will need to import existing tape numbers from VARS into MAM.</String>
 - timecode: String
 - recordedDate: Instant
 - elapsedTime: Double
+- format: Mimetype
+- width: Int
+- height: Int
 - url: URL
+- description: String
 - lastUpdated: Instant</String>
-            <ConnectedNoteIDs>1, 25</ConnectedNoteIDs>
+            <ConnectedNoteIDs>1, 25, 28</ConnectedNoteIDs>
             <PointsToNoteIDs>1</PointsToNoteIDs>
         </Note>
         <Note ID="12" FontSize="12.0" Position="509.0,711.0" Width="196.0">
@@ -137,7 +141,7 @@ Will need to import existing tape numbers from VARS into MAM.</String>
             <ConnectedNoteIDs>12</ConnectedNoteIDs>
             <PointsToNoteIDs>12</PointsToNoteIDs>
         </Note>
-        <Note ID="16" FontSize="28.0" Position="644.96875,651.527344" Width="76.0">
+        <Note ID="16" FontSize="28.0" Position="645.0,652.0" Width="76.0">
             <Appearance></Appearance>
             <String>VARS</String>
             <ConnectedNoteIDs>23, 26</ConnectedNoteIDs>
@@ -195,7 +199,7 @@ Will need to import existing tape numbers from VARS into MAM.</String>
 - chiefScientist: String
 - notes: String</String>
         </Note>
-        <Note ID="23" FontSize="12.0" Position="29.167969,573.914062" Width="437.0">
+        <Note ID="23" FontSize="12.0" Position="29.0,574.0" Width="437.0">
             <Appearance>
                 <Alignment>Left</Alignment>
             </Appearance>
@@ -217,11 +221,13 @@ Things no longer stored in VARS:
 Although an observation is tied to a particular videoView, it can related to other videoViews of the same video through the MAM.</String>
             <ConnectedNoteIDs>12</ConnectedNoteIDs>
         </Note>
-        <Note ID="25" FontSize="12.0" Position="1090.0,926.0" Width="338.0">
+        <Note ID="25" FontSize="12.0" Position="1152.914062,815.703125" Width="338.0">
             <Appearance>
                 <Alignment>Left</Alignment>
             </Appearance>
-            <String>VideoFrames are completely independent of observations, but can be related to each other by using the 3 indices</String>
+            <String>VideoFrames are completely independent of observations, but can be related to each other by using the 3 indices.
+
+Note that there may be more than one VideoFrame registred to an index. For example, an uncompressed PNG, a JPG with overlay and a watermarked JPG with overlay</String>
             <ConnectedNoteIDs>11</ConnectedNoteIDs>
         </Note>
         <Note ID="26" FontSize="12.0" Position="1164.0,579.0" Width="261.0">
@@ -253,6 +259,7 @@ This MIGHT not be performant enough though.</String>
             </Appearance>
             <String>AnxillaryDataCache
 - uuid: UUID
+- recordedDate: Instant
 - latitude: Double
 - longitude: Double
 - depthMeters: Float
@@ -261,10 +268,10 @@ This MIGHT not be performant enough though.</String>
 - oxygen: Float
 - observation: UUID
 - lastUpdated: Instant</String>
-            <ConnectedNoteIDs>12, 29</ConnectedNoteIDs>
-            <PointsToNoteIDs>12</PointsToNoteIDs>
+            <ConnectedNoteIDs>11-12, 29</ConnectedNoteIDs>
+            <PointsToNoteIDs>11-12</PointsToNoteIDs>
         </Note>
-        <Note ID="29" FontSize="12.0" Position="1094.0,1079.0" Width="200.0">
+        <Note ID="29" FontSize="12.0" Position="1222.488281,1079.0" Width="200.0">
             <Appearance>
                 <Alignment>Left</Alignment>
             </Appearance>
@@ -273,13 +280,13 @@ This MIGHT not be performant enough though.</String>
         </Note>
     </Notes>
     <BackgroundShapes>
-        <Shape ID="3" Sticky="Yes" Position="374.675781,35.0" Width="365.0" Height="491.0">
+        <Shape ID="3" Sticky="Yes" Position="336.0,39.0" Width="403.0" Height="491.0">
             <Appearance>
                 <Border Weight="1"></Border>
                 <Fill>0.99454 0.964232 0.652697</Fill>
             </Appearance>
         </Shape>
-        <Shape ID="15" Sticky="Yes" Position="487.96875,638.527344" Width="601.476562" Height="562.0">
+        <Shape ID="15" Sticky="Yes" Position="488.0,639.0" Width="620.0" Height="562.0">
             <Appearance>
                 <Border Weight="1"></Border>
                 <Fill>0.959467 0.659347 0.625097</Fill>
