@@ -4,10 +4,14 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import org.mbari.util.Tuple2;
 import org.mbari.vcr4j.SimpleVideoError;
+import org.mbari.vcr4j.VideoIO;
+import org.mbari.vcr4j.decorators.LoggingDecorator;
+import org.mbari.vcr4j.decorators.SchedulerVideoIO;
 import org.mbari.vcr4j.decorators.StatusDecorator;
 import org.mbari.vcr4j.decorators.VCRSyncDecorator;
 import org.mbari.vcr4j.javafx.JFXVideoIO;
 import org.mbari.vcr4j.javafx.JFXVideoState;
+import org.mbari.vcr4j.javafx.decorators.FauxTimecodeDecorator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.ToolBelt;
@@ -28,6 +32,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -66,10 +71,14 @@ public class JFXVideoPlayer implements VideoPlayer<JFXVideoState, SimpleVideoErr
 
                 // -- Configure VideoIO
                 JFXVideoIO videoIO = new JFXVideoIO(mediaPlayer);
-                new StatusDecorator<>(videoIO);   // Some commands should immediatly send a status request
+                new StatusDecorator<>(videoIO);   // Some commands should immediately send a status request
                 new VCRSyncDecorator<>(videoIO);  // Send state/index commands at regular intervals
+                //new LoggingDecorator<>(videoIO);
+                new FauxTimecodeDecorator(videoIO); // Convert elapse-time to duration
+                VideoIO<JFXVideoState, SimpleVideoError> io =
+                        new SchedulerVideoIO<JFXVideoState, SimpleVideoError>(videoIO, Executors.newCachedThreadPool());
 
-                cf.complete(new VideoController<>(new JFXImageCaptureService(controller), videoIO));
+                cf.complete(new VideoController<>(new JFXImageCaptureService(controller), io));
                 SwingUtilities.invokeLater(() -> {
                     movieFrame.setSize(media.getWidth(), media.getHeight());
                     movieFrame.setVisible(true);
@@ -118,17 +127,24 @@ public class JFXVideoPlayer implements VideoPlayer<JFXVideoState, SimpleVideoErr
         return openVideoArchive(toolBelt, movieLocation, platformName, sequenceNumber);
     }
 
-    private CompletableFuture<Tuple2<VideoArchive, VideoController<JFXVideoState, SimpleVideoError>>> openVideoArchive(ToolBelt toolBelt, String movieLocation,
+    protected CompletableFuture<Tuple2<VideoArchive, VideoController<JFXVideoState, SimpleVideoError>>> openVideoArchive(ToolBelt toolBelt, String movieLocation,
             String platformName,
             Integer sequenceNumber) {
 
+        return openVideoArchive(toolBelt, new VideoParams(movieLocation, platformName, sequenceNumber));
+
+    }
+
+
+    protected CompletableFuture<Tuple2<VideoArchive, VideoController<JFXVideoState, SimpleVideoError>>>
+            openVideoArchive(ToolBelt toolBelt, VideoParams videoParams) {
+
         VideoArchive videoArchive = getOrCreateVideoArchive(
-                new VideoParams(movieLocation, platformName, sequenceNumber),
+                videoParams,
                 toolBelt.getAnnotationDAOFactory());
 
-        return createVideoController(movieLocation)
+        return createVideoController(videoArchive.getName())
                 .thenCompose(c -> CompletableFuture.supplyAsync(() -> new Tuple2<>(videoArchive, c)));
-
     }
 
     public Optional<VideoArchive> findByLocation(String location, AnnotationDAOFactory daoFactory) {
@@ -153,7 +169,7 @@ public class JFXVideoPlayer implements VideoPlayer<JFXVideoState, SimpleVideoErr
         return videoArchive;
     }
 
-    private VideoArchive getOrCreateVideoArchive(VideoParams videoParams, AnnotationDAOFactory daoFactory) {
+    protected VideoArchive getOrCreateVideoArchive(VideoParams videoParams, AnnotationDAOFactory daoFactory) {
         return findByLocation(videoParams.getMovieLocation(), daoFactory)
                 .orElseGet(() -> createVideoArchive(videoParams, daoFactory));
     }

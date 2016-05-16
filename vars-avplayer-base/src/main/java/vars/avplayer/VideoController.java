@@ -56,7 +56,10 @@ public class VideoController<S extends VideoState, E extends VideoError> extends
 
     public Future<VideoIndex> getVideoIndex() {
         CompletableFuture<VideoIndex> future = new CompletableFuture<>();
-        getVideoIO().getIndexObservable().take(1).forEach(future::complete);
+        // TODO: VARS currently requires timecode. This will not be true in future versions; will need to drop filter below
+        getVideoIO().getIndexObservable()
+                .filter(vi -> vi.getTimecode().isPresent())
+                .take(1).forEach(future::complete);
         getVideoIO().send(VideoCommands.REQUEST_INDEX);
         return future;
     }

@@ -21,11 +21,14 @@ import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.media.Media;
+import javafx.scene.media.MediaException;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.util.Duration;
+import org.bushe.swing.event.EventBus;
 import org.mbari.awt.image.ImageUtilities;
 import org.mbari.vcr4j.time.Timecode;
+import vars.shared.ui.GlobalStateLookup;
 
 import javax.swing.*;
 import java.awt.image.BufferedImage;
@@ -61,13 +64,10 @@ public class JFXMovieJFrameController implements Initializable {
     @FXML
     private Button playButton;
 
-    private String mediaLocation;
 
 
     private MediaPlayer mediaPlayer;
 
-    private double frameRate;
-    private Duration duration;
     private BooleanProperty readyProperty = new SimpleBooleanProperty(false);
 
 
@@ -91,15 +91,18 @@ public class JFXMovieJFrameController implements Initializable {
     public void setMediaLocation(String mediaLocation, Consumer<JFXMovieJFrameController> onReadyRunnable) {
 
         Preconditions.checkNotNull(mediaLocation, "The medialocation can not be null");
-        this.mediaLocation = mediaLocation;
 
-        Media media = new Media(mediaLocation);
-        final ObservableMap<String,Object> metadata = media.getMetadata();
-        //timecode.setFrameRate((Double) metadata.getOrDefault("framerate", DEFAULT_FRAME_RATE));
-        frameRate = DEFAULT_FRAME_RATE;
+        scrubber.setDisable(true);
+        Media media = null;
+        try {
+            media = new Media(mediaLocation);
+        }
+        catch (MediaException e) {
+            EventBus.publish(GlobalStateLookup.TOPIC_WARNING, "Media type is not supported: " + mediaLocation);
+        }
+        //final ObservableMap<String,Object> metadata = media.getMetadata();
         mediaPlayer = new MediaPlayer(media);
         mediaView.setMediaPlayer(mediaPlayer);
-
 
         // --- Configure MediaPlayer
         mediaPlayer.currentTimeProperty().addListener(observable -> updateValues());
@@ -110,9 +113,8 @@ public class JFXMovieJFrameController implements Initializable {
 
         mediaPlayer.setOnReady(() -> {
             Media m = mediaPlayer.getMedia();
-            duration = m.getDuration();
-            Timecode tc = new Timecode(duration.toSeconds() * frameRate, frameRate);
-            SwingUtilities.invokeLater(() -> maxTimecodeTextField.setText(tc.toString()));
+            Timecode timecode = JFXUtilities.jfxDurationToTimecode(m.getDuration());
+            SwingUtilities.invokeLater(() -> maxTimecodeTextField.setText(timecode.toString()));
             updateValues();
             onReadyRunnable.accept(this);
             readyProperty.setValue(true);
@@ -144,9 +146,14 @@ public class JFXMovieJFrameController implements Initializable {
         // --- Configure Scrubber
         scrubber.valueProperty().addListener(observable -> {
             if (scrubber.isValueChanging()) {
+                Media m = mediaPlayer.getMedia();
                 // multiply duration by percentage calculated by slider position
-                mediaPlayer.seek(duration.multiply(scrubber.getValue() / 100D));
+                mediaPlayer.seek(m.getDuration().multiply(scrubber.getValue() / 100D));
             }
+            else {
+                updateValues();
+            }
+
         });
 
     }
@@ -164,9 +171,6 @@ public class JFXMovieJFrameController implements Initializable {
     public void dispose() {
         if (mediaPlayer != null) {
             mediaPlayer.stop();
-            //mediaView.setMediaPlayer(null);
-            //mediaPlayer.dispose();
-            //mediaPlayer = null;
         }
     }
 
@@ -216,12 +220,12 @@ public class JFXMovieJFrameController implements Initializable {
         if (timecodeTextField != null && scrubber != null && mediaPlayer != null) {
             Platform.runLater(() -> {
                 Duration currentTime = mediaPlayer.getCurrentTime();
-                double frames = currentTime.toSeconds() * frameRate;
-                Timecode timecode = new Timecode(frames, frameRate);
+                Duration totalTime = mediaPlayer.getMedia().getDuration();
+                Timecode timecode = JFXUtilities.jfxDurationToTimecode(currentTime);
                 timecodeTextField.setText(timecode.toString());
-                scrubber.setDisable(duration.isUnknown());
-                if (!scrubber.isDisabled() && duration.greaterThan(Duration.ZERO) && !scrubber.isValueChanging()) {
-                    scrubber.setValue(currentTime.divide(duration.toMillis()).toMillis() * 100D);
+                scrubber.setDisable(totalTime.isUnknown());
+                if (!scrubber.isDisabled() && totalTime.greaterThan(Duration.ZERO) && !scrubber.isValueChanging()) {
+                    scrubber.setValue(currentTime.divide(totalTime.toMillis()).toMillis() * 100D);
                 }
             });
         }

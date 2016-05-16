@@ -1,5 +1,6 @@
 package vars.avplayer.jfx;
 
+import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.NonDigitConsumingKeyListener;
 import org.mbari.swing.SpinningDialWaitIndicator;
 import org.mbari.swing.WaitIndicator;
@@ -18,6 +19,7 @@ import vars.annotation.CameraDeployment;
 import vars.annotation.VideoArchive;
 import vars.avplayer.VideoController;
 import vars.avplayer.VideoPlayerDialogUI;
+import vars.shared.ui.GlobalStateLookup;
 import vars.shared.ui.dialogs.StandardDialog;
 
 import javax.swing.*;
@@ -137,7 +139,12 @@ public class JFXVideoPlayerDialogUI extends StandardDialog implements VideoPlaye
      */
     private void callOkayFunction() {
         if (onOkayFunction != null) {
-            onOkayFunction.run();
+            try {
+                onOkayFunction.run();
+            }
+            catch (Exception e) {
+                EventBus.publish(GlobalStateLookup.TOPIC_NONFATAL_ERROR, e);
+            }
         }
     }
 
@@ -445,32 +452,45 @@ public class JFXVideoPlayerDialogUI extends StandardDialog implements VideoPlaye
     }
 
     public Tuple2<VideoArchive, VideoController<JFXVideoState, SimpleVideoError>> openVideoArchive() {
-        String platformName = (String) getCameraPlatformComboBox().getSelectedItem();
-        if (platformName != null && platformName.length() == 0) {
-            platformName = null;
+
+        VideoParams videoParams;
+        if (getOpenExistingRB().isSelected()) {
+            String videoArchiveName = (String) getExistingNamesComboBox().getSelectedItem();
+            videoParams = new VideoParams(videoArchiveName, null, null);
+
+        }
+        else {
+            String platformName = (String) getCameraPlatformComboBox().getSelectedItem();
+            if (platformName != null && platformName.length() == 0) {
+                platformName = null;
+            }
+
+            Integer sequenceNumber = null;
+            try {
+                sequenceNumber = Integer.parseInt(getSequenceNumberTextField().getText());
+            }
+            catch (Exception e) {
+                // DO nothing
+            }
+
+            String movieLocation = getUrlTextField().getText();
+            if (movieLocation == null || movieLocation.trim().length() == 0) {
+                throw new VARSException("Unless you provide a movie location, VARS can't open the video file.");
+            }
+            videoParams = new VideoParams(movieLocation, platformName, sequenceNumber);
         }
 
-        Integer sequenceNumber = null;
-        try {
-            sequenceNumber = Integer.parseInt(getSequenceNumberTextField().getText());
-        }
-        catch (Exception e) {
-            // DO nothing
-        }
-
-        String movieLocation = getUrlTextField().getText();
-        if (movieLocation == null || movieLocation.trim().length() == 0) {
-            throw new VARSException("Unless you provide a movie location, VARS can't open the video file.");
-        }
 
         Tuple2<VideoArchive, VideoController<JFXVideoState, SimpleVideoError>> vids = null;
         try {
-             vids = videoPlayer.openVideoArchive(toolBelt, movieLocation, platformName, sequenceNumber).get(4, TimeUnit.SECONDS);
+             vids = videoPlayer.openVideoArchive(toolBelt, videoParams).get(4, TimeUnit.SECONDS);
         } catch (Exception e) {
             log.warn("Failed to open video player", e);
         }
         return vids;
     }
+
+
 
     class SelectedRBItemListener implements ItemListener {
         public void itemStateChanged(ItemEvent e) {
