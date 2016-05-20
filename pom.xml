@@ -40,7 +40,7 @@
         <jxlayer.version>3.0.4.1</jxlayer.version> <!-- This version has SHA signatures stripped out -->
         <logback.version>1.1.4</logback.version>
         <mbarix4j.version>1.10.0</mbarix4j.version>
-        <postgresql.version>9.0-801.jdbc4</postgresql.version>
+        <postgresql.version>9.4.1208</postgresql.version>
         <qtx4j.version>0.18</qtx4j.version>
         <rxjava.version>1.1.0</rxjava.version>
         <sanselan.version>0.97</sanselan.version>

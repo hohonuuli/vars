@@ -76,16 +76,13 @@ public class QueryPersistenceServiceImpl implements QueryPersistenceService {
      * @return
      */
     public List<String> findAllConceptNamesAsStrings() {
-        final QueryFunction queryFunction = new QueryFunction() {
-
-            public Object apply(ResultSet resultSet) throws SQLException {
-                List<String> conceptNamesAsStrings = new ArrayList<String>();
-                while (resultSet.next()) {
-                    conceptNamesAsStrings.add(resultSet.getString(1));
-                }
-
-                return conceptNamesAsStrings;
+        final QueryFunction queryFunction = resultSet -> {
+            List<String> conceptNamesAsStrings = new ArrayList<>();
+            while (resultSet.next()) {
+                conceptNamesAsStrings.add(resultSet.getString(1));
             }
+
+            return conceptNamesAsStrings;
         };
 
 

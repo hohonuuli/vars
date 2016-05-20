@@ -109,6 +109,11 @@
             <version>${derby.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${postgresql.version}</version>
+        </dependency>
         <!--<dependency>-->
             <!--<groupId>com.google.code.gson</groupId>-->
             <!--<artifactId>gson</artifactId>-->
@@ -209,7 +214,7 @@
             </properties>
             <dependencies>
                 <dependency>
-                    <groupId>postgresql</groupId>
+                    <groupId>org.postgresql</groupId>
                     <artifactId>postgresql</artifactId>
                     <version>${postgresql.version}</version>
                 </dependency>
