@@ -65,7 +65,7 @@ public class CoalescingDecorator {
         List<Integer> rows = new ArrayList<>();
         for (int i = 0; i < keyColumn.size(); i++) {
             Object key0 = keyColumn.get(i);
-            if (key.equals(key0)) {
+            if (key != null && key.equals(key0)) {
                 rows.add(i);
             }
         }
