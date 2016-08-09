@@ -1,0 +1,10 @@
+#!/bin/sh
+
+VARS_HOME=`dirname "$0"`/..
+VARS_CLASSPATH=$VARS_HOME/conf:$VARS_HOME/lib/*
+
+${JAVACMD:=java} -Xms16m -Xmx512m \
+         -Duser.timezone="UTC" \
+         -Dfile.encoding=UTF8 \
+         -classpath "$VARS_CLASSPATH" \
+         vars.queryfx.ui.App "$@"
