@@ -91,14 +91,15 @@
         <module>vars-knowledgebase</module>
         <module>vars-avplayer-base</module>
         <module>vars-avplayer-rs422</module>
+        <module>vars-avplayer-sharktopoda</module>
         <module>vars-avplayer-jfx</module>
         <module>vars-avplayer-kipro</module>
         <module>vars-avplayer-vlcj</module>
         <module>vars-annotation</module>
         <module>vars-avfoundation</module>
         <module>vars-standalone</module>
-
-    </modules>
+    
+  </modules>
     <scm>
         <connection>scm:hg:https://vars-redux.googlecode.com/hg/</connection>
         <developerConnection>scm:hg:https://vars-redux.googlecode.com/hg/</developerConnection>
