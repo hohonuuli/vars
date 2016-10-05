@@ -1,10 +1,8 @@
 package vars.avplayer.sharktopoda;
 
 import org.bushe.swing.event.EventBus;
-import org.mbari.vcr4j.commands.VideoCommands;
 import org.mbari.vcr4j.sharktopoda.SharktopodaVideoIO;
 import org.mbari.vcr4j.sharktopoda.commands.FramecaptureCmd;
-import org.mbari.vcr4j.sharktopoda.commands.SharkCommands;
 import org.mbari.vcr4j.sharktopoda.decorators.FramecaptureDecorator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

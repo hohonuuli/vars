@@ -1,4 +1,4 @@
-package vars.avplayer.sharktopoda.;
+package vars.avplayer.sharktopoda;
 
 import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.NonDigitConsumingKeyListener;
@@ -7,6 +7,7 @@ import org.mbari.swing.WaitIndicator;
 import org.mbari.text.IgnoreCaseToStringComparator;
 import org.mbari.util.Tuple2;
 import org.mbari.vcr4j.SimpleVideoError;
+import org.mbari.vcr4j.sharktopoda.SharktopodaError;
 import org.mbari.vcr4j.sharktopoda.SharktopodaState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -438,7 +439,7 @@ public class SharktopodaDialogUI extends StandardDialog implements VideoPlayerDi
         getOkayButton().setEnabled(enable);
     }
 
-    public Tuple2<VideoArchive, VideoController<SharktopodaState, SimpleVideoError>> openVideoArchive() {
+    public Tuple2<VideoArchive, VideoController<SharktopodaState, SharktopodaError>> openVideoArchive() {
 
         VideoParams videoParams;
         if (getOpenExistingRB().isSelected()) {
@@ -468,7 +469,7 @@ public class SharktopodaDialogUI extends StandardDialog implements VideoPlayerDi
         }
 
 
-        Tuple2<VideoArchive, VideoController<SharktopodaState, SimpleVideoError>> vids = null;
+        Tuple2<VideoArchive, VideoController<SharktopodaState, SharktopodaError>> vids = null;
         try {
             vids = videoPlayer.openVideoArchive(toolBelt, videoParams).get(4, TimeUnit.SECONDS);
         } catch (Exception e) {

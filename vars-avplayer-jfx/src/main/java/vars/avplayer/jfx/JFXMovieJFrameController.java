@@ -120,7 +120,6 @@ public class JFXMovieJFrameController implements Initializable {
             readyProperty.setValue(true);
         });
 
-
         mediaPlayer.setOnEndOfMedia(() -> { playButton.setText(">"); });
 
         // ---  Configure play button
