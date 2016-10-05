@@ -74,7 +74,7 @@ public class JFXVideoPlayer implements VideoPlayer<JFXVideoState, SimpleVideoErr
                 new StatusDecorator<>(videoIO);   // Some commands should immediately send a status request
                 new VCRSyncDecorator<>(videoIO);  // Send state/index commands at regular intervals
                 //new LoggingDecorator<>(videoIO);
-                new FauxTimecodeDecorator(videoIO); // Convert elapse-time to duration
+                new FauxTimecodeDecorator(videoIO); // Convert elapsed-time to timecode
                 VideoIO<JFXVideoState, SimpleVideoError> io =
                         new SchedulerVideoIO<JFXVideoState, SimpleVideoError>(videoIO, Executors.newCachedThreadPool());
 

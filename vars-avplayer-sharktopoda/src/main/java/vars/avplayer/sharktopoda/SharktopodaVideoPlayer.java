@@ -1,7 +1,6 @@
 package vars.avplayer.sharktopoda;
 
 import org.mbari.util.Tuple2;
-import org.mbari.vcr4j.SimpleVideoError;
 import org.mbari.vcr4j.VideoIO;
 import org.mbari.vcr4j.decorators.SchedulerVideoIO;
 import org.mbari.vcr4j.decorators.StatusDecorator;
@@ -9,7 +8,9 @@ import org.mbari.vcr4j.decorators.VCRSyncDecorator;
 import org.mbari.vcr4j.sharktopoda.SharktopodaError;
 import org.mbari.vcr4j.sharktopoda.SharktopodaState;
 import org.mbari.vcr4j.sharktopoda.SharktopodaVideoIO;
+import org.mbari.vcr4j.sharktopoda.commands.OpenCmd;
 import org.mbari.vcr4j.sharktopoda.commands.SharkCommands;
+import org.mbari.vcr4j.sharktopoda.decorators.FauxTimecodeDecorator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.ToolBelt;
@@ -25,10 +26,12 @@ import vars.shared.rx.RXEventBus;
 import vars.shared.ui.GlobalStateLookup;
 
 import java.awt.*;
+import java.net.URL;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Created by brian on 9/1/16.
@@ -37,18 +40,29 @@ public class SharktopodaVideoPlayer implements VideoPlayer<SharktopodaState, Sha
 
     private SharktopodaDialogUI dialogUI;
     private final Logger log = LoggerFactory.getLogger(getClass());
-    private final int port = 4777;
+    private final int sharktopodaPort = 8800;
+    private final int framecapturePort = 4777;
+    private final AtomicReference<VideoController<SharktopodaState, SharktopodaError>> currentVideoController = new AtomicReference<>();
 
     protected CompletableFuture<VideoController<SharktopodaState, SharktopodaError>> createVideoController(String movieLocation) {
 
         CompletableFuture<VideoController<SharktopodaState, SharktopodaError>> cf = new CompletableFuture<>();
 
         try {
-            SharktopodaVideoIO videoIO = new SharktopodaVideoIO(UUID.randomUUID(), "localhost", port);
+            SharktopodaVideoIO videoIO = new SharktopodaVideoIO(UUID.randomUUID(), "localhost", sharktopodaPort);
+            videoIO.send(new OpenCmd(new URL(movieLocation)));
             new StatusDecorator<>(videoIO);
-            new VCRSyncDecorator<>(videoIO);
+            new VCRSyncDecorator<>(videoIO, 1000, 100, 3000000);
+            new FauxTimecodeDecorator(videoIO); // Convert elapsed-time to timecode
             VideoIO<SharktopodaState, SharktopodaError> io = new SchedulerVideoIO<>(videoIO, Executors.newCachedThreadPool());
-            cf.complete(new VideoController<>(new SharktopodaImageCaptureService(videoIO, port), io));
+            VideoController<SharktopodaState, SharktopodaError> oldVc = currentVideoController.get();
+            if (oldVc != null) {
+                oldVc.getVideoIO().send(SharkCommands.CLOSE);
+                oldVc.getImageCaptureService().dispose();
+            }
+            VideoController<SharktopodaState, SharktopodaError> newVc = new VideoController<>(new SharktopodaImageCaptureService(videoIO, framecapturePort), io);
+            currentVideoController.set(newVc);
+            cf.complete(newVc);
             io.send(SharkCommands.SHOW);
         }
         catch (Exception e) {
@@ -109,7 +123,7 @@ public class SharktopodaVideoPlayer implements VideoPlayer<SharktopodaState, Sha
 
     @Override
     public String getName() {
-        return null;
+        return "Sharktopoda";
     }
 
     public Optional<VideoArchive> findByLocation(String location, AnnotationDAOFactory daoFactory) {
