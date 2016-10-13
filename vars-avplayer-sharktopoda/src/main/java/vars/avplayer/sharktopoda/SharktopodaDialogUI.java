@@ -36,6 +36,8 @@ import java.net.MalformedURLException;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
@@ -68,7 +70,13 @@ public class SharktopodaDialogUI extends StandardDialog implements VideoPlayerDi
     private JLabel selectTimeSourcelbl;
     private Runnable onOkayFunction = DO_NOTHING_FUNCTION;
     private SharktopodaVideoPlayer videoPlayer;
+    private JLabel lblSharktopodaPort;
+    private JLabel lblFramecapturePort;
+    private JTextField sharktopodaPortTextField;
+    private JTextField framecapturePortTextField;
 
+    public static final String PREF_SHARKTOPODA_PORT = "sharktopoda-port";
+    public static final String PREF_FRAMECAPTURE_PORT = "framecapture-port";
 
 
     /**
@@ -156,61 +164,77 @@ public class SharktopodaDialogUI extends StandardDialog implements VideoPlayerDi
             panel = new JPanel();
             GroupLayout gl_panel = new GroupLayout(panel);
             gl_panel.setHorizontalGroup(
-                    gl_panel.createParallelGroup(Alignment.LEADING)
-                            .addGroup(gl_panel.createSequentialGroup()
-                                    .addContainerGap()
-                                    .addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-                                            .addComponent(getOpenByLocationRB())
-                                            .addGroup(gl_panel.createSequentialGroup()
-                                                    .addGap(29)
-                                                    .addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-                                                            .addComponent(getBrowseButton())
-                                                            .addGroup(gl_panel.createSequentialGroup()
-                                                                    .addComponent(getLblMovie())
-                                                                    .addPreferredGap(ComponentPlacement.RELATED)
-                                                                    .addComponent(getUrlTextField(), GroupLayout.DEFAULT_SIZE, 387, Short.MAX_VALUE))
-                                                            .addGroup(gl_panel.createSequentialGroup()
-                                                                    .addComponent(getLblCameraPlatform(), GroupLayout.PREFERRED_SIZE, 108, GroupLayout.PREFERRED_SIZE)
-                                                                    .addPreferredGap(ComponentPlacement.UNRELATED)
-                                                                    .addComponent(getCameraPlatformComboBox(), 0, 314, Short.MAX_VALUE))
-                                                            .addGroup(gl_panel.createSequentialGroup()
-                                                                    .addComponent(getLblSequenceNumber(), GroupLayout.PREFERRED_SIZE, 117, GroupLayout.PREFERRED_SIZE)
-                                                                    .addPreferredGap(ComponentPlacement.RELATED)
-                                                                    .addComponent(getSequenceNumberTextField(), GroupLayout.PREFERRED_SIZE, 311, GroupLayout.PREFERRED_SIZE))))
-                                            .addComponent(getOpenExistingRB())
-                                            .addGroup(gl_panel.createSequentialGroup()
-                                                    .addGap(29)
-                                                    .addComponent(getLblSelectName(), GroupLayout.PREFERRED_SIZE, 81, GroupLayout.PREFERRED_SIZE)
-                                                    .addPreferredGap(ComponentPlacement.RELATED)
-                                                    .addComponent(getExistingNamesComboBox(), 0, 353, Short.MAX_VALUE)))
-                                    .addContainerGap())
+            	gl_panel.createParallelGroup(Alignment.LEADING)
+            		.addGroup(gl_panel.createSequentialGroup()
+            			.addContainerGap()
+            			.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+            				.addComponent(getOpenByLocationRB())
+            				.addGroup(gl_panel.createSequentialGroup()
+            					.addGap(29)
+            					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+            						.addComponent(getBrowseButton())
+            						.addGroup(gl_panel.createSequentialGroup()
+            							.addComponent(getLblMovie())
+            							.addPreferredGap(ComponentPlacement.RELATED)
+            							.addComponent(getUrlTextField(), GroupLayout.DEFAULT_SIZE, 387, Short.MAX_VALUE))
+            						.addGroup(gl_panel.createSequentialGroup()
+            							.addComponent(getLblCameraPlatform(), GroupLayout.PREFERRED_SIZE, 108, GroupLayout.PREFERRED_SIZE)
+            							.addPreferredGap(ComponentPlacement.UNRELATED)
+            							.addComponent(getCameraPlatformComboBox(), 0, 314, Short.MAX_VALUE))
+            						.addGroup(gl_panel.createSequentialGroup()
+            							.addComponent(getLblSequenceNumber(), GroupLayout.PREFERRED_SIZE, 117, GroupLayout.PREFERRED_SIZE)
+            							.addPreferredGap(ComponentPlacement.RELATED)
+            							.addComponent(getSequenceNumberTextField(), GroupLayout.PREFERRED_SIZE, 311, GroupLayout.PREFERRED_SIZE))))
+            				.addComponent(getOpenExistingRB())
+            				.addGroup(gl_panel.createSequentialGroup()
+            					.addGap(29)
+            					.addComponent(getLblSelectName(), GroupLayout.PREFERRED_SIZE, 81, GroupLayout.PREFERRED_SIZE)
+            					.addPreferredGap(ComponentPlacement.RELATED)
+            					.addComponent(getExistingNamesComboBox(), 0, 347, Short.MAX_VALUE))
+            				.addGroup(gl_panel.createSequentialGroup()
+            					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+            						.addComponent(getLblSharktopodaPort())
+            						.addComponent(getLblFramecapturePort()))
+            					.addPreferredGap(ComponentPlacement.RELATED)
+            					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+            						.addComponent(getFramecapturePortTextField(), GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
+            						.addComponent(getSharktopodaPortTextField(), GroupLayout.DEFAULT_SIZE, 345, Short.MAX_VALUE))))
+            			.addContainerGap())
             );
             gl_panel.setVerticalGroup(
-                    gl_panel.createParallelGroup(Alignment.LEADING)
-                            .addGroup(gl_panel.createSequentialGroup()
-                                    .addContainerGap()
-                                    .addComponent(getOpenByLocationRB())
-                                    .addPreferredGap(ComponentPlacement.RELATED)
-                                    .addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
-                                            .addComponent(getLblMovie())
-                                            .addComponent(getUrlTextField(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                                    .addPreferredGap(ComponentPlacement.RELATED)
-                                    .addComponent(getBrowseButton())
-                                    .addPreferredGap(ComponentPlacement.RELATED)
-                                    .addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
-                                            .addComponent(getLblCameraPlatform())
-                                            .addComponent(getCameraPlatformComboBox(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                                    .addPreferredGap(ComponentPlacement.RELATED)
-                                    .addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
-                                            .addComponent(getLblSequenceNumber())
-                                            .addComponent(getSequenceNumberTextField(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                                    .addGap(18)
-                                    .addComponent(getOpenExistingRB())
-                                    .addPreferredGap(ComponentPlacement.RELATED)
-                                    .addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
-                                            .addComponent(getLblSelectName())
-                                            .addComponent(getExistingNamesComboBox(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                                    .addContainerGap(91, Short.MAX_VALUE))
+            	gl_panel.createParallelGroup(Alignment.LEADING)
+            		.addGroup(gl_panel.createSequentialGroup()
+            			.addContainerGap()
+            			.addComponent(getOpenByLocationRB())
+            			.addPreferredGap(ComponentPlacement.RELATED)
+            			.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+            				.addComponent(getLblMovie())
+            				.addComponent(getUrlTextField(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+            			.addPreferredGap(ComponentPlacement.RELATED)
+            			.addComponent(getBrowseButton())
+            			.addPreferredGap(ComponentPlacement.RELATED)
+            			.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+            				.addComponent(getLblCameraPlatform())
+            				.addComponent(getCameraPlatformComboBox(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+            			.addPreferredGap(ComponentPlacement.RELATED)
+            			.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+            				.addComponent(getLblSequenceNumber())
+            				.addComponent(getSequenceNumberTextField(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+            			.addGap(18)
+            			.addComponent(getOpenExistingRB())
+            			.addPreferredGap(ComponentPlacement.RELATED)
+            			.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+            				.addComponent(getLblSelectName())
+            				.addComponent(getExistingNamesComboBox(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+            			.addGap(18)
+            			.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+            				.addComponent(getLblSharktopodaPort())
+            				.addComponent(getSharktopodaPortTextField(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+            			.addPreferredGap(ComponentPlacement.UNRELATED)
+            			.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+            				.addComponent(getLblFramecapturePort())
+            				.addComponent(getFramecapturePortTextField(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+            			.addContainerGap(29, Short.MAX_VALUE))
             );
             panel.setLayout(gl_panel);
         }
@@ -441,10 +465,18 @@ public class SharktopodaDialogUI extends StandardDialog implements VideoPlayerDi
 
     public Tuple2<VideoArchive, VideoController<SharktopodaState, SharktopodaError>> openVideoArchive() {
 
+        String sharkPortString = sharktopodaPortTextField.getText();
+        Integer sharkPort = sharkPortString == null || sharkPortString.isEmpty() ? 8800 : Integer.parseInt(sharkPortString);
+        String framePortString = framecapturePortTextField.getText();
+        Integer framePort = framePortString == null || framePortString.isEmpty() ? 8900 : Integer.parseInt(framePortString);
+
+        saveSharktopodaPort(sharkPort);
+        saveFramecapturePort(framePort);
+
         VideoParams videoParams;
         if (getOpenExistingRB().isSelected()) {
             String videoArchiveName = (String) getExistingNamesComboBox().getSelectedItem();
-            videoParams = new VideoParams(videoArchiveName, null, null);
+            videoParams = new VideoParams(videoArchiveName, null, null, sharkPort, framePort);
 
         }
         else {
@@ -465,7 +497,8 @@ public class SharktopodaDialogUI extends StandardDialog implements VideoPlayerDi
             if (movieLocation == null || movieLocation.trim().length() == 0) {
                 throw new VARSException("Unless you provide a movie location, VARS can't open the video file.");
             }
-            videoParams = new VideoParams(movieLocation, platformName, sequenceNumber);
+
+            videoParams = new VideoParams(movieLocation, platformName, sequenceNumber, sharkPort, framePort);
         }
 
 
@@ -508,6 +541,63 @@ public class SharktopodaDialogUI extends StandardDialog implements VideoPlayerDi
         }
         return selectTimeSourcelbl;
     }
+	private JLabel getLblSharktopodaPort() {
+		if (lblSharktopodaPort == null) {
+			lblSharktopodaPort = new JLabel("Sharktopoda Port:");
+		}
+		return lblSharktopodaPort;
+	}
+	private JLabel getLblFramecapturePort() {
+		if (lblFramecapturePort == null) {
+			lblFramecapturePort = new JLabel("Framecapture Port:");
+		}
+		return lblFramecapturePort;
+	}
+	private JTextField getSharktopodaPortTextField() {
+		if (sharktopodaPortTextField == null) {
+			sharktopodaPortTextField = new JTextField();
+			sharktopodaPortTextField.setColumns(10);
+            sharktopodaPortTextField.addKeyListener(new NonDigitConsumingKeyListener());
+		}
+		return sharktopodaPortTextField;
+	}
+	private JTextField getFramecapturePortTextField() {
+		if (framecapturePortTextField == null) {
+			framecapturePortTextField = new JTextField();
+			framecapturePortTextField.setColumns(10);
+            framecapturePortTextField.addKeyListener(new NonDigitConsumingKeyListener());
+		}
+		return framecapturePortTextField;
+	}
 
+	private void saveSharktopodaPort(Integer port) {
+        savePortToPrefs(PREF_SHARKTOPODA_PORT, port);
+    }
 
+    private void saveFramecapturePort(Integer port) {
+        savePortToPrefs(PREF_FRAMECAPTURE_PORT, port);
+    }
+
+    private void savePortToPrefs(String pref, Integer port) {
+        if (port != null) {
+            Preferences prefs = Preferences.userNodeForPackage(getClass());
+            prefs.putInt(pref, port);
+            try {
+                prefs.flush();
+            }
+            catch (BackingStoreException e) {
+                log.warn("Failed to save preference of '" + pref + "'");
+            }
+        }
+    }
+
+    @Override
+    public void setVisible(boolean b) {
+        Preferences prefs = Preferences.userNodeForPackage(getClass());
+        int sharkPort = prefs.getInt(PREF_SHARKTOPODA_PORT, 8800);
+        int framePort = prefs.getInt(PREF_FRAMECAPTURE_PORT, 8900);
+        getSharktopodaPortTextField().setText(sharkPort + "");
+        getFramecapturePortTextField().setText(framePort + "");
+        super.setVisible(b);
+    }
 }

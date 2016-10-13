@@ -40,11 +40,11 @@ public class SharktopodaVideoPlayer implements VideoPlayer<SharktopodaState, Sha
 
     private SharktopodaDialogUI dialogUI;
     private final Logger log = LoggerFactory.getLogger(getClass());
-    private final int sharktopodaPort = 8800;
-    private final int framecapturePort = 4777;
     private final AtomicReference<VideoController<SharktopodaState, SharktopodaError>> currentVideoController = new AtomicReference<>();
 
-    protected CompletableFuture<VideoController<SharktopodaState, SharktopodaError>> createVideoController(String movieLocation) {
+    protected CompletableFuture<VideoController<SharktopodaState, SharktopodaError>> createVideoController(String movieLocation,
+            int sharktopodaPort,
+            int framecapturePort) {
 
         CompletableFuture<VideoController<SharktopodaState, SharktopodaError>> cf = new CompletableFuture<>();
 
@@ -83,9 +83,12 @@ public class SharktopodaVideoPlayer implements VideoPlayer<SharktopodaState, Sha
     }
 
     public CompletableFuture<Tuple2<VideoArchive, VideoController<SharktopodaState, SharktopodaError>>> openVideoArchive(ToolBelt toolBelt, String movieLocation,
-                                                                                                                         String platformName,
-                                                                                                                         Integer sequenceNumber) {
-        return openVideoArchive(toolBelt, new VideoParams(movieLocation, platformName, sequenceNumber));
+             String platformName,
+             Integer sequenceNumber,
+            int sharktopodaPort,
+            int framecapturePort) {
+        return openVideoArchive(toolBelt,
+                new VideoParams(movieLocation, platformName, sequenceNumber, sharktopodaPort, framecapturePort));
     }
 
     @Override
@@ -112,7 +115,9 @@ public class SharktopodaVideoPlayer implements VideoPlayer<SharktopodaState, Sha
                 videoParams,
                 toolBelt.getAnnotationDAOFactory());
 
-        return createVideoController(videoArchive.getName())
+        return createVideoController(videoArchive.getName(),
+                videoParams.getSharktopodaPort(),
+                videoParams.getFramecapturePort())
                 .thenCompose(c -> CompletableFuture.supplyAsync(() -> new Tuple2<>(videoArchive, c)));
     }
 
