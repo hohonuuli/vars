@@ -26,13 +26,14 @@ import java.time.ZonedDateTime;
 public class StateLookup extends GlobalStateLookup {
 
     private static final String appConfig = "vars/queryfx/app";
-    private static final Injector injector = Guice.createInjector(new QueryModule());
+    private static Injector injector;
     private static final Config config = ConfigFactory.load(appConfig);
     private static App app;
     public static final String WILD_CARD = "*";
     public static final Concept WILD_CARD_CONCEPT = new SimpleConceptBean(
             new SimpleConceptNameBean(WILD_CARD, ConceptNameTypes.PRIMARY.getName()));
     public static final ILink WILD_CARD_LINK = new LinkBean(WILD_CARD, WILD_CARD, WILD_CARD);
+    private static final Object lockObject = new Object();
 
 
     public static Config getConfig() {
@@ -40,6 +41,11 @@ public class StateLookup extends GlobalStateLookup {
     }
 
     public static Injector getInjector() {
+        if (injector == null) {
+            synchronized (lockObject) {
+                injector = Guice.createInjector(new QueryModule());
+            }
+        }
         return injector;
     }
 
