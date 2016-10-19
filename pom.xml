@@ -52,7 +52,7 @@
         <swingx.version>1.6.5-1</swingx.version>
         <swing.layout.version>1.0.3</swing.layout.version>
         <tagsoup.version>1.2.1</tagsoup.version>
-        <vcr4j.version>3.0.1</vcr4j.version>
+        <vcr4j.version>3.0.2-SNAPSHOT</vcr4j.version>
 
         <!-- Reporting plugins -->
         <maven.checkstyle.plugin>2.15</maven.checkstyle.plugin>
@@ -94,7 +94,7 @@
         <module>vars-avplayer-sharktopoda</module>
         <module>vars-avplayer-jfx</module>
         <module>vars-avplayer-kipro</module>
-        <module>vars-avplayer-vlcj</module>
+        <!--<module>vars-avplayer-vlcj</module>-->
         <module>vars-annotation</module>
         <module>vars-avfoundation</module>
         <module>vars-standalone</module>

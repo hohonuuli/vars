@@ -3,7 +3,9 @@ package vars.avplayer.rs422;
 import org.bushe.swing.event.EventBus;
 import org.mbari.util.Tuple2;
 import org.mbari.vcr4j.SimpleVideoIO;
+import org.mbari.vcr4j.VideoCommand;
 import org.mbari.vcr4j.VideoIO;
+import org.mbari.vcr4j.commands.VideoCommands;
 import org.mbari.vcr4j.decorators.SchedulerVideoIO;
 import org.mbari.vcr4j.decorators.VCRSyncDecorator;
 import org.mbari.vcr4j.rs422.RS422Error;
@@ -118,6 +120,7 @@ public class RS422VideoPlayer implements VideoPlayer<RS422State, RS422Error> {
         VideoIO<RS422State, RS422Error> io = null;
         try {
             RS422VideoIO rawIO = RXTXVideoIO.open(serialPortName);
+            //RS422VideoIO rawIO = SerialCommVideoIO.open(serialPortName);
             // Keep UI in sync by scheduling status/time requests
             new VCRSyncDecorator<>(rawIO);
             // Keep UI in sync by sending status/timecode requests after commands
@@ -132,6 +135,8 @@ public class RS422VideoPlayer implements VideoPlayer<RS422State, RS422Error> {
                     timeDecorator.getIndexObservable());
             // Move IO off of current thread
             io = new SchedulerVideoIO<>(simpleIO, Executors.newCachedThreadPool());
+            io.send(VideoCommands.REQUEST_INDEX);
+            io.send(VideoCommands.REQUEST_STATUS);
         }
         catch (Exception e) {
             EventBus.publish(GlobalStateLookup.TOPIC_NONFATAL_ERROR, e);

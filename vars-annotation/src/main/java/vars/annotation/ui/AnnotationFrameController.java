@@ -307,6 +307,7 @@ public class AnnotationFrameController implements PreferenceUpdater, UIEventSubs
             Injector injector = StateLookup.GUICE_INJECTOR;
             PreferencesFactory preferencesFactory = injector.getInstance(PreferencesFactory.class);
             PreferencesService preferencesService = new PreferencesService(preferencesFactory);
+            /* TODO Fix this for ships
             if (preferencesService.findAutoconnectVcr(preferencesService.getHostname())) {
 
                 // TODO this was added for ships. We will need a workaround for the new VARS
@@ -321,6 +322,7 @@ public class AnnotationFrameController implements PreferenceUpdater, UIEventSubs
                 }
                 StateLookup.setVideoController(videoController);
             }
+            */
 
         }
     }

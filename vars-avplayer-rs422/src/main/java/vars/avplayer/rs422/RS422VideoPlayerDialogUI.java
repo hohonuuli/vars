@@ -13,7 +13,6 @@ import vars.avplayer.OpenVideoArchivePanel;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
-import java.util.prefs.Preferences;
 
 /**
  * @author Brian Schlining
@@ -42,8 +41,10 @@ public class RS422VideoPlayerDialogUI extends OpenVideoArchiveDialog<RS422State,
                     .map(CommPortIdentifier::getName)
                     .sorted()
                     .toArray(String[]::new);
+
             serialPortComboBox = new JComboBox<>(ports);
         }
+
         return serialPortComboBox;
     }
 
