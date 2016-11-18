@@ -1,80 +1,20 @@
-2010-06-07 21:04:03.589 GMT : Apache Derby Network Server - 10.6.1.0 - (938214) started and ready to accept connections on port 1527
+Fri Nov 18 15:31:05 PST 2016 : Apache Derby Network Server - 10.12.1.1 - (1704137) started and ready to accept connections on port 1527
 ----------------------------------------------------------------
-2010-06-07 21:04:20.632 GMT:
- Booting Derby version The Apache Software Foundation - Apache Derby - 10.6.1.0 - (938214): instance a816c00e-0129-143a-2b9c-ffff8eac6c89 
-on database directory /Users/brian/Desktop/vars-standalone-1.0-SNAPSHOT-scripting/database/VARS   with class loader sun.misc.Launcher$AppClassLoader@6d6f0472
-
+Fri Nov 18 15:31:15 PST 2016:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.12.1.1 - (1704137): instance a816c00e-0158-79c7-7915-ffff8eac6c89 
+on database directory /Users/brian/workspace/vars/vars-standalone/target/vars-standalone-8.2-SNAPSHOT-scripting/database/VARS with class loader sun.misc.Launcher$AppClassLoader@4554617c 
+Loaded from file:/Users/brian/workspace/vars/vars-standalone/target/vars-standalone-8.2-SNAPSHOT-scripting/lib/derby-10.12.1.1.jar
+java.vendor=Oracle Corporation
+java.runtime.version=1.8.0_112-b16
+user.dir=/Users/brian/workspace/vars/vars-standalone/target/vars-standalone-8.2-SNAPSHOT-scripting/bin
+os.name=Mac OS X
+os.arch=x86_64
+os.version=10.12.1
+derby.system.home=./../database
 Database Class Loader started - derby.database.classpath=''
-
-------------  BEGIN SHUTDOWN ERROR STACK -------------
-
-ERROR XSLAQ: cannot create log file at directory /Users/brian/Desktop/vars-standalone-1.0-SNAPSHOT-scripting/database/VARS/log.
-	at org.apache.derby.iapi.error.StandardException.newException(Unknown Source)
-	at org.apache.derby.impl.store.raw.log.LogToFile.getLogDirectory(Unknown Source)
-	at org.apache.derby.impl.store.raw.log.LogToFile.getControlFileName(Unknown Source)
-	at org.apache.derby.impl.store.raw.log.LogToFile.checkpointWithTran(Unknown Source)
-	at org.apache.derby.impl.store.raw.log.LogToFile.checkpoint(Unknown Source)
-	at org.apache.derby.impl.store.raw.RawStore.stop(Unknown Source)
-	at org.apache.derby.impl.services.monitor.TopService.stop(Unknown Source)
-	at org.apache.derby.impl.services.monitor.TopService.shutdown(Unknown Source)
-	at org.apache.derby.impl.services.monitor.BaseMonitor.shutdown(Unknown Source)
-	at org.apache.derby.impl.services.monitor.BaseMonitor.shutdown(Unknown Source)
-	at org.apache.derby.jdbc.InternalDriver.connect(Unknown Source)
-	at org.apache.derby.jdbc.AutoloadedDriver.connect(Unknown Source)
-	at org.apache.derby.impl.drda.NetworkServerControlImpl.blockingStart(Unknown Source)
-	at org.apache.derby.impl.drda.NetworkServerControlImpl.executeWork(Unknown Source)
-	at org.apache.derby.drda.NetworkServerControl.main(Unknown Source)
-
-
-------------  END SHUTDOWN ERROR STACK -------------
-
-
-------------  BEGIN SHUTDOWN ERROR STACK -------------
-
-ERROR XSLAQ: cannot create log file at directory /Users/brian/Desktop/vars-standalone-1.0-SNAPSHOT-scripting/database/VARS/log.
-	at org.apache.derby.iapi.error.StandardException.newException(Unknown Source)
-	at org.apache.derby.impl.store.raw.log.LogToFile.getLogDirectory(Unknown Source)
-	at org.apache.derby.impl.store.raw.log.LogToFile.getControlFileName(Unknown Source)
-	at org.apache.derby.impl.store.raw.log.LogToFile.checkpointWithTran(Unknown Source)
-	at org.apache.derby.impl.store.raw.log.LogToFile.checkpoint(Unknown Source)
-	at org.apache.derby.impl.store.raw.RawStore.stop(Unknown Source)
-	at org.apache.derby.impl.services.monitor.TopService.stop(Unknown Source)
-	at org.apache.derby.impl.services.monitor.TopService.shutdown(Unknown Source)
-	at org.apache.derby.impl.services.monitor.BaseMonitor.shutdown(Unknown Source)
-	at org.apache.derby.impl.services.monitor.BaseMonitor.shutdown(Unknown Source)
-	at org.apache.derby.jdbc.InternalDriver.connect(Unknown Source)
-	at org.apache.derby.jdbc.AutoloadedDriver.connect(Unknown Source)
-	at org.apache.derby.impl.drda.NetworkServerControlImpl.blockingStart(Unknown Source)
-	at org.apache.derby.impl.drda.NetworkServerControlImpl.executeWork(Unknown Source)
-	at org.apache.derby.drda.NetworkServerControl.main(Unknown Source)
-
-
-------------  END SHUTDOWN ERROR STACK -------------
-
-
-------------  BEGIN SHUTDOWN ERROR STACK -------------
-
-ERROR XSLAQ: cannot create log file at directory /Users/brian/Desktop/vars-standalone-1.0-SNAPSHOT-scripting/database/VARS/log.
-	at org.apache.derby.iapi.error.StandardException.newException(Unknown Source)
-	at org.apache.derby.impl.store.raw.log.LogToFile.getLogDirectory(Unknown Source)
-	at org.apache.derby.impl.store.raw.log.LogToFile.getControlFileName(Unknown Source)
-	at org.apache.derby.impl.store.raw.log.LogToFile.checkpointWithTran(Unknown Source)
-	at org.apache.derby.impl.store.raw.log.LogToFile.checkpoint(Unknown Source)
-	at org.apache.derby.impl.store.raw.RawStore.stop(Unknown Source)
-	at org.apache.derby.impl.services.monitor.TopService.stop(Unknown Source)
-	at org.apache.derby.impl.services.monitor.TopService.shutdown(Unknown Source)
-	at org.apache.derby.impl.services.monitor.BaseMonitor.shutdown(Unknown Source)
-	at org.apache.derby.impl.services.monitor.BaseMonitor.shutdown(Unknown Source)
-	at org.apache.derby.jdbc.InternalDriver.connect(Unknown Source)
-	at org.apache.derby.jdbc.AutoloadedDriver.connect(Unknown Source)
-	at org.apache.derby.impl.drda.NetworkServerControlImpl.blockingStart(Unknown Source)
-	at org.apache.derby.impl.drda.NetworkServerControlImpl.executeWork(Unknown Source)
-	at org.apache.derby.drda.NetworkServerControl.main(Unknown Source)
-
-
-------------  END SHUTDOWN ERROR STACK -------------
-
-
-2010-06-07 21:06:06.985 GMT:
-Shutting down instance a816c00e-0129-143a-2b9c-ffff8eac6c89 with class loader sun.misc.Launcher$AppClassLoader@6d6f0472 
+----------------------------------------------------------------
+Fri Nov 18 15:34:56 PST 2016: Shutting down Derby engine
+----------------------------------------------------------------
+Fri Nov 18 15:34:56 PST 2016:
+Shutting down instance a816c00e-0158-79c7-7915-ffff8eac6c89 on database directory /Users/brian/workspace/vars/vars-standalone/target/vars-standalone-8.2-SNAPSHOT-scripting/database/VARS with class loader sun.misc.Launcher$AppClassLoader@4554617c 
 ----------------------------------------------------------------
