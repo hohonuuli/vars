@@ -93,20 +93,15 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
             mediaList = new JList();
             mediaList.setModel(new ListListModel(new Vector()));
             mediaList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            mediaList.addListSelectionListener(new ListSelectionListener() {
+            mediaList.addListSelectionListener(e -> {
+                final Media media = (Media) mediaList.getSelectedValue();
 
-                public void valueChanged(final ListSelectionEvent e) {
-                    final Media media = (Media) mediaList.getSelectedValue();
+                // Set the view to the selected media
+                getMediaViewPanel().setMedia(media);
 
-                    // Set the view to the selected media
-                    getMediaViewPanel().setMedia(media);
-
-                    boolean enable = !isLocked() && (media != null);
-                    getButtonPanel().getDeleteButton().setEnabled(enable);
-                    getButtonPanel().getUpdateButton().setEnabled(enable);
-                }
-
-
+                boolean enable = !isLocked() && (media != null);
+                getButtonPanel().getDeleteButton().setEnabled(enable);
+                getButtonPanel().getUpdateButton().setEnabled(enable);
             });
             mediaList.setCellRenderer(new MediaListCellRenderer());
 
