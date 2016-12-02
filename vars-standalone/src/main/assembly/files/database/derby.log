@@ -1,11 +1,11 @@
-Fri Nov 18 15:31:05 PST 2016 : Apache Derby Network Server - 10.12.1.1 - (1704137) started and ready to accept connections on port 1527
+Thu Dec 01 17:20:49 PST 2016 : Apache Derby Network Server - 10.12.1.1 - (1704137) started and ready to accept connections on port 1527
 ----------------------------------------------------------------
-Fri Nov 18 15:31:15 PST 2016:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.12.1.1 - (1704137): instance a816c00e-0158-79c7-7915-ffff8eac6c89 
+Thu Dec 01 17:21:15 PST 2016:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.12.1.1 - (1704137): instance a816c00e-0158-bd1e-8625-ffff8eac6c89 
 on database directory /Users/brian/workspace/vars/vars-standalone/target/vars-standalone-8.2-SNAPSHOT-scripting/database/VARS with class loader sun.misc.Launcher$AppClassLoader@4554617c 
 Loaded from file:/Users/brian/workspace/vars/vars-standalone/target/vars-standalone-8.2-SNAPSHOT-scripting/lib/derby-10.12.1.1.jar
 java.vendor=Oracle Corporation
-java.runtime.version=1.8.0_112-b16
+java.runtime.version=1.8.0_111-b14
 user.dir=/Users/brian/workspace/vars/vars-standalone/target/vars-standalone-8.2-SNAPSHOT-scripting/bin
 os.name=Mac OS X
 os.arch=x86_64
@@ -13,8 +13,8 @@ os.version=10.12.1
 derby.system.home=./../database
 Database Class Loader started - derby.database.classpath=''
 ----------------------------------------------------------------
-Fri Nov 18 15:34:56 PST 2016: Shutting down Derby engine
+Thu Dec 01 19:45:02 PST 2016: Shutting down Derby engine
 ----------------------------------------------------------------
-Fri Nov 18 15:34:56 PST 2016:
-Shutting down instance a816c00e-0158-79c7-7915-ffff8eac6c89 on database directory /Users/brian/workspace/vars/vars-standalone/target/vars-standalone-8.2-SNAPSHOT-scripting/database/VARS with class loader sun.misc.Launcher$AppClassLoader@4554617c 
+Thu Dec 01 19:45:02 PST 2016:
+Shutting down instance a816c00e-0158-bd1e-8625-ffff8eac6c89 on database directory /Users/brian/workspace/vars/vars-standalone/target/vars-standalone-8.2-SNAPSHOT-scripting/database/VARS with class loader sun.misc.Launcher$AppClassLoader@4554617c 
 ----------------------------------------------------------------

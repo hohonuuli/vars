@@ -18,22 +18,8 @@ package vars.annotation.jpa;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Date;
-import javax.persistence.Cacheable;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.TableGenerator;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Version;
+import javax.persistence.*;
+
 import vars.annotation.CameraData;
 import vars.annotation.VideoFrame;
 import vars.jpa.JPAEntity;
@@ -45,7 +31,9 @@ import vars.jpa.TransactionLogger;
  */
 
 @Entity(name = "CameraData")
-@Table(name = "CameraData")
+@Table(name = "CameraData",
+        indexes = {@Index(name = "idx_CameraData_FK1", columnList = "ObservationID_FK"),
+                @Index(name = "idx_CameraData_LUT", columnList = "LAST_UPDATED_TIME")})
 @Cacheable(false)
 @EntityListeners({ TransactionLogger.class, KeyNullifier.class })
 @NamedQueries( {

@@ -24,6 +24,7 @@ import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
@@ -45,7 +46,9 @@ import vars.knowledgebase.Media;
  * To change this template use File | Settings | File Templates.
  */
 @Entity(name = "Media")
-@Table(name = "Media")
+@Table(name = "Media",
+        indexes = {@Index(name = "idx_Media_FK1", columnList = "ConceptDelegateID_FK"),
+                @Index(name = "idx_Media_LUT", columnList = "LAST_UPDATED_TIME")})
 @EntityListeners({ TransactionLogger.class, KeyNullifier.class })
 @NamedQueries( {
     @NamedQuery(name = "Media.findById", query = "SELECT v FROM Media v WHERE v.id = :id") ,

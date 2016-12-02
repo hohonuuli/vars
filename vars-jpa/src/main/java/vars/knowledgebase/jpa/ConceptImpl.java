@@ -29,6 +29,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
@@ -52,7 +53,9 @@ import vars.knowledgebase.ConceptNameTypes;
  * @author brian
  */
 @Entity(name = "Concept")
-@Table(name = "Concept")
+@Table(name = "Concept",
+    indexes = {@Index(name = "idx_Concept_FK1", columnList = "ParentConceptID_FK"),
+               @Index(name = "idx_Concept_LUT", columnList = "LAST_UPDATED_TIME")})
 @EntityListeners({ TransactionLogger.class, KeyNullifier.class})
 @NamedQueries( {
     @NamedQuery(name = "Concept.findById", query = "SELECT v FROM Concept v WHERE v.id = :id") ,
@@ -68,7 +71,9 @@ import vars.knowledgebase.ConceptNameTypes;
     @NamedQuery(name = "Concept.findRoot", query = "SELECT c FROM Concept c WHERE c.parentConcept IS NULL") ,
     @NamedQuery(name = "Concept.findAll", query = "SELECT c FROM Concept c"),
     @NamedQuery(name = "Concept.findByName", query = "SELECT c FROM Concept c, IN (c.conceptNames) AS n WHERE n.name = :name"),
-    @NamedQuery(name = "Concept.findAllByNameGlob", query = "SELECT DISTINCT c FROM Concept c, IN (c.conceptNames) AS n WHERE lower(n.name) LIKE :name ORDER BY n.name")
+    @NamedQuery(name = "Concept.findAllByNameGlob", query = "SELECT DISTINCT c FROM Concept c, IN (c.conceptNames) AS n WHERE lower(n.name) LIKE :name ORDER BY n.name"),
+    @NamedQuery(name = "Concept.eagerFindById", query = "SELECT c FROM Concept c JOIN FETCH c.conceptMetadata m WHERE c.id = :id")
+
 })
 public class ConceptImpl implements Serializable, Concept, JPAEntity {
 	
@@ -80,7 +85,7 @@ public class ConceptImpl implements Serializable, Concept, JPAEntity {
         fetch = FetchType.LAZY,
         cascade = { CascadeType.ALL }
     )
-    private List<Concept> childConcepts;
+    private List<ConceptImpl> childConcepts;
 
     @OneToOne(
         mappedBy = "concept",
@@ -88,7 +93,7 @@ public class ConceptImpl implements Serializable, Concept, JPAEntity {
         cascade = { CascadeType.ALL },
         targetEntity = ConceptMetadataImpl.class
     )
-    private ConceptMetadata conceptMetadata;
+    private ConceptMetadataImpl conceptMetadata;
 
     @OneToMany(
         targetEntity = ConceptNameImpl.class,
@@ -96,7 +101,7 @@ public class ConceptImpl implements Serializable, Concept, JPAEntity {
         fetch = FetchType.EAGER,
         cascade = { CascadeType.ALL }
     )
-    private Set<ConceptName> conceptNames;
+    private Set<ConceptNameImpl> conceptNames;
 
     @Id
     @Column(
@@ -179,10 +184,10 @@ public class ConceptImpl implements Serializable, Concept, JPAEntity {
 
     public List<Concept> getChildConcepts() {
         if (childConcepts == null) {
-            childConcepts = new ArrayList <Concept>();
+            childConcepts = new ArrayList <>();
         }
 
-        return childConcepts;
+        return (List<Concept>) (List<?>) childConcepts;
     }
 
     public ConceptMetadata getConceptMetadata() {
@@ -190,6 +195,7 @@ public class ConceptImpl implements Serializable, Concept, JPAEntity {
             conceptMetadata = new ConceptMetadataImpl();
             ((ConceptMetadataImpl) conceptMetadata).setConcept(this);
         }
+
 
         return conceptMetadata;
     }
@@ -200,9 +206,9 @@ public class ConceptImpl implements Serializable, Concept, JPAEntity {
      * 
      * @param conceptMetadata
      */
-    protected void setConceptMetadata(ConceptMetadata conceptMetadata) {
+    public void setConceptMetadata(ConceptMetadata conceptMetadata) {
         ((ConceptMetadataImpl) getConceptMetadata()).setConcept(null);
-        this.conceptMetadata = conceptMetadata;
+        this.conceptMetadata = (ConceptMetadataImpl) conceptMetadata;
         ((ConceptMetadataImpl) conceptMetadata).setConcept(this);
     }
 
@@ -223,10 +229,10 @@ public class ConceptImpl implements Serializable, Concept, JPAEntity {
 
     public Set<ConceptName> getConceptNames() {
         if (conceptNames == null) {
-            conceptNames = new HashSet<ConceptName>();
+            conceptNames = new HashSet<>();
         }
 
-        return conceptNames;
+        return (Set<ConceptName>) (Set<?>) conceptNames;
     }
 
     public Long getId() {

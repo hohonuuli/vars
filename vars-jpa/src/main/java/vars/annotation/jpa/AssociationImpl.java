@@ -18,21 +18,8 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
 import java.sql.Timestamp;
-import javax.persistence.Cacheable;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
-import javax.persistence.TableGenerator;
-import javax.persistence.Transient;
-import javax.persistence.Version;
+import javax.persistence.*;
+
 import vars.LinkUtilities;
 import vars.annotation.Association;
 import vars.annotation.Observation;
@@ -47,7 +34,9 @@ import vars.jpa.TransactionLogger;
  * @author         Brian Schlining [brian@mbari.org]
  */
 @Entity(name = "Association")
-@Table(name = "Association")
+@Table(name = "Association",
+    indexes = {@Index(name = "idx_Association_FK1", columnList = "ObservationID_FK"),
+               @Index(name = "idx_Association_LUT", columnList = "LAST_UPDATED_TIME")})
 @Cacheable(false)
 @EntityListeners({ TransactionLogger.class, KeyNullifier.class })
 @NamedQueries( {

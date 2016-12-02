@@ -16,25 +16,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import javax.persistence.Cacheable;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
-import javax.persistence.Table;
-import javax.persistence.TableGenerator;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Transient;
-import javax.persistence.Version;
+import javax.persistence.*;
+
 import vars.VideoMomentByTimecodeComparator;
 import vars.annotation.CameraDeployment;
 import vars.annotation.VideoArchive;
@@ -50,7 +33,8 @@ import vars.jpa.TransactionLogger;
  */
 
 @Entity(name = "VideoArchiveSet")
-@Table(name = "VideoArchiveSet")
+@Table(name = "VideoArchiveSet",
+        indexes = {@Index(name = "idx_VideoArchiveSet_LUT", columnList = "LAST_UPDATED_TIME")})
 @Cacheable(true)
 @EntityListeners( {TransactionLogger.class, KeyNullifier.class} )
 @NamedQueries( {
