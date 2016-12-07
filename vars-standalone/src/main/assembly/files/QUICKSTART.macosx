@@ -44,7 +44,10 @@ account. Otherwise you can skip this step. To create a user account:
 Step 7:
     To start the Annotation application, in the terminal type: ./annotation
 
-Step 5:
+    If you are using the Sharktopoda video player, launch it.
+
+
+Step 8:
     To start the Query application, in the terminal type: ./query
 
 Cleaning up:

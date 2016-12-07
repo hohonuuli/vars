@@ -100,19 +100,19 @@ public class QueryResultsTable extends JTable {
                     Object value = getValueAt(row, col);
                     if (value != null) {
                         String stringValue = value.toString();
-                        if (stringValue.toLowerCase().startsWith("http")) {
+                        if (stringValue.toLowerCase().startsWith("http") ||
+                                stringValue.toLowerCase().startsWith("file")) {
                             URL url = null;
                             try {
                                 url = new URL(stringValue);
+                                JImageUrlFrame f = getImageFrame();
+                                f.setTitle(url.toExternalForm());
+                                f.setImageUrl(url);
+                                f.setVisible(true);
                             }
                             catch (MalformedURLException e1) {
                                 log.warn("The URL, " + url + ", is not valid. Unable to display it");
                             }
-
-                            JImageUrlFrame f = getImageFrame();
-                            f.setTitle(url.toExternalForm());
-                            f.setImageUrl(url);
-                            f.setVisible(true);
                         }
                     }
                 }

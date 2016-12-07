@@ -8,7 +8,8 @@ In order for VARS to run on your system you will need to install the following
 before installing VARS:
 
     1) Mac OS X 10.8 or later
-    2) Java Development Kit 8 (x64). 
+    2) Java Development Kit 8 (x64).
+    3) Sharktopoda (optional video player)
 
 Installation Instructions for Prerequisites
 
@@ -24,6 +25,15 @@ specify Java 8 by executing the following command in the terminal BEFORE
 starting the annotation application:
 
     export JAVA_HOME=`/usr/libexec/java_home -v 1.8`
+
+II) Installing Sharktopoda
+
+    Download Sharktopoda from https://github.com/underwatervideo/Sharktopoda
+
+    Drag Sharktopoda to /Applications
+
+    Launch Sharktopda. Open preferences. Next to 'on port' enter 8800 and check
+    the 'Run UDP Server' check box.
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -87,7 +87,7 @@ public class QueryResultsTableView {
 
         Function<String[], Void> showImageFn = rowItem -> {
             List<String> urls = Arrays.stream(rowItem)
-                    .filter(s -> s.startsWith("http"))
+                    .filter(s -> s.startsWith("http") || s.startsWith("file"))
                     .collect(Collectors.toList());
             if (!urls.isEmpty() && ext != null) {
                 final String imageLocation = urls.get(0);

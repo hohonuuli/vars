@@ -389,18 +389,16 @@ public class SharktopodaDialogUI extends StandardDialog implements VideoPlayerDi
         if (openExistingRB == null) {
             openExistingRB = new JRadioButton("Open Existing");
             openExistingRB.addItemListener(rbItemListener);
-            openExistingRB.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    if (loadExistingNames) {
-                        JComboBox comboBox = getExistingNamesComboBox();
-                        WaitIndicator waitIndicator = new SpinningDialWaitIndicator(comboBox);
-                        java.util.List<String> names = toolBelt.getAnnotationPersistenceService().findAllVideoArchiveNames();
-                        String[] van = new String[names.size()];
-                        names.toArray(van);
-                        comboBox.setModel(new DefaultComboBoxModel(van));
-                        waitIndicator.dispose();
-                        loadExistingNames = false;
-                    }
+            openExistingRB.addActionListener(e -> {
+                if (loadExistingNames) {
+                    JComboBox comboBox = getExistingNamesComboBox();
+                    WaitIndicator waitIndicator = new SpinningDialWaitIndicator(comboBox);
+                    List<String> names = toolBelt.getAnnotationPersistenceService().findAllVideoArchiveNames();
+                    String[] van = new String[names.size()];
+                    names.toArray(van);
+                    comboBox.setModel(new DefaultComboBoxModel(van));
+                    waitIndicator.dispose();
+                    loadExistingNames = true;
                 }
             });
         }

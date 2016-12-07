@@ -41,6 +41,10 @@ http://groups.google.com/group/mbari-vars for assistance.
 For installation instructions refer to the INSTALL.macosx and INSTALL.windows 
 files. You will need to follow these instructions before you can run VARS.
 
+VARS has a built in video player that works with h264/mp4 files. For better
+performance, it is recommended you also download the Sharktopoda video player
+from https://github.com/underwatervideo/Sharktopoda
+
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~  Running VARS
@@ -54,8 +58,10 @@ refer to QUICKSTART.macosx
 ~~ Deploying VARS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Fresh out of the box, VARS is configured as a demonstration application. Here
-are a few configuration tips to help set VARS up for your use.
+Fresh out of the box, VARS is configured as a demostration application. If you
+intend to use VARS on a single machine only, this setup will work fine.
+
+Here are a few configuration tips to help set VARS up for your use.
  
 I. Customizing the Camera-platforms
 

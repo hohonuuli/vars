@@ -20,12 +20,7 @@ import vars.queryfx.ui.AbstractValuePanel;
 import vars.queryfx.ui.ValuePanelFactory;
 import vars.queryfx.ui.db.IConstraint;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -53,7 +48,7 @@ public class AdvancedSearchWorkbench extends WorkbenchView {
         scrollPane.setContent(formLayout);
         scrollPane.setFitToWidth(true);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         setCenterNode(scrollPane);
     }
 
@@ -108,11 +103,13 @@ public class AdvancedSearchWorkbench extends WorkbenchView {
         Set<String> groupNames = groups.keySet();
         for (String name : groupNames) {
             formLayout.addHeader(name);
-            List<String> columns = groupsConfig.getStringList(name);
+            List<String> columns = groupsConfig.getStringList(name)
+                    .stream()
+                    .map(String::toUpperCase)
+                    .collect(Collectors.toList());
             List<AbstractValuePanel> matchingVps = vps.stream()
-                    .filter(vp -> columns.contains(vp.getValueName()))
-                    .sorted((vp1, vp2) ->
-                            vp1.getValueName().toUpperCase().compareTo(vp2.getValueName().toUpperCase()))
+                    .filter(vp -> columns.contains(vp.getValueName().toUpperCase()))
+                    .sorted(Comparator.comparing(vp1 -> vp1.getValueName().toUpperCase()))
                     .collect(Collectors.toList());
 
             matchingVps.stream().forEach(vp ->

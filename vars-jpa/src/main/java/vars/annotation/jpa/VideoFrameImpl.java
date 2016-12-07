@@ -54,7 +54,6 @@ public class VideoFrameImpl implements Serializable, VideoFrame, JPAEntity {
 
     @Column(
         name = "HDTimeCode",
-        nullable = false,
         length = 11
     )
     String alternateTimecode;
