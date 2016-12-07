@@ -79,7 +79,7 @@ public class UserAccountImpl implements Serializable, UserAccount, JPAEntity {
         table = "UniqueID",
         pkColumnName = "TableName",
         valueColumnName = "NextID",
-        pkColumnValue = "UserName",
+        pkColumnValue = "UserAccount",
         allocationSize = 1
     )
     Long id;
