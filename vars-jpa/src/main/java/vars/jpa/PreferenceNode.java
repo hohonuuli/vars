@@ -16,24 +16,16 @@
 package vars.jpa;
 
 import java.io.Serializable;
-import javax.persistence.AttributeOverride;
-import javax.persistence.AttributeOverrides;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 
 /**
  *
  * @author brian
  */
 @Entity(name = "PreferenceNode")
-@Table(name = "Prefs")
+@Table(name = "Prefs",
+    indexes = {@Index(name = "idx_Prefs_nodename", columnList = "NodeName"),
+               @Index(name = "idx_Prefs_prefkey", columnList = "PrefKey")})
 @IdClass(PreferenceNodeCompositeKey.class)
 @EntityListeners({ TransactionLogger.class })
 @NamedQueries({ @NamedQuery(name = "PreferenceNode.findAllLikeNodeName",
