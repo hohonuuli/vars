@@ -220,13 +220,7 @@ public class MergeEXPDAnnotations2 implements MergeFunction<Map<VideoFrame, Uber
         if (uberData.size() == 0) {
             NavigationDatumDAO navigationDatumDAO = daoFactory.newNavigationDatumDAO();
             List<NavigationDatum> navigationData = navigationDatumDAO.fetchBestNavigationData(dive);
-            uberData.addAll(Collections2.transform(navigationData, new Function<NavigationDatum, UberDatum>() {
-
-                public UberDatum apply(NavigationDatum from) {
-                    return new UberDatumImpl(null, from, null);
-                }
-
-            }));
+            uberData.addAll(Collections2.transform(navigationData, nav -> new UberDatumImpl(null, nav, null)));
         }
 
         return uberData;
