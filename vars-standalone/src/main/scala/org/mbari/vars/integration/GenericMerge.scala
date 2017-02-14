@@ -4,14 +4,16 @@ import java.io.File
 import java.net.URL
 import java.text.SimpleDateFormat
 import java.time.Instant
-import java.util.{TimeZone, Date}
+import java.util.{Date, TimeZone}
 
 import org.mbari.math.FastCollator
 import org.slf4j.LoggerFactory
 import vars.ToolBox
-import vars.annotation.{VideoFrame, AnnotationDAOFactory}
+import vars.annotation.{AnnotationDAOFactory, VideoFrame}
+
 import scala.collection.JavaConverters._
 import scala.util.Try
+import scala.util.control.NonFatal
 
 /**
  * Merge a text file with annotations by date.
@@ -115,7 +117,6 @@ class GenericMerge(val url: URL, val delimiter: String = ",") {
     * @return
     */
   private def parseDate(s: String): Date =  Try(Date.from(Instant.parse(s))).getOrElse(dateParser.parse(s))
-
 
   /**
    *
@@ -231,7 +232,7 @@ object GenericMerge {
 
     // --- Run Merge
     val gm = new GenericMerge(url)
-    gm(videoArchiveName, deltaSeconds)
+    gm(videoArchiveName, deltaSeconds, resetNulls)
   }
 }
 
