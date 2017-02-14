@@ -33,6 +33,7 @@ later). If you have significant data from a pre-6.0 VARS installation, it is
 possbible to migrate the older database to work with VARS 8.x. Contact 
 http://groups.google.com/group/mbari-vars for assistance.
 
+This release includes support for the Sharktopoda video player on Mac OS X.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~  Installing VARS
@@ -41,8 +42,8 @@ http://groups.google.com/group/mbari-vars for assistance.
 For installation instructions refer to the INSTALL.macosx and INSTALL.windows 
 files. You will need to follow these instructions before you can run VARS.
 
-VARS has a built in video player that works with h264/mp4 files. For better
-performance, it is recommended you also download the Sharktopoda video player
+VARS has a built in video player that works with h264/mp4 files. If you are 
+using macOS, it is recommended you also download the Sharktopoda video player
 from https://github.com/underwatervideo/Sharktopoda
 
 
