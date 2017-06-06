@@ -9,9 +9,17 @@ package vars.annotation;
  */
 public enum CameraDirections {
 
-    ASCEND("ascend"), CRUISE("cruise"), DESCEND("descend"), DIELTRANSECT("diel transect"),
-    ENDTRANSECT("endtransect"), LAUNCH("launch"), STARTTRANSECT("starttransect"),
-    STATIONARY("stationary"), TRANSECT("transect"), OFFTRANSECT("off transect"),
+    ASCEND("ascend"),
+    CRUISE("cruise"),
+    DESCEND("descend"),
+    DIELTRANSECT("diel transect"),
+    ENDTRANSECT("endtransect"),
+    LAUNCH("launch"),
+    POSSIBLEDUPLICATE("possible duplicate"),
+    STARTTRANSECT("starttransect"),
+    STATIONARY("stationary"),
+    TRANSECT("transect"),
+    OFFTRANSECT("off transect"),
     UNSPECIFIED("unspecified");
 
     private final String direction;
