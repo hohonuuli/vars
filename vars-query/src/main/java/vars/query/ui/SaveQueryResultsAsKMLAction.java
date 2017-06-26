@@ -208,20 +208,30 @@ public class SaveQueryResultsAsKMLAction extends ActionAdapter {
                 sb.append("      <styleUrl>").append(styleUrl).append("</styleUrl>\n");
 
                 // WRITE POSITION
-                Number latitude = latitudes.get(i);
-                Number longitude = longitudes.get(i);
-                Number depth = (depths == null || depths.get(i) == null) ? 0 : -depths.get(i).floatValue();
-                if ((latitude != null) && (longitude != null)) {
-                    sb.append("      <Point><altitudeMode>absolute</altitudeMode><coordinates>").append(longitude).append(",");
-                    sb.append(latitude).append(",").append(depth).append("</coordinates></Point>\n");
+                try {
+                    Number latitude = latitudes.get(i);
+                    Number longitude = longitudes.get(i);
+                    Number depth = (depths == null || depths.get(i) == null) ? 0 : -depths.get(i).floatValue();
+                    if ((latitude != null) && (longitude != null)) {
+                        sb.append("      <Point><altitudeMode>absolute</altitudeMode><coordinates>").append(longitude).append(",");
+                        sb.append(latitude).append(",").append(depth).append("</coordinates></Point>\n");
+                    }
+                }
+                catch (Exception e) {
+                    log.warn("Failed to extract position from ResultSet", e);
                 }
 
                 // Add TimeStamp
-                Date recordedDate = recordedDates.get(i);
-                if (recordedDate != null) {
-                    sb.append("      <TimeStamp>");
-                    sb.append("<when>").append(dateFormatISO.format(recordedDate)).append("</when>");
-                    sb.append("</TimeStamp>\n");
+                try {
+                    Date recordedDate = recordedDates.get(i);
+                    if (recordedDate != null) {
+                        sb.append("      <TimeStamp>");
+                        sb.append("<when>").append(dateFormatISO.format(recordedDate)).append("</when>");
+                        sb.append("</TimeStamp>\n");
+                    }
+                }
+                catch (Exception e) {
+                    log.warn("Failed to extract recorded date from ResultSet", e);
                 }
 
                 sb.append("    </Placemark>\n");    // END PLACEMARK
