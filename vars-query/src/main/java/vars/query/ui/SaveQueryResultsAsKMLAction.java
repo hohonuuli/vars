@@ -121,12 +121,7 @@ public class SaveQueryResultsAsKMLAction extends ActionAdapter {
             out.write("    </StyleMap>\n");
 
             // Write Placemarks
-            try {
-                queryResultsToPlacemarks(out);
-            }
-            catch (Exception e) {
-                e.printStackTrace();
-            }
+            queryResultsToPlacemarks(out);
 
             // Write footer
             out.write("  </Document>\n");
