@@ -17,7 +17,7 @@ public class SnailButton extends QuickConceptButton {
 
     @Inject
     public SnailButton(ToolBelt toolBelt) {
-        super("Snail", "/images/simple/snail.jpg", toolBelt);
+        super("snail", "/images/simple/snail.jpg", toolBelt);
     }
     
 }

@@ -17,7 +17,7 @@ public class FlatFishButton extends QuickConceptButton {
 
     @Inject
     public FlatFishButton(ToolBelt toolBelt) {
-        super("Flatfish", "/images/simple/flatfish.jpg", toolBelt);
+        super("flatfish", "/images/simple/flatfish.jpg", toolBelt);
     }
     
 }

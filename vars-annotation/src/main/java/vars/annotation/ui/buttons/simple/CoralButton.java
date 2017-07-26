@@ -17,7 +17,7 @@ public class CoralButton extends QuickConceptButton {
 
     @Inject
     public CoralButton(ToolBelt toolBelt) {
-        super("Soft Coral", "/images/simple/coral.jpg", toolBelt);
+        super("soft coral", "/images/simple/coral.jpg", toolBelt);
     }
     
 }

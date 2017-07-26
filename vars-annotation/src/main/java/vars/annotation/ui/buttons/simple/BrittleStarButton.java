@@ -17,7 +17,7 @@ public class BrittleStarButton extends QuickConceptButton {
 
     @Inject
     public BrittleStarButton(ToolBelt toolBelt) {
-        super("Brittlestar", "/images/simple/Brittlestar.jpg", toolBelt);
+        super("brittlestar", "/images/simple/brittlestar.png", toolBelt);
     }
     
     
