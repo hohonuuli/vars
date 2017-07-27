@@ -17,7 +17,7 @@ public class SeaLilyButton extends QuickConceptButton {
 
     @Inject
     public SeaLilyButton(ToolBelt toolBelt) {
-        super("Sea Lily", "/images/simple/sea_lily.jpg", toolBelt);
+        super("sea lily", "/images/simple/sea_lily.jpg", toolBelt);
     }
     
 }
