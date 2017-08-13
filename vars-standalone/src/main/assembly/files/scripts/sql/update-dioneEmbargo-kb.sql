@@ -242,65 +242,6 @@ DEALLOCATE MyCursor
 
 GO
 
--- Erenna sp. A --------------------------------------------------
-DECLARE @conceptId bigint
-
-DECLARE MyCursor CURSOR FOR
-  SELECT ConceptID_FK FROM ConceptName WHERE ConceptName = 'Erenna sp. A'
-
-OPEN MyCursor
-FETCH NEXT FROM MyCursor into @conceptId
-WHILE @@FETCH_STATUS = 0
-  BEGIN
-    PRINT @conceptId
-    FETCH NEXT FROM MyCursor INTO @conceptId
-
-    -- Drop ConceptNames first
-    DELETE FROM ConceptName WHERE id IN (SELECT cn.id FROM Concept AS c LEFT JOIN
-      ConceptName AS cn ON cn.ConceptID_FK = c.id WHERE c.ParentConceptID_FK = @conceptId)
-
-    -- Drop Concepts
-    DELETE FROM Concept WHERE ParentConceptID_FK = @conceptId
-
-    DELETE FROM ConceptName WHERE ConceptID_FK =@conceptId
-
-    DELETE FROM Concept WHERE id = @conceptId
-
-  END
-CLOSE MyCursor
-DEALLOCATE MyCursor
-
-GO
-
--- Erenna sp. B --------------------------------------------------
-DECLARE @conceptId bigint
-
-DECLARE MyCursor CURSOR FOR
-  SELECT ConceptID_FK FROM ConceptName WHERE ConceptName = 'Erenna sp. B'
-
-OPEN MyCursor
-FETCH NEXT FROM MyCursor into @conceptId
-WHILE @@FETCH_STATUS = 0
-  BEGIN
-    PRINT @conceptId
-    FETCH NEXT FROM MyCursor INTO @conceptId
-
-    -- Drop ConceptNames first
-    DELETE FROM ConceptName WHERE id IN (SELECT cn.id FROM Concept AS c LEFT JOIN
-      ConceptName AS cn ON cn.ConceptID_FK = c.id WHERE c.ParentConceptID_FK = @conceptId)
-
-    -- Drop Concepts
-    DELETE FROM Concept WHERE ParentConceptID_FK = @conceptId
-
-    DELETE FROM ConceptName WHERE ConceptID_FK =@conceptId
-
-    DELETE FROM Concept WHERE id = @conceptId
-
-  END
-CLOSE MyCursor
-DEALLOCATE MyCursor
-
-GO
 
 -- Physonectae sp. 1 --------------------------------------------------
 DECLARE @conceptId bigint
@@ -349,9 +290,6 @@ WHERE
       ConceptDelegate AS cd  ON cd.ConceptID_FK = C.id
     WHERE
       cn.ConceptName IN (
-        'Xenoturbellida', 
-        'Xenoturbellidae',
-        'Xenoturbella',  
         'Lyroctenidae',
         'Mertensia', 
         'Platyctenida',
@@ -388,10 +326,7 @@ WHERE
       Concept AS C ON C.id = cn.ConceptID_FK RIGHT JOIN
       ConceptDelegate AS cd  ON cd.ConceptID_FK = C.id
     WHERE
-      cn.ConceptName IN (
-        'Xenoturbellida', 
-        'Xenoturbellidae',
-        'Xenoturbella',  
+      cn.ConceptName IN ( 
         'Lyroctenidae',
         'Mertensia', 
         'Platyctenida',
