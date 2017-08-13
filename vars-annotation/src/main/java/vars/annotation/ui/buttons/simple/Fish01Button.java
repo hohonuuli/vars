@@ -17,7 +17,7 @@ public class Fish01Button extends QuickConceptButton {
 
     @Inject
     public Fish01Button(ToolBelt toolBelt) {
-        super("Fish", "/images/simple/fish.jpg", toolBelt);
+        super("ray finned fish", "/images/simple/fish.png", toolBelt);
     }
     
 }

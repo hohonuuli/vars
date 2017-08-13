@@ -17,7 +17,7 @@ public class OctopusButton extends QuickConceptButton {
 
     @Inject
     public OctopusButton(ToolBelt toolBelt) {
-        super("Octopus", "/images/simple/octopus.jpg", toolBelt);
+        super("Octopus", "/images/simple/octopus.png", toolBelt);
     }
     
 }

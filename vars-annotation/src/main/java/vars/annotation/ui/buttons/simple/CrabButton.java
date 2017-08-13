@@ -17,7 +17,7 @@ public class CrabButton extends QuickConceptButton {
 
     @Inject
     public CrabButton(ToolBelt toolBelt) {
-        super("Crab", "/images/simple/crab.jpg", toolBelt);
+        super("crab", "/images/simple/crab.png", toolBelt);
     }
 
     

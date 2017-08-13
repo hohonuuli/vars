@@ -17,7 +17,7 @@ public class RockfishButton extends QuickConceptButton {
 
     @Inject
     public RockfishButton(ToolBelt toolBelt) {
-        super("Rockfish", "/images/simple/rockfish.jpg", toolBelt);
+        super("rockfish", "/images/simple/rockfish.jpg", toolBelt);
     }
     
 }

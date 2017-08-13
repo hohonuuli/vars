@@ -17,7 +17,7 @@ public class JellyButton extends QuickConceptButton {
 
     @Inject
     public JellyButton(ToolBelt toolBelt) {
-        super("Jelly", "/images/simple/jelly.jpg", toolBelt);
+        super("jellyfish", "/images/simple/jelly.jpg", toolBelt);
     }
     
 }

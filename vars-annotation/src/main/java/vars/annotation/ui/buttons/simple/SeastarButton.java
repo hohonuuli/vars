@@ -17,7 +17,7 @@ public class SeastarButton extends QuickConceptButton {
 
     @Inject
     public SeastarButton(ToolBelt toolBelt) {
-        super("Seastar", "/images/simple/seastar.jpg", toolBelt);
+        super("sea star", "/images/simple/sea_star.png", toolBelt);
     }
     
 }

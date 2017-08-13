@@ -17,7 +17,7 @@ public class SeapenButton extends QuickConceptButton {
 
     @Inject
     public SeapenButton(ToolBelt toolBelt) {
-        super("Seapen", "/images/simple/Seapen.jpg", toolBelt);
+        super("sea pen", "/images/simple/sea_pen.png", toolBelt);
     }
     
 }

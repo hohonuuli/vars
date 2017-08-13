@@ -17,7 +17,7 @@ public class TrapButton extends QuickConceptButton {
 
     @Inject
     public TrapButton(ToolBelt toolBelt) {
-        super("Trap", "/images/simple/trap.jpg", toolBelt);
+        super("trap", "/images/simple/trap.jpg", toolBelt);
     }
     
 }
