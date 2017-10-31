@@ -413,3 +413,4 @@ DELETE FROM
   LinkRealization
 WHERE
   LinkName = 'dsg-MBARI-new-species'
+GO
