@@ -407,3 +407,9 @@ DELETE FROM
 WHERE 
   LinkName = 'is-bioluminescent'
 GO
+
+-- Remove dsg-MBARI-new-species
+DELETE FROM
+  LinkRealization
+WHERE
+  LinkName = 'dsg-MBARI-new-species'
