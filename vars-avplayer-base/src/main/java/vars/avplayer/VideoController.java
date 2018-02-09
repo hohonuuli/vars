@@ -69,6 +69,4 @@ public class VideoController<S extends VideoState, E extends VideoError> extends
         imageCaptureService.dispose();
     }
 
-
-
 }
