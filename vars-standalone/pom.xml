@@ -4,7 +4,7 @@
     <parent>
         <artifactId>vars-redux</artifactId>
         <groupId>vars-redux</groupId>
-        <version>8.3.3</version>
+        <version>8.3.4-SNAPSHOT</version>
     </parent>
     <artifactId>vars-standalone</artifactId>
     <name>vars-standalone</name>
@@ -77,7 +77,7 @@
             scripts
         -->
         <dependency>
-            <groupId>org.apache.commons</groupId>
+            <groupId>org.apache.sanselan</groupId>
             <artifactId>sanselan</artifactId>
             <version>${sanselan.version}</version>
         </dependency>

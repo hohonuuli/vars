@@ -47,7 +47,8 @@ public class DemoApp {
             saveDirectory.mkdirs();
         }
         AVFImageCaptureServiceImpl imageCaptureService = new AVFImageCaptureServiceImpl();
-        imageCaptureService.startSessionWithNamedDevice("FaceTime HD Camera");
+        imageCaptureService.startSessionWithNamedDevice("Blackmagic DeckLink SDI");
+        //imageCaptureService.startSessionWithNamedDevice("FaceTime HD Camera");
         for (int i = 0; i < 5; i++) {
             File target = new File(saveDirectory, "snapshot" + i + ".png");
             Image image = imageCaptureService.capture(target);
@@ -58,6 +59,7 @@ public class DemoApp {
                 System.out.println("Wrote " + target.getAbsolutePath());
             }
         }
+        imageCaptureService.stopSession();
 
     }
 }

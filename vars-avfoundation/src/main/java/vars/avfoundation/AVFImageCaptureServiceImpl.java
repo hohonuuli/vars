@@ -200,6 +200,7 @@ public class AVFImageCaptureServiceImpl implements ImageCaptureService {
                     videoSource + "' is already opened");
         }
         else if (!videoSource.isEmpty()) {
+            System.out.println("Starting image capture service using " + videoSource);
             log.debug("Starting image capture service, {}, using {}", getClass().getName(), videoSource);
             startSessionWithNamedDevice(videoSource);
             isStarted = true;
