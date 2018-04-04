@@ -46,7 +46,7 @@ class DatabaseUtility {
     public final String jdbcPassword = "samp";
 
     /**  */
-    public final String jdbcUrl = "jdbc:jtds:sqlserver://solstice.shore.mbari.org:1433/MBARI_Samples";
+    public final String jdbcUrl = "jdbc:jtds:sqlserver://perseus.shore.mbari.org:1433/MBARI_Samples";
 
     /**  */
     public final String jdbcUsername = "samp";
