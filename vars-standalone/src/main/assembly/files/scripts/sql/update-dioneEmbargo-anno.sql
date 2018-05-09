@@ -153,6 +153,17 @@ WHERE
   
 GO
 
+-- Delete Station M pyrosome annotations -----------------------------
+DELETE FROM
+  Observation
+WHERE
+  ConceptName IN (
+    'Pyrosoma',
+    'Pyrosoma atlanticum'
+  )
+
+GO
+
 -- Remove Camera directions -------------------------------------------
 UPDATE
   CameraData
