@@ -56,7 +56,7 @@ object CanadianGridDistanceApp {
         .map(a => a -> Try(Measurement.fromLink(a)).toOption)
         .filter(p => p._2.isDefined)
         .map(p => p._1 -> p._2.get)
-
+ 
     for ((a, m) <- measurements) yield {
       val p0 = new Pixel(cameraView.camera, cameraView.imageWidth, cameraView.imageHeight, m.getX0, m.getY0)
       val p1 = new Pixel(cameraView.camera, cameraView.imageWidth, cameraView.imageHeight, m.getX1, m.getY1)
