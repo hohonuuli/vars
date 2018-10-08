@@ -67,14 +67,27 @@ class TripodLoader {
                 try {
                     def metadata = Sanselan.getMetadata(stream, "FOO")
                     creationDate = metadata.findEXIFValue(TiffConstants.EXIF_TAG_CREATE_DATE)
+
+                    if (creationDate == null) {
+                        // Hack for 'Unknown Tag (0x9003): '1998:02:08 20:00:00''
+                        // Found in film images that were scanned.
+                        dateTag = metadata.items.find { it.keyword.startsWith("Unknown Tag") }
+                        creationDate = dateTag?.text
+                    }
                 }
                 catch (Exception e) {
                     print(" [unable to read creation date] ")
                 }
+
                 stream.close()
                 def date = null
                 if (creationDate) {
-                    date = dateFormat.parse(creationDate.valueDescription[1..-2])
+                    try {
+                        date = dateFormat.parse(creationDate.valueDescription[1..-2])
+                    }
+                    catch (Exception e) {
+                        print(" [unable to parse '${createDate}' as creation date] ")
+                    }
                 }
                 def timecode = new Timecode(idx, 30)
                 VideoFrame videoFrame = videoArchive.findVideoFrameByTimeCode(timecode.toString())
