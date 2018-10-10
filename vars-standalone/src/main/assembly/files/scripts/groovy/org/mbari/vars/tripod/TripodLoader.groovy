@@ -1,6 +1,8 @@
 package org.mbari.vars.tripod
 
 import vars.ToolBox
+
+import java.nio.file.Paths
 import java.text.SimpleDateFormat
 import vars.annotation.ui.PersistenceController
 import org.ccil.cowan.tagsoup.Parser
@@ -22,11 +24,81 @@ class TripodLoader {
 
     def toolBox = new ToolBox()
     def dateFormat = new SimpleDateFormat('yyyy:MM:dd HH:mm:ss')
+    def compactDateFormat = new SimpleDateFormat('yyyyMMdd HHmmss')
     def timecodeFormat = new SimpleDateFormat("HH:mm:ss:'00'")
 
     TripodLoader() {
-        dateFormat.timeZone = TimeZone.getTimeZone('UTC')
-        timecodeFormat.timeZone = TimeZone.getTimeZone('UTC')
+        def timezone = TimeZone.getTimeZone('UTC')
+        dateFormat.timeZone = timezone
+        timecodeFormat.timeZone = timezone
+        compactDateFormat.timeZone = timezone
+    }
+
+    String timestampFromName(URL url) {
+        // Try and parse timestamp out of name
+        try {
+            def path = Paths.get(url.toExternalForm())
+                    .getFileName()
+                    .toString()
+            def parts = path.split("_")
+            def year = parts[-4][0..3]
+            def month = parts[-4][4..5]
+            def day = parts[-4][6..7]
+            def hour = parts[-3]
+            def minute = parts[-2]
+            def second = parts[-1][0..1]
+            return "${year}:${month}:${day} ${hour}:${minute}:${second}"
+        }
+        catch (Exception e) {
+            e.printStackTrace()
+            print(" [unable to parse creation date from filename] ")
+            return null
+        }
+    }
+
+    String timestampFromExif(URL url) {
+
+        def creationDate = null
+        def stream = url.openStream()
+        try {
+            def metadata = Sanselan.getMetadata(stream, "FOO")
+            def creationDateTag = metadata.findEXIFValue(TiffConstants.EXIF_TAG_CREATE_DATE)
+            if (creationDateTag != null) {
+                creationDate = creationDateTag.valueDescription[1..-2]
+            }
+            else {
+                def dateTag = metadata.items.find { it.keyword.startsWith("Unknown Tag") }
+                def dateString = dateTag?.text
+                if (dateString != null) {
+                    creationDate = dateString[1..-2]
+                }
+            }
+
+        }
+        catch (Exception e) {
+            e.printStackTrace()
+            print(" [unable to read creation date from EXIF] ")
+        }
+        stream.close()
+        return creationDate
+    }
+
+    Date extractCreateDate(URL url) {
+        def creationDate = timestampFromExif(url)
+        if (creationDate == null) {
+            creationDate = timestampFromName(url)
+        }
+
+        def date = null
+        if (creationDate != null) {
+            try {
+                date = dateFormat.parse(creationDate)
+            }
+            catch (Exception e) {
+                print(" [unable to parse '${creationDate}' as creation date] ")
+            }
+        }
+        return date
     }
 
     def load(URL remoteImageDirectory,
@@ -61,38 +133,7 @@ class TripodLoader {
                 }
                 print("Processing ${imageRef}")
                 def url = new URL(imageRef)
-                def stream = url.openStream()
-                def creationDate = null
-                try {
-                    def metadata = Sanselan.getMetadata(stream, "FOO")
-                    def creationDateTag = metadata.findEXIFValue(TiffConstants.EXIF_TAG_CREATE_DATE)
-                    if (creationDateTag != null) {
-                        creationDate = creationDateTag.valueDescription[1..-2]
-                    }
-                    else {
-                        def dateTag = metadata.items.find { it.keyword.startsWith("Unknown Tag") }
-                        def dateString = dateTag?.text
-                        if (dateString != null) {
-                            creationDate = dateString[1..-2]
-                        }
-                    }
-
-                }
-                catch (Exception e) {
-                    e.printStackTrace()
-                    print(" [unable to read creation date] ")
-                }
-
-                stream.close()
-                def date = null
-                if (creationDate != null) {
-                    try {
-                        date = dateFormat.parse(creationDate)
-                    }
-                    catch (Exception e) {
-                        print(" [unable to parse '${creationDate}' as creation date] ")
-                    }
-                }
+                def date = extractCreateDate(url)
                 def timecode = new Timecode(idx, 30)
                 VideoFrame videoFrame = videoArchive.findVideoFrameByTimeCode(timecode.toString())
                 if (videoFrame == null) {
