@@ -11,7 +11,6 @@ import vars.annotation.CameraData
 import vars.annotation.PhysicalData
 import vars.annotation.VideoArchive
 import vars.annotation.Observation
-import vars.knowledgebase.ConceptName
 import org.mbari.movie.Timecode
 
 /**
@@ -25,7 +24,7 @@ class TripodLoader {
     def dateFormat = new SimpleDateFormat('yyyy:MM:dd HH:mm:ss')
     def timecodeFormat = new SimpleDateFormat("HH:mm:ss:'00'")
 
-    def TripodLoader() {
+    TripodLoader() {
         dateFormat.timeZone = TimeZone.getTimeZone('UTC')
         timecodeFormat.timeZone = TimeZone.getTimeZone('UTC')
     }
@@ -66,27 +65,32 @@ class TripodLoader {
                 def creationDate = null
                 try {
                     def metadata = Sanselan.getMetadata(stream, "FOO")
-                    creationDate = metadata.findEXIFValue(TiffConstants.EXIF_TAG_CREATE_DATE)
-
-                    if (creationDate == null) {
-                        // Hack for 'Unknown Tag (0x9003): '1998:02:08 20:00:00''
-                        // Found in film images that were scanned.
-                        dateTag = metadata.items.find { it.keyword.startsWith("Unknown Tag") }
-                        creationDate = dateTag?.text
+                    def creationDateTag = metadata.findEXIFValue(TiffConstants.EXIF_TAG_CREATE_DATE)
+                    if (creationDateTag != null) {
+                        creationDate = creationDateTag.valueDescription[1..-2]
                     }
+                    else {
+                        def dateTag = metadata.items.find { it.keyword.startsWith("Unknown Tag") }
+                        def dateString = dateTag?.text
+                        if (dateString != null) {
+                            creationDate = dateString[1..-2]
+                        }
+                    }
+
                 }
                 catch (Exception e) {
+                    e.printStackTrace()
                     print(" [unable to read creation date] ")
                 }
 
                 stream.close()
                 def date = null
-                if (creationDate) {
+                if (creationDate != null) {
                     try {
-                        date = dateFormat.parse(creationDate.valueDescription[1..-2])
+                        date = dateFormat.parse(creationDate)
                     }
                     catch (Exception e) {
-                        print(" [unable to parse '${createDate}' as creation date] ")
+                        print(" [unable to parse '${creationDate}' as creation date] ")
                     }
                 }
                 def timecode = new Timecode(idx, 30)
