@@ -84,9 +84,9 @@ class TripodLoader {
     }
 
     Date extractCreateDate(URL url) {
-        def creationDate = timestampFromExif(url)
+        def creationDate = timestampFromName(url)
         if (creationDate == null) {
-            creationDate = timestampFromName(url)
+            creationDate = timestampFromExif(url)
         }
 
         def date = null
