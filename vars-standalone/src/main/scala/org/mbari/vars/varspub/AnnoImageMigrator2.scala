@@ -51,10 +51,10 @@ class AnnoImageMigrator2(target: Path,
   private[this] val yearFormat = new SimpleDateFormat("yyyy")
   private[this] val overlayImage = ImageIO.read(overlayImageURL)
 
-  private[this] val internalConnection = DriverManager.getConnection("jdbc:jtds:sqlserver://equinox.shore.mbari.org:1433/VARS",
+  private[this] val internalConnection = DriverManager.getConnection("jdbc:jtds:sqlserver://perseus.shore.mbari.org:1433/VARS",
     "everyone", "guest")
 
-  private[this] val externalConnection = DriverManager.getConnection("jdbc:jtds:sqlserver://dione.mbari.org:51001/VARS",
+  private[this] val externalConnection = DriverManager.getConnection("jdbc:jtds:sqlserver://dione.mbari.org:1433/VARS",
     "everyone", "NeWW1stLst")
 
   /**
