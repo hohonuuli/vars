@@ -60,15 +60,11 @@ public class ImageAnnotationFrame extends JFrame {
     private final Logger log = LoggerFactory.getLogger(getClass());
     private final ButtonGroup layersButtonGroup = new ButtonGroup();
     private final List<ImageFrameLayerUI<JImageUrlCanvas>> layers = new ArrayList<ImageFrameLayerUI<JImageUrlCanvas>>();
-    private final PropertyChangeListener imageChangeListener = new PropertyChangeListener() {
-
-        @Override
-        public void propertyChange(PropertyChangeEvent evt) {
-            Image image = (Image) evt.getNewValue();
-            BufferedImage bufferedImage = ImageUtilities.toBufferedImage(image);
-            getMeasurementLayerUI().setImage(bufferedImage);
-            getAreaMeasurementLayerUI().setImage(bufferedImage);
-        }
+    private final PropertyChangeListener imageChangeListener = evt -> {
+        Image image = (Image) evt.getNewValue();
+        BufferedImage bufferedImage = ImageUtilities.toBufferedImage(image);
+        getMeasurementLayerUI().setImage(bufferedImage);
+        getAreaMeasurementLayerUI().setImage(bufferedImage);
     };
     private AnnotationLayerUI annotationLayerUI;
     private AreaMeasurementLayerUI2<JImageUrlCanvas> areaMeasurementLayerUI;
@@ -148,19 +144,14 @@ public class ImageAnnotationFrame extends JFrame {
              * When combo box changes, change the default concept used for point and
              * click annotations
              */
-            comboBox.addItemListener(new ItemListener() {
+            comboBox.addItemListener(e -> {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
 
-                @Override
-                public void itemStateChanged(ItemEvent e) {
-                    if (e.getStateChange() == ItemEvent.SELECTED) {
-
-                        Concept concept = toolBelt.getAnnotationPersistenceService().findConceptByName(
-                                (String) comboBox.getSelectedItem());
-                        log.debug("Using concept: " + concept.getPrimaryConceptName().getName());
-                        getAnnotationLayerUI().setConcept(concept);
-                    }
+                    Concept concept = toolBelt.getAnnotationPersistenceService().findConceptByName(
+                            (String) comboBox.getSelectedItem());
+                    log.debug("Using concept: " + concept.getPrimaryConceptName().getName());
+                    getAnnotationLayerUI().setConcept(concept);
                 }
-
             });
         }
 
@@ -181,7 +172,7 @@ public class ImageAnnotationFrame extends JFrame {
      */
     protected JXLayer<JImageUrlCanvas> getLayer() {
         if (layer == null) {
-            layer = new JXLayer<JImageUrlCanvas>(getImageCanvas());
+            layer = new JXLayer<>(getImageCanvas());
             layer.setUI(layers.get(0));    // Add first layer in the list as the default UI.
             setSettingsPanel(layers.get(0).getSettingsBuilder().getPanel());
         }
@@ -191,7 +182,7 @@ public class ImageAnnotationFrame extends JFrame {
 
     protected MeasurementLayerUI<JImageUrlCanvas> getMeasurementLayerUI() {
         if (measurementLayerUI == null) {
-            measurementLayerUI = new MeasurementLayerUI<JImageUrlCanvas>(controller.getToolBelt(),
+            measurementLayerUI = new MeasurementLayerUI<>(controller.getToolBelt(),
                     getCommonPainters());
             measurementLayerUI.addMeasurementCompletedListener(controller);
         }
@@ -214,15 +205,10 @@ public class ImageAnnotationFrame extends JFrame {
                 final int j = i;
                 ImageFrameLayerUI layerUI = layers.get(i);
                 JRadioButton button = new JRadioButton(layerUI.getDisplayName());
-                button.addActionListener(new ActionListener() {
-
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        ((ImageFrameLayerUI) getLayer().getUI()).resetUI();
-                        getLayer().setUI(layers.get(j));
-                        setSettingsPanel(layers.get(j).getSettingsBuilder().getPanel());
-                    }
-
+                button.addActionListener(e -> {
+                    ((ImageFrameLayerUI) getLayer().getUI()).resetUI();
+                    getLayer().setUI(layers.get(j));
+                    setSettingsPanel(layers.get(j).getSettingsBuilder().getPanel());
                 });
 
                 if (j == 0) {

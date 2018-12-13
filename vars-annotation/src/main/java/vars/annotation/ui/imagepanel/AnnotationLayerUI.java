@@ -152,7 +152,7 @@ public class AnnotationLayerUI<T extends JImageUrlCanvas> extends ImageFrameLaye
             break;
         case MouseEvent.MOUSE_RELEASED:
             if (me.getButton() != MouseEvent.BUTTON1) {
-                controller.sendSelectionNotification(new HashSet<Observation>());
+                controller.sendSelectionNotification(new HashSet<>());
                 setDirty(true);
             }
             else {

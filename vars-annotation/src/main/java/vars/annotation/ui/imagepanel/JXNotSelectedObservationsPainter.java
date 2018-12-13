@@ -58,6 +58,7 @@ public class JXNotSelectedObservationsPainter<T extends JImageUrlCanvas> extends
     public void respondTo(IAFRepaintEvent event) {
         UIDataCoordinator dataCoordinator = event.get();
         Collection<Observation> observations = new HashSet<Observation>(dataCoordinator.getObservations());
+        // TODO Add filtering to show/hide annotations from other users
         observations.removeAll(dataCoordinator.getSelectedObservations());
         setObservations(observations);
     }

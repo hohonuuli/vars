@@ -42,7 +42,7 @@ public class PointAdditionLayerUI<T extends JImageUrlCanvas> extends MultiLayerU
     private String coordinateString = null;
     final Collection<Point> sourcePoints = new Vector<Point>();
     private final Font font = new Font("Sans Serif", Font.PLAIN, 12);
-    private JXCrossHairPainter<T> crossHairPainter = new JXCrossHairPainter<T>();
+    private JXCrossHairPainter<T> crossHairPainter = new JXCrossHairPainter<>();
 
     /**
      */
