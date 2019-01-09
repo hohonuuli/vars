@@ -35,34 +35,14 @@ public class JumpToRandomVideoFrameButton extends JFancyButton {
         setIcon(new ImageIcon(getClass().getResource("/images/vars/annotation/random_button.png")));
         setText("");
         setToolTipText("Jump to random video frame");
-        checkEnabled();
-        AnnotationProcessor.process(this);
+        StateLookup.videoArchiveProperty().addListener((obs, oldv, newv) -> setEnabled(checkEnabled()));
+        setEnabled(checkEnabled());
     }
 
-    @EventSubscriber(eventClass = ObservationsAddedEvent.class)
-    public void respondTo(ObservationsAddedEvent event) {
-        checkEnabled();
+    private boolean checkEnabled() {
+        VideoArchive videoArchive = StateLookup.getVideoArchive();
+        return videoArchive != null;
     }
-
-    @EventSubscriber(eventClass = ObservationsRemovedEvent.class)
-    public void respondTo(ObservationsRemovedEvent event) {
-        checkEnabled();
-    }
-
-    @EventSubscriber(eventClass = VideoArchiveSelectedEvent.class)
-    public void respondTo(VideoArchiveSelectedEvent event) {
-//        VideoArchive videoArchive = event.get();
-//        boolean enabled = videoArchive.getVideoFrames().size() > 2;
-//        setEnabled(enabled);
-        checkEnabled();
-    }
-
-    private void checkEnabled() {
-        JXObservationTable myTable = (JXObservationTable) StateLookup.getObservationTable();
-        boolean enabled = myTable.getRowCount() > 2;
-        setEnabled(enabled);
-    }
-
 
     private void jump() {
         VideoArchive videoArchive = StateLookup.getVideoArchive();
