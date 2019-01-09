@@ -200,7 +200,6 @@ class AnnoImageMigrator(target: Path, overlayImageURL: URL, pathKey: String = "f
 
     if (useExiftool) {
 
-
       // -- Grab parameters via JPA
       val dao = toolBelt.getAnnotationDAOFactory.newCameraDataDAO()
       dao.startTransaction()
