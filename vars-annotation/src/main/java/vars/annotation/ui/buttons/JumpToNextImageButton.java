@@ -1,22 +1,16 @@
 package vars.annotation.ui.buttons;
 
-import org.bushe.swing.event.annotation.AnnotationProcessor;
-import org.bushe.swing.event.annotation.EventSubscriber;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.swing.JFancyButton;
-import org.mbari.vcr4j.time.Timecode;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoFrame;
 import vars.annotation.ui.StateLookup;
-import vars.annotation.ui.eventbus.ObservationsAddedEvent;
-import vars.annotation.ui.eventbus.ObservationsRemovedEvent;
-import vars.annotation.ui.eventbus.VideoArchiveSelectedEvent;
+
 import vars.annotation.ui.table.JXObservationTable;
 
 import javax.swing.*;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author Brian Schlining
