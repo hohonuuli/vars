@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
@@ -8,7 +8,6 @@
     </parent>
     <artifactId>vars-jpa</artifactId>
     <name>vars-jpa [Library]</name>
-
     <!--
     Build settings
 -->
@@ -32,9 +31,8 @@
                         <phase>process-classes</phase>
                         <configuration>
                             <tasks>
-                                <java classname="org.eclipse.persistence.tools.weaving.jpa.StaticWeave"
-                                      classpathref="maven.runtime.classpath" fork="true">
-                                    <arg line="-loglevel FINE -persistenceinfo src/main/resources target/classes target/classes"/>
+                                <java classname="org.eclipse.persistence.tools.weaving.jpa.StaticWeave" classpathref="maven.runtime.classpath" fork="true">
+                                    <arg line="-loglevel FINE -persistenceinfo src/main/resources target/classes target/classes" />
                                 </java>
                             </tasks>
                         </configuration>
@@ -83,7 +81,7 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.persistence</groupId>
-            <artifactId>eclipselink</artifactId>
+            <artifactId>org.eclipse.persistence.jpa</artifactId>
             <version>${eclipselink.version}</version>
             <scope>compile</scope>
             <optional>false</optional>
@@ -110,14 +108,20 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derbytools</artifactId>
+            <version>${derby.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>${postgresql.version}</version>
         </dependency>
         <!--<dependency>-->
-            <!--<groupId>com.google.code.gson</groupId>-->
-            <!--<artifactId>gson</artifactId>-->
-            <!--<version>${gson.version}</version>-->
+        <!--<groupId>com.google.code.gson</groupId>-->
+        <!--<artifactId>gson</artifactId>-->
+        <!--<version>${gson.version}</version>-->
         <!--</dependency>-->
     </dependencies>
     <!--

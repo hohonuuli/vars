@@ -8,6 +8,7 @@ import org.bushe.swing.event.EventBus;
 import org.mbari.vcr4j.VideoError;
 import org.mbari.vcr4j.VideoIndex;
 import org.mbari.vcr4j.VideoState;
+import org.reactivestreams.Subscription;
 import rx.Subscriber;
 import vars.VarsUserPreferencesFactory;
 import vars.annotation.CameraDirections;
@@ -82,7 +83,7 @@ public class StateLookup extends GlobalStateLookup {
             }
 
             if (newVal != null) {
-                newVal.getIndexObservable().subscribe(newIndexSubscriber());
+                newVal.getIndexObservable().subscribe(lastVideoIndex::set);
             }
         });
 
@@ -222,25 +223,6 @@ public class StateLookup extends GlobalStateLookup {
 
     public static void setLastVideoIndex(VideoIndex lastVideoIndex) {
         StateLookup.lastVideoIndex.set(lastVideoIndex);
-    }
-
-    private static Subscriber<VideoIndex> newIndexSubscriber() {
-        return new Subscriber<VideoIndex>() {
-            @Override
-            public void onCompleted() {
-
-            }
-
-            @Override
-            public void onError(Throwable throwable) {
-
-            }
-
-            @Override
-            public void onNext(VideoIndex videoIndex) {
-                lastVideoIndex.set(videoIndex);
-            }
-        };
     }
 
 }

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
@@ -8,9 +8,7 @@
     </parent>
     <artifactId>vars-standalone</artifactId>
     <name>vars-standalone</name>
-
     <dependencies>
-
         <!--
             Reference the 3 VARS applications
         -->
@@ -49,7 +47,6 @@
             <artifactId>logback-classic</artifactId>
             <version>${logback.version}</version>
         </dependency>
-
         <!-- Used by scripts for sending emails -->
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -62,7 +59,6 @@
             <artifactId>tagsoup</artifactId>
             <version>${tagsoup.version}</version>
         </dependency>
-
         <!--
             Dependencies for referencing the EXPD database. Used for merges
         -->
@@ -76,7 +72,6 @@
             <artifactId>expd-jdbc</artifactId>
             <version>${expd.version}</version>
         </dependency>
-
         <!--
             Sanselan is used for accessing image metadata. Used for image loading
             scripts
@@ -91,7 +86,6 @@
             <artifactId>commons-imaging</artifactId>
             <version>${commons.imaging.version}</version>
         </dependency>
-
         <!--
             Scala related classes
         -->
@@ -123,13 +117,13 @@
             <version>${jline.version}</version>
             <scope>runtime</scope>
         </dependency>
-
         <dependency>
             <groupId>org.scalatest</groupId>
             <artifactId>scalatest_${scala.version.major}</artifactId>
             <version>${scalatest.version}</version>
             <scope>test</scope>
         </dependency>
+        <!-- JDBC Driver -->
         <!-- JDBC Driver -->
         <dependency>
             <groupId>org.apache.derby</groupId>
@@ -151,7 +145,12 @@
             <version>${derby.version}</version>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derbytools</artifactId>
+            <version>${derby.version}</version>
+            <scope>test</scope>
+        </dependency>
         <!--
             Scalar for doing the damn overlays
         -->
@@ -161,7 +160,6 @@
             <version>${scalr.version}</version>
             <scope>compile</scope>
         </dependency>
-
         <!--
             Gson: Java to Json conversion
         -->
@@ -172,7 +170,6 @@
             <scope>compile</scope>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <!--
@@ -196,7 +193,6 @@
                     </execution>
                 </executions>
             </plugin>
-
             <!--
                 Include Scala compiler
             -->
@@ -233,18 +229,17 @@
                     <useZincServer>true</useZincServer>
                 </configuration>
             </plugin>
-
             <!--
                 Run scalatest Specs during testing
             -->
             <!--<plugin>-->
-                <!--<groupId>org.apache.maven.plugins</groupId>-->
-                <!--<artifactId>maven-surefire-plugin</artifactId>-->
-                <!--<configuration>-->
-                    <!--<includes>-->
-                        <!--<include>**/*Spec.*</include>-->
-                    <!--</includes>-->
-                <!--</configuration>-->
+            <!--<groupId>org.apache.maven.plugins</groupId>-->
+            <!--<artifactId>maven-surefire-plugin</artifactId>-->
+            <!--<configuration>-->
+            <!--<includes>-->
+            <!--<include>**/*Spec.*</include>-->
+            <!--</includes>-->
+            <!--</configuration>-->
             <!--</plugin>-->
             <plugin>
                 <groupId>org.scalatest</groupId>
@@ -266,7 +261,6 @@
             </plugin>
         </plugins>
     </build>
-
     <reporting>
         <plugins>
             <plugin>
@@ -276,7 +270,4 @@
             </plugin>
         </plugins>
     </reporting>
-
 </project>
-
-
