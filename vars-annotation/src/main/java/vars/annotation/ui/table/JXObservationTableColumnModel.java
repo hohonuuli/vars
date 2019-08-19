@@ -501,6 +501,11 @@ public class JXObservationTableColumnModel extends DefaultTableColumnModelExt {
 
             // TODO implement this if needed
         }
+
+        @Override
+        public boolean isSortable() {
+            return true;
+        }
     }
 
     public class RecordedDateColumn extends ValueColumn {
