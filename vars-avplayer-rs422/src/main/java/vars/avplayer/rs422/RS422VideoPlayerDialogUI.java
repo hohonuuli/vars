@@ -1,9 +1,11 @@
 package vars.avplayer.rs422;
 
-import gnu.io.CommPortIdentifier;
+
 import org.mbari.vcr4j.rs422.RS422Error;
 import org.mbari.vcr4j.rs422.RS422State;
+import org.mbari.vcr4j.rxtx.RXTX;
 import org.mbari.vcr4j.rxtx.RXTXUtilities;
+import org.mbari.vcr4j.rxtx.RXTXVideoIO;
 import vars.ToolBelt;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveDAO;
@@ -36,15 +38,19 @@ public class RS422VideoPlayerDialogUI extends OpenVideoArchiveDialog<RS422State,
 
     private JComboBox<String> getSerialPortComboBox() {
         if (serialPortComboBox == null) {
-            String[] ports = RXTXUtilities.getAvailableSerialPorts()
+            String[] ports = RXTXVideoIO.getSerialPorts()
                     .stream()
-                    .map(CommPortIdentifier::getName)
                     .sorted()
                     .toArray(String[]::new);
+//            String[] ports = RXTXUtilities.getAvailableSerialPorts()
+//                    .stream()
+//                    .map(CommPortIdentifier::getName)
+//                    .sorted()
+//                    .toArray(String[]::new);
 
             serialPortComboBox = new JComboBox<>(ports);
         }
-
+        
         return serialPortComboBox;
     }
 
