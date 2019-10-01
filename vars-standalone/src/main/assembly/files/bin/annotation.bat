@@ -5,4 +5,4 @@ SET VARS_HOME=%~dp0..
 SET VARS_CLASSPATH="%VARS_HOME%\conf";"%VARS_HOME%\lib\*"
 
 echo [VARS] Starting VARS Annotation Application
-java -cp %VARS_CLASSPATH% -Xms64m -Xmx256m -Duser.timezone=UTC vars.annotation.ui.App
+java -cp %VARS_CLASSPATH% -Xms64m -Xmx1g -Duser.timezone=UTC vars.annotation.ui.App
