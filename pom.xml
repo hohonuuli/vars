@@ -4,7 +4,7 @@
     <groupId>vars-redux</groupId>
     <artifactId>vars-redux</artifactId>
     <packaging>pom</packaging>
-    <version>8.3.4-SNAPSHOT</version>
+    <version>8.3.4</version>
     <name>vars-redux</name>
     <inceptionYear>2002</inceptionYear>
     <organization>
