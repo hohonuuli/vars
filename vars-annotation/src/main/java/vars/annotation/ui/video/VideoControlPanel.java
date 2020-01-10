@@ -15,41 +15,22 @@
 
 package vars.annotation.ui.video;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import org.mbari.util.Dispatcher;
-import org.mbari.vcr4j.IVCR;
-import org.mbari.vcr4j.ui.VCRPanel;
-
-import vars.annotation.ui.Lookup;
-import vars.avplayer.VideoControlService;
+import org.mbari.vcr4j.ui.swing.VCRPanel;
+import vars.annotation.ui.StateLookup;
 
 /**
  * <p>A VCR panel that monitors for changes of VCRs</p>
  *
  * @author  <a href="http://www.mbari.org">MBARI</a>
  */
-public class VideoControlPanel extends VCRPanel implements PropertyChangeListener {
+public class VideoControlPanel extends VCRPanel {
 
     /**
      * Constructor
      */
     public VideoControlPanel() {
         super();
-        final Dispatcher dispatcher = Lookup.getVideoControlServiceDispatcher();
-        dispatcher.addPropertyChangeListener(this);
-        final VideoControlService videoService = (VideoControlService) dispatcher.getValueObject();
-        final IVCR vcr = (videoService == null) ? null : videoService;
-        setVcr(vcr);
+        videoControllerProperty().bind(StateLookup.videoControllerProperty());
     }
 
-    /**
-     *
-     * @param evt
-     */
-    public void propertyChange(PropertyChangeEvent evt) {
-        final VideoControlService videoService = (VideoControlService) evt.getNewValue();
-        final IVCR vcr = (videoService == null) ? null : videoService;
-        setVcr(vcr);
-    }
 }

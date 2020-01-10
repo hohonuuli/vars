@@ -1,4 +1,6 @@
-SELECT 
+CREATE VIEW
+  ANNOTATIONS AS
+SELECT
     obs.ObservationDTG AS ObservationDate,
     obs.Observer,
     obs.ConceptName,

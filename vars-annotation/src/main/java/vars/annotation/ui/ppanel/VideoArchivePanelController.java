@@ -33,7 +33,6 @@ import org.mbari.awt.AwtUtilities;
 import org.mbari.swing.LabeledSpinningDialWaitIndicator;
 import org.mbari.swing.SearchableComboBoxModel;
 import org.mbari.swing.WaitIndicator;
-import org.mbari.util.Dispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.ILink;
@@ -46,7 +45,7 @@ import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveDAO;
 import vars.annotation.VideoFrame;
-import vars.annotation.ui.Lookup;
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.actions.MoveVideoFrameWithDialogAction;
 import vars.annotation.ui.commandqueue.Command;
@@ -274,7 +273,7 @@ public class VideoArchivePanelController {
     protected Collection<Observation> getObservations(boolean useSelectedOnly) {
         Collection<Observation> observations = new ArrayList<Observation>();
 
-        JXObservationTable myTable = (JXObservationTable) Lookup.getObservationTableDispatcher().getValueObject();
+        JXObservationTable myTable = (JXObservationTable) StateLookup.getObservationTable();
         ObservationTableModel model = (ObservationTableModel) myTable.getModel();
         if (useSelectedOnly) {
             int[] rows = myTable.getSelectedRows();
@@ -386,7 +385,7 @@ public class VideoArchivePanelController {
                     final String name = renameObservationsDialog.getSelectedItem();
                     renameObservationsDialog.dispose();
                     final Collection<Observation> observations = getObservations(true);
-                    UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+                    UserAccount userAccount = StateLookup.getUserAccount();
                     String user = (userAccount == null) ? UserAccount.USERNAME_DEFAULT : userAccount.getUserName();
                     Command command = new RenameObservationsCmd(name, user, observations);
                     CommandEvent commandEvent = new CommandEvent(command);
@@ -422,7 +421,7 @@ public class VideoArchivePanelController {
 
         WaitIndicator waitIndicator = new LabeledSpinningDialWaitIndicator(panel, "Refreshing ...");
 
-        VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+        VideoArchive videoArchive = StateLookup.getVideoArchive();
 
         if (videoArchive != null) {
             if (log.isDebugEnabled()) {
@@ -550,7 +549,7 @@ public class VideoArchivePanelController {
      * @param observations
      */
     protected void selectObservations(Collection<Observation> observations) {
-        JXObservationTable myTable = (JXObservationTable) Lookup.getObservationTableDispatcher().getValueObject();
+        JXObservationTable myTable = (JXObservationTable) StateLookup.getObservationTable();
         Collection<Observation> allObservations = getObservations(false);
         allObservations.retainAll(observations);
         myTable.setSelectedObservations(allObservations);

@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 import vars.ToolBelt;
 import vars.annotation.CameraData;
 import vars.annotation.CameraDataDAO;
-import vars.knowledgebase.ui.Lookup;
+import vars.knowledgebase.ui.StateLookup;
 
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -66,8 +66,7 @@ public class UpdateStillImageUrlTool {
     private static ToolBelt toolBelt;
 
     static {
-        Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
-
+        Injector injector = StateLookup.GUICE_INJECTOR;
         toolBelt = injector.getInstance(ToolBelt.class);
     }
 

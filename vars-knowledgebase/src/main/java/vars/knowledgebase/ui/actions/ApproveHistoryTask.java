@@ -44,7 +44,7 @@ import vars.knowledgebase.History;
 import vars.knowledgebase.LinkRealization;
 import vars.knowledgebase.LinkTemplate;
 import vars.knowledgebase.Media;
-import vars.knowledgebase.ui.Lookup;
+import vars.knowledgebase.ui.StateLookup;
 import vars.knowledgebase.ui.ToolBelt;
 
 /**
@@ -159,7 +159,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
             approve(userAccount, history, dao);
         }
         catch (Exception e) {
-            EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+            EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, e);
         }
         finally {
             dao.endTransaction();
@@ -189,7 +189,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
                 approve(userAccount, history, dao);
             }
             catch (Exception e) {
-                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+                EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, e);
             }
         }
         dao.endTransaction();
@@ -248,8 +248,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
             /*
              * Let the user know just how much damage they're about to do to the database
              */
-            Dispatcher dispatcher = Lookup.getApplicationFrameDispatcher();
-            Frame frame = (Frame) dispatcher.getValueObject();
+            Frame frame = StateLookup.getApplicationFrame();
             int option = JOptionPane.showConfirmDialog(frame,
                 "You are about to delete " + conceptsToBeDeleted.size() +
                 " concept(s) from the \nknowledgebase. Are you sure you want to continue?", "VARS - Delete Concepts",
@@ -329,8 +328,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
             final String conceptNameToDelete = history.getOldValue();
 
             if (canDo(userAccount, history)) {
-
-                final Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
+                final Frame frame = StateLookup.getApplicationFrame();
                 final int option = JOptionPane.showConfirmDialog(
                         frame, "Are you sure you want to delete '" + conceptNameToDelete +
                         "' ? Be aware that this will change existing annotations that use it.", "VARS - Delete ConceptName", JOptionPane
@@ -360,7 +358,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
                         toolBelt.getAnnotationPersistenceService().updateConceptNameUsedByAnnotations(concept);
                     }
                     catch (Exception e) {
-                        EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+                        EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, e);
                     }
 
                 }
@@ -382,7 +380,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
                     // findByName is case-insensitive. Check that we got the right name
                     ConceptName otherName = conceptName.getConcept().getConceptName(conceptNameToDelete);
                     if (conceptNameDAO.equalInDatastore(conceptName, otherName)) {
-                        EventBus.publish(Lookup.TOPIC_WARNING,
+                        EventBus.publish(StateLookup.TOPIC_WARNING,
                                          "You are attempting to delete a primary concept-name." + " This is NOT allowed.");
                         return;
                     }
@@ -422,7 +420,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
                 /*
                  * Confirm that we really want to do this
                  */
-                final Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
+                final Frame frame = StateLookup.getApplicationFrame();
                 final int option = JOptionPane.showConfirmDialog(
                         frame, "Are you sure you want to delete '" + history.getOldValue() +
                         "' ? Be aware that this will not effect existing annotations that use it.", "VARS - Delete LinkRealization", JOptionPane
@@ -485,7 +483,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
                 /*
                  * Confirm that we really want to do this
                  */
-                final Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
+                final Frame frame = StateLookup.getApplicationFrame();
                 final int option = JOptionPane.showConfirmDialog(
                         frame, "Are you sure you want to delete '" + history.getOldValue() +
                         "' ? Be aware that this will not effect existing annotations that use it.", "VARS - Delete LinkTemplate", JOptionPane
@@ -545,7 +543,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
 
                 final String imageReference = history.getOldValue();
 
-                final Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
+                final Frame frame = StateLookup.getApplicationFrame();
                 final int option = JOptionPane.showConfirmDialog(frame,
                     "Are you sure you want to delete '" + imageReference + "' ? ", "VARS - Delete Media",
                     JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
@@ -610,7 +608,7 @@ public class ApproveHistoryTask extends AbstractHistoryTask {
             else {
                 final String msg = "Unable to approve the History [" + history + "]";
 
-                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, msg);
+                EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, msg);
             }
         }
 

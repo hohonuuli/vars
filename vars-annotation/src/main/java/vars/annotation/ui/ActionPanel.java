@@ -96,10 +96,10 @@ public class ActionPanel extends JPanel {
          * file and instantiated at runtime. This allows location specific
          * customization with requiring the agency to rebuild VARS from scratch.
          */
-        ResourceBundle bundle = ResourceBundle.getBundle(Lookup.RESOURCE_BUNDLE, Locale.US);
+        ResourceBundle bundle = ResourceBundle.getBundle(StateLookup.RESOURCE_BUNDLE, Locale.US);
         Enumeration<String> enumeration = bundle.getKeys();
         Map<String, JButton> map = new TreeMap<String, JButton>();
-        Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
+        Injector injector = StateLookup.GUICE_INJECTOR;
         while (enumeration.hasMoreElements()) {
             String element = enumeration.nextElement();
             if (element.startsWith("actionpanel.button")) {

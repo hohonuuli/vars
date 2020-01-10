@@ -20,13 +20,11 @@ import org.bushe.swing.event.annotation.AnnotationProcessor;
 import org.bushe.swing.event.annotation.EventSubscriber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.annotation.ui.Lookup;
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.ToolBelt;
 
 import java.util.Deque;
-import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -66,7 +64,7 @@ public class CommandQueue {
                 try {
                     commandEvent = pendingQueue.poll(3600L, TimeUnit.SECONDS);
                 } catch (InterruptedException e) {
-                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+                    EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, e);
                 }
                 if (commandEvent != null) {
                     Command command = commandEvent.getCommand();
@@ -97,7 +95,7 @@ public class CommandQueue {
                         inverseCommandList.offerLast(commandEvent);
                     }
                     catch (Exception e) {
-                        EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+                        EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, e);
                     }
                 }
             }

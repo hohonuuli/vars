@@ -24,6 +24,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
@@ -46,7 +47,9 @@ import vars.knowledgebase.LinkTemplate;
  * @author         Brian Schlining [brian@mbari.org]
  */
 @Entity(name = "LinkTemplate")
-@Table(name = "LinkTemplate")
+@Table(name = "LinkTemplate",
+        indexes = {@Index(name = "idx_LinkTemplate_FK1", columnList = "ConceptDelegateID_FK"),
+                @Index(name = "idx_LinkTemplate_LUT", columnList = "LAST_UPDATED_TIME")})
 @EntityListeners({ TransactionLogger.class, KeyNullifier.class })
 @NamedQueries( {
 
@@ -88,7 +91,7 @@ public class LinkTemplateImpl implements Serializable, LinkTemplate, JPAEntity {
     @Column(name = "LinkName", length = 50)
     String linkName;
 
-    @Column(name = "LinkValue", length = 255)
+    @Column(name = "LinkValue", length = 2048)
     String linkValue;
     
     @Column(name = "ToConcept", length = 128)

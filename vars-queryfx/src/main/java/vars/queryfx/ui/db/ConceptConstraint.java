@@ -1,9 +1,8 @@
 package vars.queryfx.ui.db;
 
 import vars.ILink;
-import vars.queryfx.Lookup;
+import vars.queryfx.StateLookup;
 import vars.queryfx.beans.ResolvedConceptSelection;
-import vars.queryfx.ui.db.IConstraint;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -47,7 +46,7 @@ public class ConceptConstraint implements IConstraint<ResolvedConceptSelection> 
 
     private boolean isWildCard(String wc) {
         String u = wc.toUpperCase();
-        return u.equals(Lookup.WILD_CARD) || u.equals(ILink.VALUE_NIL);
+        return u.equals(StateLookup.WILD_CARD) || u.equals(ILink.VALUE_NIL);
     }
 
     @Override

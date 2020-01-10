@@ -33,8 +33,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JMenuItem;
@@ -49,10 +47,10 @@ import vars.CacheClearedEvent;
 import vars.CacheClearedListener;
 import vars.UserAccount;
 import vars.annotation.VideoArchive;
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.actions.NewObservationUsingConceptNameAction;
 import vars.annotation.ui.ToolBelt;
-import vars.avplayer.VideoControlService;
-import vars.annotation.ui.Lookup;
+import vars.avplayer.VideoController;
 import vars.knowledgebase.KnowledgebasePersistenceService;
 import vars.shared.ui.FancyButton;
 
@@ -126,28 +124,19 @@ public class NewObservationUsingConceptNameButton extends FancyButton
          * Enable this button if someone is logged in AND the Observation
          * in the ObservationDispather is not null and the VCR is enabled.
          */
-        Lookup.getVideoArchiveDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                hasVideoArchive = (evt.getNewValue() != null);
-                checkEnable();
-            }
+        StateLookup.videoArchiveProperty().addListener((obs, oldVal, newVal) -> {
+            hasVideoArchive = newVal != null;
+            checkEnable();
         });
-        
-        Lookup.getUserAccountDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
-            
-            public void propertyChange(PropertyChangeEvent evt) {
-                hasPerson = (evt.getNewValue() != null);
-                checkEnable();
-            }
+
+        StateLookup.userAccountProperty().addListener((obs, oldVal, newVal) -> {
+            hasPerson = newVal != null;
+            checkEnable();
         });
-        
-        Lookup.getVideoControlServiceDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
-            
-            public void propertyChange(PropertyChangeEvent evt) {
-                VideoControlService videoService = (VideoControlService) evt.getNewValue();
-                hasVcr = (videoService != null && videoService.isConnected());
-                checkEnable();
-            }
+
+        StateLookup.videoControllerProperty().addListener((obs, oldVal, newVal) -> {
+            hasVcr = newVal != null;
+            checkEnable();
         });
 
 
@@ -294,7 +283,7 @@ public class NewObservationUsingConceptNameButton extends FancyButton
                 public void actionPerformed(final ActionEvent ae) {
 
                     // Send a message to select a concept in the tree 
-                    EventBus.publish(Lookup.TOPIC_SELECT_CONCEPT, getConceptName());
+                    EventBus.publish(StateLookup.TOPIC_SELECT_CONCEPT, getConceptName());
                 }
 
 
@@ -347,18 +336,14 @@ public class NewObservationUsingConceptNameButton extends FancyButton
         setBorder(border);
 
         if (!isInitialized) {
-            final VideoArchive obj1 = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
+            final VideoArchive videoArchive = StateLookup.getVideoArchive();
+            hasVideoArchive = videoArchive != null;
 
-            hasVideoArchive = (obj1 == null) ? false : true;
+            final UserAccount userAccount = StateLookup.getUserAccount();
+            hasPerson = userAccount != null;
 
-            final UserAccount obj2 = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
-
-            hasPerson = (obj2 == null) ? false : true;
-
-            final VideoControlService videoService = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
-            final Object obj3 = (videoService == null) ? null : videoService;
-
-            hasVcr = (obj3 == null) ? false : true;
+            final VideoController videoController = StateLookup.getVideoController();
+            hasVcr = videoController != null;
         }
     }
 

@@ -41,7 +41,7 @@ import java.util.Set;
  */
 public class JXObservationsPainter<T extends JImageUrlCanvas> extends AbstractJXPainter<T> {
 
-    private Set<Observation> observations = Collections.synchronizedSet(new HashSet<Observation>());
+    private Set<Observation> observations = Collections.synchronizedSet(new HashSet<>());
     private final boolean drawConceptName;
     private final boolean drawTimecode;
     private IMarkerStyle markerStyle;
@@ -73,7 +73,7 @@ public class JXObservationsPainter<T extends JImageUrlCanvas> extends AbstractJX
      * @return A copy of the internal collection of observations
      */
     public Set<Observation> getObservations() {
-        return new HashSet<Observation>(observations);
+        return new HashSet<>(observations);
     }
 
     /**

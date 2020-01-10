@@ -9,7 +9,7 @@ import javafx.beans.property.StringProperty;
 import javafx.scene.image.Image;
 import vars.LinkUtilities;
 import vars.knowledgebase.Concept;
-import vars.queryfx.Lookup;
+import vars.queryfx.StateLookup;
 import vars.queryfx.beans.ResolvedConceptSelection;
 
 import java.util.stream.Collectors;
@@ -40,7 +40,7 @@ public class ConceptMedia implements Media {
 
         String titleString = conceptSelection.getConceptName();
         if (!LinkUtilities.formatAsString(conceptSelection.getLink())
-                .equals(LinkUtilities.formatAsString(Lookup.WILD_CARD_LINK))) {
+                .equals(LinkUtilities.formatAsString(StateLookup.WILD_CARD_LINK))) {
             titleString = titleString + " | " + LinkUtilities.formatAsString(conceptSelection.getLink());
         }
 

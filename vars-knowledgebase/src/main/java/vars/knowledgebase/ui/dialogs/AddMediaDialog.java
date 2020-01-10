@@ -44,8 +44,8 @@ import vars.knowledgebase.KnowledgebaseDAOFactory;
 import vars.knowledgebase.KnowledgebaseFactory;
 import vars.knowledgebase.Media;
 import vars.knowledgebase.MediaTypes;
-import vars.knowledgebase.ui.Lookup;
 import vars.knowledgebase.ui.MediaViewPanel;
+import vars.knowledgebase.ui.StateLookup;
 import vars.knowledgebase.ui.ToolBelt;
 import vars.shared.ui.OkCancelButtonPanel;
 
@@ -208,7 +208,7 @@ public class AddMediaDialog extends JDialog {
             final Concept concept = dao.find(getConcept());
 
 
-            final ProgressDialog progressDialog = Lookup.getProgressDialog();
+            final ProgressDialog progressDialog = StateLookup.getProgressDialog();
 
             progressDialog.setTitle("VARS - Adding Media");
 
@@ -235,13 +235,13 @@ public class AddMediaDialog extends JDialog {
                 isUrlValid = (b > -1);
 
                 if (!isUrlValid) {
-                    EventBus.publish(Lookup.TOPIC_WARNING, "Unable to read from " + url.toExternalForm());
+                    EventBus.publish(StateLookup.TOPIC_WARNING, "Unable to read from " + url.toExternalForm());
                 }
             }
             catch (Exception e1) {
                 final String s = "Failed to open URL, " + p.getUrlField().getText();
 
-                EventBus.publish(Lookup.TOPIC_WARNING, s);
+                EventBus.publish(StateLookup.TOPIC_WARNING, s);
                 log.warn(s, e1);
             }
 
@@ -263,7 +263,7 @@ public class AddMediaDialog extends JDialog {
                 if (matchingMedia.size() > 0) {
                     setConcept(null);
                     progressDialog.setVisible(false);
-                    EventBus.publish(Lookup.TOPIC_WARNING,
+                    EventBus.publish(StateLookup.TOPIC_WARNING,
                                      "A media with the URL, '" + url.toExternalForm() + "', was already found in '" +
                                      concept.getPrimaryConceptName().getName() + "'.");
                 }
@@ -315,8 +315,7 @@ public class AddMediaDialog extends JDialog {
                     dao.persist(media);
 
                     // Build the History
-                    final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
-
+                    final UserAccount userAccount = StateLookup.getUserAccount();
                     history = historyFactory.add(userAccount, media);
                     concept.getConceptMetadata().addHistory(history);
                     dao.persist(history);
@@ -327,7 +326,7 @@ public class AddMediaDialog extends JDialog {
                                      "' in the database. Removing the media reference to '" + url.toExternalForm() +
                                      "'.";
 
-                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, s);
+                    EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, s);
                 }
                 dao.endTransaction();
                 dao.close();
@@ -335,13 +334,13 @@ public class AddMediaDialog extends JDialog {
                 progressBar.setString("Refreshing");
                 progressBar.setValue(3);
 
-                EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
+                EventBus.publish(StateLookup.TOPIC_APPROVE_HISTORY, history);
 
             }
 
             setConcept(null);
             progressDialog.setVisible(false);
-            EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, concept.getPrimaryConceptName().getName());
+            EventBus.publish(StateLookup.TOPIC_REFRESH_KNOWLEGEBASE, concept.getPrimaryConceptName().getName());
         }
     }
 }

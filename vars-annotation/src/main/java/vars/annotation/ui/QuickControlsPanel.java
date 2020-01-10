@@ -77,7 +77,7 @@ public class QuickControlsPanel extends JPanel {
 
                 public void itemStateChanged(final ItemEvent e) {
                     if (e.getStateChange() == ItemEvent.SELECTED) {
-                        Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+                        Collection<Observation> observations = StateLookup.getSelectedObservations();
                         Collection<VideoFrame> videoFrames = new HashSet<VideoFrame>();
                         for (Observation observation : observations) {
                             videoFrames.add(observation.getVideoFrame());
@@ -89,13 +89,13 @@ public class QuickControlsPanel extends JPanel {
                             CommandEvent commandEvent = new CommandEvent(command);
                             EventBus.publish(commandEvent);
                         }
-                        Lookup.getCameraDirectionDispatcher().setValueObject(cbCameraDirection.getSelectedItem());
+                        StateLookup.setCameraDirection((CameraDirections) cbCameraDirection.getSelectedItem());
                     }
                 }
 
             });
             cbCameraDirection.setSelectedItem(CameraDirections.DESCEND);
-            Lookup.getCameraDirectionDispatcher().setValueObject(cbCameraDirection.getSelectedItem());
+            StateLookup.setCameraDirection((CameraDirections) cbCameraDirection.getSelectedItem());
         }
 
         return cbCameraDirection;
@@ -157,44 +157,41 @@ public class QuickControlsPanel extends JPanel {
             }
 
             setPreferredSize(new java.awt.Dimension(120, 25));
-            addActionListener(new java.awt.event.ActionListener() {
+            addActionListener(e -> {
 
-                public void actionPerformed(final java.awt.event.ActionEvent e) {
-                    final Object selectedItem = getSelectedItem();
-                    if (!(selectedItem instanceof ModeObject)) {
-                        return;
-                    }
-
-                    final ModeObject mode = (ModeObject) modeChoiceBox.getSelectedItem();
-                    action.setFormatCode(mode.code);
-                    action.doAction();
+                final Object selectedItem = getSelectedItem();
+                if (!(selectedItem instanceof ModeObject)) {
+                    return;
                 }
+
+                final ModeObject mode = (ModeObject) modeChoiceBox.getSelectedItem();
+                action.setFormatCode(mode.code);
+                action.doAction();
 
             });
-            Lookup.getVideoArchiveDispatcher().addPropertyChangeListener(this);
-        }
 
-        /**
-         *
-         * @param evt
-         */
-        public void propertyChange(final PropertyChangeEvent evt) {
-            final VideoArchive va = (VideoArchive) evt.getNewValue();
-            if (va != null) {
-                final char formatCode = va.getVideoArchiveSet().getFormatCode();
-                final ModeObject[] modes = getModeObjects();
-                for (int i = 0; i < modes.length; i++) {
-                    if (modes[i].code == formatCode) {
-                        final JComboBox cb = getModeChoiceBox();
-                        final ModeObject mo = (ModeObject) cb.getSelectedItem();
-                        if ((mo != null) && !mo.equals(modes[i])) {
-                            cb.setSelectedItem(modes[i]);
+            StateLookup.videoArchiveProperty().addListener((obs, oldVal, newVal) -> {
+                if (newVal != null) {
+                    final char formatCode = newVal.getVideoArchiveSet().getFormatCode();
+                    final ModeObject[] modes = getModeObjects();
+                    for (int i = 0; i < modes.length; i++) {
+                        if (modes[i].code == formatCode) {
+                            final JComboBox cb = getModeChoiceBox();
+                            final ModeObject mo = (ModeObject) cb.getSelectedItem();
+                            if ((mo != null) && !mo.equals(modes[i])) {
+                                cb.setSelectedItem(modes[i]);
+                            }
+
+                            return;
                         }
-
-                        return;
                     }
                 }
-            }
+            });
+        }
+
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            // TODO what to do here
         }
     }
 

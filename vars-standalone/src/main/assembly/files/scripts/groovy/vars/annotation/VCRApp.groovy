@@ -1,20 +1,21 @@
 package vars.annotation
 
-import vars.annotation.ui.Lookup
-import vars.annotation.ui.StatusLabelForVcr
+import org.mbari.vcr4j.time.Timecode
+import vars.annotation.ui.StateLookup
+
 import vars.annotation.ui.video.VideoControlPanel
 
 import javax.swing.BoxLayout
 import javax.swing.JButton
 import javax.swing.JFrame
 import javax.swing.JPanel
-import javax.swing.JTextArea
 import javax.swing.JTextField
 import javax.swing.JToolBar
 import javax.swing.SwingUtilities
 import java.awt.BorderLayout
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
+import java.util.concurrent.TimeUnit
 
 /**
  *
@@ -30,7 +31,7 @@ class VCRApp {
         pane.layout = new BorderLayout(5, 5)
 
         def toolBar = new JToolBar()
-        toolBar.add(new StatusLabelForVcr())
+        //toolBar.add(new StatusLabelForVcr())
         pane.add(toolBar, BorderLayout.NORTH)
 
         def videoControlPanel = new VideoControlPanel()
@@ -39,7 +40,7 @@ class VCRApp {
         def lowerPanel = new JPanel()
         lowerPanel.setLayout(new BoxLayout(lowerPanel, BoxLayout.X_AXIS))
         def button = new JButton("TIME")
-        def videoService = Lookup.videoControlServiceDispatcher.getValueObject()
+        def videoController = StateLookup.videoController
 
         lowerPanel.add(button)
         def textField = new JTextField()
@@ -48,8 +49,9 @@ class VCRApp {
 
         button.addActionListener(new ActionListener() {
             void actionPerformed(ActionEvent e) {
-                def videoTime = videoService.requestVideoTime()
+                def videoIndex = videoController.videoIndex.get(3, TimeUnit.SECONDS);
                 textField.text = videoTime.toString
+                textField.text = videoIndex.timecode.map(it.toString()).orElse(Timecode.EMPTY_TIMECODE_STRING)
             }
         })
         frame.pack()

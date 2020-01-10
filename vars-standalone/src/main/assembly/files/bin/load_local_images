@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+DIR_NAME=$1
+PLATFORM_NAME=$2
+SEQ_NUMBER=$3
+
+`dirname "$0"`/gsh -e "(new vars.annotation.LocalImageLoader()).loadDir('$DIR_NAME' as File, '$PLATFORM_NAME', $SEQ_NUMBER)"

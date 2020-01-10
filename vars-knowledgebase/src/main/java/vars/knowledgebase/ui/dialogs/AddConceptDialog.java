@@ -38,11 +38,11 @@ import vars.knowledgebase.ConceptNameTypes;
 import vars.knowledgebase.History;
 import vars.knowledgebase.HistoryFactory;
 import vars.knowledgebase.KnowledgebaseFactory;
-import vars.knowledgebase.ui.Lookup;
+import vars.knowledgebase.ui.StateLookup;
 import vars.knowledgebase.ui.ToolBelt;
 import vars.shared.ui.AllConceptNamesComboBox;
 import vars.shared.ui.FancyButton;
-import vars.shared.ui.GlobalLookup;
+import vars.shared.ui.GlobalStateLookup;
 
 /**
  * @author brian
@@ -82,7 +82,7 @@ public class AddConceptDialog extends javax.swing.JDialog {
      */
     @Inject
     public AddConceptDialog(ToolBelt toolBelt) {
-        super((Frame) Lookup.getApplicationFrameDispatcher().getValueObject(), true);
+        super(StateLookup.getApplicationFrame(), true);
 
         if (toolBelt == null) {
             throw new IllegalArgumentException("ToolBelt argument can not be null");
@@ -92,7 +92,7 @@ public class AddConceptDialog extends javax.swing.JDialog {
         controller = new AddConceptDialogController(toolBelt);
         initComponents();
         initModel();
-        setLocationRelativeTo((Frame) Lookup.getApplicationFrameDispatcher().getValueObject());
+        setLocationRelativeTo(StateLookup.getApplicationFrame());
         pack();
         toolBelt.getPersistenceCache().addCacheClearedListener(new CacheClearedListener() {
             public void afterClear(CacheClearedEvent evt) {
@@ -313,32 +313,27 @@ public class AddConceptDialog extends javax.swing.JDialog {
 
     private void initModel() {
 
-        final Dispatcher conceptDispatcher = Lookup.getSelectedConceptDispatcher();
-
         /*
         * Listen for the node in the tree that's been selected to set the
         * selection in the combobox
         */
-        conceptDispatcher.addPropertyChangeListener(new PropertyChangeListener() {
-
-            public void propertyChange(final PropertyChangeEvent evt) {
-                final Concept selectedConcept = (Concept) evt.getNewValue();
-                String conceptName = ConceptName.NAME_DEFAULT;
-                if (selectedConcept != null) {
-                    conceptName = selectedConcept.getPrimaryConceptName().getName();
-                }
-
-                getConceptComboBox().getModel().setSelectedItem(conceptName);
+        StateLookup.selectedConceptProperty().addListener((obs, oldVal, selectedConcept) -> {
+            String conceptName = ConceptName.NAME_DEFAULT;
+            if (selectedConcept != null) {
+                conceptName = selectedConcept.getPrimaryConceptName().getName();
             }
 
+            getConceptComboBox().getModel().setSelectedItem(conceptName);
         });
+
+
 
         /*
          * It's important to do this. Otherwise when the dialog is first displayed
          * the conceptComboBox will have 'object' selected no matter what node is
          * being edited.
          */
-        final Concept selectedConcept = (Concept) conceptDispatcher.getValueObject();
+        final Concept selectedConcept = StateLookup.getSelectedConcept();
         String conceptName = ConceptName.NAME_DEFAULT;
         if (selectedConcept != null) {
             conceptName = selectedConcept.getPrimaryConceptName().getName();
@@ -366,7 +361,7 @@ public class AddConceptDialog extends javax.swing.JDialog {
         }
         catch (Exception ex) {
             log.error("User operation failed for " + concept, ex);
-            EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, ex);
+            EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, ex);
         }
 
         setConcept(null);
@@ -460,7 +455,7 @@ public class AddConceptDialog extends javax.swing.JDialog {
             /*
              * Check userAccount status
              */
-            UserAccount userAccount = (UserAccount) GlobalLookup.getUserAccountDispatcher().getValueObject();
+            UserAccount userAccount = GlobalStateLookup.getUserAccount();
 
             String primaryName = nameField.getText();
             History history = null;
@@ -517,7 +512,7 @@ public class AddConceptDialog extends javax.swing.JDialog {
 
                 }
                 else {
-                    EventBus.publish(Lookup.TOPIC_WARNING,
+                    EventBus.publish(StateLookup.TOPIC_WARNING,
                                      "The name '" + primaryName + "' already exists in the database.");
                 }
 
@@ -526,7 +521,7 @@ public class AddConceptDialog extends javax.swing.JDialog {
             dao.close();
 
             if (history != null) {
-                EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
+                EventBus.publish(StateLookup.TOPIC_APPROVE_HISTORY, history);
             }
 
             return concept;
@@ -534,7 +529,7 @@ public class AddConceptDialog extends javax.swing.JDialog {
 
         void updateConcept(Concept concept) {
 
-            final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+            final UserAccount userAccount = StateLookup.getUserAccount();
             final HistoryFactory historyFactory = toolBelt.getHistoryFactory();
             final List<History> histories = new ArrayList<History>();
             final String parentName = (String) getConceptComboBox().getSelectedItem();
@@ -554,7 +549,7 @@ public class AddConceptDialog extends javax.swing.JDialog {
              * Make sure that you didn't tyr to add it to a descendant
              */
             if (hasDescendent) {
-                EventBus.publish(Lookup.TOPIC_WARNING,
+                EventBus.publish(StateLookup.TOPIC_WARNING,
                                  "The parent that you specified, '" + parentName + "', is already a child" + " of '" +
                                  concept.getPrimaryConceptName().getName() +
                                  "'. This is not allowed. Your request to move" + " the concept is being ignored.");
@@ -638,7 +633,7 @@ public class AddConceptDialog extends javax.swing.JDialog {
             conceptDAO.endTransaction();
             conceptDAO.close();
 
-            EventBus.publish(Lookup.TOPIC_APPROVE_HISTORIES, histories);
+            EventBus.publish(StateLookup.TOPIC_APPROVE_HISTORIES, histories);
 
         }
     }

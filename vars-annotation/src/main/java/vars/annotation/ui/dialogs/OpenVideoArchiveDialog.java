@@ -120,8 +120,8 @@ public class OpenVideoArchiveDialog extends StandardDialog {
 
     private JComboBox<String> getCameraPlatformComboBox() {
         if (cameraPlatformComboBox == null) {
-            cameraPlatformComboBox = new JComboBox<String>();
-            cameraPlatformComboBox.setModel(new DefaultComboBoxModel<String>(listCameraPlatforms()));
+            cameraPlatformComboBox = new JComboBox<>();
+            cameraPlatformComboBox.setModel(new DefaultComboBoxModel<>(listCameraPlatforms()));
         }
 
         return cameraPlatformComboBox;
@@ -129,8 +129,8 @@ public class OpenVideoArchiveDialog extends StandardDialog {
 
     private JComboBox<String> getCameraPlatformByNameComboBox() {
         if (cameraPlatformByNameComboBox == null) {
-            cameraPlatformByNameComboBox = new JComboBox<String>();
-            cameraPlatformByNameComboBox.setModel(new DefaultComboBoxModel<String>(listCameraPlatforms()));
+            cameraPlatformByNameComboBox = new JComboBox<>();
+            cameraPlatformByNameComboBox.setModel(new DefaultComboBoxModel<>(listCameraPlatforms()));
         }
 
         return cameraPlatformByNameComboBox;
@@ -138,7 +138,7 @@ public class OpenVideoArchiveDialog extends StandardDialog {
 
     private JComboBox<String> getExistingNamesComboBox() {
         if (existingNamesComboBox == null) {
-            existingNamesComboBox = new JComboBox<String>();
+            existingNamesComboBox = new JComboBox<>();
         }
 
         return existingNamesComboBox;
@@ -405,10 +405,15 @@ public class OpenVideoArchiveDialog extends StandardDialog {
     }
 
     private String[] listCameraPlatforms() {
-        final Collection<String> cameraPlatforms = VARSProperties.getCameraPlatforms();
-        String[] cp = new String[cameraPlatforms.size()];
-        cameraPlatforms.toArray(cp);
-        Arrays.sort(cp, new IgnoreCaseToStringComparator());
+        String[] cp = {};
+        try {
+            final java.util.List<String> cameraPlatforms = toolBelt.getAnnotationPersistenceService().findAllCameraPlatforms();
+            cp = new String[cameraPlatforms.size()];
+            cameraPlatforms.toArray(cp);
+        }
+        catch (NullPointerException e) {
+
+        }
         return cp;
     }
 

@@ -102,7 +102,7 @@ public class SaveQueryResultsAction extends ActionAdapter {
             List<String> columnNames = content.getA();
             List<String[]> rows = content.getB();
 
-            String columns = "# " + columnNames.stream()
+            String columns = columnNames.stream()
                     .collect(Collectors.joining("\t"));
             out.write(columns);
             out.write("\n");

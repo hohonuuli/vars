@@ -47,8 +47,8 @@ public class ApproveHistoriesSubscriber implements EventTopicSubscriber<Collecti
      * @param histories
      */
     public void onEvent(String topic, Collection<? extends History> histories) {
-        if (Lookup.TOPIC_APPROVE_HISTORIES.equals(topic)) {
-            final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+        if (StateLookup.TOPIC_APPROVE_HISTORIES.equals(topic)) {
+            final UserAccount userAccount = StateLookup.getUserAccount();
 
             try {
                 if ((userAccount != null) && (userAccount.isAdministrator())) {
@@ -56,7 +56,7 @@ public class ApproveHistoriesSubscriber implements EventTopicSubscriber<Collecti
                 }
             }
             catch (Exception e) {
-                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+                EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, e);
             }
             finally {
 
@@ -64,7 +64,7 @@ public class ApproveHistoriesSubscriber implements EventTopicSubscriber<Collecti
                 if (histories.size() > 0) {
                     Concept concept = histories.iterator().next().getConceptMetadata().getConcept();
                     if (concept != null) {
-                        EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, concept.getPrimaryConceptName().getName());
+                        EventBus.publish(StateLookup.TOPIC_REFRESH_KNOWLEGEBASE, concept.getPrimaryConceptName().getName());
                     }
                 }
 

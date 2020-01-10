@@ -1,9 +1,25 @@
 package vars.annotation.ui.video;
 
-import vars.avplayer.VideoControlService;
+import org.bushe.swing.event.EventBus;
+import org.mbari.vcr4j.VideoError;
+import org.mbari.vcr4j.VideoIO;
+import org.mbari.vcr4j.SimpleVideoIO;
+import org.mbari.vcr4j.VideoState;
+import org.mbari.vcr4j.decorators.VCRSyncDecorator;
+import org.mbari.vcr4j.rs422.RS422Error;
+import org.mbari.vcr4j.rs422.RS422State;
+import org.mbari.vcr4j.rs422.VCRVideoIO;
+import org.mbari.vcr4j.rs422.decorators.RS422StatusDecorator;
+import org.mbari.vcr4j.rs422.decorators.UserbitsAsTimeDecorator;
+import org.mbari.vcr4j.rxtx.RXTXVideoIO;
+import org.mbari.vcr4j.udp.UDPVideoIO;
+import vars.annotation.ui.StateLookup;
+import vars.avfoundation.AVFImageCaptureServiceImpl;
+import vars.avplayer.VideoController;
+import vars.avplayer.noop.NoopImageCaptureService;
 
 /**
- * Utility class for creating a {@link VideoControlService} from
+ * Utility class for creating a {@link VideoController} from
  * a String videoConnectionID (as stored in preferences)
  *
  * @author Brian Schlining
@@ -11,25 +27,37 @@ import vars.avplayer.VideoControlService;
  */
 public class VideoControlServiceFactory {
 
-    public static VideoControlService newVideoControlService(String videoConnectionId) {
-        VideoControlService videoControlService = null;
+
+    // TODO this should be moved to the avplayer modules
+    public static VideoController<? extends VideoState, ? extends VideoError> newVideoController(String videoConnectionID) {
+        VideoController<? extends VideoState, ? extends VideoError> videoController = null;
         try {
-            Double frameRate = 29.97;
-            if (videoConnectionId.contains(":")) {
-                videoControlService = new UDPVideoControlService();
-                String[] parts = videoConnectionId.split(":");
+            if (videoConnectionID.contains(":")) { // UDP
+
+                String[] parts = videoConnectionID.split(":");
                 String host = parts[0];
                 Integer port = Integer.valueOf(parts[1]);
-                videoControlService.connect(host, port, frameRate);
+
+                UDPVideoIO io = new UDPVideoIO(host, port);
+                new VCRSyncDecorator<>(io);
+                return new VideoController<>(new NoopImageCaptureService(), io);
             }
             else {
-                videoControlService = new RS422VideoControlService();
-                videoControlService.connect(videoConnectionId, frameRate);
+                VCRVideoIO io = RXTXVideoIO.open(videoConnectionID);
+                new VCRSyncDecorator<>(io);
+                new RS422StatusDecorator(io);
+                UserbitsAsTimeDecorator decorator = new UserbitsAsTimeDecorator(io);
+                VideoIO<RS422State, RS422Error> io2 = new SimpleVideoIO<>(io.getConnectionID(),
+                        io.getCommandSubject(),
+                        io.getStateObservable(),
+                        io.getErrorObservable(),
+                        decorator.getIndexObservable());
+                return new VideoController<>(new AVFImageCaptureServiceImpl(), io2);
             }
         }
         catch (Exception e) {
-            videoControlService = new DoNothingVideoControlService();
+            EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, e);
+            return null;
         }
-        return videoControlService;
     }
 }

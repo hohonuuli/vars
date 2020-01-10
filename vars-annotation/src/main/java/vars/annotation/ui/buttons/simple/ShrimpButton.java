@@ -17,7 +17,7 @@ public class ShrimpButton extends QuickConceptButton {
 
     @Inject
     public ShrimpButton(ToolBelt toolBelt) {
-        super("Shrimp", "/images/simple/shrimp.jpg", toolBelt);
+        super("shrimp", "/images/simple/shrimp.jpg", toolBelt);
     }
     
 }

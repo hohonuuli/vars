@@ -5,6 +5,7 @@ import org.mbari.util.TimeUtilities;
 import java.awt.*;
 import java.io.File;
 import java.text.DateFormat;
+import java.util.Optional;
 
 /**
  * Created with IntelliJ IDEA.
@@ -51,8 +52,8 @@ public class DemoApp {
         //imageCaptureService.startSessionWithNamedDevice("FaceTime HD Camera");
         for (int i = 0; i < 5; i++) {
             File target = new File(saveDirectory, "snapshot" + i + ".png");
-            Image image = imageCaptureService.capture(target);
-            if (image == null) {
+            Optional<Image> image = imageCaptureService.capture(target);
+            if (!image.isPresent()) {
                 System.out.println("Failed to write " + target.getAbsolutePath());
             }
             else {

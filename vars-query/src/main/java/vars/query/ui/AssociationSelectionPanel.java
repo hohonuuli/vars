@@ -327,7 +327,7 @@ public class AssociationSelectionPanel extends JPanel {
             }
         }
         catch (Exception e) {
-            EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+            EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, e);
             log.error("Failed to look up associations", e);
         }
 

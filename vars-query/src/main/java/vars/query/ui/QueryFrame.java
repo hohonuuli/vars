@@ -21,22 +21,10 @@ import java.awt.BorderLayout;
 import java.awt.HeadlessException;
 import java.util.Locale;
 import java.util.ResourceBundle;
-import javax.swing.ActionMap;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JTabbedPane;
-import javax.swing.JToolBar;
-import javax.swing.ListModel;
+import javax.swing.*;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import org.mbari.awt.event.ActionAdapter;
-import org.mbari.util.Dispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
@@ -101,8 +89,7 @@ public class QueryFrame extends JFrame {
         if (actionMap == null) {
             actionMap = new ActionMap();
 
-            Dispatcher dispatcher = Lookup.getApplicationDispatcher();
-            App queryApp = (App) dispatcher.getValueObject();
+            App queryApp = StateLookup.getApplication();
 
             if (queryApp != null) {
                 actionMap.setParent(queryApp.getActionMap());
@@ -288,8 +275,8 @@ public class QueryFrame extends JFrame {
 
     private SearchPanel getSearchPanel() {
         if (searchPanel == null) {
-            Dispatcher dispatcher = Lookup.getGuiceInjectorDispatcher();
-            Injector injector = (Injector) dispatcher.getValueObject();
+
+            Injector injector = StateLookup.GUICE_INJECTOR;
 
             searchPanel = new SearchPanel(injector);
 
@@ -332,10 +319,10 @@ public class QueryFrame extends JFrame {
         this.setSize(300, 200);
         this.setContentPane(getJContentPane());
 
-        ResourceBundle bundle = ResourceBundle.getBundle(Lookup.RESOURCE_BUNDLE, Locale.US);
+        ResourceBundle bundle = ResourceBundle.getBundle(StateLookup.RESOURCE_BUNDLE, Locale.US);
         final String title = bundle.getString("frame.title");
 
         this.setTitle(title);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
 }

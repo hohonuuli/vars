@@ -19,7 +19,8 @@ package vars.annotation.ui.preferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.UserAccount;
-import vars.annotation.ui.Lookup;
+import vars.annotation.ui.StateLookup;
+import vars.avplayer.VideoController;
 import vars.shared.preferences.PreferenceUpdater;
 import vars.avplayer.ImageCaptureService;
 
@@ -92,11 +93,13 @@ public class ImagePreferencesPanel extends JPanel implements PreferenceUpdater {
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    ImageCaptureService imageCaptureService = (ImageCaptureService) Lookup
-                        .getImageCaptureServiceDispatcher().getValueObject();
+                    VideoController videoController = StateLookup.getVideoController();
+                    if (videoController != null) {
+                        ImageCaptureService imageCaptureService = videoController.getImageCaptureService();
+                        if (imageCaptureService != null) {
+                            imageCaptureService.showSettingsDialog();
+                        }
 
-                    if (imageCaptureService != null) {
-                        imageCaptureService.showSettingsDialog();
                     }
                 }
             });

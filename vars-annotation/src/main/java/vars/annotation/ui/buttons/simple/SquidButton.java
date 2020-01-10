@@ -17,7 +17,7 @@ public class SquidButton extends QuickConceptButton {
 
     @Inject
     public SquidButton(ToolBelt toolBelt) {
-        super("Squid", "/images/simple/squid.jpg", toolBelt);
+        super("squid", "/images/simple/squid.jpg", toolBelt);
     }
     
 }

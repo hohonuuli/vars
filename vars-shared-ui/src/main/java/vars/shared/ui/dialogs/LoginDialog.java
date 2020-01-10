@@ -26,9 +26,8 @@ import vars.MiscDAOFactory;
 import vars.MiscFactory;
 import vars.UserAccount;
 import vars.UserAccountDAO;
-import vars.UserAccountRoles;
 import vars.shared.ui.FancyButton;
-import vars.shared.ui.GlobalLookup;
+import vars.shared.ui.GlobalStateLookup;
 import vars.shared.ui.UserAccountComboBox;
 
 /**
@@ -288,7 +287,7 @@ public class LoginDialog extends JDialog {
         }
 
         if (success) {
-            GlobalLookup.getUserAccountDispatcher().setValueObject(userAccount);
+            GlobalStateLookup.setUserAccount(userAccount);
             close();
         }
 
@@ -316,7 +315,7 @@ public class LoginDialog extends JDialog {
             getNameComboBox().update();
         }
         catch (Exception e) {
-            EventBus.publish(GlobalLookup.TOPIC_NONFATAL_ERROR, e);
+            EventBus.publish(GlobalStateLookup.TOPIC_NONFATAL_ERROR, e);
         }
     }
 }

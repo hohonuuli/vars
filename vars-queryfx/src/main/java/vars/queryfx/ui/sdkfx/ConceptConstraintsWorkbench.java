@@ -3,7 +3,6 @@ package vars.queryfx.ui.sdkfx;
 import com.guigarage.sdk.action.Action;
 import com.guigarage.sdk.container.WorkbenchView;
 import com.guigarage.sdk.footer.ActionFooter;
-import com.guigarage.sdk.footer.Footer;
 import com.guigarage.sdk.form.EditorFormRow;
 import com.guigarage.sdk.form.FormLayout;
 import javafx.application.Platform;
@@ -18,10 +17,10 @@ import org.slf4j.LoggerFactory;
 import vars.ILink;
 import vars.LinkBean;
 import vars.LinkUtilities;
-import vars.queryfx.Lookup;
 import vars.queryfx.AsyncQueryService;
 import vars.queryfx.rx.messages.NewConceptSelectionMsg;
 import vars.queryfx.rx.messages.ShowBasicSearchWorkbenchMsg;
+import vars.queryfx.StateLookup;
 import vars.queryfx.ui.AppIcons;
 import vars.shared.rx.RXEventBus;
 import vars.queryfx.beans.ConceptSelection;
@@ -71,7 +70,7 @@ public class ConceptConstraintsWorkbench extends WorkbenchView {
         this.queryService = queryService;
         this.executor = executor;
         this.eventBus = eventBus;
-        linksForConceptSelection.add(Lookup.WILD_CARD_LINK);
+        linksForConceptSelection.add(StateLookup.WILD_CARD_LINK);
 
         // --- Do Layout
 
@@ -139,7 +138,7 @@ public class ConceptConstraintsWorkbench extends WorkbenchView {
                 else {
                     eventBus.send(new FatalExceptionMsg("Failed to look up concepts from database", ex));
                     List<String> ls = new ArrayList<>();
-                    ls.add(Lookup.WILD_CARD);
+                    ls.add(StateLookup.WILD_CARD);
                     return ls;
                 }
             }).thenAccept(names -> {
@@ -149,7 +148,7 @@ public class ConceptConstraintsWorkbench extends WorkbenchView {
                     ObservableList<String> obs = FXCollections.observableArrayList(names);
 
                     // Need to add wild card (i.e. Formerly NIL)
-                    obs.add(0, Lookup.WILD_CARD);
+                    obs.add(0, StateLookup.WILD_CARD);
                     conceptComboBox.setItems(obs);
                     conceptComboBox.setPromptText("Enter search term (* is wildcard)");
                     conceptComboBox.getSelectionModel().select(0);
@@ -241,7 +240,7 @@ public class ConceptConstraintsWorkbench extends WorkbenchView {
 
                     runOnFXThread(() -> {
                         ObservableList<String> items = cb.getItems();
-                        items.add(Lookup.WILD_CARD);
+                        items.add(StateLookup.WILD_CARD);
                         if (list.isEmpty()) {
                             items.add(newVal.getToConcept());
                         }
@@ -294,7 +293,7 @@ public class ConceptConstraintsWorkbench extends WorkbenchView {
             runningFuture.cancel(true);
         }
 
-        if (selection.getConceptName().equals(Lookup.WILD_CARD)) {
+        if (selection.getConceptName().equals(StateLookup.WILD_CARD)) {
             runningFuture = queryService.findAllLinks();
         }
         else {
@@ -308,7 +307,7 @@ public class ConceptConstraintsWorkbench extends WorkbenchView {
 
         runningFuture.thenAccept(links -> {
             runOnFXThread(() -> {
-                linksForConceptSelection.add(Lookup.WILD_CARD_LINK);
+                linksForConceptSelection.add(StateLookup.WILD_CARD_LINK);
                 linksForConceptSelection.addAll(links);
                 EditorFormRow<ComboBox<ILink>> row = getAssociationSelectionRow();
                 ComboBox<ILink> editor = row.getEditor();
@@ -331,9 +330,9 @@ public class ConceptConstraintsWorkbench extends WorkbenchView {
         List<String> toConceptP = toConceptRow.getEditor().getItems();
         String linkValueP = linkValueRow.getEditor().getText();
 
-        String linkName = linkNameP == null || linkNameP.isEmpty() ? Lookup.WILD_CARD : linkNameP;
-        String toConcept = toConceptP.isEmpty() ? Lookup.WILD_CARD : toConceptP.get(0);
-        String linkValue = linkValueP == null || linkValueP.isEmpty() ? Lookup.WILD_CARD : linkValueP;
+        String linkName = linkNameP == null || linkNameP.isEmpty() ? StateLookup.WILD_CARD : linkNameP;
+        String toConcept = toConceptP.isEmpty() ? StateLookup.WILD_CARD : toConceptP.get(0);
+        String linkValue = linkValueP == null || linkValueP.isEmpty() ? StateLookup.WILD_CARD : linkValueP;
 
 
         ILink link = new LinkBean(linkName, toConcept, linkValue);

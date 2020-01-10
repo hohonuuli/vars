@@ -17,7 +17,7 @@ public class SkateButton extends QuickConceptButton {
 
     @Inject
     public SkateButton(ToolBelt toolBelt) {
-        super("Skate", "/images/simple/skate.jpg", toolBelt);
+        super("skate", "/images/simple/skate.jpg", toolBelt);
     }
     
 }

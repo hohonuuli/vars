@@ -58,8 +58,8 @@ public class JPGPreviewUtilities {
         s.append("LocalTime = ").append(snapTime.getFormattedLocalTime()).append("\n");
         s.append("UTCTime   = ").append(snapTime.getFormattedGmtTime()).append("\n");
         s.append("YYYYJJJ   = ").append(snapTime.getTrackingNumber()).append("\n");
-        s.append("AnnTC     = ").append(snapTime.getTimeCodeAsString()).append("\n");
-        s.append("SnapTC    = ").append(snapTime.getTimeCodeAsName()).append("\n");
+        s.append("AnnTC     = ").append(snapTime.getFramegrabName()).append("\n");
+        s.append("SnapTC    = ").append(snapTime.getTimecodeString()).append("\n");
         s.append("Annotation= ").append(strAnnoText).append("\n");
 
         if (log.isInfoEnabled()) {

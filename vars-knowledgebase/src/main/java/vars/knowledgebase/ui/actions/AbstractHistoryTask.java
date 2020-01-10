@@ -8,7 +8,7 @@ import vars.DAO;
 import vars.UserAccount;
 import vars.knowledgebase.ConceptMetadata;
 import vars.knowledgebase.History;
-import vars.knowledgebase.ui.Lookup;
+import vars.knowledgebase.ui.StateLookup;
 
 public abstract class AbstractHistoryTask {
 
@@ -30,7 +30,7 @@ public abstract class AbstractHistoryTask {
      * @param msg
      */
     protected void dropHistory(History h, final String msg, DAO dao) {
-        EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, msg);
+        EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, msg);
         h = dao.find(h);
         final ConceptMetadata conceptMetadata = h.getConceptMetadata();
         conceptMetadata.removeHistory(h);

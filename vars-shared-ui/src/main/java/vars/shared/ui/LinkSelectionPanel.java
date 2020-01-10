@@ -335,7 +335,7 @@ public class LinkSelectionPanel extends JPanel {
 
             }
             catch (final Exception e) {
-                EventBus.publish(GlobalLookup.TOPIC_NONFATAL_ERROR, e);
+                EventBus.publish(GlobalStateLookup.TOPIC_NONFATAL_ERROR, e);
                 comboBox.addItem(conceptName);
             }
         }

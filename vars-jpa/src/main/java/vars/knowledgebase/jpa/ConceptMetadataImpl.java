@@ -29,6 +29,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -61,7 +62,9 @@ import vars.knowledgebase.*;
  * </pre>
  */
 @Entity(name = "ConceptMetadata")
-@Table(name = "ConceptDelegate")
+@Table(name = "ConceptDelegate",
+        indexes = {@Index(name = "idx_ConceptDelegate_FK1", columnList = "ConceptID_FK"),
+                   @Index(name = "idx_ConceptDelegate_LUT", columnList = "LAST_UPDATED_TIME")})
 @EntityListeners({ TransactionLogger.class, KeyNullifier.class })
 @NamedQueries({ @NamedQuery(name = "ConceptMetadata.findById",
                             query = "SELECT v FROM ConceptMetadata v WHERE v.id = :id") })
@@ -78,7 +81,7 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
         cascade = {CascadeType.ALL}
     )
     @OrderBy(value = "creationDate")
-    private List<History> histories;
+    private List<HistoryImpl> histories;
 
     @Id
     @Column(
@@ -103,7 +106,7 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
         fetch = FetchType.EAGER,
         cascade = CascadeType.ALL
     )
-    private List<LinkRealization> linkRealizations;
+    private List<LinkRealizationImpl> linkRealizations;
 
     @OneToMany(
         targetEntity = LinkTemplateImpl.class,
@@ -111,7 +114,7 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
         fetch = FetchType.EAGER,
         cascade = CascadeType.ALL
     )
-    private List<LinkTemplate> linkTemplates;
+    private List<LinkTemplateImpl> linkTemplates;
 
 
     @OneToMany(
@@ -188,11 +191,11 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
 
     public Collection<History> getHistories() {
         if (histories == null) {
-            histories = new ArrayList<History>();
+            histories = new ArrayList<>();
         }
  
 
-        return histories;
+        return (List<History>) (List<?>) histories;
     }
 
     public Long getId() {
@@ -201,27 +204,27 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
 
     public Collection<LinkRealization> getLinkRealizations() {
         if (linkRealizations == null) {
-            linkRealizations = new ArrayList<LinkRealization>();
+            linkRealizations = new ArrayList<>();
         }
 
-        return linkRealizations;
+        return (List<LinkRealization>) (List<?>) linkRealizations;
     }
 
     public Collection<LinkTemplate> getLinkTemplates() {
         if (linkTemplates == null) {
-            linkTemplates = new ArrayList<LinkTemplate>();
+            linkTemplates = new ArrayList<>();
         }
 
-        return linkTemplates;
+        return (List<LinkTemplate>) (List<?>) linkTemplates;
     }
 
     public Collection<Media> getMedias() {
         if (medias == null) {
-            medias = new ArrayList<Media>();
+            medias = new ArrayList<>();
         }
 
 
-        return medias;
+        return (List<Media>) (List<?>) medias;
     }
 
     public Media getPrimaryImage() {
@@ -337,7 +340,7 @@ public class ConceptMetadataImpl implements Serializable, ConceptMetadata, JPAEn
             return false;
         }
         final ConceptMetadataImpl other = (ConceptMetadataImpl) obj;
-        if (this.id != other.id && (this.id == null || !this.id.equals(other.id))) {
+        if (!this.id.equals(other.id) && (this.id == null || !this.id.equals(other.id))) {
             return false;
         }
         return true;

@@ -17,22 +17,8 @@ package vars.annotation.jpa;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Date;
-import javax.persistence.Cacheable;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
-import javax.persistence.TableGenerator;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Version;
+import javax.persistence.*;
+
 import vars.annotation.CameraDeployment;
 import vars.annotation.VideoArchiveSet;
 import vars.jpa.JPAEntity;
@@ -47,7 +33,9 @@ import vars.jpa.TransactionLogger;
  * To change this template use File | Settings | File Templates.
  */
 @Entity(name = "CameraDeployment")
-@Table(name = "CameraPlatformDeployment")
+@Table(name = "CameraPlatformDeployment",
+        indexes = {@Index(name = "idx_CameraDeployment_FK1", columnList = "VideoArchiveSetID_FK"),
+                @Index(name = "idx_CameraDeployment_LUT", columnList = "LAST_UPDATED_TIME")})
 @Cacheable(false)
 @EntityListeners({ TransactionLogger.class, KeyNullifier.class })
 @NamedQueries( {

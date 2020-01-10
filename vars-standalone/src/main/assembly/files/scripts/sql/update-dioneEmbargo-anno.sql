@@ -20,50 +20,68 @@ WHERE
         RovName = 'Tiburon' AND
         DiveNumber IN (1001, 1029, 1030, 1031, 1032, 1033, 1034)
       )
-      OR ( -- Delete embargoes by concept
+      OR ( -- Delete embargoes by selectedConcept
         ConceptName IN (
-          'Xenoturbellida',
-          'Xenoturbellidae',
-          'Xenoturbella',
-          'Mystery Mollusc',
-          'Ctenophora',
-          'Cydippida',
-          'Cydippida 2',
-          'Llyria',
-          'Mertensia',
-          'Platyctenida sp. 1',
-          'Lyroctenidae',
-          'Lyrocteis',
-          'Tjalfiellidae',
-          'Tjalfiella',
-          'Tjalfiella tristoma',
-          'Thalassocalycida',
-          'Thalassocalycida sp. 1',
-          'Intacta',
           'Aegina sp. 1',
-          'Erenna sp. A',
-          'Erenna sp. B',
+          'Ctenophora',
+          'Cydippida 2',
+          'Cydippida',
+          'Intacta',
+          'Llyria',
+          'Lyrocteis',
+          'Lyroctenidae',
+          'Mertensia',
           'Mertensiidae sp. A',
+          'Mystery Mollusc',
+          'Mystery Mollusc',
           'Physonectae sp. 1',
+          'Platyctenida sp. 1',
+          'Platyctenida',
+          'Thalassocalycida sp. 1',
+          'Thalassocalycida',
           'Thliptodon sp. A',
-          'Tuscaroridae',
-          'Tuscarantha',
-          'Tuscarantha luciae',
+          'Tjalfiella tristoma',
+          'Tjalfiella',
+          'Tjalfiellidae',
           'Tuscarantha braueri',
-          'Tuscaretta',
+          'Tuscarantha luciae',
+          'Tuscarantha',
           'Tuscaretta globosa',
-          'Tuscaridium',
+          'Tuscaretta',
           'Tuscaridium cygneum',
-          'Tuscarilla',
+          'Tuscaridium',
+          'Tuscarilla campanella',
           'Tuscarilla nationalis',
           'Tuscarilla similis',
-          'Tuscarilla campanella',
-          'Tuscarora'
+          'Tuscarilla',
+          'Tuscarora',
+          'Tuscaroridae'
         )
       )
     )
   )
 GO
+
+-- DELETE All bioluminescent asociations ----------------------------
+DELETE FROM
+  Association
+WHERE
+  LinkName = 'is-bioluminescent'
+
+-- DELETE any associations with value of mysterey mollus -------------
+DELETE FROM
+  Observation
+WHERE
+  id IN (
+    SELECT DISTINCT
+      ObservationID_FK
+    FROM
+      Annotations
+    WHERE
+      LinkValue LIKE '%mysterey%mollusc%'
+  )
+  
+
 
 -- DELETE Bob's Xeno annotations --------------------------------------
 DELETE FROM
@@ -81,6 +99,30 @@ WHERE
          'Psamminida'
        ) AND
        (ChiefScientist LIKE '%Vrijenhoek%' OR ChiefScientist LIKE '%Clague%')
+  )
+
+GO
+
+-- Delete Benthic labs's transect data -------------------------------
+DELETE
+  Observation
+WHERE
+  VideoFrameID_FK IN (
+    SELECT
+      Vf.id
+    FROM
+      CameraPlatformDeployment as cpd RIGHT JOIN
+      VideoArchiveSet AS vas ON vas.id = cpd.VideoArchiveSetID_FK LEFT JOIN
+      VideoArchive AS va ON va.VideoArchiveSetID_FK = va.id LEFT JOIN
+      VideoFrame AS vf ON vf.VideoArchiveID_FK = va.id LEFT JOIN
+      CameraData AS cd ON cd.VideoFrameID_FK = vf.id
+    WHERE
+       cd.Direction IN ('transect', 'diel transect', 'starttransect', 'endtransect') AND
+       (cpd.ChiefScientist LIKE '%barry%' OR
+        cpd.ChiefScientist LIKE '%whaling%' OR
+        cpd.ChiefScientist LIKE '%smith%' OR
+        cpd.ChiefScientist LIKE '%clague%' OR
+        cpd.ChiefScientist LIKE '%kuhnz%')
   )
 
 GO
@@ -107,6 +149,17 @@ WHERE
        cpd.ChiefScientist LIKE '%hopcroft%' OR
        cpd.ChiefScientist LIKE '%hunt%' OR
        cpd.ChiefScientist LIKE '%hamner%')
+  )
+  
+GO
+
+-- Delete Station M pyrosome annotations -----------------------------
+DELETE FROM
+  Observation
+WHERE
+  ConceptName IN (
+    'Pyrosoma',
+    'Pyrosoma atlanticum'
   )
   
 GO

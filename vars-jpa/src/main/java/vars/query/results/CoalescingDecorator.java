@@ -18,24 +18,23 @@ public class CoalescingDecorator {
         final Map<String, List<Object>> resultsMap = queryResults.copyData();
         final Map<String, List<Object>> combinedMap = newEmptyResultMap(resultsMap);
 
-        List<Object>  keyColumn = resultsMap.get(keyColumnName);
+        List<Object>  keyColumn = queryResults.getValues(keyColumnName);
         List<Object> distinctKeys = keyColumn.stream()
                 .distinct()
                 .collect(Collectors.toList());
-        distinctKeys.stream()
-                .forEach(key -> {
-                    //System.out.print("key = " + key);
-                    Map<String, List<Object>> rows = extractRowsWithSameKey(resultsMap, keyColumnName, key);
-                    //System.out.println(". Found " + rows.values().iterator().next().size() + " rows");
-                    if (rows.values().iterator().next().size() == 1) {
-                        addRowToMap(combinedMap, rows);
-                    }
-                    else {
-                        Map<String, Object> row = combineRows(rows);
-                        addNewRowToMap(combinedMap, row);
-                    }
+        distinctKeys.forEach(key -> {
+            //System.out.print("key = " + key);
+            Map<String, List<Object>> rows = extractRowsWithSameKey(resultsMap, keyColumn, key);
+            //System.out.println(". Found " + rows.values().iterator().next().size() + " rows");
+            if (rows.values().iterator().next().size() == 1) {
+                addRowToMap(combinedMap, rows);
+            }
+            else {
+                Map<String, Object> row = combineRows(rows);
+                addNewRowToMap(combinedMap, row);
+            }
 
-                });
+        });
 
         return new QueryResults(combinedMap);
 
@@ -58,14 +57,13 @@ public class CoalescingDecorator {
         return combinedValues;
     }
 
-    private static Map<String, List<Object>> extractRowsWithSameKey(Map<String, List<Object>> resultsMap, String keyColumnName, Object key) {
+    private static Map<String, List<Object>> extractRowsWithSameKey(Map<String, List<Object>> resultsMap, List<Object> keyColumn, Object key) {
 
         // --- Get indices of rows with key
-        List<Object> keyColumn = resultsMap.get(keyColumnName);
         List<Integer> rows = new ArrayList<>();
         for (int i = 0; i < keyColumn.size(); i++) {
             Object key0 = keyColumn.get(i);
-            if (key.equals(key0)) {
+            if (key != null && key.equals(key0)) {
                 rows.add(i);
             }
         }
@@ -75,7 +73,7 @@ public class CoalescingDecorator {
         for (String columnName : resultsMap.keySet()) {
             List<Object> allRows = resultsMap.get(columnName);
             List<Object> matchedRows = matches.get(columnName);
-            rows.stream().forEach(i -> matchedRows.add(allRows.get(i)));
+            rows.forEach(i -> matchedRows.add(allRows.get(i)));
         }
 
         return matches;

@@ -5,18 +5,14 @@ import com.google.common.collect.Collections2;
 import org.bushe.swing.event.EventBus;
 import vars.DAO;
 import vars.annotation.AnnotationDAOFactory;
-import vars.annotation.AnnotationFactory;
-import vars.annotation.CameraData;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveDAO;
 import vars.annotation.VideoFrame;
-import vars.annotation.ui.Lookup;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.commandqueue.Command;
 import vars.annotation.ui.eventbus.ObservationsAddedEvent;
 import vars.annotation.ui.eventbus.ObservationsRemovedEvent;
-import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;
 
 import java.util.ArrayList;
 import java.util.Collection;

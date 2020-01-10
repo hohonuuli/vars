@@ -6,10 +6,10 @@
  * @since 2012-01-20
  */
 
-import vars.shared.ui.GlobalLookup
 import vars.annotation.VideoArchiveDAO
+import vars.shared.ui.GlobalStateLookup
 
-def df = GlobalLookup.DATE_FORMAT_UTC
+def df = GlobalStateLookup.getUTCDateFormat()
 def date = df.parse('2012-06-26 23:33:00')
 
 def toolbox = new vars.ToolBox()

@@ -17,7 +17,7 @@ public class SeaCucumberButton extends QuickConceptButton {
 
     @Inject
     public SeaCucumberButton(ToolBelt toolBelt) {
-        super("Sea Cucumber", "/images/simple/sea_cucumber.jpg", toolBelt);
+        super("sea cucumber", "/images/simple/sea_cucumber.png", toolBelt);
     }
     
 }

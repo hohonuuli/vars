@@ -135,17 +135,21 @@ class DatabaseUtility {
         def diveDao = toolBox.daoFactory.newDiveDAO()
         for (VideoArchiveSet vas in badVas) {
             for (cpd in vas.cameraDeployments) {
-                def dive = diveDao.findByPlatformAndDiveNumber(platforms[vas.platformName], cpd.sequenceNumber)
-                def chiefScientist = dive?.chiefScientist
-                if (chiefScientist) {
-                    log.debug("Updating ${vas}.chiefScientist = ${chiefScientist} for dive ${vas.platformName} ${cpd.sequenceNumber} ")
-                    dao.startTransaction()
-                    cpd = dao.find(cpd)
-                    cpd.chiefScientistName = chiefScientist
-                    dao.endTransaction()
+                try {
+                    def dive = diveDao.findByPlatformAndDiveNumber(platforms[vas.platformName], cpd.sequenceNumber)
+                    def chiefScientist = dive?.chiefScientist
+                    if (chiefScientist) {
+                        log.debug("Updating ${vas}.chiefScientist = ${chiefScientist} for dive ${vas.platformName} ${cpd.sequenceNumber} ")
+                        dao.startTransaction()
+                        cpd = dao.find(cpd)
+                        cpd.chiefScientistName = chiefScientist
+                        dao.endTransaction()
+                    } else {
+                        log.debug("Unable to find chiefScientist for ${vas.platformName} #${cpd.sequenceNumber}")
+                    }
                 }
-                else {
-                    log.debug("Unable to find chiefScientist for ${vas.platformName} #${cpd.sequenceNumber}")
+                catch (Exception e) {
+                    log.info("Unable to lookup EXPD info for ${vas.platformName} ${cpd.sequenceNumber}")
                 }
             }
 

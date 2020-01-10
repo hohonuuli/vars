@@ -15,14 +15,13 @@
 
 package vars.annotation.ui.dialogs;
 
-import java.awt.Frame;
 import java.awt.event.KeyEvent;
 import javax.swing.JDialog;
 import javax.swing.JTextField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.actions.AddNewRefNumPropAction;
-import vars.annotation.ui.Lookup;
 import vars.shared.ui.FancyButton;
 
 /**
@@ -57,7 +56,7 @@ public class NewRefNumPropDialog extends JDialog {
      * This is the default constructor
      */
     public NewRefNumPropDialog() {
-        super((Frame) Lookup.getApplicationFrameDispatcher().getValueObject(), true);
+        super(StateLookup.getAnnotationFrame(), true);
         initialize();
     }
 

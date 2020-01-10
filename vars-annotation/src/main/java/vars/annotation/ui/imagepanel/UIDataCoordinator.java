@@ -25,8 +25,8 @@ import vars.annotation.Observation;
 import vars.annotation.ObservationDAO;
 import vars.annotation.VideoFrame;
 import vars.annotation.VideoFrameDAO;
-import vars.annotation.ui.Lookup;
 import vars.annotation.ui.PersistenceController;
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.eventbus.ObservationsAddedEvent;
 import vars.annotation.ui.eventbus.ObservationsChangedEvent;
 import vars.annotation.ui.eventbus.ObservationsRemovedEvent;
@@ -170,9 +170,8 @@ public class UIDataCoordinator implements UIEventSubscriber {
         });
 
         if (!changedVideoFrame.isEmpty()) {
-            Collection<Observation> obs = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher()
-                .getValueObject();
-            setVideoFrame(changedVideoFrame.iterator().next(), new ArrayList<Observation>(obs));
+            Collection<Observation> obs = StateLookup.getSelectedObservations();
+            setVideoFrame(changedVideoFrame.iterator().next(), new ArrayList<>(obs));
         }
     }
 

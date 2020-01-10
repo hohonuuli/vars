@@ -49,7 +49,7 @@ class KnowledgebaseFrameController {
         this.persistenceCache = toolBelt.getPersistenceCache();
 
         // When a Refresh event is published refresh the knowledgebase
-        EventBus.subscribe(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, refreshTreeSubscriber);
+        EventBus.subscribe(StateLookup.TOPIC_REFRESH_KNOWLEGEBASE, refreshTreeSubscriber);
     }
 
     /**
@@ -70,7 +70,7 @@ class KnowledgebaseFrameController {
         }
         catch (Exception e) {
             log.error("Failed to clear cache", e);
-            EventBus.publish(Lookup.TOPIC_FATAL_ERROR,
+            EventBus.publish(StateLookup.TOPIC_FATAL_ERROR,
                              "Failed to clear" + " knowledgebase cache. Please close this " + "application");
         }
 

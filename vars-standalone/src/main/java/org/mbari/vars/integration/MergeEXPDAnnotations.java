@@ -30,12 +30,11 @@ import org.mbari.expd.actions.CollateByTimecodeFunction;
 import org.mbari.expd.actions.CollateFunction;
 import org.mbari.expd.jdbc.DAOFactoryImpl;
 import org.mbari.expd.jdbc.UberDatumImpl;
-import org.mbari.ocean.Seawater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.DAO;
 import vars.annotation.*;
-import vars.annotation.ui.Lookup;
+import vars.annotation.ui.StateLookup;
 import vars.integration.MergeFunction;
 import vars.integration.MergeHistory;
 import vars.integration.MergeHistoryDAO;
@@ -235,7 +234,7 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
 
 
     private List<VideoFrame> fetchVarsData() {
-        Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
+        Injector injector = StateLookup.GUICE_INJECTOR;
         AnnotationDAOFactory annotationDAOFactory = injector.getInstance(AnnotationDAOFactory.class);
         VideoArchiveSetDAO videoArchiveSetDAO = annotationDAOFactory.newVideoArchiveSetDAO();
         List<VideoFrame> myVideoFrames = new ArrayList<VideoFrame>();
@@ -336,7 +335,7 @@ public class MergeEXPDAnnotations implements MergeFunction<Map<VideoFrame, UberD
         mergeHistory.setMergeDate(new Date());
         mergeHistory.setStatusMessage("Using " + mergeType + " merge");
 
-        Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
+        Injector injector = StateLookup.GUICE_INJECTOR;
         AnnotationDAOFactory annotationDAOFactory = injector.getInstance(AnnotationDAOFactory.class);
         DAO dao = annotationDAOFactory.newDAO();
 

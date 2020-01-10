@@ -10,7 +10,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.paint.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.queryfx.Lookup;
+import vars.queryfx.StateLookup;
 import vars.queryfx.rx.messages.ShowAdvancedSearchWorkbenchMsg;
 import vars.queryfx.rx.messages.ShowBasicSearchWorkbenchMsg;
 import vars.queryfx.rx.messages.ShowConceptConstraintsWorkbenchMsg;
@@ -35,7 +35,7 @@ import vars.queryfx.ui.sdkfx.ConceptConstraintsWorkbench;
 import vars.queryfx.ui.sdkfx.ConceptMedia;
 import vars.queryfx.ui.sdkfx.CustomizeResultsWorkbench;
 import vars.shared.javafx.application.ImageFX;
-import vars.shared.ui.GlobalLookup;
+import vars.shared.ui.GlobalStateLookup;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -225,7 +225,7 @@ public class App {
     public static void main( String[] args ) {
         System.setProperty("user.timezone", "UTC");
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-        GlobalLookup.getSettingsDirectory(); // Not used
+        GlobalStateLookup.getSettingsDirectory(); // Not used
 
         /*
           Log uncaught Exceptions
@@ -244,7 +244,7 @@ public class App {
             mainLog.info("This application was launched at " + date.toString());
         }
 
-        Injector injector = Lookup.getInjector();
+        Injector injector = StateLookup.getInjector();
         ToolBelt toolBelt = injector.getInstance(ToolBelt.class);
 
         // Check that we can connect to the database. JDBC driver doesn't seem to get initialize
@@ -260,7 +260,7 @@ public class App {
 
 
         App app = new App(toolBelt);
-        Lookup.setApp(app);
+        StateLookup.setApp(app);
         ImageFX.setIsJavaFXRunning(true);
         app.getApplication().setPrefSize(800, 900);
         app.getApplication().setStopCallback(() -> System.exit(0));

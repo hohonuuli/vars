@@ -54,7 +54,6 @@ import vars.UserAccountRoles;
                 query = "SELECT c FROM UserAccount c WHERE c.affiliation LIKE :affiliation") ,
     @NamedQuery(name = "UserAccount.findByRole", query = "SELECT c FROM UserAccount c WHERE c.role LIKE :role") ,
     @NamedQuery(name = "UserAccount.findAll", query = "SELECT c FROM UserAccount c")
-
 })
 public class UserAccountImpl implements Serializable, UserAccount, JPAEntity {
 

@@ -22,14 +22,13 @@ import vars.MiscDAOFactory;
 import vars.MiscFactory;
 import vars.UserAccount;
 import vars.UserAccountDAO;
-import vars.shared.ui.GlobalLookup;
+import vars.shared.ui.GlobalStateLookup;
 
-import javax.swing.JDialog;
 import java.awt.Frame;
 
 /**
  * Displays a login dialog and registers the resulting UserAccount in the
- * {@link GlobalLookup}
+ * {@link GlobalStateLookup}
  *
  * @version    $Id: LoginAction.java 295 2006-07-06 23:47:31Z hohonuuli $
  * @author     <a href="http://www.mbari.org">Monterey Bay Aquarium Research Institute</a>
@@ -63,7 +62,7 @@ public class LoginAction extends ActionAdapter {
      *                         not be able to modify the knowledgebase.
      */
     public LoginAction(MiscDAOFactory miscDAOFactory, MiscFactory miscFactory, boolean passwordRequired) {
-        final Frame frame = (Frame) GlobalLookup.getSelectedFrameDispatcher().getValueObject();
+        final Frame frame = GlobalStateLookup.getSelectedFrame();
         loginDialog = new LoginDialog(frame, true, miscDAOFactory, miscFactory);
         loginDialog.setPasswordRequired(passwordRequired);
     }
@@ -121,7 +120,7 @@ public class LoginAction extends ActionAdapter {
             userAccount = null;
         }
         finally {
-            GlobalLookup.getUserAccountDispatcher().setValueObject(userAccount);
+            GlobalStateLookup.setUserAccount(userAccount);
         }
 
         return ok;

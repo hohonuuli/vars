@@ -38,7 +38,9 @@ import vars.jpa.TransactionLogger;
  */
 
 @Entity(name = "VideoFrame")
-@Table(name = "VideoFrame")
+@Table(name = "VideoFrame",
+        indexes = {@Index(name = "idx_VideoFrame_FK1", columnList = "VideoArchiveID_FK"),
+                @Index(name = "idx_VideoFrame_LUT", columnList = "LAST_UPDATED_TIME")})
 @Cacheable(false)
 @EntityListeners({ TransactionLogger.class, KeyNullifier.class })
 @NamedQueries({ @NamedQuery(name = "VideoFrame.findById", query = "SELECT v FROM VideoFrame v WHERE v.id = :id") ,
@@ -52,7 +54,6 @@ public class VideoFrameImpl implements Serializable, VideoFrame, JPAEntity {
 
     @Column(
         name = "HDTimeCode",
-        nullable = false,
         length = 11
     )
     String alternateTimecode;

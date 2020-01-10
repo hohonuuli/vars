@@ -5,7 +5,7 @@
     <parent>
         <groupId>vars-redux</groupId>
         <artifactId>vars-redux</artifactId>
-        <version>8.3.4-SNAPSHOT</version>
+        <version>8.2-SNAPSHOT</version>
     </parent>
     <groupId>vars-redux</groupId>
     <artifactId>vars-avplayer-vlcj</artifactId>
@@ -26,7 +26,8 @@
         <dependency>
             <groupId>uk.co.caprica</groupId>
             <artifactId>vlcj</artifactId>
-            <version>3.10.1</version>
+            <!--<version>3.10.1</version>-->
+            <version>4.0.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

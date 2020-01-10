@@ -20,7 +20,6 @@ import java.util.ResourceBundle;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.annotation.ui.Lookup;
 
 /**
  * Retrieve VARS properties. Most of the properties are configured in the file 'vars.properties'. However,
@@ -30,7 +29,7 @@ import vars.annotation.ui.Lookup;
  */
 public class VARSProperties {
 
-    private static final ResourceBundle bundle = ResourceBundle.getBundle(Lookup.RESOURCE_BUNDLE, Locale.US);
+    private static final ResourceBundle bundle = ResourceBundle.getBundle(StateLookup.RESOURCE_BUNDLE, Locale.US);
     
     /**
      * Stores cameraplatform, ship pairs. For example a vars.properties file with
@@ -94,11 +93,11 @@ public class VARSProperties {
                 String shipKey = "ship" + idx;
                 String ship = "";
                 try {
-                    log.debug("Looking for " + shipKey + " in " + Lookup.RESOURCE_BUNDLE);
+                    log.debug("Looking for " + shipKey + " in " + StateLookup.RESOURCE_BUNDLE);
                     ship = bundle.getString(shipKey);
                 }
                 catch (MissingResourceException e) {
-                    log.info("Failed to find key '" + shipKey + "' in " + Lookup.RESOURCE_BUNDLE);
+                    log.info("Failed to find key '" + shipKey + "' in " + StateLookup.RESOURCE_BUNDLE);
                     /*
                      * If we fail to find a corresponding ship just use the
                      * cameraPlatform as the ship name.
@@ -117,7 +116,7 @@ public class VARSProperties {
             deploymentLocale = getProperty("deployment.locale");
         } 
         catch (MissingResourceException e) {
-            log.info("The property 'deployment.locale' was not found in " + Lookup.RESOURCE_BUNDLE);
+            log.info("The property 'deployment.locale' was not found in " + StateLookup.RESOURCE_BUNDLE);
             deploymentLocale = null;
         }
         
@@ -125,7 +124,7 @@ public class VARSProperties {
             imageCopyrightOwner = getProperty("image.copyright.owner");
         } 
         catch (MissingResourceException e) {
-            log.info("The property 'image.copyright.owner' was not found in " + Lookup.RESOURCE_BUNDLE);
+            log.info("The property 'image.copyright.owner' was not found in " + StateLookup.RESOURCE_BUNDLE);
             imageCopyrightOwner = "";
         }
         
@@ -141,7 +140,7 @@ public class VARSProperties {
             }
         }
         catch (MissingResourceException e) {
-            log.info("The property 'vcr.url' was not found in " + Lookup.RESOURCE_BUNDLE);
+            log.info("The property 'vcr.url' was not found in " + StateLookup.RESOURCE_BUNDLE);
             vcrUrl = null;
             vcrPort = -1;
         }
@@ -150,24 +149,24 @@ public class VARSProperties {
             imageArchiveDirectory = getProperty("image.archive.dir");
         }
         catch (MissingResourceException e) {
-            log.info("The property 'image.archive.dir' was not found in " + Lookup.RESOURCE_BUNDLE);
+            log.info("The property 'image.archive.dir' was not found in " + StateLookup.RESOURCE_BUNDLE);
         }
         
         try {
             imageArchiveURL = getProperty("image.archive.url");
         }
         catch (MissingResourceException e) {
-            log.info("The property 'image.archive.url' was not found in " + Lookup.RESOURCE_BUNDLE);
+            log.info("The property 'image.archive.url' was not found in " + StateLookup.RESOURCE_BUNDLE);
         }
 
         try {
             showRecordedDateInTable = Boolean.parseBoolean(getProperty("show.recorded.date"));
         }
         catch (MissingResourceException e) {
-            log.info("The property 'show.recorded.date' was not found in " + Lookup.RESOURCE_BUNDLE);
+            log.info("The property 'show.recorded.date' was not found in " + StateLookup.RESOURCE_BUNDLE);
         }
         catch (Exception e) {
-            log.info("Expected 'true' or 'false' for 'show.recorded.date in " + Lookup.RESOURCE_BUNDLE +
+            log.info("Expected 'true' or 'false' for 'show.recorded.date in " + StateLookup.RESOURCE_BUNDLE +
                     " but found " + getProperty("show.recorded.date"));
         }
         
@@ -199,6 +198,7 @@ public class VARSProperties {
     /**
      * @return The collection of cameraplatforms found in the vars.properties file.
      * The collecition is Collection<String>
+     *    @deprecated  Use AnnotationPersistenceService.findAllCameraPlatforms instead
      */
     public static Collection<String> getCameraPlatforms() {
         return platforms.keySet();

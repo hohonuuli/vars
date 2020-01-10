@@ -17,22 +17,21 @@
 
 package vars.annotation.ui.buttons;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
+
 import org.mbari.swing.SwingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.UserAccount;
 import vars.annotation.VideoArchive;
-import vars.annotation.ui.Lookup;
 
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.video.SwingImageCaptureAction;
+import vars.avplayer.VideoController;
 import vars.shared.ui.DoNothingAction;
-import vars.avplayer.VideoControlService;
 import vars.shared.ui.FancyButton;
 import vars.avplayer.ImageCaptureService;
 
@@ -71,26 +70,23 @@ public class FrameCaptureButton extends FancyButton {
                        SwingUtils.getKeyString((KeyStroke) getAction().getValue(Action.ACCELERATOR_KEY)) + "]");
         setText("");
 
-        PropertyChangeListener listener = new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                setEnabled(checkEnable());
-            }
-        };
-
-        Lookup.getImageCaptureServiceDispatcher().addPropertyChangeListener(listener);
-        Lookup.getVideoArchiveDispatcher().addPropertyChangeListener(listener);
-        Lookup.getUserAccountDispatcher().addPropertyChangeListener(listener);
-        Lookup.getVideoControlServiceDispatcher().addPropertyChangeListener(listener);
+        StateLookup.videoControllerProperty().addListener((obs, oldVal, newVal) -> setEnabled(checkEnable()));
+        StateLookup.videoArchiveProperty().addListener((obs, oldVal, newVal) -> setEnabled(checkEnable()));
+        StateLookup.userAccountProperty().addListener((obs, oldVal, newVal) -> setEnabled(checkEnable()));
 
         setEnabled(checkEnable());
     }
 
     public boolean checkEnable() {
-        ImageCaptureService ics = (ImageCaptureService) Lookup.getImageCaptureServiceDispatcher().getValueObject();
-        VideoArchive va = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
-        UserAccount ua = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
-        VideoControlService vcs = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
-        return ics != null && va != null && ua != null && vcs != null;
+        VideoController videoController = StateLookup.getVideoController();
+        boolean enabled = false;
+        if (videoController != null) {
+            ImageCaptureService ics = videoController.getImageCaptureService();
+            VideoArchive videoArchive = StateLookup.getVideoArchive();
+            UserAccount userAccount = StateLookup.getUserAccount();
+            enabled = ics != null && videoArchive != null && userAccount != null;
+        }
+        return enabled;
     }
 
 

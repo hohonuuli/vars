@@ -138,18 +138,17 @@ public class LinkTemplateEditorPanel extends EditorPanel {
          */
         public void doAction() {
 
-
-            final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+            final UserAccount userAccount = StateLookup.getUserAccount();
             if ((userAccount != null) && !userAccount.isReadOnly()) {
                 final LinkEditorPanel panel = getLinkEditorPanel();
                 ILink link = panel.getLink();
                 if (link == null) {
-                    EventBus.publish(Lookup.TOPIC_WARNING, "No LinkTemplate has been selected");
+                    EventBus.publish(StateLookup.TOPIC_WARNING, "No LinkTemplate has been selected");
                 }
                 else if (!(link instanceof LinkTemplate)) {
 
                     // This happens when you try to delete 'nil | nil | nil'
-                    EventBus.publish(Lookup.TOPIC_WARNING,
+                    EventBus.publish(StateLookup.TOPIC_WARNING,
                                      "You are not allowed to delete '" + link.stringValue() + "'");
 
                 }
@@ -174,13 +173,13 @@ public class LinkTemplateEditorPanel extends EditorPanel {
                         dao.persist(history);
                         dao.endTransaction();
                         dao.close();
-                        EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);    // Will refresh everything
+                        EventBus.publish(StateLookup.TOPIC_APPROVE_HISTORY, history);    // Will refresh everything
 
                     }
                     catch (Exception e) {
                         log.error("Failed to delete " + linkTemplate + " in database", e);
-                        EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
-                        EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, name);
+                        EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, e);
+                        EventBus.publish(StateLookup.TOPIC_REFRESH_KNOWLEGEBASE, name);
                     }
                 }
             }
@@ -203,7 +202,7 @@ public class LinkTemplateEditorPanel extends EditorPanel {
  
         private AddLinkTemplateDialog getDialog() {
             if (dialog == null) {
-                Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
+                Frame frame = StateLookup.getApplicationFrame();
                 dialog = new AddLinkTemplateDialog(frame, getToolBelt());
             }
 
@@ -236,7 +235,7 @@ public class LinkTemplateEditorPanel extends EditorPanel {
                 if (!linkTemplateDAO.equalInDatastore(link, linkTemplate) &&
                         link.getLinkValue().equalsIgnoreCase(newLink.getLinkValue())) {
                     // Don't allow duplicate link names
-                    EventBus.publish(Lookup.TOPIC_WARNING,
+                    EventBus.publish(StateLookup.TOPIC_WARNING,
                                      "A LinkTemplate with a LinkName of '" +
                                      linkTemplate.getLinkName() + "' and a LinkValue of '" +
                                      newLink.getLinkValue() +
@@ -267,18 +266,17 @@ public class LinkTemplateEditorPanel extends EditorPanel {
         /**
          */
         public void doAction() {
-
-            final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+            final UserAccount userAccount = StateLookup.getUserAccount();
             if ((userAccount != null) && !userAccount.isReadOnly()) {
                 final LinkEditorPanel panel = getLinkEditorPanel();
                 ILink link = panel.getLink();
                 if (link == null) {
-                    EventBus.publish(Lookup.TOPIC_WARNING, "No LinkTemplate has been selected");
+                    EventBus.publish(StateLookup.TOPIC_WARNING, "No LinkTemplate has been selected");
                 }
                 else if (!(link instanceof LinkTemplate)) {
 
                     // This happens when you try to delete 'nil | nil | nil'
-                    EventBus.publish(Lookup.TOPIC_WARNING,
+                    EventBus.publish(StateLookup.TOPIC_WARNING,
                             "You are not allowed to delete '" + link.stringValue() + "'");
                 }
                 else {
@@ -297,10 +295,10 @@ public class LinkTemplateEditorPanel extends EditorPanel {
                                     updateLink(linkTemplate, newLink);
                                 }
                                 catch (Exception e) {
-                                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+                                    EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, e);
                                 }
                             }
-                            EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, newLink.getFromConcept());
+                            EventBus.publish(StateLookup.TOPIC_REFRESH_KNOWLEGEBASE, newLink.getFromConcept());
                             return null;
                         }
                     });

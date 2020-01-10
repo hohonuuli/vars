@@ -16,12 +16,14 @@ import vars.annotation.VideofileDateAdjuster
 if (args.size() != 2) {
     println("""
   |  This script will set the recorded date of each annotated video frame using
-  | the date you provide (for year, month, day) and the timecode (for hour, minute, second)
+  | the date you provide (for year, month, day, hour, minute second) and the 
+  | timecode (for hour, minute, second). So that recordedDate = date + timecode
   |
   | Usage: adjust_timecode [videoArchiveName] [date]
   | Arguments:
   |   videoArchiveName = The video name
-  |   date = date as yyyy-MM-ddTHH:mm:ss (e.g. 2015-02-23T13:01:58) UTC
+  |   date = date as yyyy-MM-ddTHH:mm:ss (e.g. 2015-02-23T13:01:58) UTC. This 
+  |          is the time of the first frame in your video.
   """.stripMargin('|'))
     return
 }

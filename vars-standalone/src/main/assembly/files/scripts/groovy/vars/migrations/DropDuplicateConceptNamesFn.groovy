@@ -7,7 +7,7 @@ import vars.knowledgebase.ConceptNameDAO
 import vars.knowledgebase.ConceptNameTypes
 
 /**
- * Drop duplicate concept names
+ * Drop duplicate selectedConcept names
  * @author Brian Schlining
  * @since 2011-12-05
  */
@@ -52,7 +52,7 @@ class DropDuplicateConceptNamesFn {
         }
         matches.each { n ->
             log.info("Dropping duplicate: ${n}")
-            def concept = n.concept
+            def concept = n.getSelectedConcept
             concept.removeConceptName(n)
             dao.remove(n)
         }

@@ -27,7 +27,7 @@ import java.awt.event.WindowEvent;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
-import vars.annotation.ui.Lookup;
+import vars.annotation.ui.StateLookup;
 import vars.shared.ui.dialogs.StandardDialog;
 
 /**
@@ -51,7 +51,7 @@ public class AddCommentAssociationDialog extends StandardDialog {
      * Create the dialog
      */
     public AddCommentAssociationDialog() {
-        this((Frame) Lookup.getApplicationFrameDispatcher().getValueObject());
+        this(StateLookup.getAnnotationFrame());
     }
 
     public AddCommentAssociationDialog(Frame parent) {

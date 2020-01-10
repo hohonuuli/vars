@@ -1,6 +1,8 @@
 package vars.annotation.ui.commandqueue.impl;
 
 import org.bushe.swing.event.EventBus;
+import org.mbari.vcr4j.VideoIndex;
+import org.mbari.vcr4j.time.Timecode;
 import vars.DAO;
 import vars.annotation.AnnotationFactory;
 import vars.annotation.AnnotationPersistenceService;
@@ -11,13 +13,12 @@ import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveDAO;
 import vars.annotation.VideoFrame;
 import vars.annotation.VideoFrameDAO;
-import vars.annotation.ui.Lookup;
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.commandqueue.Command;
 import vars.annotation.ui.eventbus.ObservationsAddedEvent;
 import vars.annotation.ui.eventbus.ObservationsRemovedEvent;
 import vars.annotation.ui.eventbus.ObservationsSelectedEvent;
-import vars.avplayer.VideoTime;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,18 +34,18 @@ public class CopyObservationsCmd implements Command {
     /** These are the observations that will be copied */
     private final Collection<Observation> sourceObservations;
     private final String videoArchiveName;
-    private final VideoTime videoTime;
+    private final VideoIndex videoIndex;
     private final String user;
     private final Collection<Observation> copyObservations = Collections.synchronizedCollection(new ArrayList<Observation>());
     private final boolean selectAddedObservations;
 
-    public CopyObservationsCmd(String videoArchiveName, VideoTime videoTime, String user, Collection<Observation> sourceObservations, boolean selectObservations) {
-        if (videoArchiveName == null || videoTime == null || sourceObservations == null) {
+    public CopyObservationsCmd(String videoArchiveName, VideoIndex videoIndex, String user, Collection<Observation> sourceObservations, boolean selectObservations) {
+        if (videoArchiveName == null || videoIndex == null || sourceObservations == null) {
             throw new IllegalArgumentException("Command arguments can not be null");
         }
         this.sourceObservations = new ArrayList<Observation>(sourceObservations);
         this.videoArchiveName = videoArchiveName;
-        this.videoTime = videoTime;
+        this.videoIndex = videoIndex;
         this.user = user;
         this.selectAddedObservations = selectObservations;
     }
@@ -64,7 +65,9 @@ public class CopyObservationsCmd implements Command {
 
         if (videoArchive != null) {
 
-            Long id = annotationPersistenceService.findTimeCodeByVideoArchiveName(videoTime.getTimecode(), videoArchiveName);
+            Timecode timecode = videoIndex.getTimecode().get(); // HACK, this needs to be changed in future when index is added
+
+            Long id = annotationPersistenceService.findTimeCodeByVideoArchiveName(timecode.toString(), videoArchiveName);
             VideoFrame videoFrame = null;
             if (id != null) {
                 videoFrame = videoFrameDAO.findByPrimaryKey(id);
@@ -72,9 +75,11 @@ public class CopyObservationsCmd implements Command {
 
             if (videoFrame == null) {
                 videoFrame = annotationFactory.newVideoFrame();
-                videoFrame.setTimecode(videoTime.getTimecode());
-                videoFrame.setRecordedDate(videoTime.getDate());
-                CameraDirections cameraDirections = (CameraDirections) Lookup.getCameraDirectionDispatcher().getValueObject();
+                final VideoFrame fVideoFrame = videoFrame;
+                videoIndex.getTimecode().ifPresent(tc -> fVideoFrame.setTimecode(tc.toString()));
+                videoIndex.getTimestamp().ifPresent(ts -> fVideoFrame.setRecordedDate(Date.from(ts)));
+                // TODO add elapsedTime when it's finally added to database
+                CameraDirections cameraDirections = StateLookup.getCameraDirection();
                 videoFrame.getCameraData().setDirection(cameraDirections.getDirection());
                 videoArchive.addVideoFrame(videoFrame);
                 dao.persist(videoFrame);
@@ -141,6 +146,7 @@ public class CopyObservationsCmd implements Command {
 
     @Override
     public String getDescription() {
-        return "Copy " + sourceObservations.size() + " observations to " + videoArchiveName + " at " + videoTime.getTimecode();
+        return "Copy " + sourceObservations.size() + " observations to " + videoArchiveName + " at " +
+                videoIndex.getTimecode().map(Timecode::toString).orElse("NO TIMECODE");
     }
 }

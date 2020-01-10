@@ -11,6 +11,7 @@ import com.google.inject.Inject;
 import java.util.Collection;
 import java.util.Map;
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 /**
  * Created by IntelliJ IDEA.
@@ -44,5 +45,20 @@ public class ConceptNameDAOImpl extends DAO implements ConceptNameDAO {
     public Collection<ConceptName> findByNameStartingWith(final String s) {
         Map<String, Object> params = new HashMap<String, Object>() {{ put("name", s.toLowerCase() + "%"); }};
         return findByNamedQuery("ConceptName.findByNameLike", params);
+    }
+
+    public List<String> findAllNamesAsStrings() {
+        final Query query = getEntityManager().createNamedQuery("ConceptName.findAllNamesAsStrings");
+        return query.getResultList();
+    }
+
+    public boolean doesConceptNameExist(final String name) {
+        final Query query = getEntityManager().createNamedQuery("ConceptName.countByName");
+        query.setParameter(1, name);
+        return (boolean) query.getResultList()
+                .stream()
+                .findFirst()
+                .map(i -> ((int) i) > 0)
+                .orElse(Boolean.FALSE);
     }
 }

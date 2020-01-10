@@ -1,7 +1,5 @@
 package vars.annotation.ui.preferences;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.Arrays;
 
 import org.bushe.swing.event.EventBus;
@@ -9,7 +7,7 @@ import org.bushe.swing.event.EventBus;
 import vars.MiscDAOFactory;
 import vars.UserAccount;
 import vars.UserAccountDAO;
-import vars.annotation.ui.Lookup;
+import vars.annotation.ui.StateLookup;
 import vars.shared.preferences.PreferenceUpdater;
 import vars.shared.ui.UserAccountPreferencesPanel;
 
@@ -23,13 +21,9 @@ public class UserPreferencesPanelController implements PreferenceUpdater {
         this.daoFactory = daoFactory;
         
         // Listen for changes to UserAccount
-        Lookup.getUserAccountDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                UserAccount userAccount = (UserAccount) evt.getNewValue();
-                setUserAccount(userAccount);
-            }
-        });
-        setUserAccount((UserAccount) Lookup.getUserAccountDispatcher().getValueObject());
+        StateLookup.userAccountProperty()
+                .addListener((obs, oldVal, newVal) -> setUserAccount(newVal));
+        setUserAccount(StateLookup.getUserAccount());
     }
 
     public void persistPreferences() {
@@ -46,8 +40,7 @@ public class UserPreferencesPanelController implements PreferenceUpdater {
                 userAccount.setEmail(p.getEmailTextField().getText());
                 userAccount.setFirstName(p.getFirstNameTextField().getText());
                 userAccount.setLastName(p.getLastNameTextField().getText());
-                //userAccount.setRole((String) p.getRoleComboBox().getSelectedItem());
-                
+
                 // Check password
                 char[] pwd1 = p.getPasswordField1().getPassword();
                 char[] pwd2 = p.getPasswordField2().getPassword();
@@ -63,7 +56,7 @@ public class UserPreferencesPanelController implements PreferenceUpdater {
             dao.close();
             
             if (changePassword && !passwordsMatch) {
-                EventBus.publish(Lookup.TOPIC_WARNING, "The two passwords provided did not match each other. " +
+                EventBus.publish(StateLookup.TOPIC_WARNING, "The two passwords provided did not match each other. " +
                 		"Your password was NOT changed");
             }
         }

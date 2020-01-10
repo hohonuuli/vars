@@ -30,7 +30,10 @@ import vars.jpa.TransactionLogger;
  */
 
 @Entity(name = "VideoArchive")
-@Table(name = "VideoArchive", uniqueConstraints = {@UniqueConstraint(columnNames = {"VideoArchiveName"})})
+@Table(name = "VideoArchive",
+        indexes = {@Index(name = "idx_VideoArchive_FK1", columnList = "VideoArchiveSetID_FK"),
+                @Index(name = "idx_VideoArchive_name", columnList = "VideoArchiveName"),
+                @Index(name = "idx_VideoArchive_LUT", columnList = "LAST_UPDATED_TIME")})
 @Cacheable(false)
 @EntityListeners( {TransactionLogger.class, KeyNullifier.class} )
 @NamedQueries( {

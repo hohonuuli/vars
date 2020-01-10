@@ -4,7 +4,7 @@
     <parent>
         <groupId>vars-redux</groupId>
         <artifactId>vars-redux</artifactId>
-        <version>8.3.4-SNAPSHOT</version>
+        <version>8.3.4</version>
     </parent>
     <groupId>vars-redux</groupId>
     <artifactId>vars-avplayer-base</artifactId>
@@ -23,6 +23,16 @@
             <groupId>org.mbari</groupId>
             <artifactId>mbarix4j</artifactId>
             <version>${mbarix4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mbari.vcr4j</groupId>
+            <artifactId>vcr4j-core</artifactId>
+            <version>${vcr4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mbari.vcr4j</groupId>
+            <artifactId>vcr4j-v2-adapter</artifactId>
+            <version>${vcr4j.version}</version>
         </dependency>
     </dependencies>
 </project>

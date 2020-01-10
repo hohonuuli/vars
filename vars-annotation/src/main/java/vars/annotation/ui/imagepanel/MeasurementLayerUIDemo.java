@@ -18,7 +18,7 @@ package vars.annotation.ui.imagepanel;
 import com.google.inject.Injector;
 import org.jdesktop.jxlayer.JXLayer;
 import org.mbari.swing.JImageUrlCanvas;
-import vars.annotation.ui.Lookup;
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.ToolBelt;
 
 import javax.swing.JFrame;
@@ -37,7 +37,7 @@ public class MeasurementLayerUIDemo {
      */
     public static void main(String[] args) {
 
-        final Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
+        final Injector injector = StateLookup.GUICE_INJECTOR;
         ToolBelt toolBelt = injector.getInstance(ToolBelt.class);
 
         // Layout components
@@ -55,16 +55,6 @@ public class MeasurementLayerUIDemo {
                 new JXCrossHairPainter<JImageUrlCanvas>()));
         JXLayer<JImageUrlCanvas> layer = new JXLayer<JImageUrlCanvas>(label);
         layer.setUI(layerUI);
-
-
-//        frame.addComponentListener(new ComponentAdapter() {
-//
-//            public void componentResized(ComponentEvent e) {
-//                label.setSize(frame.getWidth(), frame.getHeight());
-//                frame.repaint();
-//            }
-//
-//        });
 
         frame.add(layer, BorderLayout.CENTER);
         frame.pack();

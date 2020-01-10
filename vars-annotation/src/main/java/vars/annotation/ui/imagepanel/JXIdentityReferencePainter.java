@@ -83,14 +83,7 @@ public class JXIdentityReferencePainter<T extends JImageUrlCanvas> extends JXObs
             this.observation = observation;
             if (observation != null) {
                 Collection<Association> associations = Collections2.filter(observation.getAssociations(),
-                    new Predicate<Association>() {
-
-                    @Override
-                    public boolean apply(Association association) {
-                        return association.getLinkName().equalsIgnoreCase("identity-reference");
-                    }
-
-                });
+                        association -> association.getLinkName().equalsIgnoreCase("identity-reference"));
 
                 if (!associations.isEmpty()) {
                     Association identityAss = associations.iterator().next();

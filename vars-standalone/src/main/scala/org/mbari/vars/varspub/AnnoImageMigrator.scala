@@ -4,16 +4,16 @@ import java.awt._
 import java.awt.image.BufferedImage
 import java.io.File
 import java.net.URL
-import java.nio.file.{Files, Paths, Path}
-import java.sql.{ResultSet, DriverManager}
+import java.nio.file.{Files, Path, Paths}
+import java.sql.{DriverManager, ResultSet}
 import java.text.SimpleDateFormat
-import java.util.{TimeZone, GregorianCalendar, Date}
+import java.util.{Date, GregorianCalendar, TimeZone}
 import javax.imageio.ImageIO
 
 import com.google.inject.Injector
 import org.slf4j.LoggerFactory
 import vars.annotation.ui.ToolBelt
-import vars.knowledgebase.ui.{Lookup}
+import vars.knowledgebase.ui.StateLookup
 
 import scala.collection.mutable
 import scala.math._
@@ -200,7 +200,6 @@ class AnnoImageMigrator(target: Path, overlayImageURL: URL, pathKey: String = "f
 
     if (useExiftool) {
 
-
       // -- Grab parameters via JPA
       val dao = toolBelt.getAnnotationDAOFactory.newCameraDataDAO()
       dao.startTransaction()
@@ -304,7 +303,7 @@ object AnnoImageMigrator {
     val target = Paths.get(args(0))
     val overlayImageURL = new File(args(1)).toURI.toURL
     implicit val toolbelt = {
-      val injector = Lookup.getGuiceInjectorDispatcher.getValueObject.asInstanceOf[Injector]
+      val injector = StateLookup.GUICE_INJECTOR
       injector.getInstance(classOf[ToolBelt])
     }
     val imageMigrator = new AnnoImageMigrator(target, overlayImageURL)

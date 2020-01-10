@@ -18,7 +18,7 @@ public class AnemoneButton extends QuickConceptButton {
 
     @Inject
     public AnemoneButton(ToolBelt toolBelt) {
-        super("Anemone", "/images/simple/anemone.jpg", toolBelt);
+        super("anemone", "/images/simple/anemone.jpg", toolBelt);
     }
     
 }

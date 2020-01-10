@@ -35,7 +35,7 @@ import vars.annotation.CameraDirections;
 import vars.annotation.ImmutableCameraData;
 import vars.annotation.Observation;
 import vars.annotation.VideoFrame;
-import vars.annotation.ui.Lookup;
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.ToolBelt;
 import vars.annotation.ui.commandqueue.Command;
 import vars.annotation.ui.commandqueue.CommandEvent;
@@ -118,13 +118,12 @@ public class PCameraDataPanel extends PropertiesPanel {
                     final PropertyPanel p = getPropertyPanel("Direction");
                     final JTextField f1 = p.getValueField();
                     final String initialValue = f1.getText();
-                    Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
+                    Frame frame = StateLookup.getAnnotationFrame();
                     final CameraDirections selectedValue = (CameraDirections) JOptionPane.showInputDialog(frame,
                         "Select a camera direction.", "VARS - Camera Direction", JOptionPane.QUESTION_MESSAGE, null,
                         CameraDirections.values(), CameraDirections.findValue(initialValue));
                     if (selectedValue != null) {
-                        final Collection<Observation> observations = (Collection<Observation>) Lookup
-                            .getSelectedObservationsDispatcher().getValueObject();
+                        final Collection<Observation> observations = StateLookup.getSelectedObservations();
                         if (observations.size() == 1) {
 
                             try {
@@ -141,7 +140,7 @@ public class PCameraDataPanel extends PropertiesPanel {
                                 EventBus.publish(commandEvent);
                             }
                             catch (final Exception e1) {
-                                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e1);
+                                EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, e1);
                             }
 
                             f1.setText(selectedValue.toString());

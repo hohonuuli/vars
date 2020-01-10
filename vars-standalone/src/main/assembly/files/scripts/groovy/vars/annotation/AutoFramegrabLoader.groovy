@@ -2,14 +2,10 @@ package vars.annotation
 
 import vars.ToolBox
 import org.slf4j.LoggerFactory
-import vars.annotation.ui.Lookup
-import vars.avplayer.ImageCaptureService
-import vars.annotation.ui.video.RS422VideoControlService
-import org.mbari.vcr.VCRAdapter
+import vars.annotation.ui.StateLookup
+
 import org.mbari.movie.Timecode
-import org.mbari.vcr.VCRUtil
 import vars.annotation.ui.PersistenceController
-import org.mbari.vcr.IVCR
 
 /**
  *
@@ -21,10 +17,10 @@ class AutoFramegrabLoader {
     private toolBox = new ToolBox();
     private targetRootDirectory
     private targetRootUrl
-    private IVCR vcr
     private log = LoggerFactory.getLogger("AutoFramegrabLoader")
     private imageCaptureService
     private frameGrabber
+    private videoController
 
     /**
      * @param targetDir is the root of the directory to write images into
@@ -55,8 +51,7 @@ class AutoFramegrabLoader {
            that says I need to sign my classes for this to work. I need to add
            some code to sign the jars when building the standalone app
         */
-        imageCaptureService = Lookup.guiceInjectorDispatcher.valueObject.getInstance(ImageCaptureService.class);
-        // frameGrabber = imageCaptureService.grabber // using QT4J
+        imageCaptureService = StateLookup.videoController.imageCaptureService
 
         // Initialize video control service
         try {
@@ -85,7 +80,7 @@ class AutoFramegrabLoader {
         def failedCaptureCount = 0
         try {
 
-            // Need the root concept
+            // Need the root selectedConcept
             def conceptDAO = toolBox.toolBelt.knowledgebaseDAOFactory.newConceptDAO()
             conceptDAO.startTransaction()
             def conceptNameAsString = conceptDAO.findRoot().primaryConceptName.name

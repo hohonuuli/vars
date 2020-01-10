@@ -4,7 +4,7 @@
     <parent>
         <groupId>vars-redux</groupId>
         <artifactId>vars-redux</artifactId>
-        <version>8.3.4-SNAPSHOT</version>
+        <version>8.3.4</version>
     </parent>
     <groupId>vars-redux</groupId>
     <artifactId>vars-avplayer-jfx</artifactId>
@@ -23,6 +23,11 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>vars-avplayer-base</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mbari.vcr4j</groupId>
+            <artifactId>vcr4j-javafx</artifactId>
+            <version>${vcr4j.version}</version>
         </dependency>
     </dependencies>
 </project>

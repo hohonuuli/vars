@@ -16,6 +16,7 @@ import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
@@ -51,7 +52,9 @@ import vars.knowledgebase.LinkRealization;
  * </pre>
  */
 @Entity(name = "LinkRealization")
-@Table(name = "LinkRealization")
+@Table(name = "LinkRealization",
+        indexes = {@Index(name = "idx_LinkRealization_FK1", columnList = "ConceptDelegateID_FK"),
+                @Index(name = "idx_LinkRealization_LUT", columnList = "LAST_UPDATED_TIME")})
 @EntityListeners({TransactionLogger.class, KeyNullifier.class})
 @NamedQueries({
     @NamedQuery(name = "LinkRealization.findById",

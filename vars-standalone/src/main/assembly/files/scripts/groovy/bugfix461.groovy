@@ -5,12 +5,12 @@
  * @since 2012-01-20
  */
 import vars.integration.MergeType
-import vars.shared.ui.GlobalLookup
 import vars.annotation.VideoArchiveSetDAO
 import org.mbari.vars.integration.MergeEXPDAnnotations
 import org.slf4j.LoggerFactory
+import vars.shared.ui.GlobalStateLookup
 
-def df = GlobalLookup.DATE_FORMAT_UTC
+def df = GlobalStateLookup.getUTCDateFormat()
 def log = LoggerFactory.getLogger("bugfix461")
 
 def toolbox = new vars.ToolBox()

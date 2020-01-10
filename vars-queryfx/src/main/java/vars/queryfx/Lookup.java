@@ -22,6 +22,7 @@ import java.time.ZonedDateTime;
 /**
  * @author Brian Schlining
  * @since 2015-07-17T16:47:00
+ * @deprecated
  */
 public class Lookup extends GlobalLookup {
 

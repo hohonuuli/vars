@@ -2,9 +2,8 @@ package vars.annotation.ui.eventbus;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.annotation.ui.Lookup;
-import vars.avplayer.ImageCaptureService;
-import vars.avplayer.VideoControlService;
+import vars.annotation.ui.StateLookup;
+import vars.avplayer.VideoController;
 
 /**
  * @author Brian Schlining
@@ -17,22 +16,15 @@ public class ExitTopicSubscriber extends vars.shared.ui.event.ExitTopicSubscribe
     public void onEvent(String topic, Object data) {
 
         // Clean up NATIVE resources when we exit
-        log.info("Closing ImageCaptureService");
+        log.info("Closing VideoController and ImageCaptureService");
         try {
-            ImageCaptureService imageCaptureService = (ImageCaptureService) Lookup.getImageCaptureServiceDispatcher().getValueObject();
-            imageCaptureService.dispose();
+            VideoController videoController = StateLookup.getVideoController();
+            if (videoController != null) {
+                videoController.close();
+            }
         }
         catch (Throwable e) {
-            log.warn("An error occurred while closing the image capture services", e);
-        }
-
-        log.info("Closing VideoControlService");
-        try {
-            VideoControlService videoControlService = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
-            videoControlService.kill();
-        }
-        catch (Exception e) {
-             log.warn("An error occurred while closing the video control services", e);
+            log.warn("An error occurred while closing the VideoController", e);
         }
 
         super.onEvent(topic, data);

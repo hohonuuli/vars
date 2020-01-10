@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+# The name of the machine that VARS is installed in.
+# DERBY_SERVER_HOST=`hostname`
+DERBY_SERVER_HOST=localhost
+DERBY_SERVER_PORT=1527
+DERBY_USER=varsuser
+DERBY_PASSWORD=vars0sourceforge
+DERBY_HOME=`dirname "$0"`/..
+
+# Add all the derby jars to the classpath
+DERBY_CLASSPATH=$DERBY_HOME/conf
+for jar in $(ls $DERBY_HOME/lib/derby*.jar)
+do
+    DERBY_CLASSPATH=$DERBY_CLASSPATH:$jar
+done
+
+# This is the location where database files will be stored. To change
+# properties for a database system place the derby.properties file in 
+# this directory.
+DERBY_SYSTEM_HOME=$DERBY_HOME/database
+
+DERBY_CONNECTION=jdbc:derby://$DERBY_SERVER_HOST:$DERBY_SERVER_PORT/VARS\;user=$DERBY_USER\;password=$DERBY_PASSWORD;
+
+echo "Starting console for VARS database at: $DERBY_CONNECTION"
+
+${JAVACMD:=java} -cp "$DERBY_CLASSPATH" \
+    -Dderby.system.home=$DERBY_SYSTEM_HOME \
+    org.apache.derby.tools.ij $@
+    # -noSecurityManager \
+    # -h $DERBY_SERVER_HOST \
+    # -p $DERBY_SERVER_PORT \
+    # -user $DERBY_USER  \
+    # -password $DERBY_PASSWORD &

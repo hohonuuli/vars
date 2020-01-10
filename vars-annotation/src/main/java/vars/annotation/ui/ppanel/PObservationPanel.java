@@ -22,7 +22,6 @@ package vars.annotation.ui.ppanel;
 
 import java.util.Date;
 
-import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.swing.PropertyPanel;
 
@@ -32,10 +31,7 @@ import vars.annotation.AnnotationFactory;
 import vars.annotation.Observation;
 import vars.annotation.VideoFrame;
 import vars.annotation.ui.actions.ChangeTimeCodeActionWithDialog;
-import vars.knowledgebase.Concept;
-import vars.knowledgebase.ConceptDAO;
 import vars.annotation.ui.ToolBelt;
-import vars.annotation.ui.Lookup;
 
 /**
  * <p>Displays the properties of an observation</p>

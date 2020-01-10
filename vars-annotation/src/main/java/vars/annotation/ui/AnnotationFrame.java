@@ -23,8 +23,6 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -39,7 +37,7 @@ import com.google.common.collect.Sets;
 import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.annotation.AnnotationProcessor;
 import org.bushe.swing.event.annotation.EventSubscriber;
-import org.mbari.vcr4j.IVCR;
+import org.mbari.vcr4j.time.Timecode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.DAO;
@@ -67,7 +65,8 @@ import vars.annotation.ui.table.ObservationTable;
 import vars.annotation.ui.table.ObservationTableModel;
 import vars.annotation.ui.video.VideoControlPanel;
 import vars.annotation.ui.videoset.VideoArchiveSetEditorButton;
-import vars.avplayer.VideoControlService;
+import vars.avplayer.VideoController;
+import vars.shared.rx.RXEventBus;
 
 /**
  *
@@ -92,6 +91,7 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
     private JScrollPane tableScrollPane;
     private JToolBar toolBar;
     private final ToolBelt toolBelt;
+    private final RXEventBus eventBus;
     private VideoControlPanel videoControlPanel;
     private VideoArchive videoArchive;
 
@@ -102,9 +102,10 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
      *
      * @throws HeadlessException
      */
-    public AnnotationFrame(ToolBelt toolBelt) throws HeadlessException {
+    public AnnotationFrame(ToolBelt toolBelt, RXEventBus eventBus) throws HeadlessException {
         this.toolBelt = toolBelt;
-        this.controller = new AnnotationFrameController(this, toolBelt);
+        this.eventBus = eventBus;
+        this.controller = new AnnotationFrameController(this, toolBelt, eventBus);
         AnnotationProcessor.process(this); // Create EventBus Proxy
         initialize();
     }
@@ -272,9 +273,9 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
                         }
                         // TODO add check to see if the selected observations are different thant
                         // the previously selected observations BEFORE sending this
-                        Collection<Observation> oldObservations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
-                        Set<Observation> oldSelectedObservations = new HashSet<Observation>(oldObservations);
-                        if (!Sets.symmetricDifference(new HashSet<Observation>(selectedObservations), oldSelectedObservations).isEmpty()) {
+                        Collection<Observation> oldObservations = StateLookup.getSelectedObservations();
+                        Set<Observation> oldSelectedObservations = new HashSet<>(oldObservations);
+                        if (!Sets.symmetricDifference(new HashSet<>(selectedObservations), oldSelectedObservations).isEmpty()) {
                             EventBus.publish(new ObservationsSelectedEvent(table, selectedObservations));
                         }
                     }
@@ -286,7 +287,7 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
              */
             table.setComponentPopupMenu(getTablePopupMenu());
 
-            Lookup.getObservationTableDispatcher().setValueObject(table);
+            StateLookup.setObservationTable(table);
 
         }
 
@@ -298,19 +299,19 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
             tablePopupMenu = new JPopupMenu();
             JMenuItem seekItem = new JMenuItem("Seek to this timecode");
             tablePopupMenu.add(seekItem);
-            Lookup.getSelectedObservationsDispatcher().addPropertyChangeListener((evt) -> {
-                Collection<Observation> observations = (Collection<Observation>) evt.getNewValue();
-                seekItem.setEnabled(observations.size() == 1);
-            });
+            StateLookup.selectedObservationsProperty()
+                    .addListener((obs, oldVal, observations) -> seekItem.setEnabled(observations.size() == 1));
+
 
             seekItem.addActionListener((e) -> {
-                VideoControlService vcr = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
-                if (vcr != null) {
+                VideoController controller = StateLookup.getVideoController();
+                if (controller != null) {
                     // Get selected annotation
-                    Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+                    Collection<Observation> observations = StateLookup.getSelectedObservations();
                     if (observations.size() == 1) {
                         Observation obs = observations.iterator().next();
-                        vcr.seek(obs.getVideoFrame().getTimecode());
+                        Timecode timecode = new Timecode(obs.getVideoFrame().getTimecode());
+                        controller.seek(timecode);
                     }
                 }
             });
@@ -337,8 +338,7 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
             toolBar.add(new VideoArchiveSetEditorButton(toolBelt));
             toolBar.add(new PreferenceFrameButton());
             toolBar.add(new StatusLabelForPerson(toolBelt));
-            toolBar.add(new StatusLabelForVcr());
-            toolBar.add(new StatusLabelForVideoArchive(toolBelt));
+            toolBar.add(new VideoPlayersPanel(toolBelt, eventBus));
 
             // Map in undo and redo keys
             InputMap inputMap = toolBar.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
@@ -369,12 +369,10 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
     private VideoControlPanel getVideoControlPanel() {
         if (videoControlPanel == null) {
             videoControlPanel = new VideoControlPanel();
-            Lookup.getVideoControlServiceDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
 
-                public void propertyChange(PropertyChangeEvent evt) {
-                    videoControlPanel.setVcr((IVCR) evt.getNewValue());
-                }
-            });
+//            StateLookup.videoControllerProperty()
+//                    .addListener((obs, oldVal, newVal) -> videoControlPanel.setVcr(newVal));
+
         }
 
         return videoControlPanel;
@@ -395,7 +393,6 @@ public class AnnotationFrame extends JFrame implements UIEventSubscriber {
     @Override
     public void respondTo(ObservationsAddedEvent event) {
         respondTo(new ObservationsChangedEvent(this, event.get()));
-        //EventBus.publish(new ObservationsSelectedEvent(null, event.get()));
     }
 
     @EventSubscriber(eventClass = ObservationsChangedEvent.class)

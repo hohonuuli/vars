@@ -19,7 +19,7 @@ import org.bushe.swing.event.EventBus;
 import vars.MiscDAOFactory;
 import vars.UserAccount;
 import vars.UserAccountDAO;
-import vars.shared.ui.GlobalLookup;
+import vars.shared.ui.GlobalStateLookup;
 import vars.shared.ui.UserAccountComboBox;
 import vars.shared.ui.UserAccountPreferencesPanel;
 
@@ -75,7 +75,7 @@ public class AdministorUserAccountDialog extends StandardDialog {
                 dao.startTransaction();
                 userAccount = dao.find(userAccount);
                 if (userAccount == null) {
-                    EventBus.publish(GlobalLookup.TOPIC_WARNING, "Unable to find a the selected user");
+                    EventBus.publish(GlobalStateLookup.TOPIC_WARNING, "Unable to find a the selected user");
                     dispose();
                 }
                 else {
@@ -92,7 +92,7 @@ public class AdministorUserAccountDialog extends StandardDialog {
             }
         }
         catch (Exception e) {
-            EventBus.publish(GlobalLookup.TOPIC_NONFATAL_ERROR, e);
+            EventBus.publish(GlobalStateLookup.TOPIC_NONFATAL_ERROR, e);
         }
 
         dispose();

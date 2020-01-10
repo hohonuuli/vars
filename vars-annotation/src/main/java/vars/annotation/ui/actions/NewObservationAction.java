@@ -17,12 +17,16 @@ package vars.annotation.ui.actions;
 
 import java.awt.Toolkit;
 import java.util.Date;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import javax.swing.Action;
 import javax.swing.KeyStroke;
 import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
-import org.mbari.movie.Timecode;
 import org.mbari.util.NumberUtilities;
+import org.mbari.vcr4j.VideoIndex;
+import org.mbari.vcr4j.time.Timecode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.CacheClearedEvent;
@@ -31,13 +35,13 @@ import vars.UserAccount;
 import vars.annotation.CameraDirections;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.commandqueue.Command;
 import vars.annotation.ui.commandqueue.CommandEvent;
 import vars.annotation.ui.commandqueue.impl.AddObservationCmd;
+import vars.avplayer.VideoController;
 import vars.knowledgebase.ConceptName;
 import vars.annotation.ui.ToolBelt;
-import vars.avplayer.VideoControlService;
-import vars.annotation.ui.Lookup;
 
 /**
  * <p>Action to add a new VideoFrame and a 'nearly' empty Observation
@@ -121,22 +125,26 @@ public final class NewObservationAction extends ActionAdapter {
      * @param  conceptName
      * @return The observation created. null if none was created.
      */
-    public Observation doAction(final String conceptName) {
-        Observation observation = null;
+    public void doAction(final String conceptName) {
 
         // Need the VCR to get a current timecode
-        VideoControlService videoService = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
-        if (videoService != null) {
+        VideoController videoController = StateLookup.getVideoController();
+        //VideoControlService videoService = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
+        if (videoController != null) {
             try {
-                final String timecode = videoService.getVcrTimecode().toString();
-                observation = doAction(conceptName, timecode);
+                Future<VideoIndex> videoIndexFuture = videoController.getVideoIndex();
+                // TODO this needs to grab all components of the videoIndex and update those values in VARS
+                VideoIndex videoIndex = videoIndexFuture.get(3, TimeUnit.SECONDS);
+
+                // HACK, if no timecode should I throw an exception
+                Timecode timecode = videoIndex.getTimecode().orElse(Timecode.zero());
+                doAction(conceptName, timecode.toString());
             }
             catch (Exception e) {
-                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+                EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, e);
             }
         }
 
-        return observation;
     }
 
     /**
@@ -148,54 +156,49 @@ public final class NewObservationAction extends ActionAdapter {
      * @param timecode A timecode in the format of HH:MM:SS:FF
      * @return The observation created. null if none was created.
      */
-    public Observation doAction(final String conceptName, final String timecode) {
-        Observation observation = null;
+    public void doAction(final String conceptName, final String timecode) {
 
         // Need a videoArchive to add a VideoFrame too.
-        VideoArchive videoArchive = (VideoArchive) Lookup.getVideoArchiveDispatcher().getValueObject();
-        final VideoControlService videoService = (VideoControlService) Lookup.getVideoControlServiceDispatcher().getValueObject();
+        VideoArchive videoArchive = StateLookup.getVideoArchive();
+        final VideoController videoController = StateLookup.getVideoController();
+
         if (videoArchive != null) {
 
             if ((conceptName != null) && (timecode != null)) {
-                UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+                UserAccount userAccount = StateLookup.getUserAccount();
 
                 String person = userAccount.getUserName();
                 if (person == null) {
                     person = UserAccount.USERNAME_DEFAULT;
                 }
 
+                try {
+                    Future<VideoIndex> videoIndexFuture = videoController.getVideoIndex();
+                    // TODO this needs to grab all components of the videoIndex and update those values in VARS
+                    VideoIndex videoIndex = StateLookup.getLastVideoIndex();
+                    try {
+                        videoIndex = videoIndexFuture.get(3, TimeUnit.SECONDS);
+                    }
+                    catch (TimeoutException te) {
+                        log.warn("Failed to connect to video device. Using a previously stored video index", te);
+                    }
+                    Date utcDate = videoIndex.getTimestamp()
+                            .map(Date::from)
+                            .orElse(new Date());
+
+                    CameraDirections cameraDirections = StateLookup.getCameraDirection();
+                    final String cameraDirection = cameraDirections.getDirection();
 
 
-                /*
-                 * If the VCR is recording we'll grab the time off of the
-                 * computer clock. Otherwise we'll get it off of the
-                 * userbits.
-                 */
-                Date utcDate;
-                if (videoService.getVcrState().isRecording()) {
-                    utcDate = new Date();
+                    // Fire command to the CommandQueue
+                    Command command = new AddObservationCmd(conceptName, timecode, utcDate,
+                            videoArchive.getName(), person, cameraDirection, true);
+                    CommandEvent commandEvent = new CommandEvent(command);
+                    EventBus.publish(commandEvent);
                 }
-                else {
-
-                    /*
-                     *  Try to grab the userbits off of the tape. The userbits
-                     *  may have the time that the frame was recorded stored as a
-                     *  little-endian 4-byte int.
-                     */
-                    videoService.requestUserbits();
-                    final int epicSeconds = NumberUtilities.toInt(videoService.getVcrUserbits().getUserbits(), true);
-                    utcDate = new Date((long) epicSeconds * 1000L);
+                catch (Exception e) {
+                    EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, e);
                 }
-
-                CameraDirections cameraDirections = (CameraDirections) Lookup.getCameraDirectionDispatcher().getValueObject();
-                final String cameraDirection = cameraDirections.getDirection();
-
-
-                // Fire command to the CommandQueue
-                Command command = new AddObservationCmd(conceptName, timecode, utcDate,
-                        videoArchive.getName(), person, cameraDirection, true);
-                CommandEvent commandEvent = new CommandEvent(command);
-                EventBus.publish(commandEvent);
 
             }
             else {
@@ -206,6 +209,5 @@ public final class NewObservationAction extends ActionAdapter {
             log.warn("A VideoArchive has no been assigned; unable to create a VideoFrame");
         }
 
-        return observation;
     }
 }

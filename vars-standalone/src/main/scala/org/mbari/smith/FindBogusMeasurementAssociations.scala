@@ -1,8 +1,9 @@
 package org.mbari.smith
 
 import com.google.inject.Injector
-import vars.annotation.ui.{ToolBelt, Lookup}
+import vars.annotation.ui.{StateLookup, ToolBelt}
 import vars.annotation.ui.imagepanel.Measurement
+
 import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}
 
@@ -12,8 +13,7 @@ import scala.util.{Failure, Success, Try}
 object FindBogusMeasurementAssociations extends App {
 
 
-  val toolBelt = Lookup.getGuiceInjectorDispatcher.getValueObject.
-      asInstanceOf[Injector].getInstance(classOf[ToolBelt])
+  val toolBelt = StateLookup.GUICE_INJECTOR.getInstance(classOf[ToolBelt])
   val dao = toolBelt.getAnnotationDAOFactory.newAssociationDAO()
   val videoArchiveName = args(0)
   val videoFrames = CoverageEstimator.fetchAnnotations(videoArchiveName)

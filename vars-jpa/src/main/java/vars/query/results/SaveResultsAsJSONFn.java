@@ -12,7 +12,6 @@ import java.io.FileWriter;
 import java.util.Optional;
 import java.util.concurrent.Executor;
 
-import static jdk.nashorn.internal.runtime.regexp.joni.Config.log;
 
 /**
  * @author Brian Schlining

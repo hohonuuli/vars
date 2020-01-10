@@ -155,7 +155,7 @@ public class ConceptNameSelectionPanel extends JPanel {
             }
             catch (Exception e) {
                 log.error("Failed to lookup conceptnames", e);
-                EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR, e);
+                EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR, e);
                 conceptNames = new ArrayList();
             }
 

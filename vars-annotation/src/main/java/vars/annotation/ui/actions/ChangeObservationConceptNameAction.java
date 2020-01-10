@@ -25,8 +25,7 @@ import org.bushe.swing.event.EventBus;
 import org.mbari.awt.event.ActionAdapter;
 import vars.UserAccount;
 import vars.annotation.Observation;
-import vars.annotation.ui.Lookup;
-import vars.annotation.ui.PersistenceController;
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.commandqueue.Command;
 import vars.annotation.ui.commandqueue.CommandEvent;
 import vars.annotation.ui.commandqueue.impl.ChangeObservationNameCmd;
@@ -57,9 +56,9 @@ public class ChangeObservationConceptNameAction extends ActionAdapter {
      *
      */
     public void doAction() {
-        UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+        UserAccount userAccount = StateLookup.getUserAccount();
         String username = userAccount == null ? UserAccount.USERNAME_DEFAULT : userAccount.getUserName();
-        Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+        Collection<Observation> observations = StateLookup.getSelectedObservations();
         observations = new ArrayList<>(observations); // Make collection copy to avoid threading issues
         Command command = new ChangeObservationNameCmd(observations, conceptName, username, new Date());
         CommandEvent commandEvent = new CommandEvent(command);

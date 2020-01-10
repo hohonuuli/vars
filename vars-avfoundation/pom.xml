@@ -5,11 +5,11 @@
     <parent>
         <groupId>vars-redux</groupId>
         <artifactId>vars-redux</artifactId>
-        <version>8.3.4-SNAPSHOT</version>
+        <version>8.3.4</version>
     </parent>
     <groupId>vars-redux</groupId>
     <artifactId>vars-avfoundation</artifactId>
-    <version>8.3.4-SNAPSHOT</version>
+    <version>8.3.4</version>
     <name>vars-avfoundation</name>
     <url>http://maven.apache.org</url>
     <properties>
@@ -76,9 +76,9 @@
                                 <configuration>
                                     <tasks>
                                         <copy file="${xcode.builddir}/libavfimagesnap.dylib"
-                                              todir="${build.outputDirectory}/native" />
+                                              todir="${project.build.outputDirectory}/native" />
                                         <copy file="${xcode.builddir}/libavfimagesnap.dylib"
-                                              tofile="${build.outputDirectory}/native/libavfimagesnap.jnilib" />
+                                              tofile="${project.build.outputDirectory}/native/libavfimagesnap.jnilib" />
                                     </tasks>
                                 </configuration>
                             </execution>

@@ -17,7 +17,7 @@ public class SiphonophoreButton extends QuickConceptButton {
 
     @Inject
     public SiphonophoreButton(ToolBelt toolBelt) {
-        super("Siphonophore", "/images/simple/siphonophore.jpg", toolBelt);
+        super("siphonophore", "/images/simple/siphonophore.jpg", toolBelt);
     }
     
 }

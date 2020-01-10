@@ -33,6 +33,11 @@ Q: How do I deploy VARS at a large organization?
 Q: What can VARS use as a video source?
 A: VARS is designed to work VCR's that support serial connections (RS232 or RS422) or
    video files. This version that you've downloaded is for VCRs.
+   Release 8.1 has limited codec support, the recommended container/codec is 
+   mp4/h.264 with AAC audio encoding. See the documentaion at
+   https://docs.oracle.com/javase/8/javafx/api/javafx/scene/media/package-summary.html
+   for the complete list of supported codecs. NOTE: We are actively working 
+   on additional codec support.
 
 Q: What hardware do I need to annotate video tapes?
 A: 1) A VCR with a serial port (either RS422 or RS232), most professional quality 

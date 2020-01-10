@@ -14,8 +14,7 @@ import org.mbari.vcr.VCRUtil
 import org.mbari.movie.Timecode
 import org.mbari.movie.VideoTimeBean
 import vars.annotation.CameraData
-import vars.annotation.ui.Lookup
-import vars.annotation.ui.video.RS422VideoControlService
+
 import vars.avplayer.ImageCaptureService
 
 class SimpaLoader {

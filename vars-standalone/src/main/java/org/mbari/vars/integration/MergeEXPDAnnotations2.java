@@ -30,12 +30,11 @@ import org.mbari.expd.actions.CollateByTimecodeFunction;
 import org.mbari.expd.actions.CollateFunction;
 import org.mbari.expd.jdbc.DAOFactoryImpl;
 import org.mbari.expd.jdbc.UberDatumImpl;
-import org.mbari.ocean.Seawater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.DAO;
 import vars.annotation.*;
-import vars.annotation.ui.Lookup;
+import vars.annotation.ui.StateLookup;
 import vars.integration.MergeFunction;
 import vars.integration.MergeHistory;
 import vars.integration.MergeHistoryDAO;
@@ -221,13 +220,7 @@ public class MergeEXPDAnnotations2 implements MergeFunction<Map<VideoFrame, Uber
         if (uberData.size() == 0) {
             NavigationDatumDAO navigationDatumDAO = daoFactory.newNavigationDatumDAO();
             List<NavigationDatum> navigationData = navigationDatumDAO.fetchBestNavigationData(dive);
-            uberData.addAll(Collections2.transform(navigationData, new Function<NavigationDatum, UberDatum>() {
-
-                public UberDatum apply(NavigationDatum from) {
-                    return new UberDatumImpl(null, from, null);
-                }
-
-            }));
+            uberData.addAll(Collections2.transform(navigationData, nav -> new UberDatumImpl(null, nav, null)));
         }
 
         return uberData;
@@ -235,7 +228,7 @@ public class MergeEXPDAnnotations2 implements MergeFunction<Map<VideoFrame, Uber
 
 
     private List<VideoFrame> fetchVarsData() {
-        Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
+        Injector injector = StateLookup.GUICE_INJECTOR;
         AnnotationDAOFactory annotationDAOFactory = injector.getInstance(AnnotationDAOFactory.class);
         VideoArchiveSetDAO videoArchiveSetDAO = annotationDAOFactory.newVideoArchiveSetDAO();
         List<VideoFrame> myVideoFrames = new ArrayList<VideoFrame>();
@@ -336,7 +329,7 @@ public class MergeEXPDAnnotations2 implements MergeFunction<Map<VideoFrame, Uber
         mergeHistory.setMergeDate(new Date());
         mergeHistory.setStatusMessage("Using " + mergeType + " merge");
 
-        Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
+        Injector injector = StateLookup.GUICE_INJECTOR;
         AnnotationDAOFactory annotationDAOFactory = injector.getInstance(AnnotationDAOFactory.class);
         DAO dao = annotationDAOFactory.newDAO();
 

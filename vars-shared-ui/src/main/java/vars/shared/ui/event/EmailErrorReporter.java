@@ -9,7 +9,7 @@ import org.mbari.awt.AwtUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.UserAccount;
-import vars.shared.ui.GlobalLookup;
+import vars.shared.ui.GlobalStateLookup;
 
 import java.awt.*;
 import java.text.DateFormat;
@@ -41,7 +41,7 @@ public class EmailErrorReporter implements ErrorReporter {
         try {
 
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            UserAccount userAccount = (UserAccount) GlobalLookup.getUserAccountDispatcher().getValueObject();
+            UserAccount userAccount = GlobalStateLookup.getUserAccount();
 
             Email email = new HtmlEmail();
             email.setHostName("mbarimail.mbari.org");

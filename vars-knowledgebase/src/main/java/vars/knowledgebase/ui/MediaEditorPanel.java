@@ -93,20 +93,15 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
             mediaList = new JList();
             mediaList.setModel(new ListListModel(new Vector()));
             mediaList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            mediaList.addListSelectionListener(new ListSelectionListener() {
+            mediaList.addListSelectionListener(e -> {
+                final Media media = (Media) mediaList.getSelectedValue();
 
-                public void valueChanged(final ListSelectionEvent e) {
-                    final Media media = (Media) mediaList.getSelectedValue();
+                // Set the view to the selected media
+                getMediaViewPanel().setMedia(media);
 
-                    // Set the view to the selected media
-                    getMediaViewPanel().setMedia(media);
-
-                    boolean enable = !isLocked() && (media != null);
-                    getButtonPanel().getDeleteButton().setEnabled(enable);
-                    getButtonPanel().getUpdateButton().setEnabled(enable);
-                }
-
-
+                boolean enable = !isLocked() && (media != null);
+                getButtonPanel().getDeleteButton().setEnabled(enable);
+                getButtonPanel().getUpdateButton().setEnabled(enable);
             });
             mediaList.setCellRenderer(new MediaListCellRenderer());
 
@@ -139,7 +134,7 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
 //                                    }
                                 }
                                 catch (Exception e1) {
-                                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR,
+                                    EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR,
                                                      "Unable to display the video at '" + media.getUrl() + "'");
                                 }
                             }
@@ -153,7 +148,7 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
                                     jif.repaint();
                                 }
                                 catch (MalformedURLException e1) {
-                                    EventBus.publish(Lookup.TOPIC_NONFATAL_ERROR,
+                                    EventBus.publish(StateLookup.TOPIC_NONFATAL_ERROR,
                                                      "'" + media.getUrl() + "' is not a valid URL");
                                 }
 
@@ -166,7 +161,7 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
                 private JImageUrlFrame getImageFrame() {
                     if (imageFrame == null) {
                         imageFrame = new JImageUrlFrame();
-                        final Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
+                        final Frame frame = StateLookup.getApplicationFrame();
                         imageFrame.setLocationRelativeTo(frame);
                     }
 
@@ -262,7 +257,7 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
          */
         public void doAction() {
             final Media media = (Media) getMediaList().getSelectedValue();
-            final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+            final UserAccount userAccount = StateLookup.getUserAccount();
 
             History history = getToolBelt().getHistoryFactory().delete(userAccount, media);
 
@@ -275,7 +270,7 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
             dao.endTransaction();
             dao.close();
 
-            EventBus.publish(Lookup.TOPIC_APPROVE_HISTORY, history);
+            EventBus.publish(StateLookup.TOPIC_APPROVE_HISTORY, history);
         }
     }
 
@@ -323,7 +318,7 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
          */
         private AddMediaDialog getDialog() {
             if (dialog == null) {
-                final Frame frame = (Frame) Lookup.getApplicationFrameDispatcher().getValueObject();
+                final Frame frame = StateLookup.getApplicationFrame();
                 dialog = new AddMediaDialog(frame, getToolBelt());
                 dialog.setLocationRelativeTo(frame);
             }
@@ -360,7 +355,7 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
                 final InputStream in = url.openStream();
                 final int b = in.read();
                 if (b == -1) {
-                    EventBus.publish(Lookup.TOPIC_WARNING, "Unable to read from " + url.toExternalForm());
+                    EventBus.publish(StateLookup.TOPIC_WARNING, "Unable to read from " + url.toExternalForm());
                 }
                 else {
                     media.setUrl(url.toExternalForm());
@@ -369,7 +364,7 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
             catch (Exception e1) {
                 final String s = "Failed to open URL, " + panel.getUrlField().getText() +
                                  ". The URL will not be updated.";
-                EventBus.publish(Lookup.TOPIC_WARNING, s);
+                EventBus.publish(StateLookup.TOPIC_WARNING, s);
             }
 
             // TODO 20070628 brian implement history
@@ -397,7 +392,7 @@ public class MediaEditorPanel extends EditorPanel implements ILockableEditor {
             dao.close();
 
             getMediaList().paintImmediately(getMediaList().getBounds());
-            EventBus.publish(Lookup.TOPIC_REFRESH_KNOWLEGEBASE, media.getConceptMetadata().getConcept().getPrimaryConceptName().getName());
+            EventBus.publish(StateLookup.TOPIC_REFRESH_KNOWLEGEBASE, media.getConceptMetadata().getConcept().getPrimaryConceptName().getName());
 
         }
     }

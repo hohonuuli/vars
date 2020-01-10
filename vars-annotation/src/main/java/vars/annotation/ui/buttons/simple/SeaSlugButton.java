@@ -17,7 +17,7 @@ public class SeaSlugButton extends QuickConceptButton {
 
     @Inject
     public SeaSlugButton(ToolBelt toolBelt) {
-        super("Sea Slug", "/images/simple/sea_slug.jpg", toolBelt);
+        super("sea slug", "/images/simple/sea_slug.jpg", toolBelt);
     }
     
 }

@@ -60,9 +60,9 @@ drop index history.idx_history_lut
 ;
 drop index history.idx_history_fk1
 ;
-drop index concept.idx_concept_lut
+drop index selectedConcept.idx_concept_lut
 ;
-drop index concept.idx_concept_fk1
+drop index selectedConcept.idx_concept_fk1
 ;
 drop index conceptname.idx_conceptname_name
 ;
@@ -102,7 +102,7 @@ drop table conceptname
 ;
 drop table conceptdelegate
 ;
-drop table concept
+drop table selectedConcept
 ;
 drop table artifact
 ;
@@ -124,7 +124,7 @@ create table artifact  (
 	constraint artifact_pk primary key(id)
 )
 ;
-create table concept  ( 
+create table selectedConcept  (
 	id                	int8 not null,
 	parentconceptid_fk	int8 null,
 	originator        	varchar(255) null,
@@ -273,10 +273,10 @@ create index idx_conceptname_name
 	on conceptname(conceptname)
 ;
 create index idx_concept_fk1
-	on concept(parentconceptid_fk)
+	on selectedConcept(parentconceptid_fk)
 ;
 create index idx_concept_lut
-	on concept(last_updated_time)
+	on selectedConcept(last_updated_time)
 ;
 create index idx_history_fk1
 	on history(conceptdelegateid_fk)
@@ -330,7 +330,7 @@ alter table artifact
 alter table conceptdelegate
 	add constraint conceptdelegate_fk1
 	foreign key(conceptid_fk)
-	references concept(id)
+	references selectedConcept(id)
 	on delete no action 
 	on update no action 
 --	not for replication 
@@ -338,7 +338,7 @@ alter table conceptdelegate
 alter table conceptname
 	add constraint conceptname_fk1
 	foreign key(conceptid_fk)
-	references concept(id)
+	references selectedConcept(id)
 	on delete no action 
 	on update no action 
 --	not for replication 

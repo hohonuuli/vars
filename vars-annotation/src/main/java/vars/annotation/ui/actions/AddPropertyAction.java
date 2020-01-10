@@ -24,8 +24,8 @@ import org.slf4j.LoggerFactory;
 import vars.ILink;
 import vars.annotation.Association;
 import vars.annotation.Observation;
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.ToolBelt;
-import vars.annotation.ui.Lookup;
 import vars.annotation.ui.commandqueue.Command;
 import vars.annotation.ui.commandqueue.CommandEvent;
 import vars.annotation.ui.commandqueue.impl.AddAssociationCmd;
@@ -79,7 +79,7 @@ public class AddPropertyAction extends ActionAdapter {
      */
     @SuppressWarnings("unchecked")
 	public void doAction() {
-        Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+        Collection<Observation> observations = StateLookup.getSelectedObservations();
         Association associationTemplate = toolBelt.getAnnotationFactory().newAssociation(linkName, toConcept, linkValue);
         Command command = new AddAssociationCmd(associationTemplate, observations);
         CommandEvent commandEvent = new CommandEvent(command);

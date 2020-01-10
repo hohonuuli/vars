@@ -3,22 +3,18 @@ package org.mbari.vars.varspub
 import java.awt.image.BufferedImage
 import java.io._
 import java.net.URL
-import java.nio.file.{ Files, Paths, Path }
-import java.sql.{ ResultSet, DriverManager }
+import java.nio.file.{Files, Path, Paths}
+import java.sql.{DriverManager, ResultSet}
 import java.text.SimpleDateFormat
-import java.util.{ TimeZone, Date }
+import java.util.{Date, TimeZone}
 import javax.imageio.ImageIO
 
 import com.google.inject.Injector
-import org.apache.commons.imaging.Imaging
 import org.apache.commons.imaging.common.RationalNumber
-import org.apache.commons.imaging.formats.jpeg.JpegImageMetadata
-import org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter
-import org.apache.commons.imaging.formats.tiff.constants.{ GpsTagConstants, TiffTagConstants, TiffEpTagConstants, ExifTagConstants }
-import org.apache.commons.imaging.formats.tiff.write.TiffOutputSet
+import org.apache.commons.imaging.formats.tiff.constants.{ExifTagConstants, GpsTagConstants, TiffEpTagConstants, TiffTagConstants}
 import org.slf4j.LoggerFactory
 import vars.annotation.ui.ToolBelt
-import vars.knowledgebase.ui.{ Lookup }
+import vars.knowledgebase.ui.StateLookup
 
 import scala.collection.mutable
 import scala.math._
@@ -55,10 +51,10 @@ class AnnoImageMigrator2(target: Path,
   private[this] val yearFormat = new SimpleDateFormat("yyyy")
   private[this] val overlayImage = ImageIO.read(overlayImageURL)
 
-  private[this] val internalConnection = DriverManager.getConnection("jdbc:jtds:sqlserver://equinox.shore.mbari.org:1433/VARS",
+  private[this] val internalConnection = DriverManager.getConnection("jdbc:jtds:sqlserver://perseus.shore.mbari.org:1433/VARS",
     "everyone", "guest")
 
-  private[this] val externalConnection = DriverManager.getConnection("jdbc:jtds:sqlserver://dione.mbari.org:51001/VARS",
+  private[this] val externalConnection = DriverManager.getConnection("jdbc:jtds:sqlserver://dione.mbari.org:1433/VARS",
     "everyone", "NeWW1stLst")
 
   /**
@@ -348,7 +344,7 @@ object AnnoImageMigrator2 {
     val target = Paths.get(args(0))
     val overlayImageURL = new File(args(1)).toURI.toURL
     implicit val toolbelt = {
-      val injector = Lookup.getGuiceInjectorDispatcher.getValueObject.asInstanceOf[Injector]
+      val injector = StateLookup.GUICE_INJECTOR;
       injector.getInstance(classOf[ToolBelt])
     }
     val imageMigrator = new AnnoImageMigrator2(target, overlayImageURL)

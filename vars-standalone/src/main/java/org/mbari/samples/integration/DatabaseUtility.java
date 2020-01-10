@@ -22,8 +22,9 @@ import vars.ToolBelt;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptName;
-import vars.knowledgebase.ui.Lookup;
+import vars.knowledgebase.ui.StateLookup;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -45,7 +46,7 @@ class DatabaseUtility {
     public final String jdbcPassword = "samp";
 
     /**  */
-    public final String jdbcUrl = "jdbc:jtds:sqlserver://solstice.shore.mbari.org:1433/MBARI_Samples";
+    public final String jdbcUrl = "jdbc:jtds:sqlserver://perseus.shore.mbari.org:1433/MBARI_Samples";
 
     /**  */
     public final String jdbcUsername = "samp";
@@ -56,8 +57,7 @@ class DatabaseUtility {
      * Constructs ...
      */
     public DatabaseUtility() {
-        Injector injector = (Injector) Lookup.getGuiceInjectorDispatcher().getValueObject();
-
+        Injector injector = StateLookup.GUICE_INJECTOR;
         toolBelt = injector.getInstance(ToolBelt.class);
     }
 

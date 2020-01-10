@@ -11,8 +11,6 @@ package vars.annotation.ui.cbpanel;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.JPanel;
@@ -20,8 +18,8 @@ import javax.swing.JScrollPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.ToolBelt;
-import vars.annotation.ui.Lookup;
 
 /**
  *
@@ -41,11 +39,7 @@ public class ConceptButtonOverviewPanel extends JPanel {
         initialize();
         
         // Update the overview tab when the users are switched.
-        Lookup.getPreferencesDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                loadPreferences();
-            }
-        });
+        StateLookup.preferencesProperty().addListener((obs, oldVal, newVal) -> loadPreferences());
   
         loadPreferences();
     }
@@ -58,7 +52,7 @@ public class ConceptButtonOverviewPanel extends JPanel {
     
     public void loadPreferences() {
         getOverviewPanel().removeAll();
-        Preferences userPreferences = (Preferences) Lookup.getPreferencesDispatcher().getValueObject();
+        Preferences userPreferences = StateLookup.getPreferences();
         final Preferences cpPreferences = userPreferences.node(ConceptButtonPanel.PREF_CP_NODE);
         if (cpPreferences != null) {
             String[] tabNames = null;

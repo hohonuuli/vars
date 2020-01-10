@@ -5,31 +5,31 @@ import org.mbari.util.stream.StreamUtilities;
 import vars.annotation.AnnotationDAOFactory;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.ServiceLoader;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 
 /**
- * This enumeration provides access to
+ * Loads available VideoPlayer SPI's
  * Created by brian on 1/6/14.
  */
 public class VideoPlayers {
 
-    private final List<VideoPlayer> playerList; //ImmutableList.of(new VideoPlayer("Built-in",));
 
-    @Inject
-    public VideoPlayers(AnnotationDAOFactory daoFactory) {
-        ServiceLoader<VideoPlayerAccessUI> serviceLoader = ServiceLoader.load(VideoPlayerAccessUI.class);
-        List<VideoPlayer> vps =  StreamUtilities.toStream(serviceLoader.iterator())
-                .map(vp -> new VideoPlayer(vp.getName(), vp))
+    public static List<VideoPlayer> get() {
+        return StreamUtilities.toStream(loadVideoPlayers().iterator())
+                .sorted((a, b)  -> a.getName().compareToIgnoreCase(b.getName()))
                 .collect(Collectors.toList());
-        playerList = ImmutableList.copyOf(vps);
     }
 
+    public static ServiceLoader<VideoPlayer> loadVideoPlayers() {
+        return ServiceLoader.load(VideoPlayer.class);
+    }
 
-    public List<VideoPlayer> get() { return playerList; }
+    public static List<VideoPlayer> findVideoPlayers(String mimeType) {
+        return StreamUtilities.toStream(loadVideoPlayers().iterator())
+                .filter(v -> v.canPlay(mimeType))
+                .collect(Collectors.toList());
+    }
 }

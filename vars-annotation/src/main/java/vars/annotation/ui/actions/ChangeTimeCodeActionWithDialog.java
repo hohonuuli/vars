@@ -26,8 +26,8 @@ import org.mbari.awt.event.ActionAdapter;
 
 import vars.annotation.Observation;
 import vars.annotation.ui.ChangeTimeCodeFrame;
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.ToolBelt;
-import vars.annotation.ui.Lookup;
 
 /**
  * <p>Pops up a dialog that allows the user to change the timecode of the
@@ -48,14 +48,9 @@ public class ChangeTimeCodeActionWithDialog extends ActionAdapter {
     public ChangeTimeCodeActionWithDialog(ToolBelt toolBelt) {
         super("Edit Time-code");
         this.toolBelt = toolBelt;
-        Lookup.getSelectedObservationsDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
-            
-            public void propertyChange(PropertyChangeEvent evt) {
-                update((Collection<Observation>) evt.getNewValue());
-                
-            }
-        });
-        update((Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject());
+        StateLookup.selectedObservationsProperty()
+                .addListener((obs, oldVal, newVal) -> update(newVal));
+        update(StateLookup.getSelectedObservations());
     }
 
     /**
@@ -71,7 +66,7 @@ public class ChangeTimeCodeActionWithDialog extends ActionAdapter {
         if (frame == null) {
             frame = new ChangeTimeCodeFrame(toolBelt);
             frame.setTitle("VARS - Edit Time-code");
-            final Collection<Observation> observations = (Collection<Observation>) Lookup.getSelectedObservationsDispatcher().getValueObject();
+            final Collection<Observation> observations = StateLookup.getSelectedObservations();
             ((ChangeTimeCodeFrame) frame).update(observations);
             frame.pack();
         }

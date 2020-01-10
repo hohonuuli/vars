@@ -34,6 +34,7 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import org.mbari.awt.event.ActionAdapter;
 import org.mbari.util.Dispatcher;
+import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.dialogs.NewConceptButtonTabDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +42,6 @@ import org.slf4j.LoggerFactory;
 import vars.UserAccount;
 import vars.jpa.VarsUserPreferences;
 import vars.annotation.ui.ToolBelt;
-import vars.annotation.ui.Lookup;
 import vars.shared.ui.FancyButton;
 
 /**
@@ -110,17 +110,10 @@ public class ConceptButtonPanel extends JPanel {
     }
 
     /**
-     * Here's the chain of events that occurs to trigger this:
-     * <ol>
-     * <li>A new {@link UserAccount} is set in the {@link Dispatcher} at Lookup.getUserAccountDispatcher</li>
-     * <li>A {@link PropertyChangeListener} in {@link Lookup} see's the UserAccount change and updates the {@link Preferences}
-     * in the Lookup.getPreferencesDispatcher</li>
-     * <li>This panel is listening for changes to the Preferences Dispatcher and will update the UI when the preferences change</li>
-     * </ol>
      */
     public void changeUserPreferences() {
-        
-        userPreferences = (Preferences) Lookup.getPreferencesDispatcher().getValueObject();
+
+        userPreferences = StateLookup.getPreferences();
 
         if (userPreferences != null) {
             loadTabsFromPreferences();
@@ -327,26 +320,17 @@ public class ConceptButtonPanel extends JPanel {
         setLayout(new BorderLayout());
         add(getTabbedPane(), BorderLayout.CENTER);
         add(getButtonPanel(), BorderLayout.EAST);
-        
-        Lookup.getUserAccountDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
-            
-            public void propertyChange(PropertyChangeEvent evt) {
-                final boolean enabled = (evt.getNewValue() == null) ? false : true;
 
-                getNewTabAction().setEnabled(enabled);
-                getRenameTabAction().setEnabled(enabled);
-                getRemoveTabAction().setEnabled(enabled);
-                
-            }
+        StateLookup.userAccountProperty().addListener((obs, oldVal, newVal) -> {
+            final boolean enabled = newVal != null;
+
+            getNewTabAction().setEnabled(enabled);
+            getRenameTabAction().setEnabled(enabled);
+            getRemoveTabAction().setEnabled(enabled);
         });
-        
-        
-        Lookup.getPreferencesDispatcher().addPropertyChangeListener(new PropertyChangeListener() {
-            
-            public void propertyChange(PropertyChangeEvent evt) {
-                changeUserPreferences();
-            }
-        });
+
+        StateLookup.preferencesProperty()
+                .addListener((obs, oldVal, newVal) -> changeUserPreferences());
 
     }
 
@@ -383,8 +367,8 @@ public class ConceptButtonPanel extends JPanel {
         /**
          */
         public void doAction() {
-            
-            final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher().getValueObject();
+
+            final UserAccount userAccount = StateLookup.getUserAccount();
 
             if (userAccount == null) {
                 JOptionPane.showMessageDialog(ConceptButtonPanel.this, "You must be logged in to create a new tab");
@@ -452,8 +436,8 @@ public class ConceptButtonPanel extends JPanel {
          *
          */
         public void doAction() {
-            
-            final UserAccount userAccount = (UserAccount)  Lookup.getUserAccountDispatcher().getValueObject();
+
+            final UserAccount userAccount = StateLookup.getUserAccount();
 
             if (userAccount != null) {
                 final int response = JOptionPane.showConfirmDialog(ConceptButtonPanel.this,
@@ -506,8 +490,8 @@ public class ConceptButtonPanel extends JPanel {
     private class RenameTabAction extends ActionAdapter {
 
         public void doAction() {
-            
-            final UserAccount userAccount = (UserAccount) Lookup.getUserAccountDispatcher();
+
+            final UserAccount userAccount = StateLookup.getUserAccount();
 
             if (userAccount == null) {
                 return;

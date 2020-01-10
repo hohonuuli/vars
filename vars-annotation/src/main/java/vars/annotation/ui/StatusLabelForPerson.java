@@ -28,7 +28,6 @@ import java.beans.PropertyChangeEvent;
 import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
 import org.mbari.swing.SwingUtils;
-import org.mbari.util.Dispatcher;
 
 import vars.UserAccount;
 import vars.shared.ui.dialogs.LoginAction;
@@ -53,10 +52,10 @@ public class StatusLabelForPerson extends StatusLabel {
     public StatusLabelForPerson(ToolBelt toolBelt) {
         super();
         action = new LoginAction(toolBelt.getMiscDAOFactory(), toolBelt.getMiscFactory(), false);
-        final Dispatcher pd = Lookup.getUserAccountDispatcher();
-        final UserAccount userAccount = (UserAccount) pd.getValueObject();
+        final UserAccount userAccount = StateLookup.getUserAccount();
         update(userAccount);
-        pd.addPropertyChangeListener(this);
+        StateLookup.userAccountProperty()
+                .addListener((obs, oldVal, newVal) -> update(newVal));
         addMouseListener(new MouseAdapter() {
 
             @Override

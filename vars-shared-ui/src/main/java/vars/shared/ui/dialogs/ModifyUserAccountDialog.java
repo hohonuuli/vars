@@ -23,7 +23,7 @@ import vars.ToolBelt;
 import vars.UserAccount;
 import vars.UserAccountDAO;
 import vars.jpa.VarsJpaModule;
-import vars.shared.ui.GlobalLookup;
+import vars.shared.ui.GlobalStateLookup;
 
 import java.awt.Frame;
 
@@ -149,7 +149,7 @@ public class ModifyUserAccountDialog extends UserAccountDialog {
                 dao.startTransaction();
                 UserAccount userAccount = dao.findByUserName(getUserAccount().getUserName());
                 if (userAccount == null) {
-                    EventBus.publish(GlobalLookup.TOPIC_WARNING,
+                    EventBus.publish(GlobalStateLookup.TOPIC_WARNING,
                             "Unable to find a user with the name '" + getUserAccount().getUserName());
                     dialog.dispose();
                 }
@@ -169,7 +169,7 @@ public class ModifyUserAccountDialog extends UserAccountDialog {
             catch (Exception e) {
                 setReturnValue(null);
                 log.error("Failed to update user in database", e);
-                EventBus.publish(GlobalLookup.TOPIC_NONFATAL_ERROR, e);
+                EventBus.publish(GlobalStateLookup.TOPIC_NONFATAL_ERROR, e);
             }
 
             dialog.dispose();

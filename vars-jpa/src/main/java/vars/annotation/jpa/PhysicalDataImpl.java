@@ -21,22 +21,7 @@ import vars.jpa.JPAEntity;
 import vars.jpa.KeyNullifier;
 import vars.jpa.TransactionLogger;
 
-import javax.persistence.Cacheable;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.TableGenerator;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Version;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Date;
@@ -47,7 +32,9 @@ import java.util.Date;
 
 
 @Entity(name = "PhysicalData")
-@Table(name = "PhysicalData")
+@Table(name = "PhysicalData",
+        indexes = {@Index(name = "idx_PhysicalData_FK1", columnList = "ObservationID_FK"),
+                @Index(name = "idx_PhysicalData_LUT", columnList = "LAST_UPDATED_TIME")})
 @Cacheable(false)
 @EntityListeners({ TransactionLogger.class, KeyNullifier.class })
 @NamedQueries({ @NamedQuery(name = "PhysicalData.findById", query = "SELECT v FROM PhysicalData v WHERE v.id = :id") })

@@ -23,12 +23,9 @@ import java.awt.event.ActionListener;
 import java.util.Collection;
 import java.util.Optional;
 
-import org.mbari.util.Dispatcher;
-import org.mbari.vcr4j.time.Converters;
 import org.mbari.vcr4j.time.HMSF;
-import org.mbari.vcr4j.time.Timecode;
-import org.mbari.vcr4j.ui.TimeCodeSelectionFrame;
-import org.mbari.vcr4j.ui.TimeSelectPanel;
+import org.mbari.vcr4j.ui.swing.TimeCodeSelectionFrame;
+import org.mbari.vcr4j.ui.swing.TimeSelectPanel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.Observation;
@@ -77,8 +74,8 @@ public class ChangeTimeCodeFrame extends TimeCodeSelectionFrame {
             okActionListener = new ActionListener() {
 
                 public void actionPerformed(final ActionEvent e) {
-                    final Dispatcher dispatcher = Lookup.getSelectedObservationsDispatcher();
-                    final Collection<Observation> observations = (Collection<Observation>) dispatcher.getValueObject();
+                    final Collection<Observation> observations = StateLookup.getSelectedObservations();
+
                     if (observations.size() == 1) {
                         getChangeTimeCodeAction().setTimeCode(getTimePanel().getTimeAsString());
                         getChangeTimeCodeAction().doAction();

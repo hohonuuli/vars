@@ -6,6 +6,7 @@
 # export JAVACMD=$JAVA_HOME/bin/java
 # IMPORTANT!! Under the groovy installation verify that startGroovy passes -Duser.timezone="UTC" flag
 
+export JAVA_OPTS="$JAVA_OPTS -Duser.timezone=UTC"
 if [ -z $(which groovy) ]
 then
   echo "You must install groovy first! Either via homebrew or from http://groovy.codehaus.org/"

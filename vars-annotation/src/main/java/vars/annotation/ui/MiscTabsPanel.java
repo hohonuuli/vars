@@ -109,7 +109,7 @@ public class MiscTabsPanel extends javax.swing.JPanel {
             /*
              * Listen to messages to select a concept in the tree
              */
-            EventBus.subscribe(Lookup.TOPIC_SELECT_CONCEPT, lookupConceptSubscriber);
+            EventBus.subscribe(StateLookup.TOPIC_SELECT_CONCEPT, lookupConceptSubscriber);
 
         }
 

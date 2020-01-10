@@ -37,7 +37,10 @@ import vars.jpa.TransactionLogger;
  */
 
 @Entity(name = "Observation")
-@Table(name = "Observation")
+@Table(name = "Observation",
+        indexes = {@Index(name = "idx_Observation_FK1", columnList = "VideoFrameID_FK"),
+                @Index(name = "idx_Observation_concept", columnList = "ConceptName"),
+                @Index(name = "idx_Observation_LUT", columnList = "LAST_UPDATED_TIME")})
 @Cacheable(false)
 @EntityListeners({ TransactionLogger.class, KeyNullifier.class })
 @NamedQueries( {
