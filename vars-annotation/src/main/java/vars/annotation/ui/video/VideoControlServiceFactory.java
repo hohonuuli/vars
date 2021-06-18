@@ -14,7 +14,7 @@ import org.mbari.vcr4j.rs422.decorators.UserbitsAsTimeDecorator;
 import org.mbari.vcr4j.rxtx.RXTXVideoIO;
 import org.mbari.vcr4j.udp.UDPVideoIO;
 import vars.annotation.ui.StateLookup;
-import vars.avfoundation.AVFImageCaptureServiceImpl;
+// import vars.avfoundation.AVFImageCaptureServiceImpl;
 import vars.avplayer.VideoController;
 import vars.avplayer.noop.NoopImageCaptureService;
 
@@ -52,7 +52,7 @@ public class VideoControlServiceFactory {
                         io.getStateObservable(),
                         io.getErrorObservable(),
                         decorator.getIndexObservable());
-                return new VideoController<>(new AVFImageCaptureServiceImpl(), io2);
+                return new VideoController<>(new NoopImageCaptureService(), io2);
             }
         }
         catch (Exception e) {

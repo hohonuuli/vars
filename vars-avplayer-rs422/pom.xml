@@ -39,10 +39,10 @@
             <artifactId>vcr4j-udp</artifactId>
             <version>${vcr4j.version}</version>
         </dependency>
-        <dependency>
+        <!-- <dependency>
             <groupId>vars-redux</groupId>
             <artifactId>vars-avfoundation</artifactId>
             <version>${project.version}</version>
-        </dependency>
+        </dependency> -->
     </dependencies>
 </project>

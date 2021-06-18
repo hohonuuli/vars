@@ -2,7 +2,7 @@ package vars.avplayer.rs422;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vars.avfoundation.AVFImageCaptureServiceImpl;
+// import vars.avfoundation.AVFImageCaptureServiceImpl;
 import vars.avplayer.ImageCaptureService;
 import vars.avplayer.noop.NoopImageCaptureService;
 
@@ -19,7 +19,7 @@ public class ImageCaptureServiceRef {
     public static ImageCaptureService getImageCaptureService() {
         if (imageCaptureService == null) {
             try {
-                imageCaptureService = new AVFImageCaptureServiceImpl();
+                // imageCaptureService = new AVFImageCaptureServiceImpl();
             }
             catch (UnsatisfiedLinkError e) {
                 log.warn("Failed to instantiate AVFoundation Image Capture.");
