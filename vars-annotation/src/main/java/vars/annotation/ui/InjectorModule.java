@@ -4,8 +4,9 @@ import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.Scopes;
 import vars.VARSException;
-import vars.avfoundation.AVFImageCaptureServiceImpl;
+
 import vars.avplayer.ImageCaptureService;
+import vars.avplayer.noop.NoopImageCaptureService;
 
 /**
  * @author Brian Schlining
@@ -44,7 +45,8 @@ public class InjectorModule implements Module {
 //            throw new VARSException("Failed to intialize VARS avplayer dependency injection", e);
 //        }
 
-        binder.bind(ImageCaptureService.class).to(AVFImageCaptureServiceImpl.class).in(Scopes.SINGLETON);
+        //binder.bind(ImageCaptureService.class).to(AVFImageCaptureServiceImpl.class).in(Scopes.SINGLETON);
+        binder.bind(ImageCaptureService.class).to(NoopImageCaptureService.class).in(Scopes.SINGLETON);
 
     }
 

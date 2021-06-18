@@ -4,7 +4,7 @@
     <parent>
         <groupId>vars-redux</groupId>
         <artifactId>vars-redux</artifactId>
-        <version>8.3.4</version>
+        <version>8.4.0-SNAPSHOT</version>
     </parent>
     <groupId>vars-redux</groupId>
     <artifactId>vars-avplayer-rs422</artifactId>
@@ -39,10 +39,10 @@
             <artifactId>vcr4j-udp</artifactId>
             <version>${vcr4j.version}</version>
         </dependency>
-        <dependency>
+        <!-- <dependency>
             <groupId>vars-redux</groupId>
             <artifactId>vars-avfoundation</artifactId>
             <version>${project.version}</version>
-        </dependency>
+        </dependency> -->
     </dependencies>
 </project>
