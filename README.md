@@ -8,7 +8,7 @@ Originally designed for annotating underwater video, VARS can be applied to any 
 
 Documentation for VARS is at [https://hohonuuli.github.io/vars/](https://hohonuuli.github.io/vars/)
 
-Pre-built binaries can be downloaded from [Bintray](https://github.com/hohonuuli/vars/releases). 
+Pre-built binaries can be downloaded from [Github](https://github.com/hohonuuli/vars/releases). 
 
 ## Building
 
