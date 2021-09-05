@@ -181,9 +181,9 @@ public class ConceptTreeModel extends DefaultTreeModel {
 
             // Find the child node for the next family member.
             boolean found = false;
-            Enumeration<ConceptTreeNode> childrenNodes = treeNode.children();
+            Enumeration childrenNodes = treeNode.children();
             while (!found && childrenNodes.hasMoreElements()) {
-                treeNode = childrenNodes.nextElement();
+                treeNode = (ConceptTreeNode) childrenNodes.nextElement();
                 Concept concept = (Concept) treeNode.getUserObject();
 
                 if (nextConceptName.equals(concept.getPrimaryConceptName().getName())) {

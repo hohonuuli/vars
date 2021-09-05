@@ -31,6 +31,7 @@
         <jama.version>1.0.3</jama.version>
         <jasypt.version>1.9.3</jasypt.version>
         <!-- <javax.persistence.version>2.1.1</javax.persistence.version> -->
+        <javafx.version>15.0.1</javafx.version>
         <javax.transaction.version>1.1</javax.transaction.version>
         <jgoodies.version>1.0.5</jgoodies.version>
         <jline.version>2.14.2</jline.version>
@@ -88,7 +89,7 @@
         <module>vars-knowledgebase</module>
         <module>vars-avplayer-base</module>
         <!--<module>vars-avplayer-novideo</module>-->
-        <module>vars-avplayer-rs422</module>
+        <!-- <module>vars-avplayer-rs422</module> -->
         <module>vars-avplayer-sharktopoda</module>
         <module>vars-avplayer-jfx</module>
         <module>vars-avplayer-kipro</module>
@@ -334,6 +335,14 @@
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
+            <id>github</id>
+            <name>github</name>
+            <url>https://maven.pkg.github.com/mbari-org/maven</url>
+        </repository>
+        <!-- <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
             <id>central</id>
             <name>bintray</name>
             <url>http:s//jcenter.bintray.com</url>
@@ -345,7 +354,7 @@
             <id>bintray-hohonuuli-maven</id>
             <name>bintray</name>
             <url>https://dl.bintray.com/hohonuuli/maven</url>
-        </repository>
+        </repository> -->
         <repository>
             <id>eclipselink</id>
             <name>EclipseLink Repository</name>
@@ -356,11 +365,11 @@
         <!--<name>Java.net-Kenai</name>-->
         <!--<url>https://java.net/downloads/swingx/releases/</url>-->
         <!--</repository>-->
-        <repository>
+        <!-- <repository>
             <id>jboss</id>
             <name>JBoss Repository</name>
             <url>http://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-        </repository>
+        </repository> -->
         <repository>
             <id>Apache-snapshots</id>
             <name>Apache Development Snapshot Repository</name>

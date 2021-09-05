@@ -29,5 +29,15 @@
             <artifactId>vcr4j-javafx</artifactId>
             <version>${vcr4j.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-media</artifactId>
+            <version>${javafx.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-swing</artifactId>
+            <version>${javafx.version}</version>
+          </dependency>
     </dependencies>
 </project>

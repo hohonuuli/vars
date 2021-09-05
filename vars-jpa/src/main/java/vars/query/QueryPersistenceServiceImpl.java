@@ -21,7 +21,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
-import javafx.util.Pair;
+// import javafx.util.Pair;
 import org.mbari.sql.QueryFunction;
 import org.mbari.sql.QueryResults;
 import org.mbari.sql.QueryableImpl;
