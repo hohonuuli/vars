@@ -327,11 +327,11 @@
             <name>Maven Central Repository</name>
             <url>https://repo1.maven.org/maven2</url>
         </repository>
-        <repository>
+        <!-- <repository>
             <id>mbari-maven-repository</id>
             <name>MBARI Maven Repository</name>
             <url>http://dsg.mbari.org/mbari-maven-repository/repository/</url>
-        </repository>
+        </repository> -->
         <repository>
             <snapshots>
                 <enabled>false</enabled>
