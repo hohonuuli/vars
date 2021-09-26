@@ -25,7 +25,7 @@ VARS is co-developed alongside several other external modules. Normally these mo
     
     # VCR4J at https://github.com/mbari-media-management/vcr4j
     # Execute the following commands to build and install in your local maven repository
-    git clone https://github.com/mbari-media-management/vcr4j
+    git clone https://github.com/mbari-media-management/vcr4j.git
     cd vcr4j
     mvn install
 
