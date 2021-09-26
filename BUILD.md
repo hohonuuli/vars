@@ -23,9 +23,9 @@ VARS is co-developed alongside several other external modules. Normally these mo
     cd mbarix4j
     mvn install
     
-    # VCR4J at https://github.com/hohonuuli/vcr4j
+    # VCR4J at https://github.com/mbari-media-management/vcr4j
     # Execute the following commands to build and install in your local maven repository
-    git clone https://github.com/hohonuuli/vcr4j.git
+    git clone https://github.com/mbari-media-management/vcr4j
     cd vcr4j
     mvn install
 
