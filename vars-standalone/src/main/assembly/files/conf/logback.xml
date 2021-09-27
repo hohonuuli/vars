@@ -15,7 +15,7 @@
     <logger name="vars.jpa" level="ERROR" />
     <logger name="vars.annotation.DatabaseUtility" level="DEBUG" />
     <logger name="org.mbari.vars.integration.MergeEXPDAnnotations" level="WARN" />
-    <logger name="org.mbari.sql.QueryableImpl" level="DEBUG" />
+    <logger name="mbarix4j.sql.QueryableImpl" level="DEBUG" />
     <logger name="org.mbari.vars.varspub" level="INFO" />
     <logger name="org.mbari.vars.varspub.AnnoImageMigrator2" level="DEBUG" />
 
@@ -24,4 +24,3 @@
     </root>
 
 </configuration>
-

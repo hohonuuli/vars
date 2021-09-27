@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.jdesktop.jxlayer.JXLayer;
-import org.mbari.swing.JImageUrlCanvas;
+import mbarix4j.swing.JImageUrlCanvas;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.ILink;

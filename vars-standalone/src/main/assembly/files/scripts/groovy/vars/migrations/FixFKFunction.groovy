@@ -8,7 +8,7 @@ import vars.annotation.jpa.ObservationImpl
 import vars.annotation.jpa.VideoFrameImpl
 import vars.annotation.jpa.VideoArchiveImpl
 import org.slf4j.LoggerFactory
-import org.mbari.sql.QueryFunction
+import mbarix4j.sql.QueryFunction
 import vars.annotation.jpa.VideoArchiveSetImpl
 
 /**

@@ -37,9 +37,9 @@ import javax.swing.event.DocumentListener;
 
 import org.bushe.swing.event.annotation.AnnotationProcessor;
 import org.bushe.swing.event.annotation.EventSubscriber;
-import org.mbari.awt.layout.VerticalFlowLayout;
-import org.mbari.swing.PropertyPanel;
-import org.mbari.util.IObserver;
+import mbarix4j.awt.layout.VerticalFlowLayout;
+import mbarix4j.swing.PropertyPanel;
+import mbarix4j.util.IObserver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -258,7 +258,7 @@ public abstract class PropertiesPanel extends javax.swing.JPanel implements IObs
      *
      * @param  obj An Observation
      * @param  changeCode <b>null</b>
-     * @see  org.mbari.util.IObserver#update(java.lang.Object, java.lang.Object)
+     * @see  mbarix4j.util.IObserver#update(java.lang.Object, java.lang.Object)
      */
     public abstract void update(Object obj, Object changeCode);
 

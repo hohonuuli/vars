@@ -17,7 +17,7 @@ package vars.annotation.ui.imagepanel;
 
 import com.google.inject.Injector;
 import org.jdesktop.jxlayer.JXLayer;
-import org.mbari.swing.JImageUrlCanvas;
+import mbarix4j.swing.JImageUrlCanvas;
 import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.ToolBelt;
 

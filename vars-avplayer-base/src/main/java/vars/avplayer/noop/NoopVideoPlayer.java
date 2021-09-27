@@ -1,6 +1,6 @@
 package vars.avplayer.noop;
 
-import org.mbari.util.Tuple2;
+import mbarix4j.util.Tuple2;
 import org.mbari.vcr4j.adapter.noop.NoopVideoError;
 import org.mbari.vcr4j.adapter.noop.NoopVideoIO;
 import org.mbari.vcr4j.adapter.noop.NoopVideoState;

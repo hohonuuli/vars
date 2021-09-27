@@ -5,7 +5,7 @@ import java.net.URL
 import javax.imageio.ImageIO
 
 import org.imgscalr.Scalr
-import org.mbari.awt.image.ImageUtilities
+import mbarix4j.awt.image.ImageUtilities
 import org.slf4j.LoggerFactory
 import vars.ToolBox
 import vars.annotation.ui.ToolBelt

@@ -1,5 +1,5 @@
 import org.jasypt.util.password.BasicPasswordEncryptor
-import org.mbari.sql.QueryFunction
+import mbarix4j.sql.QueryFunction
 import vars.ToolBox;
 
 def toolBox = new ToolBox()

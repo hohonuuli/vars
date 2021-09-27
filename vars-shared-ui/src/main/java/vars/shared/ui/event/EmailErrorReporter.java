@@ -1,11 +1,12 @@
 package vars.shared.ui.event;
 
+import mbarix4j.awt.AwtUtilities;
 import org.apache.commons.mail.Email;
 import org.apache.commons.mail.HtmlEmail;
 import org.jdesktop.swingx.JXErrorPane;
 import org.jdesktop.swingx.error.ErrorInfo;
 import org.jdesktop.swingx.error.ErrorReporter;
-import org.mbari.awt.AwtUtilities;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.UserAccount;
@@ -56,8 +57,7 @@ public class EmailErrorReporter implements ErrorReporter {
             log.warn("Failed to send email error report", e);
         }
 
-        Frame frame = AwtUtilities.getFrame(errorPane);
-        frame.dispose();
+        AwtUtilities.getFrame(errorPane).ifPresent(Frame::dispose);
 
     }
 

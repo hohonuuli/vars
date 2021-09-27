@@ -19,7 +19,7 @@ import java.util.Collection;
 import javax.swing.Icon;
 
 import org.bushe.swing.event.EventBus;
-import org.mbari.awt.event.ActionAdapter;
+import mbarix4j.awt.event.ActionAdapter;
 import org.mbari.vcr4j.time.Timecode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

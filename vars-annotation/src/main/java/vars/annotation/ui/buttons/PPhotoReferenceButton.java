@@ -1,6 +1,6 @@
 package vars.annotation.ui.buttons;
 
-import org.mbari.awt.event.ActionAdapter;
+import mbarix4j.awt.event.ActionAdapter;
 import vars.annotation.ui.actions.AddPropertyAction;
 import vars.annotation.ui.dialogs.AddCommentAssociationDialog;
 

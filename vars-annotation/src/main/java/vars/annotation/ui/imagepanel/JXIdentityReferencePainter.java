@@ -19,7 +19,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import org.bushe.swing.event.annotation.AnnotationProcessor;
 import org.bushe.swing.event.annotation.EventSubscriber;
-import org.mbari.swing.JImageUrlCanvas;
+import mbarix4j.swing.JImageUrlCanvas;
 import vars.annotation.AnnotationPersistenceService;
 import vars.annotation.Association;
 import vars.annotation.Observation;

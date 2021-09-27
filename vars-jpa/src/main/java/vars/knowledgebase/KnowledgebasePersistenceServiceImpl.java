@@ -9,9 +9,9 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Collection;
 import java.util.ArrayList;
-import org.mbari.sql.QueryFunction;
 
-import org.mbari.sql.QueryableImpl;
+import mbarix4j.sql.QueryFunction;
+import mbarix4j.sql.QueryableImpl;
 import vars.VARSException;
 import vars.annotation.Association;
 import vars.annotation.Observation;

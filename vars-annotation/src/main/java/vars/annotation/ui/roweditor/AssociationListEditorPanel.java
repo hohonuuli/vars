@@ -40,7 +40,7 @@ import javax.swing.ToolTipManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.bushe.swing.event.EventBus;
-import org.mbari.awt.event.ActionAdapter;
+import mbarix4j.awt.event.ActionAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.LinkComparator;

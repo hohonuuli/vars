@@ -16,7 +16,7 @@
 package vars.annotation.ui.imagepanel;
 
 import org.jdesktop.jxlayer.JXLayer;
-import org.mbari.swing.JImageUrlCanvas;
+import mbarix4j.swing.JImageUrlCanvas;
 
 import javax.swing.JFrame;
 import java.awt.BorderLayout;

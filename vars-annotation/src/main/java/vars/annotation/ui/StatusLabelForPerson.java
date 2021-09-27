@@ -27,7 +27,7 @@ import java.beans.PropertyChangeEvent;
 
 import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
-import org.mbari.swing.SwingUtils;
+import mbarix4j.swing.SwingUtils;
 
 import vars.UserAccount;
 import vars.shared.ui.dialogs.LoginAction;

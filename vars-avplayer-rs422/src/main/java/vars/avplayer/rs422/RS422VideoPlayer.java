@@ -1,7 +1,7 @@
 package vars.avplayer.rs422;
 
 import org.bushe.swing.event.EventBus;
-import org.mbari.util.Tuple2;
+import mbarix4j.util.Tuple2;
 import org.mbari.vcr4j.SimpleVideoIO;
 import org.mbari.vcr4j.VideoCommand;
 import org.mbari.vcr4j.VideoIO;

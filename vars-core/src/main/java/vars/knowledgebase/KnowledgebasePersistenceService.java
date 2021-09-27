@@ -1,6 +1,6 @@
 package vars.knowledgebase;
 
-import org.mbari.sql.IQueryable;
+import mbarix4j.sql.IQueryable;
 
 /**
  * DAO used by the Knowledgebase Application for special operations

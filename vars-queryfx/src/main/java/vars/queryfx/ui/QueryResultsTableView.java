@@ -10,8 +10,9 @@ import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
-import org.mbari.net.URLUtilities;
-import org.mbari.util.Tuple2;
+
+import mbarix4j.net.URLUtilities;
+import mbarix4j.util.Tuple2;
 import vars.query.results.QueryResults;
 import vars.shared.javafx.application.ImageFX;
 import vars.shared.javafx.stage.ImageStage;

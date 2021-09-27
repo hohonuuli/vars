@@ -31,10 +31,10 @@ import javax.swing.InputMap;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import mbarix4j.util.SystemUtilities;
 import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.EventTopicSubscriber;
-import org.mbari.swing.SplashFrame;
-import org.mbari.util.SystemUtilities;
+import mbarix4j.swing.SplashFrame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.knowledgebase.KnowledgebaseDAOFactory;

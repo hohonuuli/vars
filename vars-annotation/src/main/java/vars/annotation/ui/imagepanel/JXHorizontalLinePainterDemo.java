@@ -1,8 +1,8 @@
 package vars.annotation.ui.imagepanel;
 
 import org.jdesktop.jxlayer.JXLayer;
-import org.mbari.swing.JImageCanvas;
-import org.mbari.swing.JImageUrlCanvas;
+import mbarix4j.swing.JImageCanvas;
+import mbarix4j.swing.JImageUrlCanvas;
 
 import javax.swing.*;
 import java.awt.*;

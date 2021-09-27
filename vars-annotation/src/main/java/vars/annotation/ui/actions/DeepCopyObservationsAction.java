@@ -23,7 +23,7 @@ import javax.swing.Action;
 import javax.swing.KeyStroke;
 
 import org.bushe.swing.event.EventBus;
-import org.mbari.awt.event.ActionAdapter;
+import mbarix4j.awt.event.ActionAdapter;
 import org.mbari.vcr4j.VideoIndex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

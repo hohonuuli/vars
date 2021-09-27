@@ -16,8 +16,8 @@ package vars.knowledgebase.ui;
 
 import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.EventTopicSubscriber;
-import org.mbari.swing.LabeledSpinningDialWaitIndicator;
-import org.mbari.swing.WaitIndicator;
+import mbarix4j.swing.LabeledSpinningDialWaitIndicator;
+import mbarix4j.swing.WaitIndicator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.PersistenceCache;

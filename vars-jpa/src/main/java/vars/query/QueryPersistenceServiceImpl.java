@@ -21,10 +21,10 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
+import mbarix4j.sql.QueryFunction;
+import mbarix4j.sql.QueryResults;
+import mbarix4j.sql.QueryableImpl;
 // import javafx.util.Pair;
-import org.mbari.sql.QueryFunction;
-import org.mbari.sql.QueryResults;
-import org.mbari.sql.QueryableImpl;
 import vars.ILink;
 import vars.LinkBean;
 import vars.VARSException;

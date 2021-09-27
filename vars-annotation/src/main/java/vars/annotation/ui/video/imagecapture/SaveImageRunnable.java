@@ -1,6 +1,6 @@
 package vars.annotation.ui.video.imagecapture;
 
-import org.mbari.awt.image.ImageUtilities;
+import mbarix4j.awt.image.ImageUtilities;
 import vars.avplayer.ImageCaptureException;
 
 import java.awt.image.RenderedImage;

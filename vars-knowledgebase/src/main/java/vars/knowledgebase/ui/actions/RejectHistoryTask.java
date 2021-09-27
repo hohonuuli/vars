@@ -31,7 +31,7 @@ import java.util.Set;
 import javax.swing.*;
 
 import org.bushe.swing.event.EventBus;
-import org.mbari.swing.LabeledSpinningDialWaitIndicator;
+import mbarix4j.swing.LabeledSpinningDialWaitIndicator;
 import vars.DAO;
 import vars.ILink;
 import vars.LinkBean;

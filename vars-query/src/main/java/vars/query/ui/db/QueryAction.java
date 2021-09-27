@@ -1,6 +1,6 @@
 package vars.query.ui.db;
 
-import org.mbari.awt.event.IAction;
+import mbarix4j.awt.event.IAction;
 import org.mbari.util.ExceptionHandler;
 import vars.query.results.QueryResults;
 

@@ -19,7 +19,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import org.mbari.awt.event.ActionAdapter;
+import mbarix4j.awt.event.ActionAdapter;
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoArchiveDAO;

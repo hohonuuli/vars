@@ -1,6 +1,6 @@
 package vars
 
-import org.mbari.sql.QueryFunction
+import mbarix4j.sql.QueryFunction
 import java.sql.ResultSet
 import java.text.SimpleDateFormat
 

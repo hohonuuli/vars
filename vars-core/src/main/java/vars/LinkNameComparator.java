@@ -21,7 +21,8 @@
 package vars;
 
 import java.util.Comparator;
-import org.mbari.text.IgnoreCaseToStringComparator;
+import mbarix4j.text.IgnoreCaseToStringComparator;
+
 
 /**
  * @author brian

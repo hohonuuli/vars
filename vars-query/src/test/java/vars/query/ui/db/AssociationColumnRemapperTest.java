@@ -3,7 +3,7 @@ package vars.query.ui.db;
 import com.google.common.collect.Lists;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.mbari.sql.QueryResults;
+import mbarix4j.sql.QueryResults;
 
 import java.util.ArrayList;
 import java.util.List;

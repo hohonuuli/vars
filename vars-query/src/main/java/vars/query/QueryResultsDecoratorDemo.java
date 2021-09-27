@@ -5,7 +5,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
-import org.mbari.sql.QueryResults;
+import mbarix4j.sql.QueryResults;
 import vars.query.ui.QueryResultsFrame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

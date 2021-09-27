@@ -18,7 +18,7 @@ package vars.annotation.ui.buttons;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.ImageIcon;
-import org.mbari.awt.event.ActionAdapter;
+import mbarix4j.awt.event.ActionAdapter;
 import vars.annotation.ui.actions.AddPropertyAction;
 import vars.annotation.ui.dialogs.AddCommentAssociationDialog;
 

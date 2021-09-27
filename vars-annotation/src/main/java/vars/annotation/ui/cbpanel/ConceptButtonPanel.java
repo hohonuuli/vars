@@ -32,7 +32,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
-import org.mbari.awt.event.ActionAdapter;
+import mbarix4j.awt.event.ActionAdapter;
 import org.mbari.util.Dispatcher;
 import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.dialogs.NewConceptButtonTabDialog;

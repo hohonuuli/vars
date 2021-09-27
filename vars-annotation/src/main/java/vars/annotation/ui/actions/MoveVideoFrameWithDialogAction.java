@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.bushe.swing.event.EventBus;
-import org.mbari.awt.event.ActionAdapter;
+import mbarix4j.awt.event.ActionAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.VideoArchive;

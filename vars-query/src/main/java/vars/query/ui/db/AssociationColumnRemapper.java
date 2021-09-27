@@ -1,6 +1,6 @@
 package vars.query.ui.db;
 
-import org.mbari.sql.QueryResults;
+import mbarix4j.sql.QueryResults;
 import vars.ILink;
 
 import java.util.ArrayList;

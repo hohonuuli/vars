@@ -15,7 +15,7 @@
 
 package vars.annotation.ui.imagepanel;
 
-import org.mbari.swing.JImageUrlCanvas;
+import mbarix4j.swing.JImageUrlCanvas;
 
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;

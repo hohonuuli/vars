@@ -30,7 +30,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import org.mbari.swing.SearchableComboBoxModel;
+import mbarix4j.swing.SearchableComboBoxModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.ILink;

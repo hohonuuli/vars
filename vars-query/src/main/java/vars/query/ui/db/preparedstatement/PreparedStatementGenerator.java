@@ -2,7 +2,7 @@ package vars.query.ui.db.preparedstatement;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
-import org.mbari.sql.QueryableImpl;
+import mbarix4j.sql.QueryableImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.VARSException;

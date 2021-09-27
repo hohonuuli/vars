@@ -1,7 +1,7 @@
 package org.mbari.biauv.integration
 
 import java.io.{FileWriter, BufferedWriter, File}
-import org.mbari.math.Matlib
+import mbarix4j.math.Matlib
 import scala.math._
 
 /**

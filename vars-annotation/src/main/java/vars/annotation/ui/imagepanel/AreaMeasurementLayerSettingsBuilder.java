@@ -22,7 +22,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import javax.swing.*;
 
-import org.mbari.swing.JImageUrlCanvas;
+import mbarix4j.swing.JImageUrlCanvas;
 
 /**
  * Builds a JPanel for allowing user adjustment of the settings for an AreaMeasurementLayerUI

@@ -1,24 +1,20 @@
 package vars.avplayer;
 
-import org.mbari.awt.event.NonDigitConsumingKeyListener;
-import org.mbari.swing.SpinningDialWaitIndicator;
-import org.mbari.swing.WaitIndicator;
+import mbarix4j.awt.event.NonDigitConsumingKeyListener;
+import mbarix4j.swing.SpinningDialWaitIndicator;
+import mbarix4j.swing.WaitIndicator;
 import vars.CacheClearedEvent;
 import vars.CacheClearedListener;
 import vars.ToolBelt;
-import vars.annotation.VideoArchive;
-import vars.annotation.VideoArchiveDAO;
+
 
 import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import java.awt.*;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.util.*;
+
 
 /**
  * @author Brian Schlining

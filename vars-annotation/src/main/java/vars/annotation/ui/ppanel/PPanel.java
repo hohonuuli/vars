@@ -22,8 +22,8 @@ package vars.annotation.ui.ppanel;
 
 import java.util.Collection;
 import javax.swing.JButton;
-import org.mbari.awt.event.ActionAdapter;
-import org.mbari.swing.PropertyPanel;
+import mbarix4j.awt.event.ActionAdapter;
+import mbarix4j.swing.PropertyPanel;
 import vars.annotation.Observation;
 import vars.annotation.ui.StateLookup;
 

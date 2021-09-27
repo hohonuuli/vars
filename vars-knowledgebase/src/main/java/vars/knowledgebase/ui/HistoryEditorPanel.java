@@ -35,7 +35,7 @@ import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.bushe.swing.event.EventBus;
-import org.mbari.swing.ListListModel;
+import mbarix4j.swing.ListListModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.UserAccount;

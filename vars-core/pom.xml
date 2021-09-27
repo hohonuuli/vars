@@ -4,16 +4,15 @@
     <parent>
         <artifactId>vars-redux</artifactId>
         <groupId>vars-redux</groupId>
-        <version>8.4.0-SNAPSHOT</version>
+        <version>9.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>vars-core</artifactId>
     <name>vars-core [Library]</name>
-  <!--<dependencies>
+  <dependencies>
     <dependency>
-      <groupId>org.mbari</groupId>
-      <artifactId>mbarix4j</artifactId>
-      <version>1.8-SNAPSHOT</version>
+      <groupId>org.mbari.vcr4j</groupId>
+      <artifactId>vcr4j-core</artifactId>
+      <version>${vcr4j.version}</version>
     </dependency> 
-  </dependencies> -->
+  </dependencies>
 </project>
-

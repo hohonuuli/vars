@@ -27,6 +27,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import javax.swing.ActionMap;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -43,13 +44,13 @@ import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.bushe.swing.event.EventBus;
-import org.mbari.awt.event.ActionAdapter;
-import org.mbari.swing.FancyComboBox;
-import org.mbari.swing.ListListModel;
-import org.mbari.swing.SpinningDialWaitIndicator;
-import org.mbari.swing.WaitIndicator;
+import mbarix4j.awt.event.ActionAdapter;
+import mbarix4j.swing.FancyComboBox;
+import mbarix4j.swing.ListListModel;
+import mbarix4j.swing.SpinningDialWaitIndicator;
+import mbarix4j.swing.WaitIndicator;
 import org.mbari.util.Dispatcher;
-import org.mbari.util.ImmutableList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.knowledgebase.KnowledgebaseDAOFactory;
@@ -335,7 +336,7 @@ public class  SearchPanel extends JPanel {
      */
     public Collection getConceptConstraints() {
         ListListModel model = (ListListModel) getConceptConstraintsList().getModel();
-        return new ImmutableList(model.getList());
+        return Collections.unmodifiableList(model.getList());
     }
 
     /**

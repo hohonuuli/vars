@@ -25,9 +25,11 @@ import java.io.OutputStream;
 import java.net.URL;
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingUtilities;
+
+import mbarix4j.awt.event.ActionAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.mbari.awt.event.ActionAdapter;
+
 
 //~--- classes ----------------------------------------------------------------
 

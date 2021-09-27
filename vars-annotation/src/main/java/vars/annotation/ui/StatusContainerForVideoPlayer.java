@@ -4,7 +4,7 @@ package vars.annotation.ui;
 import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.annotation.AnnotationProcessor;
 import org.bushe.swing.event.annotation.EventSubscriber;
-import org.mbari.swing.SwingUtils;
+import mbarix4j.swing.SwingUtils;
 
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.eventbus.VideoArchiveChangedEvent;

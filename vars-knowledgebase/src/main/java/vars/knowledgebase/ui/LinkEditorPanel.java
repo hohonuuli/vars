@@ -14,7 +14,8 @@
 
 package vars.knowledgebase.ui;
 
-import org.mbari.text.ObjectToStringConverter;
+
+import mbarix4j.text.ObjectToStringConverter;
 import vars.shared.ui.FullLinkListCellRender;
 import vars.shared.ui.ILockableEditor;
 import foxtrot.Job;
@@ -28,7 +29,7 @@ import java.util.List;
 import java.util.Vector;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
-import org.mbari.swing.SearchableComboBoxModel;
+import mbarix4j.swing.SearchableComboBoxModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.ILink;

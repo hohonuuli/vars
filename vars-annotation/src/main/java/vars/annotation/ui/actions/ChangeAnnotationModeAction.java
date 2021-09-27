@@ -16,7 +16,7 @@
 package vars.annotation.ui.actions;
 
 import org.bushe.swing.event.EventBus;
-import org.mbari.awt.event.ActionAdapter;
+import mbarix4j.awt.event.ActionAdapter;
 import vars.DAO;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.StateLookup;

@@ -16,8 +16,8 @@
 package vars.annotation.ui.imagepanel;
 
 import org.jdesktop.jxlayer.JXLayer;
-import org.mbari.awt.AwtUtilities;
-import org.mbari.swing.JImageUrlCanvas;
+import mbarix4j.awt.AwtUtilities;
+import mbarix4j.swing.JImageUrlCanvas;
 import vars.annotation.Observation;
 
 import java.awt.FontMetrics;

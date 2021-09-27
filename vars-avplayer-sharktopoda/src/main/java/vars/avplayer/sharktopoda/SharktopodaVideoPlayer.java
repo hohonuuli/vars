@@ -1,6 +1,6 @@
 package vars.avplayer.sharktopoda;
 
-import org.mbari.util.Tuple2;
+import mbarix4j.util.Tuple2;
 import org.mbari.vcr4j.VideoIO;
 import org.mbari.vcr4j.decorators.SchedulerVideoIO;
 import org.mbari.vcr4j.decorators.StatusDecorator;

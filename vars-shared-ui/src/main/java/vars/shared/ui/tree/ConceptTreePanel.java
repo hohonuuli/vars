@@ -32,9 +32,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
+
+import mbarix4j.swing.LabeledSpinningDialWaitIndicator;
+import mbarix4j.swing.SearchableTreePanel;
 import org.bushe.swing.event.EventBus;
-import org.mbari.swing.LabeledSpinningDialWaitIndicator;
-import org.mbari.swing.SearchableTreePanel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.PersistenceCache;

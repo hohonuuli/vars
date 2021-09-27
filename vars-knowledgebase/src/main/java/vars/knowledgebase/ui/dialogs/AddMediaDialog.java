@@ -32,7 +32,7 @@ import javax.swing.JProgressBar;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.bushe.swing.event.EventBus;
-import org.mbari.swing.ProgressDialog;
+import mbarix4j.swing.ProgressDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.DAO;

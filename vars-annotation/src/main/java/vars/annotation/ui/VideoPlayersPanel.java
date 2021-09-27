@@ -1,8 +1,8 @@
 package vars.annotation.ui;
 
 import org.bushe.swing.event.annotation.AnnotationProcessor;
-import org.mbari.swing.SwingUtils;
-import org.mbari.util.Tuple2;
+import mbarix4j.swing.SwingUtils;
+import mbarix4j.util.Tuple2;
 import vars.annotation.VideoArchive;
 import vars.avplayer.VideoController;
 import vars.avplayer.VideoPlayer;

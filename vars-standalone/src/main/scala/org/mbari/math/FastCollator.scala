@@ -1,5 +1,6 @@
 package org.mbari.math
 
+import mbarix4j.math.Matlib
 import org.slf4j.LoggerFactory
 
 /**

@@ -21,7 +21,7 @@ import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import org.mbari.swing.ListListModel;
+import mbarix4j.swing.ListListModel;
 
 /**
  * @author Brian Schlining

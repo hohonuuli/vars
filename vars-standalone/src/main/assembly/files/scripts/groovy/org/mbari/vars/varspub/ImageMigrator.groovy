@@ -15,7 +15,7 @@ import java.awt.image.BufferedImage
 import java.text.SimpleDateFormat
 import javax.imageio.ImageIO
 import org.slf4j.LoggerFactory
-import org.mbari.awt.image.ImageUtilities
+import mbarix4j.awt.image.ImageUtilities
 
 class ImageMigrator {
 

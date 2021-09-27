@@ -1,10 +1,8 @@
 package vars.avplayer;
 
-import com.google.common.collect.ImmutableList;
-import org.mbari.util.stream.StreamUtilities;
-import vars.annotation.AnnotationDAOFactory;
 
-import javax.inject.Inject;
+import mbarix4j.util.stream.StreamUtilities;
+
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;

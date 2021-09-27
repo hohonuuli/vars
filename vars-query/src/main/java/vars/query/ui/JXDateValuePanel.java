@@ -1,19 +1,16 @@
 package vars.query.ui;
 
+import mbarix4j.sql.QueryResults;
+import mbarix4j.swing.JSimpleButton;
+import mbarix4j.swing.SpinningDial;
 import org.bushe.swing.event.EventBus;
 import org.jdesktop.swingx.JXDatePicker;
-import org.mbari.sql.QueryResults;
-import org.mbari.swing.JSimpleButton;
-import org.mbari.swing.SpinningDial;
-import org.mbari.swingworker.SwingWorker;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.query.QueryPersistenceService;
 
-import javax.swing.Box;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;

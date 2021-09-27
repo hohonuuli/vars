@@ -37,8 +37,8 @@ import javax.swing.LayoutStyle;
 
 import org.bushe.swing.event.annotation.AnnotationProcessor;
 import org.bushe.swing.event.annotation.EventSubscriber;
-import org.mbari.swing.SearchableComboBoxModel;
-import org.mbari.text.ObjectToStringConverter;
+import mbarix4j.swing.SearchableComboBoxModel;
+import mbarix4j.text.ObjectToStringConverter;
 import vars.ILink;
 import vars.LinkBean;
 import vars.LinkComparator;

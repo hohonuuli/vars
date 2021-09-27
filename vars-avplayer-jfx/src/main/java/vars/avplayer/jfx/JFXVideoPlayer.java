@@ -2,7 +2,7 @@ package vars.avplayer.jfx;
 
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import org.mbari.util.Tuple2;
+import mbarix4j.util.Tuple2;
 import org.mbari.vcr4j.SimpleVideoError;
 import org.mbari.vcr4j.VideoIO;
 import org.mbari.vcr4j.decorators.LoggingDecorator;

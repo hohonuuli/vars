@@ -4,7 +4,7 @@ package vars.testing;
 import java.text.NumberFormat;
 import java.util.Date;
 
-import org.mbari.movie.Timecode;
+import org.mbari.vcr4j.time.Timecode;
 import vars.annotation.VideoFrame;
 import vars.annotation.*;
 

@@ -17,7 +17,7 @@
 
 package vars.annotation.ui.actions;
 
-import org.mbari.awt.event.ActionAdapter;
+import mbarix4j.awt.event.ActionAdapter;
 
 import vars.annotation.ui.ToolBelt;
 
@@ -48,7 +48,7 @@ public class NewObservationUsingConceptNameAction extends ActionAdapter {
     /**
      * Initiates the action.
      *
-     * @see  org.mbari.awt.event.IAction#doAction()
+     * @see  mbarix4j.awt.event.IAction#doAction()
      */
     public void doAction() {
         action1.doAction(conceptName);

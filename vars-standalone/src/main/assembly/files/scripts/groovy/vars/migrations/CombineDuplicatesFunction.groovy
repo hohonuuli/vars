@@ -1,6 +1,6 @@
 package vars.migrations
 
-import org.mbari.sql.QueryFunction
+import mbarix4j.sql.QueryFunction
 import org.slf4j.LoggerFactory
 import vars.ToolBox
 import vars.annotation.jpa.VideoArchiveImpl

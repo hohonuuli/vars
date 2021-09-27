@@ -20,7 +20,7 @@ package vars.annotation.ui.buttons;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
-import org.mbari.swing.SwingUtils;
+import mbarix4j.swing.SwingUtils;
 
 import vars.UserAccount;
 import vars.annotation.ui.StateLookup;

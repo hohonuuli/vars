@@ -13,8 +13,8 @@
 package vars;
 
 import java.util.Comparator;
+import mbarix4j.text.IgnoreCaseToStringComparator;
 
-import org.mbari.text.IgnoreCaseToStringComparator;
 
 /**
  * For comparing links using linkName, toConcept and linkValue fields.

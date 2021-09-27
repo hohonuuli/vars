@@ -22,10 +22,10 @@ import com.google.common.collect.ImmutableList;
 import foxtrot.Job;
 import foxtrot.Worker;
 import org.bushe.swing.event.EventBus;
-import org.mbari.awt.AwtUtilities;
-import org.mbari.swing.LabeledSpinningDialWaitIndicator;
-import org.mbari.swing.SearchableComboBoxModel;
-import org.mbari.swing.WaitIndicator;
+import mbarix4j.awt.AwtUtilities;
+import mbarix4j.swing.LabeledSpinningDialWaitIndicator;
+import mbarix4j.swing.SearchableComboBoxModel;
+import mbarix4j.swing.WaitIndicator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.ILink;
@@ -95,7 +95,8 @@ public class VideoArchiveSetEditorPanelController {
     public VideoArchiveSetEditorPanelController(VideoArchiveSetEditorPanel panel, ToolBelt toolBelt) {
         this.panel = panel;
         this.toolBelt = toolBelt;
-        this.moveAction = new MoveVideoFrameWithDialogAction(AwtUtilities.getFrame(panel), toolBelt);
+        // HACK - calling get on optional
+        this.moveAction = new MoveVideoFrameWithDialogAction(AwtUtilities.getFrame(panel).get(), toolBelt);
     }
 
     protected void addAssociation() {
@@ -128,7 +129,7 @@ public class VideoArchiveSetEditorPanelController {
 
 
         final Object[] options = { "OK", "CANCEL" };
-        final int confirm = JOptionPane.showOptionDialog(AwtUtilities.getFrame(panel),
+        final int confirm = JOptionPane.showOptionDialog(AwtUtilities.getFrame(panel).get(),
             "Do you want to change the camera direction to '" + direction.getDirection() + "' for the " +
             videoFrames.size() + " selected video-frames(s)?", "VARS - Confirm Delete", JOptionPane.DEFAULT_OPTION,
                 JOptionPane.WARNING_MESSAGE, null, options, options[0]);
@@ -150,7 +151,7 @@ public class VideoArchiveSetEditorPanelController {
         }
 
         final Object[] options = { "OK", "CANCEL" };
-        final int confirm = JOptionPane.showOptionDialog(AwtUtilities.getFrame(panel),
+        final int confirm = JOptionPane.showOptionDialog(AwtUtilities.getFrame(panel).get(),
             "Do you want to delete " + count + " observation(s)?", "VARS - Confirm Delete", JOptionPane.DEFAULT_OPTION,
             JOptionPane.WARNING_MESSAGE, null, options, options[0]);
 
@@ -322,7 +323,7 @@ public class VideoArchiveSetEditorPanelController {
                     final Collection<Association> associations = getFilteredAssocations(true, link);
 
                     final Object[] options = { "OK", "CANCEL" };
-                    final int confirm = JOptionPane.showOptionDialog(AwtUtilities.getFrame(panel),
+                    final int confirm = JOptionPane.showOptionDialog(AwtUtilities.getFrame(panel).get(),
                         "Do you want to delete " + associations.size() + " association(s)?", "VARS - Confirm Delete",
                         JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
 
@@ -605,7 +606,7 @@ public class VideoArchiveSetEditorPanelController {
          * Constructs ...
          */
         public AssociationSelectionDialog() {
-            super(AwtUtilities.getFrame(panel), "VARS - Select Association", true);
+            super(AwtUtilities.getFrame(panel).get(), "VARS - Select Association", true);
             linkSelectionPanel = new LinkSelectionPanel(toolBelt.getAnnotationPersistenceService());
             add(linkSelectionPanel, BorderLayout.CENTER);
             pack();

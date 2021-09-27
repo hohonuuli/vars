@@ -14,7 +14,8 @@ import java.awt.RenderingHints;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
-import org.mbari.swing.JImageUrlCanvas;
+
+import mbarix4j.swing.JImageUrlCanvas;
 import vars.shared.awt.AWTUtilities;
 
 /**

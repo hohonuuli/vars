@@ -1,10 +1,10 @@
 package org.mbari.vars.arctic
 
-import java.text.SimpleDateFormat
-import java.util.{Calendar, TimeZone, GregorianCalendar, Date}
+import mbarix4j.math.Matlib
 
-import org.mbari.math.Matlib
-import org.mbari.movie.Timecode
+import java.text.SimpleDateFormat
+import java.util.{Calendar, Date, GregorianCalendar, TimeZone}
+import org.mbari.vcr4j.time.{FrameRates, Timecode}
 
 /**
  *
@@ -37,7 +37,7 @@ object MergeUtilities {
       else findRollovers(xs.slice(r + 1, xs.size), s :: accum, s + 1)
     }
 
-    val frames = records.map(r => new Timecode(s"${r.gpsTime}:00").getFrames).toArray
+    val frames = records.map(r => new Timecode(s"${r.gpsTime}:00", FrameRates.NTSC).getFrames).toArray
     val df = Matlib.diff(frames)
     findRollovers(df).reverse.map(_ + 1) // Account for index of diff
     

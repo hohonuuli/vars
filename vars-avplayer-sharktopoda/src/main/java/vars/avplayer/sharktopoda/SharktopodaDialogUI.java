@@ -1,12 +1,11 @@
 package vars.avplayer.sharktopoda;
 
 import org.bushe.swing.event.EventBus;
-import org.mbari.awt.event.NonDigitConsumingKeyListener;
-import org.mbari.swing.SpinningDialWaitIndicator;
-import org.mbari.swing.WaitIndicator;
-import org.mbari.text.IgnoreCaseToStringComparator;
-import org.mbari.util.Tuple2;
-import org.mbari.vcr4j.SimpleVideoError;
+import mbarix4j.awt.event.NonDigitConsumingKeyListener;
+import mbarix4j.swing.SpinningDialWaitIndicator;
+import mbarix4j.swing.WaitIndicator;
+import mbarix4j.text.IgnoreCaseToStringComparator;
+import mbarix4j.util.Tuple2;
 import org.mbari.vcr4j.sharktopoda.SharktopodaError;
 import org.mbari.vcr4j.sharktopoda.SharktopodaState;
 import org.slf4j.Logger;
@@ -20,8 +19,6 @@ import vars.annotation.CameraDeployment;
 import vars.annotation.VideoArchive;
 import vars.avplayer.VideoController;
 import vars.avplayer.VideoPlayerDialogUI;
-import vars.avplayer.sharktopoda.SharktopodaVideoPlayer;
-import vars.avplayer.sharktopoda.VideoParams;
 import vars.shared.ui.GlobalStateLookup;
 import vars.shared.ui.dialogs.StandardDialog;
 

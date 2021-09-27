@@ -35,9 +35,10 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
+
+import mbarix4j.awt.event.ActionAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.mbari.awt.event.ActionAdapter;
 import vars.query.results.QueryResults;
 
 

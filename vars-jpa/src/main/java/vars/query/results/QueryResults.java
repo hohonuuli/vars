@@ -1,10 +1,9 @@
 package vars.query.results;
 
 import com.google.common.base.Preconditions;
-import org.mbari.util.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import mbarix4j.util.Tuple2;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;

@@ -33,7 +33,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import org.bushe.swing.event.EventBus;
-import org.mbari.swing.SearchableComboBoxModel;
+import mbarix4j.swing.SearchableComboBoxModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.ILink;

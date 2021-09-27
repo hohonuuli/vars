@@ -19,9 +19,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import org.mbari.swing.FancyComboBox;
-import org.mbari.swing.SortedComboBoxModel;
-import org.mbari.text.IgnoreCaseToStringComparator;
+
+import mbarix4j.swing.FancyComboBox;
+import mbarix4j.swing.SortedComboBoxModel;
+import mbarix4j.text.IgnoreCaseToStringComparator;
 import vars.MiscDAOFactory;
 import vars.UserAccount;
 import vars.UserAccountDAO;

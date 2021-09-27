@@ -31,8 +31,8 @@ import java.util.Collection;
 import javax.swing.Action;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
-import org.mbari.awt.event.ActionAdapter;
-import org.mbari.awt.event.IAction;
+import mbarix4j.awt.event.ActionAdapter;
+import mbarix4j.awt.event.IAction;
 
 import vars.annotation.Observation;
 import vars.annotation.ui.PersistenceController;
@@ -63,7 +63,7 @@ public class DeleteSelectedObservationsWithConfirmAction extends ActionAdapter {
     }
 
     /**
-     * @see org.mbari.awt.event.IAction#doAction()
+     * @see mbarix4j.awt.event.IAction#doAction()
      */
     public void doAction() {
         Collection<Observation> observations = StateLookup.getSelectedObservations();

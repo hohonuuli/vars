@@ -5,11 +5,10 @@ package vars.avplayer.jfx;
  */
 import com.google.common.base.Preconditions;
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.collections.ObservableMap;
+
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -17,7 +16,7 @@ import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Button;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
+
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.media.Media;
@@ -26,7 +25,7 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.util.Duration;
 import org.bushe.swing.event.EventBus;
-import org.mbari.awt.image.ImageUtilities;
+import mbarix4j.awt.image.ImageUtilities;
 import org.mbari.vcr4j.time.Timecode;
 import vars.shared.ui.GlobalStateLookup;
 

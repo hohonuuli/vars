@@ -31,9 +31,10 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
+
+import mbarix4j.swing.JImageFrame;
+import mbarix4j.swing.JImageUrlFrame;
 import org.bushe.swing.event.EventBus;
-import org.mbari.swing.JImageFrame;
-import org.mbari.swing.JImageUrlFrame;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.KnowledgebaseDAOFactory;

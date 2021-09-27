@@ -39,7 +39,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.border.Border;
 import org.bushe.swing.event.EventBus;
-import org.mbari.swing.IPopup;
+import mbarix4j.swing.IPopup;
 import org.mbari.util.Dispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

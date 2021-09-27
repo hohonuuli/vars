@@ -41,10 +41,11 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
-import org.mbari.awt.event.ActionAdapter;
-import org.mbari.text.IgnoreCaseToStringComparator;
+import mbarix4j.awt.event.ActionAdapter;
+
+import mbarix4j.text.IgnoreCaseToStringComparator;
 import org.mbari.util.Dispatcher;
-import org.mbari.util.ImmutableCollection;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.query.QueryPersistenceService;
@@ -385,7 +386,7 @@ public class RefineSearchPanel extends JPanel {
             }
         }
 
-        return new ImmutableCollection(valuePanels);
+        return Collections.unmodifiableCollection(valuePanels);
     }
 
     private void initialize() {

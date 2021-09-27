@@ -6,7 +6,7 @@
  * @since 2014-11-11
  */
 
-import org.mbari.sql.QueryFunction
+import mbarix4j.sql.QueryFunction
 
 def toolBox = new vars.ToolBox()
 def kbdao = toolBox.toolBelt.knowledgebasePersistenceService

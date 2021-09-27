@@ -32,7 +32,7 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
 import com.google.inject.Injector;
-import org.mbari.awt.layout.WrappingFlowLayout;
+import mbarix4j.awt.layout.WrappingFlowLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.ui.buttons.*;

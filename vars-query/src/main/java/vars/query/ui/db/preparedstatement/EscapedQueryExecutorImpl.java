@@ -1,6 +1,6 @@
 package vars.query.ui.db.preparedstatement;
 
-import org.mbari.sql.QueryableImpl;
+import mbarix4j.sql.QueryableImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.VARSException;

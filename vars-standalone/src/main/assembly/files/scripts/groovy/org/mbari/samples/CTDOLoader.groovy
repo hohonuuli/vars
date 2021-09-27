@@ -1,8 +1,8 @@
 package org.mbari.samples
 
 import org.mbari.expd.jdbc.BaseDAOImpl
-import org.mbari.sql.QueryableImpl
-import org.mbari.sql.QueryFunction
+import mbarix4j.sql.QueryableImpl
+import mbarix4j.sql.QueryFunction
 import org.slf4j.LoggerFactory
 import vars.ToolBox
 import org.mbari.samples.integration.DatabaseUtility

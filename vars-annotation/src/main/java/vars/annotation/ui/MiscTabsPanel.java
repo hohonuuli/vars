@@ -23,7 +23,7 @@ import javax.swing.tree.TreePath;
 import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.EventTopicSubscriber;
 import org.jdesktop.swingx.JXTree;
-import org.mbari.swing.SearchableTreePanel;
+import mbarix4j.swing.SearchableTreePanel;
 import vars.CacheClearedEvent;
 import vars.CacheClearedListener;
 

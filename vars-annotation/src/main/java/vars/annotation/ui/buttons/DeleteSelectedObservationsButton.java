@@ -22,7 +22,7 @@ import javax.swing.KeyStroke;
 
 import org.bushe.swing.event.annotation.AnnotationProcessor;
 import org.bushe.swing.event.annotation.EventSubscriber;
-import org.mbari.swing.SwingUtils;
+import mbarix4j.swing.SwingUtils;
 import vars.UserAccount;
 import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.actions.DeleteSelectedObservationsWithConfirmAction;

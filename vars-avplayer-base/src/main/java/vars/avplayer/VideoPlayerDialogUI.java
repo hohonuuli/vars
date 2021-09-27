@@ -1,9 +1,8 @@
 package vars.avplayer;
 
-import org.mbari.util.Tuple2;
+
 import org.mbari.vcr4j.*;
-import vars.ToolBelt;
-import vars.annotation.VideoArchive;
+
 
 /**
  * Created by brian on 1/7/14.

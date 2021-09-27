@@ -4,7 +4,7 @@ package vars.shared.javafx.scene.image;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import org.mbari.util.Tuple2;
+
 
 /**
  * Wrapper around ImageView that adds Utility methods

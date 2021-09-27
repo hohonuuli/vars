@@ -1,6 +1,7 @@
 package vars.query.results;
 
-import org.mbari.util.Tuple2;
+
+import mbarix4j.util.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

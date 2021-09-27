@@ -1,7 +1,7 @@
 package vars.annotation.ui.buttons;
 
-import org.mbari.awt.event.ActionAdapter;
-import org.mbari.swing.JFancyButton;
+import mbarix4j.awt.event.ActionAdapter;
+import mbarix4j.swing.JFancyButton;
 import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
 import vars.annotation.VideoFrame;

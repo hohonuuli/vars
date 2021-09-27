@@ -22,7 +22,7 @@ import java.beans.PropertyChangeListener;
 import java.util.Collection;
 
 import javax.swing.JFrame;
-import org.mbari.awt.event.ActionAdapter;
+import mbarix4j.awt.event.ActionAdapter;
 
 import vars.annotation.Observation;
 import vars.annotation.ui.ChangeTimeCodeFrame;

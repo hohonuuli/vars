@@ -16,7 +16,7 @@
 package vars.annotation.ui.actions;
 
 import javax.swing.JDialog;
-import org.mbari.awt.event.ActionAdapter;
+import mbarix4j.awt.event.ActionAdapter;
 
 import vars.annotation.ui.dialogs.AddSamplePropDialog;
 import vars.annotation.ui.ToolBelt;

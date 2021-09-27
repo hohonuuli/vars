@@ -22,7 +22,7 @@ import java.util.Collection;
 import java.util.Date;
 
 import org.bushe.swing.event.EventBus;
-import org.mbari.awt.event.ActionAdapter;
+import mbarix4j.awt.event.ActionAdapter;
 import vars.UserAccount;
 import vars.annotation.Observation;
 import vars.annotation.ui.StateLookup;

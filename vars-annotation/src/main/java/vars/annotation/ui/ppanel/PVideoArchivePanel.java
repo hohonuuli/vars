@@ -28,9 +28,9 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 import org.bushe.swing.event.EventBus;
-import org.mbari.awt.event.ActionAdapter;
-import org.mbari.awt.event.NonDigitConsumingKeyListener;
-import org.mbari.swing.PropertyPanel;
+import mbarix4j.awt.event.ActionAdapter;
+import mbarix4j.awt.event.NonDigitConsumingKeyListener;
+import mbarix4j.swing.PropertyPanel;
 import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.commandqueue.Command;
 import vars.annotation.ui.commandqueue.CommandEvent;
@@ -206,7 +206,7 @@ public class PVideoArchivePanel extends PropertiesPanel {
      *
      * @param  obj Description of the Parameter
      * @param  changeCode Description of the Parameter
-     * @see org.mbari.util.IObserver#update(java.lang.Object, java.lang.Object)
+     * @see mbarix4j.util.IObserver#update(java.lang.Object, java.lang.Object)
      */
     public void update(final Object obj, final Object changeCode) {
         

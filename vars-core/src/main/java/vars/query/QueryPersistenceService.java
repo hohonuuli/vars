@@ -5,14 +5,11 @@
 
 package vars.query;
 
-import java.sql.Connection;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-
-import org.mbari.sql.IQueryable;
-import org.mbari.sql.QueryableImpl;
+import mbarix4j.sql.IQueryable;
+import mbarix4j.sql.QueryableImpl;
 import vars.ILink;
 import vars.knowledgebase.Concept;
 

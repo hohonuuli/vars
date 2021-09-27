@@ -15,9 +15,7 @@
 
 package vars.annotation;
 
-import org.mbari.sql.QueryableImpl;
-import org.mbari.sql.QueryFunction;
-import com.google.common.base.Function;
+
 import com.google.common.collect.Collections2;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -31,8 +29,11 @@ import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import org.mbari.text.IgnoreCaseToStringComparator;
-import org.mbari.util.stream.StreamUtilities;
+
+import mbarix4j.sql.QueryFunction;
+import mbarix4j.sql.QueryableImpl;
+import mbarix4j.text.IgnoreCaseToStringComparator;
+import mbarix4j.util.stream.StreamUtilities;
 import vars.*;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;

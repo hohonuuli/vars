@@ -18,12 +18,12 @@
 package vars.query.ui;
 
 import com.google.inject.Inject;
-import org.mbari.sql.QueryResults;
-import org.mbari.swing.JSimpleButton;
-import org.mbari.swing.SpinningDial;
+import mbarix4j.sql.QueryResults;
+import mbarix4j.swing.JSimpleButton;
+import mbarix4j.swing.SpinningDial;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.mbari.swingworker.SwingWorker;
+import mbarix4j.swingworker.SwingWorker;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;

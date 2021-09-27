@@ -19,8 +19,7 @@ import foxtrot.Task;
 import foxtrot.Worker;
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+
 import java.io.File;
 import java.util.Date;
 import java.util.TimeZone;
@@ -30,9 +29,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.EventTopicSubscriber;
-import org.mbari.swing.SplashFrame;
-import org.mbari.util.Dispatcher;
-import org.mbari.util.SystemUtilities;
+import mbarix4j.swing.SplashFrame;
+
+import mbarix4j.util.SystemUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.knowledgebase.Concept;

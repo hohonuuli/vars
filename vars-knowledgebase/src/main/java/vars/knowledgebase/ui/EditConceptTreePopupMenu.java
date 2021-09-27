@@ -24,7 +24,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTree;
 import javax.swing.tree.TreePath;
 import org.bushe.swing.event.EventBus;
-import org.mbari.swing.WaitIndicator;
+import mbarix4j.swing.WaitIndicator;
 import vars.DAO;
 import vars.UserAccount;
 import vars.knowledgebase.Concept;

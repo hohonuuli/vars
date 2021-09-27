@@ -17,7 +17,7 @@ package vars.annotation.ui.imagepanel;
 
 import org.bushe.swing.event.annotation.AnnotationProcessor;
 import org.bushe.swing.event.annotation.EventSubscriber;
-import org.mbari.swing.JImageUrlCanvas;
+import mbarix4j.swing.JImageUrlCanvas;
 import vars.annotation.Observation;
 
 import java.util.Collection;

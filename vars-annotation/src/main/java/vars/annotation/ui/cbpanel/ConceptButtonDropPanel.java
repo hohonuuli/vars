@@ -39,9 +39,9 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import org.bushe.swing.event.EventBus;
-import org.mbari.awt.layout.WrappingFlowLayout;
-import org.mbari.swing.IPopup;
-import org.mbari.swing.SwingUtils;
+import mbarix4j.awt.layout.WrappingFlowLayout;
+import mbarix4j.swing.IPopup;
+import mbarix4j.swing.SwingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.ui.StateLookup;
@@ -204,7 +204,7 @@ public class ConceptButtonDropPanel extends JPanel {
      * Adds a delete JMenuItem to the popup list for on a button.
      *
      * @param button
-     *            A JButton that implements the org.mbari.swing.IPopup interface
+     *            A JButton that implements the mbarix4j.swing.IPopup interface
      */
     private void makeButtonDeletable(final JButton button) {
         if (button instanceof IPopup) {

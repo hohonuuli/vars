@@ -16,15 +16,14 @@
 package org.mbari.samples.integration;
 
 import com.google.inject.Injector;
-import org.mbari.sql.IQueryable;
-import org.mbari.sql.QueryableImpl;
+import mbarix4j.sql.IQueryable;
+import mbarix4j.sql.QueryableImpl;
 import vars.ToolBelt;
 import vars.knowledgebase.Concept;
 import vars.knowledgebase.ConceptDAO;
 import vars.knowledgebase.ConceptName;
 import vars.knowledgebase.ui.StateLookup;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;

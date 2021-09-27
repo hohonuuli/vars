@@ -1,15 +1,13 @@
 package vars.avplayer;
 
-import org.mbari.util.Tuple2;
+import mbarix4j.util.Tuple2;
 import org.mbari.vcr4j.VideoError;
 import org.mbari.vcr4j.VideoState;
 import vars.ToolBelt;
 import vars.annotation.VideoArchive;
 import vars.shared.rx.RXEventBus;
 
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 
 /**
  * Implementations of this class can open videos. Use `canPlay` to see if a mimetype is playable.

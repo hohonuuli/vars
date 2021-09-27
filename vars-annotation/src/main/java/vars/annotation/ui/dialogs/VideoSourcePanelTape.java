@@ -13,8 +13,8 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import org.jdesktop.layout.GroupLayout;
 import org.jdesktop.layout.LayoutStyle;
-import org.mbari.awt.event.NonDigitConsumingKeyListener;
-import org.mbari.text.IgnoreCaseToStringComparator;
+import mbarix4j.awt.event.NonDigitConsumingKeyListener;
+import mbarix4j.text.IgnoreCaseToStringComparator;
 
 import vars.annotation.AnnotationDAOFactory;
 import vars.annotation.ui.actions.OpenVideoArchiveUsingParamsAction;

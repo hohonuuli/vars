@@ -22,8 +22,8 @@ package vars.annotation.ui.ppanel;
 
 import java.util.Date;
 
-import org.mbari.awt.event.ActionAdapter;
-import org.mbari.swing.PropertyPanel;
+import mbarix4j.awt.event.ActionAdapter;
+import mbarix4j.swing.PropertyPanel;
 
 import vars.CacheClearedEvent;
 import vars.CacheClearedListener;
@@ -107,7 +107,7 @@ public class PObservationPanel extends PropertiesPanel {
      *
      * @param  obj Description of the Parameter
      * @param  changeCode Description of the Parameter
-     * @see org.mbari.util.IObserver#update(java.lang.Object, java.lang.Object)
+     * @see mbarix4j.util.IObserver#update(java.lang.Object, java.lang.Object)
      */
     public void update(final Object obj, final Object changeCode) {
         final Observation obs = (Observation) obj;

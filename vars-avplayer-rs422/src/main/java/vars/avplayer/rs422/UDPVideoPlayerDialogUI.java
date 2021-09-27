@@ -1,7 +1,7 @@
 package vars.avplayer.rs422;
 
-import org.mbari.awt.event.NonDigitConsumingKeyListener;
-import org.mbari.util.Tuple2;
+import mbarix4j.awt.event.NonDigitConsumingKeyListener;
+import mbarix4j.util.Tuple2;
 import org.mbari.vcr4j.udp.UDPError;
 import org.mbari.vcr4j.udp.UDPState;
 import vars.ToolBelt;

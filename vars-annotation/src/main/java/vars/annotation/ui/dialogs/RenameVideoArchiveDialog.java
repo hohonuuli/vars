@@ -15,10 +15,10 @@
 
 package vars.annotation.ui.dialogs;
 
-import org.mbari.awt.event.NonDigitConsumingKeyListener;
-import org.mbari.swing.SpinningDialWaitIndicator;
-import org.mbari.swing.WaitIndicator;
-import org.mbari.text.IgnoreCaseToStringComparator;
+import mbarix4j.awt.event.NonDigitConsumingKeyListener;
+import mbarix4j.swing.SpinningDialWaitIndicator;
+import mbarix4j.swing.WaitIndicator;
+import mbarix4j.text.IgnoreCaseToStringComparator;
 import vars.CacheClearedEvent;
 import vars.CacheClearedListener;
 import vars.annotation.VideoArchiveDAO;

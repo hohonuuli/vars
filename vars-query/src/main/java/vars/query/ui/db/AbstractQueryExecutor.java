@@ -9,7 +9,7 @@ import java.util.Collection;
 
 /**
  * Query's are built from the UI components. This class encapsulates the database queries
- * and returns a {@link org.mbari.sql.QueryResults} object with the results based on the
+ * and returns a {@link mbarix4j.sql.QueryResults} object with the results based on the
  * UI's settings.
  * 
  * @author Brian Schlining

@@ -26,10 +26,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.mbari.util.Tuple2;
+import mbarix4j.util.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.mbari.awt.event.ActionAdapter;
+import mbarix4j.awt.event.ActionAdapter;
 import vars.query.results.QueryResults;
 
 //~--- classes ----------------------------------------------------------------
@@ -84,7 +84,7 @@ public class SaveQueryResultsAction extends ActionAdapter {
 
     /*
      *  (non-Javadoc)
-     * @see org.mbari.awt.event.IAction#doAction()
+     * @see mbarix4j.awt.event.IAction#doAction()
      */
 
     /**

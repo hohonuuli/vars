@@ -39,8 +39,8 @@ import javax.swing.event.ListSelectionListener;
 
 import org.bushe.swing.event.annotation.AnnotationProcessor;
 import org.bushe.swing.event.annotation.EventSubscriber;
-import org.mbari.swing.SearchableComboBoxModel;
-import org.mbari.text.ObjectToStringConverter;
+import mbarix4j.swing.SearchableComboBoxModel;
+import mbarix4j.text.ObjectToStringConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.ILink;

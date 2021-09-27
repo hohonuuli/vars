@@ -23,10 +23,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import javax.swing.JFileChooser;
 import javax.swing.ProgressMonitor;
+
+import mbarix4j.awt.event.ActionAdapter;
+import mbarix4j.awt.event.ActionRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.mbari.awt.event.ActionAdapter;
-import org.mbari.awt.event.ActionRunnable;
+
 import vars.query.ui.actions.SaveFramegrabsAction;
 
 
@@ -51,7 +53,7 @@ public class SaveImagesFromQueryResultsAction extends ActionAdapter {
 
 
     /**
-     *     @see org.mbari.awt.event.IAction#doAction()
+     *     @see mbarix4j.awt.event.IAction#doAction()
      */
     public void doAction() {
         /*

@@ -12,8 +12,7 @@
 
 package vars;
 
-import org.mbari.sql.QueryableImpl;
-import org.mbari.sql.QueryFunction;
+
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import java.math.BigDecimal;
@@ -31,8 +30,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.TimeZone;
-import org.mbari.movie.Timecode;
-import org.mbari.math.Matlib;
+
+import mbarix4j.math.Matlib;
+import mbarix4j.sql.QueryFunction;
+import mbarix4j.sql.QueryableImpl;
+import org.mbari.vcr4j.time.Timecode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

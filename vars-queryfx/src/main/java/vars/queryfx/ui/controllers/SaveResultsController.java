@@ -1,9 +1,10 @@
 package vars.queryfx.ui.controllers;
 
-import org.mbari.util.Tuple2;
+
+import mbarix4j.util.Tuple2;
 import vars.query.results.QueryResults;
 import vars.query.results.QueryResultsUtilities;
-import vars.query.results.SaveResultsAsJSONFn;
+
 import vars.queryfx.rx.messages.SaveAsJSONMsg;
 import vars.shared.rx.RXEventBus;
 import vars.shared.rx.messages.NonFatalExceptionMsg;

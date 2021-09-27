@@ -10,14 +10,14 @@ import java.util.Collections;
 
 import javax.swing.*;
 
-import org.mbari.awt.event.ActionAdapter;
-import org.mbari.swing.DynamicList;
+import mbarix4j.awt.event.ActionAdapter;
+import mbarix4j.swing.DynamicList;
 import vars.annotation.ui.StateLookup;
 import vars.shared.ui.dialogs.StandardDialog;
 
 import javax.swing.border.TitledBorder;
 
-import org.mbari.swing.ListListModel;
+import mbarix4j.swing.ListListModel;
 
 /**
  * @author Brian Schlining

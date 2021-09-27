@@ -1,7 +1,7 @@
 package vars.annotation.ui.buttons;
 
 import org.bushe.swing.event.EventBus;
-import org.mbari.swing.JFancyButton;
+import mbarix4j.swing.JFancyButton;
 import vars.annotation.ui.commandqueue.RedoEvent;
 import vars.annotation.ui.commandqueue.UndoEvent;
 

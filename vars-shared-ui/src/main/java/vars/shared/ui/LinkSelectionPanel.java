@@ -33,12 +33,14 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
+
+import mbarix4j.swing.LabeledSpinningDialWaitIndicator;
+import mbarix4j.swing.SearchableComboBoxModel;
+import mbarix4j.swing.SortedComboBoxModel;
+import mbarix4j.swing.WaitIndicator;
+import mbarix4j.text.ObjectToStringConverter;
 import org.bushe.swing.event.EventBus;
-import org.mbari.swing.LabeledSpinningDialWaitIndicator;
-import org.mbari.swing.SearchableComboBoxModel;
-import org.mbari.swing.SortedComboBoxModel;
-import org.mbari.swing.WaitIndicator;
-import org.mbari.text.ObjectToStringConverter;
+
 import vars.ILink;
 import vars.LinkBean;
 import vars.LinkComparator;
@@ -134,7 +136,7 @@ public class LinkSelectionPanel extends JPanel {
 
             linksComboBox = new JComboBox();
             linksComboBox.setRenderer(new LinkListCellRenderer());
-            linksComboBox.setModel(new SearchableComboBoxModel<ILink>(new LinkComparator(),
+            linksComboBox.setModel(new SearchableComboBoxModel(new LinkComparator(),
                     new ObjectToStringConverter<ILink>() {
 
                 public String convert(ILink object) {

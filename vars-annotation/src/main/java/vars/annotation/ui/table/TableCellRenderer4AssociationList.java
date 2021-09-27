@@ -25,8 +25,8 @@ import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.ListModel;
 import javax.swing.ToolTipManager;
-import org.mbari.swing.ListListModel;
-import org.mbari.swing.table.ListTableCellRenderer;
+import mbarix4j.swing.ListListModel;
+import mbarix4j.swing.table.ListTableCellRenderer;
 import vars.LinkComparator;
 import vars.annotation.Association;
 

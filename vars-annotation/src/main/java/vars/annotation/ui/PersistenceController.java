@@ -17,7 +17,7 @@ package vars.annotation.ui;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
-import org.mbari.net.URLUtilities;
+import mbarix4j.net.URLUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.DAO;

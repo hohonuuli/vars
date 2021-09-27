@@ -23,8 +23,7 @@ import java.util.concurrent.TimeoutException;
 import javax.swing.Action;
 import javax.swing.KeyStroke;
 import org.bushe.swing.event.EventBus;
-import org.mbari.awt.event.ActionAdapter;
-import org.mbari.util.NumberUtilities;
+import mbarix4j.awt.event.ActionAdapter;
 import org.mbari.vcr4j.VideoIndex;
 import org.mbari.vcr4j.time.Timecode;
 import org.slf4j.Logger;
@@ -33,7 +32,6 @@ import vars.CacheClearedEvent;
 import vars.CacheClearedListener;
 import vars.UserAccount;
 import vars.annotation.CameraDirections;
-import vars.annotation.Observation;
 import vars.annotation.VideoArchive;
 import vars.annotation.ui.StateLookup;
 import vars.annotation.ui.commandqueue.Command;
@@ -106,7 +104,7 @@ public final class NewObservationAction extends ActionAdapter {
 
     /**
      * Initiates the action. using the DEFAULT_CONCEPTNAME
-     * @see  org.mbari.awt.event.IAction
+     * @see  mbarix4j.awt.event.IAction
      */
     public void doAction() {
         doAction(defaultConceptName);

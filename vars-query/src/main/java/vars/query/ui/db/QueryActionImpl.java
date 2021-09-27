@@ -1,6 +1,7 @@
 package vars.query.ui.db;
 
-import org.mbari.awt.event.ActionAdapter;
+import mbarix4j.awt.event.ActionAdapter;
+import mbarix4j.awt.event.ActionAdapter;
 import org.mbari.util.ExceptionHandler;
 import org.mbari.util.ExceptionHandlerSupport;
 import org.slf4j.Logger;

@@ -22,7 +22,7 @@ import java.beans.PropertyChangeListener;
 import javax.swing.JTree;
 import org.bushe.swing.event.EventBus;
 import org.bushe.swing.event.EventTopicSubscriber;
-import org.mbari.swing.ProgressDialog;
+import mbarix4j.swing.ProgressDialog;
 import org.mbari.util.Dispatcher;
 import vars.knowledgebase.Concept;
 import vars.shared.InjectorModule;

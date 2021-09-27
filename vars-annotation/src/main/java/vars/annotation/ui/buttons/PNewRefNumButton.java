@@ -15,7 +15,7 @@
 
 package vars.annotation.ui.buttons;
 
-import org.mbari.swing.IPopup;
+import mbarix4j.swing.IPopup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.annotation.VideoArchive;

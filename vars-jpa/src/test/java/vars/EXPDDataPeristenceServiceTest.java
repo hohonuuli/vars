@@ -17,7 +17,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.mbari.movie.Timecode;
+import org.mbari.vcr4j.time.Timecode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.jpa.VarsJpaTestModule;
@@ -66,7 +66,8 @@ public class EXPDDataPeristenceServiceTest {
         for (TimecodeBean b : beans) {
             VideoMoment videoMoment = dao.findTimecodeNearDate(b.platform, b.date, millisecTolerance);
             Timecode tc = new Timecode(videoMoment.getAlternateTimecode(), framerate);
-            double dt = Math.abs(tc.diffFrames(b.timecode));
+            double diffFrames = tc.getFrames() - b.timecode.getFrames();
+            double dt = Math.abs(diffFrames);
             log.debug("EXPECTED: " + b.timecode + " FOUND: " + tc);
 
             /* This doesn't always work as expected because of the lag between the

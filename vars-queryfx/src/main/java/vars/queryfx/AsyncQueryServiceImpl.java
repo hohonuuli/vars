@@ -1,7 +1,7 @@
 package vars.queryfx;
 
 import com.google.common.base.Preconditions;
-import org.mbari.sql.QueryResults;
+import mbarix4j.sql.QueryResults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vars.ILink;

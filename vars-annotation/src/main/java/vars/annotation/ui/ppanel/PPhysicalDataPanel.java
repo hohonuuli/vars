@@ -21,9 +21,9 @@ Created on October 31, 2003, 9:16 AM
 package vars.annotation.ui.ppanel;
 
 import org.bushe.swing.event.EventBus;
-import org.mbari.awt.event.ActionAdapter;
-import org.mbari.swing.PropertyPanel;
-import org.mbari.util.IObserver;
+import mbarix4j.awt.event.ActionAdapter;
+import mbarix4j.swing.PropertyPanel;
+import mbarix4j.util.IObserver;
 import vars.CacheClearedEvent;
 import vars.CacheClearedListener;
 import vars.annotation.ImmutablePhysicalData;
@@ -111,7 +111,7 @@ public class PPhysicalDataPanel extends PropertiesPanel implements IObserver {
     /**
      * @param  obj Description of the Parameter
      * @param  changeCode Description of the Parameter
-     * @see  org.mbari.util.IObserver#update(java.lang.Object, java.lang.Object)
+     * @see  mbarix4j.util.IObserver#update(java.lang.Object, java.lang.Object)
      */
     public void update(final Object obj, final Object changeCode) {
         final Observation obs = (Observation) obj;
