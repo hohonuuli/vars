@@ -90,7 +90,7 @@ public class VideoArchivePanelController {
         this.panel = panel;
         this.toolBelt = toolBelt;
         // HACK - calling get on optional
-        this.moveAction = new MoveVideoFrameWithDialogAction(AwtUtilities.getFrame(panel).get(), toolBelt, true);
+        this.moveAction = new MoveVideoFrameWithDialogAction(AwtUtilities.getFrame(panel).orElse(null), toolBelt, true);
     }
 
     protected void addAssociation() {

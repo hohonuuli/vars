@@ -22,8 +22,6 @@ Created on October 31, 2003, 9:16 AM
  */
 package vars.annotation.ui.ppanel;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;

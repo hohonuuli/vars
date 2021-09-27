@@ -83,11 +83,17 @@ public class QueryResults {
     public String[][] toRowOrientedArray() {
         Tuple2<List<String>, List<String[]>> t = toRowOrientedData();
         List<String[]> array = t.getB();
-        int r = array.size();
-        int c = array.get(0).length;
-        String[][] data = new String[r][c];
-        for (int i = 0; i < r; i++) {
-            data[i] = array.get(i);
+        String[][] data = new String[0][0];
+        try {
+            int r = array.size();
+            int c = array.get(0).length;
+            data = new String[r][c];
+            for (int i = 0; i < r; i++) {
+                data[i] = array.get(i);
+            }
+        }
+        catch (Exception e) {
+            log.info("Failed to parse query results array", e);
         }
         return data;
     }
