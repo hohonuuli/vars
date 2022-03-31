@@ -1,5 +1,11 @@
 # [MBARI's](http://www.mbari.org/) Video Annotation and Reference System (VARS)
 
+## Important
+
+This project is deprecated in favor of [MBARI's latest M3/VARS system](https://github.com/mbari-media-management). We are working on a project to allow researchers or organizations to use the current generation VARS system at <https://github.com/mbari-media-management/m3-quickstart>. The legacy version in this repository is being maintained for organizations who are still using it.
+
+## About
+
 The Video Annotation and Reference System (VARS) is a suite of tools developed by the [Monterey Bay Aquarium Research Institute](http://www.mbari.org/) for describing, cataloging, retrieving, and viewing the visual, descriptive, and quantitative data associated with video.
 
 Originally designed for annotating underwater video, VARS can be applied to any video dataset that requires constrained, searchable annotations.
