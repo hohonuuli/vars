@@ -20,7 +20,7 @@
         <commons.email.version>1.5</commons.email.version>
         <commons.imaging.version>1.0-SNAPSHOT</commons.imaging.version>
         <config.version>1.4.1</config.version>
-        <derby.version>10.15.2.0</derby.version>
+        <derby.version>10.17.1.0</derby.version>
         <eclipselink.version>2.7.9</eclipselink.version>
         <eventbus.version>1.4</eventbus.version>
         <expd.version>1.6.0.jre11</expd.version>
